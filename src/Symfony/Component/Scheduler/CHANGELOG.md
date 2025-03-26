@@ -1,10 +1,16 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `TriggerNormalizer`
+
 7.2
 ---
 
  * Add capability to skip missed periodic tasks, only the last schedule will be called
+ * Add MessageHandler returned result to `PostRunEvent`
 
 6.4
 ---

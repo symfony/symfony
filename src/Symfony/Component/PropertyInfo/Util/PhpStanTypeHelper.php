@@ -26,8 +26,8 @@ use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
-use Symfony\Component\PropertyInfo\PhpStan\NameScope;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 
 /**
  * Transforms a php doc tag value to a {@link Type} instance.
@@ -43,10 +43,10 @@ final class PhpStanTypeHelper
      *
      * @return Type[]
      */
-    public function getTypes(PhpDocTagValueNode $node, NameScope $nameScope): array
+    public function getTypes(PhpDocTagValueNode $node, TypeContext $typeContext): array
     {
         if ($node instanceof ParamTagValueNode || $node instanceof ReturnTagValueNode || $node instanceof VarTagValueNode) {
-            return $this->compressNullableType($this->extractTypes($node->type, $nameScope));
+            return $this->compressNullableType($this->extractTypes($node->type, $typeContext));
         }
 
         return [];
@@ -98,7 +98,7 @@ final class PhpStanTypeHelper
     /**
      * @return Type[]
      */
-    private function extractTypes(TypeNode $node, NameScope $nameScope): array
+    private function extractTypes(TypeNode $node, TypeContext $typeContext): array
     {
         if ($node instanceof UnionTypeNode) {
             $types = [];
@@ -107,7 +107,7 @@ final class PhpStanTypeHelper
                     // It's safer to fall back to other extractors here, as resolving const types correctly is not easy at the moment
                     return [];
                 }
-                foreach ($this->extractTypes($type, $nameScope) as $subType) {
+                foreach ($this->extractTypes($type, $typeContext) as $subType) {
                     $types[] = $subType;
                 }
             }
@@ -119,7 +119,7 @@ final class PhpStanTypeHelper
                 return [new Type(Type::BUILTIN_TYPE_STRING)];
             }
 
-            [$mainType] = $this->extractTypes($node->type, $nameScope);
+            [$mainType] = $this->extractTypes($node->type, $typeContext);
 
             if (Type::BUILTIN_TYPE_INT === $mainType->getBuiltinType()) {
                 return [$mainType];
@@ -135,14 +135,14 @@ final class PhpStanTypeHelper
             $collectionKeyTypes = $mainType->getCollectionKeyTypes();
             $collectionKeyValues = [];
             if (1 === \count($node->genericTypes)) {
-                foreach ($this->extractTypes($node->genericTypes[0], $nameScope) as $subType) {
+                foreach ($this->extractTypes($node->genericTypes[0], $typeContext) as $subType) {
                     $collectionKeyValues[] = $subType;
                 }
             } elseif (2 === \count($node->genericTypes)) {
-                foreach ($this->extractTypes($node->genericTypes[0], $nameScope) as $keySubType) {
+                foreach ($this->extractTypes($node->genericTypes[0], $typeContext) as $keySubType) {
                     $collectionKeyTypes[] = $keySubType;
                 }
-                foreach ($this->extractTypes($node->genericTypes[1], $nameScope) as $valueSubType) {
+                foreach ($this->extractTypes($node->genericTypes[1], $typeContext) as $valueSubType) {
                     $collectionKeyValues[] = $valueSubType;
                 }
             }
@@ -153,13 +153,13 @@ final class PhpStanTypeHelper
             return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)];
         }
         if ($node instanceof ArrayTypeNode) {
-            return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [new Type(Type::BUILTIN_TYPE_INT)], $this->extractTypes($node->type, $nameScope))];
+            return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [new Type(Type::BUILTIN_TYPE_INT)], $this->extractTypes($node->type, $typeContext))];
         }
         if ($node instanceof CallableTypeNode || $node instanceof CallableTypeParameterNode) {
             return [new Type(Type::BUILTIN_TYPE_CALLABLE)];
         }
         if ($node instanceof NullableTypeNode) {
-            $subTypes = $this->extractTypes($node->type, $nameScope);
+            $subTypes = $this->extractTypes($node->type, $typeContext);
             if (\count($subTypes) > 1) {
                 $subTypes[] = new Type(Type::BUILTIN_TYPE_NULL);
 
@@ -169,7 +169,7 @@ final class PhpStanTypeHelper
             return [new Type($subTypes[0]->getBuiltinType(), true, $subTypes[0]->getClassName(), $subTypes[0]->isCollection(), $subTypes[0]->getCollectionKeyTypes(), $subTypes[0]->getCollectionValueTypes())];
         }
         if ($node instanceof ThisTypeNode) {
-            return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveRootClass())];
+            return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $typeContext->getCalledClass())];
         }
         if ($node instanceof IdentifierTypeNode) {
             if (\in_array($node->name, Type::$builtinTypes, true)) {
@@ -190,7 +190,7 @@ final class PhpStanTypeHelper
                 'mixed' => [], // mixed seems to be ignored in all other extractors
                 'parent' => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $node->name)],
                 'static',
-                'self' => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveRootClass())],
+                'self' => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $typeContext->getCalledClass())],
                 'class-string',
                 'html-escaped-string',
                 'lowercase-string',
@@ -205,7 +205,7 @@ final class PhpStanTypeHelper
                 'number' => [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT)],
                 'numeric' => [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT), new Type(Type::BUILTIN_TYPE_STRING)],
                 'array-key' => [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)],
-                default => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveStringName($node->name))],
+                default => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $typeContext->normalize($node->name))],
             };
         }
 

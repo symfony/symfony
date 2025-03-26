@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
@@ -24,7 +25,7 @@ class FileTest extends TestCase
      */
     public function testMaxSize($maxSize, $bytes, $binaryFormat)
     {
-        $file = new File(['maxSize' => $maxSize]);
+        $file = new File(maxSize: $maxSize);
 
         $this->assertSame($bytes, $file->maxSize);
         $this->assertSame($binaryFormat, $file->binaryFormat);
@@ -33,7 +34,7 @@ class FileTest extends TestCase
 
     public function testMagicIsset()
     {
-        $file = new File(['maxSize' => 1]);
+        $file = new File(maxSize: 1);
 
         $this->assertTrue($file->__isset('maxSize'));
         $this->assertTrue($file->__isset('groups'));
@@ -57,7 +58,7 @@ class FileTest extends TestCase
      */
     public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
     {
-        $file = new File(['maxSize' => 1000]);
+        $file = new File(maxSize: 1000);
 
         $this->expectException(ConstraintDefinitionException::class);
 
@@ -69,7 +70,7 @@ class FileTest extends TestCase
      */
     public function testMaxSizeCannotBeSetToInvalidValueAfterInitialization($maxSize)
     {
-        $file = new File(['maxSize' => 1000]);
+        $file = new File(maxSize: 1000);
 
         try {
             $file->maxSize = $maxSize;
@@ -79,13 +80,38 @@ class FileTest extends TestCase
         $this->assertSame(1000, $file->maxSize);
     }
 
+    public function testFilenameMaxLength()
+    {
+        $file = new File(filenameMaxLength: 30);
+        $this->assertSame(30, $file->filenameMaxLength);
+    }
+
+    public function testDefaultFilenameCountUnitIsUsed()
+    {
+        $file = new File();
+        self::assertSame(File::FILENAME_COUNT_BYTES, $file->filenameCountUnit);
+    }
+
+    public function testFilenameCharsetDefaultsToNull()
+    {
+        $file = new File();
+        self::assertNull($file->filenameCharset);
+    }
+
+    public function testInvalidFilenameCountUnitThrowsException()
+    {
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage(\sprintf('The "filenameCountUnit" option must be one of the "%s::FILENAME_COUNT_*" constants ("%s" given).', File::class, 'nonExistentCountUnit'));
+        $file = new File(filenameCountUnit: 'nonExistentCountUnit');
+    }
+
     /**
      * @dataProvider provideInValidSizes
      */
     public function testInvalidMaxSize($maxSize)
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new File(['maxSize' => $maxSize]);
+        new File(maxSize: $maxSize);
     }
 
     public static function provideValidSizes()
@@ -125,7 +151,7 @@ class FileTest extends TestCase
      */
     public function testBinaryFormat($maxSize, $guessedFormat, $binaryFormat)
     {
-        $file = new File(['maxSize' => $maxSize, 'binaryFormat' => $guessedFormat]);
+        $file = new File(maxSize: $maxSize, binaryFormat: $guessedFormat);
 
         $this->assertSame($binaryFormat, $file->binaryFormat);
     }
@@ -162,6 +188,9 @@ class FileTest extends TestCase
         self::assertSame(100000, $cConstraint->maxSize);
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
+        self::assertSame(30, $cConstraint->filenameMaxLength);
+        self::assertSame('ISO-8859-15', $cConstraint->filenameCharset);
+        self::assertSame(File::FILENAME_COUNT_CODEPOINTS, $cConstraint->filenameCountUnit);
     }
 }
 
@@ -173,6 +202,6 @@ class FileDummy
     #[File(maxSize: 100, notFoundMessage: 'myMessage')]
     private $b;
 
-    #[File(maxSize: '100K', groups: ['my_group'], payload: 'some attached data')]
+    #[File(maxSize: '100K', filenameMaxLength: 30, filenameCharset: 'ISO-8859-15', filenameCountUnit: File::FILENAME_COUNT_CODEPOINTS, groups: ['my_group'], payload: 'some attached data')]
     private $c;
 }

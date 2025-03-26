@@ -22,7 +22,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\JsonEncoder\JsonEncoder;
+use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -706,6 +706,22 @@ class ConfigurationTest extends TestCase
         $this->assertSame([], $config['serializer']['default_context'] ?? []);
     }
 
+    public function testFormCsrfProtectionFieldAttrDoNotNormalizeKeys()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(false), [
+            [
+                'form' => [
+                    'csrf_protection' => [
+                        'field_attr' => ['data-example-attr' => 'value'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['data-example-attr' => 'value'], $config['form']['csrf_protection']['field_attr'] ?? []);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [
@@ -769,12 +785,14 @@ class ConfigurationTest extends TestCase
                     'localizable_html_attributes' => [],
                 ],
                 'providers' => [],
+                'globals' => [],
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),
                 'enable_attributes' => !class_exists(FullStack::class),
                 'static_method' => ['loadValidatorMetadata'],
                 'translation_domain' => 'validators',
+                'disable_translation' => false,
                 'mapping' => [
                     'paths' => [],
                 ],
@@ -808,7 +826,7 @@ class ConfigurationTest extends TestCase
             ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),
-            ],
+            ] + (!class_exists(FullStack::class) ? ['with_constructor_extractor' => false] : []),
             'router' => [
                 'enabled' => false,
                 'default_uri' => null,
@@ -866,6 +884,7 @@ class ConfigurationTest extends TestCase
                 'system' => 'cache.adapter.system',
                 'directory' => '%kernel.cache_dir%/pools/app',
                 'default_redis_provider' => 'redis://localhost',
+                'default_valkey_provider' => 'valkey://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
                 'default_doctrine_dbal_provider' => 'database_connection',
                 'default_pdo_provider' => ContainerBuilder::willBeAvailable('doctrine/dbal', Connection::class, ['symfony/framework-bundle']) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null,
@@ -922,6 +941,27 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
                 'message_bus' => null,
                 'headers' => [],
+                'dkim_signer' => [
+                    'enabled' => false,
+                    'options' => [],
+                    'key' => '',
+                    'domain' => '',
+                    'select' => '',
+                    'passphrase' => '',
+                ],
+                'smime_signer' => [
+                    'enabled' => false,
+                    'key' => '',
+                    'certificate' => '',
+                    'passphrase' => null,
+                    'extra_certificates' => null,
+                    'sign_options' => null,
+                ],
+                'smime_encrypter' => [
+                    'enabled' => false,
+                    'repository' => '',
+                    'cipher' => null,
+                ],
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
@@ -971,9 +1011,8 @@ class ConfigurationTest extends TestCase
             'remote-event' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
             ],
-            'json_encoder' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(JsonEncoder::class),
-                'paths' => [],
+            'json_streamer' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(JsonStreamWriter::class),
             ],
         ];
     }

@@ -129,7 +129,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private array $autoconfiguredInstanceof = [];
 
     /**
-     * @var array<string, callable>
+     * @var array<string, callable[]>
      */
     private array $autoconfiguredAttributes = [];
 
@@ -717,12 +717,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->autoconfiguredInstanceof[$interface] = $childDefinition;
         }
 
-        foreach ($container->getAutoconfiguredAttributes() as $attribute => $configurator) {
-            if (isset($this->autoconfiguredAttributes[$attribute])) {
-                throw new InvalidArgumentException(\sprintf('"%s" has already been autoconfigured and merge() does not support merging autoconfiguration for the same attribute.', $attribute));
-            }
-
-            $this->autoconfiguredAttributes[$attribute] = $configurator;
+        foreach ($container->getAttributeAutoconfigurators() as $attribute => $configurators) {
+            $this->autoconfiguredAttributes[$attribute] = array_merge(
+                $this->autoconfiguredAttributes[$attribute] ?? [],
+                $configurators)
+            ;
         }
     }
 
@@ -1352,6 +1351,38 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Returns service ids for a given tag, asserting they have the "container.excluded" tag.
+     *
+     *  Example:
+     *
+     *      $container->register('foo')->addResourceTag('my.tag', ['hello' => 'world'])
+     *
+     *      $serviceIds = $container->findTaggedResourceIds('my.tag');
+     *      foreach ($serviceIds as $serviceId => $tags) {
+     *          foreach ($tags as $tag) {
+     *              echo $tag['hello'];
+     *          }
+     *      }
+     *
+     * @return array<string, array> An array of tags with the tagged service as key, holding a list of attribute arrays
+     */
+    public function findTaggedResourceIds(string $tagName): array
+    {
+        $this->usedTags[] = $tagName;
+        $tags = [];
+        foreach ($this->getDefinitions() as $id => $definition) {
+            if ($definition->hasTag($tagName)) {
+                if (!$definition->hasTag('container.excluded')) {
+                    throw new InvalidArgumentException(\sprintf('The resource "%s" tagged "%s" is missing the "container.excluded" tag.', $id, $tagName));
+                }
+                $tags[$id] = $definition->getTag($tagName);
+            }
+        }
+
+        return $tags;
+    }
+
+    /**
      * Returns all tags the defined services use.
      *
      * @return string[]
@@ -1416,7 +1447,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function registerAttributeForAutoconfiguration(string $attributeClass, callable $configurator): void
     {
-        $this->autoconfiguredAttributes[$attributeClass] = $configurator;
+        $this->autoconfiguredAttributes[$attributeClass][] = $configurator;
     }
 
     /**
@@ -1457,9 +1488,30 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return array<string, callable>
+     * @return array<class-string, callable>
+     *
+     * @deprecated Use {@see getAttributeAutoconfigurators()} instead
      */
     public function getAutoconfiguredAttributes(): array
+    {
+        trigger_deprecation('symfony/dependency-injection', '7.3', 'The "%s()" method is deprecated, use "getAttributeAutoconfigurators()" instead.', __METHOD__);
+
+        $autoconfiguredAttributes = [];
+        foreach ($this->autoconfiguredAttributes as $attribute => $configurators) {
+            if (count($configurators) > 1) {
+                throw new LogicException(\sprintf('The "%s" attribute has %d configurators. Use "getAttributeAutoconfigurators()" to get all of them.', $attribute, count($configurators)));
+            }
+
+            $autoconfiguredAttributes[$attribute] = $configurators[0];
+        }
+
+        return $autoconfiguredAttributes;
+    }
+
+    /**
+     * @return array<class-string, callable[]>
+     */
+    public function getAttributeAutoconfigurators(): array
     {
         return $this->autoconfiguredAttributes;
     }

@@ -22,7 +22,7 @@ class DummyCompoundConstraint extends Compound
     {
         return [
             new NotBlank(),
-            new Length(['max' => 3]),
+            new Length(max: 3),
             new Regex('/[a-z]+/'),
             new Regex('/[0-9]+/'),
         ];

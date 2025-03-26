@@ -292,7 +292,7 @@ class FileProfilerStorageTest extends TestCase
 
         $this->storage->purge();
 
-        $this->assertEmpty($this->storage->read('token'), '->purge() removes all data stored by profiler');
+        $this->assertNull($this->storage->read('token'), '->purge() removes all data stored by profiler');
         $this->assertCount(0, $this->storage->find('127.0.0.1', '', 10, 'GET'), '->purge() removes all items from index');
     }
 

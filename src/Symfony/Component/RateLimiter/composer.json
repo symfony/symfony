@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "symfony/options-resolver": "^6.4|^7.0"
+        "symfony/options-resolver": "^7.3"
     },
     "require-dev": {
         "psr/cache": "^1.0|^2.0|^3.0",

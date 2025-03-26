@@ -408,7 +408,7 @@
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target>A jelszó túl egyszerű. Kérjük, használjon egy bonyolultabb jelszót.</target>
+                <target>A jelszó túl egyszerű. Kérjük, használjon egy erősebb jelszót.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
@@ -416,7 +416,7 @@
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
-                <target>Láthatatlan karaktert használata nem megengedett.</target>
+                <target>Láthatatlan karakterek használata nem megengedett.</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
@@ -444,27 +444,31 @@
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target state="needs-translation">This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</target>
+                <target>Ez az érték túl rövid. Tartalmaznia kell legalább egy szót.|Ez az érték túl rövid. Tartalmaznia kell legalább {{ min }} szót.</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target state="needs-translation">This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</target>
+                <target>Ez az érték túl hosszú. Csak egy szót tartalmazhat.|Ez az érték túl hosszú. Legfeljebb {{ max }} szót vagy kevesebbet tartalmazhat.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target state="needs-translation">This value does not represent a valid week in the ISO 8601 format.</target>
+                <target>Ez a érték érvénytelen hetet jelent az ISO 8601 formátumban.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target state="needs-translation">This value is not a valid week.</target>
+                <target>Ez az érték érvénytelen hét.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target state="needs-translation">This value should not be before week "{{ min }}".</target>
+                <target>Ez az érték nem lehet a "{{ min }}". hétnél korábbi.</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target state="needs-translation">This value should not be after week "{{ max }}".</target>
+                <target>Ez az érték nem lehet a "{{ max }}". hétnél későbbi.</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>This value is not a valid slug.</source>
+                <target>Ez az érték nem érvényes slug.</target>
             </trans-unit>
         </body>
     </file>

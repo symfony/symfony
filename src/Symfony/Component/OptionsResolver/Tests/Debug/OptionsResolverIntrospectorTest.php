@@ -263,4 +263,13 @@ class OptionsResolverIntrospectorTest extends TestCase
         $debug = new OptionsResolverIntrospector($resolver);
         $debug->getDeprecation('foo');
     }
+
+    public function testGetClosureNested()
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setOptions('foo', $closure = function (OptionsResolver $resolver) {});
+
+        $debug = new OptionsResolverIntrospector($resolver);
+        $this->assertSame([$closure], $debug->getNestedOptions('foo'));
+    }
 }

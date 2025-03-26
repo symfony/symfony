@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
@@ -145,5 +146,55 @@ class MoneyTypeTest extends BaseTypeTestCase
         $form->submit('1234567');
 
         $this->assertSame(1234567, $form->getData());
+    }
+
+    public function testDefaultFormattingWithScaleAndStringInput()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2, 'input' => 'string']);
+        $form->setData('12345.67890');
+
+        $this->assertSame('12345.68', $form->createView()->vars['value']);
+    }
+
+    public function testStringInputWithFloatData()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a numeric string.');
+
+        $this->factory->create(static::TESTED_TYPE, 12345.6789, [
+            'input' => 'string',
+            'scale' => 2,
+        ]);
+    }
+
+    public function testStringInputWithIntData()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a numeric string.');
+
+        $this->factory->create(static::TESTED_TYPE, 12345, [
+            'input' => 'string',
+            'scale' => 2,
+        ]);
+    }
+
+    public function testSubmitStringInputWithDefaultScale()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string']);
+        $form->submit('1.234');
+
+        $this->assertSame('1.23', $form->getData());
+        $this->assertSame(1.23, $form->getNormData());
+        $this->assertSame('1.23', $form->getViewData());
+    }
+
+    public function testSubmitStringInputWithScale()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string', 'scale' => 3]);
+        $form->submit('1.234');
+
+        $this->assertSame('1.234', $form->getData());
+        $this->assertSame(1.234, $form->getNormData());
+        $this->assertSame('1.234', $form->getViewData());
     }
 }

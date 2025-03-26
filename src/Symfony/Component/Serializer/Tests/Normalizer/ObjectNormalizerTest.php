@@ -199,8 +199,7 @@ class ObjectNormalizerTest extends TestCase
             'xml'
         );
 
-        $this->assertIsArray($obj->bar);
-        $this->assertEmpty($obj->bar);
+        $this->assertSame([], $obj->bar);
     }
 
     public function testDenormalizeWithObject()

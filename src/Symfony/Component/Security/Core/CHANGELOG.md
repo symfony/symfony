@@ -4,9 +4,13 @@ CHANGELOG
 7.3
 ---
 
- * Add `UserAuthorizationChecker::isGrantedForUser()` to test user authorization without relying on the session.
-   For example, users not currently logged in, or while processing a message from a message queue.
+ * Add `UserAuthorizationCheckerInterface` to test user authorization without relying on the session
  * Add `OfflineTokenInterface` to mark tokens that do not represent the currently logged-in user
+ * Deprecate `UserInterface::eraseCredentials()` and `TokenInterface::eraseCredentials()`,
+   erase credentials e.g. using `__serialize()` instead
+ * Add ability for voters to explain their vote
+ * Add support for voting on closures
+ * Add `OAuth2User` with OAuth2 Access Token Introspection support for `OAuth2TokenHandler`
 
 7.2
 ---

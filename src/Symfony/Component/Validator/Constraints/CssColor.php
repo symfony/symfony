@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
@@ -66,6 +67,7 @@ class CssColor extends Constraint
      * @param string[]|null                                           $groups
      * @param array<string,mixed>|null                                $options
      */
+    #[HasNamedArguments]
     public function __construct(array|string $formats = [], ?string $message = null, ?array $groups = null, $payload = null, ?array $options = null)
     {
         $validationModesAsString = implode(', ', self::$validationModes);
@@ -73,6 +75,8 @@ class CssColor extends Constraint
         if (!$formats) {
             $options['value'] = self::$validationModes;
         } elseif (\is_array($formats) && \is_string(key($formats))) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
             $options = array_merge($formats, $options ?? []);
         } elseif (\is_array($formats)) {
             if ([] === array_intersect(self::$validationModes, $formats)) {

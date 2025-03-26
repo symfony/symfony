@@ -1592,7 +1592,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $form->get('date')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
-        $this->assertEmpty($this->renderErrors($view));
+        $this->assertSame('', $this->renderErrors($view));
         $this->assertNotEmpty($this->renderErrors($view['date']));
     }
 
@@ -2213,7 +2213,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $form->get('time')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
-        $this->assertEmpty($this->renderErrors($view));
+        $this->assertSame('', $this->renderErrors($view));
         $this->assertNotEmpty($this->renderErrors($view['time']));
     }
 

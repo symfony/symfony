@@ -126,7 +126,7 @@ abstract class FileLoader extends BaseFileLoader
 
         $autoconfigureAttributes = new RegisterAutoconfigureAttributesPass();
         $autoconfigureAttributes = $autoconfigureAttributes->accept($prototype) ? $autoconfigureAttributes : null;
-        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $autoconfigureAttributes, $source);
+        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $source);
 
         $getPrototype = static fn () => clone $prototype;
         $serialized = serialize($prototype);
@@ -188,41 +188,46 @@ abstract class FileLoader extends BaseFileLoader
                 }
             }
 
-            if (interface_exists($class, false)) {
-                $this->interfaces[] = $class;
-            } else {
-                $this->setDefinition($class, $definition = $getPrototype());
-                if (null !== $errorMessage) {
-                    $definition->addError($errorMessage);
+            $r = null === $errorMessage ? $this->container->getReflectionClass($class) : null;
+            if ($r?->isAbstract() || $r?->isInterface()) {
+                if ($r->isInterface()) {
+                    $this->interfaces[] = $class;
+                }
+                $autoconfigureAttributes?->processClass($this->container, $r);
+                continue;
+            }
 
-                    continue;
-                }
-                $definition->setClass($class);
+            $this->setDefinition($class, $definition = $getPrototype());
+            if (null !== $errorMessage) {
+                $definition->addError($errorMessage);
 
-                $interfaces = [];
-                foreach (class_implements($class, false) as $interface) {
-                    $this->singlyImplemented[$interface] = ($this->singlyImplemented[$interface] ?? $class) !== $class ? false : $class;
-                    $interfaces[] = $interface;
-                }
+                continue;
+            }
+            $definition->setClass($class);
 
-                if (!$autoconfigureAttributes) {
-                    continue;
+            $interfaces = [];
+            foreach (class_implements($class, false) as $interface) {
+                $this->singlyImplemented[$interface] = ($this->singlyImplemented[$interface] ?? $class) !== $class ? false : $class;
+                $interfaces[] = $interface;
+            }
+
+            if (!$autoconfigureAttributes) {
+                continue;
+            }
+            $r = $this->container->getReflectionClass($class);
+            $defaultAlias = 1 === \count($interfaces) ? $interfaces[0] : null;
+            foreach ($r->getAttributes(AsAlias::class) as $attr) {
+                /** @var AsAlias $attribute */
+                $attribute = $attr->newInstance();
+                $alias = $attribute->id ?? $defaultAlias;
+                $public = $attribute->public;
+                if (null === $alias) {
+                    throw new LogicException(\sprintf('Alias cannot be automatically determined for class "%s". If you have used the #[AsAlias] attribute with a class implementing multiple interfaces, add the interface you want to alias to the first parameter of #[AsAlias].', $class));
                 }
-                $r = $this->container->getReflectionClass($class);
-                $defaultAlias = 1 === \count($interfaces) ? $interfaces[0] : null;
-                foreach ($r->getAttributes(AsAlias::class) as $attr) {
-                    /** @var AsAlias $attribute */
-                    $attribute = $attr->newInstance();
-                    $alias = $attribute->id ?? $defaultAlias;
-                    $public = $attribute->public;
-                    if (null === $alias) {
-                        throw new LogicException(\sprintf('Alias cannot be automatically determined for class "%s". If you have used the #[AsAlias] attribute with a class implementing multiple interfaces, add the interface you want to alias to the first parameter of #[AsAlias].', $class));
-                    }
-                    if (isset($this->aliases[$alias])) {
-                        throw new LogicException(\sprintf('The "%s" alias has already been defined with the #[AsAlias] attribute in "%s".', $alias, $this->aliases[$alias]));
-                    }
-                    $this->aliases[$alias] = new Alias($class, $public);
+                if (isset($this->aliases[$alias])) {
+                    throw new LogicException(\sprintf('The "%s" alias has already been defined with the #[AsAlias] attribute in "%s".', $alias, $this->aliases[$alias]));
                 }
+                $this->aliases[$alias] = new Alias($class, $public);
             }
         }
 
@@ -304,7 +309,7 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    private function findClasses(string $namespace, string $pattern, array $excludePatterns, ?RegisterAutoconfigureAttributesPass $autoconfigureAttributes, ?string $source): array
+    private function findClasses(string $namespace, string $pattern, array $excludePatterns, ?string $source): array
     {
         $parameterBag = $this->container->getParameterBag();
 
@@ -356,12 +361,8 @@ abstract class FileLoader extends BaseFileLoader
                 throw new InvalidArgumentException(\sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $pattern));
             }
 
-            if ($r->isInstantiable() || $r->isInterface()) {
+            if (!$r->isTrait()) {
                 $classes[$class] = null;
-            }
-
-            if ($autoconfigureAttributes && !$r->isInstantiable()) {
-                $autoconfigureAttributes->processClass($this->container, $r);
             }
         }
 

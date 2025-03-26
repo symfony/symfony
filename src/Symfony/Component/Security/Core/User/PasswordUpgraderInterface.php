@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\User;
 
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -22,6 +24,8 @@ interface PasswordUpgraderInterface
      * This method should persist the new password in the user storage and update the $user object accordingly.
      * Because you don't want your users not being able to log in, this method should be opportunistic:
      * it's fine if it does nothing or if it fails without throwing any exception.
+     *
+     * @throws UnsupportedUserException if the implementation does not support that user
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void;
 }

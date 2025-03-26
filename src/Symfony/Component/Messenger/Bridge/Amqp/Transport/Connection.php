@@ -551,7 +551,7 @@ class Connection
         }
     }
 
-    private function clear(): void
+    public function clear(): void
     {
         unset($this->amqpChannel, $this->amqpExchange, $this->amqpDelayExchange);
         $this->amqpQueues = [];

@@ -24,7 +24,7 @@ class PrototypedArrayNodeTest extends TestCase
         $node = new PrototypedArrayNode('root');
         $prototype = new ArrayNode(null, $node);
         $node->setPrototype($prototype);
-        $this->assertEmpty($node->getDefaultValue());
+        $this->assertSame([], $node->getDefaultValue());
     }
 
     public function testGetDefaultValueReturnsDefaultValueForPrototypes()

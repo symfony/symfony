@@ -86,7 +86,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidCidr(string|\Stringable $cidr, string $version)
     {
-        $this->validator->validate($cidr, new Cidr(['version' => $version]));
+        $this->validator->validate($cidr, new Cidr(version: $version));
 
         $this->assertNoViolation();
     }
@@ -108,11 +108,11 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
      */
     public function testOutOfRangeNetmask(string $cidr, int $maxExpected, ?string $version = null, ?int $min = null, ?int $max = null)
     {
-        $cidrConstraint = new Cidr([
-            'version' => $version,
-            'netmaskMin' => $min,
-            'netmaskMax' => $max,
-        ]);
+        $cidrConstraint = new Cidr(
+            version: $version,
+            netmaskMin: $min,
+            netmaskMax: $max,
+        );
         $this->validator->validate($cidr, $cidrConstraint);
 
         $this
@@ -128,7 +128,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
      */
     public function testWrongVersion(string $cidr, string $version)
     {
-        $this->validator->validate($cidr, new Cidr(['version' => $version]));
+        $this->validator->validate($cidr, new Cidr(version: $version));
 
         $this
             ->buildViolation('This value is not a valid CIDR notation.')

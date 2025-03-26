@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Mailer\Bridge\AhaSend\RemoteEvent\AhaSendPayloadConverter;
+use Symfony\Component\Mailer\Bridge\AhaSend\Webhook\AhaSendRequestParser;
 use Symfony\Component\Mailer\Bridge\Brevo\RemoteEvent\BrevoPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailchimp\RemoteEvent\MailchimpPayloadConverter;
@@ -85,6 +87,11 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.sweego', SweegoRequestParser::class)
             ->args([service('mailer.payload_converter.sweego')])
         ->alias(SweegoRequestParser::class, 'mailer.webhook.request_parser.sweego')
+
+        ->set('mailer.payload_converter.ahasend', AhaSendPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.ahasend', AhaSendRequestParser::class)
+            ->args([service('mailer.payload_converter.ahasend')])
+        ->alias(AhaSendRequestParser::class, 'mailer.webhook.request_parser.ahasend')
 
         ->set('mailer.payload_converter.mailchimp', MailchimpPayloadConverter::class)
         ->set('mailer.webhook.request_parser.mailchimp', MailchimpRequestParser::class)

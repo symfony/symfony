@@ -476,18 +476,18 @@ class LockTest extends TestCase
             public function save(Key $key): void
             {
                 $key->reduceLifetime($this->initialTtl);
-                $this->keys[spl_object_hash($key)] = $key;
+                $this->keys[spl_object_id($key)] = $key;
                 $this->checkNotExpired($key);
             }
 
             public function delete(Key $key): void
             {
-                unset($this->keys[spl_object_hash($key)]);
+                unset($this->keys[spl_object_id($key)]);
             }
 
             public function exists(Key $key): bool
             {
-                return isset($this->keys[spl_object_hash($key)]);
+                return isset($this->keys[spl_object_id($key)]);
             }
 
             public function putOffExpiration(Key $key, $ttl): void
@@ -520,18 +520,18 @@ class LockTest extends TestCase
             public function save(Key $key): void
             {
                 $key->reduceLifetime($this->initialTtl);
-                $this->keys[spl_object_hash($key)] = $key;
+                $this->keys[spl_object_id($key)] = $key;
                 $this->checkNotExpired($key);
             }
 
             public function delete(Key $key): void
             {
-                unset($this->keys[spl_object_hash($key)]);
+                unset($this->keys[spl_object_id($key)]);
             }
 
             public function exists(Key $key): bool
             {
-                return isset($this->keys[spl_object_hash($key)]);
+                return isset($this->keys[spl_object_id($key)]);
             }
 
             public function putOffExpiration(Key $key, $ttl): void

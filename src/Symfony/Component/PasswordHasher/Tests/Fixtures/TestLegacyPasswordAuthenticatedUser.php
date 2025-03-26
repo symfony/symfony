@@ -35,10 +35,9 @@ final class TestLegacyPasswordAuthenticatedUser implements LegacyPasswordAuthent
         return $this->roles;
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
-        // Do nothing
-        return;
     }
 
     public function getUserIdentifier(): string

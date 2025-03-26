@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Authentication;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
@@ -46,6 +47,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {
+    private ExposeSecurityLevel $exposeSecurityErrors;
+
     /**
      * @param iterable<mixed, AuthenticatorInterface> $authenticators
      */
@@ -56,9 +59,17 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         private string $firewallName,
         private ?LoggerInterface $logger = null,
         private bool $eraseCredentials = true,
-        private bool $hideUserNotFoundExceptions = true,
+        ExposeSecurityLevel|bool $exposeSecurityErrors = ExposeSecurityLevel::None,
         private array $requiredBadges = [],
     ) {
+        if (\is_bool($exposeSecurityErrors)) {
+            trigger_deprecation('symfony/security-http', '7.3', 'Passing a boolean as "exposeSecurityErrors" parameter is deprecated, use %s value instead.', ExposeSecurityLevel::class);
+
+            // The old parameter had an inverted meaning ($hideUserNotFoundExceptions), for that reason the current name does not reflect the behavior
+            $exposeSecurityErrors = $exposeSecurityErrors ? ExposeSecurityLevel::None : ExposeSecurityLevel::All;
+        }
+
+        $this->exposeSecurityErrors = $exposeSecurityErrors;
     }
 
     /**
@@ -198,8 +209,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             // announce the authentication token
             $authenticatedToken = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($authenticatedToken, $passport))->getAuthenticatedToken();
 
-            if (true === $this->eraseCredentials) {
-                $authenticatedToken->eraseCredentials();
+            if ($this->eraseCredentials) {
+                self::checkEraseCredentials($authenticatedToken)?->eraseCredentials();
             }
 
             $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);
@@ -250,7 +261,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
         // Avoid leaking error details in case of invalid user (e.g. user not found or invalid account status)
         // to prevent user enumeration via response content comparison
-        if ($this->hideUserNotFoundExceptions && ($authenticationException instanceof UserNotFoundException || ($authenticationException instanceof AccountStatusException && !$authenticationException instanceof CustomUserMessageAccountStatusException))) {
+        if ($this->isSensitiveException($authenticationException)) {
             $authenticationException = new BadCredentialsException('Bad credentials.', 0, $authenticationException);
         }
 
@@ -263,5 +274,55 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
         // returning null is ok, it means they want the request to continue
         return $loginFailureEvent->getResponse();
+    }
+
+    private function isSensitiveException(AuthenticationException $exception): bool
+    {
+        if (ExposeSecurityLevel::All !== $this->exposeSecurityErrors && $exception instanceof UserNotFoundException) {
+            return true;
+        }
+
+        if (ExposeSecurityLevel::None === $this->exposeSecurityErrors && $exception instanceof AccountStatusException && !$exception instanceof CustomUserMessageAccountStatusException) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @deprecated since Symfony 7.3
+     */
+    private static function checkEraseCredentials(TokenInterface|UserInterface|null $token): TokenInterface|UserInterface|null
+    {
+        if (!$token || !method_exists($token, 'eraseCredentials')) {
+            return null;
+        }
+
+        static $genericImplementations = [];
+        $m = null;
+
+        if (!isset($genericImplementations[$token::class])) {
+            $m = new \ReflectionMethod($token, 'eraseCredentials');
+            $genericImplementations[$token::class] = AbstractToken::class === $m->class;
+        }
+
+        if ($genericImplementations[$token::class]) {
+            return self::checkEraseCredentials($token->getUser());
+        }
+
+        static $deprecatedImplementations = [];
+
+        if (!isset($deprecatedImplementations[$token::class])) {
+            $m ??= new \ReflectionMethod($token, 'eraseCredentials');
+            $deprecatedImplementations[$token::class] = !$m->getAttributes(\Deprecated::class);
+        }
+
+        if ($deprecatedImplementations[$token::class]) {
+            trigger_deprecation('symfony/security-http', '7.3', 'Implementing "%s::eraseCredentials()" is deprecated since Symfony 7.3; add the #[\Deprecated] attribute on the method to signal its either empty or that you moved the logic elsewhere, typically to the "__serialize()" method.', get_debug_type($token));
+
+            return $token;
+        }
+
+        return null;
     }
 }

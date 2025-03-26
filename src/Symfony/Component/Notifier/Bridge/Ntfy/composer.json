@@ -1,7 +1,7 @@
 {
     "name": "symfony/ntfy-notifier",
     "type": "symfony-notifier-bridge",
-    "description": "Symfony Ntyf Notifier Bridge",
+    "description": "Symfony Ntfy Notifier Bridge",
     "keywords": ["ntfy", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",

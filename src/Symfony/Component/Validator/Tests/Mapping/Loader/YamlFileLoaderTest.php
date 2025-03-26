@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -26,6 +27,7 @@ use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
+use Symfony\Component\Validator\Tests\Fixtures\DummyEntityConstraintWithoutNamedArguments;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
@@ -34,6 +36,8 @@ use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutV
 
 class YamlFileLoaderTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public function testLoadClassMetadataReturnsFalseIfEmpty()
     {
         $loader = new YamlFileLoader(__DIR__.'/empty-mapping.yml');
@@ -116,18 +120,18 @@ class YamlFileLoaderTest extends TestCase
         $expected->addConstraint(new ConstraintWithNamedArguments('foo'));
         $expected->addConstraint(new ConstraintWithNamedArguments(['foo', 'bar']));
         $expected->addPropertyConstraint('firstName', new NotNull());
-        $expected->addPropertyConstraint('firstName', new Range(['min' => 3]));
+        $expected->addPropertyConstraint('firstName', new Range(min: 3));
         $expected->addPropertyConstraint('firstName', new Choice(['A', 'B']));
-        $expected->addPropertyConstraint('firstName', new All([new NotNull(), new Range(['min' => 3])]));
-        $expected->addPropertyConstraint('firstName', new All(['constraints' => [new NotNull(), new Range(['min' => 3])]]));
-        $expected->addPropertyConstraint('firstName', new Collection(['fields' => [
-            'foo' => [new NotNull(), new Range(['min' => 3])],
-            'bar' => [new Range(['min' => 5])],
-        ]]));
-        $expected->addPropertyConstraint('firstName', new Choice([
-            'message' => 'Must be one of %choices%',
-            'choices' => ['A', 'B'],
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new Collection(fields: [
+            'foo' => [new NotNull(), new Range(min: 3)],
+            'bar' => [new Range(min: 5)],
         ]));
+        $expected->addPropertyConstraint('firstName', new Choice(
+            message: 'Must be one of %choices%',
+            choices: ['A', 'B'],
+        ));
         $expected->addGetterConstraint('lastName', new NotNull());
         $expected->addGetterConstraint('valid', new IsTrue());
         $expected->addGetterConstraint('permissions', new IsTrue());
@@ -143,7 +147,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->loadClassMetadata($metadata);
 
         $expected = new ClassMetadata(Entity::class);
-        $expected->addPropertyConstraint('firstName', new Range(['max' => \PHP_INT_MAX]));
+        $expected->addPropertyConstraint('firstName', new Range(max: \PHP_INT_MAX));
 
         $this->assertEquals($expected, $metadata);
     }
@@ -186,5 +190,18 @@ class YamlFileLoaderTest extends TestCase
         $expected->setGroupSequenceProvider(true);
 
         $this->assertEquals($expected, $metadata);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadConstraintWithoutNamedArgumentsSupport()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/constraint-without-named-arguments-support.yml');
+        $metadata = new ClassMetadata(DummyEntityConstraintWithoutNamedArguments::class);
+
+        $this->expectUserDeprecationMessage('Since symfony/validator 7.3: Using constraints not supporting named arguments is deprecated. Try adding the HasNamedArguments attribute to Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutNamedArguments.');
+
+        $loader->loadClassMetadata($metadata);
     }
 }

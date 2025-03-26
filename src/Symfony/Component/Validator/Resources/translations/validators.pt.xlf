@@ -444,27 +444,31 @@
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target state="needs-translation">This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</target>
+                <target>Este valor é muito curto. Deve conter pelo menos uma palavra.|Este valor é muito curto. Deve conter pelo menos {{ min }} palavras.</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target state="needs-translation">This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</target>
+                <target>Este valor é muito longo. Deve conter apenas uma palavra.|Este valor é muito longo. Deve conter {{ max }} palavras ou menos.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target state="needs-translation">This value does not represent a valid week in the ISO 8601 format.</target>
+                <target>Este valor não representa uma semana válida no formato ISO 8601.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target state="needs-translation">This value is not a valid week.</target>
+                <target>Este valor não é uma semana válida.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target state="needs-translation">This value should not be before week "{{ min }}".</target>
+                <target>Este valor não deve ser anterior à semana "{{ min }}".</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target state="needs-translation">This value should not be after week "{{ max }}".</target>
+                <target>Este valor não deve estar após a semana "{{ max }}".</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>This value is not a valid slug.</source>
+                <target>Este valor não é um slug válido.</target>
             </trans-unit>
         </body>
     </file>

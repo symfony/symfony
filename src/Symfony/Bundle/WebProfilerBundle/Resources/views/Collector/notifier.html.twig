@@ -151,7 +151,7 @@
                                                             {%- if message.getOptions() is null %}
                                                                 {{- '(empty)' }}
                                                             {%- else %}
-                                                                {{- message.getOptions()|json_encode(constant('JSON_PRETTY_PRINT')) }}
+                                                                {{- message.getOptions().toArray()|json_encode(constant('JSON_PRETTY_PRINT')) }}
                                                             {%- endif %}
                                                         </pre>
                                                     </div>

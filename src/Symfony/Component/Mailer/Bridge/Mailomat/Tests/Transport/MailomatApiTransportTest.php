@@ -27,7 +27,7 @@ class MailomatApiTransportTest extends TestCase
     /**
      * @dataProvider getTransportData
      */
-    public function testToString(MailomatApiTransport $transport, string $expected): void
+    public function testToString(MailomatApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
     }

@@ -137,17 +137,20 @@ class TranslationDataCollectorTest extends TestCase
         $translator = $this->getTranslator();
         $translator->method('getLocale')->willReturn('fr');
         $translator->method('getFallbackLocales')->willReturn(['en']);
+        $translator->method('getGlobalParameters')->willReturn(['welcome' => 'Welcome {name}!']);
 
         $dataCollector = new TranslationDataCollector($translator);
         $dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
 
         $this->assertSame('fr', $dataCollector->getLocale());
         $this->assertSame(['en'], $dataCollector->getFallbackLocales());
+        $this->assertSame(['welcome' => 'Welcome {name}!'], $dataCollector->getGlobalParameters());
 
         $dataCollector->reset();
 
         $this->assertNull($dataCollector->getLocale());
-        $this->assertEmpty($dataCollector->getFallbackLocales());
+        $this->assertSame([], $dataCollector->getFallbackLocales());
+        $this->assertSame([], $dataCollector->getGlobalParameters());
     }
 
     private function getTranslator()

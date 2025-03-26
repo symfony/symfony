@@ -19,6 +19,8 @@ use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Ldap\Security\LdapUser;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
+use Symfony\Component\Ldap\Security\MemberOfRoles;
+use Symfony\Component\Ldap\Security\RoleFetcherInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
@@ -387,5 +389,65 @@ class LdapUserProviderTest extends TestCase
         $user = new LdapUser(new Entry('foo'), 'foo', 'bar', ['ROLE_DUMMY'], ['email' => 'foo@symfony.com']);
 
         $this->assertEquals($user, $provider->refreshUser($user));
+    }
+
+    public function testLoadUserWithCorrectRoles()
+    {
+        // Given
+        $result = $this->createMock(CollectionInterface::class);
+        $query = $this->createMock(QueryInterface::class);
+        $query
+            ->method('execute')
+            ->willReturn($result)
+        ;
+        $ldap = $this->createMock(LdapInterface::class);
+        $result
+            ->method('offsetGet')
+            ->with(0)
+            ->willReturn(new Entry('foo', ['sAMAccountName' => ['foo']]))
+        ;
+        $result
+            ->method('count')
+            ->willReturn(1)
+        ;
+        $ldap
+            ->method('escape')
+            ->willReturn('foo')
+        ;
+        $ldap
+            ->method('query')
+            ->willReturn($query)
+        ;
+        $roleFetcher = $this->createMock(RoleFetcherInterface::class);
+        $roleFetcher
+            ->method('fetchRoles')
+            ->willReturn(['ROLE_FOO', 'ROLE_BAR'])
+        ;
+
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', defaultRoles: $roleFetcher);
+
+        // When
+        $user = $provider->loadUserByIdentifier('foo');
+
+        // Then
+        $this->assertInstanceOf(LdapUser::class, $user);
+        $this->assertSame(['ROLE_FOO', 'ROLE_BAR'], $user->getRoles());
+    }
+
+    public function testMemberOfRoleFetch()
+    {
+        // Given
+        $roleFetcher = new MemberOfRoles(
+            ['Staff' => 'ROLE_STAFF', 'Admin' => 'ROLE_ADMIN'],
+            'memberOf'
+        );
+
+        $entry = new Entry('uid=elliot.alderson,ou=staff,ou=people,dc=example,dc=com', ['memberOf' => ['cn=Staff,ou=Groups,dc=example,dc=com', 'cn=Admin,ou=Groups,dc=example,dc=com']]);
+
+        // When
+        $roles = $roleFetcher->fetchRoles($entry);
+
+        // Then
+        $this->assertSame(['ROLE_STAFF', 'ROLE_ADMIN'], $roles);
     }
 }

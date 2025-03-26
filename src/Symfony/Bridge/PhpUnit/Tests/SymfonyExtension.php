@@ -14,9 +14,13 @@ namespace Symfony\Bridge\PhpUnit\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\Attribute\DnsSensitive;
+use Symfony\Bridge\PhpUnit\Attribute\TimeSensitive;
 use Symfony\Bridge\PhpUnit\Tests\Fixtures\symfonyextension\src\ClassExtendingFinalClass;
 use Symfony\Bridge\PhpUnit\Tests\Fixtures\symfonyextension\src\FinalClass;
 
+#[DnsSensitive('App\Foo\A')]
+#[TimeSensitive('App\Foo\A')]
 class SymfonyExtension extends TestCase
 {
     public function testExtensionOfFinalClass()
@@ -28,6 +32,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('time-sensitive')]
+    #[TimeSensitive('App\Bar\B')]
     public function testTimeMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\time', $namespace)));
@@ -35,6 +40,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('time-sensitive')]
+    #[TimeSensitive('App\Bar\B')]
     public function testMicrotimeMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\microtime', $namespace)));
@@ -42,6 +48,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('time-sensitive')]
+    #[TimeSensitive('App\Bar\B')]
     public function testSleepMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\sleep', $namespace)));
@@ -49,6 +56,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('time-sensitive')]
+    #[TimeSensitive('App\Bar\B')]
     public function testUsleepMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\usleep', $namespace)));
@@ -56,6 +64,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('time-sensitive')]
+    #[TimeSensitive('App\Bar\B')]
     public function testDateMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\date', $namespace)));
@@ -63,6 +72,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('time-sensitive')]
+    #[TimeSensitive('App\Bar\B')]
     public function testGmdateMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\gmdate', $namespace)));
@@ -70,6 +80,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('time-sensitive')]
+    #[TimeSensitive('App\Bar\B')]
     public function testHrtimeMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\hrtime', $namespace)));
@@ -77,6 +88,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('dns-sensitive')]
+    #[DnsSensitive('App\Bar\B')]
     public function testCheckdnsrrMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\checkdnsrr', $namespace)));
@@ -84,6 +96,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('dns-sensitive')]
+    #[DnsSensitive('App\Bar\B')]
     public function testDnsCheckRecordMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\dns_check_record', $namespace)));
@@ -91,6 +104,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('dns-sensitive')]
+    #[DnsSensitive('App\Bar\B')]
     public function testGetmxrrMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\getmxrr', $namespace)));
@@ -98,6 +112,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('dns-sensitive')]
+    #[DnsSensitive('App\Bar\B')]
     public function testDnsGetMxMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\dns_get_mx', $namespace)));
@@ -105,6 +120,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('dns-sensitive')]
+    #[DnsSensitive('App\Bar\B')]
     public function testGethostbyaddrMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\gethostbyaddr', $namespace)));
@@ -112,6 +128,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('dns-sensitive')]
+    #[DnsSensitive('App\Bar\B')]
     public function testGethostbynameMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\gethostbyname', $namespace)));
@@ -119,6 +136,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('dns-sensitive')]
+    #[DnsSensitive('App\Bar\B')]
     public function testGethostbynamelMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\gethostbynamel', $namespace)));
@@ -126,6 +144,7 @@ class SymfonyExtension extends TestCase
 
     #[DataProvider('mockedNamespaces')]
     #[Group('dns-sensitive')]
+    #[DnsSensitive('App\Bar\B')]
     public function testDnsGetRecordMockIsRegistered(string $namespace)
     {
         $this->assertTrue(\function_exists(\sprintf('%s\dns_get_record', $namespace)));
@@ -136,5 +155,7 @@ class SymfonyExtension extends TestCase
         yield 'test class namespace' => [__NAMESPACE__];
         yield 'namespace derived from test namespace' => ['Symfony\Bridge\PhpUnit'];
         yield 'explicitly configured namespace' => ['App'];
+        yield 'explicitly configured namespace through attribute on class' => ['App\Foo'];
+        yield 'explicitly configured namespace through attribute on method' => ['App\Bar'];
     }
 }

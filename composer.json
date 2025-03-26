@@ -38,7 +38,7 @@
         "composer/semver": "^3.0",
         "ext-xml": "*",
         "doctrine/event-manager": "^2",
-        "doctrine/persistence": "^3.1",
+        "doctrine/persistence": "^3.1|^4",
         "twig/twig": "^3.12",
         "psr/cache": "^2.0|^3.0",
         "psr/clock": "^1.0",
@@ -47,7 +47,7 @@
         "psr/http-message": "^1.0|^2.0",
         "psr/link": "^1.1|^2.0",
         "psr/log": "^1|^2|^3",
-        "symfony/contracts": "^3.5",
+        "symfony/contracts": "^3.6",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-grapheme": "~1.0",
         "symfony/polyfill-intl-icu": "~1.0",
@@ -83,7 +83,7 @@
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/intl": "self.version",
-        "symfony/json-encoder": "self.version",
+        "symfony/json-streamer": "self.version",
         "symfony/ldap": "self.version",
         "symfony/lock": "self.version",
         "symfony/mailer": "self.version",
@@ -91,6 +91,7 @@
         "symfony/mime": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/notifier": "self.version",
+        "symfony/object-mapper": "self.version",
         "symfony/options-resolver": "self.version",
         "symfony/password-hasher": "self.version",
         "symfony/process": "self.version",
@@ -143,7 +144,7 @@
         "monolog/monolog": "^3.0",
         "nikic/php-parser": "^4.18|^5.0",
         "nyholm/psr7": "^1.0",
-        "pda/pheanstalk": "^4.0",
+        "pda/pheanstalk": "^5.1|^7.0",
         "php-http/discovery": "^1.15",
         "php-http/httplug": "^1.0|^2.0",
         "phpdocumentor/reflection-docblock": "^5.2",
@@ -157,9 +158,10 @@
         "symfony/phpunit-bridge": "^6.4|^7.0",
         "symfony/runtime": "self.version",
         "symfony/security-acl": "~2.8|~3.0",
-        "twig/cssinliner-extra": "^2.12|^3",
-        "twig/inky-extra": "^2.12|^3",
-        "twig/markdown-extra": "^2.12|^3",
+        "symfony/webpack-encore-bundle": "^1.0|^2.0",
+        "twig/cssinliner-extra": "^3",
+        "twig/inky-extra": "^3",
+        "twig/markdown-extra": "^3",
         "web-token/jwt-library": "^3.3.2|^4.0"
     },
     "conflict": {
@@ -203,6 +205,9 @@
         ]
     },
     "autoload-dev": {
+        "psr-4": {
+            "Symfony\\Bridge\\PhpUnit\\": "src/Symfony/Bridge/PhpUnit/"
+        },
         "files": [
             "src/Symfony/Component/Clock/Resources/now.php",
             "src/Symfony/Component/VarDumper/Resources/functions/dump.php"
@@ -214,7 +219,7 @@
             "url": "src/Symfony/Contracts",
             "options": {
                 "versions": {
-                    "symfony/contracts": "3.5.x-dev"
+                    "symfony/contracts": "3.6.x-dev"
                 }
             }
         },

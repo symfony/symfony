@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -111,6 +112,7 @@ class Ip extends Constraint
      * @param self::V4*|self::V6*|self::ALL*|null $version The IP version to validate (defaults to {@see self::V4})
      * @param string[]|null                       $groups
      */
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $version = null,
@@ -119,6 +121,10 @@ class Ip extends Constraint
         ?array $groups = null,
         mixed $payload = null,
     ) {
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->version = $version ?? $this->version;

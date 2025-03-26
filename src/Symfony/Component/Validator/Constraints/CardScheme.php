@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -49,13 +50,22 @@ class CardScheme extends Constraint
     /**
      * @param non-empty-string|non-empty-string[]|array<string,mixed>|null $schemes Name(s) of the number scheme(s) used to validate the credit card number
      * @param string[]|null                                                $groups
-     * @param array<string,mixed>                                          $options
+     * @param array<string,mixed>|null                                     $options
      */
-    public function __construct(array|string|null $schemes, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
+    #[HasNamedArguments]
+    public function __construct(array|string|null $schemes, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
     {
         if (\is_array($schemes) && \is_string(key($schemes))) {
-            $options = array_merge($schemes, $options);
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($schemes, $options ?? []);
         } else {
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            } else {
+                $options = [];
+            }
+
             $options['value'] = $schemes;
         }
 

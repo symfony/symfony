@@ -21,10 +21,10 @@ class FakeMetadataFactory implements MetadataFactoryInterface
 
     public function getMetadataFor($class): MetadataInterface
     {
-        $hash = null;
+        $objectId = null;
 
         if (\is_object($class)) {
-            $hash = spl_object_hash($class);
+            $objectId = spl_object_id($class);
             $class = $class::class;
         }
 
@@ -33,8 +33,8 @@ class FakeMetadataFactory implements MetadataFactoryInterface
         }
 
         if (!isset($this->metadatas[$class])) {
-            if (isset($this->metadatas[$hash])) {
-                return $this->metadatas[$hash];
+            if (isset($this->metadatas[$objectId])) {
+                return $this->metadatas[$objectId];
             }
 
             throw new NoSuchMetadataException(sprintf('No metadata for "%s"', $class));
@@ -45,10 +45,10 @@ class FakeMetadataFactory implements MetadataFactoryInterface
 
     public function hasMetadataFor($class): bool
     {
-        $hash = null;
+        $objectId = null;
 
         if (\is_object($class)) {
-            $hash = spl_object_hash($class);
+            $objectId = spl_object_id($class);
             $class = $class::class;
         }
 
@@ -56,7 +56,7 @@ class FakeMetadataFactory implements MetadataFactoryInterface
             return false;
         }
 
-        return isset($this->metadatas[$class]) || isset($this->metadatas[$hash]);
+        return isset($this->metadatas[$class]) || isset($this->metadatas[$objectId]);
     }
 
     public function addMetadata($metadata)
@@ -66,7 +66,7 @@ class FakeMetadataFactory implements MetadataFactoryInterface
 
     public function addMetadataForValue($value, MetadataInterface $metadata)
     {
-        $key = \is_object($value) ? spl_object_hash($value) : $value;
+        $key = \is_object($value) ? spl_object_id($value) : $value;
         $this->metadatas[$key] = $metadata;
     }
 }

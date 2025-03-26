@@ -420,7 +420,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
@@ -514,7 +514,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         try {
             $resolver->onKernelControllerArguments($event);
-            $this->fail(sprintf('Expected "%s" to be thrown.', HttpException::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
         } catch (HttpException $e) {
             $validationFailedException = $e->getPrevious();
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);

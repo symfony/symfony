@@ -74,21 +74,16 @@ class ProjectServiceContainer extends Container
 
 class objectProxy1fd6daa implements \Symfony\Component\DependencyInjection\Tests\Compiler\AInterface, \Symfony\Component\DependencyInjection\Tests\Compiler\IInterface, \Symfony\Component\VarExporter\LazyObjectInterface
 {
-    use \Symfony\Component\VarExporter\LazyProxyTrait;
+    use \Symfony\Component\VarExporter\Internal\LazyDecoratorTrait;
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 
     public function initializeLazyObject(): \Symfony\Component\DependencyInjection\Tests\Compiler\AInterface&\Symfony\Component\DependencyInjection\Tests\Compiler\IInterface
     {
-        if ($state = $this->lazyObjectState ?? null) {
-            return $state->realInstance ??= ($state->initializer)();
-        }
-
-        return $this;
+        return $this->lazyObjectState->realInstance;
     }
 }
 
 // Help opcache.preload discover always-needed symbols
 class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);

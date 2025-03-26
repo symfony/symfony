@@ -152,15 +152,15 @@ class ProfilerControllerTest extends WebTestCase
 
     public function testToolbarStylesheetAction()
     {
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $twig = $this->createMock(Environment::class);
-        $profiler = $this->createMock(Profiler::class);
+        $kernel = new WebProfilerBundleKernel();
+        $client = new KernelBrowser($kernel);
 
-        $controller = new ProfilerController($urlGenerator, $profiler, $twig, []);
+        $client->request('GET', '/_wdt/styles');
 
-        $response = $controller->toolbarStylesheetAction();
+        $response = $client->getResponse();
+
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('text/css', $response->headers->get('Content-Type'));
+        $this->assertSame('text/css; charset=UTF-8', $response->headers->get('Content-Type'));
         $this->assertSame('max-age=600, private', $response->headers->get('Cache-Control'));
     }
 

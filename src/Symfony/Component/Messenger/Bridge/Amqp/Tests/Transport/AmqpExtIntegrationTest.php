@@ -72,7 +72,7 @@ class AmqpExtIntegrationTest extends TestCase
         $envelope = $envelopes[0];
         $this->assertEquals($second->getMessage(), $envelope->getMessage());
 
-        $this->assertEmpty(iterator_to_array($receiver->get()));
+        $this->assertSame([], iterator_to_array($receiver->get()));
     }
 
     public function testRetryAndDelay()

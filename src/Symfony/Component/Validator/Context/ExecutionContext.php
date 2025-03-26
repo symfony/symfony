@@ -107,7 +107,7 @@ class ExecutionContext implements ExecutionContextInterface
         private ValidatorInterface $validator,
         private mixed $root,
         private TranslatorInterface $translator,
-        private ?string $translationDomain = null,
+        private string|false|null $translationDomain = null,
     ) {
         $this->violations = new ConstraintViolationList();
         $this->cachedObjectsRefs = new \SplObjectStorage();
@@ -134,7 +134,9 @@ class ExecutionContext implements ExecutionContextInterface
     public function addViolation(string|\Stringable $message, array $parameters = []): void
     {
         $this->violations->add(new ConstraintViolation(
-            $this->translator->trans($message, $parameters, $this->translationDomain),
+            false === $this->translationDomain ?
+                strtr($message, $parameters) :
+                $this->translator->trans($message, $parameters, $this->translationDomain),
             $message,
             $parameters,
             $this->root,

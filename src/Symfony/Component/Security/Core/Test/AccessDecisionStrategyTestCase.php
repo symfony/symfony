@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -71,7 +72,7 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
             ) {
             }
 
-            public function vote(TokenInterface $token, $subject, array $attributes): int
+            public function vote(TokenInterface $token, $subject, array $attributes, ?Vote $vote = null): int
             {
                 return $this->vote;
             }

@@ -1725,7 +1725,7 @@ class LanguagesTest extends ResourceBundleTestCase
         sort($languages);
 
         $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::LANGUAGES));
+        $this->assertSame([], array_diff($languages, self::LANGUAGES));
 
         foreach (Languages::getAlpha3Names($displayLocale) as $alpha3Code => $name) {
             $alpha2Code = self::ALPHA3_TO_ALPHA2[$alpha3Code] ?? null;
@@ -1928,7 +1928,7 @@ class LanguagesTest extends ResourceBundleTestCase
         sort($languages);
 
         $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::ALPHA3_CODES));
+        $this->assertSame([], array_diff($languages, self::ALPHA3_CODES));
 
         foreach (Languages::getNames($displayLocale) as $alpha2Code => $name) {
             $alpha3Code = self::ALPHA2_TO_ALPHA3[$alpha2Code] ?? (3 === \strlen($alpha2Code) ? $alpha2Code : null);

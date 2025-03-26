@@ -1,11 +1,19 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Deprecate the `CompiledClassMetadataFactory` and `CompiledClassMetadataCacheWarmer` classes
+ * Register `NormalizerInterface` and `DenormalizerInterface` aliases for named serializers
+ * Add `NumberNormalizer` to normalize `BcMath\Number` and `GMP` as `string`
+ * Add `defaultType` to `DiscriminatorMap`
+
 7.2
 ---
 
- * Deprecate the `csv_escape_char` context option of `CsvEncoder`, the `CsvEncoder::ESCAPE_CHAR_KEY` constant
-   and the `CsvEncoderContextBuilder::withEscapeChar()` method, following its deprecation in PHP 8.4
+ * Deprecate the `csv_escape_char` context option of `CsvEncoder` and the `CsvEncoder::ESCAPE_CHAR_KEY` constant
+ * Deprecate `CsvEncoderContextBuilder::withEscapeChar()` method
  * Add `SnakeCaseToCamelCaseNameConverter`
  * Support subclasses of `\DateTime` and `\DateTimeImmutable` for denormalization
  * Add the `UidNormalizer::NORMALIZATION_FORMAT_RFC9562` constant
@@ -19,6 +27,7 @@ CHANGELOG
 
  * Add arguments `$class`, `$format` and `$context` to `NameConverterInterface::normalize()` and `NameConverterInterface::denormalize()`
  * Add `DateTimeNormalizer::CAST_KEY` context option
+ * Add `Default` and "class name" default groups
  * Add `AbstractNormalizer::FILTER_BOOL` context option
  * Add `CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES` context option
  * Deprecate `AbstractNormalizerContextBuilder::withDefaultContructorArguments(?array $defaultContructorArguments)`, use `withDefaultConstructorArguments(?array $defaultConstructorArguments)` instead (note the missing `s` character in Contructor word in deprecated method)

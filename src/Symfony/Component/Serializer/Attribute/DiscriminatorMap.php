@@ -22,12 +22,14 @@ class DiscriminatorMap
     /**
      * @param string                      $typeProperty The property holding the type discriminator
      * @param array<string, class-string> $mapping      The mapping between types and classes (i.e. ['admin_user' => AdminUser::class])
+     * @param ?string                     $defaultType  The fallback value if nothing specified by $typeProperty
      *
      * @throws InvalidArgumentException
      */
     public function __construct(
         private readonly string $typeProperty,
         private readonly array $mapping,
+        private readonly ?string $defaultType = null,
     ) {
         if (!$typeProperty) {
             throw new InvalidArgumentException(\sprintf('Parameter "typeProperty" given to "%s" cannot be empty.', static::class));
@@ -35,6 +37,10 @@ class DiscriminatorMap
 
         if (!$mapping) {
             throw new InvalidArgumentException(\sprintf('Parameter "mapping" given to "%s" cannot be empty.', static::class));
+        }
+
+        if (null !== $this->defaultType && !\array_key_exists($this->defaultType, $this->mapping)) {
+            throw new InvalidArgumentException(\sprintf('Default type "%s" given to "%s" must be present in "mapping" types.', $this->defaultType, static::class));
         }
     }
 
@@ -46,6 +52,11 @@ class DiscriminatorMap
     public function getMapping(): array
     {
         return $this->mapping;
+    }
+
+    public function getDefaultType(): ?string
+    {
+        return $this->defaultType;
     }
 }
 

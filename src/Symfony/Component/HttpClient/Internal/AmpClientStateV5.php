@@ -28,6 +28,7 @@ use Amp\Socket\Certificate;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\DnsSocketConnector;
+use Amp\Socket\InternetAddress;
 use Amp\Socket\Socket;
 use Amp\Socket\SocketAddress;
 use Amp\Socket\SocketConnector;
@@ -160,7 +161,7 @@ final class AmpClientStateV5 extends ClientState
 
         if ($options['proxy']) {
             $proxyUrl = parse_url($options['proxy']['url']);
-            $proxySocket = new SocketAddress($proxyUrl['host'], $proxyUrl['port']);
+            $proxySocket = new InternetAddress($proxyUrl['host'], $proxyUrl['port']);
             $proxyHeaders = $options['proxy']['auth'] ? ['Proxy-Authorization' => $options['proxy']['auth']] : [];
 
             if ('ssl' === $proxyUrl['scheme']) {

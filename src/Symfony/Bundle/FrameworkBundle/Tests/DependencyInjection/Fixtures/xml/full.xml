@@ -44,8 +44,8 @@
                 </framework:default-context>
             </framework:named-serializer>
         </framework:serializer>
-        <framework:property-info />
+        <framework:property-info with-constructor-extractor="true" />
         <framework:type-info />
-        <framework:json-encoder />
+        <framework:json-streamer />
     </framework:config>
 </container>

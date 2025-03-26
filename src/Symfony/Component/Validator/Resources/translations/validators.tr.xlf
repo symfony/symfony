@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">php.ini'de geçici bir klasör yapılandırılmadı, veya yapılandırılan klasör mevcut değildir.</target>
+                <target>php.ini'de geçici bir klasör yapılandırılmadı veya yapılandırılan klasör mevcut değildir.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -465,6 +465,10 @@
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
                 <target>Bu değer “{{ max }}” haftasından sonra olmamalıdır</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>This value is not a valid slug.</source>
+                <target>Bu değer geçerli bir “slug” değildir.</target>
             </trans-unit>
         </body>
     </file>

@@ -77,21 +77,9 @@ class Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute extends Container
     protected static function getFoo2Service($container, $lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $container->privates['.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo'] = $container->createProxy('FooProxyCd8d23a', static fn () => \FooProxyCd8d23a::createLazyProxy(static fn () => self::getFoo2Service($container, false)));
+            return $container->privates['.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo'] = new \ReflectionClass('Symfony\Component\DependencyInjection\Tests\Compiler\Foo')->newLazyProxy(static fn () => self::getFoo2Service($container, false));
         }
 
         return ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo());
     }
 }
-
-class FooProxyCd8d23a extends \Symfony\Component\DependencyInjection\Tests\Compiler\Foo implements \Symfony\Component\VarExporter\LazyObjectInterface
-{
-    use \Symfony\Component\VarExporter\LazyProxyTrait;
-
-    private const LAZY_OBJECT_PROPERTY_SCOPES = [];
-}
-
-// Help opcache.preload discover always-needed symbols
-class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);

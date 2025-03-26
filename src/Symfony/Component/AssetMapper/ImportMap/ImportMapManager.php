@@ -128,13 +128,15 @@ class ImportMapManager
     }
 
     /**
+     * @internal
+     *
      * Gets information about (and optionally downloads) the packages & updates the entries.
      *
      * Returns an array of the entries that were added.
      *
      * @param PackageRequireOptions[] $packagesToRequire
      */
-    private function requirePackages(array $packagesToRequire, ImportMapEntries $importMapEntries): array
+    public function requirePackages(array $packagesToRequire, ImportMapEntries $importMapEntries): array
     {
         if (!$packagesToRequire) {
             return [];

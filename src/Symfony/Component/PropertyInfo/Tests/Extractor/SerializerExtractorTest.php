@@ -49,4 +49,9 @@ class SerializerExtractorTest extends TestCase
     {
         $this->assertSame(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class, ['serializer_groups' => null]));
     }
+
+    public function testGetPropertiesWithNonExistentClassReturnsNull()
+    {
+        $this->assertNull($this->extractor->getProperties('NonExistent'));
+    }
 }

@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Notifier\Bridge\Smsbox\Webhook\SmsboxRequestParser;
 use Symfony\Component\Notifier\Bridge\Sweego\Webhook\SweegoRequestParser;
 use Symfony\Component\Notifier\Bridge\Twilio\Webhook\TwilioRequestParser;
 use Symfony\Component\Notifier\Bridge\Vonage\Webhook\VonageRequestParser;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->set('notifier.webhook.request_parser.smsbox', SmsboxRequestParser::class)
+        ->alias(SmsboxRequestParser::class, 'notifier.webhook.request_parser.smsbox')
+
         ->set('notifier.webhook.request_parser.sweego', SweegoRequestParser::class)
         ->alias(SweegoRequestParser::class, 'notifier.webhook.request_parser.sweego')
 

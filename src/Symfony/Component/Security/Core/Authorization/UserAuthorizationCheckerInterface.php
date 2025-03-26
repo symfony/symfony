@@ -23,7 +23,8 @@ interface UserAuthorizationCheckerInterface
     /**
      * Checks if the attribute is granted against the user and optionally supplied subject.
      *
-     * @param mixed $attribute A single attribute to vote on (can be of any type, string and instance of Expression are supported by the core)
+     * @param mixed               $attribute      A single attribute to vote on (can be of any type, string and instance of Expression are supported by the core)
+     * @param AccessDecision|null $accessDecision Should be used to explain the decision
      */
-    public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null): bool;
+    public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool;
 }

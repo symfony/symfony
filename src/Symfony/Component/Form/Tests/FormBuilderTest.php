@@ -173,8 +173,8 @@ class FormBuilderTest extends TestCase
         $children = $reflClass->getProperty('children');
         $unresolvedChildren = $reflClass->getProperty('unresolvedChildren');
 
-        $this->assertEmpty($children->getValue($config));
-        $this->assertEmpty($unresolvedChildren->getValue($config));
+        $this->assertSame([], $children->getValue($config));
+        $this->assertSame([], $unresolvedChildren->getValue($config));
     }
 
     public function testGetButtonBuilderBeforeExplicitlyResolvingAllChildren()

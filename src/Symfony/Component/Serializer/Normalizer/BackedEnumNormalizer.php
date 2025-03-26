@@ -33,13 +33,13 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         ];
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): int|string
+    public function normalize(mixed $data, ?string $format = null, array $context = []): int|string
     {
-        if (!$object instanceof \BackedEnum) {
+        if (!$data instanceof \BackedEnum) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
         }
 
-        return $object->value;
+        return $data->value;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

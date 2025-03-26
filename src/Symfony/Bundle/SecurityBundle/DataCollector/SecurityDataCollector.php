@@ -138,6 +138,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
             // collect voter details
             $decisionLog = $this->accessDecisionManager->getDecisionLog();
+
             foreach ($decisionLog as $key => $log) {
                 $decisionLog[$key]['voter_details'] = [];
                 foreach ($log['voterDetails'] as $voterDetail) {
@@ -147,6 +148,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                         'class' => $classData,
                         'attributes' => $voterDetail['attributes'], // Only displayed for unanimous strategy
                         'vote' => $voterDetail['vote'],
+                        'reasons' => $voterDetail['reasons'] ?? [],
                     ];
                 }
                 unset($decisionLog[$key]['voterDetails']);

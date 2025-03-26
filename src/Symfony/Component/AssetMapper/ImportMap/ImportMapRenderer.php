@@ -125,11 +125,10 @@ class ImportMapRenderer
             }
 
             $output .= <<<HTML
-                <script async$scriptAttributes>
+                <script$scriptAttributes>
                 if (!HTMLScriptElement.supports || !HTMLScriptElement.supports('importmap')) (function () {
                     const script = document.createElement('script');
                     script.src = '{$this->escapeAttributeValue($polyfillPath, \ENT_NOQUOTES)}';
-                    script.setAttribute('async', 'async');
                     {$this->createAttributesString($polyfillAttributes, "script.setAttribute('%s', '%s');", "\n    ", \ENT_NOQUOTES)}
                     document.head.appendChild(script);
                 })();

@@ -168,10 +168,10 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         fwrite($this->file, '0');
         fclose($this->file);
 
-        $constraint = new File([
-            'maxSize' => $limit,
-            'maxSizeMessage' => 'myMessage',
-        ]);
+        $constraint = new File(
+            maxSize: $limit,
+            maxSizeMessage: 'myMessage',
+        );
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
@@ -220,10 +220,10 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         fwrite($this->file, '0');
         fclose($this->file);
 
-        $constraint = new File([
-            'maxSize' => $limit,
-            'maxSizeMessage' => 'myMessage',
-        ]);
+        $constraint = new File(
+            maxSize: $limit,
+            maxSizeMessage: 'myMessage',
+        );
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
@@ -233,9 +233,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     public function testInvalidMaxSize()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new File([
-            'maxSize' => '1abc',
-        ]);
+        new File(maxSize: '1abc');
     }
 
     public static function provideBinaryFormatTests()
@@ -269,11 +267,11 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         fwrite($this->file, '0');
         fclose($this->file);
 
-        $constraint = new File([
-            'maxSize' => $limit,
-            'binaryFormat' => $binaryFormat,
-            'maxSizeMessage' => 'myMessage',
-        ]);
+        $constraint = new File(
+            maxSize: $limit,
+            binaryFormat: $binaryFormat,
+            maxSizeMessage: 'myMessage',
+        );
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
@@ -322,9 +320,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->method('getMimeType')
             ->willReturn('image/jpg');
 
-        $constraint = new File([
-            'mimeTypes' => ['image/png', 'image/jpg'],
-        ]);
+        $constraint = new File(mimeTypes: ['image/png', 'image/jpg']);
 
         $this->validator->validate($file, $constraint);
 
@@ -346,19 +342,14 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->method('getMimeType')
             ->willReturn('image/jpg');
 
-        $constraint = new File([
-            'mimeTypes' => ['image/*'],
-        ]);
+        $constraint = new File(mimeTypes: ['image/*']);
 
         $this->validator->validate($file, $constraint);
 
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider provideMimeTypeConstraints
-     */
-    public function testInvalidMimeType(File $constraint)
+    public function testInvalidMimeType()
     {
         $file = $this
             ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
@@ -373,7 +364,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->method('getMimeType')
             ->willReturn('application/pdf');
 
-        $this->validator->validate($file, $constraint);
+        $this->validator->validate($file, new File(mimeTypes: ['image/png', 'image/jpg'], mimeTypesMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ type }}', '"application/pdf"')
@@ -384,15 +375,36 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public static function provideMimeTypeConstraints(): iterable
+    /**
+     * @group legacy
+     */
+    public function testInvalidMimeTypeDoctrineStyle()
     {
-        yield 'Doctrine style' => [new File([
+        $file = $this
+            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
+            ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
+            ->getMock();
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+            ->willReturn($this->path);
+        $file
+            ->expects($this->once())
+            ->method('getMimeType')
+            ->willReturn('application/pdf');
+
+        $this->validator->validate($file, new File([
             'mimeTypes' => ['image/png', 'image/jpg'],
             'mimeTypesMessage' => 'myMessage',
-        ])];
-        yield 'named arguments' => [
-            new File(mimeTypes: ['image/png', 'image/jpg'], mimeTypesMessage: 'myMessage'),
-        ];
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ type }}', '"application/pdf"')
+            ->setParameter('{{ types }}', '"image/png", "image/jpg"')
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
     }
 
     public function testInvalidWildcardMimeType()
@@ -410,10 +422,10 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->method('getMimeType')
             ->willReturn('application/pdf');
 
-        $constraint = new File([
-            'mimeTypes' => ['image/*', 'image/jpg'],
-            'mimeTypesMessage' => 'myMessage',
-        ]);
+        $constraint = new File(
+            mimeTypes: ['image/*', 'image/jpg'],
+            mimeTypesMessage: 'myMessage',
+        );
 
         $this->validator->validate($file, $constraint);
 
@@ -426,14 +438,11 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider provideDisallowEmptyConstraints
-     */
-    public function testDisallowEmpty(File $constraint)
+    public function testDisallowEmpty()
     {
         ftruncate($this->file, 0);
 
-        $this->validator->validate($this->getFile($this->path), $constraint);
+        $this->validator->validate($this->getFile($this->path), new File(disallowEmptyMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ file }}', '"'.$this->path.'"')
@@ -442,14 +451,22 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public static function provideDisallowEmptyConstraints(): iterable
+    /**
+     * @group legacy
+     */
+    public function testDisallowEmptyDoctrineStyle()
     {
-        yield 'Doctrine style' => [new File([
+        ftruncate($this->file, 0);
+
+        $this->validator->validate($this->getFile($this->path), new File([
             'disallowEmptyMessage' => 'myMessage',
-        ])];
-        yield 'named arguments' => [
-            new File(disallowEmptyMessage: 'myMessage'),
-        ];
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
+            ->setCode(File::EMPTY_ERROR)
+            ->assertRaised();
     }
 
     /**
@@ -459,7 +476,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     {
         $file = new UploadedFile(tempnam(sys_get_temp_dir(), 'file-validator-test-'), 'originalName', 'mime', $error);
 
-        $constraint = new File([
+        $constraint = new File(...[
             $message => 'myMessage',
             'maxSize' => $maxSize,
         ]);
@@ -658,11 +675,11 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     /**
      * @dataProvider provideFilenameMaxLengthIsTooLong
      */
-    public function testFilenameMaxLengthIsTooLong(File $constraintFile, string $messageViolation)
+    public function testFilenameMaxLengthIsTooLong(File $constraintFile, string $filename, string $messageViolation)
     {
         file_put_contents($this->path, '1');
 
-        $file = new UploadedFile($this->path, 'myFileWithATooLongOriginalFileName', null, null, true);
+        $file = new UploadedFile($this->path, $filename, null, null, true);
         $this->validator->validate($file, $constraintFile);
 
         $this->buildViolation($messageViolation)
@@ -676,25 +693,82 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
 
     public static function provideFilenameMaxLengthIsTooLong(): \Generator
     {
-        yield 'Simple case with only the parameter "filenameMaxLength" ' => [
+        yield 'Codepoints and UTF-8 : default' => [
             new File(filenameMaxLength: 30),
+            'myFileWithATooLongOriginalFileName',
             'The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.',
         ];
 
-        yield 'Case with the parameter "filenameMaxLength" and a custom error message' => [
-            new File(filenameMaxLength: 20, filenameTooLongMessage: 'Your filename is too long. Please use at maximum {{ filename_max_length }} characters'),
-            'Your filename is too long. Please use at maximum {{ filename_max_length }} characters',
+        yield 'Codepoints and UTF-8: custom error message' => [
+            new File(filenameMaxLength: 20, filenameTooLongMessage: 'myMessage'),
+            'myFileWithATooLongOriginalFileName',
+            'myMessage',
+        ];
+
+        yield 'Graphemes' => [
+            new File(filenameMaxLength: 1, filenameCountUnit: File::FILENAME_COUNT_GRAPHEMES, filenameTooLongMessage: 'myMessage'),
+            "A\u{0300}A\u{0300}",
+            'myMessage',
+        ];
+
+        yield 'Bytes' => [
+            new File(filenameMaxLength: 5, filenameCountUnit: File::FILENAME_COUNT_BYTES, filenameTooLongMessage: 'myMessage'),
+            "A\u{0300}A\u{0300}",
+            'myMessage',
         ];
     }
 
-    public function testFilenameMaxLength()
+    /**
+     * @dataProvider provideFilenameCountUnit
+     */
+    public function testValidCountUnitFilenameMaxLength(int $maxLength, string $countUnit)
     {
         file_put_contents($this->path, '1');
 
-        $file = new UploadedFile($this->path, 'tinyOriginalFileName', null, null, true);
-        $this->validator->validate($file, new File(filenameMaxLength: 20));
+        $file = new UploadedFile($this->path, "A\u{0300}", null, null, true);
+        $this->validator->validate($file, new File(filenameMaxLength: $maxLength, filenameCountUnit: $countUnit));
 
         $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider provideFilenameCharset
+     */
+    public function testFilenameCharset(string $filename, string $charset, bool $isValid)
+    {
+        file_put_contents($this->path, '1');
+
+        $file = new UploadedFile($this->path, $filename, null, null, true);
+        $this->validator->validate($file, new File(filenameCharset: $charset, filenameCharsetMessage: 'myMessage'));
+
+        if ($isValid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('myMessage')
+                ->setParameter('{{ name }}', '"'.$filename.'"')
+                ->setParameter('{{ charset }}', $charset)
+                ->setCode(File::FILENAME_INVALID_CHARACTERS)
+                ->assertRaised();
+        }
+    }
+
+    public static function provideFilenameCountUnit(): array
+    {
+        return [
+            'graphemes' => [1, File::FILENAME_COUNT_GRAPHEMES],
+            'codepoints' => [2, File::FILENAME_COUNT_CODEPOINTS],
+            'bytes' => [3, File::FILENAME_COUNT_BYTES],
+        ];
+    }
+
+    public static function provideFilenameCharset(): array
+    {
+        return [
+            ['é', 'utf8', true],
+            ["\xE9", 'CP1252', true],
+            ["\xE9", 'XXX', false],
+            ["\xE9", 'utf8', false],
+        ];
     }
 
     abstract protected function getFile($filename);

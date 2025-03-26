@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -34,6 +35,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -829,6 +831,36 @@ class ContainerBuilderTest extends TestCase
         $container->merge($config);
     }
 
+    public function testMergeAttributeAutoconfiguration()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c1 = static function (Definition $definition) {});
+        $config = new ContainerBuilder();
+        $config->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c2 = function (Definition $definition) {});
+
+        $container->merge($config);
+        $this->assertSame([AsTaggedItem::class => [$c1, $c2]], $container->getAttributeAutoconfigurators());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testGetAutoconfiguredAttributes()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c = static function () {});
+
+        $this->expectUserDeprecationMessage('Since symfony/dependency-injection 7.3: The "Symfony\Component\DependencyInjection\ContainerBuilder::getAutoconfiguredAttributes()" method is deprecated, use "getAttributeAutoconfigurators()" instead.');
+        $configurators = $container->getAutoconfiguredAttributes();
+        $this->assertSame($c, $configurators[AsTaggedItem::class]);
+
+        // Method call fails with more than one configurator for a given attribute
+        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c = static function () {});
+
+        $this->expectException(LogicException::class);
+        $container->getAutoconfiguredAttributes();
+    }
+
     public function testResolveEnvValues()
     {
         $_ENV['DUMMY_ENV_VAR'] = 'du%%y';
@@ -1062,20 +1094,18 @@ class ContainerBuilderTest extends TestCase
         $container->merge(new ContainerBuilder());
     }
 
-    public function testfindTaggedServiceIds()
+    public function testFindTaggedServiceIds()
     {
         $builder = new ContainerBuilder();
-        $builder
-            ->register('foo', 'Bar\FooClass')
+        $builder->register('foo', 'Bar\FooClass')
+            ->setAbstract(true)
             ->addTag('foo', ['foo' => 'foo'])
             ->addTag('bar', ['bar' => 'bar'])
-            ->addTag('foo', ['foofoo' => 'foofoo'])
-        ;
-        $builder
-            ->register('bar', 'Bar\FooClass')
+            ->addTag('foo', ['foofoo' => 'foofoo']);
+        $builder->register('bar', 'Bar\FooClass')
             ->addTag('foo')
-            ->addTag('container.excluded')
-        ;
+            ->addTag('container.excluded');
+
         $this->assertEquals([
             'foo' => [
                 ['foo' => 'foo'],
@@ -1083,6 +1113,45 @@ class ContainerBuilderTest extends TestCase
             ],
         ], $builder->findTaggedServiceIds('foo'), '->findTaggedServiceIds() returns an array of service ids and its tag attributes');
         $this->assertEquals([], $builder->findTaggedServiceIds('foobar'), '->findTaggedServiceIds() returns an empty array if there is annotated services');
+    }
+
+    public function testFindTaggedServiceIdsThrowsWhenAbstract()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'Bar\FooClass')
+            ->setAbstract(true)
+            ->addTag('foo', ['foo' => 'foo']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The service "foo" tagged "foo" must not be abstract.');
+        $builder->findTaggedServiceIds('foo', true);
+    }
+
+    public function testFindTaggedResourceIds()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('myservice', 'Bar\FooClass')
+            ->addTag('foo', ['foo' => 'foo'])
+            ->addTag('bar', ['bar' => 'bar'])
+            ->addTag('foo', ['foofoo' => 'foofoo'])
+            ->addResourceTag('container.excluded');
+
+        $expected = ['myservice' => [['foo' => 'foo'], ['foofoo' => 'foofoo']]];
+        $this->assertSame($expected, $builder->findTaggedResourceIds('foo'));
+        $this->assertSame([], $builder->findTaggedResourceIds('foofoo'));
+    }
+
+    public function testFindTaggedResourceIdsThrowsWhenNotExcluded()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('myservice', 'Bar\FooClass')
+            ->addTag('foo', ['foo' => 'foo'])
+            ->addTag('bar', ['bar' => 'bar'])
+            ->addTag('foo', ['foofoo' => 'foofoo']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The resource "myservice" tagged "foo" is missing the "container.excluded" tag.');
+        $builder->findTaggedResourceIds('foo');
     }
 
     public function testFindUnusedTags()
@@ -1113,7 +1182,7 @@ class ContainerBuilderTest extends TestCase
         $container->setResourceTracking(false);
         $container->addObjectResource(new \BarClass());
 
-        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
+        $this->assertSame([], $container->getResources(), 'No resources get registered without resource tracking');
 
         $container->setResourceTracking(true);
         $container->addObjectResource(new \BarClass());
@@ -1136,7 +1205,7 @@ class ContainerBuilderTest extends TestCase
         $container->setResourceTracking(false);
         $r1 = $container->getReflectionClass('BarClass');
 
-        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
+        $this->assertSame([], $container->getResources(), 'No resources get registered without resource tracking');
 
         $container->setResourceTracking(true);
         $r2 = $container->getReflectionClass('BarClass');
@@ -1176,7 +1245,7 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
+        $this->assertSame([], $container->getResources(), 'No resources get registered without resource tracking');
 
         $container->register('foo', 'BarClass')->setPublic(true);
         $container->getDefinition('foo')->setLazy(true);
@@ -1335,7 +1404,7 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
 
         $configs = $container->getExtensionConfig('foo');
-        $this->assertEmpty($configs);
+        $this->assertSame([], $configs);
 
         $first = ['foo' => 'bar'];
         $container->prependExtensionConfig('foo', $first);
@@ -1882,8 +1951,12 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $wither = $container->get('wither');
+        if (\PHP_VERSION_ID >= 80400) {
+            $this->assertTrue((new \ReflectionClass($wither))->isUninitializedLazyObject($wither));
+        } else {
+            $this->assertTrue($wither->resetLazyObject());
+        }
         $this->assertInstanceOf(Foo::class, $wither->foo);
-        $this->assertTrue($wither->resetLazyObject());
         $this->assertInstanceOf(Wither::class, $wither->withFoo1($wither->foo));
     }
 

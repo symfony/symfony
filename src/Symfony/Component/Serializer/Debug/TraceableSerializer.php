@@ -66,17 +66,17 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
-        $result = $this->serializer->normalize($object, $format, $context);
+        $result = $this->serializer->normalize($data, $format, $context);
         $time = microtime(true) - $startTime;
 
         $caller = $this->getCaller(__FUNCTION__, NormalizerInterface::class);
 
-        $this->dataCollector->collectNormalize($traceId, $object, $format, $context, $time, $caller, $this->serializerName);
+        $this->dataCollector->collectNormalize($traceId, $data, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }

@@ -44,4 +44,19 @@ class IsCsrfTokenValidAttributeMethodsController
     public function withInvalidTokenKey()
     {
     }
+
+    #[IsCsrfTokenValid('foo', methods: 'DELETE')]
+    public function withDeleteMethod()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', methods: ['GET', 'POST'])]
+    public function withGetOrPostMethod()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', tokenKey: 'invalid_token_key', methods: ['POST'])]
+    public function withPostMethodAndInvalidTokenKey()
+    {
+    }
 }

@@ -8,6 +8,6 @@
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:property-info enabled="true" />
+        <framework:property-info enabled="true" with-constructor-extractor="false" />
     </framework:config>
 </container>

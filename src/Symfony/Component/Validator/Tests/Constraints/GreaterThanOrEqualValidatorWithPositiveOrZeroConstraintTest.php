@@ -61,6 +61,9 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Abstra
         ];
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintExceptionIfPropertyPath()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -69,6 +72,9 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Abstra
         return new PositiveOrZero(['propertyPath' => 'field']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintExceptionIfValue()
     {
         $this->expectException(ConstraintDefinitionException::class);

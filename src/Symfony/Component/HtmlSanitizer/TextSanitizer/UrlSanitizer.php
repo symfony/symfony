@@ -132,7 +132,7 @@ final class UrlSanitizer
     {
         // Check each chunk of the domain is valid
         foreach ($trustedParts as $key => $trustedPart) {
-            if ($uriParts[$key] !== $trustedPart) {
+            if (!\array_key_exists($key, $uriParts) || $uriParts[$key] !== $trustedPart) {
                 return false;
             }
         }

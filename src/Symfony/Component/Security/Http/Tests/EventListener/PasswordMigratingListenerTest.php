@@ -150,8 +150,6 @@ class DummyTestMigratingUserProvider extends TestMigratingUserProvider
 abstract class TestPasswordAuthenticatedUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
     abstract public function getPassword(): ?string;
-
-    abstract public function getSalt(): ?string;
 }
 
 class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
@@ -161,16 +159,12 @@ class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
         return null;
     }
 
-    public function getSalt(): ?string
-    {
-        return null;
-    }
-
     public function getRoles(): array
     {
         return [];
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
     }

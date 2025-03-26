@@ -14,6 +14,7 @@ namespace Symfony\Component\AssetMapper\Tests\Compressor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\Compressor\BrotliCompressor;
 use Symfony\Component\AssetMapper\Compressor\ChainCompressor;
+use Symfony\Component\AssetMapper\Compressor\GzipCompressor;
 use Symfony\Component\AssetMapper\Compressor\ZstandardCompressor;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -41,12 +42,19 @@ class ChainCompressorTest extends TestCase
 
     public function testCompress()
     {
-        $extensions = ['gz'];
+        $extensions = [];
+        if (null === (new GzipCompressor())->getUnsupportedReason()) {
+            $extensions[] = 'gz';
+        }
         if (null === (new BrotliCompressor())->getUnsupportedReason()) {
             $extensions[] = 'br';
         }
         if (null === (new ZstandardCompressor())->getUnsupportedReason()) {
             $extensions[] = 'zst';
+        }
+
+        if (!$extensions) {
+            $this->markTestSkipped('No supported compressors available.');
         }
 
         $this->filesystem->dumpFile(self::WRITABLE_ROOT.'/foo/bar.js', 'foobar');

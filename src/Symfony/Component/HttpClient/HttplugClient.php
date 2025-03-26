@@ -224,19 +224,44 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
     {
         try {
             $body = $request->getBody();
+            $headers = $request->getHeaders();
 
-            if ($body->isSeekable()) {
-                $body->seek(0);
+            $size = $request->getHeader('content-length')[0] ?? -1;
+            if (0 > $size && 0 < $size = $body->getSize() ?? -1) {
+                $headers['Content-Length'] = [$size];
             }
 
-            $headers = $request->getHeaders();
-            if (!$request->hasHeader('content-length') && 0 <= $size = $body->getSize() ?? -1) {
-                $headers['Content-Length'] = [$size];
+            if (0 === $size) {
+                $body = '';
+            } elseif (0 < $size && $size < 1 << 21) {
+                if ($body->isSeekable()) {
+                    try {
+                        $body->seek(0);
+                    } catch (\RuntimeException) {
+                        // ignore
+                    }
+                }
+
+                $body = $body->getContents();
+            } else {
+                $body = static function (int $size) use ($body) {
+                    if ($body->isSeekable()) {
+                        try {
+                            $body->seek(0);
+                        } catch (\RuntimeException) {
+                            // ignore
+                        }
+                    }
+
+                    while (!$body->eof()) {
+                        yield $body->read($size);
+                    }
+                };
             }
 
             $options = [
                 'headers' => $headers,
-                'body' => static fn (int $size) => $body->read($size),
+                'body' => $body,
                 'buffer' => $buffer,
             ];
 

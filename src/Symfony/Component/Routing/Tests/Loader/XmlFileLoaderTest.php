@@ -587,6 +587,16 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('xml'), $routes);
     }
 
+    public function testAddingRouteWithHosts()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('route-with-hosts.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/route-with-hosts-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
     public function testWhenEnv()
     {
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');

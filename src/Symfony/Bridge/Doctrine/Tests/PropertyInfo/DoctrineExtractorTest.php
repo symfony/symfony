@@ -30,6 +30,7 @@ use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumString;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
@@ -38,6 +39,8 @@ use Symfony\Component\TypeInfo\Type;
  */
 class DoctrineExtractorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private function createExtractor(): DoctrineExtractor
     {
         $config = ORMSetup::createConfiguration(true);
@@ -108,15 +111,24 @@ class DoctrineExtractorTest extends TestCase
     }
 
     /**
+     * @group legacy
+     *
      * @dataProvider legacyTypesProvider
      */
     public function testExtractLegacy(string $property, ?array $type = null)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor::getTypes()" method is deprecated, use "Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor::getType()" instead.');
+
         $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property, []));
     }
 
+    /**
+     * @group legacy
+     */
     public function testExtractWithEmbeddedLegacy()
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor::getTypes()" method is deprecated, use "Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor::getType()" instead.');
+
         $expectedTypes = [new LegacyType(
             LegacyType::BUILTIN_TYPE_OBJECT,
             false,
@@ -132,8 +144,13 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($expectedTypes, $actualTypes);
     }
 
+    /**
+     * @group legacy
+     */
     public function testExtractEnumLegacy()
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor::getTypes()" method is deprecated, use "Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor::getType()" instead.');
+
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString', []));
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt', []));
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumStringArray', []));
@@ -141,6 +158,9 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom', []));
     }
 
+    /**
+     * @group legacy
+     */
     public static function legacyTypesProvider(): array
     {
         // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
@@ -240,8 +260,13 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetTypesCatchExceptionLegacy()
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor::getTypes()" method is deprecated, use "Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor::getType()" instead.');
+
         $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
     }
 

@@ -142,7 +142,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return 'deserialized';
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return 'normalized';
     }

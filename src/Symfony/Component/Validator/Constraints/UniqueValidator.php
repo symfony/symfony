@@ -46,20 +46,24 @@ class UniqueValidator extends ConstraintValidator
                 continue;
             }
 
-            if (\in_array($element, $collectionElements, true)) {
-                $violationBuilder = $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($element))
-                    ->setCode(Unique::IS_NOT_UNIQUE);
+            if (!\in_array($element, $collectionElements, true)) {
+                $collectionElements[] = $element;
+                continue;
+            }
 
-                if (null !== $constraint->errorPath) {
-                    $violationBuilder->atPath("[$index].{$constraint->errorPath}");
-                }
+            $violationBuilder = $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($element))
+                ->setCode(Unique::IS_NOT_UNIQUE);
 
-                $violationBuilder->addViolation();
+            if (!$constraint->stopOnFirstError || null !== $constraint->errorPath) {
+                $violationBuilder->atPath("[$index]".(null !== $constraint->errorPath ? ".{$constraint->errorPath}" : ''));
+            }
 
+            $violationBuilder->addViolation();
+
+            if ($constraint->stopOnFirstError) {
                 return;
             }
-            $collectionElements[] = $element;
         }
     }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mailer\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\EventListener\MessageListener;
@@ -20,6 +21,8 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageListenerTest extends TestCase
 {
@@ -113,5 +116,26 @@ class MessageListenerTest extends TestCase
             'Foo' => MessageListener::HEADER_REPLACE,
         ];
         yield 'Capitalized header rule (case-insensitive), replace if set' => [$initialHeaders, $defaultHeaders, $defaultHeaders, $rules];
+    }
+
+    public function testTranslatableSubject()
+    {
+        $message = new TemplatedEmail();
+        $message->subject(new TranslatableMessage('hello.world'));
+        $listener = new MessageListener(translator: new class implements TranslatorInterface {
+            public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+            {
+                return 'Hello World';
+            }
+
+            public function getLocale(): string
+            {
+                return 'en';
+            }
+        });
+        $event = new MessageEvent($message, new Envelope(new Address('sender@example.com'), [new Address('recipient@example.com')]), 'smtp');
+        $listener->onMessage($event);
+
+        $this->assertSame('Hello World', $message->getSubject());
     }
 }

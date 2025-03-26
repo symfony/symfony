@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+
+7.3
+---
+
+ * Add `RunProcessMessage::fromShellCommandline()` to instantiate a Process via the fromShellCommandline method
+
 7.1
 ---
 

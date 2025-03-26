@@ -32,15 +32,15 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTestCase
             self::markTestSkipped('REDIS_SENTINEL_SERVICE env var is not defined.');
         }
 
-        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']&timeout=0&retry_interval=0&read_timeout=0', ['redis_sentinel' => $service, 'prefix' => 'prefix_']);
+        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']&timeout=0&retry_interval=0&read_timeout=0', ['sentinel' => $service, 'prefix' => 'prefix_']);
     }
 
     public function testInvalidDSNHasBothClusterAndSentinel()
     {
-        $dsn = 'redis:?host[redis1]&host[redis2]&host[redis3]&redis_cluster=1&redis_sentinel=mymaster';
+        $dsn = 'redis:?host[redis1]&host[redis2]&host[redis3]&cluster=1&sentinel=mymaster';
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot use both "redis_cluster" and "redis_sentinel" at the same time.');
+        $this->expectExceptionMessage('Cannot use both "cluster" and "sentinel" at the same time.');
 
         RedisAdapter::createConnection($dsn);
     }
@@ -51,6 +51,6 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTestCase
         $dsn = 'redis:?host['.str_replace(' ', ']&host[', $hosts).']';
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Failed to retrieve master information from sentinel "invalid-masterset-name".');
-        AbstractAdapter::createConnection($dsn, ['redis_sentinel' => 'invalid-masterset-name']);
+        AbstractAdapter::createConnection($dsn, ['sentinel' => 'invalid-masterset-name']);
     }
 }

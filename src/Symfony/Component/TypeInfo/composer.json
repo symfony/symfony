@@ -26,7 +26,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "psr/container": "^1.1|^2.0"
+        "psr/container": "^1.1|^2.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
         "phpstan/phpdoc-parser": "^1.0|^2.0"

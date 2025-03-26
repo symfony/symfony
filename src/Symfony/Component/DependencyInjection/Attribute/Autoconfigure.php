@@ -28,7 +28,7 @@ class Autoconfigure
      * @param bool|null                                               $shared       Whether to declare the service as shared
      * @param bool|null                                               $autowire     Whether to declare the service as autowired
      * @param array<string, mixed>|null                               $properties   The properties to define when creating the service
-     * @param array<class-string, string>|string|null                 $configurator A PHP function, reference or an array containing a class/Reference and a method to call after the service is fully initialized
+     * @param array{string, string}|string|null                       $configurator A PHP function, reference or an array containing a class/reference and a method to call after the service is fully initialized
      * @param string|null                                             $constructor  The public static method to use to instantiate the service
      */
     public function __construct(

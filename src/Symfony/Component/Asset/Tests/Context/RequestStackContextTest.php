@@ -22,7 +22,7 @@ class RequestStackContextTest extends TestCase
     {
         $requestStackContext = new RequestStackContext(new RequestStack());
 
-        $this->assertEmpty($requestStackContext->getBasePath());
+        $this->assertSame('', $requestStackContext->getBasePath());
     }
 
     public function testGetBasePathSet()

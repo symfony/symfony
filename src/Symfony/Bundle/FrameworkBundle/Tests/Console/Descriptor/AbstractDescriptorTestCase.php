@@ -50,6 +50,21 @@ abstract class AbstractDescriptorTestCase extends TestCase
         return static::getDescriptionTestData(ObjectsProvider::getRouteCollections());
     }
 
+    /** @dataProvider getDescribeRouteCollectionWithHttpMethodFilterTestData */
+    public function testDescribeRouteCollectionWithHttpMethodFilter(string $httpMethod, RouteCollection $routes, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $routes, ['method' => $httpMethod]);
+    }
+
+    public static function getDescribeRouteCollectionWithHttpMethodFilterTestData(): iterable
+    {
+        foreach (ObjectsProvider::getRouteCollectionsByHttpMethod() as $httpMethod => $routeCollection) {
+            foreach (static::getDescriptionTestData($routeCollection) as $testData) {
+                yield [$httpMethod, ...$testData];
+            }
+        }
+    }
+
     /** @dataProvider getDescribeRouteTestData */
     public function testDescribeRoute(Route $route, $expectedDescription)
     {
@@ -110,7 +125,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     /** @dataProvider getDescribeContainerDefinitionWithArgumentsShownTestData */
     public function testDescribeContainerDefinitionWithArgumentsShown(Definition $definition, $expectedDescription)
     {
-        $this->assertDescription($expectedDescription, $definition, ['show_arguments' => true]);
+        $this->assertDescription($expectedDescription, $definition, []);
     }
 
     public static function getDescribeContainerDefinitionWithArgumentsShownTestData(): array
@@ -273,6 +288,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $options['is_debug'] = false;
         $options['raw_output'] = true;
         $options['raw_text'] = true;
+        $options['method'] ??= null;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
 
         if ('txt' === $this->getFormat()) {
@@ -307,7 +323,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
             'public' => ['show_hidden' => false],
             'tag1' => ['show_hidden' => true, 'tag' => 'tag1'],
             'tags' => ['group_by' => 'tags', 'show_hidden' => true],
-            'arguments' => ['show_hidden' => false, 'show_arguments' => true],
+            'arguments' => ['show_hidden' => false],
         ];
 
         $data = [];

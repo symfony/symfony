@@ -46,6 +46,8 @@ class Connection
         'endpoint' => 'https://sqs.eu-west-1.amazonaws.com',
         'region' => 'eu-west-1',
         'queue_name' => 'messages',
+        'queue_attributes' => null,
+        'queue_tags' => null,
         'account' => null,
         'sslmode' => null,
         'debug' => null,
@@ -89,6 +91,8 @@ class Connection
      * * endpoint: absolute URL to the SQS service (Default: https://sqs.eu-west-1.amazonaws.com)
      * * region: name of the AWS region (Default: eu-west-1)
      * * queue_name: name of the queue (Default: messages)
+     * * queue_attributes: attributes of the queue, array<QueueAttributeName::*, string>
+     * * queue_tags: tags of the queue, array<string, string>
      * * account: identifier of the AWS account
      * * access_key: AWS access key
      * * secret_key: AWS secret key
@@ -132,6 +136,8 @@ class Connection
             'visibility_timeout' => null !== $options['visibility_timeout'] ? (int) $options['visibility_timeout'] : null,
             'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOL),
             'queue_name' => (string) $options['queue_name'],
+            'queue_attributes' => $options['queue_attributes'],
+            'queue_tags' => $options['queue_tags'],
         ];
 
         $clientConfiguration = [
@@ -278,12 +284,14 @@ class Connection
             throw new InvalidArgumentException(\sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
         }
 
-        $parameters = ['QueueName' => $this->configuration['queue_name']];
+        $parameters = [
+            'QueueName' => $this->configuration['queue_name'],
+            'Attributes' => $this->configuration['queue_attributes'],
+            'tags' => $this->configuration['queue_tags'],
+        ];
 
         if (self::isFifoQueue($this->configuration['queue_name'])) {
-            $parameters['Attributes'] = [
-                'FifoQueue' => 'true',
-            ];
+            $parameters['Attributes'][QueueAttributeName::FIFO_QUEUE] = 'true';
         }
 
         $this->client->createQueue($parameters);

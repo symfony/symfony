@@ -77,24 +77,35 @@ class ReflectionTypeResolverTest extends TestCase
         $this->resolver->resolve(new \ReflectionClass(self::class));
     }
 
-    /**
-     * @dataProvider classKeywordsTypesDataProvider
-     */
-    public function testCannotResolveClassKeywordsWithoutTypeContext(\ReflectionType $reflection)
+    public function testCannotResolveStaticKeywordWithoutTypeContext()
     {
+        $subject = (new \ReflectionClass(ReflectionExtractableDummy::class))->getMethod('getStatic')->getReturnType();
+
         $this->expectException(InvalidArgumentException::class);
-        $this->resolver->resolve($reflection);
+        $this->resolver->resolve($subject);
     }
 
-    /**
-     * @return iterable<array{0: \ReflectionType}>
-     */
-    public static function classKeywordsTypesDataProvider(): iterable
+    public function testResolveSelfKeywordWithoutTypeContext()
     {
-        $reflection = new \ReflectionClass(ReflectionExtractableDummy::class);
+        $subject = (new \ReflectionClass(ReflectionExtractableDummy::class))->getProperty('self')->getType();
 
-        yield [$reflection->getProperty('self')->getType()];
-        yield [$reflection->getMethod('getStatic')->getReturnType()];
-        yield [$reflection->getProperty('parent')->getType()];
+        if (\PHP_VERSION_ID >= 80500) {
+            $this->assertEquals(Type::object(ReflectionExtractableDummy::class), $this->resolver->resolve($subject));
+        } else {
+            $this->expectException(InvalidArgumentException::class);
+            $this->resolver->resolve($subject);
+        }
+    }
+
+    public function testResolveParentKeywordsWithoutTypeContext()
+    {
+        $subject = (new \ReflectionClass(ReflectionExtractableDummy::class))->getProperty('parent')->getType();
+
+        if (\PHP_VERSION_ID >= 80500) {
+            $this->assertEquals(Type::object(AbstractDummy::class), $this->resolver->resolve($subject));
+        } else {
+            $this->expectException(InvalidArgumentException::class);
+            $this->resolver->resolve($subject);
+        }
     }
 }

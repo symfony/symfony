@@ -7,5 +7,6 @@
         "bool",
         "string"
     ],
-    "has_normalizer": true
+    "has_normalizer": true,
+    "has_nested_options": false
 }

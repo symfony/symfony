@@ -92,9 +92,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidGroupedTimezones(string $timezone, int $zone)
     {
-        $constraint = new Timezone([
-            'zone' => $zone,
-        ]);
+        $constraint = new Timezone(zone: $zone);
 
         $this->validator->validate($timezone, $constraint);
 
@@ -125,9 +123,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidTimezoneWithoutZone(string $timezone)
     {
-        $constraint = new Timezone([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Timezone(message: 'myMessage');
 
         $this->validator->validate($timezone, $constraint);
 
@@ -150,10 +146,10 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidGroupedTimezones(string $timezone, int $zone)
     {
-        $constraint = new Timezone([
-            'zone' => $zone,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Timezone(
+            zone: $zone,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($timezone, $constraint);
 
@@ -193,10 +189,10 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidGroupedTimezonesByCountry(string $timezone, string $country)
     {
-        $constraint = new Timezone([
-            'zone' => \DateTimeZone::PER_COUNTRY,
-            'countryCode' => $country,
-        ]);
+        $constraint = new Timezone(
+            zone: \DateTimeZone::PER_COUNTRY,
+            countryCode: $country,
+        );
 
         $this->validator->validate($timezone, $constraint);
 
@@ -230,11 +226,11 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidGroupedTimezonesByCountry(string $timezone, string $countryCode)
     {
-        $constraint = new Timezone([
-            'message' => 'myMessage',
-            'zone' => \DateTimeZone::PER_COUNTRY,
-            'countryCode' => $countryCode,
-        ]);
+        $constraint = new Timezone(
+            message: 'myMessage',
+            zone: \DateTimeZone::PER_COUNTRY,
+            countryCode: $countryCode,
+        );
 
         $this->validator->validate($timezone, $constraint);
 
@@ -255,11 +251,11 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function testGroupedTimezonesWithInvalidCountry()
     {
-        $constraint = new Timezone([
-            'message' => 'myMessage',
-            'zone' => \DateTimeZone::PER_COUNTRY,
-            'countryCode' => 'foobar',
-        ]);
+        $constraint = new Timezone(
+            message: 'myMessage',
+            zone: \DateTimeZone::PER_COUNTRY,
+            countryCode: 'foobar',
+        );
 
         $this->validator->validate('Europe/Amsterdam', $constraint);
 
@@ -286,9 +282,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
      */
     public function testDeprecatedTimezonesAreInvalidWithoutBC(string $timezone)
     {
-        $constraint = new Timezone([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Timezone(message: 'myMessage');
 
         $this->validator->validate($timezone, $constraint);
 
@@ -332,10 +326,10 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             $this->markTestSkipped('"Europe/Saratov" is expired until 2017, current version is '.$tzDbVersion);
         }
 
-        $constraint = new Timezone([
-            'message' => 'myMessage',
-            'intlCompatible' => true,
-        ]);
+        $constraint = new Timezone(
+            message: 'myMessage',
+            intlCompatible: true,
+        );
 
         $this->validator->validate('Europe/Saratov', $constraint);
 

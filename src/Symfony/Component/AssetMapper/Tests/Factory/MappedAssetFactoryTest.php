@@ -26,7 +26,8 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
 class MappedAssetFactoryTest extends TestCase
 {
-    private const DEFAULT_FIXTURES = __DIR__.'/../Fixtures/assets/vendor';
+    private const FIXTURES_DIR = __DIR__.'/../Fixtures';
+    private const VENDOR_FIXTURES_DIR = self::FIXTURES_DIR.'/assets/vendor';
 
     private AssetMapperInterface&MockObject $assetMapper;
 
@@ -34,7 +35,7 @@ class MappedAssetFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $asset = $factory->createMappedAsset('file2.js', __DIR__.'/../Fixtures/dir1/file2.js');
+        $asset = $factory->createMappedAsset('file2.js', self::FIXTURES_DIR.'/dir1/file2.js');
         $this->assertSame('file2.js', $asset->logicalPath);
         $this->assertMatchesRegularExpression('/^\/final-assets\/file2-[a-zA-Z0-9]{7,128}\.js$/', $asset->publicPath);
         $this->assertSame('/final-assets/file2.js', $asset->publicPathWithoutDigest);
@@ -43,7 +44,7 @@ class MappedAssetFactoryTest extends TestCase
     public function testCreateMappedAssetRespectsPreDigestedPaths()
     {
         $assetMapper = $this->createFactory();
-        $asset = $assetMapper->createMappedAsset('already-abcdefVWXYZ0123456789.digested.css', __DIR__.'/../Fixtures/dir2/already-abcdefVWXYZ0123456789.digested.css');
+        $asset = $assetMapper->createMappedAsset('already-abcdefVWXYZ0123456789.digested.css', self::FIXTURES_DIR.'/dir2/already-abcdefVWXYZ0123456789.digested.css');
         $this->assertSame('already-abcdefVWXYZ0123456789.digested.css', $asset->logicalPath);
         $this->assertSame('/final-assets/already-abcdefVWXYZ0123456789.digested.css', $asset->publicPath);
         // for pre-digested files, the digest *is* part of the public path
@@ -67,18 +68,18 @@ class MappedAssetFactoryTest extends TestCase
         $assetMapper = $this->createFactory($file1Compiler);
         $expected = 'totally changed';
 
-        $asset = $assetMapper->createMappedAsset('file1.css', __DIR__.'/../Fixtures/dir1/file1.css');
+        $asset = $assetMapper->createMappedAsset('file1.css', self::FIXTURES_DIR.'/dir1/file1.css');
         $this->assertSame($expected, $asset->content);
 
         // verify internal caching doesn't cause issues
-        $asset = $assetMapper->createMappedAsset('file1.css', __DIR__.'/../Fixtures/dir1/file1.css');
+        $asset = $assetMapper->createMappedAsset('file1.css', self::FIXTURES_DIR.'/dir1/file1.css');
         $this->assertSame($expected, $asset->content);
     }
 
     public function testCreateMappedAssetWithContentThatDoesNotChange()
     {
         $assetMapper = $this->createFactory();
-        $asset = $assetMapper->createMappedAsset('file1.css', __DIR__.'/../Fixtures/dir1/file1.css');
+        $asset = $assetMapper->createMappedAsset('file1.css', self::FIXTURES_DIR.'/dir1/file1.css');
         // null content because the final content matches the file source
         $this->assertNull($asset->content);
     }
@@ -89,7 +90,7 @@ class MappedAssetFactoryTest extends TestCase
 
         $this->expectException(CircularAssetsException::class);
         $this->expectExceptionMessage('Circular reference detected while creating asset for "circular1.css": "circular1.css -> circular2.css -> circular1.css".');
-        $factory->createMappedAsset('circular1.css', __DIR__.'/../Fixtures/circular_dir/circular1.css');
+        $factory->createMappedAsset('circular1.css', self::FIXTURES_DIR.'/circular_dir/circular1.css');
     }
 
     public function testCreateMappedAssetWithDigest()
@@ -111,7 +112,7 @@ class MappedAssetFactoryTest extends TestCase
         };
 
         $factory = $this->createFactory();
-        $asset = $factory->createMappedAsset('subdir/file6.js', __DIR__.'/../Fixtures/dir2/subdir/file6.js');
+        $asset = $factory->createMappedAsset('subdir/file6.js', self::FIXTURES_DIR.'/dir2/subdir/file6.js');
         $this->assertSame('7f983f4053a57f07551fed6099c0da4e', $asset->digest);
         $this->assertFalse($asset->isPredigested);
 
@@ -119,14 +120,14 @@ class MappedAssetFactoryTest extends TestCase
         // since file6.js imports file5.js, the digest for file6 should change,
         // because, internally, the file path in file6.js to file5.js will need to change
         $factory = $this->createFactory($file6Compiler);
-        $asset = $factory->createMappedAsset('subdir/file6.js', __DIR__.'/../Fixtures/dir2/subdir/file6.js');
+        $asset = $factory->createMappedAsset('subdir/file6.js', self::FIXTURES_DIR.'/dir2/subdir/file6.js');
         $this->assertSame('7e4f24ebddd4ab2a3bcf0d89270b9f30', $asset->digest);
     }
 
     public function testCreateMappedAssetWithPredigested()
     {
         $assetMapper = $this->createFactory();
-        $asset = $assetMapper->createMappedAsset('already-abcdefVWXYZ0123456789.digested.css', __DIR__.'/../Fixtures/dir2/already-abcdefVWXYZ0123456789.digested.css');
+        $asset = $assetMapper->createMappedAsset('already-abcdefVWXYZ0123456789.digested.css', self::FIXTURES_DIR.'/dir2/already-abcdefVWXYZ0123456789.digested.css');
         $this->assertSame('abcdefVWXYZ0123456789.digested', $asset->digest);
         $this->assertTrue($asset->isPredigested);
     }
@@ -134,7 +135,7 @@ class MappedAssetFactoryTest extends TestCase
     public function testCreateMappedAssetInVendor()
     {
         $assetMapper = $this->createFactory();
-        $asset = $assetMapper->createMappedAsset('lodash.js', __DIR__.'/../Fixtures/assets/vendor/lodash/lodash.index.js');
+        $asset = $assetMapper->createMappedAsset('lodash.js', self::VENDOR_FIXTURES_DIR.'/lodash/lodash.index.js');
         $this->assertSame('lodash.js', $asset->logicalPath);
         $this->assertTrue($asset->isVendor);
     }
@@ -142,12 +143,12 @@ class MappedAssetFactoryTest extends TestCase
     public function testCreateMappedAssetInMissingVendor()
     {
         $assetMapper = $this->createFactory(null, '/this-path-does-not-exist/');
-        $asset = $assetMapper->createMappedAsset('lodash.js', __DIR__.'/../Fixtures/assets/vendor/lodash/lodash.index.js');
+        $asset = $assetMapper->createMappedAsset('lodash.js', self::VENDOR_FIXTURES_DIR.'/lodash/lodash.index.js');
         $this->assertSame('lodash.js', $asset->logicalPath);
         $this->assertFalse($asset->isVendor);
     }
 
-    private function createFactory(?AssetCompilerInterface $extraCompiler = null, ?string $vendorDir = self::DEFAULT_FIXTURES): MappedAssetFactory
+    private function createFactory(?AssetCompilerInterface $extraCompiler = null, ?string $vendorDir = self::VENDOR_FIXTURES_DIR): MappedAssetFactory
     {
         $compilers = [
             new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class)),

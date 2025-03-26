@@ -10,7 +10,9 @@ framework:
         max_depth_handler: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serializer\MaxDepthHandler
         default_context:
             enable_max_depth: true
-    property_info: { enabled: true }
+    property_info:
+        enabled: true
+        with_constructor_extractor: true
 
 services:
     serializer.alias:

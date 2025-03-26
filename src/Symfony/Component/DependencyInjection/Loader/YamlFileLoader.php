@@ -923,6 +923,11 @@ class YamlFileLoader extends FileLoader
 
             return new Expression(substr($value, 2));
         } elseif (\is_string($value) && str_starts_with($value, '@')) {
+            if (str_starts_with($value, '@>')) {
+                $argument = $this->resolveServices(substr_replace($value, '', 1, 1), $file, $isParameter);
+
+                return new ServiceClosureArgument($argument);
+            }
             if (str_starts_with($value, '@@')) {
                 $value = substr($value, 1);
                 $invalidBehavior = null;

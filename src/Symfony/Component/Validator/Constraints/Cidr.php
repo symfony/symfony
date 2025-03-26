@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -74,6 +75,7 @@ class Cidr extends Constraint
     /** @var callable|null */
     public $normalizer;
 
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $version = null,
@@ -84,6 +86,10 @@ class Cidr extends Constraint
         $payload = null,
         ?callable $normalizer = null,
     ) {
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         $this->version = $version ?? $options['version'] ?? $this->version;
 
         if (!\array_key_exists($this->version, self::NET_MAXES)) {

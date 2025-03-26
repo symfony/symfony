@@ -47,7 +47,7 @@ class EnvelopeTest extends TestCase
 
         $envelope = $envelope->withoutAll(ReceivedStamp::class);
 
-        $this->assertEmpty($envelope->all(ReceivedStamp::class));
+        $this->assertSame([], $envelope->all(ReceivedStamp::class));
         $this->assertCount(1, $envelope->all(DelayStamp::class));
     }
 
@@ -70,14 +70,14 @@ class EnvelopeTest extends TestCase
         $this->assertEquals($envelope, $envelope2);
 
         $envelope3 = $envelope2->withoutStampsOfType(ReceivedStamp::class);
-        $this->assertEmpty($envelope3->all(ReceivedStamp::class));
+        $this->assertSame([], $envelope3->all(ReceivedStamp::class));
 
         $envelope4 = $envelope3->withoutStampsOfType(DummyImplementsFooBarStamp::class);
-        $this->assertEmpty($envelope4->all(DummyImplementsFooBarStamp::class));
-        $this->assertEmpty($envelope4->all(DummyExtendsFooBarStamp::class));
+        $this->assertSame([], $envelope4->all(DummyImplementsFooBarStamp::class));
+        $this->assertSame([], $envelope4->all(DummyExtendsFooBarStamp::class));
 
         $envelope5 = $envelope3->withoutStampsOfType(DummyFooBarStampInterface::class);
-        $this->assertEmpty($envelope5->all());
+        $this->assertSame([], $envelope5->all());
     }
 
     public function testWithoutStampsOfTypeWithNonExistentStampClass()

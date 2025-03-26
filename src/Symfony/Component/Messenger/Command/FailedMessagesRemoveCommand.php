@@ -37,6 +37,7 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force the operation without confirmation'),
                 new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
+                new InputOption('class-filter', null, InputOption::VALUE_REQUIRED, 'Filter by a specific class name'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> removes given messages that are pending in the failure transport.
@@ -69,6 +70,24 @@ EOF
         $shouldDeleteAllMessages = $input->getOption('all');
 
         $idsCount = \count($ids);
+
+        if (!$receiver instanceof ListableReceiverInterface) {
+            throw new RuntimeException(\sprintf('The "%s" receiver does not support removing specific messages.', $failureTransportName));
+        }
+
+        if (!$idsCount && null !== $input->getOption('class-filter')) {
+            $ids = $this->getMessageIdsByClassFilter($input->getOption('class-filter'), $receiver);
+            $idsCount = \count($ids);
+
+            if (!$idsCount) {
+                throw new RuntimeException('No failed messages were found with this filter.');
+            }
+
+            if (!$io->confirm(\sprintf('Can you confirm you want to remove %d message%s?', $idsCount, 1 === $idsCount ? '' : 's'))) {
+                return 0;
+            }
+        }
+
         if (!$shouldDeleteAllMessages && !$idsCount) {
             throw new RuntimeException('Please specify at least one message id. If you want to remove all failed messages, use the "--all" option.');
         } elseif ($shouldDeleteAllMessages && $idsCount) {
@@ -76,10 +95,6 @@ EOF
         }
 
         $shouldDisplayMessages = $input->getOption('show-messages') || 1 === $idsCount;
-
-        if (!$receiver instanceof ListableReceiverInterface) {
-            throw new RuntimeException(\sprintf('The "%s" receiver does not support removing specific messages.', $failureTransportName));
-        }
 
         if ($shouldDeleteAllMessages) {
             $this->removeAllMessages($receiver, $io, $shouldForce, $shouldDisplayMessages);
@@ -117,6 +132,26 @@ EOF
                 $io->note(\sprintf('Message with id %s not removed.', $id));
             }
         }
+    }
+
+    private function getMessageIdsByClassFilter(string $classFilter, ListableReceiverInterface $receiver): array
+    {
+        $ids = [];
+
+        $this->phpSerializer?->acceptPhpIncompleteClass();
+        try {
+            foreach ($receiver->all() as $envelope) {
+                if ($classFilter !== $envelope->getMessage()::class) {
+                    continue;
+                }
+
+                $ids[] = $this->getMessageId($envelope);
+            };
+        } finally {
+            $this->phpSerializer?->rejectPhpIncompleteClass();
+        }
+
+        return $ids;
     }
 
     private function removeAllMessages(ListableReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldDisplayMessages): void

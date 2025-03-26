@@ -33,6 +33,7 @@ class EsmtpTransport extends SmtpTransport
     private string $password = '';
     private array $capabilities;
     private bool $autoTls = true;
+    private bool $requireTls = false;
 
     public function __construct(string $host = 'localhost', int $port = 0, ?bool $tls = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null, ?AbstractStream $stream = null, ?array $authenticators = null)
     {
@@ -116,6 +117,21 @@ class EsmtpTransport extends SmtpTransport
         return $this->autoTls;
     }
 
+    /**
+     * @return $this
+     */
+    public function setRequireTls(bool $requireTls): static
+    {
+        $this->requireTls = $requireTls;
+
+        return $this;
+    }
+
+    public function isTlsRequired(): bool
+    {
+        return $this->requireTls;
+    }
+
     public function setAuthenticators(array $authenticators): void
     {
         $this->authenticators = [];
@@ -159,6 +175,7 @@ class EsmtpTransport extends SmtpTransport
 
         /** @var SocketStream $stream */
         $stream = $this->getStream();
+        $tlsStarted = $stream->isTls();
         // WARNING: !$stream->isTLS() is right, 100% sure :)
         // if you think that the ! should be removed, read the code again
         // if doing so "fixes" your issue then it probably means your SMTP server behaves incorrectly or is wrongly configured
@@ -169,8 +186,13 @@ class EsmtpTransport extends SmtpTransport
                 throw new TransportException('Unable to connect with STARTTLS.');
             }
 
+            $tlsStarted = true;
             $response = $this->executeCommand(\sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
             $this->capabilities = $this->parseCapabilities($response);
+        }
+
+        if (!$tlsStarted && $this->isTlsRequired()) {
+            throw new TransportException('TLS required but neither TLS or STARTTLS are in use.');
         }
 
         if (\array_key_exists('AUTH', $this->capabilities)) {

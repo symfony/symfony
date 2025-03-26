@@ -73,6 +73,36 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
+    public function testDefaultProcessorWithScalarNode()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('parameter_int', 12134);
+        $container->setParameter('env(FLOATISH)', 4.2);
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = [
+            'scalar_node' => '%env(default:parameter_int:FLOATISH)%',
+        ]);
+
+        $this->doProcess($container);
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
+    public function testDefaultProcessorAndAnotherProcessorWithScalarNode()
+    {
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessageMatches('/^Invalid type for path "env_extension\.scalar_node"\. Expected one of "bool", "int", "float", "string", but got one of "int", "array"\.$/');
+
+        $container = new ContainerBuilder();
+        $container->setParameter('parameter_int', 12134);
+        $container->setParameter('env(JSON)', '{ "foo": "bar" }');
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', [
+            'scalar_node' => '%env(default:parameter_int:json:JSON)%',
+        ]);
+
+        $this->doProcess($container);
+    }
+
     public function testEnvsAreValidatedInConfigWithInvalidPlaceholder()
     {
         $this->expectException(InvalidTypeException::class);

@@ -25,12 +25,12 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 final class MapQueryParameter extends ValueResolver
 {
     /**
-     * @see https://php.net/filter.filters.validate for filter, flags and options
+     * @see https://php.net/manual/filter.constants for filter, flags and options
      *
      * @param string|null                                         $name     The name of the query parameter; if null, the name of the argument in the controller will be used
-     * @param (FILTER_VALIDATE_*)|(FILTER_SANITIZE_*)|null        $filter   The filter to pass to "filter_var()"
-     * @param int-mask-of<(FILTER_FLAG_*)|FILTER_NULL_ON_FAILURE> $flags    The flags to pass to "filter_var()"
-     * @param array                                               $options  The options to pass to "filter_var()"
+     * @param (FILTER_VALIDATE_*)|(FILTER_SANITIZE_*)|null        $filter   The filter to pass to "filter_var()", deduced from the type-hint if null
+     * @param int-mask-of<(FILTER_FLAG_*)|FILTER_NULL_ON_FAILURE> $flags
+     * @param array{min_range?: int|float, max_range?: int|float, regexp?: string, ...} $options
      * @param class-string<ValueResolverInterface>|string         $resolver The name of the resolver to use
      */
     public function __construct(

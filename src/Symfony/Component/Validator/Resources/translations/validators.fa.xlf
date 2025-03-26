@@ -466,6 +466,10 @@
                 <source>This value should not be after week "{{ max }}".</source>
                 <target>این مقدار نباید بعد از هفته "{{ max }}" باشد.</target>
             </trans-unit>
+            <trans-unit id="120">
+                <source>This value is not a valid slug.</source>
+                <target>این مقدار یک slug معتبر نیست.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

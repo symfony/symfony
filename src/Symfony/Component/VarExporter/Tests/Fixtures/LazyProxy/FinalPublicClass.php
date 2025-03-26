@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy;
 
-class FinalPublicClass
+class FinalPublicClass extends \stdClass
 {
     private $count = 0;
 

@@ -143,6 +143,12 @@ EOF
         }
 
         if ($this->receiverNames && !$input->getArgument('receivers')) {
+            if (1 === \count($this->receiverNames)) {
+                $input->setArgument('receivers', $this->receiverNames);
+
+                return;
+            }
+
             $io->block('Which transports/receivers do you want to consume?', null, 'fg=white;bg=blue', ' ', true);
 
             $io->writeln('Choose which receivers you want to consume messages from in order of priority.');
@@ -284,7 +290,7 @@ EOF
         }
 
         if (\SIGALRM === $signal) {
-            $this->logger?->info('Sending keepalive request.', ['transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+            $this->logger?->debug('Sending keepalive request.', ['transport_names' => $this->worker->getMetadata()->getTransportNames()]);
 
             $this->worker->keepalive($this->getApplication()->getAlarmInterval());
 

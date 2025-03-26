@@ -1,0 +1,34 @@
+{
+    "name": "symfony/aha-send-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony AhaSend Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Farhad Hedayatifard",
+            "email": "farhad@ahasend.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/event-dispatcher": "^1",
+        "symfony/mailer": "^7.3"
+    },
+    "require-dev": {
+        "symfony/http-client": "^6.4|^7.0",
+        "symfony/webhook": "^6.4|^7.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\AhaSend\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

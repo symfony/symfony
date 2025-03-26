@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Clazz;
@@ -48,6 +49,8 @@ require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
  */
 class PhpStanExtractorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private PhpStanExtractor $extractor;
     private PhpDocExtractor $phpDocExtractor;
 
@@ -64,6 +67,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractLegacy($property, ?array $type = null)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
@@ -72,6 +77,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testParamTagTypeIsOmittedLegacy()
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertNull($this->extractor->getTypes(PhpStanOmittedParamTagTypeDocBlock::class, 'omittedType'));
     }
 
@@ -92,6 +99,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testInvalidLegacy($property)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
     }
 
@@ -102,6 +111,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractTypesWithNoPrefixesLegacy($property, ?array $type = null)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $noPrefixExtractor = new PhpStanExtractor([], [], []);
 
         $this->assertEquals($type, $noPrefixExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
@@ -218,6 +229,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractTypesWithCustomPrefixesLegacy($property, ?array $type = null)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $customExtractor = new PhpStanExtractor(['add', 'remove'], ['is', 'can']);
 
         $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
@@ -321,6 +334,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testDocBlockFallbackLegacy($property, $types)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback', $property));
     }
 
@@ -331,6 +346,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testPropertiesDefinedByTraitsLegacy(string $property, LegacyType $type)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals([$type], $this->extractor->getTypes(DummyUsingTrait::class, $property));
     }
 
@@ -351,6 +368,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testPropertiesStaticTypeLegacy(string $class, string $property, LegacyType $type)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals([$type], $this->extractor->getTypes($class, $property));
     }
 
@@ -369,6 +388,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testPropertiesParentTypeLegacy(string $class, string $property, ?array $types)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals($types, $this->extractor->getTypes($class, $property));
     }
 
@@ -387,6 +408,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractConstructorTypesLegacy($property, ?array $type = null)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypesFromConstructor()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypeFromConstructor()" instead.');
+
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }
 
@@ -397,6 +420,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractConstructorTypesReturnNullOnEmptyDocBlockLegacy($property)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypesFromConstructor()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypeFromConstructor()" instead.');
+
         $this->assertNull($this->extractor->getTypesFromConstructor(ConstructorDummyWithoutDocBlock::class, $property));
     }
 
@@ -418,6 +443,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractorUnionTypesLegacy(string $property, ?array $types)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyUnionType', $property));
     }
 
@@ -441,6 +468,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testPseudoTypesLegacy($property, array $type)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\PhpStanPseudoTypesDummy', $property));
     }
 
@@ -477,6 +506,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testDummyNamespaceLegacy()
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals(
             [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')],
             $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace', 'dummy')
@@ -488,6 +519,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testDummyNamespaceWithPropertyLegacy()
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $phpStanTypes = $this->extractor->getTypes(\B\Dummy::class, 'property');
         $phpDocTypes = $this->phpDocExtractor->getTypes(\B\Dummy::class, 'property');
 
@@ -502,6 +535,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractorIntRangeTypeLegacy(string $property, ?array $types)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy', $property));
     }
 
@@ -521,6 +556,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractPhp80TypeLegacy(string $class, $property, ?array $type = null)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
     }
 
@@ -543,6 +580,8 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testAllowPrivateAccessLegacy(bool $allowPrivateAccess, array $expectedTypes)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $extractor = new PhpStanExtractor(allowPrivateAccess: $allowPrivateAccess);
         $this->assertEquals(
             $expectedTypes,
@@ -559,12 +598,16 @@ class PhpStanExtractorTest extends TestCase
     }
 
     /**
+     * @group legacy
+     *
      * @param list<LegacyType> $expectedTypes
      *
      * @dataProvider legacyGenericsProvider
      */
     public function testGenericsLegacy(string $property, array $expectedTypes)
     {
+        $this->expectDeprecation('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
         $this->assertEquals($expectedTypes, $this->extractor->getTypes(DummyGeneric::class, $property));
     }
 
@@ -697,6 +740,7 @@ class PhpStanExtractorTest extends TestCase
         yield 'stat' => ['stat'];
         yield 'foo' => ['foo'];
         yield 'bar' => ['bar'];
+        yield 'baz' => ['baz'];
     }
 
     /**
@@ -1080,6 +1124,24 @@ class PhpStanExtractorTest extends TestCase
             'nullableInterface',
             Type::nullable(Type::generic(Type::object(IFace::class), Type::object(Dummy::class))),
         ];
+    }
+
+    /**
+     * @dataProvider descriptionsProvider
+     */
+    public function testGetDescriptions(string $property, ?string $shortDescription, ?string $longDescription)
+    {
+        $this->assertEquals($shortDescription, $this->extractor->getShortDescription(Dummy::class, $property));
+        $this->assertEquals($longDescription, $this->extractor->getLongDescription(Dummy::class, $property));
+    }
+
+    public static function descriptionsProvider(): iterable
+    {
+        yield ['foo', 'Short description.', 'Long description.'];
+        yield ['bar', 'This is bar', null];
+        yield ['baz', 'Should be used.', null];
+        yield ['bal', 'A short description ignoring template.', "A long description...\n\n...over several lines."];
+        yield ['foo2', null, null];
     }
 }
 

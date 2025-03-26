@@ -11,9 +11,10 @@ PHPUnit %s
 Runtime:       PHP %s
 Configuration: %s/src/Symfony/Bridge/PhpUnit/Tests/Fixtures/symfonyextension/phpunit-with-extension.xml.dist
 
-D.............................................                    46 / 46 (100%)
+D................................................................ 65 / 76 ( 85%)
+...........                                                       76 / 76 (100%)
 
 Time: %s, Memory: %s
 
 OK, but there were issues!
-Tests: 46, Assertions: 46, Deprecations: 1.
+Tests: 76, Assertions: 76, Deprecations: 1.

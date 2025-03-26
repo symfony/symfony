@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Deprecate `LdapUser::eraseCredentials()` in favor of `__serialize()`
+ * Add `RoleFetcherInterface` to allow roles fetching at user loading
+ * Add ability to fetch LDAP roles
+
 7.2
 ---
 

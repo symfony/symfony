@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -153,12 +154,14 @@ class SwitchUserListener extends AbstractListener
 
             throw $e;
         }
+        $accessDecision = new AccessDecision();
 
-        if (false === $this->accessDecisionManager->decide($token, [$this->role], $user)) {
-            $exception = new AccessDeniedException();
-            $exception->setAttributes($this->role);
+        if (!$accessDecision->isGranted = $this->accessDecisionManager->decide($token, [$this->role], $user, $accessDecision)) {
+            $e = new AccessDeniedException($accessDecision->getMessage());
+            $e->setAttributes($this->role);
+            $e->setAccessDecision($accessDecision);
 
-            throw $exception;
+            throw $e;
         }
 
         $this->logger?->info('Attempting to switch to user.', ['username' => $username]);

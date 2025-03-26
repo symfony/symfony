@@ -100,7 +100,7 @@ EOF;
             if (preg_match($intervalRegexp, $part)) {
                 // Explicit rule is not a standard rule.
                 return [];
-            }  
+            }
 
             $standardRules[] = $part;
         }

@@ -14,7 +14,9 @@ namespace Symfony\Component\Routing\Loader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Attribute\DeprecatedAlias;
 use Symfony\Component\Routing\Attribute\Route as RouteAttribute;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\Exception\LogicException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -107,6 +109,15 @@ abstract class AttributeClassLoader implements LoaderInterface
             return $collection;
         }
         $fqcnAlias = false;
+
+        if (!$class->hasMethod('__invoke')) {
+            foreach ($this->getAttributes($class) as $attr) {
+                if ($attr->getAliases()) {
+                    throw new InvalidArgumentException(\sprintf('Route aliases cannot be used on non-invokable class "%s".', $class->getName()));
+                }
+            }
+        }
+
         foreach ($class->getMethods() as $method) {
             $this->defaultRouteIndex = 0;
             $routeNamesBefore = array_keys($collection->all());
@@ -229,6 +240,19 @@ abstract class AttributeClassLoader implements LoaderInterface
                 $collection->add($name.'.'.$locale, $route, $priority);
             } else {
                 $collection->add($name, $route, $priority);
+            }
+            foreach ($attr->getAliases() as $aliasAttribute) {
+                if ($aliasAttribute instanceof DeprecatedAlias) {
+                    $alias = $collection->addAlias($aliasAttribute->getAliasName(), $name);
+                    $alias->setDeprecated(
+                        $aliasAttribute->getPackage(),
+                        $aliasAttribute->getVersion(),
+                        $aliasAttribute->getMessage()
+                    );
+                    continue;
+                }
+
+                $collection->addAlias($aliasAttribute, $name);
             }
         }
     }

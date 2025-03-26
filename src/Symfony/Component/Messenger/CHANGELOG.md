@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `CloseableTransportInterface` to allow closing the transport
+ * Add `SentForRetryStamp` that identifies whether a failed message was sent for retry
+ * Add `Symfony\Component\Messenger\Middleware\DeduplicateMiddleware` and `Symfony\Component\Messenger\Stamp\DeduplicateStamp`
+ * Add `--class-filter` option to the `messenger:failed:remove` command
+
 7.2
 ---
 

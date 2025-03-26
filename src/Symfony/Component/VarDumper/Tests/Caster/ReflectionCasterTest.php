@@ -86,7 +86,7 @@ EOTXT
     public function testClosureCaster()
     {
         $a = $b = 123;
-        $var = function ($x) use ($a, &$b) {};
+        $var = function ($x) use ($a, &$b) { var_dump($a, $b); };
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'

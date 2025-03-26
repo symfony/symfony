@@ -17,6 +17,9 @@ use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 
 final class Driver extends AbstractDriverMiddleware
 {
+    /**
+     * @param \ArrayObject<string, int> $connectionExpiries
+     */
     public function __construct(
         DriverInterface $driver,
         private \ArrayObject $connectionExpiries,

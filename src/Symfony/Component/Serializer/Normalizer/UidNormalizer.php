@@ -48,16 +48,13 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface
         ];
     }
 
-    /**
-     * @param AbstractUid $object
-     */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return match ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
-            self::NORMALIZATION_FORMAT_CANONICAL => (string) $object,
-            self::NORMALIZATION_FORMAT_BASE58 => $object->toBase58(),
-            self::NORMALIZATION_FORMAT_BASE32 => $object->toBase32(),
-            self::NORMALIZATION_FORMAT_RFC4122 => $object->toRfc4122(),
+            self::NORMALIZATION_FORMAT_CANONICAL => (string) $data,
+            self::NORMALIZATION_FORMAT_BASE58 => $data->toBase58(),
+            self::NORMALIZATION_FORMAT_BASE32 => $data->toBase32(),
+            self::NORMALIZATION_FORMAT_RFC4122 => $data->toRfc4122(),
             default => throw new LogicException(\sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY])),
         };
     }

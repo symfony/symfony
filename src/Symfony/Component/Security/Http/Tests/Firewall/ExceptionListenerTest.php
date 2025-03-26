@@ -166,7 +166,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertNotEmpty($dispatcher->getListeners());
 
         $listener->unregister($dispatcher);
-        $this->assertEmpty($dispatcher->getListeners());
+        $this->assertSame([], $dispatcher->getListeners());
     }
 
     public static function getAccessDeniedExceptionProvider()

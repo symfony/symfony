@@ -300,6 +300,6 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $someFunction = fn () => true;
         $dbalStore->configureSchema($schema, $someFunction);
         $table = $schema->getTable('lock_keys');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 }

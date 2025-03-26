@@ -17,10 +17,8 @@ use Twig\Environment;
 use Twig\Node\BlockNode;
 use Twig\Node\EmptyNode;
 use Twig\Node\Expression\ArrayExpression;
-use Twig\Node\Expression\AssignNameExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
-use Twig\Node\Expression\NameExpression;
 use Twig\Node\Expression\Variable\AssignContextVariable;
 use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\ModuleNode;
@@ -60,17 +58,10 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 
             $var = '__internal_trans_default_domain'.hash('xxh128', $templateName);
 
-            if (class_exists(Nodes::class)) {
-                $name = new AssignContextVariable($var, $node->getTemplateLine());
-                $this->scope->set('domain', new ContextVariable($var, $node->getTemplateLine()));
+            $name = new AssignContextVariable($var, $node->getTemplateLine());
+            $this->scope->set('domain', new ContextVariable($var, $node->getTemplateLine()));
 
-                return new SetNode(false, new Nodes([$name]), new Nodes([$node->getNode('expr')]), $node->getTemplateLine());
-            }
-
-            $name = new AssignNameExpression($var, $node->getTemplateLine());
-            $this->scope->set('domain', new NameExpression($var, $node->getTemplateLine()));
-
-            return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
+            return new SetNode(false, new Nodes([$name]), new Nodes([$node->getNode('expr')]), $node->getTemplateLine());
         }
 
         if (!$this->scope->has('domain')) {

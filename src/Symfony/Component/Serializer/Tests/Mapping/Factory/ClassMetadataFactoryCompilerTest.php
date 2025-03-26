@@ -15,6 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryCompiler;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyThirdChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathDummy;
@@ -40,6 +44,7 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         $classMetatadataFactory = new ClassMetadataFactory(new AttributeLoader());
 
         $dummyMetadata = $classMetatadataFactory->getMetadataFor(Dummy::class);
+        $abstractDummyMetadata = $classMetatadataFactory->getMetadataFor(AbstractDummy::class);
         $maxDepthDummyMetadata = $classMetatadataFactory->getMetadataFor(MaxDepthDummy::class);
         $serializedNameDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedNameDummy::class);
         $serializedPathDummyMetadata = $classMetatadataFactory->getMetadataFor(SerializedPathDummy::class);
@@ -47,6 +52,7 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
 
         $code = (new ClassMetadataFactoryCompiler())->compile([
             $dummyMetadata,
+            $abstractDummyMetadata,
             $maxDepthDummyMetadata,
             $serializedNameDummyMetadata,
             $serializedPathDummyMetadata,
@@ -56,7 +62,7 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         file_put_contents($this->dumpPath, $code);
         $compiledMetadata = require $this->dumpPath;
 
-        $this->assertCount(5, $compiledMetadata);
+        $this->assertCount(6, $compiledMetadata);
 
         $this->assertArrayHasKey(Dummy::class, $compiledMetadata);
         $this->assertEquals([
@@ -68,6 +74,22 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
             ],
             null,
         ], $compiledMetadata[Dummy::class]);
+
+        $this->assertArrayHasKey(AbstractDummy::class, $compiledMetadata);
+        $this->assertEquals([
+            [
+                'foo' => [[], null, null, null],
+            ],
+            [
+                'type',
+                [
+                    'first' => AbstractDummyFirstChild::class,
+                    'second' => AbstractDummySecondChild::class,
+                    'third' => AbstractDummyThirdChild::class,
+                ],
+                'third',
+            ],
+        ], $compiledMetadata[AbstractDummy::class]);
 
         $this->assertArrayHasKey(MaxDepthDummy::class, $compiledMetadata);
         $this->assertEquals([

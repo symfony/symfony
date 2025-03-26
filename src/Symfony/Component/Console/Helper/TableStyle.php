@@ -46,6 +46,7 @@ class TableStyle
     private string $cellRowFormat = '%s';
     private string $cellRowContentFormat = ' %s ';
     private string $borderFormat = '%s';
+    private bool $displayOutsideBorder = true;
     private int $padType = \STR_PAD_RIGHT;
 
     /**
@@ -358,5 +359,17 @@ class TableStyle
         $this->footerTitleFormat = $format;
 
         return $this;
+    }
+
+    public function setDisplayOutsideBorder($displayOutSideBorder): static
+    {
+        $this->displayOutsideBorder = $displayOutSideBorder;
+
+        return $this;
+    }
+
+    public function displayOutsideBorder(): bool
+    {
+        return $this->displayOutsideBorder;
     }
 }

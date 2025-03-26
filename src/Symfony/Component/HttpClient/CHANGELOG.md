@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add IPv6 support to `NativeHttpClient`
+ * Allow using HTTP/3 with the `CurlHttpClient`
 
 7.2
 ---

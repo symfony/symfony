@@ -60,7 +60,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     private string $redisEvictionPolicy;
 
     public function __construct(
-        \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
+        \Redis|Relay|\Relay\Cluster|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
         private string $namespace = '',
         int $defaultLifetime = 0,
         ?MarshallerInterface $marshaller = null,
@@ -69,7 +69,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             throw new InvalidArgumentException(\sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, get_debug_type($redis->getConnection())));
         }
 
-        $isRelay = $redis instanceof Relay;
+        $isRelay = $redis instanceof Relay || $redis instanceof \Relay\Cluster;
         if ($isRelay || \defined('Redis::OPT_COMPRESSION') && \in_array($redis::class, [\Redis::class, \RedisArray::class, \RedisCluster::class], true)) {
             $compression = $redis->getOption($isRelay ? Relay::OPT_COMPRESSION : \Redis::OPT_COMPRESSION);
 
@@ -159,7 +159,7 @@ EOLUA;
 
         foreach ($results as $id => $result) {
             if ($result instanceof \RedisException || $result instanceof \Relay\Exception || $result instanceof ErrorInterface) {
-                CacheItem::log($this->logger, 'Failed to delete key "{key}": '.$result->getMessage(), ['key' => substr($id, \strlen($this->namespace)), 'exception' => $result]);
+                CacheItem::log($this->logger, 'Failed to delete key "{key}": '.$result->getMessage(), ['key' => substr($id, \strlen($this->rootNamespace)), 'exception' => $result]);
 
                 continue;
             }
@@ -225,7 +225,7 @@ EOLUA;
         $results = $this->pipeline(function () use ($tagIds, $lua) {
             if ($this->redis instanceof \Predis\ClientInterface) {
                 $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
-            } elseif (\is_array($prefix = $this->redis->getOption($this->redis instanceof Relay ? Relay::OPT_PREFIX : \Redis::OPT_PREFIX) ?? '')) {
+            } elseif (\is_array($prefix = $this->redis->getOption(($this->redis instanceof Relay || $this->redis instanceof \Relay\Cluster) ? Relay::OPT_PREFIX : \Redis::OPT_PREFIX) ?? '')) {
                 $prefix = current($prefix);
             }
 

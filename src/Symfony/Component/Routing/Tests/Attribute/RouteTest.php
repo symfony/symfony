@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Tests\Annotation;
+namespace Symfony\Component\Routing\Tests\Attribute;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Attribute\Route;
@@ -40,6 +40,7 @@ class RouteTest extends TestCase
             ['methods', 'getMethods', ['GET', 'POST']],
             ['host', 'getHost', '{locale}.example.com'],
             ['condition', 'getCondition', 'context.getMethod() == \'GET\''],
+            ['alias', 'getAliases', ['alias', 'completely_different_name']],
         ];
     }
 }

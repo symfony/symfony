@@ -571,13 +571,18 @@
                                                             {% endif %}
                                                             <td class="font-normal text-small">
                                                                 {% if voter_detail['vote'] == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_GRANTED') %}
-                                                                    ACCESS GRANTED
+                                                                    GRANTED
                                                                 {% elseif voter_detail['vote'] == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_ABSTAIN') %}
-                                                                    ACCESS ABSTAIN
+                                                                    ABSTAIN
                                                                 {% elseif voter_detail['vote'] == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_DENIED') %}
-                                                                    ACCESS DENIED
+                                                                    DENIED
                                                                 {% else %}
                                                                     unknown ({{ voter_detail['vote'] }})
+                                                                {% endif %}
+                                                                {% if voter_detail['reasons'] is not empty %}
+                                                                    {% for voter_reason in voter_detail['reasons'] %}
+                                                                        <br>{{ voter_reason }}
+                                                                    {% endfor %}
                                                                 {% endif %}
                                                             </td>
                                                         </tr>

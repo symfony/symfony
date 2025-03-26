@@ -12,9 +12,12 @@
 namespace Symfony\Component\TypeInfo\Tests\TypeContext;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAliasImport;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplates;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUses;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -118,5 +121,50 @@ class TypeContextFactoryTest extends TestCase
         $typeContextFactory = new TypeContextFactory();
 
         $this->assertEquals([], $typeContextFactory->createFromClassName(DummyWithTemplates::class)->templates);
+    }
+
+    public function testCollectTypeAliases()
+    {
+        $this->assertEquals([
+            'CustomString' => Type::string(),
+            'CustomInt' => Type::int(),
+            'AliasedCustomInt' => Type::int(),
+            'PsalmCustomString' => Type::string(),
+            'PsalmCustomInt' => Type::int(),
+            'PsalmAliasedCustomInt' => Type::int(),
+        ], $this->typeContextFactory->createFromClassName(DummyWithTypeAliases::class)->typeAliases);
+
+        $this->assertEquals([
+            'CustomString' => Type::string(),
+            'CustomInt' => Type::int(),
+            'AliasedCustomInt' => Type::int(),
+            'PsalmCustomString' => Type::string(),
+            'PsalmCustomInt' => Type::int(),
+            'PsalmAliasedCustomInt' => Type::int(),
+        ], $this->typeContextFactory->createFromReflection(new \ReflectionClass(DummyWithTypeAliases::class))->typeAliases);
+
+        $this->assertEquals([
+            'CustomString' => Type::string(),
+            'CustomInt' => Type::int(),
+            'AliasedCustomInt' => Type::int(),
+            'PsalmCustomString' => Type::string(),
+            'PsalmCustomInt' => Type::int(),
+            'PsalmAliasedCustomInt' => Type::int(),
+        ], $this->typeContextFactory->createFromReflection(new \ReflectionProperty(DummyWithTypeAliases::class, 'localAlias'))->typeAliases);
+    }
+
+    public function testDoNotCollectTypeAliasesWhenToStringTypeResolver()
+    {
+        $typeContextFactory = new TypeContextFactory();
+
+        $this->assertEquals([], $typeContextFactory->createFromClassName(DummyWithTypeAliases::class)->typeAliases);
+    }
+
+    public function testThrowWhenImportingInvalidAlias()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot find any "Invalid" type alias in "%s".', DummyWithTypeAliases::class));
+
+        $this->typeContextFactory->createFromClassName(DummyWithInvalidTypeAliasImport::class);
     }
 }

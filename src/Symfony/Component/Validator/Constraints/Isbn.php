@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -52,8 +53,9 @@ class Isbn extends Constraint
      * @param self::ISBN_*|array<string,mixed>|null $type    The type of ISBN to validate (i.e. {@see Isbn::ISBN_10}, {@see Isbn::ISBN_13} or null to accept both, defaults to null)
      * @param string|null                           $message If defined, this message has priority over the others
      * @param string[]|null                         $groups
-     * @param array<string,mixed>                   $options
+     * @param array<string,mixed>|null              $options
      */
+    #[HasNamedArguments]
     public function __construct(
         string|array|null $type = null,
         ?string $message = null,
@@ -62,11 +64,19 @@ class Isbn extends Constraint
         ?string $bothIsbnMessage = null,
         ?array $groups = null,
         mixed $payload = null,
-        array $options = [],
+        ?array $options = null,
     ) {
         if (\is_array($type)) {
-            $options = array_merge($type, $options);
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($type, $options ?? []);
         } elseif (null !== $type) {
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            } else {
+                $options = [];
+            }
+
             $options['value'] = $type;
         }
 

@@ -37,9 +37,7 @@ class JsonValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValues($value)
     {
-        $constraint = new Json([
-            'message' => 'myMessageTest',
-        ]);
+        $constraint = new Json(message: 'myMessageTest');
 
         $this->validator->validate($value, $constraint);
 

@@ -160,4 +160,12 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     {
         return $this->with(XmlEncoder::CDATA_WRAPPING_PATTERN, $cdataWrappingPattern);
     }
+
+    /**
+     * Configures whether to ignore empty attributes.
+     */
+    public function withIgnoreEmptyAttributes(?bool $ignoreEmptyAttributes): static
+    {
+        return $this->with(XmlEncoder::IGNORE_EMPTY_ATTRIBUTES, $ignoreEmptyAttributes);
+    }
 }

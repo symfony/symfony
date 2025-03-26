@@ -59,7 +59,7 @@ class AttributeLoader implements LoaderInterface
 
         foreach ($this->loadAttributes($reflectionClass) as $attribute) {
             match (true) {
-                $attribute instanceof DiscriminatorMap => $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping($attribute->getTypeProperty(), $attribute->getMapping())),
+                $attribute instanceof DiscriminatorMap => $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping($attribute->getTypeProperty(), $attribute->getMapping(), $attribute->getDefaultType())),
                 $attribute instanceof Groups => $classGroups = $attribute->getGroups(),
                 $attribute instanceof Context => $classContextAttribute = $attribute,
                 default => null,

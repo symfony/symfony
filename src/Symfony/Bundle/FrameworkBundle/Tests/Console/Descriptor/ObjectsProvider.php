@@ -37,6 +37,38 @@ class ObjectsProvider
         return ['route_collection_1' => $collection1];
     }
 
+    public static function getRouteCollectionsByHttpMethod(): array
+    {
+        $collection = new RouteCollection();
+        foreach (self::getRoutes() as $name => $route) {
+            $collection->add($name, $route);
+        }
+
+        // Clone the original collection and add a route without any specific method restrictions
+        $collectionWithRouteWithoutMethodRestriction = clone $collection;
+        $collectionWithRouteWithoutMethodRestriction->add(
+            'route_3',
+            new RouteStub(
+                '/other/route',
+                [],
+                [],
+                ['opt1' => 'val1', 'opt2' => 'val2'],
+                'localhost',
+                ['http', 'https'],
+                [],
+            )
+        );
+
+        return [
+            'GET' => [
+                'route_collection_2' => $collectionWithRouteWithoutMethodRestriction,
+            ],
+            'PUT' => [
+                'route_collection_3' => $collection,
+            ],
+        ];
+    }
+
     public static function getRoutes()
     {
         return [

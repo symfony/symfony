@@ -176,6 +176,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame('%cmd%', $command->getName());
         $this->assertSame(['%cmdalias%'], $command->getAliases());
         $this->assertSame('Creates a 80% discount', $command->getDescription());
+        $this->assertSame('The %command.name% help content.', $command->getHelp());
     }
 
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
@@ -206,7 +207,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->setDefinition('my-command', $definition);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".');
+        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must either be a subclass of "Symfony\Component\Console\Command\Command" or have an "__invoke()" method');
 
         $container->compile();
     }
@@ -303,6 +304,27 @@ class AddConsoleCommandPassTest extends TestCase
 
         $container->compile();
     }
+
+    public function testProcessInvokableCommand()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+
+        $definition = new Definition(InvokableCommand::class);
+        $definition->addTag('console.command', [
+            'command' => 'invokable',
+            'description' => 'The command description',
+            'help' => 'The %command.name% command help content.',
+        ]);
+        $container->setDefinition('invokable_command', $definition);
+
+        $container->compile();
+        $command = $container->get('console.command_loader')->get('invokable');
+
+        self::assertTrue($container->has('invokable_command.command'));
+        self::assertSame('The command description', $command->getDescription());
+        self::assertSame('The %command.name% command help content.', $command->getHelp());
+    }
 }
 
 class MyCommand extends Command
@@ -314,7 +336,7 @@ class NamedCommand extends Command
 {
 }
 
-#[AsCommand(name: '%cmd%|%cmdalias%', description: 'Creates a 80% discount')]
+#[AsCommand(name: '%cmd%|%cmdalias%', description: 'Creates a 80% discount', help: 'The %command.name% help content.')]
 class EscapedDefaultsFromPhpCommand extends Command
 {
 }
@@ -329,5 +351,13 @@ class DescribedCommand extends Command
         ++self::$initCounter;
 
         parent::__construct();
+    }
+}
+
+#[AsCommand(name: 'invokable', description: 'Just testing', help: 'The %command.name% help content.')]
+class InvokableCommand
+{
+    public function __invoke(): void
+    {
     }
 }

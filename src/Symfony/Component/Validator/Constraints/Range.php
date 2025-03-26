@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -57,6 +58,7 @@ class Range extends Constraint
      * @param non-empty-string|null           $maxPropertyPath        Property path to the max value
      * @param string[]|null                   $groups
      */
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $notInRangeMessage = null,
@@ -71,6 +73,10 @@ class Range extends Constraint
         ?array $groups = null,
         mixed $payload = null,
     ) {
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->notInRangeMessage = $notInRangeMessage ?? $this->notInRangeMessage;

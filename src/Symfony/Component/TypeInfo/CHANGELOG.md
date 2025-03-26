@@ -5,6 +5,13 @@ CHANGELOG
 ---
 
  * Add `Type::accepts()` method
+ * Add `TypeFactoryTrait::fromValue()` method
+ * Deprecate constructing a `CollectionType` instance as a list that is not an array
+ * Deprecate the third `$asList` argument of `TypeFactoryTrait::iterable()`, use `TypeFactoryTrait::list()` instead
+ * Add type alias support in `TypeContext` and `StringTypeResolver`
+ * Add `CollectionType::mergeCollectionValueTypes()` method
+ * Add `ArrayShapeType` to represent the exact shape of an array
+ * Add `Type::traverse()` method
 
 7.2
 ---

@@ -22,14 +22,30 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 class PhpDocAwareReflectionTypeResolverTest extends TestCase
 {
-    public function testReadPhpDoc()
+    /**
+     * @dataProvider readPhpDocDataProvider
+     */
+    public function testReadPhpDoc(Type $expected, \Reflector $reflector)
     {
-        $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(), new StringTypeResolver(), new TypeContextFactory());
+        $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(), new StringTypeResolver(), new TypeContextFactory(new StringTypeResolver()));
+
+        $this->assertEquals($expected, $resolver->resolve($reflector));
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: \Reflector}>
+     */
+    public static function readPhpDocDataProvider(): iterable
+    {
         $reflection = new \ReflectionClass(DummyWithPhpDoc::class);
 
-        $this->assertEquals(Type::array(Type::object(Dummy::class)), $resolver->resolve($reflection->getProperty('arrayOfDummies')));
-        $this->assertEquals(Type::object(Dummy::class), $resolver->resolve($reflection->getMethod('getNextDummy')));
-        $this->assertEquals(Type::object(Dummy::class), $resolver->resolve($reflection->getMethod('getNextDummy')->getParameters()[0]));
+        yield [Type::array(Type::object(Dummy::class)), $reflection->getProperty('arrayOfDummies')];
+        yield [Type::bool(), $reflection->getProperty('promoted')];
+        yield [Type::string(), $reflection->getProperty('promotedVar')];
+        yield [Type::string(), $reflection->getProperty('promotedVarAndParam')];
+        yield [Type::object(Dummy::class), $reflection->getMethod('getNextDummy')];
+        yield [Type::object(Dummy::class), $reflection->getMethod('getNextDummy')->getParameters()[0]];
+        yield [Type::int(), $reflection->getProperty('aliasedInt')];
     }
 
     public function testFallbackWhenNoPhpDoc()

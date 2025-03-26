@@ -422,7 +422,7 @@ class ProcessTest extends TestCase
 
         $p->run();
         $p->clearErrorOutput();
-        $this->assertEmpty($p->getErrorOutput());
+        $this->assertSame('', $p->getErrorOutput());
     }
 
     /**
@@ -475,7 +475,7 @@ class ProcessTest extends TestCase
 
         $p->run();
         $p->clearOutput();
-        $this->assertEmpty($p->getOutput());
+        $this->assertSame('', $p->getOutput());
     }
 
     public function testZeroAsOutput()
@@ -557,6 +557,20 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('');
         $this->assertNull($process->getExitCodeText());
+    }
+
+    public function testStderrNotMixedWithStdout()
+    {
+        if (!Process::isPtySupported()) {
+            $this->markTestSkipped('PTY is not supported on this operating system.');
+        }
+
+        $process = $this->getProcess('echo "foo" && echo "bar" >&2');
+        $process->setPty(true);
+        $process->run();
+
+        $this->assertSame("foo\r\n", $process->getOutput());
+        $this->assertSame("bar\n", $process->getErrorOutput());
     }
 
     public function testPTYCommand()
@@ -731,6 +745,9 @@ class ProcessTest extends TestCase
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Windows does not support POSIX signals');
+        }
+        if (\PHP_VERSION_ID < 80300 && isset($_SERVER['GITHUB_ACTIONS'])) {
+            $this->markTestSkipped('Transient on GHA with PHP < 8.3');
         }
 
         $process = $this->getProcessForCode('sleep(32);');
@@ -1682,6 +1699,9 @@ class ProcessTest extends TestCase
     {
         if (!\function_exists('pcntl_signal')) {
             $this->markTestSkipped('pnctl extension is required.');
+        }
+        if (\PHP_VERSION_ID < 80300 && isset($_SERVER['GITHUB_ACTIONS'])) {
+            $this->markTestSkipped('Transient on GHA with PHP < 8.3');
         }
 
         $process = $this->getProcess(['sleep', '10']);

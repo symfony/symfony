@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>Questo valore dovrebbe essere una delle opzioni disponibili.</target>
+                <target>Il valore selezionato non è una scelta valida.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
@@ -308,7 +308,7 @@
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>Questo valore non corrisponde al charset {{ charset }}.</target>
+                <target>Questo valore non corrisponde al charset {{ charset }} previsto.</target>
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
@@ -465,6 +465,10 @@
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
                 <target>Questo valore non dovrebbe essere dopo la settimana "{{ max }}".</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>This value is not a valid slug.</source>
+                <target>Questo valore non è uno slug valido.</target>
             </trans-unit>
         </body>
     </file>

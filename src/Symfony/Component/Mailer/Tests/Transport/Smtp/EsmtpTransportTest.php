@@ -297,6 +297,23 @@ class EsmtpTransportTest extends TestCase
             $stream->getCommands()
         );
     }
+
+    public function testRequireTls()
+    {
+        $stream = new DummyStream();
+        $transport = new EsmtpTransport(stream: $stream);
+        $transport->setRequireTls(true);
+
+        $message = new Email();
+        $message->from('sender@example.org');
+        $message->addTo('recipient@example.org');
+        $message->text('.');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('TLS required but neither TLS or STARTTLS are in use.');
+
+        $transport->send($message);
+    }
 }
 
 class CustomEsmtpTransport extends EsmtpTransport

@@ -221,14 +221,29 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertTrue($response->headers->has('Set-Cookie'));
     }
 
-    public function testPersistStrategyWithSession()
+    public function testPersistStrategyWithStartedSession()
     {
         $session = $this->createMock(Session::class);
+        $session->method('isStarted')->willReturn(true);
+
         $request = new Request();
         $request->setSession($session);
         $request->attributes->set('csrf-token', 2 << 8);
 
         $session->expects($this->once())->method('set')->with('csrf-token', 2 << 8);
+
+        $this->csrfTokenManager->persistStrategy($request);
+    }
+
+    public function testPersistStrategyWithSessionNotStarted()
+    {
+        $session = $this->createMock(Session::class);
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->attributes->set('csrf-token', 2 << 8);
+
+        $session->expects($this->never())->method('set');
 
         $this->csrfTokenManager->persistStrategy($request);
     }

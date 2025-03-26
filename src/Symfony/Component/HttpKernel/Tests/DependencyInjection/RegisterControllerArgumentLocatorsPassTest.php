@@ -277,7 +277,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertEmpty(array_keys($locator));
+        $this->assertSame([], array_keys($locator));
     }
 
     public function testControllersAreMadePublic()
@@ -440,7 +440,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertEmpty(array_keys($locator), 'enum typed argument is ignored');
+        $this->assertSame([], array_keys($locator), 'enum typed argument is ignored');
     }
 
     public function testBindWithTarget()
@@ -480,7 +480,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         (new RegisterControllerArgumentLocatorsPass())->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertEmpty(array_keys($locator), 'Response typed argument is ignored');
+        $this->assertSame([], array_keys($locator), 'Response typed argument is ignored');
     }
 
     public function testAutowireAttribute()

@@ -132,10 +132,9 @@ class ImportMapRendererTest extends TestCase
         ]);
         $html = $renderer->render([]);
         $this->assertStringContainsString('<script type="importmap" something data-turbo-track="reload">', $html);
-        $this->assertStringContainsString('<script async something data-turbo-track="reload">', $html);
+        $this->assertStringContainsString('<script something data-turbo-track="reload">', $html);
         $this->assertStringContainsString(<<<EOTXT
             script.src = 'https://polyfillUrl.example';
-            script.setAttribute('async', 'async');
             script.setAttribute('something', 'something');
             script.setAttribute('data-turbo-track', 'reload');
         EOTXT, $html);

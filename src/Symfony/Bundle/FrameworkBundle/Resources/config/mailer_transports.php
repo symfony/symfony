@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Mailer\Bridge\AhaSend\Transport\AhaSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
@@ -47,6 +48,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'mailer']);
 
     $factories = [
+        'ahasend' => AhaSendTransportFactory::class,
         'amazon' => SesTransportFactory::class,
         'azure' => AzureTransportFactory::class,
         'brevo' => BrevoTransportFactory::class,

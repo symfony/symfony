@@ -48,6 +48,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         private string $excludedAjaxPaths = '^/bundles|^/_wdt',
         private ?ContentSecurityPolicyHandler $cspHandler = null,
         private ?DumpDataCollector $dumpDataCollector = null,
+        private bool $ajaxReplace = false,
     ) {
     }
 
@@ -96,10 +97,14 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
         // do not capture redirects or modify XML HTTP Requests
         if ($request->isXmlHttpRequest()) {
+            if (self::ENABLED === $this->mode && $this->ajaxReplace && !$response->headers->has('Symfony-Debug-Toolbar-Replace')) {
+                $response->headers->set('Symfony-Debug-Toolbar-Replace', '1');
+            }
+
             return;
         }
 
-        if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects && 'html' === $request->getRequestFormat()) {
+        if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects && 'html' === $request->getRequestFormat() && $response->headers->has('Location')) {
             if ($request->hasSession() && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
                 // keep current flashes for one more request if using AutoExpireFlashBag
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());

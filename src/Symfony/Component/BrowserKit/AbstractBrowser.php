@@ -163,7 +163,7 @@ abstract class AbstractBrowser
      */
     public function jsonRequest(string $method, string $uri, array $parameters = [], array $server = [], bool $changeHistory = true): Crawler
     {
-        $content = json_encode($parameters);
+        $content = json_encode($parameters, \JSON_PRESERVE_ZERO_FRACTION);
 
         $this->setServerParameter('CONTENT_TYPE', 'application/json');
         $this->setServerParameter('HTTP_ACCEPT', 'application/json');

@@ -145,19 +145,17 @@
             }
 
             addEventListener(toggles[i], 'click', function(e) {
+                var toggle = e.currentTarget;
+
+                if (e.target.closest('a, span[data-clipboard-text], .sf-toggle') !== toggle) {
+                    return;
+                }
+
                 e.preventDefault();
 
                 if ('' !== window.getSelection().toString()) {
                     /* Don't do anything on text selection */
                     return;
-                }
-
-                var toggle = e.target || e.srcElement;
-
-                /* needed because when the toggle contains HTML contents, user can click */
-                /* on any of those elements instead of their parent '.sf-toggle' element */
-                while (!hasClass(toggle, 'sf-toggle')) {
-                    toggle = toggle.parentNode;
                 }
 
                 var element = document.querySelector(toggle.getAttribute('data-toggle-selector'));
@@ -181,22 +179,6 @@
                 var altContent = toggle.getAttribute('data-toggle-alt-content');
                 toggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
             });
-
-            /* Prevents from disallowing clicks on links inside toggles */
-            var toggleLinks = toggles[i].querySelectorAll('a');
-            for (var j = 0; j < toggleLinks.length; j++) {
-                addEventListener(toggleLinks[j], 'click', function(e) {
-                    e.stopPropagation();
-                });
-            }
-
-            /* Prevents from disallowing clicks on "copy to clipboard" elements inside toggles */
-            var copyToClipboardElements = toggles[i].querySelectorAll('span[data-clipboard-text]');
-            for (var k = 0; k < copyToClipboardElements.length; k++) {
-                addEventListener(copyToClipboardElements[k], 'click', function(e) {
-                    e.stopPropagation();
-                });
-            }
 
             toggles[i].setAttribute('data-processed', 'true');
         }

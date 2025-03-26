@@ -18,6 +18,7 @@ use Amp\Http\Client\EventListener;
 use Amp\Http\Client\NetworkInterceptor;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
+use Amp\Socket\InternetAddress;
 use Symfony\Component\HttpClient\Exception\TransportException;
 
 /**
@@ -66,14 +67,18 @@ class AmpListenerV5 implements EventListener
 
     public function requestHeaderStart(Request $request, Stream $stream): void
     {
-        $host = $stream->getRemoteAddress()->getAddress();
+        $host = $stream->getRemoteAddress()->toString();
+        if ($stream->getRemoteAddress() instanceof InternetAddress) {
+            $host = $stream->getRemoteAddress()->getAddress();
+            $this->info['primary_port'] = $stream->getRemoteAddress()->getPort();
+        }
+
         $this->info['primary_ip'] = $host;
 
         if (str_contains($host, ':')) {
             $host = '['.$host.']';
         }
 
-        $this->info['primary_port'] = $stream->getRemoteAddress()->getPort();
         $this->info['pretransfer_time'] = microtime(true) - $this->info['start_time'];
         $this->info['debug'] .= \sprintf("* Connected to %s (%s) port %d\n", $request->getUri()->getHost(), $host, $this->info['primary_port']);
 

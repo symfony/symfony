@@ -207,9 +207,17 @@ final class SameOriginCsrfTokenManager implements CsrfTokenManagerInterface
 
     public function persistStrategy(Request $request): void
     {
-        if ($request->hasSession(true) && $request->attributes->has($this->cookieName)) {
-            $request->getSession()->set($this->cookieName, $request->attributes->get($this->cookieName));
+        if (!$request->attributes->has($this->cookieName)
+            || !$request->hasSession(true)
+            || !($session = $request->getSession())->isStarted()
+        ) {
+            return;
         }
+
+        $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : 0;
+        $usageIndexReference = \PHP_INT_MIN;
+        $session->set($this->cookieName, $request->attributes->get($this->cookieName));
+        $usageIndexReference = $usageIndexValue;
     }
 
     public function onKernelResponse(ResponseEvent $event): void

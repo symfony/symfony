@@ -33,7 +33,6 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
 class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {
     private Connection $conn;
-    private static array $storeRegistry = [];
 
     /**
      * You can either pass an existing database connection a Doctrine DBAL Connection
@@ -278,8 +277,8 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
 
     private function getInternalStore(): SharedLockStoreInterface
     {
-        $namespace = spl_object_hash($this->conn);
+        static $storeRegistry = new \WeakMap();
 
-        return self::$storeRegistry[$namespace] ??= new InMemoryStore();
+        return $storeRegistry[$this->conn] ??= new InMemoryStore();
     }
 }

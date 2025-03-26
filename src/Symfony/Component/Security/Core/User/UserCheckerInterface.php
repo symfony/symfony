@@ -35,5 +35,5 @@ interface UserCheckerInterface
      *
      * @throws AccountStatusException
      */
-    public function checkPostAuth(UserInterface $user /*, TokenInterface $token*/): void;
+    public function checkPostAuth(UserInterface $user /* , TokenInterface $token */): void;
 }

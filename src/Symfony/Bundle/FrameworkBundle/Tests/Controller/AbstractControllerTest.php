@@ -40,7 +40,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -352,7 +355,19 @@ class AbstractControllerTest extends TestCase
     public function testdenyAccessUnlessGranted()
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
+        $authorizationChecker
+            ->expects($this->once())
+            ->method('isGranted')
+            ->willReturnCallback(function ($attribute, $subject, ?AccessDecision $accessDecision = null) {
+                if (class_exists(AccessDecision::class)) {
+                    $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+                    $accessDecision->votes[] = $vote = new Vote();
+                    $vote->result = VoterInterface::ACCESS_DENIED;
+                    $vote->reasons[] = 'Why should I.';
+                }
+
+                return false;
+            });
 
         $container = new Container();
         $container->set('security.authorization_checker', $authorizationChecker);
@@ -361,8 +376,17 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Access Denied.'.(class_exists(AccessDecision::class) ? ' Why should I.' : ''));
 
-        $controller->denyAccessUnlessGranted('foo');
+        try {
+            $controller->denyAccessUnlessGranted('foo');
+        } catch (AccessDeniedException $e) {
+            if (class_exists(AccessDecision::class)) {
+                $this->assertFalse($e->getAccessDecision()->isGranted);
+            }
+
+            throw $e;
+        }
     }
 
     /**

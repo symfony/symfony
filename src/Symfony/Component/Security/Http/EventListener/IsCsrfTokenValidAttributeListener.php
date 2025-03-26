@@ -45,6 +45,11 @@ final class IsCsrfTokenValidAttributeListener implements EventSubscriberInterfac
 
         foreach ($attributes as $attribute) {
             $id = $this->getTokenId($attribute->id, $request, $arguments);
+            $methods = \array_map('strtoupper', (array) $attribute->methods);
+
+            if ($methods && !\in_array($request->getMethod(), $methods, true)) {
+                continue;
+            }
 
             if (!$this->csrfTokenManager->isTokenValid(new CsrfToken($id, $request->getPayload()->getString($attribute->tokenKey)))) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');

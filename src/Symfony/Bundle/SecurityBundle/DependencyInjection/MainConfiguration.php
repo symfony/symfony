@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
@@ -54,13 +55,30 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode = $tb->getRootNode();
 
         $rootNode
+            ->beforeNormalization()
+                ->always()
+                ->then(function ($v) {
+                    if (isset($v['hide_user_not_found']) && !isset($v['expose_security_errors'])) {
+                        $v['expose_security_errors'] = $v['hide_user_not_found'] ? ExposeSecurityLevel::None : ExposeSecurityLevel::All;
+                    }
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
                 ->enumNode('session_fixation_strategy')
                     ->values([SessionAuthenticationStrategy::NONE, SessionAuthenticationStrategy::MIGRATE, SessionAuthenticationStrategy::INVALIDATE])
                     ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
                 ->end()
-                ->booleanNode('hide_user_not_found')->defaultTrue()->end()
+                ->booleanNode('hide_user_not_found')
+                    ->setDeprecated('symfony/security-bundle', '7.3', 'The "%node%" option is deprecated and will be removed in 8.0. Use the "expose_security_errors" option instead.')
+                ->end()
+                ->enumNode('expose_security_errors')
+                    ->beforeNormalization()->ifString()->then(fn ($v) => ['value' => ExposeSecurityLevel::tryFrom($v)])->end()
+                    ->values(ExposeSecurityLevel::cases())
+                    ->defaultValue(ExposeSecurityLevel::None)
+                ->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()

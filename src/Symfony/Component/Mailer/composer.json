@@ -21,13 +21,14 @@
         "psr/event-dispatcher": "^1",
         "psr/log": "^1|^2|^3",
         "symfony/event-dispatcher": "^6.4|^7.0",
-        "symfony/mime": "^7.2",
+        "symfony/mime": "^7.3",
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
         "symfony/console": "^6.4|^7.0",
         "symfony/http-client": "^6.4|^7.0",
         "symfony/messenger": "^6.4|^7.0",
+        "symfony/translation": "^6.4|^7.0",
         "symfony/twig-bridge": "^6.4|^7.0"
     },
     "conflict": {

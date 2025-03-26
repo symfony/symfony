@@ -39,7 +39,10 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function getStore(): PersistingStoreInterface
     {
-        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379]));
+        $redis = new \Predis\Client(
+            array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379]),
+            ['exceptions' => false],
+        );
 
         try {
             $redis->connect();

@@ -26,9 +26,9 @@ interface PropertyDocBlockExtractorInterface
     /**
      * Gets the first available doc block for a property. It finds the doc block
      * by the following priority:
-     *  - constructor promoted argument
-     *  - the class property
-     *  - a mutator method for that property
+     *  - constructor promoted argument,
+     *  - the class property,
+     *  - a mutator method for that property.
      *
      * If no doc block is found, it will return null.
      */

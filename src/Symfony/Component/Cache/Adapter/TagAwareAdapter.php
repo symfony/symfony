@@ -16,9 +16,11 @@ use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\BadMethodCallException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ContractsTrait;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
@@ -33,7 +35,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Sergey Belyshkin <sbelyshkin@gmail.com>
  */
-class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, PruneableInterface, ResettableInterface, LoggerAwareInterface
+class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, NamespacedPoolInterface, PruneableInterface, ResettableInterface, LoggerAwareInterface
 {
     use ContractsTrait;
     use LoggerAwareTrait;
@@ -275,6 +277,23 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         (self::$setTagVersions)($items, array_combine($tagVersions, $tagVersions));
 
         return $ok;
+    }
+
+    /**
+     * @throws BadMethodCallException When the item pool is not a NamespacedPoolInterface
+     */
+    public function withSubNamespace(string $namespace): static
+    {
+        if (!$this->pool instanceof NamespacedPoolInterface) {
+            throw new BadMethodCallException(\sprintf('Cannot call "%s::withSubNamespace()": this class doesn\'t implement "%s".', get_debug_type($this->pool), NamespacedPoolInterface::class));
+        }
+
+        $knownTagVersions = &$this->knownTagVersions; // ensures clones share the same array
+        $clone = clone $this;
+        $clone->deferred = [];
+        $clone->pool = $this->pool->withSubNamespace($namespace);
+
+        return $clone;
     }
 
     public function prune(): bool

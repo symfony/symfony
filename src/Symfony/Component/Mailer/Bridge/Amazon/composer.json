@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "async-aws/ses": "^1.3",
+        "async-aws/ses": "^1.8",
         "symfony/mailer": "^7.2"
     },
     "require-dev": {

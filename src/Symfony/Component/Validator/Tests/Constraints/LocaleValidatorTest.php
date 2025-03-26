@@ -71,9 +71,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidLocales($locale)
     {
-        $constraint = new Locale([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Locale(message: 'myMessage');
 
         $this->validator->validate($locale, $constraint);
 
@@ -96,9 +94,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidLocalesWithCanonicalization(string $locale)
     {
-        $constraint = new Locale([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Locale(message: 'myMessage');
 
         $this->validator->validate($locale, $constraint);
 
@@ -110,10 +106,10 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidLocalesWithoutCanonicalization(string $locale)
     {
-        $constraint = new Locale([
-            'message' => 'myMessage',
-            'canonicalize' => false,
-        ]);
+        $constraint = new Locale(
+            message: 'myMessage',
+            canonicalize: false,
+        );
 
         $this->validator->validate($locale, $constraint);
 
@@ -125,10 +121,10 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidLocalesWithoutCanonicalization(string $locale)
     {
-        $constraint = new Locale([
-            'message' => 'myMessage',
-            'canonicalize' => false,
-        ]);
+        $constraint = new Locale(
+            message: 'myMessage',
+            canonicalize: false,
+        );
 
         $this->validator->validate($locale, $constraint);
 

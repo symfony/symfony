@@ -13,9 +13,11 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\BadMethodCallException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -25,8 +27,9 @@ use Symfony\Contracts\Service\ResetInterface;
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
+class TraceableAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, PruneableInterface, ResettableInterface
 {
+    private string $namespace = '';
     private array $calls = [];
 
     public function __construct(
@@ -34,10 +37,13 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     ) {
     }
 
+    /**
+     * @throws BadMethodCallException When the item pool is not a CacheInterface
+     */
     public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
     {
         if (!$this->pool instanceof CacheInterface) {
-            throw new \BadMethodCallException(\sprintf('Cannot call "%s::get()": this class doesn\'t implement "%s".', get_debug_type($this->pool), CacheInterface::class));
+            throw new BadMethodCallException(\sprintf('Cannot call "%s::get()": this class doesn\'t implement "%s".', get_debug_type($this->pool), CacheInterface::class));
         }
 
         $isHit = true;
@@ -225,11 +231,29 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         return $this->pool;
     }
 
+    /**
+     * @throws BadMethodCallException When the item pool is not a NamespacedPoolInterface
+     */
+    public function withSubNamespace(string $namespace): static
+    {
+        if (!$this->pool instanceof NamespacedPoolInterface) {
+            throw new BadMethodCallException(\sprintf('Cannot call "%s::withSubNamespace()": this class doesn\'t implement "%s".', get_debug_type($this->pool), NamespacedPoolInterface::class));
+        }
+
+        $calls = &$this->calls; // ensures clones share the same array
+        $clone = clone $this;
+        $clone->namespace .= CacheItem::validateKey($namespace).':';
+        $clone->pool = $this->pool->withSubNamespace($namespace);
+
+        return $clone;
+    }
+
     protected function start(string $name): TraceableAdapterEvent
     {
         $this->calls[] = $event = new TraceableAdapterEvent();
         $event->name = $name;
         $event->start = microtime(true);
+        $event->namespace = $this->namespace;
 
         return $event;
     }
@@ -246,4 +270,5 @@ class TraceableAdapterEvent
     public array|bool $result;
     public int $hits = 0;
     public int $misses = 0;
+    public string $namespace;
 }

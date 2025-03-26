@@ -40,7 +40,7 @@ object(Symfony\Component\ErrorHandler\Error\FatalError)#%d (%d) {
   string(209) "Error: Class Symfony\Component\ErrorHandler\Broken contains 5 abstract methods and must therefore be declared abstract or implement the remaining methods (Iterator::current, Iterator::next, Iterator::key, ...)"
 %a
   ["error":"Symfony\Component\ErrorHandler\Error\FatalError":private]=>
-  array(4) {
+  array(%d) {
     ["type"]=>
     int(1)
     ["message"]=>
@@ -48,6 +48,6 @@ object(Symfony\Component\ErrorHandler\Error\FatalError)#%d (%d) {
     ["file"]=>
     string(%d) "%s"
     ["line"]=>
-    int(%d)
+    int(%d)%A
   }
 }

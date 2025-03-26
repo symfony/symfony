@@ -37,13 +37,14 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
 {
     private string $uidKey;
     private string $defaultSearch;
+    private RoleFetcherInterface $roleFetcher;
 
     public function __construct(
         private LdapInterface $ldap,
         private string $baseDn,
         private ?string $searchDn = null,
         #[\SensitiveParameter] private ?string $searchPassword = null,
-        private array $defaultRoles = [],
+        array|RoleFetcherInterface $defaultRoles = [],
         ?string $uidKey = null,
         ?string $filter = null,
         private ?string $passwordAttribute = null,
@@ -54,6 +55,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
 
         $this->uidKey = $uidKey;
         $this->defaultSearch = str_replace('{uid_key}', $uidKey, $filter);
+        $this->roleFetcher = \is_array($defaultRoles) ? new AssignDefaultRoles($defaultRoles) : $defaultRoles;
     }
 
     public function loadUserByIdentifier(string $identifier): UserInterface
@@ -147,7 +149,9 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             $extraFields[$field] = $this->getAttributeValue($entry, $field);
         }
 
-        return new LdapUser($entry, $identifier, $password, $this->defaultRoles, $extraFields);
+        $roles = $this->roleFetcher->fetchRoles($entry);
+
+        return new LdapUser($entry, $identifier, $password, $roles, $extraFields);
     }
 
     private function getAttributeValue(Entry $entry, string $attribute): mixed

@@ -253,7 +253,7 @@ class ParameterBagTest extends TestCase
             'array' => ['bang'],
         ]);
 
-        $this->assertEmpty($bag->filter('nokey'), '->filter() should return empty by default if no key is found');
+        $this->assertSame('', $bag->filter('nokey'), '->filter() should return empty by default if no key is found');
 
         $this->assertEquals('0123', $bag->filter('digits', '', \FILTER_SANITIZE_NUMBER_INT), '->filter() gets a value of parameter as integer filtering out invalid characters');
 

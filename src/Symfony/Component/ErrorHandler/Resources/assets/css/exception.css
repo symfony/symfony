@@ -57,7 +57,7 @@
     --page-background: #36393e;
     --color-text: #e0e0e0;
     --color-muted: #777;
-    --color-error: #d43934;
+    --color-error: #f76864;
     --tab-background: #404040;
     --tab-border-color: #737373;
     --tab-active-border-color: #171717;
@@ -80,7 +80,7 @@
     --metric-unit-color: #999;
     --metric-label-background: #777;
     --metric-label-color: #e0e0e0;
-    --trace-selected-background: #71663acc;
+    --trace-selected-background: #5d5227cc;
     --table-border: #444;
     --table-background: #333;
     --table-header: #555;
@@ -92,7 +92,7 @@
     --background-error: #b0413e;
     --highlight-comment: #dedede;
     --highlight-default: var(--base-6);
-    --highlight-keyword: #ff413c;
+    --highlight-keyword: #de8986;
     --highlight-string: #70a6fd;
     --base-0: #2e3136;
     --base-1: #444;

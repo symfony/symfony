@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -65,7 +66,8 @@ class CsrfValidationListenerTest extends TestCase
         $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Invalid.');
         $validation->preSubmit($event);
 
-        $this->assertNotEmpty($this->form->getErrors());
+        $this->assertInstanceOf(FormErrorIterator::class, $this->form->getErrors());
+        $this->assertGreaterThan(0, \count($this->form->getErrors()));
     }
 
     public function testMaxPostSizeExceeded()
@@ -74,7 +76,8 @@ class CsrfValidationListenerTest extends TestCase
         $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, new ServerParamsPostMaxSizeExceeded());
 
         $validation->preSubmit($event);
-        $this->assertEmpty($this->form->getErrors());
+        $this->assertInstanceOf(FormErrorIterator::class, $this->form->getErrors());
+        $this->assertCount(0, $this->form->getErrors());
     }
 }
 

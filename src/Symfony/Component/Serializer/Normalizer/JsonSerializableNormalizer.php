@@ -21,13 +21,13 @@ use Symfony\Component\Serializer\Exception\LogicException;
  */
 final class JsonSerializableNormalizer extends AbstractNormalizer
 {
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        if ($this->isCircularReference($object, $context)) {
-            return $this->handleCircularReference($object, $format, $context);
+        if ($this->isCircularReference($data, $context)) {
+            return $this->handleCircularReference($data, $format, $context);
         }
 
-        if (!$object instanceof \JsonSerializable) {
+        if (!$data instanceof \JsonSerializable) {
             throw new InvalidArgumentException(\sprintf('The object must implement "%s".', \JsonSerializable::class));
         }
 
@@ -35,7 +35,7 @@ final class JsonSerializableNormalizer extends AbstractNormalizer
             throw new LogicException('Cannot normalize object because injected serializer is not a normalizer.');
         }
 
-        return $this->serializer->normalize($object->jsonSerialize(), $format, $context);
+        return $this->serializer->normalize($data->jsonSerialize(), $format, $context);
     }
 
     public function getSupportedTypes(?string $format): array

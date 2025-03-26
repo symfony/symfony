@@ -33,17 +33,18 @@ class LazyObjectState
     public int $status = self::STATUS_UNINITIALIZED_FULL;
 
     public object $realInstance;
+    public object $cloneInstance;
 
     /**
      * @param array<string, true> $skippedProperties
      */
     public function __construct(
-        public \Closure $initializer,
+        public ?\Closure $initializer = null,
         public array $skippedProperties = [],
     ) {
     }
 
-    public function initialize($instance, $propertyName, $propertyScope)
+    public function initialize($instance, $propertyName, $writeScope)
     {
         if (self::STATUS_UNINITIALIZED_FULL !== $this->status) {
             return $this->status;
@@ -74,10 +75,10 @@ class LazyObjectState
         $skippedProperties = $this->skippedProperties;
         $properties = (array) $instance;
 
-        foreach ($propertyScopes as $key => [$scope, $name, $readonlyScope]) {
+        foreach ($propertyScopes as $key => [$scope, $name, , $access]) {
             $propertyScopes[$k = "\0$scope\0$name"] ?? $propertyScopes[$k = "\0*\0$name"] ?? $k = $name;
 
-            if ($k === $key && (null !== $readonlyScope || !\array_key_exists($k, $properties))) {
+            if ($k === $key && ($access & Hydrator::PROPERTY_HAS_HOOKS || ($access >> 2) & \ReflectionProperty::IS_READONLY || !\array_key_exists($k, $properties))) {
                 $skippedProperties[$k] = true;
             }
         }
@@ -93,5 +94,27 @@ class LazyObjectState
         }
 
         $this->status = self::STATUS_UNINITIALIZED_FULL;
+    }
+
+    public function __clone()
+    {
+        if (isset($this->cloneInstance)) {
+            try {
+                $this->realInstance = $this->cloneInstance;
+            } finally {
+                unset($this->cloneInstance);
+            }
+        } elseif (isset($this->realInstance)) {
+            $this->realInstance = clone $this->realInstance;
+        }
+    }
+
+    public function __get($name)
+    {
+        if ('realInstance' !== $name) {
+            throw new \BadMethodCallException(\sprintf('No such property "%s::$%s"', self::class, $name));
+        }
+
+        return $this->realInstance = ($this->initializer)();
     }
 }

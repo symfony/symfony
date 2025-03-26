@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -58,6 +60,7 @@ class SerializerPass implements CompilerPassInterface
             $defaultContext = $container->getParameter('serializer.default_context');
             $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $defaultContext);
             $container->getParameterBag()->remove('serializer.default_context');
+            $container->getDefinition('serializer')->setArgument('$defaultContext', $defaultContext);
         }
 
         $this->configureSerializer($container, 'serializer', $normalizers, $encoders, 'default');
@@ -150,8 +153,10 @@ class SerializerPass implements CompilerPassInterface
 
             $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $config['default_context']);
 
-            $container->registerChild($serializerId, 'serializer');
+            $container->registerChild($serializerId, 'serializer')->setArgument('$defaultContext', $config['default_context']);
             $container->registerAliasForArgument($serializerId, SerializerInterface::class, $serializerName.'.serializer');
+            $container->registerAliasForArgument($serializerId, NormalizerInterface::class, $serializerName.'.normalizer');
+            $container->registerAliasForArgument($serializerId, DenormalizerInterface::class, $serializerName.'.denormalizer');
 
             $this->configureSerializer($container, $serializerId, $normalizers, $encoders, $serializerName);
 

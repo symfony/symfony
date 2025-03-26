@@ -50,9 +50,9 @@ class ContextTest extends TestCase
         $context = new Context(['foo' => 'bar']);
 
         self::assertSame(['foo' => 'bar'], $context->getContext());
-        self::assertEmpty($context->getNormalizationContext());
-        self::assertEmpty($context->getDenormalizationContext());
-        self::assertEmpty($context->getGroups());
+        self::assertSame([], $context->getNormalizationContext());
+        self::assertSame([], $context->getDenormalizationContext());
+        self::assertSame([], $context->getGroups());
     }
 
     public function testAsContextArg()
@@ -60,9 +60,9 @@ class ContextTest extends TestCase
         $context = new Context(context: ['foo' => 'bar']);
 
         self::assertSame(['foo' => 'bar'], $context->getContext());
-        self::assertEmpty($context->getNormalizationContext());
-        self::assertEmpty($context->getDenormalizationContext());
-        self::assertEmpty($context->getGroups());
+        self::assertSame([], $context->getNormalizationContext());
+        self::assertSame([], $context->getDenormalizationContext());
+        self::assertSame([], $context->getGroups());
     }
 
     /**

@@ -57,7 +57,7 @@ class Symfony_DI_PhpDumper_Test_Lazy_Closure extends Container
      */
     protected static function getClosure1Service($container, $lazyLoad = true)
     {
-        return $container->services['closure1'] = (new class(fn () => new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo()) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure { public function cloneFoo(?\stdClass $bar = null): \Symfony\Component\DependencyInjection\Tests\Compiler\Foo { return $this->service->cloneFoo(...\func_get_args()); } })->cloneFoo(...);
+        return $container->services['closure1'] = (new class(fn () => ($container->privates['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo())) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure { public function cloneFoo(?\stdClass $bar = null): \Symfony\Component\DependencyInjection\Tests\Compiler\Foo { return $this->service->cloneFoo(...\func_get_args()); } })->cloneFoo(...);
     }
 
     /**
@@ -67,6 +67,6 @@ class Symfony_DI_PhpDumper_Test_Lazy_Closure extends Container
      */
     protected static function getClosure2Service($container, $lazyLoad = true)
     {
-        return $container->services['closure2'] = (new class(fn () => new \Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid()) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure { public function __invoke(string $name): void { $this->service->__invoke(...\func_get_args()); } })->__invoke(...);
+        return $container->services['closure2'] = (new class(fn () => ($container->privates['foo_void'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid())) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure { public function __invoke(string $name): void { $this->service->__invoke(...\func_get_args()); } })->__invoke(...);
     }
 }

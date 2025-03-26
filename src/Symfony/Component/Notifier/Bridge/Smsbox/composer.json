@@ -30,6 +30,9 @@
         "symfony/notifier": "^7.2",
         "symfony/polyfill-php83": "^1.28"
     },
+    "require-dev": {
+        "symfony/webhook": "^6.4|^7.0|^7.2"
+    },
     "autoload": {
         "psr-4": {
             "Symfony\\Component\\Notifier\\Bridge\\Smsbox\\": ""

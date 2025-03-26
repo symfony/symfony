@@ -43,4 +43,16 @@ final class BlueskyOptions implements MessageOptionsInterface
 
         return $this;
     }
+
+    public function attachCard(string $uri, File $thumb, string $title = '', string $description = ''): static
+    {
+        $this->options['external'] = [
+            'uri' => $uri,
+            'thumb' => $thumb,
+            'title' => $title,
+            'description' => $description,
+        ];
+
+        return $this;
+    }
 }

@@ -145,10 +145,15 @@ class HttpBrowser extends AbstractBrowser
             }
             if (!isset($file['tmp_name'])) {
                 $uploadedFiles[$name] = $this->getUploadedFiles($file);
+                continue;
             }
-            if (isset($file['tmp_name'])) {
-                $uploadedFiles[$name] = DataPart::fromPath($file['tmp_name'], $file['name']);
+
+            if ('' === $file['tmp_name']) {
+                $uploadedFiles[$name] = new DataPart('', '');
+                continue;
             }
+
+            $uploadedFiles[$name] = DataPart::fromPath($file['tmp_name'], $file['name']);
         }
 
         return $uploadedFiles;

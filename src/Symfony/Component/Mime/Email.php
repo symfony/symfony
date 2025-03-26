@@ -58,9 +58,9 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function subject(string $subject): static
+    public function subject(string|\Stringable $subject): static
     {
-        return $this->setHeaderBody('Text', 'Subject', $subject);
+        return $this->setHeaderBody('Text', 'Subject', (string) $subject);
     }
 
     public function getSubject(): ?string
@@ -401,7 +401,7 @@ class Email extends Message
 
     private function ensureBodyValid(): void
     {
-        if (null === $this->text && null === $this->html && !$this->attachments) {
+        if (null === $this->text && null === $this->html && !$this->attachments && null === parent::getBody()) {
             throw new LogicException('A message must have a text or an HTML part or attachments.');
         }
     }

@@ -143,6 +143,63 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
+    public function testHandleWithLogChannel()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
+
+        $defaultLogger = new TestLogger();
+        $channelLoger = new TestLogger();
+
+        $l = new ErrorListener('not used', $defaultLogger, false, [
+            \RuntimeException::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+                'log_channel' => 'channel',
+            ],
+            \Exception::class => [
+                'log_level' => 'error',
+                'status_code' => 402,
+            ],
+        ], ['channel' => $channelLoger]);
+
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertCount(0, $defaultLogger->getLogsForLevel('error'));
+        $this->assertCount(0, $defaultLogger->getLogsForLevel('warning'));
+        $this->assertCount(0, $channelLoger->getLogsForLevel('error'));
+        $this->assertCount(1, $channelLoger->getLogsForLevel('warning'));
+    }
+
+    public function testHandleWithLoggerChannelNotUsed()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
+        $defaultLogger = new TestLogger();
+        $channelLoger = new TestLogger();
+        $l = new ErrorListener('not used', $defaultLogger, false, [
+            \RuntimeException::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+            ],
+            \ErrorException::class => [
+                'log_level' => 'error',
+                'status_code' => 402,
+                'log_channel' => 'channel',
+            ],
+        ], ['channel' => $channelLoger]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertSame(0, $defaultLogger->countErrors());
+        $this->assertCount(0, $defaultLogger->getLogsForLevel('critical'));
+        $this->assertCount(1, $defaultLogger->getLogsForLevel('warning'));
+        $this->assertCount(0, $channelLoger->getLogsForLevel('warning'));
+        $this->assertCount(0, $channelLoger->getLogsForLevel('error'));
+        $this->assertCount(0, $channelLoger->getLogsForLevel('critical'));
+    }
+
     public function testHandleClassImplementingInterfaceWithLogLevelAttribute()
     {
         $request = new Request();

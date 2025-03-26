@@ -291,7 +291,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['-h' => true, '-q' => true], ['decorated' => false]);
 
-        $this->assertEmpty($tester->getDisplay(true));
+        $this->assertSame('', $tester->getDisplay(true));
     }
 
     public function testGetInvalidCommand()
@@ -2404,7 +2404,7 @@ class ApplicationTest extends TestCase
         if ($dispatcher) {
             $application->setDispatcher($dispatcher);
         }
-        $application->add(new LazyCommand($command::getDefaultName(), [], '', false, fn () => $command, true));
+        $application->add(new LazyCommand($command->getName(), [], '', false, fn () => $command, true));
 
         return $application;
     }

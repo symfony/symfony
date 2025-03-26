@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Implement the `CloseableTransportInterface` to allow closing the Redis connection
+ * Implement the `KeepaliveReceiverInterface` to enable asynchronously notifying Redis that the job is still being processed, in order to avoid timeouts
+ * Add support for `valkey:` / `valkeys:` schemes
+
 6.3
 ---
 

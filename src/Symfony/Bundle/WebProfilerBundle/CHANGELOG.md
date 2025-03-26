@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `ajax_replace` option for replacing toolbar on AJAX requests
+
 7.2
 ---
 
@@ -65,7 +70,7 @@ CHANGELOG
 -----
 
  * added information about orphaned events
- * made the toolbar auto-update with info from ajax reponses when they set the
+ * made the toolbar auto-update with info from ajax responses when they set the
    `Symfony-Debug-Toolbar-Replace header` to `1`
 
 4.0.0

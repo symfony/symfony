@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `Dsn::getBooleanOption()`
+ * Add `info` property in `SentMessage`
+
 7.2
 ---
 

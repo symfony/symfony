@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo;
 
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
@@ -171,6 +172,10 @@ trait TypeFactoryTrait
      */
     public static function iterable(?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
     {
+        if ($asList) {
+            trigger_deprecation('symfony/type-info', '7.3', 'The third argument of "%s()" is deprecated. Use the "%s::list()" method to create a list instead.', __METHOD__, self::class);
+        }
+
         return self::collection(self::builtin(TypeIdentifier::ITERABLE), $value, $key, $asList);
     }
 
@@ -188,6 +193,27 @@ trait TypeFactoryTrait
     public static function dict(?Type $value = null): CollectionType
     {
         return self::array($value, self::string());
+    }
+
+    /**
+     * @param array<array{type: Type, optional?: bool}|Type> $shape
+     */
+    public static function arrayShape(array $shape, bool $sealed = true, ?Type $extraKeyType = null, ?Type $extraValueType = null): ArrayShapeType
+    {
+        $shape = array_map(static function (array|Type $item): array {
+            return $item instanceof Type
+                ? ['type' => $item, 'optional' => false]
+                : ['type' => $item['type'], 'optional' => $item['optional'] ?? false];
+        }, $shape);
+
+        if ($extraKeyType || $extraValueType) {
+            $sealed = false;
+        }
+
+        $extraKeyType ??= !$sealed ? Type::union(Type::int(), Type::string()) : null;
+        $extraValueType ??= !$sealed ? Type::mixed() : null;
+
+        return new ArrayShapeType($shape, $extraKeyType, $extraValueType);
     }
 
     /**
@@ -266,6 +292,13 @@ trait TypeFactoryTrait
         $isNullable = fn (Type $type): bool => $type instanceof BuiltinType && TypeIdentifier::NULL === $type->getTypeIdentifier();
 
         foreach ($types as $type) {
+            if ($type instanceof NullableType) {
+                $nullableUnion = true;
+                $unionTypes[] = $type->getWrappedType();
+
+                continue;
+            }
+
             if ($type instanceof UnionType) {
                 foreach ($type->getTypes() as $unionType) {
                     if ($isNullable($type)) {
@@ -339,5 +372,80 @@ trait TypeFactoryTrait
         }
 
         return new NullableType($type);
+    }
+
+    public static function fromValue(mixed $value): Type
+    {
+        $type = match ($value) {
+            null => self::null(),
+            true => self::true(),
+            false => self::false(),
+            default => null,
+        };
+
+        if (null !== $type) {
+            return $type;
+        }
+
+        if (\is_callable($value)) {
+            return Type::callable();
+        }
+
+        if (\is_resource($value)) {
+            return Type::resource();
+        }
+
+        $type = match (get_debug_type($value)) {
+            TypeIdentifier::INT->value => self::int(),
+            TypeIdentifier::FLOAT->value => self::float(),
+            TypeIdentifier::STRING->value => self::string(),
+            default => null,
+        };
+
+        if (null !== $type) {
+            return $type;
+        }
+
+        $type = match (true) {
+            \is_object($value) => \stdClass::class === $value::class ? self::object() : self::object($value::class),
+            \is_array($value) => self::builtin(TypeIdentifier::ARRAY),
+            default => null,
+        };
+
+        if (null === $type) {
+            return Type::mixed();
+        }
+
+        if (is_iterable($value)) {
+            /** @var list<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>> $keyTypes */
+            $keyTypes = [];
+
+            /** @var list<Type> $valueTypes */
+            $valueTypes = [];
+
+            $i = 0;
+
+            foreach ($value as $k => $v) {
+                $keyTypes[] = self::fromValue($k);
+                $valueTypes[] = self::fromValue($v);
+            }
+
+            if ($keyTypes) {
+                $keyTypes = array_values(array_unique($keyTypes));
+                $keyType = \count($keyTypes) > 1 ? self::union(...$keyTypes) : $keyTypes[0];
+            } else {
+                $keyType = Type::union(Type::int(), Type::string());
+            }
+
+            $valueType = $valueTypes ? CollectionType::mergeCollectionValueTypes($valueTypes) : Type::mixed();
+
+            return self::collection($type, $valueType, $keyType, \is_array($value) && array_is_list($value));
+        }
+
+        if ($value instanceof \ArrayAccess) {
+            return self::collection($type);
+        }
+
+        return $type;
     }
 }

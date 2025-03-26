@@ -351,9 +351,8 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $argumentsInformation = [];
-        if ($showArguments && ($arguments = $definition->getArguments())) {
+        if ($arguments = $definition->getArguments()) {
             foreach ($arguments as $argument) {
                 if ($argument instanceof ServiceClosureArgument) {
                     $argument = $argument->getValues()[0];

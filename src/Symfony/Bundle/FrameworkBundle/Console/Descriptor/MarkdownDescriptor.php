@@ -155,7 +155,6 @@ class MarkdownDescriptor extends Descriptor
         $serviceIds = isset($options['tag']) && $options['tag']
             ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']))
             : $this->sortServiceIds($container->getServiceIds());
-        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $services = ['definitions' => [], 'aliases' => [], 'services' => []];
 
         if (isset($options['filter'])) {
@@ -185,7 +184,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\nDefinitions\n-----------\n");
             foreach ($services['definitions'] as $id => $service) {
                 $this->write("\n");
-                $this->describeContainerDefinition($service, ['id' => $id, 'show_arguments' => $showArguments], $container);
+                $this->describeContainerDefinition($service, ['id' => $id], $container);
             }
         }
 
@@ -231,9 +230,7 @@ class MarkdownDescriptor extends Descriptor
             $output .= "\n".'- Deprecated: no';
         }
 
-        if (isset($options['show_arguments']) && $options['show_arguments']) {
-            $output .= "\n".'- Arguments: '.($definition->getArguments() ? 'yes' : 'no');
-        }
+        $output .= "\n".'- Arguments: '.($definition->getArguments() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $output .= "\n".'- File: `'.$definition->getFile().'`';

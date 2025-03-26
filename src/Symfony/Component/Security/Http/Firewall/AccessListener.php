@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -72,19 +73,16 @@ class AccessListener extends AbstractListener
         }
 
         $token = $this->tokenStorage->getToken() ?? new NullToken();
+        $accessDecision = new AccessDecision();
 
-        if (!$this->accessDecisionManager->decide($token, $attributes, $request, true)) {
-            throw $this->createAccessDeniedException($request, $attributes);
+        if (!$accessDecision->isGranted = $this->accessDecisionManager->decide($token, $attributes, $request, $accessDecision, true)) {
+            $e = new AccessDeniedException($accessDecision->getMessage());
+            $e->setAttributes($attributes);
+            $e->setSubject($request);
+            $e->setAccessDecision($accessDecision);
+
+            throw $e;
         }
-    }
-
-    private function createAccessDeniedException(Request $request, array $attributes): AccessDeniedException
-    {
-        $exception = new AccessDeniedException();
-        $exception->setAttributes($attributes);
-        $exception->setSubject($request);
-
-        return $exception;
     }
 
     public static function getPriority(): int

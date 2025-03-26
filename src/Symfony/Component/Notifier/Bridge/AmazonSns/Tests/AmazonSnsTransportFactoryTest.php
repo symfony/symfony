@@ -18,6 +18,12 @@ class AmazonSnsTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function createFactory(): AmazonSnsTransportFactory
     {
+        // Tests will fail if a ~/.aws/config file exists with a default.region value,
+        // or if AWS_REGION env variable is set.
+        // Setting a profile & region names will bypass default options retrieved by \AsyncAws\Core::get
+        $_ENV['AWS_PROFILE'] = 'not-existing';
+        $_ENV['AWS_REGION'] = 'us-east-1';
+
         return new AmazonSnsTransportFactory();
     }
 

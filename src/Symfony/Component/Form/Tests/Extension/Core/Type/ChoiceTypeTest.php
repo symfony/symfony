@@ -878,7 +878,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
 
         $this->assertSame('b', $form->getData());
         $this->assertSame('b', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
+        $this->assertSame([], $form->getExtraData());
         $this->assertTrue($form->isSynchronized());
 
         $this->assertFalse($form[0]->getData());
@@ -906,7 +906,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
 
         $this->assertNull($form->getData());
         $this->assertSame('foobar', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
+        $this->assertSame([], $form->getExtraData());
         $this->assertFalse($form->isSynchronized());
 
         $this->assertFalse($form[0]->getData());
@@ -934,7 +934,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
 
         $this->assertSame('b', $form->getData());
         $this->assertSame('b', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
+        $this->assertSame([], $form->getExtraData());
         $this->assertTrue($form->isSynchronized());
 
         $this->assertFalse($form['placeholder']->getData());
@@ -964,7 +964,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
 
         $this->assertNull($form->getData());
         $this->assertSame('foobar', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
+        $this->assertSame([], $form->getExtraData());
         $this->assertFalse($form->isSynchronized());
 
         $this->assertFalse($form[0]->getData());
@@ -1348,7 +1348,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
 
         $this->assertSame(['a', 'c'], $form->getData());
         $this->assertSame(['a', 'c'], $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
+        $this->assertSame([], $form->getExtraData());
         $this->assertTrue($form->isSynchronized());
 
         $this->assertTrue($form[0]->getData());
@@ -1375,7 +1375,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
 
         $this->assertNull($form->getData());
         $this->assertSame('foobar', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
+        $this->assertSame([], $form->getExtraData());
         $this->assertFalse($form->isSynchronized());
 
         $this->assertFalse($form[0]->getData());
@@ -1402,7 +1402,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
 
         $this->assertSame(['a'], $form->getData());
         $this->assertSame(['a'], $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
+        $this->assertSame([], $form->getExtraData());
         $this->assertFalse($form->isValid());
 
         $this->assertTrue($form[0]->getData());

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Sweego\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Notifier\Bridge\Sweego\SweegoTransport;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -67,5 +68,23 @@ final class SweegoTransportTest extends TransportTestCase
         $transport = new SweegoTransport('apiKey', 'REGION', 'CAMPAIGN_TYPE', false, 'CAMPAIGN_ID', true, false);
         $message = $this->createMock(MessageInterface::class);
         $transport->send($message);
+    }
+
+    public function testSendSmsMessage()
+    {
+        $client = new MockHttpClient(function ($method, $url, $options) {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://api.sweego.io/send', $url);
+
+            $body = json_decode($options['body'], true);
+            $this->assertSame('sms', $body['channel']);
+
+            return new JsonMockResponse(['swg_uids' => ['123']]);
+        });
+
+        $transport = self::createTransport($client);
+        $sentMessage = $transport->send(new SmsMessage('0611223344', 'Hello!'));
+
+        $this->assertSame('123', $sentMessage->getMessageId());
     }
 }

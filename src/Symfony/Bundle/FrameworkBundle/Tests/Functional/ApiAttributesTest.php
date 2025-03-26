@@ -34,7 +34,7 @@ class ApiAttributesTest extends AbstractWebTestCase
         if ($expectedResponse) {
             self::assertJsonStringEqualsJsonString($expectedResponse, $response->getContent());
         } else {
-            self::assertEmpty($response->getContent());
+            self::assertSame('', $response->getContent());
         }
         self::assertSame($expectedStatusCode, $response->getStatusCode());
     }

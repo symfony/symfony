@@ -284,16 +284,12 @@ class TestLoginLinkHandlerUser implements UserInterface
         return $this->passwordProperty;
     }
 
-    public function getSalt(): string
-    {
-        return '';
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->username;
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
     }

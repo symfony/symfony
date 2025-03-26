@@ -148,6 +148,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mastodon\MastodonTransportFactory::class,
             'package' => 'symfony/mastodon-notifier',
         ],
+        'matrix' => [
+            'class' => Bridge\Matrix\MatrixTransportFactory::class,
+            'package' => 'symfony/matrix-notifier',
+        ],
         'mattermost' => [
             'class' => Bridge\Mattermost\MattermostTransportFactory::class,
             'package' => 'symfony/mattermost-notifier',

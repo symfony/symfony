@@ -20,6 +20,7 @@ use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\AsymmetricVisibility;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ExtendedUninitializedProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength;
@@ -831,7 +832,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'email', 'test@email.com');
 
         self::assertEquals('test@email.com', $object->getEmail());
-        self::assertEmpty($object->getEmails());
+        self::assertSame([], $object->getEmails());
     }
 
     public function testWriteToPluralPropertyWhileSingularOneExists()
@@ -1031,19 +1032,81 @@ class PropertyAccessorTest extends TestCase
 
     private function createUninitializedObjectPropertyGhost(): UninitializedObjectProperty
     {
-        if (!class_exists(ProxyHelper::class)) {
-            $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', ProxyHelper::class));
+        if (\PHP_VERSION_ID < 80400) {
+            if (!class_exists(ProxyHelper::class)) {
+                $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', ProxyHelper::class));
+            }
+
+            $class = 'UninitializedObjectPropertyGhost';
+
+            if (!class_exists($class)) {
+                eval('class '.$class.ProxyHelper::generateLazyGhost(new \ReflectionClass(UninitializedObjectProperty::class)));
+            }
+
+            $this->assertTrue(class_exists($class));
+
+            return $class::createLazyGhost(initializer: function ($instance) {
+            });
         }
 
-        $class = 'UninitializedObjectPropertyGhost';
+        return (new \ReflectionClass(UninitializedObjectProperty::class))->newLazyGhost(fn () => null);
+    }
 
-        if (!class_exists($class)) {
-            eval('class '.$class.ProxyHelper::generateLazyGhost(new \ReflectionClass(UninitializedObjectProperty::class)));
+    /**
+     * @requires PHP 8.4
+     */
+    public function testIsWritableWithAsymmetricVisibility()
+    {
+        $object = new AsymmetricVisibility();
+
+        $this->assertTrue($this->propertyAccessor->isWritable($object, 'publicPublic'));
+        $this->assertFalse($this->propertyAccessor->isWritable($object, 'publicProtected'));
+        $this->assertFalse($this->propertyAccessor->isWritable($object, 'publicPrivate'));
+        $this->assertFalse($this->propertyAccessor->isWritable($object, 'privatePrivate'));
+        $this->assertFalse($this->propertyAccessor->isWritable($object, 'virtualNoSetHook'));
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testIsReadableWithAsymmetricVisibility()
+    {
+        $object = new AsymmetricVisibility();
+
+        $this->assertTrue($this->propertyAccessor->isReadable($object, 'publicPublic'));
+        $this->assertTrue($this->propertyAccessor->isReadable($object, 'publicProtected'));
+        $this->assertTrue($this->propertyAccessor->isReadable($object, 'publicPrivate'));
+        $this->assertFalse($this->propertyAccessor->isReadable($object, 'privatePrivate'));
+        $this->assertTrue($this->propertyAccessor->isReadable($object, 'virtualNoSetHook'));
+    }
+
+    /**
+     * @requires PHP 8.4
+     *
+     * @dataProvider setValueWithAsymmetricVisibilityDataProvider
+     */
+    public function testSetValueWithAsymmetricVisibility(string $propertyPath, ?string $expectedException)
+    {
+        $object = new AsymmetricVisibility();
+
+        if ($expectedException) {
+            $this->expectException($expectedException);
+        } else {
+            $this->expectNotToPerformAssertions();
         }
 
-        $this->assertTrue(class_exists($class));
+        $this->propertyAccessor->setValue($object, $propertyPath, true);
+    }
 
-        return $class::createLazyGhost(initializer: function ($instance) {
-        });
+    /**
+     * @return iterable<array{0: string, 1: class-string|null}>
+     */
+    public static function setValueWithAsymmetricVisibilityDataProvider(): iterable
+    {
+        yield ['publicPublic', null];
+        yield ['publicProtected', \Error::class];
+        yield ['publicPrivate', \Error::class];
+        yield ['privatePrivate', NoSuchPropertyException::class];
+        yield ['virtualNoSetHook', \Error::class];
     }
 }

@@ -25,10 +25,16 @@ class RoleVoter implements CacheableVoterInterface
     ) {
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    /**
+     * @param Vote|null $vote Should be used to explain the vote
+     */
+    public function vote(TokenInterface $token, mixed $subject, array $attributes/* , ?Vote $vote = null */): int
     {
+        $vote = 3 < \func_num_args() ? func_get_arg(3) : new Vote();
+        $vote ??= new Vote();
         $result = VoterInterface::ACCESS_ABSTAIN;
         $roles = $this->extractRoles($token);
+        $missingRoles = [];
 
         foreach ($attributes as $attribute) {
             if (!\is_string($attribute) || !str_starts_with($attribute, $this->prefix)) {
@@ -36,9 +42,18 @@ class RoleVoter implements CacheableVoterInterface
             }
 
             $result = VoterInterface::ACCESS_DENIED;
+
             if (\in_array($attribute, $roles, true)) {
+                $vote->reasons[] = \sprintf('The user has %s.', $attribute);
+
                 return VoterInterface::ACCESS_GRANTED;
             }
+
+            $missingRoles[] = $attribute;
+        }
+
+        if (VoterInterface::ACCESS_DENIED === $result) {
+            $vote->reasons[] = \sprintf('The user doesn\'t have%s %s.', 1 < \count($missingRoles) ? ' any of' : '', implode(', ', $missingRoles));
         }
 
         return $result;

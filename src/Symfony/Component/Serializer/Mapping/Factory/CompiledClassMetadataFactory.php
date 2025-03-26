@@ -16,8 +16,12 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
+trigger_deprecation('symfony/serializer', '7.3', 'The "%s" class is deprecated.', CompiledClassMetadataFactory::class);
+
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+ *
+ * @deprecated since Symfony 7.3
  */
 final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterface
 {

@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -30,38 +31,53 @@ final class SecurityExtension extends AbstractExtension
     public function __construct(
         private ?AuthorizationCheckerInterface $securityChecker = null,
         private ?ImpersonateUrlGenerator $impersonateUrlGenerator = null,
-        private ?UserAuthorizationCheckerInterface $userSecurityChecker = null,
     ) {
     }
 
-    public function isGranted(mixed $role, mixed $object = null, ?string $field = null): bool
+    public function isGranted(mixed $role, mixed $object = null, ?string $field = null, ?AccessDecision $accessDecision = null): bool
     {
         if (null === $this->securityChecker) {
             return false;
         }
 
         if (null !== $field) {
+            if (!class_exists(FieldVote::class)) {
+                throw new \LogicException('Passing a $field to the "is_granted()" function requires symfony/acl. Try running "composer require symfony/acl-bundle" if you need field-level access control.');
+            }
+
             $object = new FieldVote($object, $field);
         }
 
         try {
-            return $this->securityChecker->isGranted($role, $object);
+            return $this->securityChecker->isGranted($role, $object, $accessDecision);
         } catch (AuthenticationCredentialsNotFoundException) {
             return false;
         }
     }
 
-    public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null, ?string $field = null): bool
+    public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null, ?string $field = null, ?AccessDecision $accessDecision = null): bool
     {
-        if (!$this->userSecurityChecker) {
-            throw new \LogicException(\sprintf('An instance of "%s" must be provided to use "%s()".', UserAuthorizationCheckerInterface::class, __METHOD__));
+        if (null === $this->securityChecker) {
+            return false;
         }
 
-        if ($field) {
+        if (!$this->securityChecker instanceof UserAuthorizationCheckerInterface) {
+            throw new \LogicException(\sprintf('You cannot use "%s()" if the authorization checker doesn\'t implement "%s".%s', __METHOD__, UserAuthorizationCheckerInterface::class, interface_exists(UserAuthorizationCheckerInterface::class) ? ' Try upgrading the "symfony/security-core" package to v7.3 minimum.' : ''));
+        }
+
+        if (null !== $field) {
+            if (!class_exists(FieldVote::class)) {
+                throw new \LogicException('Passing a $field to the "is_granted_for_user()" function requires symfony/acl. Try running "composer require symfony/acl-bundle" if you need field-level access control.');
+            }
+
             $subject = new FieldVote($subject, $field);
         }
 
-        return $this->userSecurityChecker->isGrantedForUser($user, $attribute, $subject);
+        try {
+            return $this->securityChecker->isGrantedForUser($user, $attribute, $subject, $accessDecision);
+        } catch (AuthenticationCredentialsNotFoundException) {
+            return false;
+        }
     }
 
     public function getImpersonateExitUrl(?string $exitTo = null): string
@@ -110,7 +126,7 @@ final class SecurityExtension extends AbstractExtension
             new TwigFunction('impersonation_path', $this->getImpersonatePath(...)),
         ];
 
-        if ($this->userSecurityChecker) {
+        if ($this->securityChecker instanceof UserAuthorizationCheckerInterface) {
             $functions[] = new TwigFunction('is_granted_for_user', $this->isGrantedForUser(...));
         }
 

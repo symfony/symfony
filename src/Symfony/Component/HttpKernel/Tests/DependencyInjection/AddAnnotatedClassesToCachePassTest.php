@@ -36,33 +36,33 @@ class AddAnnotatedClassesToCachePassTest extends TestCase
 
         $this->assertSame('Foo\\Bar', $expand(['Foo\\'], ['\\Foo\\Bar'])[0]);
         $this->assertSame('Foo\\Bar\\Acme', $expand(['Foo\\'], ['\\Foo\\Bar\\Acme'])[0]);
-        $this->assertEmpty($expand(['Foo\\'], ['\\Foo']));
+        $this->assertSame([], $expand(['Foo\\'], ['\\Foo']));
 
         $this->assertSame('Acme\\Foo\\Bar', $expand(['**\\Foo\\'], ['\\Acme\\Foo\\Bar'])[0]);
-        $this->assertEmpty($expand(['**\\Foo\\'], ['\\Foo\\Bar']));
-        $this->assertEmpty($expand(['**\\Foo\\'], ['\\Acme\\Foo']));
-        $this->assertEmpty($expand(['**\\Foo\\'], ['\\Foo']));
+        $this->assertSame([], $expand(['**\\Foo\\'], ['\\Foo\\Bar']));
+        $this->assertSame([], $expand(['**\\Foo\\'], ['\\Acme\\Foo']));
+        $this->assertSame([], $expand(['**\\Foo\\'], ['\\Foo']));
 
         $this->assertSame('Acme\\Foo', $expand(['**\\Foo'], ['\\Acme\\Foo'])[0]);
-        $this->assertEmpty($expand(['**\\Foo'], ['\\Acme\\Foo\\AcmeBundle']));
-        $this->assertEmpty($expand(['**\\Foo'], ['\\Acme\\FooBar\\AcmeBundle']));
+        $this->assertSame([], $expand(['**\\Foo'], ['\\Acme\\Foo\\AcmeBundle']));
+        $this->assertSame([], $expand(['**\\Foo'], ['\\Acme\\FooBar\\AcmeBundle']));
 
         $this->assertSame('Foo\\Acme\\Bar', $expand(['Foo\\*\\Bar'], ['\\Foo\\Acme\\Bar'])[0]);
-        $this->assertEmpty($expand(['Foo\\*\\Bar'], ['\\Foo\\Acme\\Bundle\\Bar']));
+        $this->assertSame([], $expand(['Foo\\*\\Bar'], ['\\Foo\\Acme\\Bundle\\Bar']));
 
         $this->assertSame('Foo\\Acme\\Bar', $expand(['Foo\\**\\Bar'], ['\\Foo\\Acme\\Bar'])[0]);
         $this->assertSame('Foo\\Acme\\Bundle\\Bar', $expand(['Foo\\**\\Bar'], ['\\Foo\\Acme\\Bundle\\Bar'])[0]);
 
         $this->assertSame('Acme\\Bar', $expand(['*\\Bar'], ['\\Acme\\Bar'])[0]);
-        $this->assertEmpty($expand(['*\\Bar'], ['\\Bar']));
-        $this->assertEmpty($expand(['*\\Bar'], ['\\Foo\\Acme\\Bar']));
+        $this->assertSame([], $expand(['*\\Bar'], ['\\Bar']));
+        $this->assertSame([], $expand(['*\\Bar'], ['\\Foo\\Acme\\Bar']));
 
         $this->assertSame('Foo\\Acme\\Bar', $expand(['**\\Bar'], ['\\Foo\\Acme\\Bar'])[0]);
         $this->assertSame('Foo\\Acme\\Bundle\\Bar', $expand(['**\\Bar'], ['\\Foo\\Acme\\Bundle\\Bar'])[0]);
-        $this->assertEmpty($expand(['**\\Bar'], ['\\Bar']));
+        $this->assertSame([], $expand(['**\\Bar'], ['\\Bar']));
 
         $this->assertSame('Foo\\Bar', $expand(['Foo\\*'], ['\\Foo\\Bar'])[0]);
-        $this->assertEmpty($expand(['Foo\\*'], ['\\Foo\\Acme\\Bar']));
+        $this->assertSame([], $expand(['Foo\\*'], ['\\Foo\\Acme\\Bar']));
 
         $this->assertSame('Foo\\Bar', $expand(['Foo\\**'], ['\\Foo\\Bar'])[0]);
         $this->assertSame('Foo\\Acme\\Bar', $expand(['Foo\\**'], ['\\Foo\\Acme\\Bar'])[0]);

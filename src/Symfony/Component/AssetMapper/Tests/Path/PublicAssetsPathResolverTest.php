@@ -26,7 +26,7 @@ class PublicAssetsPathResolverTest extends TestCase
         $this->assertSame('/assets-prefix/foo/bar', $resolver->resolvePublicPath('foo/bar'));
 
         $resolver = new PublicAssetsPathResolver(
-            '/assets-prefix', // The trailing slash should be added automatically
+            'assets-prefix', // The leading and trailing slash should be added automatically
         );
         $this->assertSame('/assets-prefix/', $resolver->resolvePublicPath(''));
         $this->assertSame('/assets-prefix/foo/bar', $resolver->resolvePublicPath('/foo/bar'));

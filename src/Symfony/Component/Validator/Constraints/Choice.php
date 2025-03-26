@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -59,6 +60,7 @@ class Choice extends Constraint
      * @param string[]|null        $groups
      * @param bool|null            $match    Whether to validate the values are part of the choices or not (defaults to true)
      */
+    #[HasNamedArguments]
     public function __construct(
         string|array $options = [],
         ?array $choices = null,
@@ -78,7 +80,10 @@ class Choice extends Constraint
         if (\is_array($options) && $options && array_is_list($options)) {
             $choices ??= $options;
             $options = [];
+        } elseif (\is_array($options) && [] !== $options) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
         }
+
         if (null !== $choices) {
             $options['value'] = $choices;
         }

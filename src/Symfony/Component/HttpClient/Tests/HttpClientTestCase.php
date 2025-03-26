@@ -700,4 +700,37 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame('GET', $body['REQUEST_METHOD']);
         $this->assertSame('/', $body['REQUEST_URI']);
     }
+
+    public function testResponseCanBeProcessedAfterClientReset()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://127.0.0.1:8057/timeout-body');
+        $stream = $client->stream($response);
+
+        $response->getStatusCode();
+        $client->reset();
+        $stream->current();
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testUnixSocket()
+    {
+        if (!file_exists('/var/run/docker.sock')) {
+            $this->markTestSkipped('Docker socket not found.');
+        }
+
+        $client = $this->getHttpClient(__FUNCTION__)
+            ->withOptions([
+                'base_uri' => 'http://docker',
+                'bindto' => '/run/docker.sock',
+            ]);
+
+        $response = $client->request('GET', '/info');
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $info = $response->getInfo();
+        $this->assertSame('/run/docker.sock', $info['primary_ip']);
+    }
 }

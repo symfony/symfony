@@ -155,7 +155,7 @@ class YamlFileLoader extends FileLoader
             $defaults['_stateless'] = $config['stateless'];
         }
 
-        $routes = $this->createLocalizedRoute($collection, $name, $config['path']);
+        $routes = $this->createLocalizedRoute(new RouteCollection(), $name, $config['path']);
         $routes->addDefaults($defaults);
         $routes->addRequirements($requirements);
         $routes->addOptions($options);
@@ -166,6 +166,8 @@ class YamlFileLoader extends FileLoader
         if (isset($config['host'])) {
             $this->addHost($routes, $config['host']);
         }
+
+        $collection->addCollection($routes);
     }
 
     /**

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `totalCreditsRemoved` info into returned `SentMessage`
+
 6.2
 ---
 

@@ -355,9 +355,11 @@ trait HttpClientTrait
                 }
             });
 
-            $body = http_build_query($body, '', '&');
+            if ('' === $body = http_build_query($body, '', '&')) {
+                return '';
+            }
 
-            if ('' === $body || !$streams && !str_contains($normalizedHeaders['content-type'][0] ?? '', 'multipart/form-data')) {
+            if (!$streams && !str_contains($normalizedHeaders['content-type'][0] ?? '', 'multipart/form-data')) {
                 if (!str_contains($normalizedHeaders['content-type'][0] ?? '', 'application/x-www-form-urlencoded')) {
                     $normalizedHeaders['content-type'] = ['Content-Type: application/x-www-form-urlencoded'];
                 }

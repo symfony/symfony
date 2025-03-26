@@ -593,23 +593,6 @@ diff --git a/src/Symfony/Component/VarDumper/Dumper/DataDumperInterface.php b/sr
 -    public function dump(Data $data);
 +    public function dump(Data $data): ?string;
  }
-diff --git a/src/Symfony/Component/VarExporter/Tests/ProxyHelperTest.php b/src/Symfony/Component/VarExporter/Tests/ProxyHelperTest.php
---- a/src/Symfony/Component/VarExporter/Tests/ProxyHelperTest.php
-+++ b/src/Symfony/Component/VarExporter/Tests/ProxyHelperTest.php
-@@ -172,5 +172,5 @@ class ProxyHelperTest extends TestCase
-     {
-         yield 'not type hinted __unserialize method' => [new class {
--            public function __unserialize($array)
-+            public function __unserialize($array): void
-             {
-             }
-@@ -192,5 +192,5 @@ class ProxyHelperTest extends TestCase
- 
-         yield 'type hinted __unserialize method' => [new class {
--            public function __unserialize(array $array)
-+            public function __unserialize(array $array): void
-             {
-             }
 diff --git a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php b/src/Symfony/Contracts/Translation/LocaleAwareInterface.php
 --- a/src/Symfony/Contracts/Translation/LocaleAwareInterface.php
 +++ b/src/Symfony/Contracts/Translation/LocaleAwareInterface.php

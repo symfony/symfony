@@ -97,9 +97,19 @@ abstract class AbstractLoader implements LoaderInterface
                 return new $className($options['value']);
             }
 
+            if (array_is_list($options)) {
+                return new $className($options);
+            }
+
             return new $className(...$options);
         }
 
-        return new $className($options);
+        if ($options) {
+            trigger_deprecation('symfony/validator', '7.3', 'Using constraints not supporting named arguments is deprecated. Try adding the HasNamedArguments attribute to %s.', $className);
+
+            return new $className($options);
+        }
+
+        return new $className();
     }
 }

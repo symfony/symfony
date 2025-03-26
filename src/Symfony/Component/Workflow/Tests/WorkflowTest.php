@@ -734,7 +734,7 @@ class WorkflowTest extends TestCase
         });
         $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
 
-        $this->assertEmpty($workflow->getEnabledTransitions($subject));
+        $this->assertSame([], $workflow->getEnabledTransitions($subject));
 
         $subject->setMarking(['d' => 1]);
         $transitions = $workflow->getEnabledTransitions($subject);

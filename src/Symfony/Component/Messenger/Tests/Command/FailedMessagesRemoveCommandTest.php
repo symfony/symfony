@@ -182,6 +182,53 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Message with id 30 removed.', $tester->getDisplay());
     }
 
+    public function testRemoveMessagesFilteredByClassMessage()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+
+        $anotherClass = new class extends \stdClass {};
+
+        $series = [
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(10)]),
+            new Envelope(new $anotherClass(), [new TransportMessageIdStamp(20)]),
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(30)]),
+        ];
+        $receiver->expects($this->once())->method('all')->willReturn($series);
+
+        $expectedRemovedIds = [10, 30];
+        $receiver->expects($this->exactly(2))->method('find')
+            ->willReturnCallback(function (...$args) use ($series, &$expectedRemovedIds) {
+                $expectedArgs = array_shift($expectedRemovedIds);
+                $this->assertSame([$expectedArgs], $args);
+
+                $return = array_filter(
+                    $series,
+                    static fn (Envelope $envelope) => [$envelope->last(TransportMessageIdStamp::class)->getId()] === $args,
+                );
+
+                return current($return);
+            })
+        ;
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+
+        $command = new FailedMessagesRemoveCommand(
+            $globalFailureReceiverName,
+            $serviceLocator
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--class-filter' => "stdClass", '--force' => true, '--show-messages' => true]);
+
+        $this->assertStringContainsString('Can you confirm you want to remove 2 messages? (yes/no)', $tester->getDisplay());
+        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        $this->assertStringContainsString('Message with id 10 removed.', $tester->getDisplay());
+        $this->assertStringContainsString('Message with id 30 removed.', $tester->getDisplay());
+    }
+
     public function testCompletingTransport()
     {
         $globalFailureReceiverName = 'failure_receiver';

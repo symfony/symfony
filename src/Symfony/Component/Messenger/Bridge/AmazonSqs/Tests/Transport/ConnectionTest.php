@@ -13,7 +13,9 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
 use AsyncAws\Core\Exception\Http\HttpException;
 use AsyncAws\Core\Test\ResultMockFactory;
+use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\GetQueueUrlResult;
+use AsyncAws\Sqs\Result\QueueExistsWaiter;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\Message;
@@ -383,6 +385,43 @@ class ConnectionTest extends TestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('SQS visibility_timeout (1s) cannot be smaller than the keepalive interval (2s).');
         $connection->keepalive('123', 2);
+    }
+
+    public function testQueueAttributesAndTags()
+    {
+        $queueName = 'queueName.fifo';
+        $queueAttributes = [
+            QueueAttributeName::MESSAGE_RETENTION_PERIOD => '900',
+            QueueAttributeName::MAXIMUM_MESSAGE_SIZE => '1024',
+        ];
+        $queueTags = ['tag1' => 'value1', 'tag2' => 'value2'];
+
+        $queueExistsWaiter = ResultMockFactory::waiter(QueueExistsWaiter::class, QueueExistsWaiter::STATE_FAILURE);
+        $client = $this->createMock(SqsClient::class);
+        $client->method('queueExists')->willReturn($queueExistsWaiter);
+        $client->expects($this->once())->method('createQueue')->with(['QueueName' => $queueName, 'Attributes' => array_merge($queueAttributes, [QueueAttributeName::FIFO_QUEUE => 'true']), 'tags' => $queueTags]);
+
+        $connection = new Connection(['queue_name' => $queueName, 'queue_attributes' => $queueAttributes, 'queue_tags' => $queueTags], $client);
+
+        $this->expectException(TransportException::class);
+        $connection->setup();
+    }
+
+    public function testQueueAttributesAndTagsFromDsn()
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $queueName = 'queueName';
+        $queueAttributes = [
+            QueueAttributeName::MESSAGE_RETENTION_PERIOD => '900',
+            QueueAttributeName::MAXIMUM_MESSAGE_SIZE => '1024',
+        ];
+        $queueTags = ['tag1' => 'value1', 'tag2' => 'value2'];
+
+        $this->assertEquals(
+            new Connection(['queue_name' => $queueName, 'queue_attributes' => $queueAttributes, 'queue_tags' => $queueTags], new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://default/'.$queueName, ['queue_attributes' => $queueAttributes, 'queue_tags' => $queueTags], $httpClient)
+        );
     }
 
     private function getMockedQueueUrlResponse(): MockResponse

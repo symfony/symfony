@@ -12,9 +12,11 @@
 namespace Symfony\Component\TypeInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyEnum;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
@@ -29,6 +31,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class TypeFactoryTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public function testCreateBuiltin()
     {
         $this->assertEquals(new BuiltinType(TypeIdentifier::INT), Type::builtin(TypeIdentifier::INT));
@@ -136,15 +140,6 @@ class TypeFactoryTest extends TestCase
             )),
             Type::iterable(Type::bool(), Type::string()),
         );
-
-        $this->assertEquals(
-            new CollectionType(new GenericType(
-                new BuiltinType(TypeIdentifier::ITERABLE),
-                new BuiltinType(TypeIdentifier::INT),
-                new BuiltinType(TypeIdentifier::BOOL),
-            ), isList: true),
-            Type::iterable(Type::bool(), Type::int(), true),
-        );
     }
 
     public function testCreateObject()
@@ -205,5 +200,92 @@ class TypeFactoryTest extends TestCase
             new NullableType(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING))),
             Type::nullable(Type::union(Type::int(), Type::string(), Type::null())),
         );
+        $this->assertEquals(
+            new NullableType(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING))),
+            Type::union(Type::nullable(Type::int()), Type::string()),
+        );
+    }
+
+    public function testCreateArrayShape()
+    {
+        $this->assertEquals(new ArrayShapeType(['foo' => ['type' => Type::bool(), 'optional' => true]]), Type::arrayShape(['foo' => ['type' => Type::bool(), 'optional' => true]]));
+        $this->assertEquals(new ArrayShapeType(['foo' => ['type' => Type::bool(), 'optional' => false]]), Type::arrayShape(['foo' => Type::bool()]));
+        $this->assertEquals(new ArrayShapeType(
+            shape: ['foo' => ['type' => Type::bool(), 'optional' => false]],
+            extraKeyType: Type::union(Type::int(), Type::string()),
+            extraValueType: Type::mixed(),
+        ), Type::arrayShape(['foo' => Type::bool()], sealed: false));
+        $this->assertEquals(new ArrayShapeType(
+            shape: ['foo' => ['type' => Type::bool(), 'optional' => false]],
+            extraKeyType: Type::string(),
+            extraValueType: Type::bool(),
+        ), Type::arrayShape(['foo' => Type::bool()], extraKeyType: Type::string(), extraValueType: Type::bool()));
+    }
+
+    /**
+     * @dataProvider createFromValueProvider
+     */
+    public function testCreateFromValue(Type $expected, mixed $value)
+    {
+        $this->assertEquals($expected, Type::fromValue($value));
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: mixed}>
+     */
+    public static function createFromValueProvider(): iterable
+    {
+        // builtin
+        yield [Type::null(), null];
+        yield [Type::true(), true];
+        yield [Type::false(), false];
+        yield [Type::int(), 1];
+        yield [Type::float(), 1.1];
+        yield [Type::string(), 'string'];
+        yield [Type::callable(), strtoupper(...)];
+        yield [Type::resource(), fopen('php://temp', 'r')];
+
+        // object
+        yield [Type::object(\DateTimeImmutable::class), new \DateTimeImmutable()];
+        yield [Type::object(), new \stdClass()];
+        yield [Type::list(Type::object()), [new \stdClass(), new \DateTimeImmutable()]];
+
+        // collection
+        $arrayAccess = new class implements \ArrayAccess {
+            public function offsetExists(mixed $offset): bool
+            {
+                return true;
+            }
+
+            public function offsetGet(mixed $offset): mixed
+            {
+                return null;
+            }
+
+            public function offsetSet(mixed $offset, mixed $value): void
+            {
+            }
+
+            public function offsetUnset(mixed $offset): void
+            {
+            }
+        };
+
+        yield [Type::list(Type::int()), [1, 2, 3]];
+        yield [Type::dict(Type::bool()), ['a' => true, 'b' => false]];
+        yield [Type::array(Type::string()), [1 => 'foo', 'bar' => 'baz']];
+        yield [Type::array(Type::nullable(Type::bool()), Type::int()), [1 => true, 2 => null, 3 => false]];
+        yield [Type::collection(Type::object(\ArrayIterator::class), Type::mixed(), Type::union(Type::int(), Type::string())), new \ArrayIterator()];
+        yield [Type::collection(Type::object(\Generator::class), Type::string(), Type::int()), (fn (): iterable => yield 'string')()];
+        yield [Type::collection(Type::object($arrayAccess::class)), $arrayAccess];
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCannotCreateIterableList()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/type-info 7.3: The third argument of "Symfony\Component\TypeInfo\TypeFactoryTrait::iterable()" is deprecated. Use the "Symfony\Component\TypeInfo\Type::list()" method to create a list instead.');
+        Type::iterable(key: Type::int(), asList: true);
     }
 }

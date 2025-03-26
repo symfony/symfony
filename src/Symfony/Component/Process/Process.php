@@ -82,7 +82,6 @@ class Process implements \IteratorAggregate
     private WindowsPipes|UnixPipes $processPipes;
 
     private ?int $latestSignal = null;
-    private ?int $cachedExitCode = null;
 
     private static ?bool $sigchild = null;
     private static array $executables = [];
@@ -1324,21 +1323,10 @@ class Process implements \IteratorAggregate
             return;
         }
 
-        $this->processInformation = proc_get_status($this->process);
-        $running = $this->processInformation['running'];
-
-        // In PHP < 8.3, "proc_get_status" only returns the correct exit status on the first call.
-        // Subsequent calls return -1 as the process is discarded. This workaround caches the first
-        // retrieved exit status for consistent results in later calls, mimicking PHP 8.3 behavior.
-        if (\PHP_VERSION_ID < 80300) {
-            if (!isset($this->cachedExitCode) && !$running && -1 !== $this->processInformation['exitcode']) {
-                $this->cachedExitCode = $this->processInformation['exitcode'];
-            }
-
-            if (isset($this->cachedExitCode) && !$running && -1 === $this->processInformation['exitcode']) {
-                $this->processInformation['exitcode'] = $this->cachedExitCode;
-            }
+        if ($this->processInformation['running'] ?? true) {
+            $this->processInformation = proc_get_status($this->process);
         }
+        $running = $this->processInformation['running'];
 
         $this->readPipes($running && $blocking, '\\' !== \DIRECTORY_SEPARATOR || !$running);
 

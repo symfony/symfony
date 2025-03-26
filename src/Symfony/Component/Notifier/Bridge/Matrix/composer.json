@@ -1,0 +1,33 @@
+{
+  "name": "symfony/matrix-notifier",
+  "type": "symfony-notifier-bridge",
+  "description": "Symfony Matrix Notifier Bridge",
+  "keywords": ["matrix", "notifier"],
+  "homepage": "https://symfony.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Frank Schulze",
+      "email": "frank@akiber.de"
+    },
+    {
+      "name": "Symfony Community",
+      "homepage": "https://symfony.com/contributors"
+    }
+  ],
+  "require": {
+    "php": ">=8.2",
+    "symfony/notifier": "^7.3",
+    "symfony/uid": "^7.2",
+    "symfony/http-client": "^6.4|^7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Symfony\\Component\\Notifier\\Bridge\\Matrix\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  },
+  "minimum-stability": "dev"
+}

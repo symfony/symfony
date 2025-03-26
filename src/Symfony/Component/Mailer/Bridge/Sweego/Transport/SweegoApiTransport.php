@@ -90,6 +90,7 @@ final class SweegoApiTransport extends AbstractApiTransport
             'from' => $this->formatAddress($envelope->getSender()),
             'subject' => $email->getSubject(),
             'campaign-type' => 'transac',
+            'channel' => 'email',
         ];
 
         if ($email->getTextBody()) {
@@ -98,6 +99,10 @@ final class SweegoApiTransport extends AbstractApiTransport
 
         if ($email->getHtmlBody()) {
             $payload['message-html'] = $email->getHtmlBody();
+        }
+
+        if ($email->getAttachments()) {
+            $payload['attachments'] = $this->getAttachments($email);
         }
 
         if ($payload['headers'] = $this->prepareHeaders($email->getHeaders())) {
@@ -109,6 +114,30 @@ final class SweegoApiTransport extends AbstractApiTransport
         $payload['provider'] = 'sweego';
 
         return $payload;
+    }
+
+    private function getAttachments(Email $email): array
+    {
+        $attachments = [];
+        foreach ($email->getAttachments() as $attachment) {
+            $headers = $attachment->getPreparedHeaders();
+            $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
+            $disposition = $headers->getHeaderBody('Content-Disposition');
+
+            $att = [
+                'content' => $attachment->bodyToString(),
+                'filename' => $filename,
+                'disposition' => $disposition,
+            ];
+
+            if ('inline' === $disposition) {
+                $att['content_id'] = $attachment->hasContentId() ? $attachment->getContentId() : $filename;
+            }
+
+            $attachments[] = $att;
+        }
+
+        return $attachments;
     }
 
     private function prepareHeaders(Headers $headers): array

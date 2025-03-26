@@ -118,12 +118,19 @@ class TextDescriptor extends Descriptor
             'Allowed types' => 'allowedTypes',
             'Allowed values' => 'allowedValues',
             'Normalizers' => 'normalizers',
+            'Nested Options' => 'nestedOptions',
         ];
         $rows = [];
         foreach ($map as $label => $name) {
             $value = \array_key_exists($name, $definition) ? $dump($definition[$name]) : '-';
             if ('default' === $name && isset($definition['lazy'])) {
                 $value = "Value: $value\n\nClosure(s): ".$dump($definition['lazy']);
+            } elseif ('nestedOptions' === $name && isset($definition['nestedOptions'])) {
+                $nestedResolver = new OptionsResolver();
+                foreach ($definition['nestedOptions'] as $nestedOption) {
+                    $nestedOption($nestedResolver, $optionsResolver);
+                }
+                $value = $dump($nestedResolver->getDefinedOptions());
             }
 
             $rows[] = ["<info>$label</info>", $value];

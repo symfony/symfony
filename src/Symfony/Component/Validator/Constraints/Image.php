@@ -107,7 +107,7 @@ class Image extends File
      * @param positive-int|null        $maxHeight                   Maximum image height
      * @param int<0, int>|null         $minHeight                   Minimum image weight
      * @param positive-int|float|null  $maxRatio                    Maximum image ratio
-     * @param int<0, max>|float|null   $minRatio                    Minimum image ration
+     * @param int<0, max>|float|null   $minRatio                    Minimum image ratio
      * @param int<0, max>|float|null   $minPixels                   Minimum amount of pixels
      * @param positive-int|float|null  $maxPixels                   Maximum amount of pixels
      * @param bool|null                $allowSquare                 Whether to allow a square image (defaults to true)
@@ -165,6 +165,9 @@ class Image extends File
         ?string $corruptedMessage = null,
         ?array $groups = null,
         mixed $payload = null,
+        ?string $filenameCharset = null,
+        ?string $filenameCountUnit = null,
+        ?string $filenameCharsetMessage = null,
     ) {
         parent::__construct(
             $options,
@@ -187,7 +190,10 @@ class Image extends File
             $uploadExtensionErrorMessage,
             $uploadErrorMessage,
             $groups,
-            $payload
+            $payload,
+            $filenameCharset,
+            $filenameCountUnit,
+            $filenameCharsetMessage,
         );
 
         $this->minWidth = $minWidth ?? $this->minWidth;

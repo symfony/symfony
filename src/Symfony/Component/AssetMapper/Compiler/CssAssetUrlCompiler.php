@@ -35,7 +35,32 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
-        return preg_replace_callback(self::ASSET_URL_PATTERN, function ($matches) use ($asset, $assetMapper) {
+        preg_match_all('/\/\*|\*\//', $content, $commentMatches, \PREG_OFFSET_CAPTURE);
+
+        $start = null;
+        $commentBlocks = [];
+        foreach ($commentMatches[0] as $match) {
+            if ('/*' === $match[0]) {
+                $start = $match[1];
+            } elseif ($start) {
+                $commentBlocks[] = [$start, $match[1]];
+                $start = null;
+            }
+        }
+
+        return preg_replace_callback(self::ASSET_URL_PATTERN, function ($matches) use ($asset, $assetMapper, $commentBlocks) {
+            $matchPos = $matches[0][1];
+
+            // Ignore matchs inside comments
+            foreach ($commentBlocks as $block) {
+                if ($matchPos > $block[0]) {
+                    if ($matchPos < $block[1]) {
+                        return $matches[0][0];
+                    }
+                    break;
+                }
+            }
+
             try {
                 $resolvedSourcePath = Path::join(\dirname($asset->sourcePath), $matches[1]);
             } catch (RuntimeException $e) {

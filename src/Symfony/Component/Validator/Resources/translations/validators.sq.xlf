@@ -475,6 +475,10 @@
                 <source>This value should not be after week "{{ max }}".</source>
                 <target>Kjo vlerë nuk duhet të jetë pas javës "{{ max }}".</target>
             </trans-unit>
+            <trans-unit id="120">
+                <source>This value is not a valid slug.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një slug i vlefshëm.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -35,7 +35,7 @@ class PostalApiTransportTest extends TestCase
     {
         return [
             [
-                (new PostalApiTransport('TOKEN', 'postal.localhost')),
+                new PostalApiTransport('TOKEN', 'postal.localhost'),
                 'postal+api://postal.localhost',
             ],
             [

@@ -21,6 +21,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+ *
+ * @group legacy
  */
 final class CompiledClassMetadataFactoryTest extends TestCase
 {

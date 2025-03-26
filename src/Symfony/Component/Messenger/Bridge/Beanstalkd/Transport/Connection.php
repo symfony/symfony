@@ -11,11 +11,16 @@
 
 namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 
-use Pheanstalk\Contract\PheanstalkInterface;
+use Pheanstalk\Contract\PheanstalkManagerInterface;
+use Pheanstalk\Contract\PheanstalkPublisherInterface;
+use Pheanstalk\Contract\PheanstalkSubscriberInterface;
+use Pheanstalk\Contract\SocketFactoryInterface;
 use Pheanstalk\Exception;
-use Pheanstalk\Job as PheanstalkJob;
-use Pheanstalk\JobId;
+use Pheanstalk\Exception\ConnectionException;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\Values\Job as PheanstalkJob;
+use Pheanstalk\Values\JobId;
+use Pheanstalk\Values\TubeName;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 
@@ -29,14 +34,16 @@ use Symfony\Component\Messenger\Exception\TransportException;
 class Connection
 {
     private const DEFAULT_OPTIONS = [
-        'tube_name' => PheanstalkInterface::DEFAULT_TUBE,
+        'tube_name' => 'default',
         'timeout' => 0,
         'ttr' => 90,
+        'bury_on_reject' => false,
     ];
 
-    private string $tube;
+    private TubeName $tube;
     private int $timeout;
     private int $ttr;
+    private bool $buryOnReject;
 
     /**
      * Constructor.
@@ -46,15 +53,17 @@ class Connection
      * * tube_name: name of the tube
      * * timeout: message reservation timeout (in seconds)
      * * ttr: the message time to run before it is put back in the ready queue (in seconds)
+     * * bury_on_reject: bury rejected messages instead of deleting them
      */
     public function __construct(
         private array $configuration,
-        private PheanstalkInterface $client,
+        private PheanstalkSubscriberInterface&PheanstalkPublisherInterface&PheanstalkManagerInterface $client,
     ) {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
-        $this->tube = $this->configuration['tube_name'];
+        $this->tube = new TubeName($this->configuration['tube_name']);
         $this->timeout = $this->configuration['timeout'];
         $this->ttr = $this->configuration['ttr'];
+        $this->buryOnReject = $this->configuration['bury_on_reject'];
     }
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = []): self
@@ -65,7 +74,7 @@ class Connection
 
         $connectionCredentials = [
             'host' => $components['host'],
-            'port' => $components['port'] ?? PheanstalkInterface::DEFAULT_PORT,
+            'port' => $components['port'] ?? SocketFactoryInterface::DEFAULT_PORT,
         ];
 
         $query = [];
@@ -74,7 +83,15 @@ class Connection
         }
 
         $configuration = [];
-        $configuration += $options + $query + self::DEFAULT_OPTIONS;
+        foreach (self::DEFAULT_OPTIONS as $k => $v) {
+            $value = $options[$k] ?? $query[$k] ?? $v;
+
+            $configuration[$k] = match (\gettype($v)) {
+                'integer' => filter_var($value, \FILTER_VALIDATE_INT),
+                'boolean' => filter_var($value, \FILTER_VALIDATE_BOOL),
+                default => $value,
+            };
+        }
 
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
@@ -101,37 +118,37 @@ class Connection
 
     public function getTube(): string
     {
-        return $this->tube;
+        return (string) $this->tube;
     }
 
     /**
-     * @param int $delay The delay in milliseconds
+     * @param int  $delay    The delay in milliseconds
+     * @param ?int $priority The priority at which the message will be reserved
      *
      * @return string The inserted id
      */
-    public function send(string $body, array $headers, int $delay = 0): string
+    public function send(string $body, array $headers, int $delay = 0, ?int $priority = null): string
     {
-        $message = json_encode([
-            'body' => $body,
-            'headers' => $headers,
-        ]);
-
-        if (false === $message) {
-            throw new TransportException(json_last_error_msg());
-        }
-
         try {
-            $job = $this->client->useTube($this->tube)->put(
-                $message,
-                PheanstalkInterface::DEFAULT_PRIORITY,
-                (int) ($delay / 1000),
-                $this->ttr
-            );
-        } catch (Exception $exception) {
+            $message = json_encode([
+                'body' => $body,
+                'headers' => $headers,
+            ], \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
 
-        return (string) $job->getId();
+        return $this->withReconnect(function () use ($message, $delay, $priority) {
+            $this->client->useTube($this->tube);
+            $job = $this->client->put(
+                $message,
+                $priority ?? PheanstalkPublisherInterface::DEFAULT_PRIORITY,
+                (int) ($delay / 1000),
+                $this->ttr
+            );
+
+            return $job->getId();
+        });
     }
 
     public function get(): ?array
@@ -144,10 +161,14 @@ class Connection
 
         $data = $job->getData();
 
-        $beanstalkdEnvelope = json_decode($data, true);
+        try {
+            $beanstalkdEnvelope = json_decode($data, true, flags: \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
 
         return [
-            'id' => (string) $job->getId(),
+            'id' => $job->getId(),
             'body' => $beanstalkdEnvelope['body'],
             'headers' => $beanstalkdEnvelope['headers'],
         ];
@@ -155,49 +176,79 @@ class Connection
 
     private function getFromTube(): ?PheanstalkJob
     {
-        try {
-            return $this->client->watchOnly($this->tube)->reserveWithTimeout($this->timeout);
-        } catch (Exception $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
+        return $this->withReconnect(function () {
+            if ($this->client->watch($this->tube) > 1) {
+                foreach ($this->client->listTubesWatched() as $tube) {
+                    if ((string) $tube !== (string) $this->tube) {
+                        $this->client->ignore($tube);
+                    }
+                }
+            }
+
+            return $this->client->reserveWithTimeout($this->timeout);
+        });
     }
 
     public function ack(string $id): void
     {
-        try {
-            $this->client->useTube($this->tube)->delete(new JobId((int) $id));
-        } catch (Exception $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
+        $this->withReconnect(function () use ($id) {
+            $this->client->useTube($this->tube);
+            $this->client->delete(new JobId($id));
+        });
     }
 
-    public function reject(string $id): void
+    public function reject(string $id, ?int $priority = null, bool $forceDelete = false): void
     {
-        try {
-            $this->client->useTube($this->tube)->delete(new JobId((int) $id));
-        } catch (Exception $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
+        $this->withReconnect(function () use ($id, $priority, $forceDelete) {
+            $this->client->useTube($this->tube);
+
+            if (!$forceDelete && $this->buryOnReject) {
+                $this->client->bury(new JobId($id), $priority ?? PheanstalkPublisherInterface::DEFAULT_PRIORITY);
+            } else {
+                $this->client->delete(new JobId($id));
+            }
+        });
     }
 
     public function keepalive(string $id): void
     {
-        try {
-            $this->client->useTube($this->tube)->touch(new JobId((int) $id));
-        } catch (Exception $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
+        $this->withReconnect(function () use ($id) {
+            $this->client->useTube($this->tube);
+            $this->client->touch(new JobId($id));
+        });
     }
 
     public function getMessageCount(): int
     {
-        try {
+        return $this->withReconnect(function () {
             $this->client->useTube($this->tube);
             $tubeStats = $this->client->statsTube($this->tube);
+
+            return $tubeStats->currentJobsReady;
+        });
+    }
+
+    public function getMessagePriority(string $id): int
+    {
+        return $this->withReconnect(function () use ($id) {
+            $jobStats = $this->client->statsJob(new JobId($id));
+
+            return $jobStats->priority;
+        });
+    }
+
+    private function withReconnect(callable $command): mixed
+    {
+        try {
+            try {
+                return $command();
+            } catch (ConnectionException) {
+                $this->client->disconnect();
+
+                return $command();
+            }
         } catch (Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
-
-        return (int) $tubeStats['current-jobs-ready'];
     }
 }

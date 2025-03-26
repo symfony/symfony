@@ -335,17 +335,17 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     /**
      * @internal
      */
-    protected function getId(mixed $key): string
+    protected function getId(mixed $key, ?string $namespace = null): string
     {
         if ('pgsql' !== $this->platformName ??= $this->getPlatformName()) {
-            return parent::getId($key);
+            return parent::getId($key, $namespace);
         }
 
         if (str_contains($key, "\0") || str_contains($key, '%') || !preg_match('//u', $key)) {
             $key = rawurlencode($key);
         }
 
-        return parent::getId($key);
+        return parent::getId($key, $namespace);
     }
 
     private function getPlatformName(): string

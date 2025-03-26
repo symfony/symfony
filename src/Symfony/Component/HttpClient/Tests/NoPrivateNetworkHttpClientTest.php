@@ -178,13 +178,14 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     public function testHeadersArePassedOnRedirect()
     {
         $ipAddr = '104.26.14.6';
-        $url = sprintf('http://%s/', $ipAddr);
+        $url = \sprintf('http://%s/', $ipAddr);
         $content = 'foo';
 
         $callback = function ($method, $url, $options) use ($content): MockResponse {
             $this->assertArrayHasKey('headers', $options);
             $this->assertNotContains('content-type: application/json', $options['headers']);
             $this->assertContains('foo: bar', $options['headers']);
+
             return new MockResponse($content);
         };
         $responses = [

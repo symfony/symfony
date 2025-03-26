@@ -450,6 +450,16 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
 
+    public function testAddingRouteWithHosts()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('route-with-hosts.yml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/route-with-hosts-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
     public function testWhenEnv()
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');

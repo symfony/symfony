@@ -57,7 +57,7 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
             throw new InvalidArgumentException(\sprintf('The object must implement "%s".', FlattenException::class));
         }
 
-        $data = [];
+        $error = [];
         $context += $this->defaultContext;
         $debug = $this->debug && ($context['debug'] ?? true);
         $exception = $context['exception'] ?? null;
@@ -67,7 +67,7 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
             if ($exception instanceof PartialDenormalizationException) {
                 $trans = $this->translator ? $this->translator->trans(...) : fn ($m, $p) => strtr($m, $p);
                 $template = 'This value should be of type {{ type }}.';
-                $data = [
+                $error = [
                     self::TYPE => 'https://symfony.com/errors/validation',
                     self::TITLE => 'Validation Failed',
                     'violations' => array_map(
@@ -84,27 +84,27 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
                         $exception->getErrors()
                     ),
                 ];
-                $data['detail'] = implode("\n", array_map(fn ($e) => $e['propertyPath'].': '.$e['title'], $data['violations']));
+                $error['detail'] = implode("\n", array_map(fn ($e) => $e['propertyPath'].': '.$e['title'], $error['violations']));
             } elseif (($exception instanceof ValidationFailedException || $exception instanceof MessageValidationFailedException)
                 && $this->serializer instanceof NormalizerInterface
                 && $this->serializer->supportsNormalization($exception->getViolations(), $format, $context)
             ) {
-                $data = $this->serializer->normalize($exception->getViolations(), $format, $context);
+                $error = $this->serializer->normalize($exception->getViolations(), $format, $context);
             }
         }
 
-        $data = [
-            self::TYPE => $data[self::TYPE] ?? $context[self::TYPE] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
-            self::TITLE => $data[self::TITLE] ?? $context[self::TITLE] ?? 'An error occurred',
+        $error = [
+            self::TYPE => $error[self::TYPE] ?? $context[self::TYPE] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
+            self::TITLE => $error[self::TITLE] ?? $context[self::TITLE] ?? 'An error occurred',
             self::STATUS => $context[self::STATUS] ?? $object->getStatusCode(),
-            'detail' => $data['detail'] ?? ($debug ? $object->getMessage() : $object->getStatusText()),
-        ] + $data;
+            'detail' => $error['detail'] ?? ($debug ? $object->getMessage() : $object->getStatusText()),
+        ] + $error;
         if ($debug) {
-            $data['class'] = $object->getClass();
-            $data['trace'] = $object->getTrace();
+            $error['class'] = $object->getClass();
+            $error['trace'] = $object->getTrace();
         }
 
-        return $data;
+        return $error;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

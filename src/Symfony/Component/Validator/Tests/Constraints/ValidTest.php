@@ -23,7 +23,7 @@ class ValidTest extends TestCase
 {
     public function testGroupsCanBeSet()
     {
-        $constraint = new Valid(['groups' => 'foo']);
+        $constraint = new Valid(groups: ['foo']);
 
         $this->assertSame(['foo'], $constraint->groups);
     }

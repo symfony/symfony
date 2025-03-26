@@ -47,6 +47,7 @@
             <xsd:element name="mapping" type="discriminator-map-mapping" maxOccurs="unbounded" />
         </xsd:choice>
         <xsd:attribute name="type-property" type="xsd:string" use="required" />
+        <xsd:attribute name="default-type" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="discriminator-map-mapping">

@@ -602,6 +602,56 @@ class TranslatorTest extends TestCase
 
         $translator->getCatalogue('en');
     }
+
+    public function testTransWithGlobalParameters()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['welcome' => 'Welcome {name}!'], 'en');
+        $translator->addResource('array', ['welcome' => 'Bienvenue {name}!'], 'fr');
+        $translator->addGlobalParameter('{name}', 'Global name');
+
+        $this->assertSame('Welcome Global name!', $translator->trans('welcome'));
+        $this->assertSame('Bienvenue Global name!', $translator->trans('welcome', [], null, 'fr'));
+        $this->assertSame('Welcome John!', $translator->trans('welcome', ['{name}' => 'John']));
+        $this->assertSame('Bienvenue Jean!', $translator->trans('welcome', ['{name}' => 'Jean'], null, 'fr'));
+    }
+
+    public function testTransWithGlobalTranslatableParameters()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['welcome' => 'Welcome on {link}!'], 'en');
+        $translator->addResource('array', ['welcome' => 'Bienvenue sur {link}!'], 'fr');
+
+        $translator->addResource('array', ['url' => 'example.com/admin'], 'en', 'globals');
+        $translator->addResource('array', ['url' => 'example.fr/admin'], 'fr', 'globals');
+
+        $translator->addGlobalParameter('{link}', new TranslatableMessage('url', [], 'globals'));
+
+        $this->assertSame('Welcome on example.com/admin!', $translator->trans('welcome'));
+        $this->assertSame('Bienvenue sur example.fr/admin!', $translator->trans('welcome', [], null, 'fr'));
+        $this->assertSame('Welcome on other.com!', $translator->trans('welcome', ['{link}' => 'other.com']));
+        $this->assertSame('Bienvenue sur autre.fr!', $translator->trans('welcome', ['{link}' => 'autre.fr'], null, 'fr'));
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testTransICUWithGlobalParameters()
+    {
+        $domain = 'test.'.MessageCatalogue::INTL_DOMAIN_SUFFIX;
+
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', [
+            'apples' => '{apples, plural, =0 {There are no apples} one {There is one apple} other {There are # apples}}',
+        ], 'en', $domain);
+        $translator->addGlobalParameter('{apples}', 42);
+
+        $this->assertSame('There are 42 apples', $translator->trans('apples', [], $domain));
+        $this->assertSame('There is one apple', $translator->trans('apples', ['{apples}' => 1], $domain));
+    }
 }
 
 class StringClass

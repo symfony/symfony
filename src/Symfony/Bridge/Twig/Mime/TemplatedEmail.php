@@ -18,10 +18,28 @@ use Symfony\Component\Mime\Email;
  */
 class TemplatedEmail extends Email
 {
+    private string|\Stringable|null $subject = null;
     private ?string $htmlTemplate = null;
     private ?string $textTemplate = null;
     private ?string $locale = null;
     private array $context = [];
+
+    /**
+     * @return $this
+     */
+    public function subject(string|\Stringable $subject): static
+    {
+        parent::subject($subject);
+
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+    public function getTranslatableSubject(): string|\Stringable|null
+    {
+        return $this->subject;
+    }
 
     /**
      * @return $this
@@ -100,7 +118,7 @@ class TemplatedEmail extends Email
      */
     public function __serialize(): array
     {
-        return [$this->htmlTemplate, $this->textTemplate, $this->context, parent::__serialize(),  $this->locale];
+        return [$this->htmlTemplate, $this->textTemplate, $this->context, parent::__serialize(), $this->locale, $this->subject];
     }
 
     /**
@@ -110,6 +128,7 @@ class TemplatedEmail extends Email
     {
         [$this->htmlTemplate, $this->textTemplate, $this->context, $parentData] = $data;
         $this->locale = $data[4] ?? null;
+        $this->subject = $data[5] ?? null;
 
         parent::__unserialize($parentData);
     }

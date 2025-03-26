@@ -18,12 +18,9 @@ use Twig\Environment;
 use Twig\Extension\CoreExtension;
 use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
-use Twig\Node\Expression\ConditionalExpression;
 use Twig\Node\Expression\ConstantExpression;
-use Twig\Node\Expression\NameExpression;
 use Twig\Node\Expression\Ternary\ConditionalTernary;
 use Twig\Node\Expression\Variable\ContextVariable;
-use Twig\Node\Node;
 use Twig\Node\Nodes;
 use Twig\TwigFunction;
 
@@ -31,15 +28,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
 {
     public function testCompileWidget()
     {
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([
-                new ContextVariable('form', 0),
-            ]);
-        } else {
-            $arguments = new Node([
-                new NameExpression('form', 0),
-            ]);
-        }
+        $arguments = new Nodes([
+            new ContextVariable('form', 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_widget'), $arguments, 0);
 
@@ -56,23 +47,13 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileWidgetWithVariables()
     {
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([
-                new ContextVariable('form', 0),
-                new ArrayExpression([
-                    new ConstantExpression('foo', 0),
-                    new ConstantExpression('bar', 0),
-                ], 0),
-            ]);
-        } else {
-            $arguments = new Node([
-                new NameExpression('form', 0),
-                new ArrayExpression([
-                    new ConstantExpression('foo', 0),
-                    new ConstantExpression('bar', 0),
-                ], 0),
-            ]);
-        }
+        $arguments = new Nodes([
+            new ContextVariable('form', 0),
+            new ArrayExpression([
+                new ConstantExpression('foo', 0),
+                new ConstantExpression('bar', 0),
+            ], 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_widget'), $arguments, 0);
 
@@ -89,17 +70,10 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithLabel()
     {
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([
-                new ContextVariable('form', 0),
-                new ConstantExpression('my label', 0),
-            ]);
-        } else {
-            $arguments = new Node([
-                new NameExpression('form', 0),
-                new ConstantExpression('my label', 0),
-            ]);
-        }
+        $arguments = new Nodes([
+            new ContextVariable('form', 0),
+            new ConstantExpression('my label', 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
@@ -116,17 +90,10 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithNullLabel()
     {
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([
-                new ContextVariable('form', 0),
-                new ConstantExpression(null, 0),
-            ]);
-        } else {
-            $arguments = new Node([
-                new NameExpression('form', 0),
-                new ConstantExpression(null, 0),
-            ]);
-        }
+        $arguments = new Nodes([
+            new ContextVariable('form', 0),
+            new ConstantExpression(null, 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
@@ -145,17 +112,10 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithEmptyStringLabel()
     {
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([
-                new ContextVariable('form', 0),
-                new ConstantExpression('', 0),
-            ]);
-        } else {
-            $arguments = new Node([
-                new NameExpression('form', 0),
-                new ConstantExpression('', 0),
-            ]);
-        }
+        $arguments = new Nodes([
+            new ContextVariable('form', 0),
+            new ConstantExpression('', 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
@@ -174,15 +134,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithDefaultLabel()
     {
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([
-                new ContextVariable('form', 0),
-            ]);
-        } else {
-            $arguments = new Node([
-                new NameExpression('form', 0),
-            ]);
-        }
+        $arguments = new Nodes([
+            new ContextVariable('form', 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
@@ -199,25 +153,14 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithAttributes()
     {
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([
-                new ContextVariable('form', 0),
-                new ConstantExpression(null, 0),
-                new ArrayExpression([
-                    new ConstantExpression('foo', 0),
-                    new ConstantExpression('bar', 0),
-                ], 0),
-            ]);
-        } else {
-            $arguments = new Node([
-                new NameExpression('form', 0),
-                new ConstantExpression(null, 0),
-                new ArrayExpression([
-                    new ConstantExpression('foo', 0),
-                    new ConstantExpression('bar', 0),
-                ], 0),
-            ]);
-        }
+        $arguments = new Nodes([
+            new ContextVariable('form', 0),
+            new ConstantExpression(null, 0),
+            new ArrayExpression([
+                new ConstantExpression('foo', 0),
+                new ConstantExpression('bar', 0),
+            ], 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
@@ -237,29 +180,16 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithLabelAndAttributes()
     {
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([
-                new ContextVariable('form', 0),
-                new ConstantExpression('value in argument', 0),
-                new ArrayExpression([
-                    new ConstantExpression('foo', 0),
-                    new ConstantExpression('bar', 0),
-                    new ConstantExpression('label', 0),
-                    new ConstantExpression('value in attributes', 0),
-                ], 0),
-            ]);
-        } else {
-            $arguments = new Node([
-                new NameExpression('form', 0),
-                new ConstantExpression('value in argument', 0),
-                new ArrayExpression([
-                    new ConstantExpression('foo', 0),
-                    new ConstantExpression('bar', 0),
-                    new ConstantExpression('label', 0),
-                    new ConstantExpression('value in attributes', 0),
-                ], 0),
-            ]);
-        }
+        $arguments = new Nodes([
+            new ContextVariable('form', 0),
+            new ConstantExpression('value in argument', 0),
+            new ArrayExpression([
+                new ConstantExpression('foo', 0),
+                new ConstantExpression('bar', 0),
+                new ConstantExpression('label', 0),
+                new ConstantExpression('value in attributes', 0),
+            ], 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
@@ -276,33 +206,17 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithLabelThatEvaluatesToNull()
     {
-        if (class_exists(ConditionalTernary::class)) {
-            $conditional = new ConditionalTernary(
-                // if
-                new ConstantExpression(true, 0),
-                // then
-                new ConstantExpression(null, 0),
-                // else
-                new ConstantExpression(null, 0),
-                0
-            );
-        } else {
-            $conditional = new ConditionalExpression(
-                // if
-                new ConstantExpression(true, 0),
-                // then
-                new ConstantExpression(null, 0),
-                // else
-                new ConstantExpression(null, 0),
-                0
-            );
-        }
+        $conditional = new ConditionalTernary(
+            // if
+            new ConstantExpression(true, 0),
+            // then
+            new ConstantExpression(null, 0),
+            // else
+            new ConstantExpression(null, 0),
+            0
+        );
 
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([new ContextVariable('form', 0), $conditional]);
-        } else {
-            $arguments = new Node([new NameExpression('form', 0), $conditional]);
-        }
+        $arguments = new Nodes([new ContextVariable('form', 0), $conditional]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
@@ -323,51 +237,26 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes()
     {
-        if (class_exists(ConditionalTernary::class)) {
-            $conditional = new ConditionalTernary(
-                // if
-                new ConstantExpression(true, 0),
-                // then
-                new ConstantExpression(null, 0),
-                // else
-                new ConstantExpression(null, 0),
-                0
-            );
-        } else {
-            $conditional = new ConditionalExpression(
-                // if
-                new ConstantExpression(true, 0),
-                // then
-                new ConstantExpression(null, 0),
-                // else
-                new ConstantExpression(null, 0),
-                0
-            );
-        }
+        $conditional = new ConditionalTernary(
+            // if
+            new ConstantExpression(true, 0),
+            // then
+            new ConstantExpression(null, 0),
+            // else
+            new ConstantExpression(null, 0),
+            0
+        );
 
-        if (class_exists(Nodes::class)) {
-            $arguments = new Nodes([
-                new ContextVariable('form', 0),
-                $conditional,
-                new ArrayExpression([
-                    new ConstantExpression('foo', 0),
-                    new ConstantExpression('bar', 0),
-                    new ConstantExpression('label', 0),
-                    new ConstantExpression('value in attributes', 0),
-                ], 0),
-            ]);
-        } else {
-            $arguments = new Node([
-                new NameExpression('form', 0),
-                $conditional,
-                new ArrayExpression([
-                    new ConstantExpression('foo', 0),
-                    new ConstantExpression('bar', 0),
-                    new ConstantExpression('label', 0),
-                    new ConstantExpression('value in attributes', 0),
-                ], 0),
-            ]);
-        }
+        $arguments = new Nodes([
+            new ContextVariable('form', 0),
+            $conditional,
+            new ArrayExpression([
+                new ConstantExpression('foo', 0),
+                new ConstantExpression('bar', 0),
+                new ConstantExpression('label', 0),
+                new ConstantExpression('value in attributes', 0),
+            ], 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 

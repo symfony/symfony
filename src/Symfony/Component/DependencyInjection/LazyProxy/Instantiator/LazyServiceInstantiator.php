@@ -29,10 +29,19 @@ final class LazyServiceInstantiator implements InstantiatorInterface
             throw new InvalidArgumentException(\sprintf('Cannot instantiate lazy proxy for service "%s".', $id));
         }
 
-        if (!class_exists($proxyClass = $dumper->getProxyClass($definition, $asGhostObject), false)) {
+        if (\PHP_VERSION_ID >= 80400 && $asGhostObject) {
+            return (new \ReflectionClass($definition->getClass()))->newLazyGhost(static function ($ghost) use ($realInstantiator) { $realInstantiator($ghost); });
+        }
+
+        $class = null;
+        if (!class_exists($proxyClass = $dumper->getProxyClass($definition, $asGhostObject, $class), false)) {
             eval($dumper->getProxyCode($definition, $id));
         }
 
-        return $asGhostObject ? $proxyClass::createLazyGhost($realInstantiator) : $proxyClass::createLazyProxy($realInstantiator);
+        if ($definition->getClass() === $proxyClass) {
+            return $class->newLazyProxy($realInstantiator);
+        }
+
+        return \PHP_VERSION_ID < 80400 && $asGhostObject ? $proxyClass::createLazyGhost($realInstantiator) : $proxyClass::createLazyProxy($realInstantiator);
     }
 }

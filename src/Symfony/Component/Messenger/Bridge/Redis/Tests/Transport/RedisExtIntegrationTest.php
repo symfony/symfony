@@ -39,7 +39,7 @@ class RedisExtIntegrationTest extends TestCase
 
         try {
             $this->redis = $this->createRedisClient();
-            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null], $this->redis);
+            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null], $this->redis);
             $this->connection->cleanup();
             $this->connection->setup();
         } catch (\Exception $e) {
@@ -147,7 +147,7 @@ class RedisExtIntegrationTest extends TestCase
     public function testConnectionBelowRedeliverTimeout()
     {
         // lower redeliver timeout and claim interval
-        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null], $this->redis);
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['sentinel' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null], $this->redis);
 
         $connection->cleanup();
         $connection->setup();
@@ -175,7 +175,7 @@ class RedisExtIntegrationTest extends TestCase
         // lower redeliver timeout and claim interval
         $connection = Connection::fromDsn(
             getenv('MESSENGER_REDIS_DSN'),
-            ['redeliver_timeout' => 0, 'claim_interval' => 500, 'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null],
+            ['redeliver_timeout' => 0, 'claim_interval' => 500, 'sentinel' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null],
 
             $this->redis
         );
@@ -254,6 +254,7 @@ class RedisExtIntegrationTest extends TestCase
 
     public static function sentinelOptionNames(): \Generator
     {
+        yield ['sentinel'];
         yield ['redis_sentinel'];
         yield ['sentinel_master'];
     }
@@ -263,7 +264,7 @@ class RedisExtIntegrationTest extends TestCase
         $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'),
             ['lazy' => true,
                 'delete_after_ack' => true,
-                'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+                'sentinel' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
             ], $this->redis);
 
         $connection->add('1', []);
@@ -335,7 +336,7 @@ class RedisExtIntegrationTest extends TestCase
         $dsn = array_map(fn ($host) => 'redis://'.$host, $hosts);
         $dsn = implode(',', $dsn);
 
-        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null]));
+        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['sentinel' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null]));
     }
 
     public function testJsonError()
@@ -360,7 +361,7 @@ class RedisExtIntegrationTest extends TestCase
     {
         $redis = $this->createRedisClient();
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['sentinel_master' => null], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['sentinel' => null], $redis);
 
         try {
             $this->assertNull($connection->get()); // no message, should return null immediately
@@ -378,7 +379,7 @@ class RedisExtIntegrationTest extends TestCase
     public function testGetAfterReject()
     {
         $redis = $this->createRedisClient();
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel' => null], $redis);
 
         try {
             $connection->add('1', []);
@@ -387,7 +388,7 @@ class RedisExtIntegrationTest extends TestCase
             $failing = $connection->get();
             $connection->reject($failing['id']);
 
-            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null], $redis);
+            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel' => null], $redis);
             $this->assertNotNull($connection->get());
         } finally {
             $redis->unlink('messenger-rejectthenget');

@@ -72,11 +72,11 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
      *
-     * @param int $magicMethods A bitwise combination of the MAGIC_* constants
-     *                          to specify the allowed magic methods (__get, __set, __call)
-     *                          or self::DISALLOW_MAGIC_METHODS for none
-     * @param int $throw        A bitwise combination of the THROW_* constants
-     *                          to specify when exceptions should be thrown
+     * @param int $magicMethodsFlags A bitwise combination of the MAGIC_* constants
+     *                               to specify the allowed magic methods (__get, __set, __call)
+     *                               or self::DISALLOW_MAGIC_METHODS for none
+     * @param int $throw             A bitwise combination of the THROW_* constants
+     *                               to specify when exceptions should be thrown
      */
     public function __construct(
         private int $magicMethodsFlags = self::MAGIC_GET | self::MAGIC_SET,
@@ -216,7 +216,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             ];
 
             // handle stdClass with properties with a dot in the name
-            if ($objectOrArray instanceof \stdClass && str_contains($propertyPath, '.')  && property_exists($objectOrArray, $propertyPath)) {
+            if ($objectOrArray instanceof \stdClass && str_contains($propertyPath, '.') && property_exists($objectOrArray, $propertyPath)) {
                 $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty);
             } else {
                 $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
@@ -629,15 +629,22 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function isPropertyWritable(object $object, string $property): bool
     {
-        $mutatorForArray = $this->getWriteInfo($object::class, $property, []);
+        if ($object instanceof \stdClass && property_exists($object, $property)) {
+            return true;
+        }
 
-        if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType() || ($object instanceof \stdClass && property_exists($object, $property))) {
+        $mutatorForArray = $this->getWriteInfo($object::class, $property, []);
+        if (PropertyWriteInfo::TYPE_PROPERTY === $mutatorForArray->getType()) {
+            return 'public' === $mutatorForArray->getVisibility();
+        }
+
+        if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType()) {
             return true;
         }
 
         $mutator = $this->getWriteInfo($object::class, $property, '');
 
-        return PropertyWriteInfo::TYPE_NONE !== $mutator->getType() || ($object instanceof \stdClass && property_exists($object, $property));
+        return PropertyWriteInfo::TYPE_NONE !== $mutator->getType();
     }
 
     /**

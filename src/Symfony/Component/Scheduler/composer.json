@@ -30,7 +30,8 @@
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/event-dispatcher": "^6.4|^7.0",
         "symfony/lock": "^6.4|^7.0",
-        "symfony/messenger": "^6.4|^7.0"
+        "symfony/messenger": "^6.4|^7.0",
+        "symfony/serializer": "^6.4|^7.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Scheduler\\": "" },

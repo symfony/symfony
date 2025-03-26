@@ -55,4 +55,9 @@ class FooController
     public function condition()
     {
     }
+
+    #[Route(alias: ['alias', 'completely_different_name'])]
+    public function alias()
+    {
+    }
 }

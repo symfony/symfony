@@ -62,7 +62,7 @@ class TranslationExtractCommand extends Command
         parent::__construct();
 
         if (!method_exists($writer, 'getFormats')) {
-            throw new \InvalidArgumentException(sprintf('The writer class "%s" does not implement the "getFormats()" method.', $writer::class));
+            throw new \InvalidArgumentException(\sprintf('The writer class "%s" does not implement the "getFormats()" method.', $writer::class));
         }
     }
 

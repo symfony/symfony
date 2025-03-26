@@ -50,7 +50,7 @@ class LocalPublicAssetsFilesystem implements PublicAssetsFilesystemInterface
         return $this->publicDir;
     }
 
-    private function compress($targetPath): void
+    private function compress(string $targetPath): void
     {
         foreach ($this->extensionsToCompress as $ext) {
             if (!str_ends_with($targetPath, ".$ext")) {

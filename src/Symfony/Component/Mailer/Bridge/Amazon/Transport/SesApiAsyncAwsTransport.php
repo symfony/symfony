@@ -107,6 +107,10 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }
 
+        if ($customHeaders = $this->getCustomHeaders($email->getHeaders())) {
+            $request['Content']['Simple']['Headers'] = $customHeaders;
+        }
+
         foreach ($email->getHeaders()->all() as $header) {
             if ($header instanceof MetadataHeader) {
                 $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
@@ -121,6 +125,29 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         $emailRecipients = array_merge($email->getCc(), $email->getBcc());
 
         return array_filter($envelope->getRecipients(), fn (Address $address) => !\in_array($address, $emailRecipients, true));
+    }
+
+    private function getCustomHeaders(Headers $headers): array
+    {
+        $headersPrepared = [];
+
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'return-path', 'subject', 'reply-to', 'sender', 'content-type', 'x-ses-configuration-set', 'x-ses-source-arn', 'x-ses-list-management-options'];
+        foreach ($headers->all() as $name => $header) {
+            if (\in_array($name, $headersToBypass, true)) {
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                continue;
+            }
+
+            $headersPrepared[] = [
+                'Name' => $header->getName(),
+                'Value' => $header->getBodyAsString(),
+            ];
+        }
+
+        return $headersPrepared;
     }
 
     protected function stringifyAddresses(array $addresses): array

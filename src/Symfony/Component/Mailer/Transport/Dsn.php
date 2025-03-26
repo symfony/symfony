@@ -79,4 +79,9 @@ final class Dsn
     {
         return $this->options[$key] ?? $default;
     }
+
+    public function getBooleanOption(string $key, bool $default = false): bool
+    {
+        return filter_var($this->getOption($key, $default), \FILTER_VALIDATE_BOOLEAN);
+    }
 }

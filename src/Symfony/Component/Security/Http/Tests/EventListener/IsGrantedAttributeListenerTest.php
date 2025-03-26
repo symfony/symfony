@@ -13,12 +13,20 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeController;
@@ -213,10 +221,23 @@ class IsGrantedAttributeListenerTest extends TestCase
      */
     public function testAccessDeniedMessages(string|Expression $attribute, string|array|null $subject, string $method, int $numOfArguments, string $expectedMessage)
     {
-        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authChecker->expects($this->any())
-            ->method('isGranted')
-            ->willReturn(false);
+        $authChecker = new AuthorizationChecker(new TokenStorage(), new AccessDecisionManager((function () use (&$authChecker) {
+            yield new ExpressionVoter(new ExpressionLanguage(), null, $authChecker);
+            yield new RoleVoter();
+            yield new class extends Voter {
+                protected function supports(string $attribute, mixed $subject): bool
+                {
+                    return 'POST_VIEW' === $attribute;
+                }
+
+                protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
+                {
+                    $vote->reasons[] = 'Because I can 😈.';
+
+                    return false;
+                }
+            };
+        })()));
 
         $expressionLanguage = $this->createMock(ExpressionLanguage::class);
         $expressionLanguage->expects($this->any())
@@ -252,12 +273,12 @@ class IsGrantedAttributeListenerTest extends TestCase
 
     public static function getAccessDeniedMessageTests()
     {
-        yield ['ROLE_ADMIN', null, 'admin', 0, 'Access Denied by #[IsGranted("ROLE_ADMIN")] on controller'];
-        yield ['ROLE_ADMIN', 'bar', 'withSubject', 2, 'Access Denied by #[IsGranted("ROLE_ADMIN", "arg2Name")] on controller'];
-        yield ['ROLE_ADMIN', ['arg1Name' => 'bar', 'arg2Name' => 'bar'], 'withSubjectArray', 2, 'Access Denied by #[IsGranted("ROLE_ADMIN", ["arg1Name", "arg2Name"])] on controller'];
-        yield [new Expression('"ROLE_ADMIN" in role_names or is_granted("POST_VIEW", subject)'), 'bar', 'withExpressionInAttribute', 1, 'Access Denied by #[IsGranted(new Expression(""ROLE_ADMIN" in role_names or is_granted("POST_VIEW", subject)"), "post")] on controller'];
-        yield [new Expression('user === subject'), 'bar', 'withExpressionInSubject', 1, 'Access Denied by #[IsGranted(new Expression("user === subject"), new Expression("args["post"].getAuthor()"))] on controller'];
-        yield [new Expression('user === subject["author"]'), ['author' => 'bar', 'alias' => 'bar'], 'withNestedExpressionInSubject', 2, 'Access Denied by #[IsGranted(new Expression("user === subject["author"]"), ["author" => new Expression("args["post"].getAuthor()"), "alias" => "arg2Name"])] on controller'];
+        yield ['ROLE_ADMIN', null, 'admin', 0, 'Access Denied. The user doesn\'t have ROLE_ADMIN.'];
+        yield ['ROLE_ADMIN', 'bar', 'withSubject', 2, 'Access Denied. The user doesn\'t have ROLE_ADMIN.'];
+        yield ['ROLE_ADMIN', ['arg1Name' => 'bar', 'arg2Name' => 'bar'], 'withSubjectArray', 2, 'Access Denied. The user doesn\'t have ROLE_ADMIN.'];
+        yield [new Expression('"ROLE_ADMIN" in role_names or is_granted("POST_VIEW", subject)'), 'bar', 'withExpressionInAttribute', 1, 'Access Denied. Because I can 😈. Expression ("ROLE_ADMIN" in role_names or is_granted("POST_VIEW", subject)) is false.'];
+        yield [new Expression('user === subject'), 'bar', 'withExpressionInSubject', 1, 'Access Denied. Expression (user === subject) is false.'];
+        yield [new Expression('user === subject["author"]'), ['author' => 'bar', 'alias' => 'bar'], 'withNestedExpressionInSubject', 2, 'Access Denied. Expression (user === subject["author"]) is false.'];
     }
 
     public function testNotFoundHttpException()

@@ -136,6 +136,9 @@ class EntityUserProviderTest extends TestCase
         $provider->refreshUser($user2);
     }
 
+    /**
+     * @group legacy
+     */
     public function testSupportProxy()
     {
         $em = DoctrineTestHelper::createTestEntityManager();
@@ -202,6 +205,9 @@ class EntityUserProviderTest extends TestCase
         $provider->upgradePassword($user, 'foobar');
     }
 
+    /**
+     * @group legacy
+     */
     public function testRefreshedUserProxyIsLoaded()
     {
         $em = DoctrineTestHelper::createTestEntityManager();

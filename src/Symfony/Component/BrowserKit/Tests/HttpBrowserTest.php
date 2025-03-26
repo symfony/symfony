@@ -14,6 +14,8 @@ namespace Symfony\Component\BrowserKit\Tests;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\HttpBrowser;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -206,6 +208,37 @@ class HttpBrowserTest extends AbstractBrowserTest
             'two slashes' => ['//'],
             'multiple slashes' => ['////'],
         ];
+    }
+
+    public function testEmptyUpload()
+    {
+        $client = new MockHttpClient(function ($method, $url, $options) {
+            $this->assertSame('POST', $method);
+            $this->assertSame('http://localhost/', $url);
+            $this->assertStringStartsWith('Content-Type: multipart/form-data; boundary=', $options['normalized_headers']['content-type'][0]);
+
+            $body = '';
+            while ('' !== $data = $options['body'](1024)) {
+                $body .= $data;
+            }
+
+            $expected = <<<EOTXT
+                --%s\r
+                Content-Type: application/octet-stream\r
+                Content-Transfer-Encoding: 8bit\r
+                Content-Disposition: form-data; name="file"; filename=""\r
+                \r
+                \r
+                --%s--\r
+
+                EOTXT;
+            $this->assertStringMatchesFormat($expected, $body);
+
+            return new MockResponse();
+        });
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', '/', [], ['file' => ['tmp_name' => '', 'name' => 'file']]);
     }
 
     private function uploadFile(string $data): string

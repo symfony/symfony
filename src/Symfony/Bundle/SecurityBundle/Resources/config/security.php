@@ -31,9 +31,9 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
-use Symfony\Component\Security\Core\Authorization\UserAuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\ClosureVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
@@ -68,12 +68,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.access.decision_manager'),
             ])
         ->alias(AuthorizationCheckerInterface::class, 'security.authorization_checker')
-
-        ->set('security.user_authorization_checker', UserAuthorizationChecker::class)
-            ->args([
-                service('security.access.decision_manager'),
-            ])
-        ->alias(UserAuthorizationCheckerInterface::class, 'security.user_authorization_checker')
+        ->alias(UserAuthorizationCheckerInterface::class, 'security.authorization_checker')
 
         ->set('security.token_storage', UsageTrackingTokenStorage::class)
             ->args([
@@ -93,7 +88,7 @@ return static function (ContainerConfigurator $container) {
                 service_locator([
                     'security.token_storage' => service('security.token_storage'),
                     'security.authorization_checker' => service('security.authorization_checker'),
-                    'security.user_authorization_checker' => service('security.user_authorization_checker'),
+                    'security.user_authorization_checker' => service('security.authorization_checker'),
                     'security.authenticator.managers_locator' => service('security.authenticator.managers_locator')->ignoreOnInvalid(),
                     'request_stack' => service('request_stack'),
                     'security.firewall.map' => service('security.firewall.map'),
@@ -168,6 +163,12 @@ return static function (ContainerConfigurator $container) {
                 service('security.authentication.trust_resolver'),
                 service('security.authorization_checker'),
                 service('security.role_hierarchy')->nullOnInvalid(),
+            ])
+            ->tag('security.voter', ['priority' => 245])
+
+        ->set('security.access.closure_voter', ClosureVoter::class)
+            ->args([
+                service('security.authorization_checker'),
             ])
             ->tag('security.voter', ['priority' => 245])
 

@@ -117,7 +117,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $adapter = new DoctrineDbalAdapter($connection);
         $adapter->configureSchema($schema, $connection, fn () => true);
         $table = $schema->getTable('cache_items');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 
     /**

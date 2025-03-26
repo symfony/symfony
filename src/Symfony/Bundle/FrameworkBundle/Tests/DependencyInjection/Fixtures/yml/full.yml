@@ -64,10 +64,11 @@ framework:
                  default_context:
                      enable_max_depth: false
     type_info: ~
-    property_info: ~
+    property_info:
+        with_constructor_extractor: true
     ide: file%%link%%format
     request:
         formats:
             csv: ['text/csv', 'text/plain']
             pdf: 'application/pdf'
-    json_encoder: ~
+    json_streamer: ~

@@ -85,7 +85,7 @@ class AttributeLoaderTest extends TestCase
             'first' => AbstractDummyFirstChild::class,
             'second' => AbstractDummySecondChild::class,
             'third' => AbstractDummyThirdChild::class,
-        ]));
+        ], 'third'));
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
         $expected->getReflectionClass();

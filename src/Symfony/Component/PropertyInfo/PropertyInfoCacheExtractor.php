@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\PropertyInfo\Util\LegacyTypeConverter;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -58,11 +59,49 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
 
     public function getType(string $class, string $property, array $context = []): ?Type
     {
-        return $this->extract('getType', [$class, $property, $context]);
+        try {
+            $serializedArguments = serialize([$class, $property, $context]);
+        } catch (\Exception) {
+            // If arguments are not serializable, skip the cache
+            if (method_exists($this->propertyInfoExtractor, 'getType')) {
+                return $this->propertyInfoExtractor->getType($class, $property, $context);
+            }
+
+            return LegacyTypeConverter::toTypeInfoType($this->propertyInfoExtractor->getTypes($class, $property, $context));
+        }
+
+        // Calling rawurlencode escapes special characters not allowed in PSR-6's keys
+        $key = rawurlencode('getType.'.$serializedArguments);
+
+        if (\array_key_exists($key, $this->arrayCache)) {
+            return $this->arrayCache[$key];
+        }
+
+        $item = $this->cacheItemPool->getItem($key);
+
+        if ($item->isHit()) {
+            return $this->arrayCache[$key] = $item->get();
+        }
+
+        if (method_exists($this->propertyInfoExtractor, 'getType')) {
+            $value = $this->propertyInfoExtractor->getType($class, $property, $context);
+        } else {
+            $value = LegacyTypeConverter::toTypeInfoType($this->propertyInfoExtractor->getTypes($class, $property, $context));
+        }
+
+        $item->set($value);
+        $this->cacheItemPool->save($item);
+
+        return $this->arrayCache[$key] = $value;
     }
 
+    /**
+     * @deprecated since Symfony 7.3, use "getType" instead
+     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
+        trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
+
         return $this->extract('getTypes', [$class, $property, $context]);
     }
 

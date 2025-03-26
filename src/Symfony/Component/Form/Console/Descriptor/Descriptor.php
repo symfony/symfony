@@ -118,6 +118,7 @@ abstract class Descriptor implements DescriptorInterface
             'allowedValues' => 'getAllowedValues',
             'normalizers' => 'getNormalizers',
             'deprecation' => 'getDeprecation',
+            'nestedOptions' => 'getNestedOptions',
         ];
 
         foreach ($map as $key => $method) {

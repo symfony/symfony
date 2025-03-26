@@ -31,7 +31,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Symfony\Component\JsonEncoder\EncoderInterface;
+use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
@@ -182,7 +182,7 @@ class Configuration implements ConfigurationInterface
         $this->addHtmlSanitizerSection($rootNode, $enableIfStandalone);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode, $enableIfStandalone);
-        $this->addJsonEncoderSection($rootNode, $enableIfStandalone);
+        $this->addJsonStreamerSection($rootNode, $enableIfStandalone);
 
         return $treeBuilder;
     }
@@ -253,6 +253,7 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('field_name')->defaultValue('_token')->end()
                                 ->arrayNode('field_attr')
                                     ->performNoDeepMerging()
+                                    ->normalizeKeys(false)
                                     ->scalarPrototype()->end()
                                     ->defaultValue(['data-controller' => 'csrf-protection'])
                                 ->end()
@@ -966,6 +967,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('fallback')
                     ->fixXmlConfig('path')
                     ->fixXmlConfig('provider')
+                    ->fixXmlConfig('global')
                     ->children()
                         ->arrayNode('fallbacks')
                             ->info('Defaults to the value of "default_locale".')
@@ -1020,6 +1022,33 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->defaultValue([])
                         ->end()
+                        ->arrayNode('globals')
+                            ->info('Global parameters.')
+                            ->example(['app_version' => 3.14])
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
+                            ->arrayPrototype()
+                                ->fixXmlConfig('parameter')
+                                ->children()
+                                    ->variableNode('value')->end()
+                                    ->stringNode('message')->end()
+                                    ->arrayNode('parameters')
+                                        ->normalizeKeys(false)
+                                        ->useAttributeAsKey('name')
+                                        ->scalarPrototype()->end()
+                                    ->end()
+                                    ->stringNode('domain')->end()
+                                ->end()
+                                ->beforeNormalization()
+                                    ->ifTrue(static fn ($v) => !\is_array($v))
+                                    ->then(static fn ($v) => ['value' => $v])
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(static fn ($v) => !(isset($v['value']) xor isset($v['message'])))
+                                    ->thenInvalid('The "globals" parameter should be either a string or an array with a "value" or a "message" key')
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -1034,7 +1063,9 @@ class Configuration implements ConfigurationInterface
                     ->info('Validation configuration')
                     ->{$enableIfStandalone('symfony/validator', Validation::class)}()
                     ->children()
-                        ->scalarNode('cache')->end()
+                        ->scalarNode('cache')
+                            ->setDeprecated('symfony/framework-bundle', '7.3', 'Setting the "%path%.%node%" configuration option is deprecated. It will be removed in version 8.0.')
+                        ->end()
                         ->booleanNode('enable_attributes')->{class_exists(FullStack::class) ? 'defaultFalse' : 'defaultTrue'}()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(['loadValidatorMetadata'])
@@ -1054,17 +1085,16 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('not_compromised_password')
-                            ->canBeDisabled()
+                            ->canBeDisabled('When disabled, compromised passwords will be accepted as valid.')
                             ->children()
-                                ->booleanNode('enabled')
-                                    ->defaultTrue()
-                                    ->info('When disabled, compromised passwords will be accepted as valid.')
-                                ->end()
                                 ->scalarNode('endpoint')
                                     ->defaultNull()
                                     ->info('API endpoint for the NotCompromisedPassword Validator.')
                                 ->end()
                             ->end()
+                        ->end()
+                        ->booleanNode('disable_translation')
+                            ->defaultFalse()
                         ->end()
                         ->arrayNode('auto_mapping')
                             ->info('A collection of namespaces for which auto-mapping will be enabled by default, or null to opt-in with the EnableAutoMapping constraint.')
@@ -1226,7 +1256,22 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('property_info')
                     ->info('Property info configuration')
                     ->{$enableIfStandalone('symfony/property-info', PropertyInfoExtractorInterface::class)}()
+                    ->children()
+                        ->booleanNode('with_constructor_extractor')
+                            ->info('Registers the constructor extractor.')
+                        ->end()
+                    ->end()
                 ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(fn ($v) => $v['property_info']['enabled'] && !isset($v['property_info']['with_constructor_extractor']))
+                ->then(function ($v) {
+                    $v['property_info']['with_constructor_extractor'] = false;
+
+                    trigger_deprecation('symfony/framework-bundle', '7.3', 'Not setting the "with_constructor_extractor" option explicitly is deprecated because its default value will change in version 8.0.');
+
+                    return $v;
+                })
             ->end()
         ;
     }
@@ -1268,6 +1313,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('directory')->defaultValue('%kernel.cache_dir%/pools/app')->end()
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
+                        ->scalarNode('default_valkey_provider')->defaultValue('valkey://localhost')->end()
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
                         ->scalarNode('default_doctrine_dbal_provider')->defaultValue('database_connection')->end()
                         ->scalarNode('default_pdo_provider')->defaultValue($willBeAvailable('doctrine/dbal', Connection::class) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null)->end()
@@ -1410,6 +1456,10 @@ class Configuration implements ConfigurationInterface
                                     ->ifTrue(fn ($v) => null !== $v && ($v < 100 || $v > 599))
                                     ->thenInvalid('The status code is not valid. Pick a value between 100 and 599.')
                                 ->end()
+                                ->defaultNull()
+                            ->end()
+                            ->scalarNode('log_channel')
+                                ->info('The channel of log message. Null to let Symfony decide.')
                                 ->defaultNull()
                             ->end()
                         ->end()
@@ -1558,6 +1608,7 @@ class Configuration implements ConfigurationInterface
                     ->{$enableIfStandalone('symfony/messenger', MessageBusInterface::class)}()
                     ->fixXmlConfig('transport')
                     ->fixXmlConfig('bus', 'buses')
+                    ->fixXmlConfig('stop_worker_on_signal')
                     ->validate()
                         ->ifTrue(fn ($v) => isset($v['buses']) && \count($v['buses']) > 1 && null === $v['default_bus'])
                         ->thenInvalid('You must specify the "default_bus" if you define more than one bus.')
@@ -1690,7 +1741,26 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('stop_worker_on_signals')
                             ->defaultValue([])
                             ->info('A list of signals that should stop the worker; defaults to SIGTERM and SIGINT.')
-                            ->integerPrototype()->end()
+                            ->beforeNormalization()
+                                ->always(function ($signals) {
+                                    if (!\is_array($signals)) {
+                                        throw new InvalidConfigurationException('The "stop_worker_on_signals" option must be an array in messenger configuration.');
+                                    }
+
+                                    return array_map(static function ($v) {
+                                        if (\is_string($v) && str_starts_with($v, 'SIG') && \array_key_exists($v, get_defined_constants(true)['pcntl'])) {
+                                            return \constant($v);
+                                        }
+
+                                        if (!\is_int($v)) {
+                                            throw new InvalidConfigurationException('The "stop_worker_on_signals" option must be an array of pcntl signals in messenger configuration.');
+                                        }
+
+                                        return $v;
+                                    }, $signals);
+                                })
+                            ->end()
+                            ->scalarPrototype()->end()
                         ->end()
                         ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')
@@ -2225,6 +2295,88 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                        ->arrayNode('dkim_signer')
+                            ->addDefaultsIfNotSet()
+                            ->fixXmlConfig('option')
+                            ->canBeEnabled()
+                            ->info('DKIM signer configuration')
+                            ->children()
+                                ->scalarNode('key')
+                                    ->info('Key content, or path to key (in PEM format with the `file://` prefix)')
+                                    ->defaultValue('')
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('domain')->defaultValue('')->end()
+                                ->scalarNode('select')->defaultValue('')->end()
+                                ->scalarNode('passphrase')
+                                    ->info('The private key passphrase')
+                                    ->defaultValue('')
+                                ->end()
+                                ->arrayNode('options')
+                                    ->performNoDeepMerging()
+                                    ->normalizeKeys(false)
+                                    ->useAttributeAsKey('name')
+                                    ->prototype('variable')->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('smime_signer')
+                            ->addDefaultsIfNotSet()
+                            ->canBeEnabled()
+                            ->info('S/MIME signer configuration')
+                            ->children()
+                                ->scalarNode('key')
+                                    ->info('Path to key (in PEM format)')
+                                    ->defaultValue('')
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('certificate')
+                                    ->info('Path to certificate (in PEM format without the `file://` prefix)')
+                                    ->defaultValue('')
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('passphrase')
+                                    ->info('The private key passphrase')
+                                    ->defaultNull()
+                                ->end()
+                                ->scalarNode('extra_certificates')->defaultNull()->end()
+                                ->integerNode('sign_options')->defaultNull()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('smime_encrypter')
+                            ->addDefaultsIfNotSet()
+                            ->canBeEnabled()
+                            ->info('S/MIME encrypter configuration')
+                            ->children()
+                                ->scalarNode('repository')
+                                    ->info('Path to the S/MIME certificate repository. Shall implement the `Symfony\Component\Mailer\EventListener\SmimeCertificateRepositoryInterface`.')
+                                    ->defaultValue('')
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->integerNode('cipher')
+                                    ->info('A set of algorithms used to encrypt the message')
+                                    ->defaultNull()
+                                    ->beforeNormalization()
+                                        ->always(function ($v): ?int {
+                                            if (null === $v) {
+                                                return null;
+                                            }
+                                            if (\defined('OPENSSL_CIPHER_'.$v)) {
+                                                return \constant('OPENSSL_CIPHER_'.$v);
+                                            }
+
+                                            throw new \InvalidArgumentException(\sprintf('"%s" is not a valid OPENSSL cipher.', $v));
+                                        })
+                                    ->end()
+                                    ->validate()
+                                        ->ifTrue(function ($v) {
+                                            return \extension_loaded('openssl') && null !== $v && !\defined('OPENSSL_CIPHER_'.$v);
+                                        })
+                                        ->thenInvalid('You must provide a valid cipher.')
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -2573,23 +2725,13 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addJsonEncoderSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addJsonStreamerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
             ->children()
-                ->arrayNode('json_encoder')
-                    ->info('JSON encoder configuration')
-                    ->{$enableIfStandalone('symfony/json-encoder', EncoderInterface::class)}()
-                    ->fixXmlConfig('path')
-                    ->children()
-                        ->arrayNode('paths')
-                            ->info('Namespaces and paths of encodable/decodable classes.')
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('namespace')
-                            ->scalarPrototype()->end()
-                            ->defaultValue([])
-                        ->end()
-                    ->end()
+                ->arrayNode('json_streamer')
+                    ->info('JSON streamer configuration')
+                    ->{$enableIfStandalone('symfony/json-streamer', StreamWriterInterface::class)}()
                 ->end()
             ->end()
         ;

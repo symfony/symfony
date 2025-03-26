@@ -114,4 +114,11 @@ class RequestStack
 
         throw new SessionNotFoundException();
     }
+
+    public function resetRequestFormats(): void
+    {
+        static $resetRequestFormats;
+        $resetRequestFormats ??= \Closure::bind(static fn () => self::$formats = null, null, Request::class);
+        $resetRequestFormats();
+    }
 }

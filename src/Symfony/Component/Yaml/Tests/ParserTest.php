@@ -1755,6 +1755,34 @@ YAML;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    /**
+     * @dataProvider wrappedUnquotedStringsProvider
+     */
+    public function testWrappedUnquotedStringWithMultipleSpacesInValue(string $yaml, array $expected)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public static function wrappedUnquotedStringsProvider()
+    {
+        return [
+            'mapping' => [
+                '{ foo: bar  bar, fiz: cat      cat }',
+                [
+                    'foo' => 'bar  bar',
+                    'fiz' => 'cat      cat',
+                ],
+            ],
+            'sequence' => [
+                '[ bar  bar, cat      cat ]',
+                [
+                    'bar  bar',
+                    'cat      cat',
+                ],
+            ],
+        ];
+    }
+
     public function testParseMultiLineUnquotedString()
     {
         $yaml = <<<EOT
@@ -1766,6 +1794,69 @@ bar: baz
 EOT;
 
         $this->assertSame(['foo' => 'bar baz foobar foo', 'bar' => 'baz'], $this->parser->parse($yaml));
+    }
+
+    /**
+     * @dataProvider unquotedStringWithTrailingComment
+     */
+    public function testParseMultiLineUnquotedStringWithTrailingComment(string $yaml, array $expected)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function unquotedStringWithTrailingComment()
+    {
+        return [
+            'comment after comma' => [
+                <<<'YAML'
+                {
+                    foo: 3, # comment
+                    bar: 3
+                }
+                YAML,
+                ['foo' => 3, 'bar' => 3],
+            ],
+            'comment after space' => [
+                <<<'YAML'
+                {
+                    foo: 3 # comment
+                }
+                YAML,
+                ['foo' => 3],
+            ],
+            'comment after space, but missing space after #' => [
+                <<<'YAML'
+                {
+                    foo: 3 #comment
+                }
+                YAML,
+                ['foo' => 3],
+            ],
+            'comment after tab' => [
+                <<<YAML
+                {
+                    foo: 3\t# comment
+                }
+                YAML,
+                ['foo' => 3],
+            ],
+            'comment after tab, but missing space after #' => [
+                <<<YAML
+                {
+                    foo: 3\t#comment
+                }
+                YAML,
+                ['foo' => 3],
+            ],
+            '# in mapping value' => [
+                <<<'YAML'
+                {
+                    foo: example.com/#about
+                }
+                YAML,
+                ['foo' => 'example.com/#about'],
+            ],
+        ];
     }
 
     /**
@@ -2179,6 +2270,19 @@ map: {key: "value", a: "b"}
 param: "some"
 YAML,
             ],
+            'mixed mapping with inline notation on one line with a comment' => [
+                [
+                    'map' => [
+                        'key' => 'value',
+                        'a' => 'b',
+                    ],
+                    'param' => 'some',
+                ],
+                <<<YAML
+map: {key: "value", a: "b"} # comment
+param: "some"
+YAML,
+            ],
             'mixed mapping with compact inline notation on one line' => [
                 [
                     'map' => [
@@ -2265,6 +2369,30 @@ YAML,
         $yaml = <<<YAML
 { foo: bar }
 foobar
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
+    public function testInlineMappingFollowedByMoreContentIsInvalid()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unexpected token "baz" at line 1 (near "{ foo: bar } baz").');
+
+        $yaml = <<<YAML
+{ foo: bar } baz
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
+    public function testInlineSequenceFollowedByMoreContentIsInvalid()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unexpected token ",bar," at line 1 (near "[\'foo\'],bar,").');
+
+        $yaml = <<<YAML
+['foo'],bar,
 YAML;
 
         $this->parser->parse($yaml);

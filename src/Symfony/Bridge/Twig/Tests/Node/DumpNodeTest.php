@@ -16,9 +16,7 @@ use Symfony\Bridge\Twig\Node\DumpNode;
 use Twig\Compiler;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
-use Twig\Node\Expression\NameExpression;
 use Twig\Node\Expression\Variable\ContextVariable;
-use Twig\Node\Node;
 use Twig\Node\Nodes;
 
 class DumpNodeTest extends TestCase
@@ -73,15 +71,9 @@ EOTXT;
 
     public function testOneVar()
     {
-        if (class_exists(Nodes::class)) {
-            $vars = new Nodes([
-                new ContextVariable('foo', 7),
-            ]);
-        } else {
-            $vars = new Node([
-                new NameExpression('foo', 7),
-            ]);
-        }
+        $vars = new Nodes([
+            new ContextVariable('foo', 7),
+        ]);
 
         $node = new DumpNode('bar', $vars, 7);
 
@@ -103,18 +95,10 @@ EOTXT;
 
     public function testMultiVars()
     {
-        if (class_exists(Nodes::class)) {
-            $vars = new Nodes([
-                new ContextVariable('foo', 7),
-                new ContextVariable('bar', 7),
-            ]);
-        } else {
-            $vars = new Node([
-                new NameExpression('foo', 7),
-                new NameExpression('bar', 7),
-            ]);
-        }
-
+        $vars = new Nodes([
+            new ContextVariable('foo', 7),
+            new ContextVariable('bar', 7),
+        ]);
         $node = new DumpNode('bar', $vars, 7);
 
         $env = new Environment($this->createMock(LoaderInterface::class));

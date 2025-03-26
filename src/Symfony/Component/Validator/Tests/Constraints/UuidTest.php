@@ -24,11 +24,14 @@ class UuidTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $uuid = new Uuid(['normalizer' => 'trim']);
+        $uuid = new Uuid(normalizer: 'trim');
 
         $this->assertEquals('trim', $uuid->normalizer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -36,6 +39,9 @@ class UuidTest extends TestCase
         new Uuid(['normalizer' => 'Unknown Callable']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

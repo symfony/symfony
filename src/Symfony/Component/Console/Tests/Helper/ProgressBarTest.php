@@ -416,6 +416,81 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testOverwriteWithSectionOutputAndEol()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+
+        $bar = new ProgressBar($output, 50, 0);
+        $bar->setFormat('[%bar%] %percent:3s%%' . PHP_EOL . '%message%' . PHP_EOL);
+        $bar->setMessage('');
+        $bar->start();
+        $bar->display();
+        $bar->setMessage('Doing something...');
+        $bar->advance();
+        $bar->setMessage('Doing something foo...');
+        $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals(escapeshellcmd(
+            '[>---------------------------]   0%'.\PHP_EOL.\PHP_EOL.
+            "\x1b[2A\x1b[0J".'[>---------------------------]   2%'.\PHP_EOL. 'Doing something...' . \PHP_EOL .
+            "\x1b[2A\x1b[0J".'[=>--------------------------]   4%'.\PHP_EOL. 'Doing something foo...' . \PHP_EOL),
+            escapeshellcmd(stream_get_contents($output->getStream()))
+        );
+    }
+
+    public function testOverwriteWithSectionOutputAndEolWithEmptyMessage()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+
+        $bar = new ProgressBar($output, 50, 0);
+        $bar->setFormat('[%bar%] %percent:3s%%' . PHP_EOL . '%message%');
+        $bar->setMessage('Start');
+        $bar->start();
+        $bar->display();
+        $bar->setMessage('');
+        $bar->advance();
+        $bar->setMessage('Doing something...');
+        $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals(escapeshellcmd(
+            '[>---------------------------]   0%'.\PHP_EOL.'Start'.\PHP_EOL.
+            "\x1b[2A\x1b[0J".'[>---------------------------]   2%'.\PHP_EOL .
+            "\x1b[1A\x1b[0J".'[=>--------------------------]   4%'.\PHP_EOL. 'Doing something...' . \PHP_EOL),
+            escapeshellcmd(stream_get_contents($output->getStream()))
+        );
+    }
+
+    public function testOverwriteWithSectionOutputAndEolWithEmptyMessageComment()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+
+        $bar = new ProgressBar($output, 50, 0);
+        $bar->setFormat('[%bar%] %percent:3s%%' . PHP_EOL . '<comment>%message%</comment>');
+        $bar->setMessage('Start');
+        $bar->start();
+        $bar->display();
+        $bar->setMessage('');
+        $bar->advance();
+        $bar->setMessage('Doing something...');
+        $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals(escapeshellcmd(
+            '[>---------------------------]   0%'.\PHP_EOL."\x1b[33mStart\x1b[39m".\PHP_EOL.
+            "\x1b[2A\x1b[0J".'[>---------------------------]   2%'.\PHP_EOL .
+            "\x1b[1A\x1b[0J".'[=>--------------------------]   4%'.\PHP_EOL. "\x1b[33mDoing something...\x1b[39m" . \PHP_EOL),
+            escapeshellcmd(stream_get_contents($output->getStream()))
+        );
+    }
+
     public function testOverwriteWithAnsiSectionOutput()
     {
         // output has 43 visible characters plus 2 invisible ANSI characters

@@ -109,7 +109,7 @@ class XmlFileLoaderTest extends TestCase
         $expected = new ClassMetadata(AbstractDummy::class, new ClassDiscriminatorMapping('type', [
             'first' => AbstractDummyFirstChild::class,
             'second' => AbstractDummySecondChild::class,
-        ]));
+        ], 'second'));
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
 

@@ -53,7 +53,7 @@ class MapEntity extends ValueResolver
     public function withDefaults(self $defaults, ?string $class): static
     {
         $clone = clone $this;
-        $clone->class ??= class_exists($class ?? '') ? $class : null;
+        $clone->class ??= class_exists($class ?? '') || interface_exists($class ?? '', false) ? $class : null;
         $clone->objectManager ??= $defaults->objectManager;
         $clone->expr ??= $defaults->expr;
         $clone->mapping ??= $defaults->mapping;

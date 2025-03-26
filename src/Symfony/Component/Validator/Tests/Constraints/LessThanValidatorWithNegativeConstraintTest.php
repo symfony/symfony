@@ -58,6 +58,9 @@ class LessThanValidatorWithNegativeConstraintTest extends AbstractComparisonVali
         ];
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintExceptionIfPropertyPath()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -66,6 +69,9 @@ class LessThanValidatorWithNegativeConstraintTest extends AbstractComparisonVali
         return new Negative(['propertyPath' => 'field']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintExceptionIfValue()
     {
         $this->expectException(ConstraintDefinitionException::class);

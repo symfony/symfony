@@ -64,6 +64,7 @@ trait PriorityTaggedServiceTrait
             $definition = $container->getDefinition($serviceId);
             $class = $definition->getClass();
             $class = $container->getParameterBag()->resolveValue($class) ?: null;
+            $reflector = null !== $class ? $container->getReflectionClass($class) : null;
             $checkTaggedItem = !$definition->hasTag($definition->isAutoconfigured() ? 'container.ignore_attributes' : $tagName);
 
             foreach ($attributes as $attribute) {
@@ -71,8 +72,8 @@ trait PriorityTaggedServiceTrait
 
                 if (isset($attribute['priority'])) {
                     $priority = $attribute['priority'];
-                } elseif (null === $defaultPriority && $defaultPriorityMethod && $class) {
-                    $defaultPriority = PriorityTaggedServiceUtil::getDefault($container, $serviceId, $class, $defaultPriorityMethod, $tagName, 'priority', $checkTaggedItem);
+                } elseif (null === $defaultPriority && $defaultPriorityMethod && $reflector) {
+                    $defaultPriority = PriorityTaggedServiceUtil::getDefault($serviceId, $reflector, $defaultPriorityMethod, $tagName, 'priority', $checkTaggedItem);
                 }
                 $priority ??= $defaultPriority ??= 0;
 
@@ -84,8 +85,8 @@ trait PriorityTaggedServiceTrait
                 if (null !== $indexAttribute && isset($attribute[$indexAttribute])) {
                     $index = $parameterBag->resolveValue($attribute[$indexAttribute]);
                 }
-                if (null === $index && null === $defaultIndex && $defaultPriorityMethod && $class) {
-                    $defaultIndex = PriorityTaggedServiceUtil::getDefault($container, $serviceId, $class, $defaultIndexMethod ?? 'getDefaultName', $tagName, $indexAttribute, $checkTaggedItem);
+                if (null === $index && null === $defaultIndex && $defaultPriorityMethod && $reflector) {
+                    $defaultIndex = PriorityTaggedServiceUtil::getDefault($serviceId, $reflector, $defaultIndexMethod ?? 'getDefaultName', $tagName, $indexAttribute, $checkTaggedItem);
                 }
                 $decorated = $definition->getTag('container.decorator')[0]['id'] ?? null;
                 $index = $index ?? $defaultIndex ?? $defaultIndex = $decorated ?? $serviceId;
@@ -93,8 +94,8 @@ trait PriorityTaggedServiceTrait
                 $services[] = [$priority, ++$i, $index, $serviceId, $class];
             }
 
-            if ($class) {
-                $attributes = (new \ReflectionClass($class))->getAttributes(AsTaggedItem::class);
+            if ($reflector) {
+                $attributes = $reflector->getAttributes(AsTaggedItem::class);
                 $attributeCount = \count($attributes);
 
                 foreach ($attributes as $attribute) {
@@ -137,9 +138,11 @@ trait PriorityTaggedServiceTrait
  */
 class PriorityTaggedServiceUtil
 {
-    public static function getDefault(ContainerBuilder $container, string $serviceId, string $class, string $defaultMethod, string $tagName, ?string $indexAttribute, bool $checkTaggedItem): string|int|null
+    public static function getDefault(string $serviceId, \ReflectionClass $r, string $defaultMethod, string $tagName, ?string $indexAttribute, bool $checkTaggedItem): string|int|null
     {
-        if (!($r = $container->getReflectionClass($class)) || (!$checkTaggedItem && !$r->hasMethod($defaultMethod))) {
+        $class = $r->getName();
+
+        if (!$checkTaggedItem && !$r->hasMethod($defaultMethod)) {
             return null;
         }
 

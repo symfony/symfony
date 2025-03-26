@@ -44,6 +44,7 @@ use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber
 use Symfony\Component\Console\EventListener\ErrorListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
+use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand as MessengerDebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
@@ -59,6 +60,7 @@ use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Command\TranslationPushCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand;
 use Symfony\Component\Validator\Command\DebugCommand as ValidatorDebugCommand;
+use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -382,6 +384,14 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('secrets.vault'),
                 service('secrets.local_vault')->ignoreOnInvalid(),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.error_dumper', ErrorDumpCommand::class)
+            ->args([
+                service('filesystem'),
+                service('error_renderer.html'),
+                service(EntrypointLookupInterface::class)->nullOnInvalid(),
             ])
             ->tag('console.command')
 

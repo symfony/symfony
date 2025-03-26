@@ -31,13 +31,13 @@ final class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerI
     /**
      * @throws InvalidArgumentException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): string
+    public function normalize(mixed $data, ?string $format = null, array $context = []): string
     {
-        if (!$object instanceof \DateTimeZone) {
+        if (!$data instanceof \DateTimeZone) {
             throw new InvalidArgumentException('The object must be an instance of "\DateTimeZone".');
         }
 
-        return $object->getName();
+        return $data->getName();
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

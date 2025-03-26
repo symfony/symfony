@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\RemoteEvent;
 
 use PHPUnit\Framework\TestCase;
@@ -96,5 +105,36 @@ class SendgridPayloadConverterTest extends TestCase
             'timestamp' => 'invalid',
             'email' => 'test@example.com',
         ]);
+    }
+
+    public function testAsynchronousBounce()
+    {
+        $converter = new SendgridPayloadConverter();
+
+        $event = $converter->convert([
+            'event' => 'bounce',
+            'sg_event_id' => '123456',
+            'timestamp' => '123456789',
+            'email' => 'test@example.com',
+        ]);
+
+        $this->assertInstanceOf(MailerDeliveryEvent::class, $event);
+        $this->assertSame('123456', $event->getId());
+    }
+
+    public function testWithStringCategory()
+    {
+        $converter = new SendgridPayloadConverter();
+
+        $event = $converter->convert([
+            'event' => 'processed',
+            'sg_message_id' => '123456',
+            'timestamp' => '123456789',
+            'email' => 'test@example.com',
+            'category' => 'cat facts',
+        ]);
+
+        $this->assertInstanceOf(MailerDeliveryEvent::class, $event);
+        $this->assertSame(['cat facts'], $event->getTags());
     }
 }

@@ -30,6 +30,7 @@ class DnsMock
         'NAPTR' => \DNS_NAPTR,
         'TXT' => \DNS_TXT,
         'HINFO' => \DNS_HINFO,
+        'CAA' => '\\' !== \DIRECTORY_SEPARATOR ? \DNS_CAA : 0,
     ];
 
     /**

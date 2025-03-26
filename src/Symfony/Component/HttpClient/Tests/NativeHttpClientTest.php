@@ -71,4 +71,9 @@ class NativeHttpClientTest extends HttpClientTestCase
 
         DnsMock::withMockedHosts([]);
     }
+
+    public function testUnixSocket()
+    {
+        $this->markTestSkipped('NativeHttpClient doesn\'t support binding to unix sockets.');
+    }
 }

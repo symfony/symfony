@@ -206,11 +206,11 @@ class SmtpTransport extends AbstractTransport
             $this->ping();
         }
 
-        if (!$this->started) {
-            $this->start();
-        }
-
         try {
+            if (!$this->started) {
+                $this->start();
+            }
+
             $envelope = $message->getEnvelope();
             $this->doMailFromCommand($envelope->getSender()->getEncodedAddress(), $envelope->anyAddressHasUnicodeLocalpart());
             foreach ($envelope->getRecipients() as $recipient) {

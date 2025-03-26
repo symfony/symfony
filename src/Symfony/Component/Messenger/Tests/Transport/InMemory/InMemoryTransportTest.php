@@ -177,9 +177,9 @@ class InMemoryTransportTest extends TestCase
 
         $this->transport->reset();
 
-        $this->assertEmpty($this->transport->get(), 'Should be empty after reset');
-        $this->assertEmpty($this->transport->getAcknowledged(), 'Should be empty after reset');
-        $this->assertEmpty($this->transport->getRejected(), 'Should be empty after reset');
-        $this->assertEmpty($this->transport->getSent(), 'Should be empty after reset');
+        $this->assertSame([], $this->transport->get(), 'Should be empty after reset');
+        $this->assertSame([], $this->transport->getAcknowledged(), 'Should be empty after reset');
+        $this->assertSame([], $this->transport->getRejected(), 'Should be empty after reset');
+        $this->assertSame([], $this->transport->getSent(), 'Should be empty after reset');
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Attribute;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Checks if user has permission to access to some resource using security roles and voters.
@@ -24,15 +25,15 @@ use Symfony\Component\ExpressionLanguage\Expression;
 final class IsGranted
 {
     /**
-     * @param string|Expression            $attribute     The attribute that will be checked against a given authentication token and optional subject
-     * @param array|string|Expression|null $subject       An optional subject - e.g. the current object being voted on
-     * @param string|null                  $message       A custom message when access is not granted
-     * @param int|null                     $statusCode    If set, will throw HttpKernel's HttpException with the given $statusCode; if null, Security\Core's AccessDeniedException will be used
-     * @param int|null                     $exceptionCode If set, will add the exception code to thrown exception
+     * @param string|Expression|\Closure(IsGrantedContext, mixed $subject):bool $attribute The attribute that will be checked against a given authentication token and optional subject
+     * @param array|string|Expression|\Closure(array<string,mixed>, Request):mixed|null $subject An optional subject - e.g. the current object being voted on
+     * @param string|null $message       A custom message when access is not granted
+     * @param int|null    $statusCode    If set, will throw HttpKernel's HttpException with the given $statusCode; if null, Security\Core's AccessDeniedException will be used
+     * @param int|null    $exceptionCode If set, will add the exception code to thrown exception
      */
     public function __construct(
-        public string|Expression $attribute,
-        public array|string|Expression|null $subject = null,
+        public string|Expression|\Closure $attribute,
+        public array|string|Expression|\Closure|null $subject = null,
         public ?string $message = null,
         public ?int $statusCode = null,
         public ?int $exceptionCode = null,

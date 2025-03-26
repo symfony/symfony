@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -45,10 +46,11 @@ class Timezone extends Constraint
      * @param string|null                  $countryCode    Restrict the valid timezones to this country if the zone option is {@see \DateTimeZone::PER_COUNTRY}
      * @param bool|null                    $intlCompatible Whether to restrict valid timezones to ones available in PHP's intl (defaults to false)
      * @param string[]|null                $groups
-     * @param array<string,mixed>          $options
+     * @param array<string,mixed>|null     $options
      *
      * @see \DateTimeZone
      */
+    #[HasNamedArguments]
     public function __construct(
         int|array|null $zone = null,
         ?string $message = null,
@@ -56,11 +58,19 @@ class Timezone extends Constraint
         ?bool $intlCompatible = null,
         ?array $groups = null,
         mixed $payload = null,
-        array $options = [],
+        ?array $options = null,
     ) {
         if (\is_array($zone)) {
-            $options = array_merge($zone, $options);
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($zone, $options ?? []);
         } elseif (null !== $zone) {
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            } else {
+                $options = [];
+            }
+
             $options['value'] = $zone;
         }
 

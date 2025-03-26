@@ -12,6 +12,8 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
 {
     private $booleanNode;
     private $enumNode;
+    private $fqcnEnumNode;
+    private $fqcnUnitEnumNode;
     private $floatNode;
     private $integerNode;
     private $scalarNode;
@@ -40,6 +42,32 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
     {
         $this->_usedProperties['enumNode'] = true;
         $this->enumNode = $value;
+
+        return $this;
+    }
+
+    /**
+     * @default null
+     * @param ParamConfigurator|\Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum::Foo|\Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum::Bar $value
+     * @return $this
+     */
+    public function fqcnEnumNode($value): static
+    {
+        $this->_usedProperties['fqcnEnumNode'] = true;
+        $this->fqcnEnumNode = $value;
+
+        return $this;
+    }
+
+    /**
+     * @default null
+     * @param ParamConfigurator|\Symfony\Component\Config\Tests\Fixtures\TestEnum::Foo|\Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar|\Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc $value
+     * @return $this
+     */
+    public function fqcnUnitEnumNode($value): static
+    {
+        $this->_usedProperties['fqcnUnitEnumNode'] = true;
+        $this->fqcnUnitEnumNode = $value;
 
         return $this;
     }
@@ -115,6 +143,18 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
             unset($value['enum_node']);
         }
 
+        if (array_key_exists('fqcn_enum_node', $value)) {
+            $this->_usedProperties['fqcnEnumNode'] = true;
+            $this->fqcnEnumNode = $value['fqcn_enum_node'];
+            unset($value['fqcn_enum_node']);
+        }
+
+        if (array_key_exists('fqcn_unit_enum_node', $value)) {
+            $this->_usedProperties['fqcnUnitEnumNode'] = true;
+            $this->fqcnUnitEnumNode = $value['fqcn_unit_enum_node'];
+            unset($value['fqcn_unit_enum_node']);
+        }
+
         if (array_key_exists('float_node', $value)) {
             $this->_usedProperties['floatNode'] = true;
             $this->floatNode = $value['float_node'];
@@ -152,6 +192,12 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
         }
         if (isset($this->_usedProperties['enumNode'])) {
             $output['enum_node'] = $this->enumNode;
+        }
+        if (isset($this->_usedProperties['fqcnEnumNode'])) {
+            $output['fqcn_enum_node'] = $this->fqcnEnumNode;
+        }
+        if (isset($this->_usedProperties['fqcnUnitEnumNode'])) {
+            $output['fqcn_unit_enum_node'] = $this->fqcnUnitEnumNode;
         }
         if (isset($this->_usedProperties['floatNode'])) {
             $output['float_node'] = $this->floatNode;

@@ -138,6 +138,32 @@ class RequirementTest extends TestCase
     }
 
     /**
+     * @testWith    ["67c8b7d295c70befc3070bf2"]
+     *              ["000000000000000000000000"]
+     */
+    public function testMongoDbIdOK(string $id)
+    {
+        $this->assertMatchesRegularExpression(
+            (new Route('/{id}', [], ['id' => Requirement::MONGODB_ID]))->compile()->getRegex(),
+            '/'.$id,
+        );
+    }
+
+    /**
+     * @testWith    ["67C8b7D295C70BEFC3070BF2"]
+     *              ["67c8b7d295c70befc3070bg2"]
+     *              ["67c8b7d295c70befc3070bf2a"]
+     *              ["67c8b7d295c70befc3070bf"]
+     */
+    public function testMongoDbIdKO(string $id)
+    {
+        $this->assertDoesNotMatchRegularExpression(
+            (new Route('/{id}', [], ['id' => Requirement::MONGODB_ID]))->compile()->getRegex(),
+            '/'.$id,
+        );
+    }
+
+    /**
      * @testWith    ["1"]
      *              ["42"]
      *              ["42198"]

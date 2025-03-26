@@ -24,7 +24,7 @@ return static function (ContainerConfigurator $container) {
                 param('validator.translation_domain'),
                 service('form.server_params'),
                 param('form.type_extension.csrf.field_attr'),
-                abstract_arg('framework.form.csrf_protection.token_id'),
+                param('.form.type_extension.csrf.token_id'),
             ])
             ->tag('form.type_extension')
     ;

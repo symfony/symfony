@@ -352,7 +352,7 @@ class PdoSessionHandlerTest extends TestCase
         $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
         $pdoSessionHandler->configureSchema($schema, fn () => true);
         $table = $schema->getTable('sessions');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 
     public static function provideUrlDsnPairs()

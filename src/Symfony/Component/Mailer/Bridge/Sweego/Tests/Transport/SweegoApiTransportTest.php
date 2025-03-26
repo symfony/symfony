@@ -110,6 +110,9 @@ class SweegoApiTransportTest extends TestCase
             $this->assertSame('https://api.sweego.io:8984/send', $url);
             $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
+            $payload = json_decode($options['body'], true);
+            $this->assertSame('email', $payload['channel']);
+
             return new JsonMockResponse(['transaction_id' => 'foobar'], [
                 'http_code' => 200,
             ]);

@@ -346,4 +346,12 @@ class HeadersTest extends TestCase
         $this->expectException(\LogicException::class);
         $headers->setHeaderParameter('Content-Disposition', 'name', 'foo');
     }
+
+    public function testPathHeaderHasNoName()
+    {
+        $headers = new Headers();
+
+        $headers->addPathHeader('Return-Path', new Address('some@path', 'any ignored name'));
+        $this->assertSame('<some@path>', $headers->get('Return-Path')->getBodyAsString());
+    }
 }

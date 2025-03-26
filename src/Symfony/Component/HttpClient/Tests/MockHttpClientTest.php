@@ -505,6 +505,11 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
     }
 
+    public function testUnixSocket()
+    {
+        $this->markTestSkipped('MockHttpClient doesn\'t support binding to unix sockets.');
+    }
+
     public function testChangeResponseFactory()
     {
         /* @var MockHttpClient $client */

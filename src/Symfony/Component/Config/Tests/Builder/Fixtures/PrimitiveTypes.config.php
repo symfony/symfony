@@ -14,6 +14,8 @@ use Symfony\Config\PrimitiveTypesConfig;
 return static function (PrimitiveTypesConfig $config) {
     $config->booleanNode(true);
     $config->enumNode('foo');
+    $config->fqcnEnumNode('bar');
+    $config->fqcnUnitEnumNode(\Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar);
     $config->floatNode(47.11);
     $config->integerNode(1337);
     $config->scalarNode('foobar');

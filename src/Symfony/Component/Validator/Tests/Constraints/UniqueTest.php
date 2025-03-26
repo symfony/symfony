@@ -37,6 +37,9 @@ class UniqueTest extends TestCase
         self::assertSame('intval', $dConstraint->normalizer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -44,6 +47,9 @@ class UniqueTest extends TestCase
         new Unique(['normalizer' => 'Unknown Callable']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

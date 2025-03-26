@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -46,6 +47,7 @@ class UniqueEntity extends Constraint
      *                                               a fieldName => value associative array according to the fields option configuration
      * @param string|null          $errorPath        Bind the constraint violation to this field instead of the first one in the fields option configuration
      */
+    #[HasNamedArguments]
     public function __construct(
         array|string $fields,
         ?string $message = null,
@@ -58,11 +60,19 @@ class UniqueEntity extends Constraint
         ?array $identifierFieldNames = null,
         ?array $groups = null,
         $payload = null,
-        array $options = [],
+        ?array $options = null,
     ) {
         if (\is_array($fields) && \is_string(key($fields)) && [] === array_diff(array_keys($fields), array_merge(array_keys(get_class_vars(static::class)), ['value']))) {
-            $options = array_merge($fields, $options);
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($fields, $options ?? []);
         } else {
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            } else {
+                $options = [];
+            }
+
             $options['fields'] = $fields;
         }
 

@@ -63,7 +63,7 @@ class LazyServiceDumperTest extends TestCase
         $definition = (new Definition(ReadOnlyClass::class))->setLazy(true);
 
         $this->assertTrue($dumper->isProxyCandidate($definition));
-        $this->assertStringContainsString('readonly class ReadOnlyClassGhost', $dumper->getProxyCode($definition));
+        $this->assertStringContainsString(\PHP_VERSION_ID >= 80400 ? '' : 'readonly class ReadOnlyClassGhost', $dumper->getProxyCode($definition));
     }
 }
 

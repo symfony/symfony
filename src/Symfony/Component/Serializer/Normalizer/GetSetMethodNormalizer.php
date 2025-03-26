@@ -100,6 +100,7 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return !$method->isStatic()
             && !$method->getAttributes(Ignore::class)
             && 0 < $method->getNumberOfParameters()
+            && 3 < \strlen($method->name)
             && str_starts_with($method->name, 'set')
             && !ctype_lower($method->name[3])
         ;

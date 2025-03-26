@@ -924,6 +924,10 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('debug.'.TestAuthenticator::class, (string) reset($managerAuthenticators), 'AuthenticatorManager must be injected traceable authenticators in debug mode.');
 
         $this->assertTrue($container->hasDefinition(TestAuthenticator::class), 'Original authenticator must still exist in the container so it can be used outside of the AuthenticatorManager’s context.');
+
+        $securityHelperAuthenticatorLocator = $container->getDefinition($container->getDefinition('security.helper')->getArgument(1)['main']);
+        $this->assertArrayHasKey(TestAuthenticator::class, $authenticatorMap = $securityHelperAuthenticatorLocator->getArgument(0), 'When programmatically authenticating a user, authenticators’ name must be their original ID.');
+        $this->assertSame(TestAuthenticator::class, (string) $authenticatorMap[TestAuthenticator::class]->getValues()[0], 'When programmatically authenticating a user, original authenticators must be used.');
     }
 
     protected function getRawContainer()

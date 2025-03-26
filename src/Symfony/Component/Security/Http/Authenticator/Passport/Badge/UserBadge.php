@@ -33,6 +33,7 @@ class UserBadge implements BadgeInterface
     /** @var callable|null */
     private $userLoader;
     private UserInterface $user;
+    private ?\Closure $identifierNormalizer = null;
 
     /**
      * Initializes the user badge.
@@ -51,6 +52,7 @@ class UserBadge implements BadgeInterface
         private string $userIdentifier,
         ?callable $userLoader = null,
         private ?array $attributes = null,
+        ?\Closure $identifierNormalizer = null,
     ) {
         if ('' === $userIdentifier) {
             trigger_deprecation('symfony/security-http', '7.2', 'Using an empty string as user identifier is deprecated and will throw an exception in Symfony 8.0.');
@@ -60,12 +62,20 @@ class UserBadge implements BadgeInterface
         if (\strlen($userIdentifier) > self::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Username too long.');
         }
+        if ($identifierNormalizer) {
+            $this->identifierNormalizer = static fn () => $identifierNormalizer($userIdentifier);
+        }
 
         $this->userLoader = $userLoader;
     }
 
     public function getUserIdentifier(): string
     {
+        if (isset($this->identifierNormalizer)) {
+            $this->userIdentifier = ($this->identifierNormalizer)();
+            $this->identifierNormalizer = null;
+        }
+
         return $this->userIdentifier;
     }
 
@@ -88,15 +98,15 @@ class UserBadge implements BadgeInterface
         }
 
         if (null === $this->getAttributes()) {
-            $user = ($this->userLoader)($this->userIdentifier);
+            $user = ($this->userLoader)($this->getUserIdentifier());
         } else {
-            $user = ($this->userLoader)($this->userIdentifier, $this->getAttributes());
+            $user = ($this->userLoader)($this->getUserIdentifier(), $this->getAttributes());
         }
 
         // No user has been found via the $this->userLoader callback
         if (null === $user) {
             $exception = new UserNotFoundException();
-            $exception->setUserIdentifier($this->userIdentifier);
+            $exception->setUserIdentifier($this->getUserIdentifier());
 
             throw $exception;
         }

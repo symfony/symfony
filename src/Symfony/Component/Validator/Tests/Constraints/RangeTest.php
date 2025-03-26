@@ -18,6 +18,9 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class RangeTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPath()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -35,6 +38,9 @@ class RangeTest extends TestCase
         new Range(min: 'min', minPropertyPath: 'minPropertyPath');
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPath()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -56,7 +62,7 @@ class RangeTest extends TestCase
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given');
-        new Range([]);
+        new Range();
     }
 
     public function testThrowsNoDefaultOptionConfiguredException()
@@ -86,6 +92,9 @@ class RangeTest extends TestCase
         new Range(min: 'min', max: 'max', maxMessage: 'maxMessage');
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageAndMaxMessageOptions()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -98,6 +107,9 @@ class RangeTest extends TestCase
         ]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageOptions()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -109,6 +121,9 @@ class RangeTest extends TestCase
         ]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMaxMessageOptions()
     {
         $this->expectException(ConstraintDefinitionException::class);

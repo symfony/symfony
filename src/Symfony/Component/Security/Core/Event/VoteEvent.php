@@ -28,6 +28,7 @@ final class VoteEvent extends Event
         private mixed $subject,
         private array $attributes,
         private int $vote,
+        private array $reasons = [],
     ) {
     }
 
@@ -49,5 +50,10 @@ final class VoteEvent extends Event
     public function getVote(): int
     {
         return $this->vote;
+    }
+
+    public function getReasons(): array
+    {
+        return $this->reasons;
     }
 }

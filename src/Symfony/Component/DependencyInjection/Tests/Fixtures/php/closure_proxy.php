@@ -55,6 +55,6 @@ class Symfony_DI_PhpDumper_Test_Closure_Proxy extends Container
      */
     protected static function getClosureProxyService($container, $lazyLoad = true)
     {
-        return $container->services['closure_proxy'] = new class(fn () => new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo()) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure implements \Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface { public function theMethod() { return $this->service->cloneFoo(...\func_get_args()); } };
+        return $container->services['closure_proxy'] = new class(fn () => ($container->privates['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo())) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure implements \Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface { public function theMethod() { return $this->service->cloneFoo(...\func_get_args()); } };
     }
 }

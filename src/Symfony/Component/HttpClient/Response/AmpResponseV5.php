@@ -162,7 +162,7 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
     /**
      * @param AmpClientStateV5 $multi
      */
-    private static function perform(ClientState $multi, ?array &$responses = null): void
+    private static function perform(ClientState $multi, ?array $responses = null): void
     {
         if ($responses) {
             foreach ($responses as $response) {

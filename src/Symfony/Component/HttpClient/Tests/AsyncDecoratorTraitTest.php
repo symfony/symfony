@@ -231,6 +231,20 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
         $this->assertStringContainsString('SERVER_PROTOCOL', $response->getContent());
         $this->assertStringContainsString('HTTP_HOST', $response->getContent());
+
+        $client = new class(parent::getHttpClient(__FUNCTION__)) implements HttpClientInterface {
+            use AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return new AsyncResponse($this->client, $method, $url, $options);
+            }
+        };
+
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        $this->assertStringContainsString('SERVER_PROTOCOL', $response->getContent());
+        $this->assertStringContainsString('HTTP_HOST', $response->getContent());
     }
 
     public function testRetryTimeout()

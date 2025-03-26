@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -39,13 +40,22 @@ class DateTime extends Constraint
     /**
      * @param non-empty-string|array<string,mixed>|null $format  The datetime format to match (defaults to 'Y-m-d H:i:s')
      * @param string[]|null                             $groups
-     * @param array<string,mixed>                       $options
+     * @param array<string,mixed>|null                  $options
      */
-    public function __construct(string|array|null $format = null, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
+    #[HasNamedArguments]
+    public function __construct(string|array|null $format = null, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
     {
         if (\is_array($format)) {
-            $options = array_merge($format, $options);
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($format, $options ?? []);
         } elseif (null !== $format) {
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            } else {
+                $options = [];
+            }
+
             $options['value'] = $format;
         }
 

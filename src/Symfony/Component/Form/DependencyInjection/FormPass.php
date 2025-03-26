@@ -47,6 +47,7 @@ class FormPass implements CompilerPassInterface
         // Get service locator argument
         $servicesMap = [];
         $namespaces = ['Symfony\Component\Form\Extension\Core\Type' => true];
+        $csrfTokenIds = [];
 
         // Builds an array with fully-qualified type class names as keys and service IDs as values
         foreach ($container->findTaggedServiceIds('form.type', true) as $serviceId => $tag) {
@@ -54,12 +55,24 @@ class FormPass implements CompilerPassInterface
             $serviceDefinition = $container->getDefinition($serviceId);
             $servicesMap[$formType = $serviceDefinition->getClass()] = new Reference($serviceId);
             $namespaces[substr($formType, 0, strrpos($formType, '\\'))] = true;
+
+            if (isset($tag[0]['csrf_token_id'])) {
+                $csrfTokenIds[$formType] = $tag[0]['csrf_token_id'];
+            }
         }
 
         if ($container->hasDefinition('console.command.form_debug')) {
             $commandDefinition = $container->getDefinition('console.command.form_debug');
             $commandDefinition->setArgument(1, array_keys($namespaces));
             $commandDefinition->setArgument(2, array_keys($servicesMap));
+        }
+
+        if ($csrfTokenIds && $container->hasDefinition('form.type_extension.csrf')) {
+            $csrfExtension = $container->getDefinition('form.type_extension.csrf');
+
+            if (8 <= \count($csrfExtension->getArguments())) {
+                $csrfExtension->replaceArgument(7, $csrfTokenIds);
+            }
         }
 
         return ServiceLocatorTagPass::register($container, $servicesMap);

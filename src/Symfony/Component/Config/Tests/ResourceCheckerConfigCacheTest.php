@@ -168,6 +168,6 @@ class ResourceCheckerConfigCacheTest extends TestCase
                     'resource' => __FILE__,
                 ],
             ],
-        ]));
+        ], \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE));
     }
 }

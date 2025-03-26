@@ -15,6 +15,7 @@ tag1
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
@@ -36,6 +37,7 @@ tag2
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
@@ -57,6 +59,7 @@ tag3
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`

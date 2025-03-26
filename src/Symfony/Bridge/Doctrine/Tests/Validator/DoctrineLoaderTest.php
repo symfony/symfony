@@ -210,7 +210,7 @@ class DoctrineLoaderTest extends TestCase
         $this->assertSame(AutoMappingStrategy::DISABLED, $classMetadata->getAutoMappingStrategy());
 
         $maxLengthMetadata = $classMetadata->getPropertyMetadata('maxLength');
-        $this->assertEmpty($maxLengthMetadata);
+        $this->assertSame([], $maxLengthMetadata);
 
         /** @var PropertyMetadata[] $autoMappingExplicitlyEnabledMetadata */
         $autoMappingExplicitlyEnabledMetadata = $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled');

@@ -43,7 +43,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         ];
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         if (\array_key_exists(self::PAYLOAD_FIELDS, $context)) {
             $payloadFieldsToSerialize = $context[self::PAYLOAD_FIELDS];
@@ -59,7 +59,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
 
         $violations = [];
         $messages = [];
-        foreach ($object as $violation) {
+        foreach ($data as $violation) {
             $propertyPath = $this->nameConverter ? $this->nameConverter->normalize($violation->getPropertyPath(), null, $format, $context) : $violation->getPropertyPath();
 
             $violationEntry = [

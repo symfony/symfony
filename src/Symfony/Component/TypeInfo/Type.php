@@ -76,4 +76,27 @@ abstract class Type implements \Stringable
 
         return $this->isSatisfiedBy($specification);
     }
+
+    /**
+     * Traverses the whole type tree.
+     *
+     * @return iterable<self>
+     */
+    public function traverse(bool $traverseComposite = true, bool $traverseWrapped = true): iterable
+    {
+        yield $this;
+
+        if ($this instanceof CompositeTypeInterface && $traverseComposite) {
+            foreach ($this->getTypes() as $type) {
+                yield $type;
+            }
+
+            // prevent yielding twice when having a type that is both composite and wrapped
+            return;
+        }
+
+        if ($this instanceof WrappingTypeInterface && $traverseWrapped) {
+            yield $this->getWrappedType();
+        }
+    }
 }

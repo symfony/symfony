@@ -15,13 +15,20 @@ use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Event\TestSuite\Loaded;
 use PHPUnit\Event\TestSuite\LoadedSubscriber;
 use PHPUnit\Metadata\Group;
+use Symfony\Bridge\PhpUnit\Attribute\TimeSensitive;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Bridge\PhpUnit\Metadata\AttributeReader;
 
 /**
  * @internal
  */
 class RegisterClockMockSubscriber implements LoadedSubscriber
 {
+    public function __construct(
+        private AttributeReader $reader,
+    ) {
+    }
+
     public function notify(Loaded $event): void
     {
         foreach ($event->testSuite()->tests() as $test) {
@@ -33,6 +40,10 @@ class RegisterClockMockSubscriber implements LoadedSubscriber
                 if ($metadata instanceof Group && 'time-sensitive' === $metadata->groupName()) {
                     ClockMock::register($test->className());
                 }
+            }
+
+            foreach ($this->reader->forClassAndMethod($test->className(), $test->methodName(), TimeSensitive::class) as $attribute) {
+                ClockMock::register($attribute->class ?? $test->className());
             }
         }
     }

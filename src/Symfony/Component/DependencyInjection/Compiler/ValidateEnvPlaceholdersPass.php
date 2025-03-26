@@ -46,17 +46,8 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
         $defaultBag = new ParameterBag($resolvingBag->all());
         $envTypes = $resolvingBag->getProvidedTypes();
         foreach ($resolvingBag->getEnvPlaceholders() + $resolvingBag->getUnusedEnvPlaceholders() as $env => $placeholders) {
-            $values = [];
-            if (false === $i = strpos($env, ':')) {
-                $default = $defaultBag->has("env($env)") ? $defaultBag->get("env($env)") : self::TYPE_FIXTURES['string'];
-                $defaultType = null !== $default ? get_debug_type($default) : 'string';
-                $values[$defaultType] = $default;
-            } else {
-                $prefix = substr($env, 0, $i);
-                foreach ($envTypes[$prefix] ?? ['string'] as $type) {
-                    $values[$type] = self::TYPE_FIXTURES[$type] ?? null;
-                }
-            }
+            $values = $this->getPlaceholderValues($env, $defaultBag, $envTypes);
+
             foreach ($placeholders as $placeholder) {
                 BaseNode::setPlaceholder($placeholder, $values);
             }
@@ -96,5 +87,51 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
         } finally {
             $this->extensionConfig = [];
         }
+    }
+
+    /**
+     * @param array<string, list<string>> $envTypes
+     *
+     * @return array<string, mixed>
+     */
+    private function getPlaceholderValues(string $env, ParameterBag $defaultBag, array $envTypes): array
+    {
+        if (false === $i = strpos($env, ':')) {
+            [$default, $defaultType] = $this->getParameterDefaultAndDefaultType("env($env)", $defaultBag);
+
+            return [$defaultType => $default];
+        }
+
+        $prefix = substr($env, 0, $i);
+        if ('default' === $prefix) {
+            $parts = explode(':', $env);
+            array_shift($parts); // Remove 'default' prefix
+            $parameter = array_shift($parts); // Retrieve and remove parameter
+
+            [$defaultParameter, $defaultParameterType] = $this->getParameterDefaultAndDefaultType($parameter, $defaultBag);
+
+            return [
+                $defaultParameterType => $defaultParameter,
+                ...$this->getPlaceholderValues(implode(':', $parts), $defaultBag, $envTypes),
+            ];
+        }
+
+        $values = [];
+        foreach ($envTypes[$prefix] ?? ['string'] as $type) {
+            $values[$type] = self::TYPE_FIXTURES[$type] ?? null;
+        }
+
+        return $values;
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function getParameterDefaultAndDefaultType(string $name, ParameterBag $defaultBag): array
+    {
+        $default = $defaultBag->has($name) ? $defaultBag->get($name) : self::TYPE_FIXTURES['string'];
+        $defaultType = null !== $default ? get_debug_type($default) : 'string';
+
+        return [$default, $defaultType];
     }
 }

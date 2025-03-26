@@ -27,7 +27,9 @@ class LoggerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $container->setAlias(LoggerInterface::class, 'logger');
+        if (!$container->has(LoggerInterface::class)) {
+            $container->setAlias(LoggerInterface::class, 'logger');
+        }
 
         if ($container->has('logger')) {
             return;

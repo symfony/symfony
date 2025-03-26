@@ -133,7 +133,7 @@ class StreamedResponseTest extends TestCase
         ob_start();
         $modified->sendContent();
         $string = ob_get_clean();
-        $this->assertEmpty($string);
+        $this->assertSame('', $string);
     }
 
     public function testSendInformationalResponse()

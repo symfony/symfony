@@ -14,6 +14,7 @@ namespace Symfony\Component\Translation\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
 
 class DataCollectorTranslatorTest extends TestCase
@@ -82,6 +83,18 @@ class DataCollectorTranslatorTest extends TestCase
         ];
 
         $this->assertEquals($expectedMessages, $collector->getCollectedMessages());
+    }
+
+    public function testGetGlobalParameters()
+    {
+        $translatable = new TranslatableMessage('url.front');
+
+        $translator = new Translator('en');
+        $translator->addGlobalParameter('app', 'My app');
+        $translator->addGlobalParameter('url', $translatable);
+        $collector = new DataCollectorTranslator($translator);
+
+        $this->assertEquals(['app' => 'My app', 'url' => $translatable], $collector->getGlobalParameters());
     }
 
     private function createCollector()

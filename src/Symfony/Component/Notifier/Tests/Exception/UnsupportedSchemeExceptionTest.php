@@ -58,6 +58,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Lox24\Lox24TransportFactory::class => false,
             Bridge\Mailjet\MailjetTransportFactory::class => false,
             Bridge\Mastodon\MastodonTransportFactory::class => false,
+            Bridge\Matrix\MatrixTransportFactory::class => false,
             Bridge\Mattermost\MattermostTransportFactory::class => false,
             Bridge\Mercure\MercureTransportFactory::class => false,
             Bridge\MessageBird\MessageBirdTransportFactory::class => false,
@@ -155,6 +156,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['lox24', 'symfony/lox24-notifier'];
         yield ['mailjet', 'symfony/mailjet-notifier'];
         yield ['mastodon', 'symfony/mastodon-notifier'];
+        yield ['matrix', 'symfony/matrix-notifier'];
         yield ['mattermost', 'symfony/mattermost-notifier'];
         yield ['mercure', 'symfony/mercure-notifier'];
         yield ['messagebird', 'symfony/message-bird-notifier'];

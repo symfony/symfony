@@ -1,0 +1,6 @@
+---
+static:
+    path: /example
+    host:
+        nl: www.example.nl
+        en: www.example.com

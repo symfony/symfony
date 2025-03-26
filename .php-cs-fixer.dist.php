@@ -13,14 +13,19 @@ if (!file_exists(__DIR__.'/src')) {
     exit(0);
 }
 
-$fileHeaderComment = <<<'EOF'
-This file is part of the Symfony package.
+$fileHeaderParts = [
+    <<<'EOF'
+        This file is part of the Symfony package.
 
-(c) Fabien Potencier <fabien@symfony.com>
+        (c) Fabien Potencier <fabien@symfony.com>
 
-For the full copyright and license information, please view the LICENSE
-file that was distributed with this source code.
-EOF;
+        EOF,
+    <<<'EOF'
+
+        For the full copyright and license information, please view the LICENSE
+        file that was distributed with this source code.
+        EOF,
+];
 
 return (new PhpCsFixer\Config())
     // @see https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/pull/7777
@@ -31,7 +36,16 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'protected_to_private' => false,
-        'header_comment' => ['header' => $fileHeaderComment],
+        'header_comment' => [
+            'header' => implode('', $fileHeaderParts),
+            'validator' => implode('', [
+                '/',
+                preg_quote($fileHeaderParts[0], '/'),
+                '(?P<EXTRA>.*)??',
+                preg_quote($fileHeaderParts[1], '/'),
+                '/s',
+            ])
+        ],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

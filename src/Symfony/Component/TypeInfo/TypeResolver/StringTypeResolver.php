@@ -102,7 +102,20 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof ArrayShapeNode) {
-            return Type::array();
+            $shape = [];
+            foreach ($node->items as $item) {
+                $shape[(string) $item->keyName] = [
+                    'type' => $this->getTypeFromNode($item->valueType, $typeContext),
+                    'optional' => $item->optional,
+                ];
+            }
+
+            return Type::arrayShape(
+                $shape,
+                $node->sealed,
+                $node->unsealedType?->keyType ? $this->getTypeFromNode($node->unsealedType->keyType, $typeContext) : null,
+                $node->unsealedType?->valueType ? $this->getTypeFromNode($node->unsealedType->valueType, $typeContext) : null,
+            );
         }
 
         if ($node instanceof ObjectShapeNode) {
@@ -273,6 +286,10 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if (isset($typeContext?->templates[$identifier])) {
             return Type::template($identifier, $typeContext->templates[$identifier]);
+        }
+
+        if (isset($typeContext?->typeAliases[$identifier])) {
+            return $typeContext->typeAliases[$identifier];
         }
 
         throw new \DomainException(\sprintf('Unhandled "%s" identifier.', $identifier));

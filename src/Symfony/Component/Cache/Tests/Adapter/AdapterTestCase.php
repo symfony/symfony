@@ -18,6 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
@@ -349,6 +350,33 @@ abstract class AdapterTestCase extends CachePoolTest
         }
 
         $this->assertEquals('value-50', $cache->getItem((string) 50)->get());
+    }
+
+    public function testNamespaces()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $this->assertInstanceOf(NamespacedPoolInterface::class, $cache);
+
+        $derived = $cache->withSubNamespace('derived');
+
+        $item = $derived->getItem('foo');
+        $derived->save($item->set('Foo'));
+
+        $this->assertFalse($cache->getItem('foo')->isHit());
+
+        $item = $cache->getItem('bar');
+        $cache->save($item->set('Bar'));
+
+        $this->assertFalse($derived->getItem('bar')->isHit());
+        $this->assertTrue($cache->getItem('bar')->isHit());
+
+        $derived = $cache->withSubNamespace('derived');
+        $this->assertTrue($derived->getItem('foo')->isHit());
     }
 }
 

@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Yaml\Dumper;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
@@ -85,7 +87,11 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     {
         $context = array_merge($this->defaultContext, $context);
 
-        return $this->parser->parse($data, $context[self::YAML_FLAGS]);
+        try {
+            return $this->parser->parse($data, $context[self::YAML_FLAGS]);
+        } catch (ParseException $e) {
+            throw new NotEncodableValueException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     public function supportsDecoding(string $format): bool

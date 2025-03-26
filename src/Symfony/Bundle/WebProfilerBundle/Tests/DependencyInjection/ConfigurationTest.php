@@ -36,7 +36,10 @@ class ConfigurationTest extends TestCase
                 'options' => [],
                 'expectedResult' => [
                     'intercept_redirects' => false,
-                    'toolbar' => false,
+                    'toolbar' => [
+                        'enabled' => false,
+                        'ajax_replace' => false,
+                    ],
                     'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt',
                 ],
             ],
@@ -44,7 +47,10 @@ class ConfigurationTest extends TestCase
                 'options' => ['toolbar' => true],
                 'expectedResult' => [
                     'intercept_redirects' => false,
-                    'toolbar' => true,
+                    'toolbar' => [
+                        'enabled' => true,
+                        'ajax_replace' => false,
+                    ],
                     'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt',
                 ],
             ],
@@ -52,8 +58,22 @@ class ConfigurationTest extends TestCase
                 'options' => ['excluded_ajax_paths' => 'test'],
                 'expectedResult' => [
                     'intercept_redirects' => false,
-                    'toolbar' => false,
+                    'toolbar' => [
+                        'enabled' => false,
+                        'ajax_replace' => false,
+                    ],
                     'excluded_ajax_paths' => 'test',
+                ],
+            ],
+            [
+                'options' => ['toolbar' => ['ajax_replace' => true]],
+                'expectedResult' => [
+                    'intercept_redirects' => false,
+                    'toolbar' => [
+                        'enabled' => true,
+                        'ajax_replace' => true,
+                    ],
+                    'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt',
                 ],
             ],
         ];
@@ -78,7 +98,10 @@ class ConfigurationTest extends TestCase
                 'interceptRedirects' => true,
                 'expectedResult' => [
                     'intercept_redirects' => true,
-                    'toolbar' => false,
+                    'toolbar' => [
+                        'enabled' => false,
+                        'ajax_replace' => false,
+                    ],
                     'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt',
                 ],
             ],
@@ -86,7 +109,10 @@ class ConfigurationTest extends TestCase
                 'interceptRedirects' => false,
                 'expectedResult' => [
                     'intercept_redirects' => false,
-                    'toolbar' => false,
+                    'toolbar' => [
+                        'enabled' => false,
+                        'ajax_replace' => false,
+                    ],
                     'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt',
                 ],
             ],

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Exception\TransportException;
@@ -422,7 +423,7 @@ class ConnectionTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Failed to retrieve master information from master name "%s" and address "%s".', $uid, $exp));
 
-        Connection::fromDsn(\sprintf('%s/messenger-clearlasterror', $master), ['delete_after_ack' => true, 'sentinel_master' => $uid], null);
+        Connection::fromDsn(\sprintf('%s/messenger-clearlasterror', $master), ['delete_after_ack' => true, 'sentinel' => $uid], null);
     }
 
     public function testFromDsnOnUnixSocketWithUserAndPassword()
@@ -485,7 +486,46 @@ class ConnectionTest extends TestCase
         );
     }
 
-    private function createRedisMock(): \Redis
+    public function testKeepalive()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(1))->method('xclaim')
+            ->with('queue', 'symfony', 'consumer', 0, [$id = 'redisid-123'], ['JUSTID'])
+            ->willReturn([]);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $connection->keepalive($id);
+    }
+
+    public function testKeepaliveWhenARedisExceptionOccurs()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(1))->method('xclaim')
+            ->with('queue', 'symfony', 'consumer', 0, [$id = 'redisid-123'], ['JUSTID'])
+            ->willThrowException($exception = new \RedisException('Something went wrong '.time()));
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        $connection->keepalive($id);
+    }
+
+    public function testKeepaliveWithTooSmallTtl()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->never())->method('xclaim');
+
+        $connection = Connection::fromDsn('redis://localhost/queue?redeliver_timeout=1', [], $redis);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Redis redeliver_timeout (1000s) cannot be smaller than the keepalive interval (3000s).');
+        $connection->keepalive('redisid-123', 3000);
+    }
+
+    private function createRedisMock(): MockObject&\Redis
     {
         $redis = $this->createMock(\Redis::class);
         $redis->expects($this->any())

@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
+use Symfony\Component\Mailer\Bridge\AhaSend\Transport\AhaSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
@@ -43,6 +44,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     {
         ClassExistsMock::register(__CLASS__);
         ClassExistsMock::withMockedClasses([
+            AhaSendTransportFactory::class => false,
             AzureTransportFactory::class => false,
             BrevoTransportFactory::class => false,
             GmailTransportFactory::class => false,
@@ -79,6 +81,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
 
     public static function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
+        yield ['ahasend', 'symfony/aha-send-mailer'];
         yield ['azure', 'symfony/azure-mailer'];
         yield ['brevo', 'symfony/brevo-mailer'];
         yield ['gmail', 'symfony/google-mailer'];

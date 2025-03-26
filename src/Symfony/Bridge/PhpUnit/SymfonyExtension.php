@@ -20,6 +20,7 @@ use Symfony\Bridge\PhpUnit\Extension\DisableDnsMockSubscriber;
 use Symfony\Bridge\PhpUnit\Extension\EnableClockMockSubscriber;
 use Symfony\Bridge\PhpUnit\Extension\RegisterClockMockSubscriber;
 use Symfony\Bridge\PhpUnit\Extension\RegisterDnsMockSubscriber;
+use Symfony\Bridge\PhpUnit\Metadata\AttributeReader;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 class SymfonyExtension implements Extension
@@ -30,15 +31,17 @@ class SymfonyExtension implements Extension
             DebugClassLoader::enable();
         }
 
+        $reader = new AttributeReader();
+
         if ($parameters->has('clock-mock-namespaces')) {
             foreach (explode(',', $parameters->get('clock-mock-namespaces')) as $namespace) {
                 ClockMock::register($namespace.'\DummyClass');
             }
         }
 
-        $facade->registerSubscriber(new RegisterClockMockSubscriber());
-        $facade->registerSubscriber(new EnableClockMockSubscriber());
-        $facade->registerSubscriber(new DisableClockMockSubscriber());
+        $facade->registerSubscriber(new RegisterClockMockSubscriber($reader));
+        $facade->registerSubscriber(new EnableClockMockSubscriber($reader));
+        $facade->registerSubscriber(new DisableClockMockSubscriber($reader));
 
         if ($parameters->has('dns-mock-namespaces')) {
             foreach (explode(',', $parameters->get('dns-mock-namespaces')) as $namespace) {
@@ -46,7 +49,7 @@ class SymfonyExtension implements Extension
             }
         }
 
-        $facade->registerSubscriber(new RegisterDnsMockSubscriber());
-        $facade->registerSubscriber(new DisableDnsMockSubscriber());
+        $facade->registerSubscriber(new RegisterDnsMockSubscriber($reader));
+        $facade->registerSubscriber(new DisableDnsMockSubscriber($reader));
     }
 }

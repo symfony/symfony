@@ -57,6 +57,7 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
         $row = $stmt->fetchNumeric() ?: throw new TokenNotFoundException('No token found.');
 
         [$class, $username, $value, $last_used] = $row;
+
         return new PersistentToken($class, $username, $series, $value, new \DateTimeImmutable($last_used));
     }
 

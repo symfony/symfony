@@ -66,7 +66,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         // initialize placeholder only in second bag
         $secondBag->get($parameter);
 
-        $this->assertEmpty($firstBag->getEnvPlaceholders());
+        $this->assertSame([], $firstBag->getEnvPlaceholders());
 
         $firstBag->mergeEnvPlaceholders($secondBag);
         $mergedPlaceholders = $firstBag->getEnvPlaceholders();

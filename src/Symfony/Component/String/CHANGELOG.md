@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add the `AbstractString::pascal()` method
+
 7.2
 ---
 

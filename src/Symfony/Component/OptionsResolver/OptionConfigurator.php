@@ -143,4 +143,18 @@ final class OptionConfigurator
 
         return $this;
     }
+
+    /**
+     * Defines nested options.
+     *
+     * @param \Closure(OptionsResolver $resolver, Options $parent): void $nested
+     *
+     * @return $this
+     */
+    public function options(\Closure $nested): static
+    {
+        $this->resolver->setOptions($this->name, $nested);
+
+        return $this;
+    }
 }

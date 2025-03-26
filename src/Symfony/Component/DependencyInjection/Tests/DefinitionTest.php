@@ -258,6 +258,16 @@ class DefinitionTest extends TestCase
         ], $def->getTags(), '->getTags() returns all tags');
     }
 
+    public function testAddResourceTag()
+    {
+        $def = new Definition('stdClass');
+        $def->addResourceTag('foo', ['bar' => true]);
+
+        $this->assertSame([['bar' => true]], $def->getTag('foo'));
+        $this->assertTrue($def->isAbstract());
+        $this->assertSame([['source' => 'by tag "foo"']], $def->getTag('container.excluded'));
+    }
+
     public function testSetArgument()
     {
         $def = new Definition('stdClass');

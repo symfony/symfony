@@ -47,27 +47,27 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
         return self::SUPPORTED_TYPES;
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): string
+    public function normalize(mixed $data, ?string $format = null, array $context = []): string
     {
-        if (!$object instanceof \SplFileInfo) {
+        if (!$data instanceof \SplFileInfo) {
             throw new InvalidArgumentException('The object must be an instance of "\SplFileInfo".');
         }
 
-        $mimeType = $this->getMimeType($object);
-        $splFileObject = $this->extractSplFileObject($object);
+        $mimeType = $this->getMimeType($data);
+        $splFileObject = $this->extractSplFileObject($data);
 
-        $data = '';
+        $splFileData = '';
 
         $splFileObject->rewind();
         while (!$splFileObject->eof()) {
-            $data .= $splFileObject->fgets();
+            $splFileData .= $splFileObject->fgets();
         }
 
         if ('text' === explode('/', $mimeType, 2)[0]) {
-            return \sprintf('data:%s,%s', $mimeType, rawurlencode($data));
+            return \sprintf('data:%s,%s', $mimeType, rawurlencode($splFileData));
         }
 
-        return \sprintf('data:%s;base64,%s', $mimeType, base64_encode($data));
+        return \sprintf('data:%s;base64,%s', $mimeType, base64_encode($splFileData));
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

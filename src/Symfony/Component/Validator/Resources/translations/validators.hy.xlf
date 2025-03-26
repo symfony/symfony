@@ -444,27 +444,31 @@
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target state="needs-translation">This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</target>
+                <target state="needs-review-translation">Այս արժեքը շատ կարճ է: պետք է պարունակի գոնե մեկ բառ.|Այս արժեքը շատ կարճ է: պետք է պարունակի գոնե {{ min }} բառեր:</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target state="needs-translation">This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</target>
+                <target state="needs-review-translation">Այս արժեքը շատ երկար է: պետք է պարունակի միայն մեկ բառ.|Այս արժեքը շատ երկար է: պետք է պարունակի {{ max }} բառ կամ ավելի քիչ:</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target state="needs-translation">This value does not represent a valid week in the ISO 8601 format.</target>
+                <target state="needs-review-translation">Այս արժեքը չի ներկայացնում ISO 8601 ձևաչափով գործող շաբաթ։</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target state="needs-translation">This value is not a valid week.</target>
+                <target state="needs-review-translation">Այս արժեքը վավեր շաբաթ չէ:</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target state="needs-translation">This value should not be before week "{{ min }}".</target>
+                <target state="needs-review-translation">Այս արժեքը չպետք է լինի «{{ min }}» շաբաթից առաջ։</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target state="needs-translation">This value should not be after week "{{ max }}".</target>
+                <target state="needs-review-translation">Այս արժեքը չպետք է լինի «{{ max }}» շաբաթից հետո։</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>This value is not a valid slug.</source>
+                <target state="needs-review-translation">Այս արժեքը վավեր slug չէ:</target>
             </trans-unit>
         </body>
     </file>

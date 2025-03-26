@@ -15,6 +15,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - File: `/path/to/file`
 - Tag: `tag1`
     - Attr3: val3
@@ -36,6 +37,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
@@ -59,6 +61,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - File: `/path/to/file`
 - Tag: `tag1`
     - Priority: 0
@@ -75,6 +78,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - File: `/path/to/file`
 - Tag: `tag1`
     - Attr1: val1

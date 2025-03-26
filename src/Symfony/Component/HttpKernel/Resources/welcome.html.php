@@ -265,7 +265,7 @@ SVG;
                     <strong>Next Step</strong>
                     <?php echo $renderNextStepIconSvg; ?>
                     <span>
-                        <a href="https://symfony.com/doc/<?php echo $docVersion; ?>/page_creation.html">Create your first page</a>
+                        <a target="_blank" href="https://symfony.com/doc/<?php echo $docVersion; ?>/page_creation.html">Create your first page</a>
                         to replace this placeholder page.
                     </span>
                 </p>

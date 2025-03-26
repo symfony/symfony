@@ -60,6 +60,7 @@ final class Transport
         Bridge\Lox24\Lox24TransportFactory::class,
         Bridge\Mailjet\MailjetTransportFactory::class,
         Bridge\Mastodon\MastodonTransportFactory::class,
+        Bridge\Matrix\MatrixTransportFactory::class,
         Bridge\Mattermost\MattermostTransportFactory::class,
         Bridge\Mercure\MercureTransportFactory::class,
         Bridge\MessageBird\MessageBirdTransportFactory::class,

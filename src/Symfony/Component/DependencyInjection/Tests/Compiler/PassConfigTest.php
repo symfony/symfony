@@ -45,10 +45,10 @@ class PassConfigTest extends TestCase
         $config->setOptimizationPasses([]);
         $config->setRemovingPasses([]);
 
-        $this->assertEmpty($config->getBeforeOptimizationPasses());
-        $this->assertEmpty($config->getAfterRemovingPasses());
-        $this->assertEmpty($config->getBeforeRemovingPasses());
-        $this->assertEmpty($config->getOptimizationPasses());
-        $this->assertEmpty($config->getRemovingPasses());
+        $this->assertSame([], $config->getBeforeOptimizationPasses());
+        $this->assertSame([], $config->getAfterRemovingPasses());
+        $this->assertSame([], $config->getBeforeRemovingPasses());
+        $this->assertSame([], $config->getOptimizationPasses());
+        $this->assertSame([], $config->getRemovingPasses());
     }
 }

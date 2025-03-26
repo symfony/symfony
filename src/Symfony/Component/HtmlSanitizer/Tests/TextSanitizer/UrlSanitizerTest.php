@@ -274,6 +274,15 @@ class UrlSanitizerTest extends TestCase
             'expected' => null,
         ];
 
+        yield [
+            'input' => 'https://trusted.com/link.php',
+            'allowedSchemes' => ['http', 'https'],
+            'allowedHosts' => ['subdomain.trusted.com', 'trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'https://trusted.com/link.php',
+        ];
+
         // Allow relative
         yield [
             'input' => '/link.php',

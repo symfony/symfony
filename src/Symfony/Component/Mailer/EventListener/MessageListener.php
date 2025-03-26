@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\EventListener;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
@@ -19,9 +20,11 @@ use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Message;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Manipulates the headers and the body of a Message.
+ * Manipulates the headers, subject, and the body of a Message.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -45,6 +48,7 @@ class MessageListener implements EventSubscriberInterface
         private ?Headers $headers = null,
         private ?BodyRendererInterface $renderer = null,
         array $headerRules = self::DEFAULT_RULES,
+        private ?TranslatorInterface $translator = null,
     ) {
         foreach ($headerRules as $headerName => $rule) {
             $this->addHeaderRule($headerName, $rule);
@@ -68,6 +72,7 @@ class MessageListener implements EventSubscriberInterface
         }
 
         $this->setHeaders($message);
+        $this->translateSubject($message);
         $this->renderMessage($message);
     }
 
@@ -113,6 +118,15 @@ class MessageListener implements EventSubscriberInterface
                     }
             }
         }
+    }
+
+    private function translateSubject(Message $message): void
+    {
+        if (!$message instanceof TemplatedEmail || !$this->translator || !$message->getTranslatableSubject() instanceof TranslatableMessage) {
+            return;
+        }
+
+        $message->subject($message->getTranslatableSubject()->trans($this->translator, $message->getLocale()));
     }
 
     private function renderMessage(Message $message): void

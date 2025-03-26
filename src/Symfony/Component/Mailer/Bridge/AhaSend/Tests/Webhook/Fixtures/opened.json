@@ -1,0 +1,16 @@
+{
+  "type": "message.opened",
+  "timestamp": "2024-10-28T18:30:01.797985335Z",
+  "data": {
+    "account_id": "4cdd7bdd-294e-4762-892f-83d40abf5a87",
+    "event": "on_opened",
+    "from": "info@example.com",
+    "recipient": "someone@example.com",
+    "subject": "Sample email for testing webhooks",
+    "message_id_header": "message-id-header",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
+    "ip": "1.2.3.4",
+    "is_bot": "",
+    "id": "ahasend-message-id"
+  }
+}

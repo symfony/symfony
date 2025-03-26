@@ -181,19 +181,17 @@ final class AmpResponseV4 implements ResponseInterface, StreamableInterface
     /**
      * @param AmpClientStateV4 $multi
      */
-    private static function perform(ClientState $multi, ?array &$responses = null): void
+    private static function perform(ClientState $multi, ?array $responses = null): void
     {
-        if ($responses) {
-            foreach ($responses as $response) {
-                try {
-                    if ($response->info['start_time']) {
-                        $response->info['total_time'] = microtime(true) - $response->info['start_time'];
-                        ($response->onProgress)();
-                    }
-                } catch (\Throwable $e) {
-                    $multi->handlesActivity[$response->id][] = null;
-                    $multi->handlesActivity[$response->id][] = $e;
+        foreach ($responses ?? [] as $response) {
+            try {
+                if ($response->info['start_time']) {
+                    $response->info['total_time'] = microtime(true) - $response->info['start_time'];
+                    ($response->onProgress)();
                 }
+            } catch (\Throwable $e) {
+                $multi->handlesActivity[$response->id][] = null;
+                $multi->handlesActivity[$response->id][] = $e;
             }
         }
     }

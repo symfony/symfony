@@ -7,6 +7,28 @@ in 7.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.1.0...v7.1.1
 
+* 7.1.10 (2024-12-31)
+
+ * bug #59304 [PropertyInfo] Remove ``@internal`` from `PropertyReadInfo` and `PropertyWriteInfo` (Dario Guarracino)
+ * bug #59228 [HttpFoundation] Avoid mime type guess with temp files in `BinaryFileResponse` (alexandre-daubois)
+ * bug #59318 [Finder] Fix using `==` as default operator in `DateComparator` (MatTheCat)
+ * bug #59321 [HtmlSanitizer] reject URLs containing whitespaces (xabbuh)
+ * bug #59250 [HttpClient] Fix a typo in NoPrivateNetworkHttpClient (Jontsa)
+ * bug #59103 [Messenger] ensure exception on rollback does not hide previous exception (nikophil)
+ * bug #59226 [FrameworkBundle] require the writer to implement getFormats() in the translation:extract (xabbuh)
+ * bug #59213 [FrameworkBundle] don't require fake notifier transports to be installed as non-dev dependencies (xabbuh)
+ * bug #59066 Fix resolve enum in string type resolver (DavidBadura)
+ * bug #59156 [PropertyInfo]  Fix interface handling in PhpStanTypeHelper (mtarld)
+ * bug #59160 [BeanstalkMessenger] Round delay to an integer to avoid deprecation warning (plantas)
+ * bug #59012 [PropertyInfo] Fix interface handling in `PhpStanTypeHelper` (janedbal)
+ * bug #59134 [HttpKernel] Denormalize request data using the csv format when using "#[MapQueryString]" or "#[MapRequestPayload]" (except for content data) (ovidiuenache)
+ * bug #59140 [WebProfilerBundle] fix: white-space in highlighted code (chr-hertel)
+ * bug #59124 [FrameworkBundle] fix: notifier push channel bus abstract arg (raphael-geffroy)
+ * bug #59069 [Console] Fix division by 0 error (Rindula)
+ * bug #59070 [PropertyInfo] evaluate access flags for properties with asymmetric visibility (xabbuh)
+ * bug #59062 [HttpClient] Always set CURLOPT_CUSTOMREQUEST to the correct HTTP method in CurlHttpClient (KurtThiemann)
+ * bug #59023 [HttpClient] Fix streaming and redirecting with NoPrivateNetworkHttpClient (nicolas-grekas)
+
 * 7.1.9 (2024-11-27)
 
  * bug #59013 [HttpClient] Fix checking for private IPs before connecting (nicolas-grekas)

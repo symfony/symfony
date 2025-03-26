@@ -19,6 +19,8 @@ use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
 use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -83,9 +85,11 @@ class SerializerPassTest extends TestCase
 
     public function testBindSerializerDefaultContext()
     {
+        $context = ['enable_max_depth' => true];
+
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        $container->register('serializer')->setArguments([null, null]);
+        $container->register('serializer')->setArguments([null, null, []]);
         $container->setParameter('serializer.default_context', ['enable_max_depth' => true]);
         $definition = $container->register('n1')->addTag('serializer.normalizer')->addTag('serializer.encoder');
 
@@ -93,7 +97,8 @@ class SerializerPassTest extends TestCase
         $serializerPass->process($container);
 
         $bindings = $definition->getBindings();
-        $this->assertEquals($bindings['array $defaultContext'], new BoundArgument(['enable_max_depth' => true], false));
+        $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
+        $this->assertEquals($context, $container->getDefinition('serializer')->getArgument('$defaultContext'));
     }
 
     public function testNormalizersAndEncodersAreDecoratedAndOrderedWhenCollectingData()
@@ -553,7 +558,7 @@ class SerializerPassTest extends TestCase
             'api' => ['default_context' => $defaultContext = ['enable_max_depth' => true]],
         ]);
 
-        $container->register('serializer')->setArguments([null, null]);
+        $container->register('serializer')->setArguments([null, null, []]);
         $definition = $container->register('n1')
             ->addTag('serializer.normalizer', ['serializer' => '*'])
             ->addTag('serializer.encoder', ['serializer' => '*'])
@@ -562,11 +567,13 @@ class SerializerPassTest extends TestCase
         $serializerPass = new SerializerPass();
         $serializerPass->process($container);
 
-        $this->assertEmpty($definition->getBindings());
+        $this->assertSame([], $definition->getBindings());
 
         $bindings = $container->getDefinition('n1.api')->getBindings();
         $this->assertArrayHasKey('array $defaultContext', $bindings);
         $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($defaultContext, false));
+        $this->assertArrayNotHasKey('$defaultContext', $container->getDefinition('serializer')->getArguments());
+        $this->assertEquals($defaultContext, $container->getDefinition('serializer.api')->getArgument('$defaultContext'));
     }
 
     public function testNamedSerializersAreRegistered()
@@ -591,6 +598,8 @@ class SerializerPassTest extends TestCase
         $this->assertTrue($container->hasAlias(\sprintf('%s $apiSerializer', SerializerInterface::class)));
         $this->assertTrue($container->hasDefinition('serializer.api2'));
         $this->assertTrue($container->hasAlias(\sprintf('%s $api2Serializer', SerializerInterface::class)));
+        $this->assertTrue($container->hasAlias(\sprintf('%s $api2Normalizer', NormalizerInterface::class)));
+        $this->assertTrue($container->hasAlias(\sprintf('%s $api2Denormalizer', DenormalizerInterface::class)));
     }
 
     public function testNormalizersAndEncodersAreDecoratedAndOrderedWhenCollectingDataForNamedSerializers()

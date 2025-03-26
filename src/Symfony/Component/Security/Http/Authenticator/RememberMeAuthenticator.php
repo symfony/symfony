@@ -60,7 +60,7 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
         LoggerInterface|string|null $logger = null,
     ) {
         if (\is_string($tokenStorage)) {
-            trigger_deprecation('symfony/security-core', '7.2', 'The "$secret" argument of "%s()" is deprecated.', __METHOD__);
+            trigger_deprecation('symfony/security-http', '7.2', 'The "$secret" argument of "%s()" is deprecated.', __METHOD__);
 
             $this->secret = $tokenStorage;
             $tokenStorage = $cookieName;

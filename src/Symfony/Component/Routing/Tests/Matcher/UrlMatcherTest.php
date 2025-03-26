@@ -1011,7 +1011,30 @@ class UrlMatcherTest extends TestCase
             '_route' => 'a',
             'slug' => 'vienna-2024',
             '_route_mapping' => [
-                'slug' => 'conference',
+                'slug' => [
+                    'conference',
+                    'slug',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $matcher->match('/conference/vienna-2024'));
+    }
+
+    public function testMappingwithAlias()
+    {
+        $collection = new RouteCollection();
+        $collection->add('a', new Route('/conference/{conferenceSlug:conference.slug}'));
+
+        $matcher = $this->getUrlMatcher($collection);
+
+        $expected = [
+            '_route' => 'a',
+            'conferenceSlug' => 'vienna-2024',
+            '_route_mapping' => [
+                'conferenceSlug' => [
+                    'conference',
+                    'slug',
+                ],
             ],
         ];
         $this->assertEquals($expected, $matcher->match('/conference/vienna-2024'));

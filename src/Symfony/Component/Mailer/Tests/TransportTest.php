@@ -58,6 +58,11 @@ class TransportTest extends TestCase
             'roundrobin(dummy://a failover(dummy://b dummy://a) dummy://b)',
             new RoundRobinTransport([$transportA, new FailoverTransport([$transportB, $transportA]), $transportB]),
         ];
+
+        yield 'round robin transport with retry period' => [
+            'roundrobin(dummy://a dummy://b)?retry_period=15',
+            new RoundRobinTransport([$transportA, $transportB], 15),
+        ];
     }
 
     /**

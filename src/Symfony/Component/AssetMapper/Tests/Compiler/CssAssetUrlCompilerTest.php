@@ -114,6 +114,36 @@ class CssAssetUrlCompilerTest extends TestCase
             'expectedOutput' => 'body { background: url("https://cdn.io/images/bar.png"); }',
             'expectedDependencies' => [],
         ];
+
+        yield 'ignore_comments' => [
+            'input' => 'body { background: url("images/foo.png"); /* background: url("images/bar.png"); */ }',
+            'expectedOutput' => 'body { background: url("images/foo.123456.png"); /* background: url("images/bar.png"); */ }',
+            'expectedDependencies' => ['images/foo.png'],
+        ];
+
+        yield 'ignore_comment_after_rule' => [
+            'input' => 'body { background: url("images/foo.png"); } /* url("images/need-ignore.png") */',
+            'expectedOutput' => 'body { background: url("images/foo.123456.png"); } /* url("images/need-ignore.png") */',
+            'expectedDependencies' => ['images/foo.png'],
+        ];
+
+        yield 'ignore_comment_within_rule' => [
+            'input' => 'body { background: url("images/foo.png") /* url("images/need-ignore.png") */; }',
+            'expectedOutput' => 'body { background: url("images/foo.123456.png") /* url("images/need-ignore.png") */; }',
+            'expectedDependencies' => ['images/foo.png'],
+        ];
+
+        yield 'ignore_multiline_comment_after_rule' => [
+            'input' => 'body {
+                background: url("images/foo.png"); /*
+                url("images/need-ignore.png") */
+            }',
+            'expectedOutput' => 'body {
+                background: url("images/foo.123456.png"); /*
+                url("images/need-ignore.png") */
+            }',
+            'expectedDependencies' => ['images/foo.png'],
+        ];
     }
 
     public function testCompileFindsRelativeFilesViaSourcePath()

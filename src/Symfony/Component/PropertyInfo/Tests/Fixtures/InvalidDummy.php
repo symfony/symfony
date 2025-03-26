@@ -47,4 +47,11 @@ class InvalidDummy
     {
         return 'bar';
     }
+
+    /**
+     * @param $baz
+     */
+    public function setBaz($baz)
+    {
+    }
 }

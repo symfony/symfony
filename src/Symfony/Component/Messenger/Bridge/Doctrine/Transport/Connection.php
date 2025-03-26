@@ -286,6 +286,34 @@ class Connection implements ResetInterface
         }
     }
 
+    public function keepalive(string $id, ?int $seconds = null): void
+    {
+        // Check if the redeliver timeout is smaller than the keepalive interval
+        if (null !== $seconds && $this->configuration['redeliver_timeout'] < $seconds) {
+            throw new TransportException(\sprintf('Doctrine redeliver_timeout (%ds) cannot be smaller than the keepalive interval (%ds).', $this->configuration['redeliver_timeout'], $seconds));
+        }
+
+        $this->driverConnection->beginTransaction();
+        try {
+            $queryBuilder = $this->driverConnection->createQueryBuilder()
+                ->update($this->configuration['table_name'])
+                ->set('delivered_at', '?')
+                ->where('id = ?');
+            $now = new \DateTimeImmutable('UTC');
+            $this->executeStatement($queryBuilder->getSQL(), [
+                $now,
+                $id,
+            ], [
+                Types::DATETIME_IMMUTABLE,
+            ]);
+
+            $this->driverConnection->commit();
+        } catch (\Throwable $e) {
+            $this->driverConnection->rollBack();
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+    }
+
     public function setup(): void
     {
         $configuration = $this->driverConnection->getConfiguration();

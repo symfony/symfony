@@ -16,6 +16,7 @@ use Doctrine\DBAL\Schema\Schema;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -67,6 +68,22 @@ class DoctrineTransportTest extends TestCase
             ->with($schema, $dbalConnection, static fn () => true);
 
         $transport->configureSchema($schema, $dbalConnection, static fn () => true);
+    }
+
+    public function testKeepalive()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class)
+        );
+
+        $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
+
+        $connection->expects($this->once())
+            ->method('keepalive')
+            ->with('1');
+
+        $transport->keepalive($envelope);
     }
 
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): DoctrineTransport

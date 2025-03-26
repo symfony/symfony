@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Intl\Countries;
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 
@@ -41,6 +42,7 @@ class Country extends Constraint
      *
      * @see https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3#Current_codes
      */
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
@@ -50,6 +52,10 @@ class Country extends Constraint
     ) {
         if (!class_exists(Countries::class)) {
             throw new LogicException('The Intl component is required to use the Country constraint. Try running "composer require symfony/intl".');
+        }
+
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
         }
 
         parent::__construct($options, $groups, $payload);

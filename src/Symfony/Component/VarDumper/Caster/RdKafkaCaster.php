@@ -28,6 +28,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * Casts RdKafka related classes to array representation.
  *
  * @author Romain Neutron <imprec@gmail.com>
+ *
+ * @internal since Symfony 7.3
  */
 class RdKafkaCaster
 {

@@ -18,14 +18,13 @@
     "require": {
         "php": ">=8.2",
         "ext-ldap": "*",
-        "symfony/options-resolver": "^6.4|^7.0"
+        "symfony/options-resolver": "^7.3"
     },
     "require-dev": {
         "symfony/security-core": "^6.4|^7.0",
         "symfony/security-http": "^6.4|^7.0"
     },
     "conflict": {
-        "symfony/options-resolver": "<6.4",
         "symfony/security-core": "<6.4"
     },
     "autoload": {

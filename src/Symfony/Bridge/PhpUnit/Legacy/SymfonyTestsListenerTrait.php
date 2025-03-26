@@ -336,7 +336,7 @@ class SymfonyTestsListenerTrait
 
             return $h ? $h($type, $msg, $file, $line, $context) : false;
         }
-        // If the message is serialized we need to extract the message. This occurs when the error is triggered by
+        // If the message is serialized we need to extract the message. This occurs when the error is triggered
         // by the isolated test path in \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest().
         $parsedMsg = @unserialize($msg);
         if (\is_array($parsedMsg)) {

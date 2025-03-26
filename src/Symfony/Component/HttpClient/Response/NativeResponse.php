@@ -80,7 +80,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         };
 
         $this->canary = new Canary(static function () use ($multi, $id) {
-            if (null !== ($host = $multi->openHandles[$id][6] ?? null) && 0 >= --$multi->hosts[$host]) {
+            if (null !== ($host = $multi->openHandles[$id][6] ?? null) && isset($multi->hosts[$host]) && 0 >= --$multi->hosts[$host]) {
                 unset($multi->hosts[$host]);
             }
             unset($multi->openHandles[$id], $multi->handlesActivity[$id]);
@@ -229,7 +229,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
     /**
      * @param NativeClientState $multi
      */
-    private static function perform(ClientState $multi, ?array &$responses = null): void
+    private static function perform(ClientState $multi, ?array $responses = null): void
     {
         foreach ($multi->openHandles as $i => [$pauseExpiry, $h, $buffer, $onProgress]) {
             if ($pauseExpiry) {
@@ -303,7 +303,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
                 $multi->handlesActivity[$i][] = null;
                 $multi->handlesActivity[$i][] = $e;
-                if (null !== ($host = $multi->openHandles[$i][6] ?? null) && 0 >= --$multi->hosts[$host]) {
+                if (null !== ($host = $multi->openHandles[$i][6] ?? null) && isset($multi->hosts[$host]) && 0 >= --$multi->hosts[$host]) {
                     unset($multi->hosts[$host]);
                 }
                 unset($multi->openHandles[$i]);

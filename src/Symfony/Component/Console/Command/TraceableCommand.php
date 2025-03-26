@@ -45,6 +45,7 @@ final class TraceableCommand extends Command implements SignalableCommandInterfa
     /** @var array<string, mixed> */
     public array $interactiveInputs = [];
     public array $handledSignals = [];
+    public ?array $invokableCommandInfo = null;
 
     public function __construct(
         Command $command,
@@ -171,6 +172,18 @@ final class TraceableCommand extends Command implements SignalableCommandInterfa
      */
     public function setCode(callable $code): static
     {
+        if ($code instanceof InvokableCommand) {
+            $r = new \ReflectionFunction(\Closure::bind(function () {
+                return $this->code;
+            }, $code, InvokableCommand::class)());
+
+            $this->invokableCommandInfo = [
+                'class' => $r->getClosureScopeClass()->name,
+                'file' => $r->getFileName(),
+                'line' => $r->getStartLine(),
+            ];
+        }
+
         $this->command->setCode($code);
 
         return parent::setCode(function (InputInterface $input, OutputInterface $output) use ($code): int {

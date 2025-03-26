@@ -911,6 +911,87 @@ YAML;
     }
 
     /**
+     * @dataProvider getForceQuotesOnValuesData
+     */
+    public function testCanForceQuotesOnValues(array $input, string $expected)
+    {
+        $this->assertSame($expected, $this->dumper->dump($input, 0, 0, Yaml::DUMP_FORCE_DOUBLE_QUOTES_ON_VALUES));
+    }
+
+    public function getForceQuotesOnValuesData(): iterable
+    {
+        yield 'empty string' => [
+            ['foo' => ''],
+            '{ foo: \'\' }',
+        ];
+
+        yield 'double quote' => [
+            ['foo' => '"'],
+            '{ foo: "\"" }',
+        ];
+
+        yield 'single quote' => [
+            ['foo' => "'"],
+            '{ foo: "\'" }',
+        ];
+
+        yield 'line break' => [
+            ['foo' => "line\nbreak"],
+            '{ foo: "line\nbreak" }',
+        ];
+
+        yield 'tab character' => [
+            ['foo' => "tab\tcharacter"],
+            '{ foo: "tab\tcharacter" }',
+        ];
+
+        yield 'backslash' => [
+            ['foo' => "back\\slash"],
+            '{ foo: "back\\\\slash" }',
+        ];
+
+        yield 'colon' => [
+            ['foo' => 'colon: value'],
+            '{ foo: "colon: value" }',
+        ];
+
+        yield 'dash' => [
+            ['foo' => '- dash'],
+            '{ foo: "- dash" }',
+        ];
+
+        yield 'numeric' => [
+            ['foo' => 23],
+            '{ foo: 23 }',
+        ];
+
+        yield 'boolean' => [
+            ['foo' => true],
+            '{ foo: true }',
+        ];
+
+        yield 'null' => [
+            ['foo' => null],
+            '{ foo: null }',
+        ];
+
+        yield 'nested' => [
+            ['foo' => ['bar' => 'bat', 'baz' => 23]],
+            '{ foo: { bar: "bat", baz: 23 } }',
+        ];
+
+        yield 'mix of values' => [
+            ['foo' => 'bat', 'bar' => 23, 'baz' => true, 'qux' => "line\nbreak"],
+            '{ foo: "bat", bar: 23, baz: true, qux: "line\nbreak" }',
+        ];
+
+        yield 'special YAML characters' => [
+            ['foo' => 'colon: value', 'bar' => '- dash', 'baz' => '? question', 'qux' => '# hash'],
+            '{ foo: "colon: value", bar: "- dash", baz: "? question", qux: "# hash" }',
+        ];
+    }
+
+    /**
      * @dataProvider getNumericKeyData
      */
     public function testDumpInlineNumericKeyAsString(array $input, bool $inline, int $flags, string $expected)
@@ -1085,38 +1166,122 @@ YAML;
                 ],
             ],
         ];
-        $expected = <<<YAML
+
+        yield 'Compact nested mapping 1' => [
+            $data,
+            <<<YAML
 planets:
-\t- name: Mercury
-\t  distance: 57910000
-\t  properties:
-\t\t  - name: size
-\t\t    value: 4879
-\t\t  - name: moons
-\t\t    value: 0
-\t\t  - - - {  }
-\t- name: Jupiter
-\t  distance: 778500000
-\t  properties:
-\t\t  - name: size
-\t\t    value: 139820
-\t\t  - name: moons
-\t\t    value: 79
-\t\t  - - {  }
+ - name: Mercury
+   distance: 57910000
+   properties:
+    - name: size
+      value: 4879
+    - name: moons
+      value: 0
+    -
+     -
+      - {  }
+ - name: Jupiter
+   distance: 778500000
+   properties:
+    - name: size
+      value: 139820
+    - name: moons
+      value: 79
+    -
+     - {  }
 
-YAML;
+YAML,
+            1,
+        ];
 
-        for ($indentation = 1; $indentation < 5; ++$indentation) {
-            yield \sprintf('Compact nested mapping %d', $indentation) => [
-                $data,
-                strtr($expected, ["\t" => str_repeat(' ', $indentation)]),
-                $indentation,
-            ];
-        }
+        yield 'Compact nested mapping 2' => [
+            $data,
+            <<<YAML
+planets:
+  - name: Mercury
+    distance: 57910000
+    properties:
+      - name: size
+        value: 4879
+      - name: moons
+        value: 0
+      -
+        -
+          - {  }
+  - name: Jupiter
+    distance: 778500000
+    properties:
+      - name: size
+        value: 139820
+      - name: moons
+        value: 79
+      -
+        - {  }
 
-        $indentation = 2;
-        $inline = 4;
-        $expected = <<<YAML
+YAML,
+            2,
+        ];
+
+        yield 'Compact nested mapping 3' => [
+            $data,
+            <<<YAML
+planets:
+   - name: Mercury
+     distance: 57910000
+     properties:
+        - name: size
+          value: 4879
+        - name: moons
+          value: 0
+        -
+           -
+              - {  }
+   - name: Jupiter
+     distance: 778500000
+     properties:
+        - name: size
+          value: 139820
+        - name: moons
+          value: 79
+        -
+           - {  }
+
+YAML,
+            3,
+        ];
+
+        yield 'Compact nested mapping 4' => [
+            $data,
+            <<<YAML
+planets:
+    - name: Mercury
+      distance: 57910000
+      properties:
+          - name: size
+            value: 4879
+          - name: moons
+            value: 0
+          -
+              -
+                  - {  }
+    - name: Jupiter
+      distance: 778500000
+      properties:
+          - name: size
+            value: 139820
+          - name: moons
+            value: 79
+          -
+              - {  }
+
+YAML,
+            4,
+        ];
+
+        yield 'Compact nested mapping 2 and inline 4' => [
+            $data,
+            <<<YAML
 planets:
   - name: Mercury
     distance: 57910000
@@ -1131,13 +1296,9 @@ planets:
       - { name: moons, value: 79 }
       - [{  }]
 
-YAML;
-
-        yield \sprintf('Compact nested mapping %d and inline %d', $indentation, $inline) => [
-            $data,
-            $expected,
-            $indentation,
-            $inline,
+YAML,
+            2,
+            4,
         ];
     }
 

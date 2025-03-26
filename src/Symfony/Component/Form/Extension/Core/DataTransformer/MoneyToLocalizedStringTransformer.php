@@ -70,7 +70,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
         if (null !== $value) {
             $value = (string) ($value * $this->divisor);
 
-            if ('float' === $this->input) {
+            if ('integer' !== $this->input) {
                 return (float) $value;
             }
 

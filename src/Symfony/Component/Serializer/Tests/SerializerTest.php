@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -54,6 +55,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameAttributeDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DenormalizableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
@@ -792,6 +794,18 @@ class SerializerTest extends TestCase
         $obj = $serializer->deserialize('<?xml version="1.0" encoding="UTF-8"?><DummyNullableInt><value/></DummyNullableInt>', DummyNullableInt::class, 'xml');
         $this->assertInstanceOf(DummyNullableInt::class, $obj);
         $this->assertNull($obj->value);
+    }
+
+    public function testDeserializeIntAsStringPropertyInXML()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory, $nameConverter, null, $extractor)], ['xml' => new XmlEncoder()]);
+
+        $obj = $serializer->deserialize('<?xml version="1.0" encoding="UTF-8"?><NameAttributeDummy foo="123" />', SerializedNameAttributeDummy::class, 'xml');
+
+        $this->assertSame('123', $obj->foo);
     }
 
     public function testUnionTypeDeserializable()
@@ -1673,6 +1687,32 @@ class SerializerTest extends TestCase
         $serializer->deserialize($json, DummyWithVariadicParameter::class, 'json', [
             DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
         ]);
+    }
+
+    public function testEmptyArrayAsObjectDefaultContext()
+    {
+        $serializer = new Serializer(
+            defaultContext: [Serializer::EMPTY_ARRAY_AS_OBJECT => true],
+        );
+        $this->assertEquals(new \ArrayObject(), $serializer->normalize([]));
+    }
+
+    public function testPreserveEmptyObjectsAsDefaultContext()
+    {
+        $serializer = new Serializer(
+            defaultContext: [AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true],
+        );
+        $this->assertEquals(new \ArrayObject(), $serializer->normalize(new \ArrayIterator()));
+    }
+
+    public function testCollectDenormalizationErrorsDefaultContext()
+    {
+        $data = ['variadic' => ['a random string']];
+        $serializer = new Serializer([new UidNormalizer(), new ObjectNormalizer()], [], [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]);
+
+        $this->expectException(PartialDenormalizationException::class);
+
+        $serializer->denormalize($data, DummyWithVariadicParameter::class);
     }
 }
 

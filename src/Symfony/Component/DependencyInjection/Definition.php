@@ -456,6 +456,20 @@ class Definition
     }
 
     /**
+     * Adds a "resource" tag to the definition and marks it as excluded.
+     *
+     * These definitions should be processed using {@see ContainerBuilder::findTaggedResourceIds()}
+     *
+     * @return $this
+     */
+    public function addResourceTag(string $name, array $attributes = []): static
+    {
+        return $this->addTag($name, $attributes)
+            ->addTag('container.excluded', ['source' => \sprintf('by tag "%s"', $name)])
+            ->setAbstract(true);
+    }
+
+    /**
      * Whether this definition has a tag with the given name.
      */
     public function hasTag(string $name): bool

@@ -36,6 +36,7 @@ return static function (ContainerConfigurator $container) {
         'line-notify' => Bridge\LineNotify\LineNotifyTransportFactory::class,
         'linked-in' => Bridge\LinkedIn\LinkedInTransportFactory::class,
         'mastodon' => Bridge\Mastodon\MastodonTransportFactory::class,
+        'matrix' => Bridge\Matrix\MatrixTransportFactory::class,
         'mattermost' => Bridge\Mattermost\MattermostTransportFactory::class,
         'mercure' => Bridge\Mercure\MercureTransportFactory::class,
         'microsoft-teams' => Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,

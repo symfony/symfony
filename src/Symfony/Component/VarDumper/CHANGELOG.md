@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add casters for `Dba\Connection`, `SQLite3Result`, `OpenSSLAsymmetricKey` and `OpenSSLCertificateSigningRequest`
+ * Deprecate `ResourceCaster::castCurl()`, `ResourceCaster::castGd()` and `ResourceCaster::castOpensslX509()`
+ * Mark all casters as `@internal`
+
 7.2
 ---
 

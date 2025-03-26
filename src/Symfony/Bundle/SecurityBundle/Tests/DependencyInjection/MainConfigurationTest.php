@@ -12,13 +12,17 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel;
 
 class MainConfigurationTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     /**
      * The minimal, required config needed to not have any required validation
      * issues.
@@ -227,5 +231,53 @@ class MainConfigurationTest extends TestCase
 
         $configuration = new MainConfiguration(['stub' => $factory], []);
         $configuration->getConfigTreeBuilder();
+    }
+
+    /**
+     * @dataProvider provideHideUserNotFoundData
+     */
+    public function testExposeSecurityErrors(array $config, ExposeSecurityLevel $expectedExposeSecurityErrors)
+    {
+        $config = array_merge(static::$minimalConfig, $config);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+
+        $this->assertEquals($expectedExposeSecurityErrors, $processedConfig['expose_security_errors']);
+        $this->assertArrayNotHasKey('hide_user_not_found', $processedConfig);
+    }
+
+    public static function provideHideUserNotFoundData(): iterable
+    {
+        yield [[], ExposeSecurityLevel::None];
+        yield [['expose_security_errors' => ExposeSecurityLevel::None], ExposeSecurityLevel::None];
+        yield [['expose_security_errors' => ExposeSecurityLevel::AccountStatus], ExposeSecurityLevel::AccountStatus];
+        yield [['expose_security_errors' => ExposeSecurityLevel::All], ExposeSecurityLevel::All];
+    }
+
+    /**
+     * @dataProvider provideHideUserNotFoundLegacyData
+     *
+     * @group legacy
+     */
+    public function testExposeSecurityErrorsWithLegacyConfig(array $config, ExposeSecurityLevel $expectedExposeSecurityErrors, ?bool $expectedHideUserNotFound)
+    {
+        $this->expectUserDeprecationMessage('Since symfony/security-bundle 7.3: The "hide_user_not_found" option is deprecated and will be removed in 8.0. Use the "expose_security_errors" option instead.');
+
+        $config = array_merge(static::$minimalConfig, $config);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+
+        $this->assertEquals($expectedExposeSecurityErrors, $processedConfig['expose_security_errors']);
+        $this->assertEquals($expectedHideUserNotFound, $processedConfig['hide_user_not_found']);
+    }
+
+    public static function provideHideUserNotFoundLegacyData(): iterable
+    {
+        yield [['hide_user_not_found' => true], ExposeSecurityLevel::None, true];
+        yield [['hide_user_not_found' => false], ExposeSecurityLevel::All, false];
     }
 }

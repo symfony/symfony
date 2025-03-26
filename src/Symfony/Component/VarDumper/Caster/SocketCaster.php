@@ -15,16 +15,38 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ * @author Alexandre Daubois <alex.daubois@gmail.com>
+ *
+ * @internal
  */
 final class SocketCaster
 {
-    public static function castSocket(\Socket $h, array $a, Stub $stub, bool $isNested): array
+    public static function castSocket(\Socket $socket, array $a, Stub $stub, bool $isNested): array
     {
-        if (\PHP_VERSION_ID >= 80300 && socket_atmark($h)) {
-            $a[Caster::PREFIX_VIRTUAL.'atmark'] = true;
+        socket_getsockname($socket, $addr, $port);
+        $info = stream_get_meta_data(socket_export_stream($socket));
+
+        if (\PHP_VERSION_ID >= 80300) {
+            $uri = ($info['uri'] ?? '//');
+            if (str_starts_with($uri, 'unix://')) {
+                $uri .= $addr;
+            } else {
+                $uri .= \sprintf(str_contains($addr, ':') ? '[%s]:%s' : '%s:%s', $addr, $port);
+            }
+
+            $a[Caster::PREFIX_VIRTUAL.'uri'] = $uri;
+
+            if (@socket_atmark($socket)) {
+                $a[Caster::PREFIX_VIRTUAL.'atmark'] = true;
+            }
         }
 
-        if (!$lastError = socket_last_error($h)) {
+        $a += [
+            Caster::PREFIX_VIRTUAL.'timed_out' => $info['timed_out'],
+            Caster::PREFIX_VIRTUAL.'blocked' => $info['blocked'],
+        ];
+
+        if (!$lastError = socket_last_error($socket)) {
             return $a;
         }
 

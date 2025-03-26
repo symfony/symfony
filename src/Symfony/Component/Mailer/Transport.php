@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\AhaSend\Transport\AhaSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
@@ -52,6 +53,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class Transport
 {
     private const FACTORY_CLASSES = [
+        AhaSendTransportFactory::class,
         AzureTransportFactory::class,
         BrevoTransportFactory::class,
         GmailTransportFactory::class,
@@ -143,6 +145,11 @@ final class Transport
                         if (')' === $dsn[$offset - 1]) {
                             break;
                         }
+                    }
+
+                    parse_str(substr($dsn, $offset + 1), $query);
+                    if ($period = $query['retry_period'] ?? 0) {
+                        return [new $class($args, (int) $period), $offset + \strlen('retry_period='.$period) + 1];
                     }
 
                     return [new $class($args), $offset];

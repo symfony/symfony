@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -34,9 +35,23 @@ class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
             throw new LogicException('You cannot use the "oidc_user_info" token handler since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
         }
 
-        $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oidc_user_info'))
+        $tokenHandlerDefinition = $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oidc_user_info'))
             ->replaceArgument(0, $clientDefinition)
             ->replaceArgument(2, $config['claim']);
+
+        if (isset($config['discovery'])) {
+            if (!ContainerBuilder::willBeAvailable('symfony/cache', CacheInterface::class, ['symfony/security-bundle'])) {
+                throw new LogicException('You cannot use the "oidc_user_info" token handler with "discovery" since the Cache component is not installed. Try running "composer require symfony/cache".');
+            }
+
+            $tokenHandlerDefinition->addMethodCall(
+                'enableDiscovery',
+                [
+                    new Reference($config['discovery']['cache']['id']),
+                    "$id.oidc_configuration",
+                ]
+            );
+        }
     }
 
     public function getKey(): string
@@ -55,9 +70,23 @@ class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
                 ->end()
                 ->children()
                     ->scalarNode('base_uri')
-                        ->info('Base URI of the userinfo endpoint on the OIDC server.')
+                        ->info('Base URI of the userinfo endpoint on the OIDC server, or the OIDC server URI to use the discovery (require "discovery" to be configured).')
                         ->isRequired()
                         ->cannotBeEmpty()
+                    ->end()
+                    ->arrayNode('discovery')
+                        ->info('Enable the OIDC discovery.')
+                        ->children()
+                            ->arrayNode('cache')
+                                ->children()
+                                    ->scalarNode('id')
+                                        ->info('Cache service id to use to cache the OIDC discovery configuration.')
+                                        ->isRequired()
+                                        ->cannotBeEmpty()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                     ->scalarNode('claim')
                         ->info('Claim which contains the user identifier (e.g. sub, email, etc.).')

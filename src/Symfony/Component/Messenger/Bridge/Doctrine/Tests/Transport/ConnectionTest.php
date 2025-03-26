@@ -299,6 +299,110 @@ class ConnectionTest extends TestCase
         self::assertSame('1', $id);
     }
 
+    public function testKeepalive()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $connection = new Connection(['redeliver_timeout' => 30, 'table_name' => 'messenger_messages'], $driverConnection);
+
+        $queryBuilder->expects($this->once())
+            ->method('update')
+            ->with('messenger_messages')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('set')
+            ->with('delivered_at', '?')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('id = ?')
+            ->willReturnSelf();
+
+        $driverConnection->expects($this->once())
+            ->method('beginTransaction');
+
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('UPDATE');
+
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->with('UPDATE')
+            ->willReturn(1);
+
+        $driverConnection->expects($this->once())
+            ->method('commit');
+
+        $connection->keepalive('1');
+    }
+
+    public function testKeepaliveRollback()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $connection = new Connection(['redeliver_timeout' => 30, 'table_name' => 'messenger_messages'], $driverConnection);
+
+        $queryBuilder->expects($this->once())
+            ->method('update')
+            ->with('messenger_messages')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('set')
+            ->with('delivered_at', '?')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('id = ?')
+            ->willReturnSelf();
+
+        $driverConnection->expects($this->once())
+            ->method('beginTransaction');
+
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('UPDATE');
+
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->willThrowException($this->createMock(DBALException::class));
+
+        $driverConnection->expects($this->never())
+            ->method('commit');
+
+        $driverConnection->expects($this->once())
+            ->method('rollBack');
+
+        $this->expectException(TransportException::class);
+
+        $connection->keepalive('1');
+    }
+
+    public function testKeepaliveThrowsExceptionWhenRedeliverTimeoutIsLessThenInterval()
+    {
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $connection = new Connection(['redeliver_timeout' => 30], $driverConnection);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Doctrine redeliver_timeout (30s) cannot be smaller than the keepalive interval (60s).');
+
+        $connection->keepalive('1', 60);
+    }
+
     private function getDBALConnectionMock()
     {
         $driverConnection = $this->createMock(DBALConnection::class);
@@ -699,7 +803,7 @@ class ConnectionTest extends TestCase
         $connection = new Connection([], $driverConnection);
         $connection->configureSchema($schema, $driverConnection, fn () => true);
         $table = $schema->getTable('messenger_messages');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 
     /**

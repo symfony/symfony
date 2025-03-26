@@ -1,10 +1,18 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Reset the manager registry using native lazy objects when applicable
+ * Deprecate the `DoctrineExtractor::getTypes()` method, use `DoctrineExtractor::getType()` instead
+ * Add support for `Symfony\Component\Clock\DatePoint` as `DatePointType` Doctrine type
+
 7.2
 ---
 
  * Accept `ReadableCollection` in `CollectionToArrayTransformer`
+ * Add type aliases support to `EntityValueResolver`
 
 7.1
 ---

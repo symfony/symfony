@@ -239,11 +239,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * enableableArrayNode: {enabled: false, ...}  # The config is disabled
      * enableableArrayNode: false                  # The config is disabled
      *
+     * @param string|null $info A description of what happens when the node is enabled or disabled
+     *
      * @return $this
      */
-    public function canBeEnabled(): static
+    public function canBeEnabled(/* ?string $info = null */): static
     {
-        $this
+        $disabledNode = $this
             ->addDefaultsIfNotSet()
             ->treatFalseLike(['enabled' => false])
             ->treatTrueLike(['enabled' => true])
@@ -261,6 +263,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                     ->defaultFalse()
         ;
 
+        $info = 1 <= \func_num_args() ? func_get_arg(0) : null;
+        if ($info) {
+            $disabledNode->info($info);
+        }
+
         return $this;
     }
 
@@ -269,11 +276,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * By default, the section is enabled.
      *
+     * @param string|null $info A description of what happens when the node is enabled or disabled
+     *
      * @return $this
      */
-    public function canBeDisabled(): static
+    public function canBeDisabled(/* ?string $info = null */): static
     {
-        $this
+        $enabledNode = $this
             ->addDefaultsIfNotSet()
             ->treatFalseLike(['enabled' => false])
             ->treatTrueLike(['enabled' => true])
@@ -282,6 +291,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 ->booleanNode('enabled')
                     ->defaultTrue()
         ;
+
+        $info = 1 <= \func_num_args() ? func_get_arg(0) : null;
+        if ($info) {
+            $enabledNode->info($info);
+        }
 
         return $this;
     }

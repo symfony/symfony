@@ -62,6 +62,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFac
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
@@ -82,6 +83,7 @@ use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -613,21 +615,25 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], array_keys($configuration));
 
         $this->assertEqualsCanonicalizing([
+            'log_channel' => null,
             'log_level' => 'info',
             'status_code' => 422,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class]);
 
         $this->assertEqualsCanonicalizing([
+            'log_channel' => null,
             'log_level' => 'info',
             'status_code' => null,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class]);
 
         $this->assertEqualsCanonicalizing([
+            'log_channel' => null,
             'log_level' => 'info',
             'status_code' => null,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\ConflictHttpException::class]);
 
         $this->assertEqualsCanonicalizing([
+            'log_channel' => null,
             'log_level' => null,
             'status_code' => 500,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException::class]);
@@ -795,7 +801,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             \ARRAY_FILTER_USE_KEY
         );
 
-        $this->assertEmpty($messengerDefinitions);
+        $this->assertSame([], $messengerDefinitions);
         $this->assertFalse($container->hasDefinition('console.command.messenger_consume_messages'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_debug'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_stop_workers'));
@@ -1055,9 +1061,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['enable_max_depth' => true], $serializerTransportDefinition->getArgument(2));
     }
 
-    public function testMessengerWithMultipleBuses()
+    public function testMessengerWithMultipleBusesWithoutDeduplicateMiddleware()
     {
-        $container = $this->createContainerFromFile('messenger_multiple_buses');
+        $container = $this->createContainerFromFile('messenger_multiple_buses_without_deduplicate_middleware');
 
         $this->assertTrue($container->has('messenger.bus.commands'));
         $this->assertSame([], $container->getDefinition('messenger.bus.commands')->getArgument(0));
@@ -1076,6 +1082,48 @@ abstract class FrameworkExtensionTestCase extends TestCase
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'dispatch_after_current_bus'],
             ['id' => 'failed_message_processing_middleware'],
+            ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
+            ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'handle_message', 'arguments' => [false]],
+        ], $container->getParameter('messenger.bus.events.middleware'));
+        $this->assertTrue($container->has('messenger.bus.queries'));
+        $this->assertSame([], $container->getDefinition('messenger.bus.queries')->getArgument(0));
+        $this->assertEquals([
+            ['id' => 'send_message', 'arguments' => []],
+            ['id' => 'handle_message', 'arguments' => []],
+        ], $container->getParameter('messenger.bus.queries.middleware'));
+
+        $this->assertTrue($container->hasAlias('messenger.default_bus'));
+        $this->assertSame('messenger.bus.commands', (string) $container->getAlias('messenger.default_bus'));
+    }
+
+    public function testMessengerWithMultipleBusesWithDeduplicateMiddleware()
+    {
+        if (!class_exists(DeduplicateMiddleware::class)) {
+            $this->markTestSkipped('DeduplicateMiddleware not available.');
+        }
+
+        $container = $this->createContainerFromFile('messenger_multiple_buses_with_deduplicate_middleware');
+
+        $this->assertTrue($container->has('messenger.bus.commands'));
+        $this->assertSame([], $container->getDefinition('messenger.bus.commands')->getArgument(0));
+        $this->assertEquals([
+            ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
+            ['id' => 'reject_redelivered_message_middleware'],
+            ['id' => 'dispatch_after_current_bus'],
+            ['id' => 'failed_message_processing_middleware'],
+            ['id' => 'deduplicate_middleware'],
+            ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'handle_message', 'arguments' => [false]],
+        ], $container->getParameter('messenger.bus.commands.middleware'));
+        $this->assertTrue($container->has('messenger.bus.events'));
+        $this->assertSame([], $container->getDefinition('messenger.bus.events')->getArgument(0));
+        $this->assertEquals([
+            ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
+            ['id' => 'reject_redelivered_message_middleware'],
+            ['id' => 'dispatch_after_current_bus'],
+            ['id' => 'failed_message_processing_middleware'],
+            ['id' => 'deduplicate_middleware'],
             ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
             ['id' => 'send_message', 'arguments' => [true]],
             ['id' => 'handle_message', 'arguments' => [false]],
@@ -1196,6 +1244,36 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('translator_cache_dir_disabled');
         $options = $container->getDefinition('translator.default')->getArgument(4);
         $this->assertNull($options['cache_dir']);
+    }
+
+    public function testTranslatorGlobals()
+    {
+        $container = $this->createContainerFromFile('translator_globals');
+
+        $calls = $container->getDefinition('translator.default')->getMethodCalls();
+
+        $this->assertCount(5, $calls);
+        $this->assertSame(
+            ['addGlobalParameter', ['%%app_name%%', 'My application']],
+            $calls[2],
+        );
+        $this->assertSame(
+            ['addGlobalParameter', ['{app_version}', '1.2.3']],
+            $calls[3],
+        );
+        $this->assertEquals(
+            ['addGlobalParameter', ['{url}', new Definition(TranslatableMessage::class, ['url', ['scheme' => 'https://'], 'global'])]],
+            $calls[4],
+        );
+    }
+
+    public function testTranslatorWithoutGlobals()
+    {
+        $container = $this->createContainerFromFile('translator_without_globals');
+
+        $calls = $container->getDefinition('translator.default')->getMethodCalls();
+
+        $this->assertCount(2, $calls);
     }
 
     public function testValidation()
@@ -1676,6 +1754,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('property_info');
         $this->assertTrue($container->has('property_info'));
+        $this->assertFalse($container->has('property_info.constructor_extractor'));
+    }
+
+    public function testPropertyInfoWithConstructorExtractorEnabled()
+    {
+        $container = $this->createContainerFromFile('property_info_with_constructor_extractor');
+        $this->assertTrue($container->has('property_info'));
+        $this->assertTrue($container->has('property_info.constructor_extractor'));
     }
 
     public function testPropertyInfoCacheActivated()
@@ -1890,7 +1976,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $container = $this->createContainer(['kernel.debug' => false]);
         (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true]]], $container);
-        $this->assertEmpty($container->getDefinition('config_cache_factory')->getArguments());
+        $this->assertSame([], $container->getDefinition('config_cache_factory')->getArguments());
     }
 
     public function testLoggerAwareRegistration()
@@ -1950,8 +2036,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ];
         $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client.transport')->getArguments());
 
+        $this->assertTrue($container->getDefinition('http_client')->hasTag('kernel.reset'));
+
         $this->assertTrue($container->hasDefinition('foo'), 'should have the "foo" service.');
-        $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());
+        $definition = $container->getDefinition('foo');
+        $this->assertSame(ScopingHttpClient::class, $definition->getClass());
+        $this->assertTrue($definition->hasTag('kernel.reset'));
     }
 
     public function testScopedHttpClientWithoutQueryOption()
@@ -2101,8 +2191,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasAlias('mailer'));
         $this->assertTrue($container->hasDefinition('mailer.transports'));
         $this->assertSame($expectedTransports, $container->getDefinition('mailer.transports')->getArgument(0));
-        $this->assertTrue($container->hasDefinition('mailer.default_transport'));
-        $this->assertSame(current($expectedTransports), $container->getDefinition('mailer.default_transport')->getArgument(0));
+        $this->assertTrue($container->hasAlias('mailer.default_transport'));
         $this->assertTrue($container->hasDefinition('mailer.envelope_listener'));
         $l = $container->getDefinition('mailer.envelope_listener');
         $this->assertSame('sender@example.org', $l->getArgument(0));
@@ -2497,10 +2586,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
         self::assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
     }
 
-    public function testJsonEncoderEnabled()
+    public function testJsonStreamerEnabled()
     {
-        $container = $this->createContainerFromFile('json_encoder');
-        $this->assertTrue($container->has('json_encoder.encoder'));
+        $container = $this->createContainerFromFile('json_streamer');
+        $this->assertTrue($container->has('json_streamer.stream_writer'));
     }
 
     protected function createContainer(array $data = [])

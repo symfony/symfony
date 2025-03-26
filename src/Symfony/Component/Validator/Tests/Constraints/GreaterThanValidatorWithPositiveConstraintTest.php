@@ -58,6 +58,9 @@ class GreaterThanValidatorWithPositiveConstraintTest extends AbstractComparisonV
         ];
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintExceptionIfPropertyPath()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -66,6 +69,9 @@ class GreaterThanValidatorWithPositiveConstraintTest extends AbstractComparisonV
         return new Positive(['propertyPath' => 'field']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testThrowsConstraintExceptionIfValue()
     {
         $this->expectException(ConstraintDefinitionException::class);

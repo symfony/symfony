@@ -15,6 +15,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal since Symfony 7.3
  */
 final class AddressInfoCaster
 {

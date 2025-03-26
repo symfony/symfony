@@ -31,16 +31,16 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Collection(['fields' => [
-            'foo' => new Range(['min' => 4]),
-        ]]));
+        $this->validator->validate(null, new Collection(fields: [
+            'foo' => new Range(min: 4),
+        ]));
 
         $this->assertNoViolation();
     }
 
     public function testFieldsAsDefaultOption()
     {
-        $constraint = new Range(['min' => 4]);
+        $constraint = new Range(min: 4);
 
         $data = $this->prepareTestData(['foo' => 'foobar']);
 
@@ -56,14 +56,14 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
     public function testThrowsExceptionIfNotTraversable()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate('foobar', new Collection(['fields' => [
-            'foo' => new Range(['min' => 4]),
-        ]]));
+        $this->validator->validate('foobar', new Collection(fields: [
+            'foo' => new Range(min: 4),
+        ]));
     }
 
     public function testWalkSingleConstraint()
     {
-        $constraint = new Range(['min' => 4]);
+        $constraint = new Range(min: 4);
 
         $array = [
             'foo' => 3,
@@ -78,12 +78,12 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->validate($data, new Collection([
-            'fields' => [
+        $this->validator->validate($data, new Collection(
+            fields: [
                 'foo' => $constraint,
                 'bar' => $constraint,
             ],
-        ]));
+        ));
 
         $this->assertNoViolation();
     }
@@ -91,7 +91,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
     public function testWalkMultipleConstraints()
     {
         $constraints = [
-            new Range(['min' => 4]),
+            new Range(min: 4),
             new NotNull(),
         ];
 
@@ -108,19 +108,19 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->validate($data, new Collection([
-            'fields' => [
+        $this->validator->validate($data, new Collection(
+            fields: [
                 'foo' => $constraints,
                 'bar' => $constraints,
             ],
-        ]));
+        ));
 
         $this->assertNoViolation();
     }
 
     public function testExtraFieldsDisallowed()
     {
-        $constraint = new Range(['min' => 4]);
+        $constraint = new Range(min: 4);
 
         $data = $this->prepareTestData([
             'foo' => 5,
@@ -129,12 +129,12 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $this->expectValidateValueAt(0, '[foo]', $data['foo'], [$constraint]);
 
-        $this->validator->validate($data, new Collection([
-            'fields' => [
+        $this->validator->validate($data, new Collection(
+            fields: [
                 'foo' => $constraint,
             ],
-            'extraFieldsMessage' => 'myMessage',
-        ]));
+            extraFieldsMessage: 'myMessage',
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ field }}', '"baz"')
@@ -152,12 +152,12 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
             'baz' => 6,
         ]);
 
-        $this->validator->validate($data, new Collection([
-            'fields' => [
+        $this->validator->validate($data, new Collection(
+            fields: [
                 'foo' => $constraint,
             ],
-            'extraFieldsMessage' => 'myMessage',
-        ]));
+            extraFieldsMessage: 'myMessage',
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ field }}', '"baz"')
@@ -174,15 +174,15 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
             'foo' => null,
         ]);
 
-        $constraint = new Range(['min' => 4]);
+        $constraint = new Range(min: 4);
 
         $this->expectValidateValueAt(0, '[foo]', $data['foo'], [$constraint]);
 
-        $this->validator->validate($data, new Collection([
-            'fields' => [
+        $this->validator->validate($data, new Collection(
+            fields: [
                 'foo' => $constraint,
             ],
-        ]));
+        ));
 
         $this->assertNoViolation();
     }
@@ -194,16 +194,16 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
             'bar' => 6,
         ]);
 
-        $constraint = new Range(['min' => 4]);
+        $constraint = new Range(min: 4);
 
         $this->expectValidateValueAt(0, '[foo]', $data['foo'], [$constraint]);
 
-        $this->validator->validate($data, new Collection([
-            'fields' => [
+        $this->validator->validate($data, new Collection(
+            fields: [
                 'foo' => $constraint,
             ],
-            'allowExtraFields' => true,
-        ]));
+            allowExtraFields: true,
+        ));
 
         $this->assertNoViolation();
     }
@@ -212,14 +212,14 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
     {
         $data = $this->prepareTestData([]);
 
-        $constraint = new Range(['min' => 4]);
+        $constraint = new Range(min: 4);
 
-        $this->validator->validate($data, new Collection([
-            'fields' => [
+        $this->validator->validate($data, new Collection(
+            fields: [
                 'foo' => $constraint,
             ],
-            'missingFieldsMessage' => 'myMessage',
-        ]));
+            missingFieldsMessage: 'myMessage',
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ field }}', '"foo"')
@@ -233,14 +233,14 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
     {
         $data = $this->prepareTestData([]);
 
-        $constraint = new Range(['min' => 4]);
+        $constraint = new Range(min: 4);
 
-        $this->validator->validate($data, new Collection([
-            'fields' => [
+        $this->validator->validate($data, new Collection(
+            fields: [
                 'foo' => $constraint,
             ],
-            'allowMissingFields' => true,
-        ]));
+            allowMissingFields: true,
+        ));
 
         $this->assertNoViolation();
     }
@@ -275,7 +275,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
             'foo' => 5,
         ];
 
-        $constraint = new Range(['min' => 4]);
+        $constraint = new Range(min: 4);
 
         $this->expectValidateValueAt(0, '[foo]', $array['foo'], [$constraint]);
 
@@ -296,7 +296,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $constraints = [
             new NotNull(),
-            new Range(['min' => 4]),
+            new Range(min: 4),
         ];
 
         $this->expectValidateValueAt(0, '[foo]', $array['foo'], $constraints);
@@ -327,12 +327,12 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
     {
         $data = $this->prepareTestData([]);
 
-        $this->validator->validate($data, new Collection([
-            'fields' => [
+        $this->validator->validate($data, new Collection(
+            fields: [
                 'foo' => new Required(),
             ],
-            'missingFieldsMessage' => 'myMessage',
-        ]));
+            missingFieldsMessage: 'myMessage',
+        ));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ field }}', '"foo"')
@@ -348,7 +348,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
             'foo' => 5,
         ];
 
-        $constraint = new Range(['min' => 4]);
+        $constraint = new Range(min: 4);
 
         $this->expectValidateValueAt(0, '[foo]', $array['foo'], [$constraint]);
 
@@ -369,7 +369,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $constraints = [
             new NotNull(),
-            new Range(['min' => 4]),
+            new Range(min: 4),
         ];
 
         $this->expectValidateValueAt(0, '[foo]', $array['foo'], $constraints);
@@ -389,15 +389,15 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
             'foo' => 3,
         ]);
 
-        $constraint = new Range(['min' => 2]);
+        $constraint = new Range(min: 2);
 
         $this->expectValidateValueAt(0, '[foo]', $value['foo'], [$constraint]);
 
-        $this->validator->validate($value, new Collection([
-            'fields' => [
+        $this->validator->validate($value, new Collection(
+            fields: [
                 'foo' => $constraint,
             ],
-        ]));
+        ));
 
         $this->assertEquals([
             'foo' => 3,

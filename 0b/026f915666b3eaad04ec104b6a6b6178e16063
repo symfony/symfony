@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by kbond at 2025-01-03T15:46:20Z
+
+> We use the existing empty interface Twig\Extension\RuntimeExtensionInterface to identify services that are registered as Twig...
+
+This shouldn't be required?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-01-03T16:08:42Z
+
+I need to update the PR to register attributes on methods directly for autoconfiguration. The `RuntimeExtensionInterface` interface and the `#[AsTwigExtension]` attribute I added at one point, are not needed.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-03-06T09:39:06Z
+
+PR updated. I added tests for the autoconfiguration. The service is registered as Twig runtime only when there are non-static methods.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-03-24T21:38:25Z
+
+Twig counter-part has been merged now.

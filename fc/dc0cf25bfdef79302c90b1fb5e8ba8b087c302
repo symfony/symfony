@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by norkunas at 2025-03-14T11:08:26Z
+
+@stof can you review this?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-03-17T19:49:27Z
+
+> Instead of this, which adds cross-cutting concerns to the base class (= combinatory explosion), what about allowing Email objects to implement TranslatableInterface?
+
+So the trans method would act as a subject getter?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-17T20:09:01Z
+
+Hum, maybe not, I thing I had something else in mind ("static" instead of "string" as return type):
+```php
+interface TranslatableInterface
+{
+    public function trans(TranslatorInterface $translator, ?string $locale = null): static;
+}
+```
+
+:thinking:
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-03-17T20:11:39Z
+
+For me it doesn't matter if I'd need to call trans or translatableSubject, still it will need to be stored as it's done now, no?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-03-25T22:14:23Z
+
+What about having the existing subject accept a stringable object? Then, in the listener (or a translation specific one), check for an instance of TranslatableMessage and translate?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-03-26T04:39:34Z
+
+> What about having the existing subject accept a stringable object? Then, in the listener (or a translation specific one), check for an instance of TranslatableMessage and translate?
+
+If argument widening is not a BC break then sure
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-03-26T05:18:36Z
+
+> What about having the existing subject accept a stringable object?
+
+Done.

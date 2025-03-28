@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-11-08T12:28:25Z
+
+What is the use case for this ?
+
+---------------------------------------------------------------------------
+
+by sfmok at 2024-11-08T15:54:29Z
+
+> What is the use case for this ?
+
+@stof the constraint is intended to validate the Twig syntax of user-customized templates (e.g., emails, reports, widgets) to prevent syntax-related runtime errors.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-11-09T17:18:56Z
+
+The low-deps test failure appears to be caused by your changes.

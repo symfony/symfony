@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `Symfony\Component\Messenger\Handler\BatchAsyncHandlerTrait` designed for parallel execution using ParallelMessageBus
+
+
 7.2
 ---
 

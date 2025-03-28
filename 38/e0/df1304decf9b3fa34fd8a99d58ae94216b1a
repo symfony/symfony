@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by mvhirsch at 2025-01-30T14:00:11Z
+
+> Symfony would not be the only beneficiary: we can easily imagine that libraries like Behat (or PHPUnit, why not) could use this package to implement asserts on JSON.
+
+Not to forget `zenstruck/browser` which has [opt-in support for jmespath](https://github.com/zenstruck/browser?tab=readme-ov-file#json-assertions). Having native support for JSONPath might be awesome. WDYT @kbond?
+
+---------------------------------------------------------------------------
+
+by hantsy at 2025-01-31T10:57:25Z
+
+> As stated in RFC 9535, this component embeds a few read-to-use functions:
+
+Add the raw `jsonPath` function to evaluate the JsonPath expression directly.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-01-31T13:15:03Z
+
+> Not to forget zenstruck/browser which has opt-in support for jmespath. Having native support for JSONPath might be awesome. WDYT @kbond?
+
+Absolutely! That's the first thing I thought of.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2025-01-31T15:07:54Z
+
+Why "JsonCrawler" and not "JsonPath"?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-01-31T15:33:49Z
+
+> Why "JsonCrawler" and not "JsonPath"?
+
+Had the same thought earlier today, happy to see I'm not the only one! Let's see if anybody's against this naming. Otherwise, let's call it JsonPath, makes more sense to me as well.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-01T11:59:00Z
+
+@GromNaN I think that's a good question. Here's why I'm not 100% sure that would be a fit.
+
+> Why restrict this rich syntax to JSON documents when you can browse a tree of PHP objects in the same way
+
+Given the complexity of PropertyAccess (the logic to know if a property is writable/readable, get the value, read it, etc. is far from being trivial), I'm afraid it would bring a lot more complexity to JsonPath. The few times I fixed something in PropertyAccess was a whole challenge by itself just to understand all supported cases. JsonPath only deals with always-readable scalar values in arrays, which makes things _way_ more simple. **However**, what would be possible is to create something like a converter in a second time, to convert a JsonPath to a PropertyPath. PropertyAccess could then have an opt-in possibility to be used together with JsonPath.
+
+> It would give more power to the PropertyAccess component
+
+Definitely, but wouldn't it be too much power actually? PropertyAccess is, again, very complex and supports _a lot_ of cases. But let's put implementation complexity aside. In my opinion, it would be very confusing for developers to have, in the same component, two different syntaxes that look alike, but doesn't have the same possibilities at all. For newcomers, it could be really puzzling.
+
+Finally, if external packages (like testing frameworks and the ones I mentioned in the description) would like to support JsonPath, I'm not sure we should force to install the whole PropertyAccess component with it.
+
+But I still think that having an opt-in dependency to JsonPath in PropertyAccess, to convert from one syntax to another, is something that may be investigated!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-01T14:38:40Z
+
+Thank you @GromNaN and @stof for your review, I addressed all comments and renamed the component JsonPath.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-02-02T15:16:04Z
+
+Thanks for exploring the proposal for `PropertyAccess`. I agree that the usage case is very different, and that it would add a lot of complexity.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2025-02-03T11:23:45Z
+
+Open question: would it be possible in some way to reuse the parsing infrastructure provided by JsonEncoder, so we wouldn't have to decode the whole JSON document and store it in memory to access a path. This would provide a huge performance improvement.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-02-03T19:06:16Z
+
+I totally agree with @dunglas, and I even wonder if it should be a subset of the JsonEncoder component, as it will perfectly fit in that component scope and can leverage easily its lexer/splitter (which are internal at the moment). But maybe this implies a too big scope for the ones who just want to use JSON pointers
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-03T19:52:34Z
+
+> But maybe this implies a too big scope for the ones who just want to use JSON pointers
+
+Indeed, JsonEncoder is already complex and I fear that would be the first step to get back to the Serializer component, capable of everything and what made its reputation among maintainers 😅
+
+---
+
+As discussed with @mtarld, the Splitter could be great help. For the PR purpose, I removed the `@internal` annotation from it, maybe this should be done is a separate PR.
+
+Putting the annotation story aside, thank you for the idea @dunglas! Happy to say that I achieved the goal. I just introduced `JsonPathTokenReducer` (name to be discussed, not 100% happy of it) which takes advantage of JsonEncoder's `Splitter`. It finds the smallest deserializable part of the JSON string given the JSONPath. It then substrings the JSON and adapt the JSONPath accordingly. I think it works great, I wrote a bunch of tests for it. The rest of the test suite is untouched after the introduction of this class. Tell me what you think! 🙂
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-04T10:01:55Z
+
+Thank you Mathias, that was really relevant 👍 A few updates:
+- Renamed `JsonPathTokenReducer` to `JsonPathUtils`, inspired by some other classes like `BinaryUtil` from Uid
+- Supports both string and resources, with an opt-in dependency to JsonEncoder in case of a resource
+- Better path/JSON simplification logic using only iterators and no more arrays as suggested, to leverage the most of JsonEncoder's Splitter
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-10T08:21:35Z
+
+Just pushed a fix for the `search()` function that tries to match a regex against any substring of the value, see `JsonCrawlerTest::testSearchFunctionMatchSubstring()`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-03-03T07:10:44Z
+
+@alexandre-daubois You can rebase this one to use the new `JsonStreamer` component :)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-03-03T07:55:31Z
+
+Updated with JsonStreamer, thank you!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-03-19T11:01:16Z
+
+Rebased on 7.3.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-03-28T12:45:40Z
+
+It deserves further investigation about the scope indeed, but we could imagine a `JsonNavigator` component (or something like that) that combines both JSON path manipulation and hypermedia JSON+LD APIs navigation. At first glance, it seems reasonable to me to have both under one component as JsonPath actually "navigates" through JSON trees.

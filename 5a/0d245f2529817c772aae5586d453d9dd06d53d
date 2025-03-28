@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-03-26T16:38:57Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by aleho at 2025-03-26T16:43:29Z
+
+Thank you, @carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-26T16:52:23Z
+
+it would be great to add a test covering this case (we have tests for the rendering of forms)
+
+---------------------------------------------------------------------------
+
+by aleho at 2025-03-27T10:23:27Z
+
+@stof I added tests for both cases, with duplication on and off, to make sure my changes don't break anything.

@@ -126,6 +126,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
             $this->assertHttpKernelIsCalled();
             $this->assertResponseOk();
+
             $this->assertTraceContains('invalidate');
             $this->assertTraceContains('pass');
         }
@@ -634,6 +635,8 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertLessThan(2, strtotime($this->responses[0]->headers->get('Date')) - strtotime($this->response->headers->get('Date')));
         $this->assertGreaterThan(0, $this->response->headers->get('Age'));
         $this->assertNotNull($this->response->headers->get('X-Content-Digest'));
+        $this->assertNotNull($this->response->headers->get('Cache-Status'));
+        $this->assertTraceContains('hit');
         $this->assertTraceContains('fresh');
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());

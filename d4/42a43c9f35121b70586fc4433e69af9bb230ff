@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-28T17:44:59Z
+
+For 7.2?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-03-28T17:49:39Z
+
+> For 7.2?
+
+That's a minor cleanup, not a bug. So I think the [rule](https://symfony.com/doc/7.3/contributing/core_team.html#pull-request-merging-process) is to merge into 7.3.

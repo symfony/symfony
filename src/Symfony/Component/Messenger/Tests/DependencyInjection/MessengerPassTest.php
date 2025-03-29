@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Utils\ObjectAsMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
@@ -383,6 +384,16 @@ class MessengerPassTest extends TestCase
             DummyMessage::class,
             [$abstractHandlerId]
         );
+    }
+
+    public function testRegisterClassesWithExcludedAttributes()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register(ObjectAsMessage::class);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(true, $container->getDefinition(ObjectAsMessage::class)->hasTag('container.excluded')); //false I miss something
     }
 
     public function testThrowsExceptionIfTheHandlerClassDoesNotExist()

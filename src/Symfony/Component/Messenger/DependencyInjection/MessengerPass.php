@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\TraceableMessageBus;
@@ -50,6 +51,7 @@ class MessengerPass implements CompilerPassInterface
             $this->registerReceivers($container, $busIds);
         }
         $this->registerHandlers($container, $busIds);
+        $this->excludeMessagesFromServices($container);
     }
 
     private function registerHandlers(ContainerBuilder $container, array $busIds): void
@@ -387,5 +389,13 @@ class MessengerPass implements CompilerPassInterface
 
             return $definition->getClass();
         }
+    }
+
+    private function excludeMessagesFromServices(ContainerBuilder $container): void
+    {
+        $container->registerAttributeForAutoconfiguration(
+            AsMessage::class,
+            static fn (ChildDefinition $definition) => $definition->addTag('container.excluded')
+        );
     }
 }

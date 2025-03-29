@@ -11,6 +11,7 @@ CHANGELOG
    for auto-configuration of classes excluded from the service container
  * Accept multiple auto-configuration callbacks for the same attribute class
  * Leverage native lazy objects when possible for lazy services
+ * Class attributes `#[AsMessage]` and `#[Entity]` are now automatically excluded as services injection, like `#[Exclude]` does
 
 7.2
 ---

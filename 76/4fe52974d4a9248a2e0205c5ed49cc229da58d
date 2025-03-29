@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-09-08T11:20:38Z
+
+As far as I remember, we decided not to deprecate it, just mention the new bridge and exclude it from new releases.
+
+Is that true @fabpot ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-11T07:29:59Z
+
+> we decided not to deprecate it
+
+reading https://github.com/symfony/symfony/pull/52936, it looks like we decided to postpone the deprecation to another PR, so here we are, this PR looks legit to me
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2024-09-11T11:30:26Z
+
+Thanks for reviews ! I've applied suggested changes, and fix CS according to fabbot
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2024-10-06T04:45:07Z
+
+I think i'm up to date with requested changes, and rebased for pending conflicts
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2025-01-16T19:05:38Z
+
+> Tests are failing as we're still using some deprecated code somewhere without proper annotations. Can you have a look? Thank you.
+
+Thanks for reminding me this, I think it's better now :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-01-17T06:54:18Z
+
+It looks like tests are still failing.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-02-28T12:55:53Z
+
+@MrYamous up to finish this PR?
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2025-02-28T12:59:43Z
+
+> @MrYamous up to finish this PR?
+
+@OskarStark Yes i'm going to finish this PR
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2025-02-28T15:15:09Z
+
+I've made some changes and rebased, I'm not sure but fails seems unrelated

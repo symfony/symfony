@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by antonkomarev at 2025-03-29T09:46:55Z
+
+@nicolas-grekas is there caching of attribute usage? Then it will only affect cache warm up.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-29T10:14:31Z
+
+Yes, I'm thinking about optimizing the compile time indeed. At runtime, it doesn't matter.

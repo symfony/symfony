@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-09-25T10:38:02Z
+
+@stof thanks a lot for the through review!
+
+* I fixed most of the issues that you pointed
+* About adding BC support for previous values, it's not worth it. The worst-case scenario is that someone had the toolbar closed an, after updating Symfony, the toolbar will be displayed. This is fine. Just click again on the close button.
+* Also, about close/open not being the same as show/hide ... it's true. But these changes don't modify the current behavior. The close/open buttons have been merged into a single toggle button which is always visible.
+
+This is how it works on my local machine:
+
+![toolbar](https://github.com/user-attachments/assets/287554bf-3e15-4002-9cc5-ed9f42ce6a11)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-09-26T12:36:09Z
+
+@javiereguiluz it does change the existing behavior. In 7.1, we have 3 different state:
+
+- hidden toolbar, used while the Ajax request loading it is running
+- closed toolbar
+- opened toolbar
+
+Your PR shows a closed toolbar during loading (and if loading fails, this will be quite confusing)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-09-26T13:01:31Z
+
+In my second commit I changed the default so the toolbar is visible by default. Would that be enough?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-12-07T10:36:50Z
+
+I've rebased this to Symfony 7.3 during the #SymfonyHackday of SymfonyCon 2024.

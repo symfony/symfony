@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-05-19T16:59:23Z
+
+I rebased this branch. As I think this is a new feature and we are in RC phase I updated the changelog to 6.2.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-05-19T18:05:48Z
+
+While having stamps part of the `dispatch()` signature works (not fond of it personally), I tend to think `handle()` should rather be free of this concept.
+My reasoning is that `HandleTrait` is meant to ease implementing regular command/query buses, and doing so would kind of make it deviate from the command bus pattern which aims to be purely about handling domain use cases without leaking any technical detail.
+Considering this, and given one can already pass a stamped envelope to `handle()` (not fond of it either 😅), I would prefer not to merge this.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-05-20T10:35:46Z
+
+In our cases it is very important that we are allowed to input stamps. As they control our middlewares. We had very bad experience with "automated" middlewares like DoctrineFlush oder DoctrineTransactionMiddleware and creating for everything seperate message buses was a bad developer experience. So we decided to use stamps for this kind of things so developer had 100% control in the userinterface layer our messages are dispatched how the message is handled by the middlewares. And I don't see much which speak against it as it is still optional and if somebody don't want to use it they don't need it.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2024-12-13T13:37:20Z
+
+Is there any chance to rediscuss this? We are using Stamps not only for Doctrine Flush but also for `Lock Mechanic`:
+
+```php
+new YourMessage(), [new LockStamp('lock-key', 300.0, true)])
+```
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-01-06T12:52:31Z
+
+just rebased, fabbot unrelated: https://github.com/symfony/symfony/pull/42124#discussion_r1883970935
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-03-26T20:00:59Z
+
+Something I can do to push this over the line :)

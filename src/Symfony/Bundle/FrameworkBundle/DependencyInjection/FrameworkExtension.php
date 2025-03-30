@@ -107,6 +107,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
 use Symfony\Component\HttpKernel\Profiler\ProfilerStateChecker;
+use Symfony\Component\JsonPath\JsonPath;
 use Symfony\Component\JsonStreamer\Attribute\JsonStreamable;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\StreamReaderInterface;
@@ -474,6 +475,10 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerJsonStreamerConfiguration($config['json_streamer'], $container, $loader);
+        }
+
+        if ($this->readConfigEnabled('json_path', $container, $config['json_path'])) {
+            $this->registerJsonPathConfiguration($config['json_path'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('lock', $container, $config['lock'])) {
@@ -2132,6 +2137,15 @@ class FrameworkExtension extends Extension
         if (\PHP_VERSION_ID >= 80400) {
             $container->removeDefinition('.json_streamer.cache_warmer.lazy_ghost');
         }
+    }
+
+    private function registerJsonPathConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        if (class_exists(JsonPath::class)) {
+            throw new LogicException('JsonPath support cannot be enabled as the JsonPath component is not installed. Try running "composer require symfony/json-path".');
+        }
+
+        $loader->load('json_path.php');
     }
 
     private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

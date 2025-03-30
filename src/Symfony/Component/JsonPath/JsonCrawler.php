@@ -28,7 +28,7 @@ use Symfony\Component\JsonStreamer\Read\Splitter;
  *
  * @experimental
  */
-final class JsonCrawler implements JsonCrawlerInterface
+final class JsonCrawler implements CrawlerInterface, JsonCrawlerInterface
 {
     private const RFC9535_FUNCTIONS = [
         'length' => true,
@@ -39,14 +39,21 @@ final class JsonCrawler implements JsonCrawlerInterface
     ];
 
     /**
-     * @param resource|string $raw
+     * @param resource|string|array $data
      */
-    public function __construct(
-        private readonly mixed $raw,
-    ) {
-        if (!\is_string($raw) && !\is_resource($raw)) {
-            throw new InvalidArgumentException(\sprintf('Expected string or resource, got "%s".', get_debug_type($raw)));
+    public function __construct(private mixed $data = [])
+    {
+        if (!\is_string($data) && !\is_resource($data) && !\is_array($data)) {
+            throw new \TypeError(\sprintf('Argument #1 ($data) must be of type string, array or resource, %s given.', get_debug_type($data)));
         }
+    }
+
+    /**
+     * @param resource|string|array $data
+     */
+    public function fromJson(mixed $data): CrawlerInterface
+    {
+        return new self($data);
     }
 
     public function find(string|JsonPath $query): array
@@ -58,29 +65,33 @@ final class JsonCrawler implements JsonCrawlerInterface
     {
         try {
             $tokens = JsonPathTokenizer::tokenize($query);
-            $json = $this->raw;
+            $json = $this->data;
 
-            if (\is_resource($this->raw)) {
+            if (\is_resource($this->data)) {
                 if (!class_exists(Splitter::class)) {
                     throw new \LogicException('The JsonStreamer package is required to evaluate a path against a resource. Try running "composer require symfony/json-streamer".');
                 }
 
                 $simplified = JsonPathUtils::findSmallestDeserializableStringAndPath(
                     $tokens,
-                    $this->raw,
+                    $this->data,
                 );
 
                 $tokens = $simplified['tokens'];
                 $json = $simplified['json'];
             }
 
-            try {
-                $data = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
-                throw new InvalidJsonStringInputException($e->getMessage(), $e);
-            }
+            if (\is_array($json)) {
+                $current = [$json];
+            } else {
+                try {
+                    $data = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new InvalidJsonStringInputException($e->getMessage(), $e);
+                }
 
-            $current = [$data];
+                $current = [$data];
+            }
 
             foreach ($tokens as $token) {
                 $next = [];

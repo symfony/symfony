@@ -20,10 +20,10 @@ use Symfony\Component\JsonPath\JsonPath;
 
 class JsonCrawlerTest extends TestCase
 {
-    public function testNotStringOrResourceThrows()
+    public function testWrongDataType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected string or resource, got "int".');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument #1 ($data) must be of type string, array or resource, int given.');
 
         new JsonCrawler(42);
     }
@@ -33,7 +33,24 @@ class JsonCrawlerTest extends TestCase
         $this->expectException(InvalidJsonStringInputException::class);
         $this->expectExceptionMessage('Invalid JSON input: Syntax error.');
 
-        (new JsonCrawler('invalid'))->find('$..*');
+        (new JsonCrawler('invalid'))
+            ->find('$..*');
+    }
+
+    public function testFromJson()
+    {
+        $crawler = (new JsonCrawler())->fromJson('{"a": 1, "b": 2}');
+
+        $result = $crawler->find('$.*');
+        $this->assertSame([1, 2], $result);
+    }
+
+    public function testNoDataInConstructorMakesCrawlerNoop()
+    {
+        $crawler = new JsonCrawler();
+
+        $result = $crawler->find('$..*');
+        $this->assertSame([], $result);
     }
 
     public function testAllAuthors()
@@ -49,6 +66,33 @@ class JsonCrawlerTest extends TestCase
         ], $result);
     }
 
+    public function testArrayAsInput()
+    {
+        $crawler = new JsonCrawler([
+            'a' => true,
+            'b' => false,
+            'c' => null,
+            'd' => ['e' => 1],
+        ]);
+
+        $result = $crawler->find('$.*');
+        $this->assertSame([true, false, null, ['e' => 1]], $result);
+    }
+
+    public function testArrayInputWithFilter()
+    {
+        $crawler = new JsonCrawler([
+            'a' => true,
+            'b' => false,
+            'c' => null,
+            'd' => ['e' => 1],
+        ]);
+
+        $result = $crawler->find('$[?(@.e == 1)]');
+        $this->assertCount(1, $result);
+        $this->assertSame([['e' => 1]], $result);
+    }
+
     public function testAllThingsInStore()
     {
         $result = self::getBookstoreCrawler()->find('$.store.*');
@@ -61,8 +105,8 @@ class JsonCrawlerTest extends TestCase
     public function testEscapedDoubleQuotesInFieldName()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": {"b\\"c": 42}}
-JSON);
+            {"a": {"b\\"c": 42}}
+        JSON);
 
         $result = $crawler->find("$['a']['b\\\"c']");
 
@@ -142,8 +186,8 @@ JSON);
     public function testSliceWithStep()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
+        JSON);
 
         $result = $crawler->find('$.a[1:5:2]');
         $this->assertSame([5, 2], $result);
@@ -152,8 +196,8 @@ JSON);
     public function testNegativeSlice()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
+        JSON);
 
         $result = $crawler->find('$.a[-3:]');
 
@@ -242,8 +286,8 @@ JSON);
     public function testBoundaryConditions()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6]}
+        JSON);
 
         $result = $crawler->find('$.a[0:6]');
         $this->assertSame([3, 5, 1, 2, 4, 6], $result);
@@ -258,8 +302,8 @@ JSON);
     public function testFilterByValue()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
+        JSON);
 
         $result = $crawler->find("$.a[?(@.b == 'kilo')]");
 
@@ -407,50 +451,50 @@ JSON);
     private static function getBookstoreCrawler(): JsonCrawler
     {
         return new JsonCrawler(<<<JSON
-{
-    "store": {
-        "book": [
             {
-                "category": "reference",
-                "author": "Nigel Rees",
-                "title": "Sayings of the Century",
-                "price": 8.95
-            },
-            {
-                "category": "fiction",
-                "author": "Evelyn Waugh",
-                "title": "Sword of Honour",
-                "price": 12.99
-            },
-            {
-                "category": "fiction",
-                "author": "Herman Melville",
-                "title": "Moby Dick",
-                "isbn": "0-553-21311-3",
-                "price": 8.99,
-                "extra": [42]
-            },
-            {
-                "category": "fiction",
-                "author": "J. R. R. Tolkien",
-                "title": "The Lord of the Rings",
-                "isbn": "0-395-19395-8",
-                "price": 22.99
+                "store": {
+                    "book": [
+                        {
+                            "category": "reference",
+                            "author": "Nigel Rees",
+                            "title": "Sayings of the Century",
+                            "price": 8.95
+                        },
+                        {
+                            "category": "fiction",
+                            "author": "Evelyn Waugh",
+                            "title": "Sword of Honour",
+                            "price": 12.99
+                        },
+                        {
+                            "category": "fiction",
+                            "author": "Herman Melville",
+                            "title": "Moby Dick",
+                            "isbn": "0-553-21311-3",
+                            "price": 8.99,
+                            "extra": [42]
+                        },
+                        {
+                            "category": "fiction",
+                            "author": "J. R. R. Tolkien",
+                            "title": "The Lord of the Rings",
+                            "isbn": "0-395-19395-8",
+                            "price": 22.99
+                        }
+                    ],
+                    "bicycle": {
+                        "color": "red",
+                        "price": 399
+                    }
+                }
             }
-        ],
-        "bicycle": {
-            "color": "red",
-            "price": 399
-        }
-    }
-}
-JSON);
+        JSON);
     }
 
     private static function getSimpleCollectionCrawler(): JsonCrawler
     {
         return new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6]}
+        JSON);
     }
 }

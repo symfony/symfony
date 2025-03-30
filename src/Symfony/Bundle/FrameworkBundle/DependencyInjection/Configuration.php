@@ -31,6 +31,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\JsonPath\JsonPath;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
@@ -186,6 +187,7 @@ class Configuration implements ConfigurationInterface
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode, $enableIfStandalone);
         $this->addJsonStreamerSection($rootNode, $enableIfStandalone);
+        $this->addJsonPathSection($rootNode, $enableIfStandalone);
 
         return $treeBuilder;
     }
@@ -2759,6 +2761,18 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('json_streamer')
                     ->info('JSON streamer configuration')
                     ->{$enableIfStandalone('symfony/json-streamer', StreamWriterInterface::class)}()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addJsonPathSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('json_path')
+                    ->info('JsonPath configuration')
+                    ->{$enableIfStandalone('symfony/json-path', JsonPath::class)}()
                 ->end()
             ->end()
         ;

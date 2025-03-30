@@ -22,6 +22,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\JsonPath\JsonPath;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
@@ -1014,6 +1015,9 @@ class ConfigurationTest extends TestCase
             'json_streamer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(JsonStreamWriter::class),
             ],
+            'json_path' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(JsonPath::class),
+            ]
         ];
     }
 

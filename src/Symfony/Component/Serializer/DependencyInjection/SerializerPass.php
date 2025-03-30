@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -204,30 +205,37 @@ class SerializerPass implements CompilerPassInterface
     private function buildChildDefinitions(ContainerBuilder $container, string $serializerName, array $services, array $config): array
     {
         foreach ($services as &$id) {
-            $childId = $id.'.'.$serializerName;
-
-            $definition = $container->registerChild($childId, (string) $id)
-                ->setClass($container->getDefinition((string) $id)->getClass())
-            ;
-
-            if (null !== $nameConverterIndex = $this->findNameConverterIndex($container, (string) $id)) {
-                $definition->replaceArgument($nameConverterIndex, new Reference($config['name_converter']));
-            }
-
-            $id = new Reference($childId);
+            $id = $this->buildChildDefinition($container, $serializerName, (string) $id, $config);
         }
 
         return $services;
     }
 
-    private function findNameConverterIndex(ContainerBuilder $container, string $id): int|string|null
+    private function buildChildDefinition(ContainerBuilder $container, string $serializerName, string $id, array $config): Reference
     {
-        foreach ($container->getDefinition($id)->getArguments() as $index => $argument) {
-            if ($argument instanceof Reference && self::NAME_CONVERTER_METADATA_AWARE_ID === (string) $argument) {
-                return $index;
+        $childId = $id.'.'.$serializerName;
+
+        $definition = $container->getDefinition($id);
+        $childDefinition = $container->registerChild($childId, $id)
+            ->setClass($definition->getClass())
+        ;
+
+        foreach ($definition->getArguments() as $index => $argument) {
+            if (!$argument instanceof Reference) {
+                continue;
+            }
+
+            if (self::NAME_CONVERTER_METADATA_AWARE_ID === (string) $argument) {
+                $childDefinition->replaceArgument($index, new Reference($config['name_converter']));
+            } elseif (
+                $container->hasDefinition($argument)
+                && is_a(($argDefinition = $container->getDefinition($argument))->getClass(), NormalizerInterface::class, true)
+                && !$argDefinition->hasTag('serializer.normalizer')
+            ) {
+                $childDefinition->replaceArgument($index, $this->buildChildDefinition($container, $serializerName, (string) $argument, $config));
             }
         }
 
-        return null;
+        return new Reference($childId);
     }
 }

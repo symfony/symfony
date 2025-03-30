@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Debug\TraceableNormalizer;
 use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -113,8 +114,7 @@ class SerializerPassTest extends TestCase
         $container->setParameter('kernel.debug', false);
         $container->register('serializer')->setArguments([null, null, []]);
         $container->getParameterBag()->add($parameters);
-        $definition = $container->register('serializer.normalizer.object')
-            ->setClass(ObjectNormalizer::class)
+        $definition = $container->register('serializer.normalizer.object', ObjectNormalizer::class)
             ->addTag('serializer.normalizer')
             ->addTag('serializer.encoder')
         ;
@@ -620,8 +620,7 @@ class SerializerPassTest extends TestCase
 
         $container->register('serializer')->setArguments([null, null, []]);
         $container->getParameterBag()->add($parameters);
-        $container->register('serializer.normalizer.object')
-            ->setClass(ObjectNormalizer::class)
+        $container->register('serializer.normalizer.object', ObjectNormalizer::class)
             ->addTag('serializer.normalizer', ['serializer' => '*'])
             ->addTag('serializer.encoder', ['serializer' => '*'])
         ;
@@ -701,5 +700,35 @@ class SerializerPassTest extends TestCase
         $this->assertEquals(new Reference('e.api'), $traceableEncoderDefinition->getArgument(0));
         $this->assertEquals(new Reference('serializer.data_collector'), $traceableEncoderDefinition->getArgument(1));
         $this->assertSame('api', $traceableEncoderDefinition->getArgument(2));
+    }
+
+    public function testPropertyNormalizerChildDefinitionIsRegisteredWhenUsingNamedSerializer()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('.serializer.named_serializers', [
+            'api' => ['name_converter' => 'my.name_converter'],
+        ]);
+
+        $container->register('serializer')->setArguments([null, null]);
+        $container->register('serializer.normalizer.property', PropertyNormalizer::class)
+            ->setArguments([null, new Reference('serializer.name_converter.metadata_aware')])
+        ;
+        $container->register('n1')
+            ->addArgument(new Reference('serializer.normalizer.property'))
+            ->addTag('serializer.normalizer', ['serializer' => '*'])
+            ->addTag('serializer.encoder', ['serializer' => '*'])
+        ;
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $this->assertEquals(new Reference('serializer.normalizer.property'), $container->getDefinition('n1')->getArgument(0));
+        $this->assertEquals(new Reference('serializer.normalizer.property.api'), $container->getDefinition('n1.api')->getArgument(0));
+
+        $nameConverter = (string) $container->getDefinition('serializer.normalizer.property.api')->getArgument(1);
+        $this->assertStringStartsWith('serializer.name_converter.metadata_aware.', $nameConverter);
+        $this->assertEquals(new Reference('my.name_converter'), $container->getDefinition($nameConverter)->getArgument(0));
     }
 }

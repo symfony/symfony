@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+  * Add `ExternalTemplatedEmail`
+
+
 7.0
 ---
 

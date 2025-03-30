@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Auto-configure the `form.data_class` resource tag for classes with the `#[AsFormType]` attribute
  * Add the `framework.webhook.no_private_network` and `framework.webhook.http_client` options
  * Add the `claim_check` option to Messenger transports
  * Add the `framework.asset_mapper.importmap_entries` option to limit the rendered import map to the entries reachable from the rendered entrypoints

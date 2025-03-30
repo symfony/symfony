@@ -17,8 +17,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\Attribute\AsFormType;
+use Symfony\Component\Form\Attribute\FormField;
+use Symfony\Component\Form\DataClassType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Util\StringUtil;
 
 /**
  * Adds all services with the tags "form.type", "form.type_extension" and
@@ -61,10 +67,22 @@ class FormPass implements CompilerPassInterface
             }
         }
 
+        $dataClasses = [];
+        // abstract data classes get a type too, they can be the parent type of concrete ones
+        foreach (array_keys($container->findTaggedResourceIds('form.data_class', false)) as $id) {
+            $class = $container->getDefinition($id)->getClass();
+            $container->setDefinition($typeId = '.form.data_class_type.'.$class, $this->createDataClassTypeDefinition($container, $class));
+
+            $servicesMap[$class] = new Reference($typeId);
+            $dataClasses[] = $class;
+            $namespaces[substr($class, 0, strrpos($class, '\\') ?: \strlen($class))] = true;
+        }
+
         if ($container->hasDefinition('console.command.form_debug')) {
             $commandDefinition = $container->getDefinition('console.command.form_debug');
             $commandDefinition->setArgument(1, array_keys($namespaces));
             $commandDefinition->setArgument(2, array_keys($servicesMap));
+            $commandDefinition->setArgument('$dataClassTypes', $dataClasses);
         }
 
         if ($csrfTokenIds && $container->hasDefinition('form.type_extension.csrf')) {
@@ -137,5 +155,77 @@ class FormPass implements CompilerPassInterface
         }
 
         return new IteratorArgument($guessers);
+    }
+
+    private function createDataClassTypeDefinition(ContainerBuilder $container, string $class): Definition
+    {
+        $reflector = $container->getReflectionClass($class);
+
+        if (!$attributes = $reflector->getAttributes(AsFormType::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+            throw new InvalidArgumentException(\sprintf('The class "%s" is tagged "form.data_class" but has no #[AsFormType] attribute.', $class));
+        }
+        $asFormData = $attributes[0]->newInstance();
+        $options = $asFormData->options;
+
+        if (\array_key_exists('data_class', $options)) {
+            throw new InvalidArgumentException(\sprintf('The "data_class" option cannot be set on the #[AsFormType] attribute of class "%s", the class itself is the data class.', $class));
+        }
+        $this->validateOptionValues($options, \sprintf('the #[AsFormType] attribute of class "%s"', $class));
+
+        $fields = [];
+        foreach ($reflector->getProperties() as $property) {
+            if ($property->getDeclaringClass()->name !== $reflector->name || !$fieldAttributes = $property->getAttributes(FormField::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+                continue;
+            }
+            $field = $fieldAttributes[0]->newInstance();
+            $context = \sprintf('the #[FormField] attribute of property "%s::$%s"', $class, $property->name);
+
+            if (null !== $field->type && !class_exists($field->type)) {
+                throw new InvalidArgumentException(\sprintf('The form type "%s" declared on %s does not exist.', $field->type, $context));
+            }
+
+            $name = $property->name;
+            $fieldOptions = $field->options;
+            if (null !== $field->name) {
+                if (isset($fieldOptions['property_path'])) {
+                    throw new InvalidArgumentException(\sprintf('The "name" argument of %s cannot be combined with the "property_path" option.', $context));
+                }
+                $fieldOptions['property_path'] = $name;
+                $name = $field->name;
+            }
+            if (isset($fields[$name])) {
+                throw new InvalidArgumentException(\sprintf('Duplicate field "%s" declared on %s.', $name, $context));
+            }
+            $this->validateOptionValues($fieldOptions, $context);
+
+            $fields[$name] = [$field->type, $fieldOptions];
+        }
+
+        $parent = FormType::class;
+        $parentReflector = $reflector;
+        while ($parentReflector = $parentReflector->getParentClass()) {
+            if ($parentReflector->getAttributes(AsFormType::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+                $parent = $parentReflector->name;
+                break;
+            }
+        }
+
+        // escape option values so that "%" is kept verbatim when the definition is resolved
+        $parameterBag = $container->getParameterBag();
+
+        return new Definition(DataClassType::class, [$class, $parent, StringUtil::fqcnToBlockPrefix($class) ?: '', $parameterBag->escapeValue($fields), $parameterBag->escapeValue($options)]);
+    }
+
+    private function validateOptionValues(array $options, string $context, string $path = ''): void
+    {
+        foreach ($options as $name => $value) {
+            $name = $path ? $path.'['.$name.']' : $name;
+
+            if (\is_array($value)) {
+                $this->validateOptionValues($value, $context, $name);
+            } elseif (!\is_scalar($value) && null !== $value && !$value instanceof \UnitEnum && !$value instanceof Reference) {
+                throw new InvalidArgumentException(\sprintf('The "%s" option declared on %s contains a value of type "%s"; only scalar, array, enum and service reference values can be compiled. Use a form type class or a type extension for dynamic options.', $name, $context, get_debug_type($value)));
+            }
+        }
     }
 }

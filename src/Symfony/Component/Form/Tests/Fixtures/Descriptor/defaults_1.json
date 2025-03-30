@@ -5,6 +5,7 @@
     "service_form_types": [
         "Symfony\\Bridge\\Doctrine\\Form\\Type\\EntityType"
     ],
+    "data_class_form_types": [],
     "type_extensions": [
         "Symfony\\Component\\Form\\Extension\\Csrf\\Type\\FormTypeCsrfExtension"
     ],

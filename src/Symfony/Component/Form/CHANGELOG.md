@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `#[AsFormType]` and `#[FormField]` attributes to derive a form type from the properties of a data class
  * Add support for grouping and nested steps in `FormFlowType`
  * Deprecate the `regions` option of `TimezoneType`, it has had no effect since 5.0
  * Add `PolymorphicCollectionType` for collections whose entries do not all share the same type

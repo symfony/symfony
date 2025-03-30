@@ -19,11 +19,16 @@ use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Command\DebugCommand;
+use Symfony\Component\Form\DataClassType;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\UserData;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -60,6 +65,56 @@ class DebugCommandTest extends TestCase
             TXT,
             $tester->getDisplay(true)
         );
+    }
+
+    public function testDebugDataClassTypesListing()
+    {
+        $tester = $this->createCommandTester(dataClassTypes: [UserData::class]);
+        $ret = $tester->execute([], ['decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('Data class form types', $tester->getDisplay());
+        $this->assertStringContainsString(UserData::class, $tester->getDisplay());
+    }
+
+    public function testDebugDataClassTypeByFqcn()
+    {
+        $type = new DataClassType(UserData::class, FormType::class, 'user_data', [], []);
+        $extension = new class($type) implements FormExtensionInterface {
+            public function __construct(private DataClassType $type)
+            {
+            }
+
+            public function getType(string $name): FormTypeInterface
+            {
+                return $this->type;
+            }
+
+            public function hasType(string $name): bool
+            {
+                return $name === $this->type->getDataClass();
+            }
+
+            public function getTypeExtensions(string $name): array
+            {
+                return [];
+            }
+
+            public function hasTypeExtensions(string $name): bool
+            {
+                return false;
+            }
+
+            public function getTypeGuesser(): ?FormTypeGuesserInterface
+            {
+                return null;
+            }
+        };
+        $tester = $this->createCommandTester(extensions: [$extension], dataClassTypes: [UserData::class]);
+        $ret = $tester->execute(['class' => UserData::class], ['decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('data_class', $tester->getDisplay());
     }
 
     public function testDebugSingleFormType()
@@ -279,10 +334,10 @@ class DebugCommandTest extends TestCase
         return $coreTypes;
     }
 
-    private function createCommandTester(array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [])
+    private function createCommandTester(array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [], array $extensions = [], array $dataClassTypes = [])
     {
-        $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());
-        $command = new DebugCommand($formRegistry, $namespaces, $types);
+        $formRegistry = new FormRegistry($extensions, new ResolvedFormTypeFactory());
+        $command = new DebugCommand($formRegistry, $namespaces, $types, [], [], null, $dataClassTypes);
         $application = new Application();
         $application->addCommand($command);
 

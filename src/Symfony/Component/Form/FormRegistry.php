@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Attribute\AsFormType;
 use Symfony\Component\Form\Exception\ExceptionInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\LogicException;
@@ -72,6 +73,10 @@ class FormRegistry implements FormRegistryInterface
                     throw new InvalidArgumentException(\sprintf('Could not load type "%s": class does not exist.', $name));
                 }
                 if (!is_subclass_of($name, FormTypeInterface::class)) {
+                    if ((new \ReflectionClass($name))->getAttributes(AsFormType::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+                        throw new InvalidArgumentException(\sprintf('Could not load type "%s": the class uses the #[AsFormType] attribute but is not registered as a form type. Make sure the class is discovered by the service container.', $name));
+                    }
+
                     throw new InvalidArgumentException(\sprintf('Could not load type "%s": class does not implement "Symfony\Component\Form\FormTypeInterface".', $name));
                 }
 
@@ -90,7 +95,7 @@ class FormRegistry implements FormRegistryInterface
     private function resolveType(FormTypeInterface $type): ResolvedFormTypeInterface
     {
         $parentType = $type->getParent();
-        $fqcn = $type::class;
+        $fqcn = $type instanceof DataClassType ? $type->getDataClass() : $type::class;
 
         if (isset($this->checkedTypes[$fqcn])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$fqcn]));

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\DataClassType;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -413,6 +414,22 @@ class FormDataExtractorTest extends TestCase
                 'name' => 'bar',
             ],
         ], $this->dataExtractor->extractViewVariables($view));
+    }
+
+    public function testTypeClassOfDataClassType()
+    {
+        $form = $this->createBuilder('name')
+            ->setType(new ResolvedFormType(new DataClassType('App\\SomeData', 'App\\ParentType', 'some_data', [], [])))
+            ->getForm();
+
+        $this->assertSame([
+            'id' => 'name',
+            'name' => 'name',
+            'type_class' => 'App\\SomeData',
+            'synchronized' => true,
+            'passed_options' => [],
+            'resolved_options' => [],
+        ], $this->dataExtractor->extractConfiguration($form));
     }
 
     private function createBuilder(string $name, array $options = []): FormBuilder

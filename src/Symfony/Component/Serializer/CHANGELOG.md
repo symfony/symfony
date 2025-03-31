@@ -8,6 +8,7 @@ CHANGELOG
  * Register `NormalizerInterface` and `DenormalizerInterface` aliases for named serializers
  * Add `NumberNormalizer` to normalize `BcMath\Number` and `GMP` as `string`
  * Add `defaultType` to `DiscriminatorMap`
+ * Support setting `$objectClassResolver` via `SerializerPass`
 
 7.2
 ---

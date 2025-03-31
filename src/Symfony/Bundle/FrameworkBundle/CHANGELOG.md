@@ -21,6 +21,7 @@ CHANGELOG
  * Allow configuring the logging channel per type of exceptions
  * Enable service argument resolution on classes that use the `#[Route]` attribute,
    the `#[AsController]` attribute is no longer required
+ * Add `framework.serializer.object_class_resolver` option
 
 7.2
 ---

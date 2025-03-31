@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -73,6 +74,10 @@ class SerializerPass implements CompilerPassInterface
             ? $container->getParameter('.serializer.max_depth_handler') : null;
 
         $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $defaultContext, $circularReferenceHandler, $maxDepthHandler);
+
+        if ($container->hasParameter('.serializer.object_class_resolver')) {
+            $this->setObjectClassResolver($container, $normalizers, $container->getParameter('.serializer.object_class_resolver'));
+        }
 
         $this->configureSerializer($container, 'serializer', $normalizers, $encoders, 'default');
 
@@ -130,6 +135,23 @@ class SerializerPass implements CompilerPassInterface
         }
     }
 
+    private function setObjectClassResolver(ContainerBuilder $container, array $services, string|callable $objectClassResolver): void
+    {
+        foreach ($services as $id) {
+            $definition = $container->getDefinition((string) $id);
+
+            if (!is_a($definition->getClass(), AbstractObjectNormalizer::class, true)) {
+                continue;
+            }
+
+            if (!\is_callable($objectClassResolver)) {
+                $objectClassResolver = new Reference($objectClassResolver);
+            }
+
+            $definition->setArgument('$objectClassResolver', $objectClassResolver);
+        }
+    }
+
     private function configureSerializer(ContainerBuilder $container, string $id, array $normalizers, array $encoders, string $serializerName): void
     {
         if ($container->getParameter('kernel.debug') && $container->hasDefinition('serializer.data_collector')) {
@@ -174,6 +196,10 @@ class SerializerPass implements CompilerPassInterface
             $encoders = $this->buildChildDefinitions($container, $serializerName, $encoders, $config);
 
             $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $config['default_context'], $circularReferenceHandler, $maxDepthHandler);
+
+            if ($config['object_class_resolver'] ?? false) {
+                $this->setObjectClassResolver($container, $normalizers, $config['object_class_resolver']);
+            }
 
             $container->registerChild($serializerId, 'serializer')->setArgument('$defaultContext', $config['default_context']);
             $container->registerAliasForArgument($serializerId, SerializerInterface::class, $serializerName.'.serializer');

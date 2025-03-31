@@ -2070,6 +2070,10 @@ class FrameworkExtension extends Extension
             $container->setParameter('serializer.default_context', $defaultContext);
         }
 
+        if ($config['object_class_resolver'] ?? false) {
+            $container->setParameter('.serializer.object_class_resolver', $config['object_class_resolver']);
+        }
+
         if ($config['circular_reference_handler'] ?? false) {
             $container->setParameter('.serializer.circular_reference_handler', $config['circular_reference_handler']);
         }

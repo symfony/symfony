@@ -1172,6 +1172,13 @@ class Configuration implements ConfigurationInterface
                 ->defaultValue([])
                 ->prototype('variable')->end()
         ;
+        $objectClassResolver = fn () => (new NodeBuilder())
+            ->variableNode('object_class_resolver')
+                ->validate()
+                    ->ifTrue(fn ($v) => !\is_string($v) && !\is_callable($v))
+                    ->thenInvalid('The "object_class_resolver" parameter must be a string or a callable.')
+                ->end()
+        ;
 
         $rootNode
             ->children()
@@ -1182,6 +1189,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('enable_attributes')->{class_exists(FullStack::class) ? 'defaultFalse' : 'defaultTrue'}()->end()
                         ->scalarNode('name_converter')->end()
+                        ->append($objectClassResolver())
                         ->scalarNode('circular_reference_handler')->end()
                         ->scalarNode('max_depth_handler')->end()
                         ->arrayNode('mapping')
@@ -1199,6 +1207,7 @@ class Configuration implements ConfigurationInterface
                             ->arrayPrototype()
                                 ->children()
                                     ->scalarNode('name_converter')->end()
+                                    ->append($objectClassResolver())
                                     ->append($defaultContextNode())
                                     ->booleanNode('include_built_in_normalizers')
                                         ->info('Whether to include the built-in normalizers')

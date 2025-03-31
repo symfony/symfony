@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
 use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -115,8 +116,7 @@ class SerializerPassTest extends TestCase
         $container->setParameter('kernel.debug', false);
         $container->register('serializer')->setArguments([null, null, []]);
         $container->getParameterBag()->add($parameters);
-        $definition = $container->register('serializer.normalizer.object')
-            ->setClass(ObjectNormalizer::class)
+        $definition = $container->register('serializer.normalizer.object', ObjectNormalizer::class)
             ->addTag('serializer.normalizer')
             ->addTag('serializer.encoder')
         ;
@@ -126,6 +126,40 @@ class SerializerPassTest extends TestCase
 
         $bindings = $definition->getBindings();
         $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
+    }
+
+    /**
+     * @dataProvider provideSetObjectClassResolverData
+     */
+    public function testSetObjectClassResolver(array $parameters, array $expectedArguments)
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->register('serializer')->setArguments([null, null]);
+        $container->getParameterBag()->add($parameters);
+        $definition = $container->register('n1', AbstractObjectNormalizer::class)->addTag('serializer.normalizer')->addTag('serializer.encoder');
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $this->assertEquals($expectedArguments, $definition->getArguments());
+    }
+
+    public static function provideSetObjectClassResolverData(): iterable
+    {
+        yield [[], []];
+        yield [
+            ['.serializer.object_class_resolver' => 'strlen'],
+            ['$objectClassResolver' => 'strlen'],
+        ];
+        yield [
+            ['.serializer.object_class_resolver' => [self::class, 'provideSetObjectClassResolverData']],
+            ['$objectClassResolver' => [self::class, 'provideSetObjectClassResolverData']],
+        ];
+        yield [
+            ['.serializer.object_class_resolver' => 'my.service'],
+            ['$objectClassResolver' => new Reference('my.service')],
+        ];
     }
 
     public function testNormalizersAndEncodersAreDecoratedAndOrderedWhenCollectingData()
@@ -622,8 +656,7 @@ class SerializerPassTest extends TestCase
 
         $container->register('serializer')->setArguments([null, null, []]);
         $container->getParameterBag()->add($parameters);
-        $container->register('serializer.normalizer.object')
-            ->setClass(ObjectNormalizer::class)
+        $container->register('serializer.normalizer.object', ObjectNormalizer::class)
             ->addTag('serializer.normalizer', ['serializer' => '*'])
             ->addTag('serializer.encoder', ['serializer' => '*'])
         ;
@@ -634,6 +667,30 @@ class SerializerPassTest extends TestCase
         $bindings = $container->getDefinition('serializer.normalizer.object.api')->getBindings();
         $this->assertArrayHasKey('array $defaultContext', $bindings);
         $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
+    }
+
+    /**
+     * @dataProvider provideSetObjectClassResolverData
+     */
+    public function testSetObjectClassResolverToNamedSerializers(array $parameters, array $expectedArguments)
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('.serializer.named_serializers', [
+            'api' => ['object_class_resolver' => $parameters['.serializer.object_class_resolver'] ?? null],
+        ]);
+
+        $container->register('serializer')->setArguments([null, null]);
+        $container->register('n1', AbstractObjectNormalizer::class)
+            ->addTag('serializer.normalizer', ['serializer' => '*'])
+            ->addTag('serializer.encoder', ['serializer' => '*'])
+        ;
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $definition = $container->getDefinition('n1.api');
+        $this->assertEquals($expectedArguments, $definition->getArguments());
     }
 
     public function testNamedSerializersAreRegistered()

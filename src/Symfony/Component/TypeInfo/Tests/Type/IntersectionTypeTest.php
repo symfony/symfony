@@ -57,12 +57,6 @@ class IntersectionTypeTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testSortTypesOnCreation()
-    {
-        $type = new IntersectionType(Type::object(\DateTime::class), Type::object(\Iterator::class), Type::object(\Stringable::class));
-        $this->assertEquals([Type::object(\DateTime::class), Type::object(\Iterator::class), Type::object(\Stringable::class)], $type->getTypes());
-    }
-
     public function testComposedTypesAreSatisfiedBy()
     {
         $type = new IntersectionType(Type::object(\Iterator::class), Type::object(\Stringable::class));

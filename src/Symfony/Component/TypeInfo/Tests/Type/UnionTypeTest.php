@@ -62,12 +62,6 @@ class UnionTypeTest extends TestCase
         new UnionType(Type::object(), Type::object(\DateTime::class));
     }
 
-    public function testSortTypesOnCreation()
-    {
-        $type = new UnionType(Type::int(), Type::string(), Type::bool());
-        $this->assertEquals([Type::bool(), Type::int(), Type::string()], $type->getTypes());
-    }
-
     public function testComposedTypesAreSatisfiedBy()
     {
         $type = new UnionType(Type::object(\Iterator::class), Type::int());
@@ -80,9 +74,9 @@ class UnionTypeTest extends TestCase
     public function testToString()
     {
         $type = new UnionType(Type::int(), Type::string(), Type::float());
-        $this->assertSame('float|int|string', (string) $type);
+        $this->assertSame('int|string|float', (string) $type);
 
         $type = new UnionType(Type::int(), Type::string(), Type::intersection(Type::object(\DateTime::class), Type::object(\Iterator::class)));
-        $this->assertSame(\sprintf('(%s&%s)|int|string', \DateTime::class, \Iterator::class), (string) $type);
+        $this->assertSame(\sprintf('int|string|(%s&%s)', \DateTime::class, \Iterator::class), (string) $type);
     }
 }

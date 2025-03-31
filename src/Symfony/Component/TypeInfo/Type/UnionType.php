@@ -55,7 +55,6 @@ class UnionType extends Type implements CompositeTypeInterface
             }
         }
 
-        usort($types, fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
         $this->types = array_values(array_unique($types));
 
         $builtinTypesIdentifiers = array_map(

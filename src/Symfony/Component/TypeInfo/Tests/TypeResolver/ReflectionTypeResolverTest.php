@@ -67,7 +67,7 @@ class ReflectionTypeResolverTest extends TestCase
         yield [Type::nullable(Type::enum(DummyEnum::class)), $reflection->getProperty('nullableEnum')->getType()];
         yield [Type::enum(DummyBackedEnum::class), $reflection->getProperty('backedEnum')->getType()];
         yield [Type::nullable(Type::enum(DummyBackedEnum::class)), $reflection->getProperty('nullableBackedEnum')->getType()];
-        yield [Type::union(Type::int(), Type::string()), $reflection->getProperty('union')->getType()];
+        yield [Type::union(Type::string(), Type::int()), $reflection->getProperty('union')->getType()];
         yield [Type::intersection(Type::object(\Traversable::class), Type::object(\Stringable::class)), $reflection->getProperty('intersection')->getType()];
     }
 

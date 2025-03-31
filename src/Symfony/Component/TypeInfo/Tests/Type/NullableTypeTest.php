@@ -27,10 +27,10 @@ class NullableTypeTest extends TestCase
     public function testNullPartIsAdded()
     {
         $type = new NullableType(Type::int());
-        $this->assertEquals([Type::int(), Type::null()], $type->getTypes());
+        $this->assertEquals([Type::null(), Type::int()], $type->getTypes());
 
         $type = new NullableType(Type::union(Type::int(), Type::string()));
-        $this->assertEquals([Type::int(), Type::null(), Type::string()], $type->getTypes());
+        $this->assertEquals([Type::null(), Type::int(), Type::string()], $type->getTypes());
     }
 
     public function testWrappedTypeIsSatisfiedBy()

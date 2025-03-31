@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-31T13:07:01Z
+
+Maybe you can add a custom message for `JsonStreamable` as well? Something like `because it's a JSON streamable object`?
+https://github.com/symfony/symfony/pull/60095/files#diff-e4f52d5033296421d02e360c8355aa1931bdfb0c12579f4815ea02b724322c0cR814
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-31T13:13:19Z
+
+> custom message for JsonStreamable
+
+right, updated
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-03-31T13:17:02Z
+
+Thanks for the update of the tag source, that's better than the arbitrary tags.

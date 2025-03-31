@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-28T08:53:56Z
+
+What's the rational? Didn't we add the option because the overhead was significant? Did anything change?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-28T09:00:48Z
+
+Back in time, we added that flag to prevent apps that were injecting concrete implementations instead of interfaces to break when upgrading to 6.1.
+
+IIRC, there was no relation with any overhead at that time.
+
+For the record, users doing:
+```php
+public function __construct(ObjectNormalizer $normalizer) {}
+```
+instead of:
+```php
+public function __construct(#[Target('...')] NormalizerInterface $normalizer) {}
+```
+had broken app when enabling the debug. That was why we have hidden the decoration behind a flag.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-28T09:01:58Z
+
+But maybe at least we can change the default? So that we can remove the recipe definition at some point?
+
+Which means:
+- requiring to define explicitly the value in 7.3
+- change the default in 8.0
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-28T10:22:51Z
+
+Here is the PR introducing the flag: https://github.com/symfony/symfony/pull/46625
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-28T10:35:39Z
+
+Indeed, adding this option was a quick fix. It isn't meant to stay
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-28T12:29:15Z
+
+There are still few tests to fix for information
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-03-28T12:29:39Z
+
+Why not deprecate the option instead?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-28T13:20:13Z
+
+Because the actual default value is `false`, and I want to have a `true` in the end, I think the steps should be:
+- deprecate not setting the value to `true` (7.3)
+- deprecate the config option (8.1) - as it'll be `true` for sure
+- remove the config option (9.0)
+
+Deprecating the config option directly (and therefore removing it in 8.0) will not allow users to adapt their code first.
+
+But it may be ok for such a change. WDYT?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-28T18:57:21Z
+
+Deprecating the option sounds good to me. The notice is what will actually urge people to fix their code so that it works with the serializer collector, no matter if it's about changing the default or removing that option. I think the latter gives enough time, no need for more.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-29T10:20:23Z
+
+The related tests are fixed now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-31T14:50:25Z
+
+@chalasr if you mean deprecating the option whatever the value, then I don't agree: this would annoy people that just updated their recipe / created a new project since 6.1, while at the same time create a migration risk, with a leaky BC layer.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-03-31T14:54:31Z
+
+Fair enough
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-31T15:00:05Z
+
+In the upgrade note, it might be nice to tell about what you wrote in https://github.com/symfony/symfony/pull/60069#issuecomment-2760606900 BTW.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-03-31T15:29:08Z
+
+Here you go: https://github.com/symfony/symfony/compare/fda5371b559b9c03113c726a7e33dbbd176339b3..29c75621c740dea5df27d86fff4293ae5c50b673

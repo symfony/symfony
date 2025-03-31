@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-03-31T07:19:08Z
+
+I have pushed another commit which rewrites the test a bit to no longer mess around with Doctrine ORM internals, but provide a custom repository instead which provides the results required by the test methods.

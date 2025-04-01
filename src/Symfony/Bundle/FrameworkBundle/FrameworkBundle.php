@@ -98,7 +98,7 @@ class FrameworkBundle extends Bundle
 {
     public function boot(): void
     {
-        $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
+        $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 0;
 
         if (class_exists(SymfonyRuntime::class)) {
             $handler = set_error_handler('var_dump');

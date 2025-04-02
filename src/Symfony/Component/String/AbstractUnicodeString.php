@@ -346,10 +346,19 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function snake(): static
     {
-        $str = $this->camel();
-        $str->string = mb_strtolower(preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $str->string), 'UTF-8');
+        $str = clone $this;
 
-        return $str;
+        // space numbers
+        $str->string = preg_replace('/\d+/u', ' $0 ', $str->string);
+        // split words
+        $str->string = preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1 \2', $str->string);
+        // clean spaces
+        $str->string = preg_replace(['/[^\pL0-9]++/u', '/( {2,})/u'], ' ', $str->string);
+
+        return $str->trimStart()
+            ->trimEnd()
+            ->replace(' ', '_')
+            ->lower();
     }
 
     public function title(bool $allWords = false): static

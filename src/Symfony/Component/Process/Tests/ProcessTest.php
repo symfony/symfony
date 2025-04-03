@@ -413,10 +413,10 @@ class ProcessTest extends TestCase
     {
         $lock = tempnam(sys_get_temp_dir(), __FUNCTION__);
 
-        $p = $this->getProcessForCode('file_put_contents($s = \''.$uri.'\', \'foo\'); flock(fopen('.var_export($lock, true).', \'r\'), LOCK_EX); file_put_contents($s, \'bar\');');
+        $p = $this->getProcessForCode('file_put_contents($s = \''.$uri.'\', \'foo\'); (bool) flock(fopen('.var_export($lock, true).', \'r\'), LOCK_EX); file_put_contents($s, \'bar\');');
 
         $h = fopen($lock, 'w');
-        flock($h, \LOCK_EX);
+        (bool) flock($h, \LOCK_EX);
 
         $p->start();
 
@@ -428,7 +428,7 @@ class ProcessTest extends TestCase
             $this->assertSame($s, $p->$getIncrementalOutput());
             $this->assertSame('', $p->$getIncrementalOutput());
 
-            flock($h, \LOCK_UN);
+            (bool) flock($h, \LOCK_UN);
         }
 
         fclose($h);

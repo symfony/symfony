@@ -152,7 +152,6 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 
         $handle = $key->getState(__CLASS__)[1];
 
-        flock($handle, \LOCK_UN | \LOCK_NB);
         fclose($handle);
 
         $key->removeState(__CLASS__);

@@ -435,7 +435,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 } elseif (!is_file($cachePath) || !\is_object($this->container = include $cachePath)) {
                     $this->container = null;
                 } elseif (!$oldContainer || $this->container::class !== $oldContainer->name) {
-                    flock($lock, \LOCK_UN);
                     fclose($lock);
                     $this->container->set('kernel', $this);
 
@@ -517,7 +516,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
         if ($lock) {
-            flock($lock, \LOCK_UN);
             fclose($lock);
         }
 

@@ -307,9 +307,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         $h = fopen($file, 'r');
-        flock($h, \LOCK_SH);
+        (bool) flock($h, \LOCK_SH);
         $data = stream_get_contents($h);
-        flock($h, \LOCK_UN);
         fclose($h);
 
         if (\function_exists('gzdecode')) {

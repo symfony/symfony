@@ -74,7 +74,6 @@ final class LockRegistry
 
         foreach (self::$openedFiles as $file) {
             if ($file) {
-                flock($file, \LOCK_UN);
                 fclose($file);
             }
         }
@@ -123,9 +122,9 @@ final class LockRegistry
                 }
                 // if we failed the race, retry locking in blocking mode to wait for the winner
                 $logger?->info('Item "{key}" is locked, waiting for it to be released', ['key' => $item->getKey()]);
-                flock($lock, \LOCK_SH);
+                $locked = flock($lock, \LOCK_SH);
             } finally {
-                flock($lock, \LOCK_UN);
+                (bool) flock($lock, \LOCK_UN);
                 unset(self::$lockedFiles[$key]);
             }
 

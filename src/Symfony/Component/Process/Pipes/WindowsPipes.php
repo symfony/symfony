@@ -66,13 +66,11 @@ class WindowsPipes extends AbstractPipes
                         continue 2;
                     }
                     if (isset($this->lockHandles[$pipe])) {
-                        flock($this->lockHandles[$pipe], \LOCK_UN);
                         fclose($this->lockHandles[$pipe]);
                     }
                     $this->lockHandles[$pipe] = $h;
 
                     if (!($h = fopen($file, 'w')) || !fclose($h) || !$h = fopen($file, 'r')) {
-                        flock($this->lockHandles[$pipe], \LOCK_UN);
                         fclose($this->lockHandles[$pipe]);
                         unset($this->lockHandles[$pipe]);
                         continue 2;
@@ -162,7 +160,6 @@ class WindowsPipes extends AbstractPipes
             if ($close) {
                 ftruncate($fileHandle, 0);
                 fclose($fileHandle);
-                flock($this->lockHandles[$type], \LOCK_UN);
                 fclose($this->lockHandles[$type]);
                 unset($this->fileHandles[$type], $this->lockHandles[$type]);
             }
@@ -196,7 +193,6 @@ class WindowsPipes extends AbstractPipes
         foreach ($this->fileHandles as $type => $handle) {
             ftruncate($handle, 0);
             fclose($handle);
-            flock($this->lockHandles[$type], \LOCK_UN);
             fclose($this->lockHandles[$type]);
         }
         $this->fileHandles = $this->lockHandles = [];

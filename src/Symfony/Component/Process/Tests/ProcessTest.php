@@ -400,10 +400,12 @@ class ProcessTest extends TestCase
     {
         $lock = tempnam(sys_get_temp_dir(), __FUNCTION__);
 
-        $p = $this->getProcessForCode('file_put_contents($s = \''.$uri.'\', \'foo\'); flock(fopen('.var_export($lock, true).', \'r\'), LOCK_EX); file_put_contents($s, \'bar\');');
+        $p = $this->getProcessForCode('file_put_contents($s = \''.$uri.'\', \'foo\'); $lock = flock(fopen('.var_export($lock, true).', \'r\'), LOCK_EX); file_put_contents($s, \'bar\');');
 
         $h = fopen($lock, 'w');
-        flock($h, \LOCK_EX);
+        if (false === flock($h, \LOCK_EX)) {
+            throw new RuntimeException('Unable to acquire lock');
+        }
 
         $p->start();
 
@@ -415,7 +417,9 @@ class ProcessTest extends TestCase
             $this->assertSame($s, $p->$getIncrementalOutput());
             $this->assertSame('', $p->$getIncrementalOutput());
 
-            flock($h, \LOCK_UN);
+            if (false === flock($h, \LOCK_UN)) {
+                throw new RuntimeException('Unable to release lock');
+            }
         }
 
         fclose($h);

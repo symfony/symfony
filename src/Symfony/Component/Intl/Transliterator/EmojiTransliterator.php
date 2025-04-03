@@ -24,7 +24,7 @@ if (!class_exists(\Transliterator::class)) {
         private array $map;
         private \Transliterator $transliterator;
 
-        public static function create(string $id, int $direction = self::FORWARD): self
+        public static function create(string $id, int $direction = self::FORWARD): EmojiTransliterator
         {
             $id = strtolower($id);
 
@@ -65,7 +65,7 @@ if (!class_exists(\Transliterator::class)) {
             return $instance;
         }
 
-        public function createInverse(): self
+        public function createInverse(): EmojiTransliterator
         {
             return self::create($this->id, self::REVERSE);
         }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Process;
 
 use Symfony\Component\Process\Contracts\CommandExecutorInterface;
 use Symfony\Component\Process\Contracts\ExecutableFinderInterface;
+use Symfony\Component\Process\Exception\PhpUnixExecutableInvalidVersionException;
 use Symfony\Component\Process\Exception\PhpUnixExecutableNotFoundException;
 
 /**
@@ -43,6 +44,11 @@ class PhpUnixExecutableFinder
      */
     public function find(?string $version = null, bool $includeArgs = true): string
     {
+
+        if (!empty($version) && !$this->isValidPhpVersion($version)) {
+            throw new PhpUnixExecutableInvalidVersionException("Invalid php version : ".$version);
+        }
+
         if (null === $version && $this->defaultExecutableFinder) {
             $default = $this->defaultExecutableFinder->find($includeArgs);
 
@@ -74,5 +80,27 @@ class PhpUnixExecutableFinder
     private function isValidPhpExecutable(string $path): bool
     {
         return !empty($path) && file_exists($path) && is_executable($path);
+    }
+
+    /**
+     * Checks if a string is a valid PHP version.
+     *
+     * A valid PHP version is in the format `major.minor.patch`, where:
+     * - `major`, `minor`, and `patch` are numeric values.
+     * - An optional pre-release label (e.g., `-beta`, `-alpha`) and build metadata (e.g., `+build1`) may also be included.
+     *
+     * This function also supports versions with or without a leading "v" (e.g., `v7.4.0` is valid).
+     *
+     * @param string $version The version string to check.
+     *
+     * @return bool Returns `true` if the version string is a valid PHP version, otherwise `false`.
+     */
+    private function isValidPhpVersion(string $version): bool
+    {
+        if (str_starts_with($version, 'v')) {
+            $version = substr($version, 1);
+        }
+
+        return preg_match('/^\d+\.\d+(\.\d+)?(-[a-zA-Z0-9\-\.]+)?$/', $version) === 1;
     }
 }

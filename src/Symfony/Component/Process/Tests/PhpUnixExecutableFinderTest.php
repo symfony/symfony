@@ -12,6 +12,7 @@
 namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\PhpUnixExecutableInvalidVersionException;
 use Symfony\Component\Process\PhpUnixExecutableFinder;
 use Symfony\Component\Process\Contracts\ExecutableFinderInterface;
 use Symfony\Component\Process\Contracts\CommandExecutorInterface;
@@ -108,5 +109,16 @@ class PhpUnixExecutableFinderTest extends TestCase
         // The find method should return the PHP executable path
         $result = $this->phpExecutableFinder->find();
         $this->assertEquals('/usr/bin/php', $result);
+    }
+
+    /**
+     * Test the find method throws PhpUnixExecutableInvalidVersionException if the specific version executable is invalid.
+     */
+    public function testFindInvalidVersionExecutableThrowsException(): void
+    {
+        $this->expectException(PhpUnixExecutableInvalidVersionException::class);
+        $this->expectExceptionMessage('Invalid php version : invalid.version.8.X');
+
+        $this->phpExecutableFinder->find('invalid.version.8.X');
     }
 }

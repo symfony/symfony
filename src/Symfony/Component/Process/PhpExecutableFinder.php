@@ -11,13 +11,16 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Contracts\ExecutableFinderInterface;
+
 /**
  * An executable finder specifically designed for the PHP executable.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Pululu Kinanga Andre <pululuandre@gmail.com>
  */
-class PhpExecutableFinder
+class PhpExecutableFinder implements ExecutableFinderInterface
 {
     private ExecutableFinder $executableFinder;
 

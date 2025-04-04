@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Process;
 
-use Symfony\Component\Process\Exception\PhpSpecifExecutableInvalidVersionException;
-use Symfony\Component\Process\Exception\PhpSpecifExecutableNotFoundException;
+use Symfony\Component\Process\Exception\PhpExecutableInvalidVersionException;
+use Symfony\Component\Process\Exception\PhpExecutableNotFoundException;
 
 /**
  * An executable finder specifically designed for the PHP executable.
@@ -22,27 +22,29 @@ use Symfony\Component\Process\Exception\PhpSpecifExecutableNotFoundException;
  */
 class PhpSpecifExecutableFinder
 {
+    public function __construct(private readonly ExecutableFinder $executableFinder){}
+
     /**
      * Finds the PHP executable path, optionally for a specific version.
      *
      * @return string The path to the PHP executable.
-     * @throws PhpSpecifExecutableNotFoundException If no executable is found.
+     * @throws PhpExecutableNotFoundException If no executable is found.
      */
     public function find(string $version): string
     {
 
         if (!$this->isValidPhpVersion($version)) {
-            throw new PhpSpecifExecutableInvalidVersionException("Invalid php version : ".$version);
+            throw new PhpExecutableInvalidVersionException("Invalid php version : ".$version);
         }
 
         $binary = "php{$version}";
-        $process = $this->runProcess(['command', '-v', $binary]);
+        $commandResult = $this->executableFinder->find($binary);
 
-        if (!$process->isSuccessful()) {
-            throw new PhpSpecifExecutableNotFoundException("PHP executable not found for the version : ".$version);
+        if (empty($commandResult)) {
+            throw new PhpExecutableNotFoundException("PHP executable not found for the version : ".$version);
         }
 
-        return trim($process->getOutput());
+        return trim($commandResult);
     }
 
     /**
@@ -65,12 +67,5 @@ class PhpSpecifExecutableFinder
         }
 
         return preg_match('/^\d+\.\d+(\.\d+)?(-[a-zA-Z0-9\-\.]+)?$/', $version) === 1;
-    }
-
-    protected function runProcess(array $command): Process
-    {
-        $process = new Process($command);
-        $process->run();
-        return $process;
     }
 }

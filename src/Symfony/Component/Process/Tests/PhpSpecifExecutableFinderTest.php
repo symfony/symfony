@@ -4,56 +4,59 @@ namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpSpecifExecutableFinder;
-use Symfony\Component\Process\Exception\PhpSpecifExecutableInvalidVersionException;
-use Symfony\Component\Process\Exception\PhpSpecifExecutableNotFoundException;
-use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\PhpExecutableInvalidVersionException;
+use Symfony\Component\Process\Exception\PhpExecutableNotFoundException;
+use Symfony\Component\Process\ExecutableFinder;
 
+/**
+ * @covers \Symfony\Component\Process\PhpSpecifExecutableFinder
+ */
 class PhpSpecifExecutableFinderTest extends TestCase
 {
-    private PhpSpecifExecutableFinder $finder;
+    private PhpSpecifExecutableFinder $phpFinder;
+    private $executableFinderMock;
 
     protected function setUp(): void
     {
-        $this->finder = new PhpSpecifExecutableFinder();
-    }
-
-    public function testFindThrowsExceptionForInvalidVersion()
-    {
-        $this->expectException(PhpSpecifExecutableInvalidVersionException::class);
-        $this->expectExceptionMessage("Invalid php version : invalid.version");
-        $this->finder->find('invalid.version');
-    }
-
-    public function testFindThrowsExceptionWhenPhpNotFound()
-    {
-        $this->expectException(PhpSpecifExecutableNotFoundException::class);
-        $this->expectExceptionMessage("PHP executable not found for the version : 8.3");
-
-        $mockProcess = $this->createMock(Process::class);
-        $mockProcess->method('isSuccessful')->willReturn(false);
-
-        $finder = $this->getMockBuilder(PhpSpecifExecutableFinder::class)
-            ->onlyMethods(['runProcess'])
-            ->getMock();
-
-        $finder->method('runProcess')->willReturn($mockProcess);
-
-        $finder->find('8.3');
+        // Création d'un mock pour ExecutableFinder
+        $this->executableFinderMock = $this->createMock(ExecutableFinder::class);
+        $this->phpFinder = new PhpSpecifExecutableFinder($this->executableFinderMock);
     }
 
     public function testFindReturnsExecutablePath()
     {
-        $mockProcess = $this->createMock(Process::class);
-        $mockProcess->method('isSuccessful')->willReturn(true);
-        $mockProcess->method('getOutput')->willReturn('/usr/bin/php8.3');
+        $this->executableFinderMock
+            ->method('find')
+            ->willReturnCallback(function ($binary) {
+                return match ($binary) {
+                    'php8.3' => '/bin/php8.3',
+                    'php8.4' => '/usr/bin/php8.4',
+                    default => null,
+                };
+            });
 
-        $finder = $this->getMockBuilder(PhpSpecifExecutableFinder::class)
-            ->onlyMethods(['runProcess'])
-            ->getMock();
+        // Test pour PHP 8.3
+        $result83 = $this->phpFinder->find('8.3');
+        $this->assertStringEndsWith('php8.3', $result83);
 
-        $finder->method('runProcess')->willReturn($mockProcess);
+        // Test pour PHP 8.4
+        $result84 = $this->phpFinder->find('8.4');
+        $this->assertStringEndsWith('php8.4', $result84);
+    }
 
-        $result = $finder->find('8.3');
-        $this->assertEquals('/usr/bin/php8.3', trim($result));
+    public function testFindThrowsExceptionForInvalidVersion()
+    {
+        $this->expectException(PhpExecutableInvalidVersionException::class);
+        $this->phpFinder->find('invalid-version');
+    }
+
+    public function testFindThrowsExceptionWhenExecutableNotFound()
+    {
+        $this->executableFinderMock
+            ->method('find')
+            ->willReturn(null);
+
+        $this->expectException(PhpExecutableNotFoundException::class);
+        $this->phpFinder->find('8.3');
     }
 }

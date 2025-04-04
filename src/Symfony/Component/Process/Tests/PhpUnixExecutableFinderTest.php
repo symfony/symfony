@@ -45,7 +45,7 @@ class PhpUnixExecutableFinderTest extends TestCase
     /**
      * Test that the find method returns the correct PHP executable path for the default executable.
      */
-    public function testFindDefaultExecutable(): void
+    public function testFindDefaultExecutable()
     {
         // Mock the behavior of the defaultExecutableFinder to return a valid PHP path
         $this->defaultExecutableFinder
@@ -60,7 +60,7 @@ class PhpUnixExecutableFinderTest extends TestCase
     /**
      * Test that the find method returns the correct PHP executable path for a specific version.
      */
-    public function testFindSpecificVersionExecutable(): void
+    public function testFindSpecificVersionExecutable()
     {
         // Simulate command execution returning the correct path for php8.3
         $this->commandExecutor
@@ -76,7 +76,7 @@ class PhpUnixExecutableFinderTest extends TestCase
     /**
      * Test the find method throws PhpUnixExecutableNotFoundException if the specific version executable is not found.
      */
-    public function testFindSpecificVersionExecutableThrowsException(): void
+    public function testFindSpecificVersionExecutableThrowsException()
     {
         // Simulate command execution returning an empty result (no PHP executable found)
         $this->commandExecutor
@@ -86,7 +86,7 @@ class PhpUnixExecutableFinderTest extends TestCase
             ->willReturn('');
 
         $this->expectException(PhpUnixExecutableNotFoundException::class);
-        $this->expectExceptionMessage('PHP executable not found for the given version');
+        $this->expectExceptionMessage('PHP executable not found for the given version.');
 
         $this->phpExecutableFinder->find('8.3');
     }
@@ -94,7 +94,7 @@ class PhpUnixExecutableFinderTest extends TestCase
     /**
      * Test the find method when defaultExecutableFinder is null.
      */
-    public function testFindWhenDefaultExecutableFinderIsNull(): void
+    public function testFindWhenDefaultExecutableFinderIsNull()
     {
         // Set defaultExecutableFinder to null by creating a new PhpUnixExecutableFinder instance
         $this->phpExecutableFinder = new PhpUnixExecutableFinder($this->commandExecutor, null);
@@ -114,7 +114,7 @@ class PhpUnixExecutableFinderTest extends TestCase
     /**
      * Test the find method throws PhpUnixExecutableInvalidVersionException if the specific version executable is invalid.
      */
-    public function testFindInvalidVersionExecutableThrowsException(): void
+    public function testFindInvalidVersionExecutableThrowsException()
     {
         $this->expectException(PhpUnixExecutableInvalidVersionException::class);
         $this->expectExceptionMessage('Invalid php version : invalid.version.8.X');

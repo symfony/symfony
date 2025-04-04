@@ -53,7 +53,7 @@ class PhpUnixExecutableFinder
             $default = $this->defaultExecutableFinder->find($includeArgs);
 
             if (!is_string($default)) {
-                throw new PhpUnixExecutableNotFoundException("PHP default executable not found");
+                throw new PhpUnixExecutableNotFoundException("PHP default executable not found.");
             }
 
             return $default;
@@ -68,7 +68,7 @@ class PhpUnixExecutableFinder
             return $path;
         }
 
-        throw new PhpUnixExecutableNotFoundException("PHP executable not found for the given version");
+        throw new PhpUnixExecutableNotFoundException("PHP executable not found for the given version.");
     }
 
     /**

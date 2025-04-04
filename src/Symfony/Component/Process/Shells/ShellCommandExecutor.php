@@ -27,6 +27,8 @@ class ShellCommandExecutor implements CommandExecutorInterface
      */
     public function execute(string $command): ?string
     {
-        return shell_exec($command);
+        $result = shell_exec($command);
+
+        return is_string($result) ? $result : null;
     }
 }

@@ -75,7 +75,7 @@ jobs:
           "extension=php_sodium.dll" >> php.ini-max
           Copy php.ini-max php.ini
           cd ${{ github.workspace }}
-          iwr -outf composer.phar https://getcomposer.org/download/latest-stable/composer.phar
+          iwr -outf composer.phar https://getcomposer.org/download/2.8.6/composer.phar
 
       - name: Install dependencies
         id: setup

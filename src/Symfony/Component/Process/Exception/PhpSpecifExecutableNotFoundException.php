@@ -11,10 +11,10 @@
 namespace Symfony\Component\Process\Exception;
 
 /**
- * PhpUnixExecutableNotFoundException for the Process Component.
+ * PhpSpecifExecutableNotFoundException for the Process Component.
  *
  * @author Pululu Kinanga Andre <pululuandre@gmail.com>
  */
-class PhpUnixExecutableNotFoundException extends \Exception implements ExceptionInterface
+class PhpSpecifExecutableNotFoundException extends \Exception implements ExceptionInterface
 {
 }

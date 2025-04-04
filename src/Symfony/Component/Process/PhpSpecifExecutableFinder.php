@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Process;
 
-use Symfony\Component\Process\Exception\PhpUnixExecutableInvalidVersionException;
-use Symfony\Component\Process\Exception\PhpUnixExecutableNotFoundException;
+use Symfony\Component\Process\Exception\PhpSpecifExecutableInvalidVersionException;
+use Symfony\Component\Process\Exception\PhpSpecifExecutableNotFoundException;
 
 /**
  * An executable finder specifically designed for the PHP executable.
@@ -26,20 +26,20 @@ class PhpSpecifExecutableFinder
      * Finds the PHP executable path, optionally for a specific version.
      *
      * @return string The path to the PHP executable.
-     * @throws PhpUnixExecutableNotFoundException If no executable is found.
+     * @throws PhpSpecifExecutableNotFoundException If no executable is found.
      */
     public function find(string $version): string
     {
 
         if (!$this->isValidPhpVersion($version)) {
-            throw new PhpUnixExecutableInvalidVersionException("Invalid php version : ".$version);
+            throw new PhpSpecifExecutableInvalidVersionException("Invalid php version : ".$version);
         }
 
         $binary = "php{$version}";
         $process = $this->runProcess(['command', '-v', $binary]);
 
         if (!$process->isSuccessful()) {
-            throw new PhpUnixExecutableNotFoundException("PHP executable not found for the version : ".$version);
+            throw new PhpSpecifExecutableNotFoundException("PHP executable not found for the version : ".$version);
         }
 
         return trim($process->getOutput());

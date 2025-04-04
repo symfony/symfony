@@ -4,8 +4,8 @@ namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpSpecifExecutableFinder;
-use Symfony\Component\Process\Exception\PhpUnixExecutableInvalidVersionException;
-use Symfony\Component\Process\Exception\PhpUnixExecutableNotFoundException;
+use Symfony\Component\Process\Exception\PhpSpecifExecutableInvalidVersionException;
+use Symfony\Component\Process\Exception\PhpSpecifExecutableNotFoundException;
 use Symfony\Component\Process\Process;
 
 class PhpSpecifExecutableFinderTest extends TestCase
@@ -19,14 +19,14 @@ class PhpSpecifExecutableFinderTest extends TestCase
 
     public function testFindThrowsExceptionForInvalidVersion()
     {
-        $this->expectException(PhpUnixExecutableInvalidVersionException::class);
+        $this->expectException(PhpSpecifExecutableInvalidVersionException::class);
         $this->expectExceptionMessage("Invalid php version : invalid.version");
         $this->finder->find('invalid.version');
     }
 
     public function testFindThrowsExceptionWhenPhpNotFound()
     {
-        $this->expectException(PhpUnixExecutableNotFoundException::class);
+        $this->expectException(PhpSpecifExecutableNotFoundException::class);
         $this->expectExceptionMessage("PHP executable not found for the version : 8.3");
 
         $mockProcess = $this->createMock(Process::class);

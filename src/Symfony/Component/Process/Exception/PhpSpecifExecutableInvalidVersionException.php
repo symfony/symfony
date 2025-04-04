@@ -11,10 +11,10 @@
 namespace Symfony\Component\Process\Exception;
 
 /**
- * PhpUnixExecutableInvalidVersionException for the Process Component.
+ * PhpSpecifExecutableInvalidVersionException for the Process Component.
  *
  * @author Pululu Kinanga Andre <pululuandre@gmail.com>
  */
-class PhpUnixExecutableInvalidVersionException extends \InvalidArgumentException implements ExceptionInterface
+class PhpSpecifExecutableInvalidVersionException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

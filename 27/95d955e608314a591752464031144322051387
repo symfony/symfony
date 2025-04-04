@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-02-12T23:16:01Z
+
+This can also be used in the Yaml JsonSchema: https://github.com/symfony/symfony/pull/59620
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-13T08:27:50Z
+
+Should we bump the minimum requirement for `symfony/config` to `^7.3` in bundles, or conditionally call `documentationUri()` on the root node?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-02-13T17:13:15Z
+
+I suggest bumping the min version instead of doing conditional calls. It makes the code simpler
+
+---------------------------------------------------------------------------
+
+by stof at 2025-02-13T23:05:45Z
+
+You should probably also update the dumpers to add a comment with the documentation URL (when present), so that `debug:config` and `config:dump-reference` show it.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-02-14T09:18:59Z
+
+Right, here's the result with the latest push:
+
+<img width="1085" alt="Capture d’écran 2025-02-14 à 10 14 52" src="https://github.com/user-attachments/assets/224174a2-9a01-409f-9048-6dfbd226869d" />
+
+<img width="714" alt="Capture d’écran 2025-02-14 à 10 07 21" src="https://github.com/user-attachments/assets/9a55758b-bcd6-496d-82e8-f855bc691d11" />

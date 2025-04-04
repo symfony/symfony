@@ -5,7 +5,7 @@ CHANGELOG
 7.3
 ---
 
- * Introduce `PhpUnixExecutableFinder` to find php executable for a given specific version
+ * Introduce `PhpSpecifExecutableFinder` to find php executable for a given specific version
  * Add `RunProcessMessage::fromShellCommandline()` to instantiate a Process via the fromShellCommandline method
 
 7.1

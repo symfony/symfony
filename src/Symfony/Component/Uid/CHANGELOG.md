@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Make `Uuid` throw more concrete `InvalidUuidException`
+ * Make `Ulid` throw more concrete `InvalidUlidException`
+
 7.2
 ---
 

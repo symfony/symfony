@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-04-04T13:13:22Z
+
+let's leverage the trait we introduced in #54593 for forward compatibility with PHPUnit 11
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-04-04T13:37:17Z
+
+Should `expectDeprecation()` go away at some point?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-04T13:47:11Z
+
+@chalasr it is supported only when using the bridge deprecation reporting feature, and that feature is supported only for PHPUnit 9.6 and older.
+when using the native PHPUnit deprecation reporting feature (for PHPUnit 11+, or even 10+ if you don't care about feature parity), you have to use the native PHPUnit API.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-04-04T13:48:47Z
+
+Thanks for clarifying @stof

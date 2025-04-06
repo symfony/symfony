@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-04-04T13:17:09Z
+
+the keys returned by the data provider now match the argument names of the test method: https://github.com/symfony/symfony/blob/85a073ef7d5089241852e7fd686a76c58359af5a/src/Symfony/Component/Notifier/Bridge/Bluesky/Tests/BlueskyTransportTest.php#L280

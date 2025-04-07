@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-07T09:43:03Z
+
+`#[Autowire('enum:Suit:APP_SUIT')]`
+
+This means: autowire the string `'enum:Suit:APP_SUIT'`.
+I guess you meant `#[Autowire(env: 'enum:Suit:APP_SUIT')]` since you're telling about env vars.
+But then, this whole PR looks dubious. Can you please clarify?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-04-07T09:52:51Z
+
+@nicolas-grekas Sorry, you're right. I made some mistakes in the test and PR description. I had to reproduce this without copying code from our project. The PR + description are updated now.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-07T07:32:42Z
+
+Looks like the test suite needs some love :)
+
+---------------------------------------------------------------------------
+
+by llupa at 2025-04-07T11:54:04Z
+
+In this update there seems to be 11 new `en_*` codes (Italy, Hungary, Portugal & other EU countries). I just added the new codes that were data-dumped to LocalesTest; Also a small handful of languages seem to have been removed, did the same in LanguagesTest.

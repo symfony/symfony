@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-04-03T20:21:41Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-04-05T15:57:38Z
+
+I agree about this qualifying as a feature. And then it's a behavior change for which I think we can anticipate complains. Could we make this opt-in somehow?
+
+---------------------------------------------------------------------------
+
+by chillbram at 2025-04-07T13:17:49Z
+
+@Spomky Is there anything I need to do to tag it as an enhancement?
+
+@chalasr I think given that the current situation does not follow any of the three [matching schemes](https://www.rfc-editor.org/rfc/rfc4647.html#section-3.1) as defined in RFC4647, it would be kind of odd to retain this behaviour in Symfony itself. As it's quite trivial to implement this in your own code base by simply using `array_intersect()` on `$request->getLanguages()`, I personally don't see much reason to complicate the current implementation and maintain that old behaviour in some way.

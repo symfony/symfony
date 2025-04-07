@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by PatchRanger at 2025-04-07T12:38:39Z
+
+I could be missing something, but the fail looks totally unrelated to the one-line-change I made 🤔
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-07T12:59:04Z
+
+this change is legitimate, but it also indicates a gap in test coverage for our ProxyAdapter. The whole point of the ProxyAdapter is to adapt *external* PSR-6 implementations, but the tests of that class are adapting our own ArrayAdapter (and so won't detect cases where the implementation fails for third-party implementations).
+@nicolas-grekas do you think we could easily improve the tests of the ProxyAdapter ?

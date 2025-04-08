@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-04-08T14:44:52Z
+
+shouldn't we write the test expectation in a way compatible with the ICU version used on CI to avoid skipping tests all the time in CI ? Otherwise, the test might not bring actual value

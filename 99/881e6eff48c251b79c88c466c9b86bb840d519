@@ -1,0 +1,138 @@
+---------------------------------------------------------------------------
+
+by TimWolla at 2025-03-21T12:53:45Z
+
+I think the test failures are unrelated, because other PRs created around the same time also fail the same tests. But please let me know if this is related to the change in `src/Symfony/Bundle/FrameworkBundle/Resources/config/messenger.php`, since I'm new-ish to Symfony (contributions) :smiley:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-21T12:56:54Z
+
+What about resolving #59788 in the process?
+Removing gc_collect_cycles might be enough.
+Dunno if a middleware would be more appropriate (since @stof mentioned this way in the linked issue)
+
+---------------------------------------------------------------------------
+
+by TimWolla at 2025-03-24T09:48:07Z
+
+Thanks for the link to that issue.
+
+> Removing gc_collect_cycles might be enough.
+
+I think having an explicit `gc_collect_cycles()` outside of the actual message processing is a good thing, since this avoids running the cycle collection while a message is currently being processed, introducing unexpected and unpredictable delays.
+
+Though of course this amount if increased CPU usage is not a good thing either. Perhaps this is worth filing an issue with PHP itself? At least the documentation could more clearly indicate how expensive the cycle collector is.
+
+> Dunno if a middleware would be more appropriate
+
+I lack the Symfony experience to say whether a middleware or an event listener would be more appropriate. Please tell me what do to here, I can:
+
+- Revert the changes for `gc_collect_cycles()`, making this PR focused on the peak memory usage reset and deferring the cycle collection solution.
+- Split this into two separate event listeners, one for the reset and the other for the cycle collection.
+- Split this into an event listener for the reset and a middleware for the cycle collection.
+- Something else?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-24T11:19:44Z
+
+Both the reset of the peak memory usage and the cycle collection could be implemented either as middlewares or as event listeners I think. but FrameworkBundle has an existing configuration to choose which middlewares to register, while making it a listener would require introducing a new configuration setting to make it configurable. That's why I suggested a middleware initially.
+Another reason is that the middleware would be usable for projects using the Messenger component without its event-dispatcher integration (the event dispatcher is optional in the Worker class). This does not matter for the framework usage as FrameworkBundle always injects the event dispatcher, but it matters for standalone usage.
+
+---------------------------------------------------------------------------
+
+by TimWolla at 2025-03-24T11:51:56Z
+
+I see, thank you. I'll have a look at updating this PR to make use of middlewares and I'll report back if I have any further questions (or an updated implementation).
+
+---------------------------------------------------------------------------
+
+by TimWolla at 2025-03-24T12:46:57Z
+
+I've looked into this and realize that for the `gc_collect_cycles()` neither a middleware nor the currently chosen events would be appropriate, because the cycle collection happens before the message is `ack()`ed (this introducing the unintended delay into message processing).
+
+Looking at the current worker code, the `WorkerRunningEvent` with a check for `!$event->isWorkerIdle()` would probably be best, but would come with the event drawbacks you mentioned.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-24T12:48:31Z
+
+To solve https://github.com/symfony/symfony/issues/59788, I suggest that resetting the peak memory usage and collecting cycles get implemented as 2 separate middlewares.
+
+---------------------------------------------------------------------------
+
+by TimWolla at 2025-03-24T13:00:16Z
+
+Yes, but running `gc_collect_cycles()` in a middleware is not particularly useful, as I've outlined in my previous comment: This kind of “clean-up” work should ideally happen after ack'ing a message and before retrieving the next one so that the message processing is not unnecessarily blocked by the cycle collection.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-08T13:51:57Z
+
+Please rebase to get rid of the merge commit.
+Here's my review as a diff actually:
+
+<details>
+
+```diff
+diff --git a/src/Symfony/Component/Messenger/EventListener/ResetMemoryUsageListener.php b/src/Symfony/Component/Messenger/EventListener/ResetMemoryUsageListener.php
+index c4168018bd..f5c199c530 100644
+--- a/src/Symfony/Component/Messenger/EventListener/ResetMemoryUsageListener.php
++++ b/src/Symfony/Component/Messenger/EventListener/ResetMemoryUsageListener.php
+@@ -12,35 +12,36 @@
+ namespace Symfony\Component\Messenger\EventListener;
+
+ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+-use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+-use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+ use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
++use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+
+ /**
+  * @author Tim Düsterhus <tim@tideways-gmbh.com>
+  */
+-class ResetMemoryUsageListener implements EventSubscriberInterface
++final class ResetMemoryUsageListener implements EventSubscriberInterface
+ {
++    private bool $collect = false;
++
+     public function resetBefore(WorkerMessageReceivedEvent $event): void
+     {
+         // Reset the peak memory usage for accurate measurement of the
+         // memory usage on a per-message basis.
+         memory_reset_peak_usage();
++        $this->collect = true;
+     }
+
+-    public function collectAfter(WorkerMessageHandledEvent|WorkerMessageFailedEvent $event): void
++    public function collectAfter(WorkerRunningEvent $event): void
+     {
+-        // Run the cycle collector after handling a message to avoid it
+-        // running while the message is reserved and in processing.
+-        gc_collect_cycles();
++        if ($event->isWorkerIdle() && $this->collect) {
++            gc_collect_cycles();
++        }
+     }
+
+     public static function getSubscribedEvents(): array
+     {
+         return [
+-            WorkerMessageReceivedEvent::class => ['resetBefore', -1024],
+-            WorkerMessageFailedEvent::class => ['collectAfter', -1024],
+-            WorkerMessageHandledEvent::class => ['collectAfter', -1024],
++            WorkerMessageReceivedEvent::class => ['resetBefore', 1024],
++            WorkerRunningEvent::class => ['collectAfter', -1024],
+         ];
+     }
+ }
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-04-08T13:57:07Z
+
+Shall we backport the GC part of the patch to 6.4 to fix https://github.com/symfony/symfony/issues/59788?

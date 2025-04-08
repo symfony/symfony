@@ -41,6 +41,17 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
     {
         $this->twig ??= $this->container->get('twig');
 
+        // No cache, nothing to warmup
+        if (!$this->twig->getCache()) {
+            return [];
+        }
+
+        // When auto-reload is enabled, cache don't need to be warmed up during the initial build.
+        // This speedups dev env when the build dir is configured.
+        if ($buildDir && $this->twig->isAutoReload()) {
+            return [];
+        }
+
         foreach ($this->iterator as $template) {
             try {
                 $this->twig->load($template);

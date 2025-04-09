@@ -21,8 +21,6 @@ spl_autoload_register(function ($class) {
 });
 
 require __DIR__.'/../../../../SymfonyExtension.php';
-require __DIR__.'/../../../../Extension/DisableClockMockSubscriber.php';
-require __DIR__.'/../../../../Extension/DisableDnsMockSubscriber.php';
 require __DIR__.'/../../../../Extension/EnableClockMockSubscriber.php';
 require __DIR__.'/../../../../Extension/RegisterClockMockSubscriber.php';
 require __DIR__.'/../../../../Extension/RegisterDnsMockSubscriber.php';

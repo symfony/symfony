@@ -61,6 +61,7 @@ RdKafka\Conf {
   client.id: "rdkafka"
 %A
   dr_msg_cb: "0x%x"
+%A
 }
 EODUMP;
 
@@ -114,7 +115,7 @@ EODUMP;
         $expectedDump = <<<EODUMP
 RdKafka\TopicConf {
   request.required.acks: "%i"
-  request.timeout.ms: "5000"
+  request.timeout.ms: "%d"
   message.timeout.ms: "300000"
 %A
   auto.commit.enable: "true"

@@ -24,17 +24,16 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author David Petrásek <davidpetrasek@hotmail.cz>
  */
-#[When(env: 'dev')]
 class TurboDriveCspListener implements EventSubscriberInterface
 {
     public function __construct(
-        readonly private KernelInterface $kernel,
+        private readonly bool $isDebug,
     ) {
     }
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$this->kernel->isDebug()) {
+        if (!$this->isDebug) {
             return;
         }
         if (!$event->isMainRequest()) {
@@ -80,17 +79,26 @@ class TurboDriveCspListener implements EventSubscriberInterface
         $scriptTag = '<script>'.$scriptContent.'</script>';
 
         $hash = base64_encode(hash('sha256', $scriptContent, true));
-        $hashString = "'sha256-".$hash."'";
+        $hashString = "'sha256-" . $hash . "'";
 
         if (preg_match('/script-src\s+([^;]+)/', $csp, $matches)) {
+            // If script-src exists, update it if the hash is not present.
             $scriptSrc = $matches[1];
 
             if (!str_contains($scriptSrc, $hashString)) {
-                $newScriptSrc = $scriptSrc.' '.$hashString;
-                $csp = str_replace($matches[0], 'script-src '.$newScriptSrc, $csp);
+                $newScriptSrc = $scriptSrc . ' ' . $hashString;
+                $csp = str_replace($matches[0], 'script-src ' . $newScriptSrc, $csp);
             }
         } else {
-            $csp .= "; script-src 'self' ".$hashString;
+            // If no script-src directive exists, check for default-src to preserve its sources.
+            if (preg_match('/default-src\s+([^;]+)/', $csp, $defaultMatches)) {
+                $defaultSrc = $defaultMatches[1];
+                $newScriptSrc = $defaultSrc . ' ' . $hashString;
+                $csp .= "; script-src " . $newScriptSrc;
+            } else {
+                // Fallback case if neither script-src nor default-src are present.
+                $csp .= "; script-src 'self' " . $hashString;
+            }
         }
         $response->headers->set('Content-Security-Policy', $csp);
 

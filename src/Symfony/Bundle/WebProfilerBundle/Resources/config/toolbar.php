@@ -28,14 +28,16 @@ return static function (ContainerConfigurator $container, ContainerBuilder $cont
             service('web_profiler.csp.handler'),
             service('data_collector.dump')->ignoreOnInvalid(),
         ])
-        ->tag('kernel.event_subscriber');
+        ->tag('kernel.event_subscriber')
+    ;
 
     $bundles = $containerBuilder->getParameter('kernel.bundles');
-    if (\is_array($bundles) && isset($bundles['TurboBundle'])) {
+    if ($_SERVER['APP_ENV'] === 'dev' && isset($bundles['TurboBundle'])) {
         $services->set('web_profiler.turbo_drive_csp', TurboDriveCspListener::class)
             ->args([
-                service('kernel'),
+                service('kernel.debug'),
             ])
-            ->tag('kernel.event_subscriber');
+            ->tag('kernel.event_subscriber')
+        ;
     }
 };

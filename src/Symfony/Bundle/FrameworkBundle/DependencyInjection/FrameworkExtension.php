@@ -100,6 +100,7 @@ use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
+use Symfony\Component\HttpKernel\Attribute\AsArgumentValueResolver;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -765,6 +766,14 @@ class FrameworkExtension extends Extension
         $container->registerAttributeForAutoconfiguration(AsTargetedValueResolver::class, static function (ChildDefinition $definition, AsTargetedValueResolver $attribute): void {
             $definition->addTag('controller.targeted_value_resolver', $attribute->name ? ['name' => $attribute->name] : []);
         });
+
+        $container->registerAttributeForAutoconfiguration(AsArgumentValueResolver::class, static function (ChildDefinition $definition, AsArgumentValueResolver $attribute): void {
+            $definition->addTag('controller.argument_value_resolver', [
+                'name' => $attribute->name,
+                'priority' => $attribute->priority,
+            ]);
+        });
+
         $container->registerAttributeForAutoconfiguration(AsSchedule::class, static function (ChildDefinition $definition, AsSchedule $attribute): void {
             $definition->addTag('scheduler.schedule_provider', ['name' => $attribute->name]);
         });

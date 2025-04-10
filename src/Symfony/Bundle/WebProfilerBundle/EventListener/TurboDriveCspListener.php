@@ -26,36 +26,14 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class TurboDriveCspListener implements EventSubscriberInterface
 {
-    public function __construct(
-        private readonly bool $isDebug,
-    ) {
-    }
-
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$this->isDebug) {
-            return;
-        }
-        if (!$event->isMainRequest()) {
-            return;
-        }
-
-        $request = $event->getRequest();
-        $routeName = $request->get('_route');
-
-        if ('_wdt' === $routeName) {
-            return;
-        }
-
-        if ($request->headers->has('X-Turbo-Request-Id')) {
-            return;
-        } elseif ($request->headers->has('Turbo-Frame')) {
-            return;
-        } elseif ('turbo_stream' === $request->getPreferredFormat()) {
-            return;
-        }
-
         $response = $event->getResponse();
+        $responseContent = $response->getContent();
+
+        if (!str_contains($responseContent, '<div id="sfwdt')) {
+            return;
+        }
 
         $csp = $response->headers->get('Content-Security-Policy');
         if (!$csp) {
@@ -102,14 +80,14 @@ class TurboDriveCspListener implements EventSubscriberInterface
         }
         $response->headers->set('Content-Security-Policy', $csp);
 
-        $modifiedContent = str_replace('</head>', $scriptTag.'</head>', $response->getContent());
+        $modifiedContent = str_replace('</head>', $scriptTag.'</head>', $responseContent);
         $response->setContent($modifiedContent);
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::RESPONSE => ['onKernelResponse', -256],
+            KernelEvents::RESPONSE => ['onKernelResponse', -128],
         ];
     }
 }

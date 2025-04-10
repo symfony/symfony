@@ -11,22 +11,10 @@
 
 namespace Symfony\Component\Uid;
 
-final class InvalidUuidException extends \InvalidArgumentException
+final class InvalidUuidException extends InvalidUidException
 {
-    public function __construct(
-        private readonly int $type,
-        private readonly string $value,
-    ) {
-        parent::__construct(\sprintf('Invalid UUID%s: "%s".', $this->type ? 'v'.$this->type : '', $this->value));
-    }
-
-    public function getType(): int
+    public function __construct(int $type, string $value)
     {
-        return $this->type;
-    }
-
-    public function getValue(): string
-    {
-        return $this->value;
+        parent::__construct($value, \sprintf('Invalid UUID%s: "%s".', $type ? 'v'.$type : '', $value));
     }
 }

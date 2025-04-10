@@ -11,16 +11,10 @@
 
 namespace Symfony\Component\Uid;
 
-final class InvalidUlidException extends \InvalidArgumentException
+final class InvalidUlidException extends InvalidUidException
 {
-    public function __construct(
-        private readonly string $value,
-    ) {
-        parent::__construct(\sprintf('Invalid ULID: "%s".', $this->value));
-    }
-
-    public function getValue(): string
+    public function __construct(string $value)
     {
-        return $this->value;
+        parent::__construct($value, \sprintf('Invalid ULID: "%s".', $value));
     }
 }

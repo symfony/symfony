@@ -44,6 +44,7 @@ class Route
      * @param bool|null                                         $stateless    Whether the route is defined as stateless or stateful, @see https://symfony.com/doc/current/routing.html#stateless-routes
      * @param string|null                                       $env          The env in which the route is defined (i.e. "dev", "test", "prod")
      * @param string|DeprecatedAlias|(string|DeprecatedAlias)[] $alias        The list of aliases for this route
+     * @param bool|null                                         $override     Whether the route should override existing routes with the same name
      */
     public function __construct(
         string|array|null $path = null,
@@ -62,6 +63,7 @@ class Route
         ?bool $stateless = null,
         private ?string $env = null,
         string|DeprecatedAlias|array $alias = [],
+        private ?bool $override = null,
     ) {
         if (\is_array($path)) {
             $this->localizedPaths = $path;
@@ -223,6 +225,16 @@ class Route
     public function setAliases(string|DeprecatedAlias|array $aliases): void
     {
         $this->aliases = \is_array($aliases) ? $aliases : [$aliases];
+    }
+
+    public function setOverride(?bool $override): void
+    {
+        $this->override = $override;
+    }
+
+    public function getOverride(): ?bool
+    {
+        return $this->override;
     }
 }
 

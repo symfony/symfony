@@ -82,9 +82,11 @@ class RouteCollection implements \IteratorAggregate, \Countable
         return \count($this->routes);
     }
 
-    public function add(string $name, Route $route, int $priority = 0): void
+    public function add(string $name, Route $route, int $priority = 0, bool $override = true): void
     {
-        unset($this->routes[$name], $this->priorities[$name], $this->aliases[$name]);
+        if ($override) {
+            unset($this->routes[$name], $this->priorities[$name], $this->aliases[$name]);
+        }
 
         $this->routes[$name] = $route;
 

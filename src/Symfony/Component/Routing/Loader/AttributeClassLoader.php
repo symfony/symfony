@@ -185,6 +185,7 @@ abstract class AttributeClassLoader implements LoaderInterface
         $host = $attr->getHost() ?? $globals['host'];
         $condition = $attr->getCondition() ?? $globals['condition'];
         $priority = $attr->getPriority() ?? $globals['priority'];
+        $override = $attr->getOverride() ?? $globals['override'];
 
         $path = $attr->getLocalizedPaths() ?: $attr->getPath();
         $prefix = $globals['localized_paths'] ?: $globals['path'];
@@ -237,9 +238,9 @@ abstract class AttributeClassLoader implements LoaderInterface
                 $route->setDefault('_locale', $locale);
                 $route->setRequirement('_locale', preg_quote($locale));
                 $route->setDefault('_canonical_route', $name);
-                $collection->add($name.'.'.$locale, $route, $priority);
+                $collection->add($name.'.'.$locale, $route, $priority, $override);
             } else {
-                $collection->add($name, $route, $priority);
+                $collection->add($name, $route, $priority, $override);
             }
             foreach ($attr->getAliases() as $aliasAttribute) {
                 if ($aliasAttribute instanceof DeprecatedAlias) {

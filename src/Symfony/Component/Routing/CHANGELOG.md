@@ -6,6 +6,7 @@ CHANGELOG
 
  * Allow aliases and deprecations in `#[Route]` attribute
  * Add the `Requirement::MONGODB_ID` constant to validate MongoDB ObjectIDs in hexadecimal format
+ * Add `override` parameter in `#[Route]` attribute
 
 7.2
 ---

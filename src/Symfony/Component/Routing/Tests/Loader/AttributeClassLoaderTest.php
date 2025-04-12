@@ -44,6 +44,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MultipleDeprecate
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\NothingButNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PrefixedActionLocalizedRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PrefixedActionPathController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PrivateProtectedMethodsController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RequirementsWithoutPlaceholderNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithEnv;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithPrefixController;
@@ -307,6 +308,13 @@ class AttributeClassLoaderTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->loader->load(AbstractClassController::class);
+    }
+
+    public function testLoadingClassWithRouteAttributeOnNonPublicMethod()
+    {
+        $routes = $this->loader->load(PrivateProtectedMethodsController::class);
+        $this->assertCount(1, $routes);
+        $routes->get('foo');
     }
 
     public function testLocalizedPrefixWithoutRouteLocale()

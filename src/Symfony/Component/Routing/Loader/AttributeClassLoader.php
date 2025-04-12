@@ -119,6 +119,10 @@ abstract class AttributeClassLoader implements LoaderInterface
         }
 
         foreach ($class->getMethods() as $method) {
+            if (!$method->isPublic()) {
+                continue;
+            }
+
             $this->defaultRouteIndex = 0;
             $routeNamesBefore = array_keys($collection->all());
             foreach ($this->getAttributes($method) as $attr) {

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '😶‍🌫' => '𞤴𞤫𞥅𞤧𞤮 𞤲𞤣𞤫𞤪 𞤣𞤵𞥅𞤤𞤫',
     '😮‍💨' => '𞤴𞤫𞥅𞤧𞤮 𞤣𞤵𞤨𞥆𞤢𞤴𞤲𞤺𞤮',

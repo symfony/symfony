@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'سۆيۈش: چوڭلار, چوڭلار, ئاچ تېرە رەڭ, and ئارا ئاچ تېرە رەڭگى',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'سۆيۈش: چوڭلار, چوڭلار, ئاچ تېرە رەڭ, and ئارا تېرە رەڭگى',

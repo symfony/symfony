@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'ચુંબન: વ્યક્તિ, વ્યક્તિ, ચામડીનો આછો રંગ, ચામડીનો મધ્યમ આછો રંગ',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'ચુંબન: વ્યક્તિ, વ્યક્તિ, ચામડીનો આછો રંગ, મધ્યમ ચામડીનો રંગ',

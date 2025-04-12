@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'porik, kiž so koši: dorosćeny, dorosćeny, swětła barba kože a srěnjoswětła barba kože',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'porik, kiž so koši: dorosćeny, dorosćeny, swětła barba kože a srěnja barba kože',

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'бакнеж: возрасно лице, возрасно лице, тип на кожа 1–2 и тип на кожа 3',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'бакнеж: возрасно лице, возрасно лице, тип на кожа 1–2 и тип на кожа 4',

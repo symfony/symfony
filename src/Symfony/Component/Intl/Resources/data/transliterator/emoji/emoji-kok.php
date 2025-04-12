@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'उमो: व्यक्ती, व्यक्ती, उजळ कातीचो रंग, मध्यम-उजळ कातीचो रंग',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'उमो: व्यक्ती, व्यक्ती, उजळ कातीचो रंग, मध्यम कातीचो रंग',

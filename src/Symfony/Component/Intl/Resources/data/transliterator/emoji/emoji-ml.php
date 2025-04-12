@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'ചുംബനം: വ്യക്തി, വ്യക്തി, തെളിഞ്ഞ ചർമ്മ നിറം, ഇടത്തരം തെളിഞ്ഞ ചർമ്മ നിറം',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'ചുംബനം: വ്യക്തി, വ്യക്തി, തെളിഞ്ഞ ചർമ്മ നിറം, ചർമ്മത്തിന്റെ നിറം-4',

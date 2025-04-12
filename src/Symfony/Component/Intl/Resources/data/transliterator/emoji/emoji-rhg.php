@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '👩‍❤‍💋‍👨' => '𐴀𐴝𐴂𐴧𐴥𐴗𐴝: 𐴁𐴠𐴍𐴞, 𐴔𐴝𐴕𐴥𐴟𐴙𐴐𐴢',
     '👨‍❤‍💋‍👨' => '𐴀𐴝𐴂𐴧𐴥𐴗𐴝: 𐴔𐴝𐴕𐴥𐴟𐴙𐴐𐴢, 𐴔𐴝𐴕𐴥𐴟𐴙𐴐𐴢',

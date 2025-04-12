@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => '2人でキス: 大人 大人 薄い肌色 やや薄い肌色',
     '🧑🏻‍❤‍💋‍🧑🏽' => '2人でキス: 大人 大人 薄い肌色 中間の肌色',

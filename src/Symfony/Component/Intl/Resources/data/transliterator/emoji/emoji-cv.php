@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'чупту: ҫитӗннӗ ҫын ҫитӗннӗ ҫын сӑран ҫутӑ тӗсӗ ӳт-тирӗн вӑтам-ҫутӑ тӗсӗ',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'чупту: ҫитӗннӗ ҫын ҫитӗннӗ ҫын сӑран ҫутӑ тӗсӗ сӑран вӑтам тонӗ',

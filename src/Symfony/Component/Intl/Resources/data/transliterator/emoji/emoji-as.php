@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'চুমা: প্ৰাপ্তবয়স্ক, প্ৰাপ্তবয়স্ক, পাতল ছালৰ ৰং, মধ্যমীয়া-পাতল ছালৰ ৰং',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'চুমা: প্ৰাপ্তবয়স্ক, প্ৰাপ্তবয়স্ক, পাতল ছালৰ ৰং, মধ্যমীয়া ছালৰ ৰং',

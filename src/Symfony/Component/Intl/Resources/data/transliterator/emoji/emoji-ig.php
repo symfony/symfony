@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'nsusò ọnụ: okenye, okenye, ọtanjele ahụ maka ọcha, ọtanjele ahụ maka ọcha-ndịna etiti',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'nsusò ọnụ: okenye, okenye, ọtanjele ahụ maka ọcha, ọtanjele ahụ ndịna etiti',

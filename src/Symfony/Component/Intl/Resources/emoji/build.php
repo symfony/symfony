@@ -16,6 +16,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\VarExporter\VarExporter;
 
+Builder::extractLicense();
 Builder::cleanTarget();
 $emojisCodePoints = Builder::getEmojisCodePoints();
 Builder::saveRules(Builder::buildRules($emojisCodePoints));
@@ -26,6 +27,20 @@ Builder::saveRules(Builder::buildSlackRules($emojisCodePoints));
 final class Builder
 {
     private const TARGET_DIR = __DIR__.'/../data/transliterator/emoji/';
+
+    private static string $license;
+
+    public static function extractLicense(): void
+    {
+        if (isset(self::$license)) {
+            return;
+        }
+
+        $file = file_get_contents(__FILE__);
+        preg_match('{/\*.*?\*/}s', $file, $matches);
+
+        self::$license = $matches[0];
+    }
 
     public static function getEmojisCodePoints(): array
     {
@@ -213,9 +228,10 @@ final class Builder
 
     public static function saveRules(iterable $rulesByLocale): void
     {
+        $license = self::$license;
         $firstChars = [];
         foreach ($rulesByLocale as $filename => $rules) {
-            file_put_contents(self::TARGET_DIR."/$filename.php", "<?php\n\nreturn ".VarExporter::export($rules).";\n");
+            file_put_contents(self::TARGET_DIR."/$filename.php", "<?php\n\n{$license}\n\nreturn ".VarExporter::export($rules).";\n");
 
             foreach ($rules as $k => $v) {
                 if (!str_starts_with($filename, 'emoji-')) {

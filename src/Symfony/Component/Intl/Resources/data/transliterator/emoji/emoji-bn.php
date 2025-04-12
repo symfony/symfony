@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'চুম্বন: প্রাপ্তবয়স্ক, প্রাপ্তবয়স্ক, হালকা ত্বকের রঙ, মাঝারি-হালকা ত্বকের রঙ',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'চুম্বন: প্রাপ্তবয়স্ক, প্রাপ্তবয়স্ক, হালকা ত্বকের রঙ, মাঝারি ত্বকের রঙ',

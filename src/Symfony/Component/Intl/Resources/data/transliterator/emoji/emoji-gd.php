@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'pòg: inbheach, inbheach, tòna soilleir a’ chraicinn ’s tòna meadhanach soilleir a’ chraicinn',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'pòg: inbheach, inbheach, tòna soilleir a’ chraicinn ’s tòna meadhanach a’ chraicinn',

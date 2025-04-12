@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'beijo: pessoa, pessoa, tipo de pele 1–2 e tipo de pele 3',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'beijo: pessoa, pessoa, tipo de pele 1–2 e tipo de pele 4',

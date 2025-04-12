@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'nụ hôn: người, người, màu da sáng, màu da sáng trung bình',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'nụ hôn: người, người, màu da sáng, màu da trung bình',

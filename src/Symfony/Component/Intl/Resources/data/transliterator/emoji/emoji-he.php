@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'נשיקה: אדם, אדם, גוון עור בהיר, גוון עור בהיר בינוני',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'נשיקה: אדם, אדם, גוון עור בהיר, גוון עור בינוני',

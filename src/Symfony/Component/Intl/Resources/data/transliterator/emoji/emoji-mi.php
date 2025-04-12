@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'kihi: pakeke, pakeke, kiri āhua māmā, kiri āhua māmā-waenga',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'kihi: pakeke, pakeke, kiri āhua māmā, kiri āhua waenga',

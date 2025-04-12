@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'poljubac: odrasla osoba, odrasla osoba, svijetla boja kože i svijetlo maslinasta boja kože',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'poljubac: odrasla osoba, odrasla osoba, svijetla boja kože i maslinasta boja kože',

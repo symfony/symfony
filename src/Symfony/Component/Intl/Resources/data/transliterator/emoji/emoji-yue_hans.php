@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => '吻: 成人 成人 浅肤色 中浅肤色',
     '🧑🏻‍❤‍💋‍🧑🏽' => '吻: 成人 成人 浅肤色 中肤色',

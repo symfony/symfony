@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'бӯса: калонсол, калонсол, ранги равшани пӯст, ранги равшании миёнаи пӯст',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'бӯса: калонсол, калонсол, ранги равшани пӯст, ранги миёнаи пӯст',

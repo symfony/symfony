@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'முத்தமிடுதல்: வயது வந்தவர், வயது வந்தவர், வகை 1–2, வகை 3',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'முத்தமிடுதல்: வயது வந்தவர், வயது வந்தவர், வகை 1–2, வகை 4',

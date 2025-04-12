@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'ଚୁମ୍ବନ: ବ୍ୟକ୍ତି, ବ୍ୟକ୍ତି, ହାଲକା ଚର୍ମ ରଙ୍ଗ, ମଧ୍ୟମ-ହାଲକା ଚର୍ମ ରଙ୍ଗ',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'ଚୁମ୍ବନ: ବ୍ୟକ୍ତି, ବ୍ୟକ୍ତି, ହାଲକା ଚର୍ମ ରଙ୍ଗ, ମଧ୍ୟମ ଚର୍ମ ରଙ୍ଗ',

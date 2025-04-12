@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '🧑🏻‍❤‍💋‍🧑🏼' => 'چومنا: بالغ, بالغ, ہلکی رنگت آلی جلد, ہلکی درمیانی رنگت آلی جلد',
     '🧑🏻‍❤‍💋‍🧑🏽' => 'چومنا: بالغ, بالغ, ہلکی رنگت آلی جلد, درمیانی رنگت آلی جلد',

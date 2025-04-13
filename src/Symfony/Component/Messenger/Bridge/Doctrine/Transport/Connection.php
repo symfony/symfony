@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception as DBALException;
@@ -158,15 +159,17 @@ class Connection implements ResetInterface
 
     public function get(): ?array
     {
-        if ($this->doMysqlCleanup && $this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+        if ($this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            if ($this->doMysqlCleanup) {
+                $this->deleteDeliveredMessageForMySQLPlatform();
+            }
             try {
-                $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59']);
-                $this->doMysqlCleanup = false;
-            } catch (DriverException $e) {
-                // Ignore the exception
-            } catch (TableNotFoundException $e) {
+                return $this->getMessageForMySQLPlatform();
+            } catch (TableNotFoundException) {
                 if ($this->autoSetup) {
                     $this->setup();
+
+                    return $this->getMessageForMySQLPlatform();
                 }
             }
         }
@@ -626,5 +629,112 @@ class Connection implements ResetInterface
         } catch (DBALException) {
             return $sql;
         }
+    }
+
+    private function getMessageForMySQLPlatform(): ?array
+    {
+        $possibleIdsToClaim = $this->createAvailableMessagesQueryBuilder()
+            ->select('id')
+            ->orderBy('available_at', 'ASC')
+            ->setMaxResults(100)->fetchFirstColumn();
+
+        if (0 === \count($possibleIdsToClaim)) {
+            $this->queueEmptiedAt = microtime(true) * 1000;
+
+            return null;
+        }
+        $this->queueEmptiedAt = null;
+
+        foreach ($possibleIdsToClaim as $id) {
+            $claimedId = $this->claimMessage($id);
+            if (null !== $claimedId) {
+                break;
+            }
+        }
+
+        if (!isset($claimedId)) {
+            // all open messages already have been claimed by other workers.
+            return null;
+        }
+
+        $messageData = $this->createQueryBuilder()
+            ->andWhere('m.id = :id')
+            ->setParameter(':id', $claimedId)
+            ->fetchAssociative();
+
+        return $this->decodeEnvelopeHeaders($messageData);
+    }
+
+    /**
+     * @throws DBALException
+     */
+    private function deleteDeliveredMessageForMySQLPlatform(): void
+    {
+        try {
+            $ids = $this->selectMessageIdsToDelete();
+            $this->driverConnection->createQueryBuilder()
+                ->delete($this->configuration['table_name'])
+                ->where('id IN (:ids)')
+                ->setParameter('ids', $ids, ArrayParameterType::INTEGER)
+                ->executeQuery()
+            ;
+            $this->doMysqlCleanup = false;
+        } catch (DriverException $e) {
+            // Ignore the exception
+        } catch (TableNotFoundException $e) {
+            if ($this->autoSetup) {
+                $this->setup();
+            }
+        }
+    }
+
+    /**
+     * @return array<int, mixed>
+     *
+     * @throws DBALException
+     */
+    private function selectMessageIdsToDelete(): array
+    {
+        return $this->driverConnection->createQueryBuilder()
+            ->select('m.id')
+            ->from($this->configuration['table_name'], 'm')
+            ->where('m.queue_name = ?')
+            ->andWhere('m.delivered_at = ?')
+            ->setParameters([
+                $this->configuration['queue_name'],
+                '9999-12-31 23:59:59',
+            ], [
+                Types::STRING,
+                Types::STRING,
+            ])
+            ->setMaxResults(5_000)
+            ->fetchFirstColumn();
+    }
+
+    private function claimMessage(mixed $id): mixed
+    {
+        $now = new \DateTimeImmutable('UTC');
+        $redeliverLimit = $now->modify(\sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
+
+        $claimed = $this->driverConnection->createQueryBuilder()
+                ->update($this->configuration['table_name'])
+                ->set('delivered_at', ':now')
+                ->andWhere('id = :id')
+                ->andWhere('queue_name = :queue_name')
+                ->andWhere('delivered_at is null OR delivered_at < :redeliver_imit')
+                ->setParameters([
+                    'now' => $now,
+                    'id' => $id,
+                    'queue_name' => $this->configuration['queue_name'],
+                    'redeliver_imit' => $redeliverLimit,
+                ], [
+                    'now' => Types::DATETIME_IMMUTABLE,
+                    'id' => Types::INTEGER,
+                    'queue_name' => Types::STRING,
+                    'redeliver_imit' => Types::DATETIME_IMMUTABLE,
+                ])
+                ->executeStatement() > 0;
+
+        return $claimed ? $id : null;
     }
 }

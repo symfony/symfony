@@ -668,46 +668,41 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
+    /**
+     * @dataProvider providePlatformMySQLSql
+     */
+    public function testGeneratedMySQLSqlOnGet(AbstractPlatform $platform, string $expectedSql, string $expectedUpdateSql)
+    {
+        $driverConnection = $this->createMock(DBALConnection::class);
+        $driverConnection->method('getDatabasePlatform')->willReturn($platform);
+        $driverConnection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($driverConnection));
+
+        $result = $this->createMock(Result::class);
+        $result->method('fetchFirstColumn')->willReturn(['id' => 3]);
+
+        $driverConnection
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with($this->callback(function ($sql) use ($expectedSql) {
+                return trim($expectedSql) === trim($sql);
+            }))
+            ->willReturn($result)
+        ;
+        $driverConnection
+            ->expects($this->once())
+            ->method('executeStatement')
+            ->with($this->callback(function ($sql) use ($expectedUpdateSql) {
+                return trim($expectedUpdateSql) === trim($sql);
+            }))
+            ->willReturn(0)
+        ;
+
+        $connection = new Connection([], $driverConnection);
+        $connection->get();
+    }
+
     public static function providePlatformSql(): iterable
     {
-        yield 'MySQL' => [
-            class_exists(MySQLPlatform::class) ? new MySQLPlatform() : new MySQL57Platform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
-        ];
-
-        if (class_exists(MySQL80Platform::class) && !method_exists(QueryBuilder::class, 'forUpdate')) {
-            yield 'MySQL8 & DBAL<3.8' => [
-                new MySQL80Platform(),
-                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
-            ];
-        }
-
-        if (class_exists(MySQL80Platform::class) && method_exists(QueryBuilder::class, 'forUpdate')) {
-            yield 'MySQL8 & DBAL>=3.8' => [
-                new MySQL80Platform(),
-                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
-            ];
-        }
-
-        yield 'MariaDB' => [
-            new MariaDBPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
-        ];
-
-        if (interface_exists(DBALException::class)) {
-            // DBAL 4+
-            $mariaDbPlatformClass = 'Doctrine\DBAL\Platforms\MariaDB1060Platform';
-        } else {
-            $mariaDbPlatformClass = 'Doctrine\DBAL\Platforms\MariaDb1060Platform';
-        }
-
-        if (class_exists($mariaDbPlatformClass)) {
-            yield 'MariaDB106' => [
-                new $mariaDbPlatformClass(),
-                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
-            ];
-        }
-
         if (class_exists(MySQL57Platform::class)) {
             yield 'Postgres & DBAL<4' => [
                 new PostgreSQLPlatform(),
@@ -769,6 +764,51 @@ class ConnectionTest extends TestCase
             yield 'Oracle & DBAL>=4' => [
                 new OraclePlatform(),
                 'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC FETCH NEXT 1 ROWS ONLY) FOR UPDATE SKIP LOCKED',
+            ];
+        }
+    }
+
+    public static function providePlatformMySQLSql(): iterable
+    {
+        yield 'MySQL' => [
+            class_exists(MySQLPlatform::class) ? new MySQLPlatform() : new MySQL57Platform(),
+            'SELECT id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 100',
+            'UPDATE messenger_messages SET delivered_at = :now WHERE (id = :id) AND (queue_name = :queue_name) AND (delivered_at is null OR delivered_at < :redeliver_imit)',
+        ];
+
+        if (class_exists(MySQL80Platform::class) && !method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'MySQL8 & DBAL<3.8' => [
+                new MySQL80Platform(),
+                'SELECT id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 100',
+                'UPDATE messenger_messages SET delivered_at = :now WHERE (id = :id) AND (queue_name = :queue_name) AND (delivered_at is null OR delivered_at < :redeliver_imit)',
+            ];
+        }
+
+        if (class_exists(MySQL80Platform::class) && method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'MySQL8 & DBAL>=3.8' => [
+                new MySQL80Platform(),
+                'SELECT id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 100',
+                'UPDATE messenger_messages SET delivered_at = :now WHERE (id = :id) AND (queue_name = :queue_name) AND (delivered_at is null OR delivered_at < :redeliver_imit)',
+            ];
+        }
+        yield 'MariaDB' => [
+            new MariaDBPlatform(),
+            'SELECT id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 100',
+            'UPDATE messenger_messages SET delivered_at = :now WHERE (id = :id) AND (queue_name = :queue_name) AND (delivered_at is null OR delivered_at < :redeliver_imit)',
+        ];
+
+        if (interface_exists(DBALException::class)) {
+            // DBAL 4+
+            $mariaDbPlatformClass = 'Doctrine\DBAL\Platforms\MariaDB1060Platform';
+        } else {
+            $mariaDbPlatformClass = 'Doctrine\DBAL\Platforms\MariaDb1060Platform';
+        }
+
+        if (class_exists($mariaDbPlatformClass)) {
+            yield 'MariaDB106' => [
+                new $mariaDbPlatformClass(),
+                'SELECT id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 100',
+                'UPDATE messenger_messages SET delivered_at = :now WHERE (id = :id) AND (queue_name = :queue_name) AND (delivered_at is null OR delivered_at < :redeliver_imit)',
             ];
         }
     }

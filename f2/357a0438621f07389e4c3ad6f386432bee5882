@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-04-10T14:52:03Z
+
+> Alternatively, we could ban it from the codebase. It's not better than the annotation anyway.
+
+The benefit of the native attribute is that PHP will report the deprecation in the place doing the call, not in the method being deprecated, so it gives a better location for the warning (in our system using `trigger_deprecation`, identifying the most useful location requires investigating the trace, which is not displayed by default by PHP for warnings IIRC, even though it is included when using `symfony/error-handler`).
+But I agree we can delay its usage in our codebase until Symfony 8.x when we won't need a fallback anymore.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-04-11T17:59:52Z
+
+```
+$this->workflows->get($event->getWorkflowName());
+```
+
+im wondering if we can avoid `$this` and `$event` mixing to get a workflow, eg. is the deprecation really legit?
+
+cant we fix `getWorkflow` instead? using the same solution (leveraging the actual DI target object)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-11T18:04:24Z
+
+> cant we fix `getWorkflow` instead? using the same solution (leveraging the actual DI target object)
+
+I means injecting a locator in every workflow. IMHO this is not the respectability of the workflow to do that.
+
+I already thought about using a custom event dispatcher, but a bit overkill IMHO.
+
+More over, having a generic listener is really rare, so this use case is really limited

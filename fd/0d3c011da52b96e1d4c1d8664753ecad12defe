@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-04-10T08:45:05Z
+
+I updated the PR title to have a better changelog entry (to me, this deserves being mentioned in the changelog)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-04-11T07:29:31Z
+
+fabbot suggests adding a license header to the scripts, which seems correct.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-11T08:17:20Z
+
+> fabbot suggests adding a license header to the scripts, which seems correct.
+
+We didn't do that on other files. Should I open another PR to fix all other files?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-04-13T08:44:31Z
+
+> fabbot suggests adding a license header to the scripts, which seems correct.
+
+fabbot does not complain anymore :)

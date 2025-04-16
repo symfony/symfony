@@ -32,19 +32,32 @@ class RedisStore implements SharedLockStoreInterface
     use ExpiringStoreTrait;
 
     private const NO_SCRIPT_ERROR_MESSAGE_PREFIX = 'NOSCRIPT';
+    /**
+     * @internal
+     */
+    private const NS_SEPARATOR = ':';
 
     private bool $supportTime;
 
+    private string $namespace = '';
+
     /**
      * @param float $initialTtl The expiration delay of locks in seconds
+     * @param array $options See below
+     *
+     *  Options:
+     *       namespace: Prefix used for keys
      */
     public function __construct(
         private \Redis|Relay|RelayCluster|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
         private float $initialTtl = 300.0,
+        private array $options = [],
     ) {
         if ($initialTtl <= 0) {
             throw new InvalidTtlException(\sprintf('"%s()" expects a strictly positive TTL. Got %d.', __METHOD__, $initialTtl));
         }
+
+        $this->namespace = isset($this->options['namespace']) ? $this->options['namespace'] . static::NS_SEPARATOR : '';
     }
 
     public function save(Key $key): void
@@ -85,7 +98,7 @@ class RedisStore implements SharedLockStoreInterface
         ';
 
         $key->reduceLifetime($this->initialTtl);
-        if (!$this->evaluate($script, (string) $key, [microtime(true), $this->getUniqueToken($key), (int) ceil($this->initialTtl * 1000)])) {
+        if (!$this->evaluate($script, $this->namespace . $key, [microtime(true), $this->getUniqueToken($key), (int) ceil($this->initialTtl * 1000)])) {
             throw new LockConflictedException();
         }
 
@@ -125,7 +138,7 @@ class RedisStore implements SharedLockStoreInterface
         ';
 
         $key->reduceLifetime($this->initialTtl);
-        if (!$this->evaluate($script, (string) $key, [microtime(true), $this->getUniqueToken($key), (int) ceil($this->initialTtl * 1000)])) {
+        if (!$this->evaluate($script, $this->namespace . $key, [microtime(true), $this->getUniqueToken($key), (int) ceil($this->initialTtl * 1000)])) {
             throw new LockConflictedException();
         }
 
@@ -165,7 +178,7 @@ class RedisStore implements SharedLockStoreInterface
         ';
 
         $key->reduceLifetime($ttl);
-        if (!$this->evaluate($script, (string) $key, [microtime(true), $this->getUniqueToken($key), (int) ceil($ttl * 1000)])) {
+        if (!$this->evaluate($script, $this->namespace . $key, [microtime(true), $this->getUniqueToken($key), (int) ceil($ttl * 1000)])) {
             throw new LockConflictedException();
         }
 
@@ -199,7 +212,7 @@ class RedisStore implements SharedLockStoreInterface
             return true
         ';
 
-        $this->evaluate($script, (string) $key, [$this->getUniqueToken($key)]);
+        $this->evaluate($script, $this->namespace . $key, [$this->getUniqueToken($key)]);
     }
 
     public function exists(Key $key): bool
@@ -225,7 +238,7 @@ class RedisStore implements SharedLockStoreInterface
             return false
         ';
 
-        return (bool) $this->evaluate($script, (string) $key, [microtime(true), $this->getUniqueToken($key)]);
+        return (bool) $this->evaluate($script, $this->namespace . $key, [microtime(true), $this->getUniqueToken($key)]);
     }
 
     private function evaluate(string $script, string $resource, array $args): mixed

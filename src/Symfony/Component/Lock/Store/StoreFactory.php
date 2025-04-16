@@ -69,9 +69,21 @@ class StoreFactory
                     throw new InvalidArgumentException('Unsupported Redis or Memcached DSN. Try running "composer require symfony/cache".');
                 }
                 $storeClass = str_starts_with($connection, 'memcached:') ? MemcachedStore::class : RedisStore::class;
+
+                $matches = [];
+                $namespace = '';
+                if (preg_match('/^(.*[\?&])namespace=([^&#]*)&?(([^#]*).*)$/', $connection, $matches)) {
+                    $prefix = $matches[1];
+                    $namespace = $matches[2];
+                    if (empty($matches[4])) {
+                        $prefix = substr($prefix, 0, -1);
+                    }
+                    $connection = $prefix.$matches[3];
+                }
+
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 
-                return new $storeClass($connection);
+                return new $storeClass($connection, ['namespace' => $namespace]);
 
             case str_starts_with($connection, 'mongodb'):
                 return new MongoDbStore($connection);

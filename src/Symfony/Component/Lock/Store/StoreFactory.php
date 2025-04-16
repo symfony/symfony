@@ -83,7 +83,7 @@ class StoreFactory
 
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 
-                return new $storeClass($connection, ['namespace' => $namespace]);
+                return new $storeClass($connection, options: ['namespace' => $namespace]);
 
             case str_starts_with($connection, 'mongodb'):
                 return new MongoDbStore($connection);

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by aleho at 2025-04-08T07:18:17Z
+
+@nicolas-grekas I could write a test case for `WrappedTemplatedEmail` and trigger all the HTML handling like sending it. That would need a template and small image for tests. I'd only start if that's OK for you because I don't want to throw away that work.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-08T07:20:24Z
+
+The proposal looks good to me. I'd say it just misses some tests + a line in the CHANGELOG file of the bridge.
+
+---------------------------------------------------------------------------
+
+by aleho at 2025-04-11T07:29:39Z
+
+@nicolas-grekas I'm not too happy with hard-coding the strings to test like that because of how line breaks are handled, but I guess the intention is clear and they should be easy to maintain if something changes.
+
+The Doctrine tests failing are hopefully not related to my changes?

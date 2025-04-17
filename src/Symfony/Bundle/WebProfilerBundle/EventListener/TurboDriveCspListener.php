@@ -30,7 +30,7 @@ class TurboDriveCspListener implements EventSubscriberInterface
         if (!$event->isMainRequest()) {
             return;
         }
-        
+
         $request = $event->getRequest();
 
         // do not capture redirects or modify XML HTTP Requests
@@ -39,7 +39,7 @@ class TurboDriveCspListener implements EventSubscriberInterface
         }
 
         $response = $event->getResponse();
-        
+
         if (!$response->headers->has('Content-Security-Policy')
             || $response->isRedirection()
             || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type') ?? '', 'html'))
@@ -48,7 +48,7 @@ class TurboDriveCspListener implements EventSubscriberInterface
         ) {
             return;
         }
-       
+
         $responseContent = $response->getContent();
 
         if (!str_contains($responseContent, '<div id="sfwdt')) {
@@ -61,7 +61,7 @@ class TurboDriveCspListener implements EventSubscriberInterface
             document.addEventListener('turbo:before-fetch-request', (event) =>
             {
                 const wdt = document.querySelector('.sf-toolbar');      if (!wdt) return;
-                const wdtStyle = wdt.nextElementSibling;                if (!wdtStyle) return;  
+                const wdtStyle = wdt.nextElementSibling;                if (!wdtStyle) return;
                 if (wdtStyle.nonce) {
                     event.detail.fetchOptions.headers['X-SymfonyProfiler-Style-Nonce'] = wdtStyle.nonce;
                 }

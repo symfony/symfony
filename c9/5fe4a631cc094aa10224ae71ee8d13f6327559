@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-04-17T21:01:33Z
+
+I stumbled upon this issue while working on #58370. It took me a while to find the root cause as the CI currently isn't failing despite the bug that's being fixed in this PR (probably because the order in which tests are executed matters). That's why I split the PR into three commits (we can still squash them while merging though):
+
+1) reduce the CI config for the Windows job to showcase that [the tests actually fail](https://github.com/symfony/symfony/actions/runs/14524678493/job/40753516019) without the fix
+2) the fix being applied with restoring the original config to show that the patch does [indeed fix the issue](https://github.com/symfony/symfony/actions/runs/14524741448/job/40753713133)
+3) restoring the CI config to the previous state

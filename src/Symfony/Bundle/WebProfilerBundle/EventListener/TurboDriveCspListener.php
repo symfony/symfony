@@ -27,7 +27,28 @@ class TurboDriveCspListener implements EventSubscriberInterface
 {
     public function onKernelResponse(ResponseEvent $event): void
     {
+        if (!$event->isMainRequest()) {
+            return;
+        }
+        
+        $request = $event->getRequest();
+
+        // do not capture redirects or modify XML HTTP Requests
+        if ($request->isXmlHttpRequest()) {
+            return;
+        }
+
         $response = $event->getResponse();
+        
+        if (!$response->headers->has('Content-Security-Policy')
+            || $response->isRedirection()
+            || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type') ?? '', 'html'))
+            || 'html' !== $request->getRequestFormat()
+            || false !== stripos($response->headers->get('Content-Disposition', ''), 'attachment;')
+        ) {
+            return;
+        }
+       
         $responseContent = $response->getContent();
 
         if (!str_contains($responseContent, '<div id="sfwdt')) {
@@ -35,21 +56,18 @@ class TurboDriveCspListener implements EventSubscriberInterface
         }
 
         $csp = $response->headers->get('Content-Security-Policy');
-        if (!$csp) {
-            return;
-        }
 
         $scriptContent = <<<'EOD'
             document.addEventListener('turbo:before-fetch-request', (event) =>
             {
-                var wdt = document.querySelector('.sf-toolbar');
-                if (wdt)
-                {
-                    let wdtStyle = wdt.nextElementSibling;
-                    let wdtScript = wdtStyle.nextElementSibling;
-
-                    if (wdtStyle.nonce) {event.detail.fetchOptions.headers['X-SymfonyProfiler-Style-Nonce'] = wdtStyle.nonce;}
-                    if (wdtScript.nonce) {event.detail.fetchOptions.headers['X-SymfonyProfiler-Script-Nonce'] = wdtScript.nonce;}
+                const wdt = document.querySelector('.sf-toolbar');      if (!wdt) return;
+                const wdtStyle = wdt.nextElementSibling;                if (!wdtStyle) return;  
+                if (wdtStyle.nonce) {
+                    event.detail.fetchOptions.headers['X-SymfonyProfiler-Style-Nonce'] = wdtStyle.nonce;
+                }
+                const wdtScript = wdtStyle.nextElementSibling;          if (!wdtScript) return;
+                if (wdtScript.nonce) {
+                     event.detail.fetchOptions.headers['X-SymfonyProfiler-Script-Nonce'] = wdtScript.nonce;
                 }
             });
         EOD;

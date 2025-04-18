@@ -1,0 +1,444 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-03-31T14:21:09Z
+
+There is strictly no guarantee in the ContainerInterface that a service class is a subtype of the object id, even when the object id is a class-string. This PR adds this in the contract of the interface, which is a BC break to me (btw, it might force us to forbid some kind of service decoration to ensure this is true)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2025-03-31T14:25:04Z
+
+I agree with @stof here. We decided against using PHPdoc types that do not represent the 100% use-case, even if it improves the experience for 95% There is no guarantee that there is a direct relation between service ID and object type, even though it's a common convention that there is.
+
+So 👎 from me.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-03-31T14:34:23Z
+
+> There is strictly no guarantee in the ContainerInterface that a service class is a subtype of the object id, even when the object id is a class-string. This PR adds this in the contract of the interface, which is a BC break to me (btw, it might force us to forbid some kind of service decoration to ensure this is true)
+
+Indeed, but I thought it would be okay since it's only PHPDoc.
+
+But since it increase the DX a lot in test env, I thought it would be okay.
+
+If we add a sentence, to explain is not 100% accurate, would it be okay?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-31T14:37:15Z
+
+> Indeed, but I thought it would be okay since it's only PHPDoc.
+
+Our phpdoc in our interfaces is considered as part of the defined contract (it is taken into account when deciding whether the change we do is a BC break or no)
+
+> If we add a sentence, to explain is not 100% accurate, would it be okay?
+
+still -1 to me, because of the previous point.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-03-31T14:37:37Z
+
+okay, let's close it then
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-03-31T14:38:39Z
+
+Oh, there was a race condition here. I close the PR at the same time of last comment from @nicolas-grekas. Let's re-open
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-31T14:40:48Z
+
+> Better than that: I'm fine if ppl that use a FQCN identifier without returning a compatible instance get a SA warning.
+
+They would not. they might get a runtime error because the runtime type does not match what the SA thinks the type was. Static analysis won't report errors on the service definition file if not respecting that rule (as it does not even analyze those XML/Yaml files) and the original service definition might even respect the rule without the final one respecting it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-31T14:42:49Z
+
+I don't think your interpretation of the BC policy is the one we're really sticking to. At least I don't agree with this argument when considering the current proposal. To me its totally fine and desired I'd say.
+
+> They would not. they might get a runtime error because the runtime type does not match what the SA thinks the type was. Static analysis won't report errors on the service definition file if not respecting that rule (as it does not even analyze those XML/Yaml files) and the original service definition might even respect the rule without the final one respecting it.
+
+This is reverse thinking: the current declaration doesn't provide anything like that either, so the new one won't provide more guarantees. The DX improvement is obvious, the SA downside is none in practice.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-31T14:47:19Z
+
+The new phpdoc explicitly says "if the id looks like a class-string, the method MUST return an object of that type (or null)". That's definitely a stricter contract for the interface than saying "the method MUST return an object (or null)".
+
+And phpdoc types have always been part of our BC policy (otherwise, adding native types would have been a BC break for *callers* of our methods due to narrowing the parameter types)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-31T14:56:03Z
+
+The BC policy is designed to allow people to upgrade seamlessly. Seamlessly "means without us breaking their app". Yes we consider types in phpdocs, as guides toward what should be supported. We also change them at will when needed, provided this doesn't create any execution-time side effect - which is the core criteria when BC is concerned.
+Here, this is not a BC break: nothing changes. Also: no, we don't have to enforce phpdoc, so a runtime chek using eg service decoration wouldn't be required - because it's not our job to call something correctly. Types are just nicer if they help sort out not-working cases, but they're certainly not mandatory (we didn't have them before and we still delivered.)
+
+So to me, DX clearly wins here.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-31T15:02:04Z
+
+@nicolas-grekas interface implementations have to respect the contract defined in the interface. That's where the BC break is when making the interface stricter (and with this PR, we would end up allowing to instantiate a Container that does not respect ContainerInterface depending on how services are configured)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-31T15:06:48Z
+
+The "allowing" part is not our business, same as one can wire a logger into a service argument that needs a serializer: "PHP" will throw, not "us". People are free to run whatever works for them. Declaring the intent is enough on our side, and will always be. Then no, no BC break here, because no exec-time side effect...
+
+---------------------------------------------------------------------------
+
+by wouterj at 2025-03-31T15:08:47Z
+
+Implementations of this interface will get static analysis errors if they don't guarantee a correct return object type if a class FQCN is passed. That's a regression from the current state. Still, I don't think we consider static analysis errors a BC break (otherwise, any additional PHPdoc type is a BC break as it could lead to new static analysis errors).
+
+However, this does change how we treat PHPdoc types. If we think this is OK, there are more types that we welcome from the phpstan/psalm stubs. We rejected these in the past, as they didn't represent the 100% truth (https://github.com/symfony/symfony/pull/47016). E.g. the stubbed form types which are a bigger elephpant in the room.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-31T15:13:14Z
+
+@nicolas-grekas the big difference is that in this case, the class that won't respect its interface is **our** class. So the faulty code would be ours.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-31T15:15:26Z
+
+We're not responsible for how people configure their containers, really.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-31T15:20:19Z
+
+Adding a decorator on a service that was registered using its class name as id (the default convention) is enough to make the service invalid regarding this new rule (the dev intent is probably to decorate based on the interface of the class rather than the class itself). And this does not require weird wiring of the container, just using one of its flagship features.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-31T15:25:31Z
+
+Sure, but still: the decorator has to act like the real objects, so the API will still be the same. SA tools won't be able to notice anyway, too many indirections. And if they do, ppl can decorate the common interface that the decorated and decorator must share.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-03-31T15:59:49Z
+
+@nicolas-grekas if the code is written against the common interface, things indeed work. But SA will tell you that the type you get is `MyImplementation::class` and won't complain if I pass it to a method that has `MyImplementation` as parameter type instead of the common interface (which will then fail when running it as the type is `MyDecorator`).
+
+When installing the phpstan-symfony extension, phpstan will infer the type of `$container->get()` calls based on the actual configuration of the container (it inspects the dumped XML file in the cache), which solves the use case of @lyrixx regarding tests *without* introducing false positive for static analysis and without compromising the contract of the interface.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2025-04-05T12:59:09Z
+
+That's a very good point. All static analysers are using our XML dump of the container, which we make specifically for this use-case: mapping magic service ID strings to PHP object information.
+I don't see a reason to merge a less ideal solution for a problem that is already fixed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-07T08:01:26Z
+
+I don't know about the extension, but is the extension able to cope with scoped containers?
+Because having the extension know about the main DI one doesn't really help DX, since this container shouldn't be used ANYWHERE (capital letter so that ppl that do so realize it's plain wrong 99,99% of the time.)
+
+On the other end, scoped containers are a thing ppl can use at will. Yet how are they supported by the extension, DX wise?
+
+@lyrixx maybe you'd have some hints on these questions?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-07T09:41:53Z
+
+Actually, My main "pain point" is in the test env. (**edit, well not really, see bellow**)
+It's not about SA, but about **IDE**
+
+I never inject the full container, and anyway all my services are privates.
+
+But I wrote too many times this kind of code
+
+```
+public function test()
+{
+    /** @var Foobar $foobar */
+    $foobar = static::getContainer()->get(Foobar::class);
+    $foobar->iWantAutoCompleteHereSoINeedThePhpDoc();
+}
+```
+
+So I opened this PR to allow me to avoid the PHPDoc.
+
+TBH, I knew  this was not perfect, and was a bit wrong for a very few use case. But I thought it was not a big deal. I didn't realize it would "break" SA.
+
+And about phpstan/symfony, I used it, and it works well, except with `#[AutowireLocator]`. It does not understand we inject a specialized container. So it keeps yelling at us because we try to get a private service from it. But it's not (it's private in the main container, but not in the specialized). But it may be fixed at some point... 🤞🏼
+
+😅, While writing this comment, I'm realizing I inject some specialized container in my app. So I would be also useful for code living in src/
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-07T10:04:05Z
+
+@lyrixx the static analyzer of the IDE can also read the dumped XML file. And I know that the Symfony plugin for PHPStorm is using that file for that purpose for instance.
+
+> And about phpstan/symfony, I used it, and it works well, except with `#[AutowireLocator]`. It does not understand we inject a specialized container. So it keeps yelling at us because we try to get a private service from it. But it's not (it's private in the main container, but not in the specialized). But it may be fixed at some point... 🤞🏼
+
+Please open an issue on the phpstan/phpstan-symfony repo to report that issue. It is the first step of getting this fixed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-04-07T10:31:51Z
+
+we use this in our base test case class
+
+```
+    /**
+     * @template T
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    protected static function getServiceClass(string $class): object
+    {
+        return self::getContainer()->get($class);
+    }
+```
+
+pretty simple, does the job :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-09T11:48:40Z
+
+Maybe we could add the phpdoc to the self::getContainer method? Even if it's not 100% accurate, this is a nice place to compromise. WDYT?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-04-10T13:02:36Z
+
+it's slippery slope, assuming SA analyses the tests/ directory
+
+maybe consider a dedicated method in `KernelTestCase` or `TestContainer` first
+
+otherwise patching `TestContainer::get` as such, sounds reasonable
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-04-10T13:12:52Z
+
+that said, i hope we can conventionally fix `ContainerInterface::get(Some::class)` returning a `Some` object, some day
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-10T13:22:47Z
+
+@ro0NL with our convention registering services using their concrete class as id, this would prevent us from ever decorating them (as the decorator will generally implement the same interface to which the id is aliased, but won't be the same concrete class). Otherwise, `ContainerInterface::get(ConcreteClass::class)` returning the decorator instance would not respect the signature of the method (and so would be a bug in our implementation of `get`)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-10T13:29:22Z
+
+This PR is a rabbit hole 😅
+
+Actually, I don't care about SA. (I mean, in this very context, otherwise I love SA and especially phpstan!)
+
+What could solve my issue is something not interpreted by SA but only by IDE. Do someone know a special tag, like `@ide-return XXXX`? 🙈
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-10T13:36:17Z
+
+@lyrixx what IDEs are doing is **also** static analysis.
+
+If you have a case where `ContainerInterface::get(ConcreteClass::class)` actually returns `DecoratorClass` (implementing the interface but not being a `ConcreteClass` and so not having the extra methods of `ConcreteClass` that are not in the interface, like setters for instance), the IDE will also be wrong in which methods are available in completion.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-04-10T13:38:25Z
+
+@lyrixx yes, but IDE needs SA to even function. If anything, we dont need any more phpdoc to describe types :see_no_evil:
+
+@stof decorators would work at the interface level, my point is, it's OK for `get(Some::class)` to return a subclass of `Some`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-04-10T13:42:08Z
+
+the most straightforward way to tackle this, IMHO, would be indeed to leverage the dumped XML data in a standard/default/works-out-of-the-box manner
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-10T13:52:41Z
+
+@ro0NL the generic types added here are not restricted to the case where `Some::class` is an interface and not a concrete class.
+
+> the most straightforward way to tackle this, IMHO, would be indeed to leverage the dumped XML data in a standard/default/works-out-of-the-box manner
+
+As said previously, the Symfony plugin for PHPStorm already leverages this dumped XML file (since years). I don't know about plugins for other IDEs.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-04-10T13:56:22Z
+
+> the generic types added here are not restricted to the case where Some::class is an interface and not a concrete class
+
+yes, that's why it's slippery slope, unless we fix the convention first
+
+> the Symfony plugin for PHPStorm already leverages this dumped XML file
+
+in our case, we're running psalm in GHA (but this PR aims VS code IDE)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-04-10T14:02:18Z
+
+i mean, given `get(Some::class)`, i dont care if it gives an interface implementation, subclass, or actual `Some`; it should prove an `instanceof` check works, which is what this PR is about
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-10T14:10:29Z
+
+> i mean, given `get(Some::class)`, i dont care if it gives an interface implementation, subclass, or actual `Some`; it should prove an `instanceof` check works, which is what this PR is about
+
+@ro0NL and this is precisely what is incompatible with the way the component works.
+
+Example with those services defined (which is the common result when using PSR-4 discovery for your services):
+
+```yaml
+defaults:
+    autoconfigure: true
+    autowire: true
+    public: false
+
+services:
+    ConcreteClass: ~
+    MyInterface: '@ConcreteClass'
+
+    DecoratorClass:
+        decorates: ConcreteClass
+```
+
+```php
+$container->get(MyInterface::class) instanceof MyInterface; // true (DecoratorClass implements MyInterface
+$container->get(ConcreteClass::class) instanceof ConcreteClass; // false (DecoratorClass does not extend ConcreteClass)
+```
+
+So adding the feature that any id looking like a class/interface name must return an instance of that class would require us to remove features of our container as they are fundamentally incompatible with that requirement.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-16T08:39:34Z
+
+> $container->get(ConcreteClass::class)
+
+This style is breaking IoC BTW.
+(and by that I mean: we don't need to care about this situation)
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-17T10:09:44Z
+
+@nicolas-grekas you seem to say that using a concrete class name as service id breaks IOC. but that's the default behavior of Symfony.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-17T10:15:45Z
+
+When using AutowireLocator you mean, sure. Still, it's a matter of vision. Your reasoning makes sense in a world where types are reified. Mine works in an erased types world. I prefer erased types: they're good enough to solve the purpose of types in a language like PHP.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-04-17T13:46:39Z
+
+I'm 👎 on this for the same reasons as stof and wouter (3 downvotes). This takes a too big shortcut for a too small benefit as this only matters in tests. Not worth the hack/wrong assumption IMHO
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-04-17T14:05:58Z
+
+What do you think about changing phpdoc to rely on interfaces then?
+
+https://psalm.dev/r/2c3a6cac5a
+
+I don't know whether IDE will handle this properly, and why for now Psalm resolves class-string as interface-string too, but this will be the most safe approarch in my opinion
+
+```php
+<?php
+
+interface Container
+{
+    /**
+     * @template T
+     * @template V
+     *
+     * @param T $id
+     *
+     * @return T is interface-string<V> ? V : mixed
+     */
+     public function get(string $id): mixed;
+}
+
+$container = container();
+
+/** @psalm-trace $interfaceInstance */
+$interfaceInstance = $container->get(\ArrayAccess::class); // expected - `\ArrayAccess`
+
+/** @psalm-trace $classInstance */
+$classInstance = $container->get(\stdClass::class); // expected - `mixed`
+
+function container(): Container
+{
+   throw new \InvalidArgumentException('Not necessary');
+}
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-17T14:09:12Z
+
+@chalasr
+> benefit as this only matters in tests.
+
+You missed Service Locator
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-04-17T14:26:16Z
+
+@lyrixx I rather use the lowest possible abstraction which is the PSR interface, as in the docs and every locator of our codebase
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-18T15:39:05Z
+
+I don't think `C|object` will help much, as this would get normalized to `object`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-18T15:48:09Z
+
+> I don't think C|object will help much, as this would get normalized to object
+
+I think C|object is the answer to @lyrixx previous comment:
+
+> What could solve my issue is something not interpreted by SA but only by IDE.
+
+C|object does
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-18T15:48:17Z
+
+I updated the PR with @nicolas-grekas proposal. It seems good. Now I have autocomplete, and we don't mess [with SA](https://phpstan.org/r/a58736e6-f181-4bea-ad14-134f55229664)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-18T16:44:18Z
+
+Thank you all for the discussion!

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by kbond at 2025-04-02T00:31:57Z
+
+I'm not a huge fan of `signAndWrap()` and the `SignedUri` VO. I'd be ok dropping these and just keeping `verify()` + named exceptions.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-04-02T19:50:59Z
+
+I've updated this PR to just add `SignedUri::verify()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-18T15:27:06Z
+
+(rebase needed)

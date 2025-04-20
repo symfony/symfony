@@ -715,7 +715,7 @@ class Connection implements ResetInterface
         $now = new \DateTimeImmutable('UTC');
         $redeliverLimit = $now->modify(\sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
-        $claimed = $this->driverConnection->createQueryBuilder()
+        $claimed = 0 < $this->driverConnection->createQueryBuilder()
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', ':now')
                 ->andWhere('id = :id')

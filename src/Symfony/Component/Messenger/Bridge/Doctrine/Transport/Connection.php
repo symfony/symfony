@@ -638,7 +638,7 @@ class Connection implements ResetInterface
             ->orderBy('available_at', 'ASC')
             ->setMaxResults(100)->fetchFirstColumn();
 
-        if (0 === \count($possibleIdsToClaim)) {
+        if (!$possibleIdsToClaim) {
             $this->queueEmptiedAt = microtime(true) * 1000;
 
             return null;

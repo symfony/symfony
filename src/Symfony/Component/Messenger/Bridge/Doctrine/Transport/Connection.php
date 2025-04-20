@@ -646,8 +646,7 @@ class Connection implements ResetInterface
         $this->queueEmptiedAt = null;
 
         foreach ($possibleIdsToClaim as $id) {
-            $claimedId = $this->claimMessage($id);
-            if (null !== $claimedId) {
+            if (null === $claimedId = $this->claimMessage($id)) {
                 break;
             }
         }

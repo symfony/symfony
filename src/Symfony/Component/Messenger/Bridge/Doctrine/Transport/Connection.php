@@ -645,13 +645,14 @@ class Connection implements ResetInterface
         }
         $this->queueEmptiedAt = null;
 
+        $claimedId = null;
         foreach ($possibleIdsToClaim as $id) {
             if (null === $claimedId = $this->claimMessage($id)) {
                 break;
             }
         }
 
-        if (!isset($claimedId)) {
+        if (!null === $claimedId) {
             // all open messages already have been claimed by other workers.
             return null;
         }
@@ -732,7 +733,7 @@ class Connection implements ResetInterface
                     'queue_name' => Types::STRING,
                     'redeliver_imit' => Types::DATETIME_IMMUTABLE,
                 ])
-                ->executeStatement() > 0;
+                ->executeStatement();
 
         return $claimed ? $id : null;
     }

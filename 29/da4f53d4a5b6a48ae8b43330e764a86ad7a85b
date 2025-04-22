@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2025-04-18T11:45:45Z
+
+hello @nicolas-grekas 👋🏻
+does this PR can be linked to https://github.com/symfony/symfony/issues/60037 in some way ?
+as well, can it be replicated to other symfony part as per https://github.com/symfony/symfony/issues/60037#issuecomment-2754422264 ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-18T12:04:48Z
+
+It's related yes: the same approach could be taken for all traceable decorators. Help wanted for the others /cc @lyrixx et al.

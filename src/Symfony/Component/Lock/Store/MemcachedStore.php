@@ -26,15 +26,9 @@ class MemcachedStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    /**
-     * @internal
-     */
     private const NS_SEPARATOR = ':';
-
     private bool $useExtendedReturn;
-
     private string $namespace = '';
-
 
     public static function isSupported(): bool
     {
@@ -64,7 +58,7 @@ class MemcachedStore implements PersistingStoreInterface
     {
         $token = $this->getUniqueToken($key);
         $key->reduceLifetime($this->initialTtl);
-        if (!$this->memcached->add($this->namespace . $key, $token, (int) ceil($this->initialTtl))) {
+        if (!$this->memcached->add($this->namespace.$key, $token, (int) ceil($this->initialTtl))) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         }
@@ -88,7 +82,7 @@ class MemcachedStore implements PersistingStoreInterface
         $key->reduceLifetime($ttl);
         // Could happens when we ask a putOff after a timeout but in luck nobody steal the lock
         if (\Memcached::RES_NOTFOUND === $this->memcached->getResultCode()) {
-            if ($this->memcached->add($this->namespace . $key, $token, $ttl)) {
+            if ($this->memcached->add($this->namespace.$key, $token, $ttl)) {
                 return;
             }
 
@@ -101,7 +95,7 @@ class MemcachedStore implements PersistingStoreInterface
             throw new LockConflictedException();
         }
 
-        if (!$this->memcached->cas($cas, $this->namespace . $key, $token, $ttl)) {
+        if (!$this->memcached->cas($cas, $this->namespace.$key, $token, $ttl)) {
             throw new LockConflictedException();
         }
 
@@ -120,18 +114,18 @@ class MemcachedStore implements PersistingStoreInterface
         }
 
         // To avoid concurrency in deletion, the trick is to extends the TTL then deleting the key
-        if (!$this->memcached->cas($cas, $this->namespace . $key, $token, 2)) {
+        if (!$this->memcached->cas($cas, $this->namespace.$key, $token, 2)) {
             // Someone steal our lock. It does not belongs to us anymore. Nothing to do.
             return;
         }
 
         // Now, we are the owner of the lock for 2 more seconds, we can delete it.
-        $this->memcached->delete($this->namespace . $key);
+        $this->memcached->delete($this->namespace.$key);
     }
 
     public function exists(Key $key): bool
     {
-        return $this->memcached->get($this->namespace . $key) === $this->getUniqueToken($key);
+        return $this->memcached->get($this->namespace.$key) === $this->getUniqueToken($key);
     }
 
     private function getUniqueToken(Key $key): string
@@ -147,7 +141,7 @@ class MemcachedStore implements PersistingStoreInterface
     private function getValueAndCas(Key $key): array
     {
         if ($this->useExtendedReturn ??= version_compare(phpversion('memcached'), '2.9.9', '>')) {
-            $extendedReturn = $this->memcached->get($this->namespace . $key, null, \Memcached::GET_EXTENDED);
+            $extendedReturn = $this->memcached->get($this->namespace.$key, null, \Memcached::GET_EXTENDED);
             if (\Memcached::GET_ERROR_RETURN_VALUE === $extendedReturn) {
                 return [$extendedReturn, 0.0];
             }
@@ -156,7 +150,7 @@ class MemcachedStore implements PersistingStoreInterface
         }
 
         $cas = 0.0;
-        $value = $this->memcached->get($this->namespace . $key, null, $cas);
+        $value = $this->memcached->get($this->namespace.$key, null, $cas);
 
         return [$value, $cas];
     }

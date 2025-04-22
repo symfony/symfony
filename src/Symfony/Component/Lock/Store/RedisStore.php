@@ -32,13 +32,8 @@ class RedisStore implements SharedLockStoreInterface
     use ExpiringStoreTrait;
 
     private const NO_SCRIPT_ERROR_MESSAGE_PREFIX = 'NOSCRIPT';
-    /**
-     * @internal
-     */
     private const NS_SEPARATOR = ':';
-
     private bool $supportTime;
-
     private string $namespace = '';
 
     /**
@@ -98,7 +93,7 @@ class RedisStore implements SharedLockStoreInterface
         ';
 
         $key->reduceLifetime($this->initialTtl);
-        if (!$this->evaluate($script, $this->namespace . $key, [microtime(true), $this->getUniqueToken($key), (int) ceil($this->initialTtl * 1000)])) {
+        if (!$this->evaluate($script, $this->namespace.$key, [microtime(true), $this->getUniqueToken($key), (int) ceil($this->initialTtl * 1000)])) {
             throw new LockConflictedException();
         }
 
@@ -138,7 +133,7 @@ class RedisStore implements SharedLockStoreInterface
         ';
 
         $key->reduceLifetime($this->initialTtl);
-        if (!$this->evaluate($script, $this->namespace . $key, [microtime(true), $this->getUniqueToken($key), (int) ceil($this->initialTtl * 1000)])) {
+        if (!$this->evaluate($script, $this->namespace.$key, [microtime(true), $this->getUniqueToken($key), (int) ceil($this->initialTtl * 1000)])) {
             throw new LockConflictedException();
         }
 
@@ -178,7 +173,7 @@ class RedisStore implements SharedLockStoreInterface
         ';
 
         $key->reduceLifetime($ttl);
-        if (!$this->evaluate($script, $this->namespace . $key, [microtime(true), $this->getUniqueToken($key), (int) ceil($ttl * 1000)])) {
+        if (!$this->evaluate($script, $this->namespace.$key, [microtime(true), $this->getUniqueToken($key), (int) ceil($ttl * 1000)])) {
             throw new LockConflictedException();
         }
 
@@ -212,7 +207,7 @@ class RedisStore implements SharedLockStoreInterface
             return true
         ';
 
-        $this->evaluate($script, $this->namespace . $key, [$this->getUniqueToken($key)]);
+        $this->evaluate($script, $this->namespace.$key, [$this->getUniqueToken($key)]);
     }
 
     public function exists(Key $key): bool
@@ -238,7 +233,7 @@ class RedisStore implements SharedLockStoreInterface
             return false
         ';
 
-        return (bool) $this->evaluate($script, $this->namespace . $key, [microtime(true), $this->getUniqueToken($key)]);
+        return (bool) $this->evaluate($script, $this->namespace.$key, [microtime(true), $this->getUniqueToken($key)]);
     }
 
     private function evaluate(string $script, string $resource, array $args): mixed
@@ -336,7 +331,7 @@ class RedisStore implements SharedLockStoreInterface
 	            return 1
             ';
             try {
-                $this->supportTime = 1 === $this->evaluate($script, $this->namespace . 'symfony_check_support_time', []);
+                $this->supportTime = 1 === $this->evaluate($script, $this->namespace.'symfony_check_support_time', []);
             } catch (LockStorageException $e) {
                 if (!str_contains($e->getMessage(), 'commands not allowed after non deterministic')
                     && !str_contains($e->getMessage(), 'is not allowed from script script')

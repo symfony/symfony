@@ -309,7 +309,7 @@ abstract class AbstractBrowser
      * Finds the first form that contains a button with the given content and
      * uses it to submit the given form field values.
      *
-     * @param string $button           The text content, id, value or name of the form <button> or <input type="submit">
+     * @param string $button           The text content, id or name of the form <button> or <input type="submit">
      * @param array  $fieldValues      Use this syntax: ['my_form[name]' => '...', 'my_form[email]' => '...']
      * @param string $method           The HTTP method used to submit the form
      * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include an HTTP_ prefix as PHP does)
@@ -320,7 +320,7 @@ abstract class AbstractBrowser
         $buttonNode = $crawler->selectButton($button);
 
         if (0 === $buttonNode->count()) {
-            throw new InvalidArgumentException(sprintf('There is no button with "%s" as its content, id, value or name.', $button));
+            throw new InvalidArgumentException(sprintf('There is no button with "%s" as its content, id or name.', $button));
         }
 
         $form = $buttonNode->form($fieldValues, $method);

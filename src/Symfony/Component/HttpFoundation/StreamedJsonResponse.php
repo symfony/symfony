@@ -88,6 +88,8 @@ class StreamedJsonResponse extends StreamedResponse
         }
 
         echo json_encode($data, $jsonEncodingOptions);
+        @ob_flush();
+        flush();
     }
 
     private function streamArray(array $data, int $jsonEncodingOptions, int $keyEncodingOptions): void
@@ -117,12 +119,16 @@ class StreamedJsonResponse extends StreamedResponse
         foreach ($generators as $index => $generator) {
             // send first and between parts of the structure
             echo $jsonParts[$index];
+            @ob_flush();
+            flush();
 
             $this->streamData($generator, $jsonEncodingOptions, $keyEncodingOptions);
         }
 
         // send last part of the structure
         echo $jsonParts[array_key_last($jsonParts)];
+        @ob_flush();
+        flush();
     }
 
     private function streamIterable(iterable $iterable, int $jsonEncodingOptions, int $keyEncodingOptions): void
@@ -141,13 +147,19 @@ class StreamedJsonResponse extends StreamedResponse
                 }
 
                 echo $startTag;
+                @ob_flush();
+                flush();
             } else {
                 // if not first element of the generic, a separator is required between the elements
                 echo ',';
+                @ob_flush();
+                flush();
             }
 
             if ('{' === $startTag) {
                 echo json_encode((string) $key, $keyEncodingOptions).':';
+                @ob_flush();
+                flush();
             }
 
             $this->streamData($item, $jsonEncodingOptions, $keyEncodingOptions);
@@ -155,8 +167,12 @@ class StreamedJsonResponse extends StreamedResponse
 
         if ($isFirstItem) { // indicates that the generator was empty
             echo '[';
+            @ob_flush();
+            flush();
         }
 
         echo '[' === $startTag ? ']' : '}';
+        @ob_flush();
+        flush();
     }
 }

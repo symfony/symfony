@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -38,36 +39,58 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        $serviceMap = [];
-        $autowire = $value->isAutowired();
+        $locatorRef = self::registerLocator($value, $this->container, $this->currentId);
 
-        foreach ($value->getTag('container.service_subscriber') as $attributes) {
-            if (!$attributes) {
-                $autowire = true;
-                continue;
+        $value->addTag('container.service_subscriber.locator', ['id' => (string) $locatorRef]);
+
+        $value->setBindings([
+            PsrContainerInterface::class => new BoundArgument($locatorRef, false),
+            ServiceProviderInterface::class => new BoundArgument($locatorRef, false),
+        ] + $value->getBindings());
+
+        return parent::processValue($value);
+    }
+
+    /**
+     * @param class-string<ServiceSubscriberInterface>|Definition $value
+     */
+    public static function registerLocator(string|Definition $value, ContainerBuilder $container, string $currentId): Reference
+    {
+        if ($value instanceof Definition) {
+            $autowire = $value->isAutowired();
+
+            foreach ($value->getTag('container.service_subscriber') as $attributes) {
+                if (!$attributes) {
+                    $autowire = true;
+                    continue;
+                }
+                ksort($attributes);
+                if ([] !== array_diff(array_keys($attributes), ['id', 'key'])) {
+                    throw new InvalidArgumentException(\sprintf('The "container.service_subscriber" tag accepts only the "key" and "id" attributes, "%s" given for service "%s".', implode('", "', array_keys($attributes)), $currentId));
+                }
+                if (!\array_key_exists('id', $attributes)) {
+                    throw new InvalidArgumentException(\sprintf('Missing "id" attribute on "container.service_subscriber" tag with key="%s" for service "%s".', $attributes['key'], $currentId));
+                }
+                if (!\array_key_exists('key', $attributes)) {
+                    $attributes['key'] = $attributes['id'];
+                }
+                if (isset($serviceMap[$attributes['key']])) {
+                    continue;
+                }
+                $serviceMap[$attributes['key']] = new Reference($attributes['id']);
             }
-            ksort($attributes);
-            if ([] !== array_diff(array_keys($attributes), ['id', 'key'])) {
-                throw new InvalidArgumentException(\sprintf('The "container.service_subscriber" tag accepts only the "key" and "id" attributes, "%s" given for service "%s".', implode('", "', array_keys($attributes)), $this->currentId));
-            }
-            if (!\array_key_exists('id', $attributes)) {
-                throw new InvalidArgumentException(\sprintf('Missing "id" attribute on "container.service_subscriber" tag with key="%s" for service "%s".', $attributes['key'], $this->currentId));
-            }
-            if (!\array_key_exists('key', $attributes)) {
-                $attributes['key'] = $attributes['id'];
-            }
-            if (isset($serviceMap[$attributes['key']])) {
-                continue;
-            }
-            $serviceMap[$attributes['key']] = new Reference($attributes['id']);
+            $class = $value->getClass();
+        } else {
+            $class = $value;
         }
-        $class = $value->getClass();
 
-        if (!$r = $this->container->getReflectionClass($class)) {
-            throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $class, $this->currentId));
+        $serviceMap = [];
+
+        if (!$r = $container->getReflectionClass($class)) {
+            throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $class, $currentId));
         }
         if (!$r->isSubclassOf(ServiceSubscriberInterface::class)) {
-            throw new InvalidArgumentException(\sprintf('Service "%s" must implement interface "%s".', $this->currentId, ServiceSubscriberInterface::class));
+            throw new InvalidArgumentException(\sprintf('Service "%s" must implement interface "%s".', $currentId, ServiceSubscriberInterface::class));
         }
         $class = $r->name;
         $subscriberMap = [];
@@ -87,7 +110,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             }
 
             if (!\is_string($type) || !preg_match('/(?(DEFINE)(?<cn>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+))(?(DEFINE)(?<fqcn>(?&cn)(?:\\\\(?&cn))*+))^\??(?&fqcn)(?:(?:\|(?&fqcn))*+|(?:&(?&fqcn))*+)$/', $type)) {
-                throw new InvalidArgumentException(\sprintf('"%s::getSubscribedServices()" must return valid PHP types for service "%s" key "%s", "%s" returned.', $class, $this->currentId, $key, \is_string($type) ? $type : get_debug_type($type)));
+                throw new InvalidArgumentException(\sprintf('"%s::getSubscribedServices()" must return valid PHP types for service "%s" key "%s", "%s" returned.', $class, $currentId, $key, \is_string($type) ? $type : get_debug_type($type)));
             }
             $optionalBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
             if ('?' === $type[0]) {
@@ -100,7 +123,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             }
             if (!isset($serviceMap[$key])) {
                 if (!$autowire) {
-                    throw new InvalidArgumentException(\sprintf('Service "%s" misses a "container.service_subscriber" tag with "key"/"id" attributes corresponding to entry "%s" as returned by "%s::getSubscribedServices()".', $this->currentId, $key, $class));
+                    throw new InvalidArgumentException(\sprintf('Service "%s" misses a "container.service_subscriber" tag with "key"/"id" attributes corresponding to entry "%s" as returned by "%s::getSubscribedServices()".', $currentId, $key, $class));
                 }
                 $serviceMap[$key] = new Reference($type);
             }
@@ -113,9 +136,9 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 }
             }
 
-            if (null !== $name && !$this->container->has($name) && !$this->container->has($type.' $'.$name)) {
+            if (null !== $name && !$container->has($name) && !$container->has($type.' $'.$name)) {
                 $camelCaseName = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name))));
-                $name = $this->container->has($type.' $'.$camelCaseName) ? $camelCaseName : $name;
+                $name = $container->has($type.' $'.$camelCaseName) ? $camelCaseName : $name;
             }
 
             $subscriberMap[$key] = new TypedReference((string) $serviceMap[$key], $type, $optionalBehavior, $name, $attributes);
@@ -124,18 +147,9 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
 
         if ($serviceMap = array_keys($serviceMap)) {
             $message = \sprintf(1 < \count($serviceMap) ? 'keys "%s" do' : 'key "%s" does', str_replace('%', '%%', implode('", "', $serviceMap)));
-            throw new InvalidArgumentException(\sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $this->currentId));
+            throw new InvalidArgumentException(\sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $currentId));
         }
 
-        $locatorRef = ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId);
-
-        $value->addTag('container.service_subscriber.locator', ['id' => (string) $locatorRef]);
-
-        $value->setBindings([
-            PsrContainerInterface::class => new BoundArgument($locatorRef, false),
-            ServiceProviderInterface::class => new BoundArgument($locatorRef, false),
-        ] + $value->getBindings());
-
-        return parent::processValue($value);
+        return ServiceLocatorTagPass::register($container, $subscriberMap, $currentId);
     }
 }

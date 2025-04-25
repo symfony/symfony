@@ -56,6 +56,8 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
      */
     public static function registerLocator(string|Definition $value, ContainerBuilder $container, string $currentId): Reference
     {
+        $serviceMap = [];
+
         if ($value instanceof Definition) {
             $autowire = $value->isAutowired();
 
@@ -79,12 +81,11 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 }
                 $serviceMap[$attributes['key']] = new Reference($attributes['id']);
             }
+
             $class = $value->getClass();
         } else {
             $class = $value;
         }
-
-        $serviceMap = [];
 
         if (!$r = $container->getReflectionClass($class)) {
             throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $class, $currentId));

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Hakayashii at 2025-04-27T15:35:20Z
+
+I added a new test case for property hooks with a default value. Therefore, I had to move the added property from the Hooked class to a separate HookedWithDefaultValue class, because otherwise the existing test case would have failed too.

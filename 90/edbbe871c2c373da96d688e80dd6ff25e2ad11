@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-04-17T13:01:36Z
+
+To avoid maintaining route definition twice, should we make our XML files import the PHP file ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-04-18T13:00:54Z
+
+Can we trigger a runtime deprecation? :) (if xml imports php, maybe we can trace that)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-04-27T13:12:37Z
+
+> To avoid maintaining route definition twice, should we make our XML files import the PHP file ?
+
+Done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-04-27T13:13:11Z
+
+> Can we trigger a runtime deprecation? :) (if xml imports php, maybe we can trace that)
+
+Done (hackish, tell me if there is something "better" as I want the deprecation to be local to the code)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-04-27T13:42:21Z
+
+Recipes updated in https://github.com/symfony/recipes/pull/1407

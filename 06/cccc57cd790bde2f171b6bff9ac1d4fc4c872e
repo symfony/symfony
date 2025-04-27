@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-04-25T10:29:11Z
+
+Hmm, what about removing the client side validation completely and let the API return a proper error? Can you check what is happening if we would do so?
+My point is, that we cannot keep track of all new and updated limitations in the future and we always need a fix PR + a release 🤷‍♂️
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-04-25T10:31:37Z
+
+I'm pretty sure that limits were not changed, just wrong calculation was used :) I'm fine either way. But at least for me it's easier when i can click on the method like `addField` and see what are the limits, instead of going to discord docs.

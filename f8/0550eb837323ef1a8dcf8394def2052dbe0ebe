@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-18T13:59:41Z
+
+This approach is aimed at command lines, which don't have the `--profile` flag set by default, which mean the profiler is not instantiated.
+But once one `--profile`, then the profiler is instantiated, and so are all data collectors, which then will enable the tracing infrastructure.
+On web pages, the profiler is always instantiated by ProfilerListener so tracing will always be enabled.
+I guess that's not what you describe. (yet I don't know what you describe means precisely).
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-18T14:05:55Z
+
+We have a `Profiler::disable()` method to disable to disable runtime collecting of data for the current request (well, to be exact, until `Profiler::enable()` is called or until services are reset which will use back the default state). for instance, the controller of WebProfilerBundle disables collecting profiles for requests to the WebProfilerBundle UI (as that would make a mess in the profiles).
+
+The solution used here does not respect that
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-18T14:11:18Z
+
+Indeed, this approach doesn't try to handle calls to Profiler::disable()/enable() because there are too far reached. Except using global state and hardcoding, I don't see how one could make each tracing decorator know about the profiler - they're decoupled.
+Still, this achieves the purpose: once the profiler is instantiated, the tracing infra is enabled. And remains enabled yes.
+Since these decorators are currently always enabled, independently of the profiler itself, this PR still provides a desired improvement: command lines won't collect needless data anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-18T14:51:40Z
+
+> Except using global state and hardcoding, I don't see how one could make each tracing decorator know about the profiler - they're decoupled.
+
+OK, here is a way: make the added `$enabled` properties `bool|Closure():bool`, then make all tracing decorators call the closure everytime there's a need to fetch the current state. Then generate this closure using DI and some bridge class between the profiler's state and the bool that we need.
+
+Let's try the current simpler approach first and improve later, if the need arises.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-04-18T21:50:13Z
+
+The `Closure` would be `$profiler->isEnabled(...)`. This could create a circular reference.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-19T07:16:26Z
+
+> The Closure would be $profiler->isEnabled(...). This could create a circular reference.
+
+Basically yes, but I'd do it in a more subtle way: I'd add a intermediary closure who would get the profiler using a scoped container, and this container would reference the profiler using `IGNORE_ON_UNINITIALIZED_REFERENCE`, so that the profiler is not instantiated on this side of the relation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-22T09:13:55Z
+
+PR updated with the closure I described in my previous comment: I figured out it was actually simpler this way, because it then doesn't need patching data collectors anymore.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-04-25T11:46:57Z
+
+@nicolas-grekas according to https://github.com/symfony/symfony/issues/60037#issuecomment-2815483531
+
+In devland code (external bundles or app « tracers »)
+
+What are the changes required to mimic this?
+only inject such new service and check the state prior to code exec? If so cant this be autowired in some way or not?
+
+Is it worth an entry in the doc as well ? (Perhaps near data collector section as most likely to be related)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-25T16:55:38Z
+
+Autowiring that should be possible with some named alias. I'm not going to be able to update this PR soon but it could be merged and followed up by the alias one.
+Doc indeed!
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-04-26T17:40:28Z
+
+Feel free to ping me for doc part :)

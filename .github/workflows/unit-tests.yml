@@ -60,7 +60,7 @@ jobs:
       - name: Install optional commands
         if: matrix.php == '8.4'
         run: |
-          sudo apt-get update
+          sudo apt-get update --allow-releaseinfo-change
           sudo apt-get install zopfli
 
       - name: Configure environment

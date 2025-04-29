@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by dkarlovi at 2025-04-28T15:15:48Z
+
+/cc @stof.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-28T15:23:39Z
+
+I suggest adding the more precise type on the property `TransportResponseTrait::$headers` as well, so that Psalm is not reporting issues on the TransportResponseTrait implementation of the method
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2025-04-29T10:06:41Z
+
+@stof
+
+> I suggest adding the more precise type on the property `TransportResponseTrait::$headers` as well, so that Psalm is not reporting issues on the TransportResponseTrait implementation of the method
+
+Done.

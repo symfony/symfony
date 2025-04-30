@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-04-25T10:09:00Z
+
+https://github.com/symfony/symfony/pull/60268 should be merged first and upmerged to 7.2, so that this PR can then be only about the new things for 7.2
+
+---------------------------------------------------------------------------
+
+by StevenRenaux at 2025-04-25T11:09:09Z
+
+> #60268 should be merged first and upmerged to 7.2, so that this PR can then be only about the new things for 7.2
+
+@stof
+I'm agree but since 6.4 the tests about ServiceSubscriberTraits was updated, you can see with LegacyParentTestService. Or we need to updated it after the merge.
+
+Let me know
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-25T11:49:38Z
+
+@StevenRenaux I'm not saying this PR is useless. This PR should be updated after the upmerge (which will happen anyway)

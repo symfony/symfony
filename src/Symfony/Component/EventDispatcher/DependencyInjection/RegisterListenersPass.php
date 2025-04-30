@@ -172,10 +172,13 @@ class RegisterListenersPass implements CompilerPassInterface
 
     private function getEventFromTypeDeclaration(ContainerBuilder $container, string $id, string $method): string
     {
+        $class = $container->getDefinition($id)->getClass();
+        if (!$r = $container->getReflectionClass($class)) {
+            throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+        }
+
         if (
-            null === ($class = $container->getDefinition($id)->getClass())
-            || !($r = $container->getReflectionClass($class, false))
-            || !$r->hasMethod($method)
+            !$r->hasMethod($method)
             || 1 > ($m = $r->getMethod($method))->getNumberOfParameters()
             || !($type = $m->getParameters()[0]->getType()) instanceof \ReflectionNamedType
             || $type->isBuiltin()

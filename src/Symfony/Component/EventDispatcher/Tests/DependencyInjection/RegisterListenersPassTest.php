@@ -503,6 +503,19 @@ class RegisterListenersPassTest extends TestCase
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
+    public function testMissingListenerClassThrowsClearError()
+    {
+        $container = new ContainerBuilder();
+        $container->register('broken_listener', 'App\EventListener\BrokenListener')
+            ->addTag('kernel.event_listener');
+        $container->register('event_dispatcher');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Class "App\EventListener\BrokenListener" used for service "broken_listener" cannot be found.');
+
+        $compilerPass = new RegisterListenersPass();
+        $compilerPass->process($container);
+    }
 }
 
 class SubscriberService implements EventSubscriberInterface

@@ -11,6 +11,7 @@ CHANGELOG
  * Add ability for voters to explain their vote
  * Add support for voting on closures
  * Add `OAuth2User` with OAuth2 Access Token Introspection support for `OAuth2TokenHandler`
+ * Add support for backed enums in `SignatureHasher::computeSignatureHash()`
 
 7.2
 ---

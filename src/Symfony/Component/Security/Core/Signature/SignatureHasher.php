@@ -106,13 +106,15 @@ class SignatureHasher
 
         foreach ($this->signatureProperties as $property) {
             $value = $this->propertyAccessor->getValue($user, $property) ?? '';
+
             if ($value instanceof \DateTimeInterface) {
                 $value = $value->format('c');
-            }
-
-            if (!\is_scalar($value) && !$value instanceof \Stringable) {
+            } elseif ($value instanceof \BackedEnum) {
+                $value = $value->value;
+            } elseif (!\is_scalar($value) && !$value instanceof \Stringable) {
                 throw new \InvalidArgumentException(\sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, $user::class, get_debug_type($value)));
             }
+
             hash_update($fieldsHash, ':'.base64_encode($value));
         }
 

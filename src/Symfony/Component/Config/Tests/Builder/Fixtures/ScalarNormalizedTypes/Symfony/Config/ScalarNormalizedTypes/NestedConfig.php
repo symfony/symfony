@@ -47,8 +47,9 @@ class NestedConfig
      * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|$this
      * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig : static)
+     * @phpstan-return ($value is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig : $this)
      */
-    public function nestedListObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|static
+    public function nestedListObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|self
     {
         $this->_usedProperties['nestedListObject'] = true;
         if (!\is_array($value)) {

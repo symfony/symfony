@@ -30,4 +30,15 @@ return [
         'nested_object' => true,
         'nested_list_object' => ['one', 'two'],
     ],
+    'keyed_list_scalar' => [
+        'Foo\\Bar' => [
+            'list' => ['one', 'two'],
+        ],
+        'Foo\\Baz' => [
+            'list' => ['one', 'two'],
+        ],
+        'Foo\\Foo' => [
+            'list' => ['one', 'two'],
+        ],
+    ],
 ];

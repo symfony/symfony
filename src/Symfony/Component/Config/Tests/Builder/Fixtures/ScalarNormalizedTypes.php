@@ -136,6 +136,23 @@ class ScalarNormalizedTypes implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('keyed_list_scalar')
+                    ->normalizeKeys(false)
+                    ->useAttributeAsKey('class')
+                    ->beforeNormalization()
+                        ->always()
+                        ->then(function ($config) {
+                            return $config;
+                        })
+                    ->end()
+                    ->prototype('array')
+                        ->children()
+                            ->arrayNode('list')
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

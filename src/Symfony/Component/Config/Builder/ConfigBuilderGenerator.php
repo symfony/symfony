@@ -284,7 +284,8 @@ public function NAME(string $VAR, TYPE $VALUE): static
         if ($hasNormalizationClosures) {
             $comment = sprintf(" * @template TValue\n * @param TValue \$value\n%s", $comment);
             $comment .= sprintf(' * @return %s|$this'."\n", $childClass->getFqcn());
-            $comment .= sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n ", $childClass->getFqcn());
+            $comment .= sprintf(' * @psalm-return (TValue is array ? %s : static)'."\n", $childClass->getFqcn());
+            $comment .= sprintf(' * @phpstan-return ($value is array ? %s : $this)'."\n ", $childClass->getFqcn());
         }
         if ('' !== $comment) {
             $comment = "/**\n$comment*/\n";
@@ -292,7 +293,7 @@ public function NAME(string $VAR, TYPE $VALUE): static
 
         if (null === $key = $node->getKeyAttribute()) {
             $body = $hasNormalizationClosures ? '
-COMMENTpublic function NAME(PARAM_TYPE $value = []): CLASS|static
+COMMENTpublic function NAME(PARAM_TYPE $value = []): CLASS|self
 {
     $this->_usedProperties[\'PROPERTY\'] = true;
     if (!\is_array($value)) {
@@ -317,7 +318,7 @@ COMMENTpublic function NAME(array $value = []): CLASS
             ]);
         } else {
             $body = $hasNormalizationClosures ? '
-COMMENTpublic function NAME(string $VAR, PARAM_TYPE $VALUE = []): CLASS|static
+COMMENTpublic function NAME(string $VAR, PARAM_TYPE $VALUE = []): CLASS|self
 {
     if (!\is_array($VALUE)) {
         $this->_usedProperties[\'PROPERTY\'] = true;
@@ -352,7 +353,7 @@ COMMENTpublic function NAME(string $VAR, array $VALUE = []): CLASS
                 'CLASS' => $childClass->getFqcn(),
                 'VAR' => '' === $key ? 'key' : $key,
                 'VALUE' => 'value' === $key ? 'data' : 'value',
-                'PARAM_TYPE' => \in_array('mixed', $prototypeParameterTypes, true) ? 'mixed' : implode('|', $prototypeParameterTypes),
+                'PARAM_TYPE' => \in_array('mixed', $prototypeParameterTypes, true) ? 'mixed' : implode('|', [...$prototypeParameterTypes, $childClass->getFqcn()]),
             ]);
         }
 

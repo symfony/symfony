@@ -9,6 +9,7 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig;
 use Symfony\Config\ScalarNormalizedTypesConfig;
 
 return static function (ScalarNormalizedTypesConfig $config) {
@@ -28,4 +29,10 @@ return static function (ScalarNormalizedTypesConfig $config) {
         'nested_object' => true,
         'nested_list_object' => ['one', 'two'],
     ]);
+
+    $config->keyedListScalar('Foo\\Bar')->list(['one', 'two']);
+    $config->keyedListScalar('Foo\\Baz', ['list' => ['one', 'two']]);
+    $keyedListScalarConfig = new KeyedListScalarConfig();
+    $keyedListScalarConfig->list(['one', 'two']);
+    $config->keyedListScalar('Foo\\Foo', $keyedListScalarConfig);
 };

@@ -6,6 +6,7 @@ require_once __DIR__.\DIRECTORY_SEPARATOR.'ScalarNormalizedTypes'.\DIRECTORY_SEP
 require_once __DIR__.\DIRECTORY_SEPARATOR.'ScalarNormalizedTypes'.\DIRECTORY_SEPARATOR.'ListObjectConfig.php';
 require_once __DIR__.\DIRECTORY_SEPARATOR.'ScalarNormalizedTypes'.\DIRECTORY_SEPARATOR.'KeyedListObjectConfig.php';
 require_once __DIR__.\DIRECTORY_SEPARATOR.'ScalarNormalizedTypes'.\DIRECTORY_SEPARATOR.'NestedConfig.php';
+require_once __DIR__.\DIRECTORY_SEPARATOR.'ScalarNormalizedTypes'.\DIRECTORY_SEPARATOR.'KeyedListScalarConfig.php';
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -21,6 +22,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     private $listObject;
     private $keyedListObject;
     private $nested;
+    private $keyedListScalar;
     private $_usedProperties = [];
 
     /**
@@ -78,8 +80,9 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
      * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig|$this
      * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig : static)
+     * @phpstan-return ($value is array ? \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig : $this)
      */
-    public function listObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig|static
+    public function listObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig|self
     {
         $this->_usedProperties['listObject'] = true;
         if (!\is_array($value)) {
@@ -96,8 +99,9 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
      * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig|$this
      * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig : static)
+     * @phpstan-return ($value is array ? \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig : $this)
      */
-    public function keyedListObject(string $class, mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig|static
+    public function keyedListObject(string $class, mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig|self
     {
         if (!\is_array($value)) {
             $this->_usedProperties['keyedListObject'] = true;
@@ -126,6 +130,32 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
         }
 
         return $this->nested;
+    }
+
+    /**
+     * @template TValue
+     * @param TValue $value
+     * @return \Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig : static)
+     * @phpstan-return ($value is array ? \Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig : $this)
+     */
+    public function keyedListScalar(string $class, array|\Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig $value = []): \Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig|self
+    {
+        if (!\is_array($value)) {
+            $this->_usedProperties['keyedListScalar'] = true;
+            $this->keyedListScalar[$class] = $value;
+
+            return $this;
+        }
+
+        if (!isset($this->keyedListScalar[$class]) || !$this->keyedListScalar[$class] instanceof \Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig) {
+            $this->_usedProperties['keyedListScalar'] = true;
+            $this->keyedListScalar[$class] = new \Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig($value);
+        } elseif (1 < \func_num_args()) {
+            throw new InvalidConfigurationException('The node created by "keyedListScalar()" has already been initialized. You cannot pass values the second time you call keyedListScalar().');
+        }
+
+        return $this->keyedListScalar[$class];
     }
 
     public function getExtensionAlias(): string
@@ -171,6 +201,12 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
             unset($value['nested']);
         }
 
+        if (array_key_exists('keyed_list_scalar', $value)) {
+            $this->_usedProperties['keyedListScalar'] = true;
+            $this->keyedListScalar = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig($v) : $v, $value['keyed_list_scalar']);
+            unset($value['keyed_list_scalar']);
+        }
+
         if ([] !== $value) {
             throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
         }
@@ -196,6 +232,9 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
         }
         if (isset($this->_usedProperties['nested'])) {
             $output['nested'] = $this->nested->toArray();
+        }
+        if (isset($this->_usedProperties['keyedListScalar'])) {
+            $output['keyed_list_scalar'] = array_map(fn ($v) => $v instanceof \Symfony\Config\ScalarNormalizedTypes\KeyedListScalarConfig ? $v->toArray() : $v, $this->keyedListScalar);
         }
 
         return $output;

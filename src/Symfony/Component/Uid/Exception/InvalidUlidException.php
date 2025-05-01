@@ -15,6 +15,6 @@ class InvalidUlidException extends InvalidArgumentException
 {
     public function __construct(string $value)
     {
-        parent::__construct(\sprintf('Invalid ULID: "%s".', $value));
+        parent::__construct($value, \sprintf('Invalid ULID: "%s".', $value));
     }
 }

@@ -50,7 +50,7 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
         $uuid = $this->uid;
         $time = BinaryUtil::hexToNumericString('0'.substr($uuid, 0, 8).substr($uuid, 9, 4).substr($uuid, 15, 3));
         if ('-' === $time[0]) {
-            throw new InvalidArgumentException('Cannot convert UUID to v7: its timestamp is before the Unix epoch.');
+            throw new InvalidArgumentException($uuid, 'Cannot convert UUID to v7: its timestamp is before the Unix epoch.');
         }
 
         $ms = \strlen($time) > 4 ? substr($time, 0, -4) : '0';

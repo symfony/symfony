@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add component-specific exception hierarchy
+ * Add `InvalidArgumentException::$value`
 
 7.2
 ---

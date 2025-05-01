@@ -57,7 +57,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
             $time = microtime(false);
             $time = substr($time, 11).substr($time, 2, 3);
         } elseif (0 > $time = $time->format('Uv')) {
-            throw new InvalidArgumentException('The timestamp must be positive.');
+            throw new InvalidArgumentException($time, 'The timestamp must be positive.');
         }
 
         if ($time > self::$time || (null !== $mtime && $time !== self::$time)) {

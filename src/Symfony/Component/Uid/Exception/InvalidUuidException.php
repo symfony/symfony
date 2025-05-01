@@ -17,6 +17,6 @@ class InvalidUuidException extends InvalidArgumentException
         public readonly int $type,
         string $value,
     ) {
-        parent::__construct(\sprintf('Invalid UUID%s: "%s".', $type ? 'v'.$type : '', $value));
+        parent::__construct($value, \sprintf('Invalid UUID%s: "%s".', $type ? 'v'.$type : '', $value));
     }
 }

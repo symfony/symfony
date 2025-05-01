@@ -412,7 +412,8 @@ public function NAME($value): static
     {
         $comment = '';
         if ('' !== $info = (string) $node->getInfo()) {
-            $comment .= ' * '.$info."\n";
+            $info     = preg_replace('/^\s+/m', '', $info);
+            $comment .= preg_replace('/^/m', ' * ', $info) ."\n";
         }
 
         if (!$node instanceof ArrayNode) {

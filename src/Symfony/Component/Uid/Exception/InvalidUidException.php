@@ -11,12 +11,6 @@
 
 namespace Symfony\Component\Uid\Exception;
 
-class InvalidUuidException extends InvalidArgumentException
+class InvalidUidException extends InvalidArgumentException
 {
-    public function __construct(
-        public readonly int $type,
-        string $value,
-    ) {
-        parent::__construct(\sprintf('Invalid UUID%s: "%s".', $type ? 'v'.$type : '', $value));
-    }
 }

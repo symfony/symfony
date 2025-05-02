@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-01T12:41:37Z
+
+I debugged [the current failure](https://github.com/symfony/symfony/actions/runs/14775172037/job/41482035260#step:5:12) on my fork and updating the actions to more recent versions seems to fix the job:
+
+- without the update you can see the same error on my fork: https://github.com/xabbuh/symfony/actions/runs/14775425298/job/41482724880#step:5:12
+- after updating the job succeeds: https://github.com/xabbuh/symfony/actions/runs/14775474727

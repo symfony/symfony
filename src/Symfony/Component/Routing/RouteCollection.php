@@ -242,10 +242,15 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function setHost(?string $pattern, array $defaults = [], array $requirements = []): void
     {
         foreach ($this->routes as $route) {
+            if ('' !== $route->getHost() && $route->getHost() !== $pattern) {
+                trigger_deprecation('symfony/routing', '7.3', 'Overriding a route\'s host with its group\'s is deprecated, you should remove it from the route.');
+            }
+
             $route->setHost($pattern);
-            $route->addDefaults($defaults);
-            $route->addRequirements($requirements);
         }
+
+        $this->addDefaults($defaults);
+        $this->addRequirements($requirements);
     }
 
     /**
@@ -256,6 +261,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function setCondition(?string $condition): void
     {
         foreach ($this->routes as $route) {
+            if ('' !== $route->getCondition() && $route->getCondition() !== $condition) {
+                trigger_deprecation('symfony/routing', '7.3', 'Overriding a route\'s condition with its group\'s is deprecated, you should remove it from the route.');
+            }
+
             $route->setCondition($condition);
         }
     }
@@ -267,10 +276,18 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function addDefaults(array $defaults): void
     {
-        if ($defaults) {
-            foreach ($this->routes as $route) {
-                $route->addDefaults($defaults);
+        if (!$defaults) {
+            return;
+        }
+
+        foreach ($this->routes as $route) {
+            foreach ($defaults as $name => $value) {
+                if ($route->hasDefault($name) && $route->getDefault($name) !== $value) {
+                    trigger_deprecation('symfony/routing', '7.3', 'Overriding a route\'s default with its group\'s is deprecated, you should remove it from the route.');
+                }
             }
+
+            $route->addDefaults($defaults);
         }
     }
 
@@ -281,10 +298,18 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function addRequirements(array $requirements): void
     {
-        if ($requirements) {
-            foreach ($this->routes as $route) {
-                $route->addRequirements($requirements);
+        if (!$requirements) {
+            return;
+        }
+
+        foreach ($this->routes as $route) {
+            foreach ($requirements as $key => $regex) {
+                if ($route->hasRequirement($key) && $route->getRequirement($key) !== $regex) {
+                    trigger_deprecation('symfony/routing', '7.3', 'Overriding a route\'s requirement with its group\'s is deprecated, you should remove it from the route.');
+                }
             }
+
+            $route->addRequirements($requirements);
         }
     }
 
@@ -295,10 +320,18 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function addOptions(array $options): void
     {
-        if ($options) {
-            foreach ($this->routes as $route) {
-                $route->addOptions($options);
+        if (!$options) {
+            return;
+        }
+
+        foreach ($this->routes as $route) {
+            foreach ($options as $name => $value) {
+                if ($route->hasOption($name) && $route->getOption($name) !== $value) {
+                    trigger_deprecation('symfony/routing', '7.3', 'Overriding a route\'s option with its group\'s is deprecated, you should remove it from the route.');
+                }
             }
+
+            $route->addOptions($options);
         }
     }
 
@@ -310,6 +343,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function setSchemes(string|array $schemes): void
     {
         foreach ($this->routes as $route) {
+            if ($route->getSchemes() !== [] && $route->getSchemes() != (array) $schemes) {
+                trigger_deprecation('symfony/routing', '7.3', 'Overriding a route\'s schemes with its group\'s is deprecated, you should remove it from the route.');
+            }
+
             $route->setSchemes($schemes);
         }
     }
@@ -322,6 +359,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function setMethods(string|array $methods): void
     {
         foreach ($this->routes as $route) {
+            if ($route->getMethods() !== [] && $route->getMethods() != (array) $methods) {
+                trigger_deprecation('symfony/routing', '7.3', 'Overriding a route\'s methods with its group\'s is deprecated, you should remove it from the route.');
+            }
+
             $route->setMethods($methods);
         }
     }

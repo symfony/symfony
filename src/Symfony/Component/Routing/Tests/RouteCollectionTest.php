@@ -12,12 +12,15 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class RouteCollectionTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public function testRoute()
     {
         $collection = new RouteCollection();
@@ -115,27 +118,65 @@ class RouteCollectionTest extends TestCase
     public function testAddDefaultsAndRequirementsAndOptions()
     {
         $collection = new RouteCollection();
-        $collection->add('foo', new Route('/{placeholder}'));
         $collection1 = new RouteCollection();
-        $collection1->add('bar', new Route('/{placeholder}',
-            ['_controller' => 'fixed', 'placeholder' => 'default'], ['placeholder' => '.+'], ['option' => 'value'])
-        );
+        $collection1->add('foo', new Route('/{placeholder}'));
         $collection->addCollection($collection1);
 
         $collection->addDefaults(['placeholder' => 'new-default']);
         $this->assertEquals(['placeholder' => 'new-default'], $collection->get('foo')->getDefaults(), '->addDefaults() adds defaults to all routes');
-        $this->assertEquals(['_controller' => 'fixed', 'placeholder' => 'new-default'], $collection->get('bar')->getDefaults(),
-            '->addDefaults() adds defaults to all routes and overwrites existing ones');
 
         $collection->addRequirements(['placeholder' => '\d+']);
         $this->assertEquals(['placeholder' => '\d+'], $collection->get('foo')->getRequirements(), '->addRequirements() adds requirements to all routes');
-        $this->assertEquals(['placeholder' => '\d+'], $collection->get('bar')->getRequirements(),
-            '->addRequirements() adds requirements to all routes and overwrites existing ones');
 
         $collection->addOptions(['option' => 'new-value']);
         $this->assertEquals(
             ['option' => 'new-value', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'],
-            $collection->get('bar')->getOptions(), '->addOptions() adds options to all routes and overwrites existing ones'
+            $collection->get('foo')->getOptions(), '->addOptions() adds options to all routes'
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCollectionOverridingDefaultsIsDeprecated()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{placeholder}', ['placeholder' => 'default']));
+
+        $this->expectUserDeprecationMessage('Since symfony/routing 7.3: Overriding a route\'s default with its group\'s is deprecated, you should remove it from the route.');
+        $collection->addDefaults(['placeholder' => 'new-default']);
+
+        $this->assertEquals(['placeholder' => 'new-default'], $collection->get('foo')->getDefaults());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCollectionOverridingRequirementsIsDeprecated()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{placeholder}', requirements: ['placeholder' => '.+']));
+
+        $this->expectUserDeprecationMessage('Since symfony/routing 7.3: Overriding a route\'s requirement with its group\'s is deprecated, you should remove it from the route.');
+        $collection->addRequirements(['placeholder' => '\d+']);
+
+        $this->assertEquals(['placeholder' => '\d+'], $collection->get('foo')->getRequirements());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCollectionOverridingOptionsIsDeprecated()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{placeholder}', options: ['option' => 'value']));
+
+        $this->expectUserDeprecationMessage('Since symfony/routing 7.3: Overriding a route\'s option with its group\'s is deprecated, you should remove it from the route.');
+        $collection->addOptions(['option' => 'new-value']);
+
+        $this->assertEquals(
+            ['option' => 'new-value', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'],
+            $collection->get('foo')->getOptions()
         );
     }
 
@@ -240,29 +281,52 @@ class RouteCollectionTest extends TestCase
     public function testSetHost()
     {
         $collection = new RouteCollection();
-        $routea = new Route('/a');
-        $routeb = new Route('/b', [], [], [], '{locale}.example.net');
-        $collection->add('a', $routea);
-        $collection->add('b', $routeb);
+        $route = new Route('/a');
+        $collection->add('a', $route);
 
         $collection->setHost('{locale}.example.com');
 
-        $this->assertEquals('{locale}.example.com', $routea->getHost());
-        $this->assertEquals('{locale}.example.com', $routeb->getHost());
+        $this->assertEquals('{locale}.example.com', $route->getHost());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCollectionOverridingHostIsDeprecated()
+    {
+        $collection = new RouteCollection();
+        $route = new Route('/a', [], [], [], '{locale}.example.net');
+        $collection->add('a', $route);
+
+        $this->expectUserDeprecationMessage('Since symfony/routing 7.3: Overriding a route\'s host with its group\'s is deprecated, you should remove it from the route.');
+        $collection->setHost('{locale}.example.com');
+
+        $this->assertEquals('{locale}.example.com', $route->getHost());
     }
 
     public function testSetCondition()
     {
         $collection = new RouteCollection();
         $routea = new Route('/a');
-        $routeb = new Route('/b', [], [], [], '{locale}.example.net', [], [], 'context.getMethod() == "GET"');
         $collection->add('a', $routea);
-        $collection->add('b', $routeb);
 
         $collection->setCondition('context.getMethod() == "POST"');
 
         $this->assertEquals('context.getMethod() == "POST"', $routea->getCondition());
-        $this->assertEquals('context.getMethod() == "POST"', $routeb->getCondition());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCollectionOverridingConditionsIsDeprecated()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{placeholder}', condition: 'condition'));
+
+        $this->expectUserDeprecationMessage('Since symfony/routing 7.3: Overriding a route\'s condition with its group\'s is deprecated, you should remove it from the route.');
+        $collection->setCondition(null);
+
+        $this->assertEquals('', $collection->get('foo')->getCondition());
     }
 
     public function testClone()
@@ -283,29 +347,53 @@ class RouteCollectionTest extends TestCase
     public function testSetSchemes()
     {
         $collection = new RouteCollection();
-        $routea = new Route('/a', [], [], [], '', 'http');
-        $routeb = new Route('/b');
-        $collection->add('a', $routea);
-        $collection->add('b', $routeb);
+        $route = new Route('/a');
+        $collection->add('a', $route);
 
         $collection->setSchemes(['http', 'https']);
 
-        $this->assertEquals(['http', 'https'], $routea->getSchemes());
-        $this->assertEquals(['http', 'https'], $routeb->getSchemes());
+        $this->assertEquals(['http', 'https'], $route->getSchemes());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCollectionOverridingSchemesIsDeprecated()
+    {
+        $collection = new RouteCollection();
+        $route = new Route('/a', [], [], [], '', 'http');
+        $collection->add('a', $route);
+
+        $this->expectUserDeprecationMessage('Since symfony/routing 7.3: Overriding a route\'s schemes with its group\'s is deprecated, you should remove it from the route.');
+        $collection->setSchemes(['http', 'https']);
+
+        $this->assertEquals(['http', 'https'], $route->getSchemes());
     }
 
     public function testSetMethods()
     {
         $collection = new RouteCollection();
-        $routea = new Route('/a', [], [], [], '', [], ['GET', 'POST']);
-        $routeb = new Route('/b');
-        $collection->add('a', $routea);
-        $collection->add('b', $routeb);
+        $route = new Route('/a');
+        $collection->add('a', $route);
 
         $collection->setMethods('PUT');
 
-        $this->assertEquals(['PUT'], $routea->getMethods());
-        $this->assertEquals(['PUT'], $routeb->getMethods());
+        $this->assertEquals(['PUT'], $route->getMethods());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCollectionOverridingMethodsIsDeprecated()
+    {
+        $collection = new RouteCollection();
+        $route = new Route('/a', [], [], [], '', [], ['GET', 'POST']);
+        $collection->add('a', $route);
+
+        $this->expectUserDeprecationMessage('Since symfony/routing 7.3: Overriding a route\'s methods with its group\'s is deprecated, you should remove it from the route.');
+        $collection->setMethods('PUT');
+
+        $this->assertEquals(['PUT'], $route->getMethods());
     }
 
     public function testAddNamePrefix()

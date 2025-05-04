@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+* Deprecate `RouteCollection` overriding its routes' properties
+
 7.3
 ---
 

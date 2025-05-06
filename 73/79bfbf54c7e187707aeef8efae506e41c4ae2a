@@ -1,0 +1,207 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-03-24T20:30:34Z
+
+I extracted the CS fixes into
+* https://github.com/symfony/symfony/pull/60031
+
+to keep this PR clean
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-03-27T15:47:55Z
+
+Ready for review @mtarld @GromNaN
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-03-31T08:27:56Z
+
+The feature is relevant, but I find the syntax of the attribute is not explicit.
+
+I would find it clearer if the target contained `[class, property]` instead. That would let the `if` for an actual condition.
+
+```diff
+- #[Map(target: 'foo', transform: 'strtoupper', if: B::class)]
++ #[Map(target: [B::class, 'foo'], transform: 'strtoupper']
+```
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-03-31T10:43:10Z
+
+> I would find it clearer if the target contained [class, property] instead. That would let the if for an actual condition.
+
+This was my first attempt but its weird to use a Closure that's not interpreted as a Closure no? Also the `target` is either a class or a property name, using this would require more code changes. instead of
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-03-31T10:49:15Z
+
+Then, can we add a `targetClass` property to the attribute? We'd need separate attribute classes since the properties diverge: `MapClass` and `MapProperty`.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-03-31T18:54:41Z
+
+`targetClass` is confusing with target, not sure this needs to split attributes in two for now and if we did `MapProperty` would have class and property. What's wrong with just having the class on the `if`?
+
+```
+#[Map(if: fn($target) => $target instance of ClassName)]
+```
+
+using the class name is just a shortcut for that. Although to make this work we would also need to add the `target` to our callbacks.
+
+To re-center the debate I think symfony should allow some use cases with a as straightforward as possible DX, when users want more behavior it's quite feasible using the MetadataFactory.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-03-31T19:23:33Z
+
+Adding the `target` after the `value` and the `source`, sounds like a good idea. The condition callable signature would become `function (mixed $value, object $source, object $target)`.
+
+The if condition can be an invokable object that implements `ConditionCallableInterface`.
+
+```php
+readonly class TargetClass implements ConditionCallableInterface {
+    public function __construct(private string $targetClass) {}
+    public function __invoke(mixed $value, object $source, object $target): bool {
+        return is_a($this->targetClass, $target, true);
+    }
+}
+```
+
+Usage:
+```php
+#[Map(target: B::class)]
+class A
+{
+    #[Map(target: 'foo', transform: 'strtoupper', if: new TargetClass(B::class))]
+    public string $something = 'test';
+}
+```
+
+That way, it's explicit, it doesn't require the PHP 8.5 closures in attributes and keep a good DX. Later you can combine more conditions by nesting objects.
+
+Experimentation: https://github.com/soyuka/symfony/pull/1
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-04-01T08:30:34Z
+
+@GromNaN I'm not sure it's a good idea to have the target in the callbacks especially that if you mutate the target your results will probably be unexpected ^^. I like the `new TargetClass` though having closures inside attributes may behave weirdly when caching or dumping.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-04-01T08:50:22Z
+
+I really think there gonna be use cases where we need to check access stuff than the class name on the target. Think about IRI creation, or discrimination based on a property during hydration. So for me `object $target` is the way to go.
+
+IMO, if users are mutating the target within the callback, they are using the component in a bad way, and we kind of can't avoid it (maybe we can write some disclaimer in the documentation?)
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-04-02T08:12:00Z
+
+I reverted my changes to the previous version with the added `$target`, in the end it's a good addition that brings flexibility. Not sure where I should put the `TargetClass` closure as we may introduce more shortcuts like this in the future.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2025-04-02T16:13:33Z
+
+I'm being late on this, but having this check on the `if` condition will avoid potential optimization later if there is other conditions.
+
+It's due to the fact, that those kind of condition (evaluating a target class) can be easily checked during metadata extraction. But if there is future condition that induce runtime check it will be impossible to extrapolate this check during metadata extraction (since it's too generic) so we will have to do it each time
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2025-04-02T16:28:11Z
+
+Maybe something like this would be better :
+
+```php
+#[Map(target: B::class)]
+#[Map(target: C::class)]
+class A
+{
+    #[Map(to: 'foo', target: B::class, transform: 'strtoupper')]
+    #[Map(to: 'bar')]
+    public string $something = 'test';
+
+    public string $doesNotExistInTargetB = 'foo';
+}
+```
+
+It keep target consistent with the attribute being on either a property or the class,
+
+However this is a hard change in current api (but since it's not released i think it's ok ?)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-04-02T17:22:06Z
+
+It would be no problem yes
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-04-02T18:54:06Z
+
+@joelwurtz I think it's too confusing to have `to`/`from` and `source`/`target`. I don't share the concerns as we can easily take this check as a "static" check that we can induce during the metadata extraction. We could also add a particular interface that would force these checks at runtime instead.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2025-04-02T19:04:09Z
+
+Personally i find this confusing to have the same property on the same attribute that does not mean the same thing given the position of the attribute :/ (as an user i would expect a property having the same meaning)
+
+> I don't share the concerns as we can easily take this check as a "static" check that we can induce during the metadata extraction. We could also add a particular interface that would force these checks at runtime instead.
+
+Not sure how it would work since they may be check that combine multiple checks ?
+
+I just find this complex given the use case
+
+EDIT :
+
+Also this could be :
+
+```php
+#[Map(property: 'foo', target: B::class, transform: 'strtoupper')]
+```
+
+(Could be also rename ? or any other name)
+
+So no to / from, work both ways
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-04-03T07:11:03Z
+
+I'm not sure we need to anticipate these use cases quite yet as we're still a long way to go before adding performance optimizations. I suggest that we leave this like this: the `if` adds a condition, and it's quite clear that "map only when this class is the target" is a condition. I want this API to be tried in user-land and we'll see if the use cases don't match we'll consider changing the whole API. Same goes when we will want to introduce performance with a cache warmup we'll see how this goes.
+
+> Not sure how it would work since they may be check that combine multiple checks ?
+
+Sure but then they would be executed at runtime, just like transformations. Let's say we have `class TargetClass implements StaticConditionInterface` then we know we can execute the condition when doing an optimization pass. If not, we just use the condition at runtime.
+
+> Personally i find this confusing to have the same property on the same attribute that does not mean the same thing given the position of the attribute
+
+You mean having the `target` being a `class` on the class attribute and a `property` on the property attribute? Then we shall have two different attributes and it brings other issues (like mapping an embed object).
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2025-04-15T07:35:22Z
+
+> You mean having the target being a class on the class attribute and a property on the property attribute? Then we shall have two different attributes and it brings other issues (like mapping an embed object).
+
+Yes that was i mean, i think consistent wording is important across a component, specially when this parameter can be considered as a "configuration" parameter having different meaning for the same word in the same component will induce a lot of friction IMO
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-04-15T13:02:04Z
+
+Although the potential confusion seems real, making that setting context-dependent (i.e. expecting a property if used on a property vs a FQCN if used on a class) looks sensible to me. Throwing meaningful errors on such mistake should be good enough, do we have that?
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-04-16T12:13:30Z
+
+IMHO its outside of the current scope of this PR we can always open a new issue to discuss this (or add this to the RFC issue)

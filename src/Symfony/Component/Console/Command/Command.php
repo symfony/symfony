@@ -214,12 +214,16 @@ class Command
      *
      * @return int 0 if everything went fine, or an exit code
      *
-     * @throws LogicException When this abstract method is not implemented
+     * @throws LogicException When this abstract method is not implemented or doesn't implement InvokableCommand
      *
      * @see setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if ($this->code) {
+            return ($this->code)($input, $output);
+        }
+
         throw new LogicException('You must override the execute() method in the concrete command class.');
     }
 
@@ -310,10 +314,6 @@ class Command
         }
 
         $input->validate();
-
-        if ($this->code) {
-            return ($this->code)($input, $output);
-        }
 
         return $this->execute($input, $output);
     }

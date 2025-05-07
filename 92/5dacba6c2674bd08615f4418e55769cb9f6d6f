@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-05-06T13:01:19Z
+
+Why was there this constraint and why are you removing it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-06T13:26:55Z
+
+@yceruto  added it in #60076 but it turned out that the conflict rule doesn’t seem to be necessary for the test suite to pass.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-06T13:44:50Z
+
+I can’t recall the exact reason I introduced this conflict, but based on the nature of that PR, I assume it was related to a deprecation failure. I might be overlooking something, but since @xabbuh confirmed that the failure no longer occurs, I’m fine with removing it.

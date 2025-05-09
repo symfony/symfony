@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-09T12:31:22Z
+
+I believe there’s another way to keep this working without implementing the interface: https://github.com/symfony/symfony-docs/pull/20932/files#diff-738612fa300cdcb8d044a240dcec7bc9db05a1671f30e3d1b987bbf200037b8c but I might be missing something, could you please confirm?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-09T12:33:56Z
+
+@yceruto it should work indeed, but the proposed approach makes sense to me also.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-09T12:44:01Z
+
+@yceruto I remember we discussed this at the time and you had some arguments against `SignalableCommandInterface`, namely that the listener approach is better design-wise because less intrusive. I agreed with that and still do but I think either we decide that we don't need this interface at all and then it should be deprecated, or invokable commands should support it
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-09T12:59:34Z
+
+Yes, I'd prefer a single way to do this for invokable command, less variants to document and maintain.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-05-09T13:11:38Z
+
+@yceruto Just a heads up, `symfony/event-dispatcher` is an optional dependency of the console component. If not installed, users won't be able to handle signals. I'm not saying that's good or bad, just something to be aware of.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-09T13:23:18Z
+
+I understand the intention of supporting all features used in normal commands, but in standalone usage, the invokable command approach doesn’t work naturally, people need to call explicitly setCode(), name, description, etc. In those cases, you’ll probably extend the `Command` class directly to avoid the extra burden.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-05-09T13:42:05Z
+
+My argument was more about why not to deprecate or remove the `SignalableCommandInterface` and since it has its use case (when the component is used standalone), it feels counter-intuitive for it not to work with invokable commands.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-09T13:53:13Z
+
+In those standalone cases without an `event-dispatcher`, you can still use signalable invokable commands by extending `Command` and implementing `SignalableCommandInterface`. The additional requirement is the manual extension, which is fine in my opinion since these are edge cases.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-09T13:58:41Z
+
+If the goal is to simplify support for invokable commands, I suggest keeping this PR as-is with the `Command implements SignalableCommandInterface` approach part only. This way, if someone wants to use this feature with an invokable command, they only need to extend the `Command` class, just as we currently recommend for `interact()` and other advanced use cases.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-09T14:08:33Z
+
+@yceruto If you mean we should not support `SomeInvokableCommand implements SignalableCommandInterface` then I disagree, reducing differences/limitations using invokable commands is worthwhile IMHO. The fact that extending `Command` is easier with console standalone shouldn't be taken as given I think, might improves later. Adding `interact()` or `initialize()` equivalents at some point is not excluded to me, if there's some traction.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-09T14:18:40Z
+
+I’m fine with invokable commands not supporting all CLI features out of the box. If extending the Command class is the way to enable them, that’s totally acceptable to me, just like we already do with invokable controllers and AbstractController. I don’t mind extending a class if that’s all it takes to unlock the functionality I need.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-09T14:22:21Z
+
+Sure, but why make it more complex than expected? I don't see your point sorry.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-09T14:26:58Z
+
+Shortcut methods and unsupported features are different stories. Stop me if I'm wrong but there is no AbstractController feature that cannot be implemented the same way by controllers not extending it
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-09T14:33:20Z
+
+My goal is to make it simpler for developers, but I’m probably wrong in this case, sorry for the noise and confusion @nicolas-grekas.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-09T14:45:19Z
+
+No worries, it's always useful to have a discussion. Here I don't see much added complexity (I see this as simpler actually, on the Command side) so I'm fine with the change.

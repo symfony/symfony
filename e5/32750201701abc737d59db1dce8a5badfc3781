@@ -1,0 +1,411 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-01-23T16:04:36Z
+
+There are also cases where the parameter doesn't have a default value, or where the default value is inconsistent.
+- `#[Option] bool $arg` or `#[Option] bool $arg = true`: same behavior as `#[Option] bool $arg = false`: `VALUE_NONE`
+- `#[Option] string $arg`: same behavior as `#[Option] ?string $arg = null`: `VALUE_REQUIRED`
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-01-23T16:15:27Z
+
+I suggest we make options require a default in their argument definition:
+- `#[Option] ?string $foo`: exception
+- `#[Option] ?string $foo = null`: `VALUE_REQUIRED`
+- `#[Option] bool $arg`: exception
+
+> `#[Option] bool $arg = true`
+
+I think, right now, that would be `VALUE_NONE | VALUE_NEGATABLE` but this feels unintuitive to me. @yceruto pointed out to me that this could be useful for deprecating default values though (like what was done with `--complete`/`--force` in the `doctrine:schema:update` command).
+
+---------------------------------------------------------------------------
+
+by stof at 2025-01-23T17:58:56Z
+
+@kbond for a no-op boolean flag, you still need to keep the same default value than before, because you still need to detect the explicit usage of the flag to display deprecation warning (but you would then ignore that flag for the actual logic)
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-03T15:03:58Z
+
+> for a no-op boolean flag, you still need to keep the same default value than before, because you still need to detect the explicit usage of the flag to display deprecation warning (but you would then ignore that flag for the actual logic)
+
+@stof, wouldn't `#[Option] ?bool $arg = null` work for this? If anything other than `null`, trigger a deprecation?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-03T16:26:07Z
+
+> For instance, #[Option] ?bool $arg = false should be invalid and throw an exception because it doesn't make sense.
+
+I agree, better expose a negatable option for such cases and then the `false` default is pointless.
+
+ > I suggest we make options require a default in their argument definition:
+
+Not sure as using `#[Option] ?bool $colors` works well to me.
+
+> > #[Option] bool $arg = true.
+> I think, right now, that would be VALUE_NONE | VALUE_NEGATABLE but this feels unintuitive to me.
+
+Same as above, I think it should be `#[Option] ?bool $colors` resulting in
+- not passed : `null`
+- `--colors`:  `true`
+- `--no-colors`:  `false`
+
+No? And `#[Option] ?bool $colors = null` would be strictly equivalent.
+
+> wouldn't #[Option] ?bool $arg = null work for this? If anything other than null, trigger a deprecation?
+
+Makes sense to me.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-03T16:30:50Z
+
+Thanks for the review!
+
+> Not sure as using `#[Option] ?bool $colors` works well to me.
+
+I'm sure it's fine but it isn't crystal clear that `null` would be passed here if no option is passed.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-03T16:41:22Z
+
+What about `#[Option] array $arg = []`? Are you thinking `#[Option] array $arg` should be valid (and an empty array passed)?
+
+I sort of thought it was easier to reason about if we have a hard "all options require a default" rule.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-03T17:27:43Z
+
+> I'm sure it's fine but it isn't crystal clear that null would be passed here if no option is passed.
+
+No blocker but I feel like it is clear enough that `?` is what actually handles the case where the option is absent and so you'll get a `null` value.
+
+> What about #[Option] array $arg = []? Are you thinking #[Option] array $arg should be valid (and an empty array passed)?
+
+I think yes.
+
+> I sort of thought it was easier to reason about if we have a hard "all options require a default" rule
+
+And I don't strongly disagree, I'm just leaning towards leaving this up to implementors as I can't think of any issue it could cause and one may be happy to lighten their signatures.
+
+> #[Option] array $arg = ['default']: VALUE_REQUIRED | VALUE_ARRAY (maybe? it feels ambiguous to me - are passed options appended?)
+
+If by appended you mean that you end up with the default values + the user values in the array then I would say no. As soon as one set such array option once the default is lost IMHO
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-03T17:42:56Z
+
+Ok, I'm good with this, couple of remaining questions, what should the following do?
+1. `#[Option] bool $arg` default to false but make the option negatable?
+2. `#[Option] bool $arg = true` make the option negatable or just noop?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-05-03T17:47:42Z
+
+If there is some combination of parameter type, default value and input type that seems illogical, we can throw a LogicException.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-03T17:50:56Z
+
+> Ok, I'm good with this, couple of remaining questions, what should the following do?
+>
+> 1. `#[Option] bool $arg` default to false but make the option negatable?
+> 2. `#[Option] bool $arg = true` make the option negatable or just noop?
+
+What about no default value means negatable, default means not?
+
+@GromNaN I’m not sure to understand, could you illustrate?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-03T17:56:02Z
+
+> If there is some combination of parameter type, default value and input type seems illogical, we can throw a Logo exception.
+
+That's kind of what I'm trying to do here: detailing things that don't make sense and throw logic exceptions.
+
+> What about no default value means negatable, default means not?
+
+I'm ok with that. But when there's no default (`#[Option] bool $arg`), what should the default be (if no option is passed), `false` I think. Again, though, like `?bool $arg`, this isn't totally clear imo.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-03T18:56:54Z
+
+Default false (when omitted) matches with what `Input::getOption()` does so that could work. I was more thinking about using `null` as the general marker for "not passed" as you don't have the `hasOption()` check, which basically means all invoke parameters configured as input options must be nullable.
+If we go with `false` as default for not passed, I'm starting to think we may need to make negatable configurable opt-in through the Attribute... too much assumption. wdyt?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-03T19:58:38Z
+
+That all sounds good. I'll adjust this PR to enforce/accommodate these rules (hopefully in a way that makes it clear).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-03T20:41:29Z
+
+Hey there! here are my thoughts about some points
+ * I like the rule that options must define a default value, it's aligned with the option definition and nature. Assuming default value will lead to implicit behavior that’s harder to reason about, debug, and document, especially when options are optional by design. A clear default forces the developer to make an intentional decision.
+ * `#[Option] ?bool $arg = null: VALUE_NONE | VALUE_NEGATABLE` I'm more to throw an exception in this case than open it to assumptions. Cause that only boolean options are negatable, and passing `--no-opt` makes sense when the default value is `true`, otherwise you don't need to negate.
+ * `#[Option] ?string $arg = null: VALUE_REQUIRED` this one is confusing to me, ppl can think the opposite as they are setting `null` as default.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-03T20:45:05Z
+
+* `#[Option] array $arg = ['default']: VALUE_REQUIRED | VALUE_ARRAY (maybe? it feels ambiguous to me - are passed options appended?)` IMO it should never append
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-03T20:54:48Z
+
+> I like the rule that options must define a default value,
+
+This was my thinking also - you articulated it better 😉
+
+> #[Option] ?bool $arg = null: VALUE_NONE | VALUE_NEGATABLE I'm more to throw an exception
+
+How else could we allow negatable options (where you need to know if it was explicitly passed)?
+
+> [Option] ?string $arg = null: VALUE_REQUIRED this one is confusing to me, ppl can think the opposite as they are setting null as default.
+
+Again, how else could we handle this case?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-03T21:16:13Z
+
+>>#[Option] ?bool $arg = null: VALUE_NONE | VALUE_NEGATABLE I'm more to throw an exception
+>How else could we allow negatable options (where you need to know if it was explicitly passed)?
+
+Forget that comment, I just saw that it's the current case, and allow to check the option was explicitly passed. Nothing new there regarding the current implementation, right?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-03T21:20:50Z
+
+>>[Option] ?string $arg = null: VALUE_REQUIRED this one is confusing to me, ppl can think the opposite as they are setting null as default.
+
+>Again, how else could we handle this case?
+
+Here IMO it has a different meaning, a nullable option should not require a value (seeing it from the usage perspective). I think this case can be currently handled with `[Option] string $opt = '': VALUE_REQUIRED` instead
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-03T22:05:24Z
+
+> Nothing new there regarding the current implementation, right?
+
+I don't believe so but I'll double check.
+
+> I think this case can be currently handled with [Option] string $opt = '': VALUE_REQUIRED instead
+
+That's fair. I guess the only thing I don't like is not being able to distinguish between *no option passed* and `--arg=""`. (I don't believe this to be a real scenario but maybe I'm wrong)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-03T22:37:05Z
+
+>>Nothing new there regarding the current implementation, right?
+
+>I don't believe so but I'll double check.
+
+that case is actually tested in `testBinaryInputOptions` the `$c` option.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-03T22:49:07Z
+
+>>I think this case can be currently handled with [Option] string $opt = '': VALUE_REQUIRED instead
+
+>That's fair. I guess the only thing I don't like is not being able to distinguish between no option passed and --arg="". (I don't believe this to be a real scenario but maybe I'm wrong)
+
+I don’t see a real scenario either, but you can still use `$input->hasParameterOption('--arg')` to check whether the option was passed or not.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-03T23:04:30Z
+
+I’d like to revisit these general rules from a usage perspective, not because they’re ideal, but because they reflect how we’ve implemented the current behavior:
+ 1. Omitting an option hydrates its default value (which must be defined); If necessary, use `$input->hasParameterOption('--opt')` to check whether the option was explicitly passed and matches the default value.
+ 2. Passing an option with a value `--opt=value` hydrates that value (only valid for non-boolean options);
+ 3. Passing an option without a value `--opt` hydrates:
+     * `true` for boolean options
+     * `null` for others (only valid for nullable options)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-04T00:08:26Z
+
+> > That's fair. I guess the only thing I don't like is not being able to distinguish between no option passed and --arg="". (I don't believe this to be a real scenario but maybe I'm wrong)
+
+> I don’t see a real scenario either, but you can still use $input->hasParameterOption('--arg') to check whether the option was passed or not.
+
+It is kind of a big deal, see https://github.com/symfony/symfony/pull/21228. Indeed, using `hasParamerterOption()` should fix it
+
+> Passing an option without a value --opt hydrates:
+> - true for boolean options
+> - null for others (only valid for nullable options)
+
+That's the plan to me.
+
+> and passing --no-opt makes sense when the default value is true, otherwise you don't need to negate.
+
+👍  for default true = negatable. Should we force making it nullable so we can pass it `null` when the option is omitted e.g. `?bool $colors = true`  means `VALUE_NONE | VALUE_NEGATABLE`
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-04T17:45:55Z
+
+>Should we force making it nullable so we can pass it null when the option is omitted e.g. ?bool $colors = true means VALUE_NONE | VALUE_NEGATABLE
+
+If we want a stricter approach and want to throw when it doesn’t make sense, then the case `?bool $colors = true` is one of them, yes, as there’s no way to get a `null` value there (following these rules https://github.com/symfony/symfony/pull/59602#issuecomment-2848847676).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-04T19:13:11Z
+
+Then I don't get which case should make an option negatable per your suggestions?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-04T19:25:32Z
+
+Here is the full table for `#[Option]`:
+| No. | Signature | Definition | Usage | Value |
+|--|--|--|--|--|
+| 1 | `bool $opt = false` | `VALUE_NONE` | `<omitted>` <br> `--opt` | `false` (default) <br> `true` |
+| 2 | `bool $opt = true` | `VALUE_NONE` &<br>`VALUE_NEGATABLE` | `<omitted>` <br> `--opt` <br> `--no-opt` | `true` (default) <br> `true` <br> `false`
+| 3 | `?bool $opt = null` | `VALUE_NONE` &<br>`VALUE_NEGATABLE` | `<omitted>` <br> `--opt` <br> `--no-opt` | `null` (default) <br> `true` <br> `false`
+| 4 | `string $opt = ''` | `VALUE_REQUIRED` | `<omitted>` <br> `--opt=val` | `''` (default) <br> `'val'`
+| 5 | `?string $opt = ''` | `VALUE_OPTIONAL` | `<omitted>`<br>`--opt`<br>`--opt=val` | `''` (default)<br>`null`<br>`'val'` |
+| 6 |  <del>`?string $opt = null`</del><br>(proposed for removal) | `VALUE_OPTIONAL` | `<omitted>`<br>`--opt`<br>`--opt=val` | `null` (default)<br>`null`<br>`'val'` |
+| 7 | `array $opt = []` | `VALUE_REQUIRED` &<br>`VALUE_ARRAY` | `<omitted>` <br> `--opt=val1` | `[]` (default)<br>`['val1']`
+
+EDIT:
+Consistent rules are:
+ * all options must define a default value
+ * the default value is used only when the option is omitted
+ * boolean options are defined as `VALUE_NONE`
+ * non-false boolean options are defined as `VALUE_NAGATABLE`
+ * non-boolean/non-nullable options are defined as `VALUE_REQUIRED`
+ * non-boolean/nullable options are defined as `VALUE_OPTIONAL`
+ * array options are defined as `VALUE_ARRAY`
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-04T19:44:33Z
+
+I think this case `#[Option] string|bool $arg = false: VALUE_OPTIONAL` is just a special DX friendly signature for case 5.
+
+| Signature | Definition | Usage | Value |
+|--|--|--|--|
+| `string\|bool $opt = false` | `VALUE_OPTIONAL` | `<omitted>` <br> `--opt=val` <br> `--opt` | `false` (default)<br>`'val'` <br>`true` |
+
+and I agree that it's better but not a blocker for me.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-04T23:28:12Z
+
+That all works for me. Can we add:
+| Signature | Definition | Usage | Value |
+|--|--|--|--|
+| `array $opt = ['1', '2']` | `VALUE_ARRAY & VALUE_REQUIRED` | `<omitted>` <br> `--opt=val1` | `['1', '2']` (default)<br>`['val1']` |
+
+?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-04T23:37:28Z
+
+> If we want a stricter approach and want to throw when it doesn’t make sense, then the case ?bool $colors = true is one of them, yes, as there’s no way to get a null value there (following these rules https://github.com/symfony/symfony/pull/59602#issuecomment-2848847676).
+
+A use case for `?bool $colors = true` to be `VALUE_NONE | `VALUE_NEGATABLE` would be to have 3 modes where
+- not passed gives `null`  and means "auto" like (if colors are supported then great else fallback to disabled)
+- `--colors` gives `true` and means colors must be enabled (error if not supported)
+- `--no-colors` gives `false` and means no colors at all
+
+ There are other ways to achieve this (e.g. `--colors=always`) but I'd be fine supporting it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-05T00:41:14Z
+
+>>If we want a stricter approach and want to throw when it doesn’t make sense, then the case ?bool $colors = true is one of them, yes, as there’s no way to get a null value there (following these rules https://github.com/symfony/symfony/pull/59602#issuecomment-2848847676).
+
+>A use case for ?bool $colors = true to be VALUE_NONE | VALUE_NEGATABLE` would be to have 3 modes where
+>
+>not passed gives null and means "auto" like (if colors are supported then great else fallback to disabled)
+>--colors gives true and means colors must be enabled (error if not supported)
+>--no-colors gives false and means no colors at all
+
+Isn't it the case 3 of the table exactly? that case should be covered by `?bool $colors = null`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-05T00:50:32Z
+
+Yes it is, my bad!
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-05T16:52:26Z
+
+I like the table, so the final table should be part of the PR header and in the docs ❤️
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-05T23:01:59Z
+
+Found some signatures that probably deserve a `LogicException`:
+
+1. `#[Option] ?bool $opt = true/false` (focus on the nullable type `?` when default value is not `null`)
+
+   Since boolean options are defined as `VALUE_NONE`, using `--opt` sets the value to `true`,  omitting the option sets the value to `true` or `false` (depending on its default value), and negating `--no-opt` sets the value to `false`, there is no way you can receive a `null` value in this case. So, the exception message should suggest removing the nullable type from the signature or set `null` as default value (which will be used when omitted).
+
+ 3. `#[Option] ?array $opt = []` (focus on the nullable type `?`)
+
+    Since an array of values is expected (or the default value if omitted), I can't find a use case for passing the options without a value, e.g. `--opt` or `--opt --opt` for an array option. The exception should suggest removing the nullable type from the signature, so --option=value is always required in this case.
+
+ 5. `?string $opt = null` (maybe this one too? focus on the `null` as default value)
+
+    Since omitting the option sets the value to `null` (default), the intent behind passing the option without a value results in (null) the same outcome as omitting the option, making this intent unclear. Here we could suggest setting a non-null default value instead.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-05T23:12:43Z
+
+Had to stare at 3 for a while but yes, that all sounds good to me.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-06T03:08:30Z
+
+Thanks for all the feedback! I'll finalize this PR this week.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-07T23:35:57Z
+
+Ok, PR updated:
+
+1. Adds tests for the rules described in [this table](https://github.com/symfony/symfony/pull/59602#issuecomment-2849377828) (they all worked w/o changes)
+2. Adds exceptions/tests for the restrictions described in [this table](https://github.com/symfony/symfony/pull/59602#issuecomment-2852574031) (I had to add some checks for two of these)
+
+There's likely other logic checks we could make but I didn't want to go overboard.
+
+~I have to admit, I find the nuance between 5 & 6 in [this table](https://github.com/symfony/symfony/pull/59602#issuecomment-2849377828) awkward to reason about (btw, 5 works but 6 throws exception). For 5, it's really not obvious that this will be `VALUE_OPTIONAL` and that `null` will be the value when the option is used w/o a value. It feels like it should throw an exception as it's similar to `?bool = false` (nullable parameter with non-null default).~
+
+~I'd suggest making https://github.com/symfony/symfony/pull/59602#issuecomment-2849384881 possible before 7.3 and use this to document this option type. (I can do this in a follow-up PR)~
+
+I've discovered this is just how `VALUE_OPTIONAL` works - when the option is used w/o a value, `null` is given. I don't believe we can change this so [this](https://github.com/symfony/symfony/pull/59602#issuecomment-2849384881) is not possible (unless I'm mistaken).

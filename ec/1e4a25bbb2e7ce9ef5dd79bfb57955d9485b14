@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-08T09:37:38Z
+
+Can we cover this case with a test?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2025-05-08T09:55:16Z
+
+Added a test yes. I think looking a bit more at what happens the flow is like this:
+
+- RememberMeAuthenticator::authenticate attempts to read the cookie, that throws an AuthenticationException which fails the login
+- RememberMeListener handles the LoginFailureEvent and calls clearRememberMeCookie
+- the clearing tries to read the cookie first and that throws if it is malformed (fixed by this PR so it is caught and the cookie is cleared without failure, the persistent data is not cleared obviously as we cannot map any persistent data from a malformed cookie)

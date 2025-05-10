@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-03-27T11:25:08Z
+
+shouldn't this dual cache setup be disabled when autoReload is enabled ? Otherwise, any template cached in the readonly cache won't be reloaded (as the cache never writes the new content) which will break the DX
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2024-03-27T11:33:19Z
+
+> shouldn't this dual cache setup be disabled when autoReload is enabled ? Otherwise, any template cached in the readonly cache won't be reloaded (as the cache never writes the new content) which will break the DX
+
+I don't think it needs to. Looking at the `Environment::loadTemplate` method, it skips the `cache::load` call if autoReload is enabled, and calls `cache::write` directly. As the ChainCache propagates the write to all caches, from that moment, only the Runtime cache will be used, with the updated copy of the template.
+Or did I miss something ?
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2024-08-04T17:13:22Z
+
+> A little test of the `ChainCache` class would be beneficial: there's a bit of critical logic in it that needs to be validated.
+
+@GromNaN I created the test for ChainCache in the Twig repo 👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2024-08-07T12:44:09Z
+
+This one can now be updated as the new Twig classes have been merged in Twig repo.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-04-11T14:24:26Z
+
+Tests are failing.
+```
+Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException: You have requested a non-existent parameter "kernel.build_dir". Did you mean this: "kernel.cache_dir"?
+```
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2025-04-11T15:11:32Z
+
+> Tests are failing.
+>
+> ```
+> Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException: You have requested a non-existent parameter "kernel.build_dir". Did you mean this: "kernel.cache_dir"?
+> ```
+
+Fixed, I didn't realise the tests were using a smaller kernel.
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2025-05-08T16:52:47Z
+
+@GromNaN @fabpot @nicolas-grekas @OskarStark Could we still get this merged in 7.3 ?

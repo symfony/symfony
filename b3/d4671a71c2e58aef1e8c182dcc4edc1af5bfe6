@@ -1,0 +1,252 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-14T08:45:42Z
+
+Do you have real world examples of validation rules? I suppose you enable those validators only in the "dev" env?
+I don't like the implementation, DI extensions are not meant for such things. A compiler pass would be a better fit, but if one day we need validators to support proper DI themselves, we'll have to make them services. And then, no need for any explicit configuration anymore since autoconfiguration could do the job.
+Then remains the "when" do we run this. What about calling during cache warmup?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-03-14T09:20:01Z
+
+> Do you have real world examples of validation rules?
+
+Here is the code my client wrote
+
+<details><summary>WorkflowValidator.php</summary>
+<p>
+
+```php
+<?php
+
+namespace App\Validator;
+
+use App\Service\WorkflowService;
+use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
+use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
+
+class WorkflowValidator implements DefinitionValidatorInterface
+{
+    private const VALID_PLACE_TYPES = [
+        'Information',
+        'UserChoice',
+        'Print',
+        'Modification',
+        'ChooseRepair',
+        'DoneRepair',
+        'ReasonAndPhoto',
+        'Photo',
+        'ProductInformation',
+        'Conditional',
+        'Final',
+    ];
+
+    public function validate(Definition $definition, string $name): void
+    {
+        $metadataStore = $definition->getMetadataStore();
+        foreach ($definition->getPlaces() as $place) {
+            $transitions = $this->getForwardTransitionsByPlace($definition, $place);
+            $placeMetadata = $metadataStore->getPlaceMetadata($place);
+
+            if (! key_exists('type', $placeMetadata)) {
+                throw new InvalidDefinitionException(sprintf('[%s] place "%s" has no type - %s', $name, $place, json_encode($placeMetadata)));
+            }
+
+            if (! \in_array($placeMetadata['type'], self::VALID_PLACE_TYPES, true)) {
+                throw new InvalidDefinitionException(sprintf('[%s] place "%s" has a unknow type "%s"', $name, $place, $placeMetadata['type']));
+            }
+
+            switch ($placeMetadata['type']) {
+                case 'Information':
+                case 'Modification':
+                case 'ChooseRepair':
+                case 'ReasonAndPhoto':
+                case 'Photo':
+                case 'Print':
+                    if (\count($transitions) !== 1) {
+                        throw new InvalidDefinitionException(sprintf('workflow: "%s" place "%s" of type "%s" should have one outgoing transitions. found: "%s"', $name, $place, $placeMetadata['type'], $this->display($transitions)));
+                    }
+                    break;
+                case 'UserChoice':
+                    if (\count($transitions) === 0) {
+                        throw new InvalidDefinitionException(sprintf('workflow: "%s" place "%s" of type "%s" should have at least one outgoing transition.', $name, $place, $placeMetadata['type']));
+                    }
+                    foreach ($transitions as $transition) {
+                        $transitionMeta = $metadataStore->getTransitionMetadata($transition);
+                        if (! \array_key_exists('text', $transitionMeta)) {
+                            throw new InvalidDefinitionException(sprintf('workflow: "%s" transition "%s" should have a text', $name, $transition->getName()));
+                        }
+                        if (! \array_key_exists('type', $transitionMeta)) {
+                            throw new InvalidDefinitionException(sprintf('workflow: "%s" transition "%s" should have a type', $name, $transition->getName()));
+                        }
+                    }
+                    break;
+                case 'Conditional':
+                    if (\count($transitions) === 0) {
+                        throw new InvalidDefinitionException(sprintf('workflow: "%s" place "%s" of type "%s" should have at least one outgoing transition.', $name, $place, $placeMetadata['type']));
+                    }
+                    break;
+            }
+        }
+    }
+
+    private function getForwardTransitionsByPlace(Definition $definition, string $place): array
+    {
+        return array_filter($definition->getTransitions(), function ($transition) use ($place) {
+            return \in_array($place, $transition->getFroms(), true) && $transition->getName() !== WorkflowService::CANCEL_TRANSITION;
+        });
+    }
+
+    private function display(array $transitions): string
+    {
+        return implode(',', array_map(function ($transition) {
+            return $transition->getName();
+        }, $transitions));
+    }
+}
+```
+
+</p>
+</details>
+
+> I suppose you enable those validators only in the "dev" env?
+
+I have no opinion on this one. If the definition is valid in dev, It'll be in prod. And vice versa
+
+> DI extensions are not meant for such things
+
+We already do some validation in the DI extension, but it could be moved to a compiler pass. I'm okay with that. More over, I used compiler pass in the project because the extension point does not exist yet.
+
+<details><summary>Kernel.php</summary>
+<p>
+
+```php
+class Kernel extends BaseKernel implements CompilerPassInterface
+{
+    use MicroKernelTrait;
+
+    public function process(ContainerBuilder $container): void
+    {
+        // Validate all workflows
+        foreach ($container->findTaggedServiceIds('workflow') as $id => $_) {
+            $workflowDefinition = $container->getDefinition($id);
+
+            $definitionArgument = $workflowDefinition->getArgument(0);
+            if (! $definitionArgument instanceof Reference) {
+                throw new RuntimeException('The first argument of the workflow service must be a reference.');
+            }
+
+            // warning: usually, one should not use the container to get a
+            // service during the compilation phase But i'm an engineer, i know
+            // what i'm doing
+            $definition = $container->get((string) $definitionArgument);
+            $name = $workflowDefinition->getArgument(3);
+
+            (new WorkflowValidator())->validate($definition, $name);
+        }
+    }
+}
+```
+
+</p>
+</details>
+
+> And then, no need for any explicit configuration anymore since autoconfiguration could do the job.
+
+This is not so simple. One validator could apply on one workflow but not another one. [ref](https://github.com/symfony/symfony/blob/e49f84b1207030dc9747e798a3030060a7a257a6/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1045-L1050)
+
+But we could pass the workflow name along the definition. But it required to update the Interface... deprecation layer... a bit boring, but why not!
+
+>Then remains the "when" do we run this. What about calling during cache warmup?
+
+I'm lacking knowledge in cache warmup! Is it always run, even after `rm -rf var/cache` ? Theses checks **must** be run only once, during the container building
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-14T09:39:35Z
+
+> we could pass the workflow name along the definition
+
+Why would we need that? We could create a WorkflowValidationCacheWarmer (and make it non-optional to answer your last question), and a compiler pass that'd configure this cache-warmer so that it knows about the names of the workflows?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-08-13T15:11:44Z
+
+I closed the other PR. This one is the right way to do it
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-09-24T08:57:30Z
+
+@stof thanks for the review.
+
+* I added some code to ensure we can instantiate the validator
+* I added some tests
+* I removed unnecessary support for using string instead of array of strings in configuration
+* I rebased to fix conflicts.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2024-10-01T06:27:01Z
+
+This PR is ready 👍🏼
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-03-24T14:12:44Z
+
+ping @nicolas-grekas.
+
+I know you don't like it. But the PR has already +1 year. It's quite simple and solve a real use case.
+
+I know you would prefer to have DI enabled on the validator, but it cannot. It's all about validating **DI**. Thus the DI is not setup yet.
+
+More over, the validator is only about configuration. There is no need for external services.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-03-24T15:00:01Z
+
+> Could the check be moved to a compiler pass? That'd allow validating workflows that aren't defined using semantic config at least.
+
+Sure. How should I transfert the data? DI Tag?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-03-24T15:01:49Z
+
+An attribute on the `workflow` tag yes?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-10T10:31:51Z
+
+Ok, Now everything is done in a compiler pass. Failing tests are not related.
+Ready for review
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-10T13:39:45Z
+
+@nicolas-grekas Thanks for the review. I addressed your comments, and I also added "resource tracking" on Validator file
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-14T12:37:58Z
+
+The failure looks related.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-14T13:03:46Z
+
+Thanks, fixed. Your suggestion was wrong about `""` :D
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-05-05T09:45:20Z
+
+PR updated, the failure is not related

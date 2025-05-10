@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by Okhoshi at 2023-12-10T20:58:46Z
+
+> I wonder if it wouldn't be nicer to adapt the behavior based on whether the file is relative or absolute?
+
+I also considered that option, and haven't realized `symfony/filesystem` was already required in the Bundle. Will change to that 👍
+
+> This way we don't need any deprecations nor any new methods:
+>
+> * when the path is absolute, we use that as we do now
+> * when the path is relative, we put the file in the build dir
+
+However, the deprecations and the new method are still necessary to let the extending class make the choice where to store the file. If we go with the current code, and the logic that when the path is relative we store in the build dir, it would force every CacheWarmer extending the `AbstractPhpFileCacheWarmer` to use the build dir.
+Or did I miss something ? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-04-03T14:24:15Z
+
+I'm having a hard time reasoning about the way things work during warmup...
+
+Right now, we made warmers be called with $buildDir set to null during post-compile warmups.
+Would it make sense to change this to be:
+- set cache_dir to build_dir during compile-time warmups
+- keep cache_dir and build_dir to their defined values during post-compile warmups?
+
+cache warmers would then be able to compare $cacheDir and $buildDir to decide if there is a readonly cache they shouldn't touch.
+
+Wouldn't that make all your related PRs simpler? (The most important change being to set $cacheDir to the build-dir during compile-time warmups)
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2024-04-04T17:09:20Z
+
+@nicolas-grekas I took a step back regarding this whole build_dir/cache_dir situation, and you are right that we can't prevent people to do mistakes anyway 👍 I could indeed drastically simplify this PR once I accepted that fact 🙂.
+
+However, passing the buildDir as null when we run the warmers in post-compile warmup is equivalent to your suggestion, so I suggest to keep that as it is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-27T13:41:50Z
+
+Can you please rebase on top of 7.2?
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2025-04-01T07:39:02Z
+
+@nicolas-grekas Anything missing on this PR to get it merged ? :)
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2025-05-08T16:53:44Z
+
+@nicolas-grekas @OskarStark Could we still get this merged in 7.3 ?

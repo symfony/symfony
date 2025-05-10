@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by andyexeter at 2024-10-23T10:02:27Z
+
+Appveyor build failure appears unrelated
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-23T13:43:34Z
+
+In other places, we perform the `class_exists` check on the `Recipe` class of flex (which has no extra dependency through a parent class) to detect the fact that Flex is installed.
+
+---------------------------------------------------------------------------
+
+by andyexeter at 2024-11-28T16:19:52Z
+
+> In other places, we perform the `class_exists` check on the `Recipe` class of flex (which has no extra dependency through a parent class) to detect the fact that Flex is installed.
+
+@stof could you point me in the direction of where that is done? I can't find any reference to the `Recipe` class in the Symfony monorepo.
+
+@nicolas-grekas is anything blocking this being merged?

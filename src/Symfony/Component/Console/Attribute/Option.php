@@ -84,10 +84,6 @@ class Option
             throw new LogicException(\sprintf('The option parameter "$%s" must not be nullable when it has a default boolean value.', $name));
         }
 
-        if ('string' === $self->typeName && null === $self->default) {
-            throw new LogicException(\sprintf('The option parameter "$%s" must not have a default of null.', $name));
-        }
-
         if ('array' === $self->typeName && $self->allowNull) {
             throw new LogicException(\sprintf('The option parameter "$%s" must not be nullable.', $name));
         }
@@ -97,11 +93,10 @@ class Option
             if (false !== $self->default) {
                 $self->mode |= InputOption::VALUE_NEGATABLE;
             }
+        } elseif ('array' === $self->typeName) {
+            $self->mode = InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY;
         } else {
-            $self->mode = $self->allowNull ? InputOption::VALUE_OPTIONAL : InputOption::VALUE_REQUIRED;
-            if ('array' === $self->typeName) {
-                $self->mode |= InputOption::VALUE_IS_ARRAY;
-            }
+            $self->mode = $self->allowNull && null !== $self->default ? InputOption::VALUE_OPTIONAL : InputOption::VALUE_REQUIRED;
         }
 
         if (\is_array($self->suggestedValues) && !\is_callable($self->suggestedValues) && 2 === \count($self->suggestedValues) && ($instance = $parameter->getDeclaringFunction()->getClosureThis()) && $instance::class === $self->suggestedValues[0] && \is_callable([$instance, $self->suggestedValues[1]])) {

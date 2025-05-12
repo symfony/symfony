@@ -86,7 +86,8 @@ class InvokableCommandTest extends TestCase
         $timeoutInputOption = $command->getDefinition()->getOption('idle');
         self::assertSame('idle', $timeoutInputOption->getName());
         self::assertNull($timeoutInputOption->getShortcut());
-        self::assertTrue($timeoutInputOption->isValueOptional());
+        self::assertTrue($timeoutInputOption->isValueRequired());
+        self::assertFalse($timeoutInputOption->isValueOptional());
         self::assertFalse($timeoutInputOption->isNegatable());
         self::assertNull($timeoutInputOption->getDefault());
 
@@ -265,11 +266,13 @@ class InvokableCommandTest extends TestCase
             #[Option] ?string $b = '',
             #[Option] array $c = [],
             #[Option] array $d = ['a', 'b'],
+            #[Option] ?string $e = null,
         ) use ($expected): int {
             $this->assertSame($expected[0], $a);
             $this->assertSame($expected[1], $b);
             $this->assertSame($expected[2], $c);
             $this->assertSame($expected[3], $d);
+            $this->assertSame($expected[4], $e);
 
             return 0;
         });
@@ -279,9 +282,9 @@ class InvokableCommandTest extends TestCase
 
     public static function provideNonBinaryInputOptions(): \Generator
     {
-        yield 'defaults' => [[], ['', '', [], ['a', 'b']]];
-        yield 'with-value' => [['--a' => 'x', '--b' => 'y', '--c' => ['z'], '--d' => ['c', 'd']], ['x', 'y', ['z'], ['c', 'd']]];
-        yield 'without-value' => [['--b' => null], ['', null, [], ['a', 'b']]];
+        yield 'defaults' => [[], ['', '', [], ['a', 'b'], null]];
+        yield 'with-value' => [['--a' => 'x', '--b' => 'y', '--c' => ['z'], '--d' => ['c', 'd'], '--e' => 'a'], ['x', 'y', ['z'], ['c', 'd'], 'a']];
+        yield 'without-value' => [['--b' => null], ['', null, [], ['a', 'b'], null]];
     }
 
     /**
@@ -311,10 +314,6 @@ class InvokableCommandTest extends TestCase
         yield 'nullable-bool-default-false' => [
             function (#[Option] ?bool $a = false) {},
             'The option parameter "$a" must not be nullable when it has a default boolean value.',
-        ];
-        yield 'nullable-string' => [
-            function (#[Option] ?string $a = null) {},
-            'The option parameter "$a" must not have a default of null.',
         ];
         yield 'nullable-array' => [
             function (#[Option] ?array $a = null) {},

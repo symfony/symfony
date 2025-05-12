@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2025-04-30T06:26:52Z
+
+Hey @santysisi , thanks for this PR!
+
+Indeed I'm a bit worried about the memory usage. Could you give it a try with more complex and filled rows?
+
+At least, I think this behavior should be opt-in (using a context option) to let applications needing to be really memory efficient work properly.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-05-09T21:17:19Z
+
+Hi @mtarld , thanks for your comment :smile: ,  I really appreciate it!
+
+I agree with your concern, and I think it's a really good idea. Yes, I can give it a try with more complex and filled row. I’d be happy to do that if you want! 😄
+That said, I believe such a refactor should go into the 7.4 branch, since this PR is just a fix. Also, from what I can tell, the current fix doesn’t significantly impact memory usage, but maybe I’m wrong.

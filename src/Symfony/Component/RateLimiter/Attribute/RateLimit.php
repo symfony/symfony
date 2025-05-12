@@ -12,7 +12,7 @@
 namespace Symfony\Component\RateLimiter\Attribute;
 
 /**
- * Add the hability to rate limit a method from a controller
+ * Rate limit the controller.
  *
  * @see https://symfony.com/doc/current/rate_limiter.html
  *
@@ -22,11 +22,11 @@ namespace Symfony\Component\RateLimiter\Attribute;
 final class RateLimit
 {
     /**
-     * @param string $limiter The name of the limiter to use
-     * @param array $methods Methods to apply the rate limit
+     * @param string $limiter The configured limiter name
+     * @param string[] $methods Request methods to apply the rate limit (`[]` for all)
      */
     public function __construct(
         public string $limiter,
-        public array $methods
+        public array $methods = []
     ) {}
 }

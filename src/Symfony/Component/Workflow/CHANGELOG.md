@@ -1,13 +1,18 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Deprecate `Event::getWorkflow()` method
+
 7.1
 ---
 
  * Add method `getEnabledTransition()` to `WorkflowInterface`
  * Automatically register places from transitions
  * Add support for workflows that need to store many tokens in the marking
- * Add method `getName()` in event classes to build event names in subscribers 
+ * Add method `getName()` in event classes to build event names in subscribers
 
 7.0
 ---

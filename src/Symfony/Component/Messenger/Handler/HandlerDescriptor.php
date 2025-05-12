@@ -47,7 +47,7 @@ final class HandlerDescriptor
         }
     }
 
-    public function getHandler(): callable
+    public function getHandler(): \Closure
     {
         return $this->handler;
     }

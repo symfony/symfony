@@ -29,11 +29,11 @@ trait ZeroComparisonConstraintTrait
             trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
         }
 
-        if (is_array($options) && isset($options['propertyPath'])) {
+        if (\is_array($options) && isset($options['propertyPath'])) {
             throw new ConstraintDefinitionException(\sprintf('The "propertyPath" option of the "%s" constraint cannot be set.', static::class));
         }
 
-        if (is_array($options) && isset($options['value'])) {
+        if (\is_array($options) && isset($options['value'])) {
             throw new ConstraintDefinitionException(\sprintf('The "value" option of the "%s" constraint cannot be set.', static::class));
         }
 

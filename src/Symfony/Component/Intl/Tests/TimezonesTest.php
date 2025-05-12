@@ -473,7 +473,7 @@ class TimezonesTest extends ResourceBundleTestCase
         sort($zones);
 
         $this->assertNotEmpty($zones);
-        $this->assertEmpty(array_diff($zones, self::ZONES));
+        $this->assertSame([], array_diff($zones, self::ZONES));
     }
 
     public function testGetNamesDefaultLocale()

@@ -83,6 +83,7 @@ class WordCountValidatorTest extends ConstraintValidatorTestCase
         yield [new StringableValue('my ûtf 8'), 3];
         yield [null, 1]; // null should always pass and eventually be handled by NotNullValidator
         yield ['', 1]; // empty string should always pass and eventually be handled by NotBlankValidator
+        yield ['My String 0', 3];
     }
 
     public static function provideInvalidTypes()

@@ -47,6 +47,10 @@ final class DoctrineTestHelper
         $config ??= self::createTestConfiguration();
         $eventManager = new EventManager();
 
+        if (\PHP_VERSION_ID >= 80400 && method_exists($config, 'enableNativeLazyObjects')) {
+            $config->enableNativeLazyObjects(true);
+        }
+
         return new EntityManager(DriverManager::getConnection($params, $config, $eventManager), $config, $eventManager);
     }
 

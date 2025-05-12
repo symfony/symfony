@@ -8,6 +8,7 @@ return [
         'bn_BD' => 'bangla (Bangladeš)',
         'bn_IN' => 'bangla (Indija)',
         'cs_CZ' => 'češki (Češka Republika)',
+        'en_CZ' => 'engleski (Češka Republika)',
         'en_HK' => 'engleski (SAR Hongkong)',
         'en_KN' => 'engleski (Sveti Kits i Nevis)',
         'en_MO' => 'engleski (SAR Makao)',

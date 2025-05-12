@@ -16,6 +16,7 @@ use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\String\UnicodeString;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class Argument
@@ -34,8 +35,8 @@ class Argument
      * @param array<string|Suggestion>|callable(CompletionInput):list<string|Suggestion> $suggestedValues The values used for input completion
      */
     public function __construct(
-        public string $name = '',
         public string $description = '',
+        public string $name = '',
         array|callable $suggestedValues = [],
     ) {
         $this->suggestedValues = \is_callable($suggestedValues) ? $suggestedValues(...) : $suggestedValues;
@@ -65,7 +66,7 @@ class Argument
         }
 
         if (!$self->name) {
-            $self->name = $name;
+            $self->name = (new UnicodeString($name))->kebab();
         }
 
         $self->default = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;

@@ -85,7 +85,7 @@ class UploadedFileValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
         $data = $event->getArguments()[0];
 
-        $this->assertEmpty($data);
+        $this->assertSame([], $data);
     }
 
     /**

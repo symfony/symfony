@@ -39,7 +39,6 @@ class AddConsoleCommandPass implements CompilerPassInterface
 
         foreach ($commandServices as $id => $tags) {
             $definition = $container->getDefinition($id);
-            $definition->addTag('container.no_preload');
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
             if (!$r = $container->getReflectionClass($class)) {
@@ -57,6 +56,8 @@ class AddConsoleCommandPass implements CompilerPassInterface
             } else {
                 $invokableRef = null;
             }
+
+            $definition->addTag('container.no_preload');
 
             /** @var AsCommand|null $attribute */
             $attribute = ($r->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();

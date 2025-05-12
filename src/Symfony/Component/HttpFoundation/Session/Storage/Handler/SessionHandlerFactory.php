@@ -57,6 +57,8 @@ class SessionHandlerFactory
 
             case str_starts_with($connection, 'redis:'):
             case str_starts_with($connection, 'rediss:'):
+            case str_starts_with($connection, 'valkey:'):
+            case str_starts_with($connection, 'valkeys:'):
             case str_starts_with($connection, 'memcached:'):
                 if (!class_exists(AbstractAdapter::class)) {
                     throw new \InvalidArgumentException('Unsupported Redis or Memcached DSN. Try running "composer require symfony/cache".');

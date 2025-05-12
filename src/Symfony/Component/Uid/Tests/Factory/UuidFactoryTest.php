@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Uuid;
@@ -81,7 +82,7 @@ final class UuidFactoryTest extends TestCase
 
     public function testInvalidCreateTimed()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The given UUID date cannot be earlier than 1582-10-15.');
 
         (new UuidFactory())->timeBased()->create(new \DateTimeImmutable('@-12219292800.001000'));

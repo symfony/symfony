@@ -642,10 +642,10 @@ class AbstractBrowserTest extends TestCase
             $client->request('POST', 'http://www.example.com/foo/foobar', $parameters, $files, $server, $content);
 
             $this->assertSame('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect with POST method on response code: '.$code.'.');
-            $this->assertEmpty($client->getRequest()->getParameters(), '->followRedirect() drops parameters with POST method on response code: '.$code.'.');
-            $this->assertEmpty($client->getRequest()->getFiles(), '->followRedirect() drops files with POST method on response code: '.$code.'.');
+            $this->assertSame([], $client->getRequest()->getParameters(), '->followRedirect() drops parameters with POST method on response code: '.$code.'.');
+            $this->assertSame([], $client->getRequest()->getFiles(), '->followRedirect() drops files with POST method on response code: '.$code.'.');
             $this->assertArrayHasKey('X_TEST_FOO', $client->getRequest()->getServer(), '->followRedirect() keeps $_SERVER with POST method on response code: '.$code.'.');
-            $this->assertEmpty($client->getRequest()->getContent(), '->followRedirect() drops content with POST method on response code: '.$code.'.');
+            $this->assertNull($client->getRequest()->getContent(), '->followRedirect() drops content with POST method on response code: '.$code.'.');
             $this->assertSame('GET', $client->getRequest()->getMethod(), '->followRedirect() drops request method to GET on response code: '.$code.'.');
         }
     }

@@ -785,6 +785,7 @@ class ConfigurationTest extends TestCase
                     'localizable_html_attributes' => [],
                 ],
                 'providers' => [],
+                'globals' => [],
             ],
             'validation' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -883,6 +884,7 @@ class ConfigurationTest extends TestCase
                 'system' => 'cache.adapter.system',
                 'directory' => '%kernel.cache_dir%/pools/app',
                 'default_redis_provider' => 'redis://localhost',
+                'default_valkey_provider' => 'valkey://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
                 'default_doctrine_dbal_provider' => 'database_connection',
                 'default_pdo_provider' => ContainerBuilder::willBeAvailable('doctrine/dbal', Connection::class, ['symfony/framework-bundle']) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null,
@@ -957,7 +959,7 @@ class ConfigurationTest extends TestCase
                 ],
                 'smime_encrypter' => [
                     'enabled' => false,
-                    'certificate' => '',
+                    'repository' => '',
                     'cipher' => null,
                 ],
             ],

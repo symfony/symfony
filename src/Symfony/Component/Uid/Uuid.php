@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Uid;
 
+use Symfony\Component\Uid\Exception\InvalidUuidException;
+
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
@@ -39,13 +41,13 @@ class Uuid extends AbstractUid
         $type = preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $uuid) ? (int) $uuid[14] : false;
 
         if (false === $type || (static::TYPE ?: $type) !== $type) {
-            throw new \InvalidArgumentException(\sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
+            throw new InvalidUuidException(static::TYPE, $uuid);
         }
 
         $this->uid = strtolower($uuid);
 
         if ($checkVariant && !\in_array($this->uid[19], ['8', '9', 'a', 'b'], true)) {
-            throw new \InvalidArgumentException(\sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
+            throw new InvalidUuidException(static::TYPE, $uuid);
         }
     }
 

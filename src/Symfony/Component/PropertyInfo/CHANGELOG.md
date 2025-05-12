@@ -6,6 +6,9 @@ CHANGELOG
 
  * Add support for `non-positive-int`, `non-negative-int` and `non-zero-int` PHPStan types to `PhpStanExtractor`
  * Add `PropertyDescriptionExtractorInterface` to `PhpStanExtractor`
+ * Deprecate the `Type` class, use `Symfony\Component\TypeInfo\Type` class from `symfony/type-info` instead
+ * Deprecate the `PropertyTypeExtractorInterface::getTypes()` method, use `PropertyTypeExtractorInterface::getType()` instead
+ * Deprecate the `ConstructorArgumentTypeExtractorInterface::getTypesFromConstructor()` method, use `ConstructorArgumentTypeExtractorInterface::getTypeFromConstructor()` instead
 
 7.1
 ---

@@ -896,8 +896,8 @@ class SessionListenerTest extends TestCase
 
         (new SessionListener($container, true))->reset();
 
-        $this->assertEmpty($_SESSION);
-        $this->assertEmpty(session_id());
+        $this->assertSame([], $_SESSION);
+        $this->assertSame('', session_id());
         $this->assertSame(\PHP_SESSION_NONE, session_status());
     }
 
@@ -917,8 +917,8 @@ class SessionListenerTest extends TestCase
 
         (new SessionListener($container, true))->reset();
 
-        $this->assertEmpty($_SESSION);
-        $this->assertEmpty(session_id());
+        $this->assertSame([], $_SESSION);
+        $this->assertSame('', session_id());
         $this->assertSame(\PHP_SESSION_NONE, session_status());
     }
 

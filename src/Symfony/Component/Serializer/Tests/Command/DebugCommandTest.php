@@ -17,8 +17,8 @@ use Symfony\Component\Serializer\Command\DebugCommand;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
-use Symfony\Component\Serializer\Tests\Dummy\DummyClassWithDiscriminatorMap;
 use Symfony\Component\Serializer\Tests\Dummy\DummyClassOne;
+use Symfony\Component\Serializer\Tests\Dummy\DummyClassWithDiscriminatorMap;
 
 /**
  * @author Loïc Frémont <lc.fremont@gmail.com>

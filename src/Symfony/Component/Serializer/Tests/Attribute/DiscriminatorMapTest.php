@@ -49,7 +49,7 @@ class DiscriminatorMapTest extends TestCase
     public function testExceptionWithMissingDefaultTypeInMapping()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Default type "bar" given to "%s" must be present in "mapping" types.', DiscriminatorMap::class));
+        $this->expectExceptionMessage(\sprintf('Default type "bar" given to "%s" must be present in "mapping" types.', DiscriminatorMap::class));
         new DiscriminatorMap(typeProperty: 'type', mapping: ['foo' => 'FooClass'], defaultType: 'bar');
     }
 }

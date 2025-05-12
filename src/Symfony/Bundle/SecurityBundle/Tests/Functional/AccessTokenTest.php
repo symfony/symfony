@@ -353,9 +353,17 @@ class AccessTokenTest extends AbstractWebTestCase
 
     /**
      * @dataProvider validAccessTokens
+     *
+     * @requires extension openssl
      */
-    public function testOidcSuccess(string $token)
+    public function testOidcSuccess(callable $tokenFactory)
     {
+        try {
+            $token = $tokenFactory();
+        } catch (\RuntimeException $e) {
+            $this->markTestSkipped($e->getMessage());
+        }
+
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc.yml']);
         $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => \sprintf('Bearer %s', $token)]);
         $response = $client->getResponse();
@@ -367,9 +375,17 @@ class AccessTokenTest extends AbstractWebTestCase
 
     /**
      * @dataProvider invalidAccessTokens
+     *
+     * @requires extension openssl
      */
-    public function testOidcFailure(string $token)
+    public function testOidcFailure(callable $tokenFactory)
     {
+        try {
+            $token = $tokenFactory();
+        } catch (\RuntimeException $e) {
+            $this->markTestSkipped($e->getMessage());
+        }
+
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc.yml']);
         $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => \sprintf('Bearer %s', $token)]);
         $response = $client->getResponse();
@@ -440,12 +456,10 @@ class AccessTokenTest extends AbstractWebTestCase
             'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
             'username' => 'dunglas',
         ];
-        $jws = self::createJws($claims);
-        $jwe = self::createJwe($jws);
 
         return [
-            [$jws],
-            [$jwe],
+            [fn () => self::createJws($claims)],
+            [fn () => self::createJwe(self::createJws($claims))],
         ];
     }
 
@@ -466,14 +480,14 @@ class AccessTokenTest extends AbstractWebTestCase
         ];
 
         return [
-            [self::createJws([...$claims, 'aud' => 'Invalid Audience'])],
-            [self::createJws([...$claims, 'iss' => 'Invalid Issuer'])],
-            [self::createJws([...$claims, 'exp' => $time - 3600])],
-            [self::createJws([...$claims, 'nbf' => $time + 3600])],
-            [self::createJws([...$claims, 'iat' => $time + 3600])],
-            [self::createJws([...$claims, 'username' => 'Invalid Username'])],
-            [self::createJwe(self::createJws($claims), ['exp' => $time - 3600])],
-            [self::createJwe(self::createJws($claims), ['cty' => 'x-specific'])],
+            [fn () => self::createJws([...$claims, 'aud' => 'Invalid Audience'])],
+            [fn () => self::createJws([...$claims, 'iss' => 'Invalid Issuer'])],
+            [fn () => self::createJws([...$claims, 'exp' => $time - 3600])],
+            [fn () => self::createJws([...$claims, 'nbf' => $time + 3600])],
+            [fn () => self::createJws([...$claims, 'iat' => $time + 3600])],
+            [fn () => self::createJws([...$claims, 'username' => 'Invalid Username'])],
+            [fn () => self::createJwe(self::createJws($claims), ['exp' => $time - 3600])],
+            [fn () => self::createJwe(self::createJws($claims), ['cty' => 'x-specific'])],
         ];
     }
 

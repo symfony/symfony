@@ -127,7 +127,7 @@ class ResponseTest extends ResponseTestCase
         ob_start();
         $modified->sendContent();
         $string = ob_get_clean();
-        $this->assertEmpty($string);
+        $this->assertSame('', $string);
     }
 
     public function testIsSuccessful()

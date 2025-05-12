@@ -8,7 +8,7 @@ namespace Symfony\Component\JsonStreamer\Tests\Fixtures\Model;
 class DummyWithGenerics
 {
     /**
-     * @var array<int, T>
+     * @var list<T>
      */
     public array $dummies = [];
 }

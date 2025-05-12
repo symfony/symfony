@@ -100,7 +100,7 @@ class TemplatedEmail extends Email
      */
     public function __serialize(): array
     {
-        return [$this->htmlTemplate, $this->textTemplate, $this->context, parent::__serialize(),  $this->locale];
+        return [$this->htmlTemplate, $this->textTemplate, $this->context, parent::__serialize(), $this->locale];
     }
 
     /**

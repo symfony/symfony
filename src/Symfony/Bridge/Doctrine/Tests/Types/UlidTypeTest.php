@@ -11,23 +11,17 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Types;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
-
-// DBAL 3 compatibility
-class_exists('Doctrine\DBAL\Platforms\SqlitePlatform');
-
-// DBAL 3 compatibility
-class_exists('Doctrine\DBAL\Platforms\SqlitePlatform');
 
 final class UlidTypeTest extends TestCase
 {
@@ -87,25 +81,25 @@ final class UlidTypeTest extends TestCase
     {
         $this->expectException(ConversionException::class);
 
-        $this->type->convertToDatabaseValue(new \stdClass(), new SQLitePlatform());
+        $this->type->convertToDatabaseValue(new \stdClass(), self::getSqlitePlatform());
     }
 
     public function testNullConversionForDatabaseValue()
     {
-        $this->assertNull($this->type->convertToDatabaseValue(null, new SQLitePlatform()));
+        $this->assertNull($this->type->convertToDatabaseValue(null, self::getSqlitePlatform()));
     }
 
     public function testUlidInterfaceConvertsToPHPValue()
     {
         $ulid = $this->createMock(AbstractUid::class);
-        $actual = $this->type->convertToPHPValue($ulid, new SQLitePlatform());
+        $actual = $this->type->convertToPHPValue($ulid, self::getSqlitePlatform());
 
         $this->assertSame($ulid, $actual);
     }
 
     public function testUlidConvertsToPHPValue()
     {
-        $ulid = $this->type->convertToPHPValue(self::DUMMY_ULID, new SQLitePlatform());
+        $ulid = $this->type->convertToPHPValue(self::DUMMY_ULID, self::getSqlitePlatform());
 
         $this->assertInstanceOf(Ulid::class, $ulid);
         $this->assertEquals(self::DUMMY_ULID, $ulid->__toString());
@@ -115,19 +109,19 @@ final class UlidTypeTest extends TestCase
     {
         $this->expectException(ConversionException::class);
 
-        $this->type->convertToPHPValue('abcdefg', new SQLitePlatform());
+        $this->type->convertToPHPValue('abcdefg', self::getSqlitePlatform());
     }
 
     public function testNullConversionForPHPValue()
     {
-        $this->assertNull($this->type->convertToPHPValue(null, new SQLitePlatform()));
+        $this->assertNull($this->type->convertToPHPValue(null, self::getSqlitePlatform()));
     }
 
     public function testReturnValueIfUlidForPHPValue()
     {
         $ulid = new Ulid();
 
-        $this->assertSame($ulid, $this->type->convertToPHPValue($ulid, new SQLitePlatform()));
+        $this->assertSame($ulid, $this->type->convertToPHPValue($ulid, self::getSqlitePlatform()));
     }
 
     public function testGetName()
@@ -146,13 +140,23 @@ final class UlidTypeTest extends TestCase
     public static function provideSqlDeclarations(): \Generator
     {
         yield [new PostgreSQLPlatform(), 'UUID'];
-        yield [new SQLitePlatform(), 'BLOB'];
+        yield [self::getSqlitePlatform(), 'BLOB'];
         yield [new MySQLPlatform(), 'BINARY(16)'];
         yield [new MariaDBPlatform(), 'BINARY(16)'];
     }
 
     public function testRequiresSQLCommentHint()
     {
-        $this->assertTrue($this->type->requiresSQLCommentHint(new SQLitePlatform()));
+        $this->assertTrue($this->type->requiresSQLCommentHint(self::getSqlitePlatform()));
+    }
+
+    private static function getSqlitePlatform(): AbstractPlatform
+    {
+        if (interface_exists(Exception::class)) {
+            // DBAL 4+
+            return new \Doctrine\DBAL\Platforms\SQLitePlatform();
+        }
+
+        return new \Doctrine\DBAL\Platforms\SqlitePlatform();
     }
 }

@@ -61,7 +61,7 @@ final class WhenTest extends TestCase
                 groups: ['Default', 'WhenTestWithAttributes'],
             ),
         ], $classConstraint->constraints);
-        self::assertEmpty($classConstraint->otherwise);
+        self::assertSame([], $classConstraint->otherwise);
 
         [$fooConstraint] = $metadata->properties['foo']->getConstraints();
 
@@ -71,7 +71,7 @@ final class WhenTest extends TestCase
             new NotNull(groups: ['Default', 'WhenTestWithAttributes']),
             new NotBlank(groups: ['Default', 'WhenTestWithAttributes']),
         ], $fooConstraint->constraints);
-        self::assertEmpty($fooConstraint->otherwise);
+        self::assertSame([], $fooConstraint->otherwise);
         self::assertSame(['Default', 'WhenTestWithAttributes'], $fooConstraint->groups);
 
         [$barConstraint] = $metadata->properties['bar']->getConstraints();
@@ -82,7 +82,7 @@ final class WhenTest extends TestCase
             new NotNull(groups: ['foo']),
             new NotBlank(groups: ['foo']),
         ], $barConstraint->constraints);
-        self::assertEmpty($barConstraint->otherwise);
+        self::assertSame([], $barConstraint->otherwise);
         self::assertSame(['foo'], $barConstraint->groups);
 
         [$quxConstraint] = $metadata->properties['qux']->getConstraints();
@@ -90,7 +90,7 @@ final class WhenTest extends TestCase
         self::assertInstanceOf(When::class, $quxConstraint);
         self::assertSame('true', $quxConstraint->expression);
         self::assertEquals([new NotNull(groups: ['foo'])], $quxConstraint->constraints);
-        self::assertEmpty($quxConstraint->otherwise);
+        self::assertSame([], $quxConstraint->otherwise);
         self::assertSame(['foo'], $quxConstraint->groups);
 
         [$bazConstraint] = $metadata->getters['baz']->getConstraints();
@@ -101,7 +101,7 @@ final class WhenTest extends TestCase
             new NotNull(groups: ['Default', 'WhenTestWithAttributes']),
             new NotBlank(groups: ['Default', 'WhenTestWithAttributes']),
         ], $bazConstraint->constraints);
-        self::assertEmpty($bazConstraint->otherwise);
+        self::assertSame([], $bazConstraint->otherwise);
         self::assertSame(['Default', 'WhenTestWithAttributes'], $bazConstraint->groups);
 
         [$quuxConstraint] = $metadata->properties['quux']->getConstraints();
@@ -118,8 +118,6 @@ final class WhenTest extends TestCase
      */
     public function testAttributesWithClosure()
     {
-        $this->markTestSkipped('Requires https://github.com/php/php-src/issues/17851 to be fixed');
-
         $loader = new AttributeLoader();
         $metadata = new ClassMetadata(WhenTestWithClosure::class);
 
@@ -135,7 +133,7 @@ final class WhenTest extends TestCase
                 groups: ['Default', 'WhenTestWithClosure'],
             ),
         ], $classConstraint->constraints);
-        self::assertEmpty($classConstraint->otherwise);
+        self::assertSame([], $classConstraint->otherwise);
 
         [$fooConstraint] = $metadata->properties['foo']->getConstraints();
 
@@ -145,7 +143,7 @@ final class WhenTest extends TestCase
             new NotNull(groups: ['Default', 'WhenTestWithClosure']),
             new NotBlank(groups: ['Default', 'WhenTestWithClosure']),
         ], $fooConstraint->constraints);
-        self::assertEmpty($fooConstraint->otherwise);
+        self::assertSame([], $fooConstraint->otherwise);
         self::assertSame(['Default', 'WhenTestWithClosure'], $fooConstraint->groups);
     }
 }

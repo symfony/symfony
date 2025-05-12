@@ -155,8 +155,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return $properties ? array_values($properties) : null;
     }
 
+    /**
+     * @deprecated since Symfony 7.3, use "getType" instead
+     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
+        trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
+
         if ($fromMutator = $this->extractFromMutator($class, $property)) {
             return $fromMutator;
         }
@@ -180,10 +185,14 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     }
 
     /**
+     * @deprecated since Symfony 7.3, use "getTypeFromConstructor" instead
+     *
      * @return LegacyType[]|null
      */
     public function getTypesFromConstructor(string $class, string $property): ?array
     {
+        trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getTypeFromConstructor()" instead.', __METHOD__, self::class);
+
         try {
             $reflection = new \ReflectionClass($class);
         } catch (\ReflectionException) {

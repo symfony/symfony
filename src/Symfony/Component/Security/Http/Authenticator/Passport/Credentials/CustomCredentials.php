@@ -27,9 +27,9 @@ class CustomCredentials implements CredentialsInterface
     private bool $resolved = false;
 
     /**
-     * @param callable $customCredentialsChecker the check function. If this function does not return `true`, a
-     *                                           BadCredentialsException is thrown. You may also throw a more
-     *                                           specific exception in the function.
+     * @param callable(mixed, UserInterface) $customCredentialsChecker If the callable does not return `true`, a
+     *                                                                 BadCredentialsException is thrown. You may
+     *                                                                 also throw a more specific exception.
      */
     public function __construct(
         callable $customCredentialsChecker,

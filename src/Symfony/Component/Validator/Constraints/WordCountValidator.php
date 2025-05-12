@@ -44,7 +44,7 @@ final class WordCountValidator extends ConstraintValidator
         $words = iterator_to_array($iterator->getPartsIterator());
 
         // erase "blank words" and don't count them as words
-        $wordsCount = \count(array_filter(array_map(trim(...), $words)));
+        $wordsCount = \count(array_filter(array_map(trim(...), $words), fn ($word) => '' !== $word));
 
         if (null !== $constraint->min && $wordsCount < $constraint->min) {
             $this->context->buildViolation($constraint->minMessage)

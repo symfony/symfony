@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy;
 
-class AsymmetricVisibility
+class AsymmetricVisibility extends \stdClass
 {
-    public private(set) int $foo;
+    public function __construct(
+        public private(set) int $foo,
+        private readonly int $bar,
+    ) {
+    }
 
-    public function __construct(int $foo)
+    public function getBar(): int
     {
-        $this->foo = $foo;
+        return $this->bar;
     }
 }

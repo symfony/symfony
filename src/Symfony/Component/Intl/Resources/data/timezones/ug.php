@@ -157,7 +157,7 @@ return [
         'America/Nassau' => 'شەرقىي قىسىم ۋاقتى (Nassau)',
         'America/New_York' => 'شەرقىي قىسىم ۋاقتى (New York)',
         'America/Nome' => 'ئالياسكا ۋاقتى (Nome)',
-        'America/Noronha' => 'فېرناندو-نورونخا ۋاقتى (Noronha)',
+        'America/Noronha' => 'فېرناندو-نورونخا ۋاقتى (Fernando de Noronha)',
         'America/North_Dakota/Beulah' => 'ئوتتۇرا قىسىم ۋاقتى (Beulah, North Dakota)',
         'America/North_Dakota/Center' => 'ئوتتۇرا قىسىم ۋاقتى (Center, North Dakota)',
         'America/North_Dakota/New_Salem' => 'ئوتتۇرا قىسىم ۋاقتى (New Salem, North Dakota)',

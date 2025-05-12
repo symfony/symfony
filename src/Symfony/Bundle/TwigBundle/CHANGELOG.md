@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Enable `#[AsTwigFilter]`, `#[AsTwigFunction]` and `#[AsTwigTest]` attributes
+   to configure extensions on runtime classes
+ * Add support for a `twig` validator
+ * Use `ChainCache` to store warmed-up cache in `kernel.build_dir` and runtime cache in `kernel.cache_dir`
+ * Make `TemplateCacheWarmer` use `kernel.build_dir` instead of `kernel.cache_dir`
+
 7.1
 ---
 

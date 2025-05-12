@@ -20,6 +20,9 @@ use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
  */
 class Hydrator
 {
+    public const PROPERTY_HAS_HOOKS = 1;
+    public const PROPERTY_NOT_BY_REF = 2;
+
     public static array $hydrators = [];
     public static array $simpleHydrators = [];
     public static array $propertyScopes = [];
@@ -150,13 +153,16 @@ class Hydrator
     public static function getSimpleHydrator($class)
     {
         $baseHydrator = self::$simpleHydrators['stdClass'] ??= (function ($properties, $object) {
-            $readonly = (array) $this;
+            $notByRef = (array) $this;
 
             foreach ($properties as $name => &$value) {
-                $object->$name = $value;
-
-                if (!($readonly[$name] ?? false)) {
+                if (!$noRef = $notByRef[$name] ?? false) {
+                    $object->$name = $value;
                     $object->$name = &$value;
+                } elseif (true !== $noRef) {
+                    $noRef($object, $value);
+                } else {
+                    $object->$name = $value;
                 }
             }
         })->bindTo(new \stdClass());
@@ -211,14 +217,19 @@ class Hydrator
         }
 
         if (!$classReflector->isInternal()) {
-            $readonly = new \stdClass();
-            foreach ($classReflector->getProperties(\ReflectionProperty::IS_READONLY) as $propertyReflector) {
-                if ($class === $propertyReflector->class) {
-                    $readonly->{$propertyReflector->name} = true;
+            $notByRef = new \stdClass();
+            foreach ($classReflector->getProperties() as $propertyReflector) {
+                if ($propertyReflector->isStatic()) {
+                    continue;
+                }
+                if (\PHP_VERSION_ID >= 80400 && !$propertyReflector->isAbstract() && $propertyReflector->getHooks()) {
+                    $notByRef->{$propertyReflector->name} = $propertyReflector->setRawValue(...);
+                } elseif ($propertyReflector->isReadOnly()) {
+                    $notByRef->{$propertyReflector->name} = true;
                 }
             }
 
-            return $baseHydrator->bindTo($readonly, $class);
+            return $baseHydrator->bindTo($notByRef, $class);
         }
 
         if ($classReflector->name !== $class) {
@@ -260,25 +271,26 @@ class Hydrator
                 continue;
             }
             $name = $property->name;
-            $writeScope = null;
+            $access = ($flags << 2) | ($flags & \ReflectionProperty::IS_READONLY ? self::PROPERTY_NOT_BY_REF : 0);
+
+            if (\PHP_VERSION_ID >= 80400 && !$property->isAbstract() && $h = $property->getHooks()) {
+                $access |= self::PROPERTY_HAS_HOOKS | (isset($h['get']) && !$h['get']->returnsReference() ? self::PROPERTY_NOT_BY_REF : 0);
+            }
 
             if (\ReflectionProperty::IS_PRIVATE & $flags) {
-                if (\PHP_VERSION_ID >= 80400 ? $property->isPrivateSet() : ($flags & \ReflectionProperty::IS_READONLY)) {
-                    $writeScope = $class;
-                }
-                $propertyScopes["\0$class\0$name"] = $propertyScopes[$name] = [$class, $name, $writeScope, $property];
+                $propertyScopes["\0$class\0$name"] = $propertyScopes[$name] = [$class, $name, null, $access, $property];
 
                 continue;
             }
-            if (\PHP_VERSION_ID >= 80400 ? $property->isProtectedSet() || $property->isPrivateSet() : ($flags & \ReflectionProperty::IS_READONLY)) {
-                $writeScope = $property->class;
+
+            $propertyScopes[$name] = [$class, $name, null, $access, $property];
+
+            if ($flags & (\PHP_VERSION_ID >= 80400 ? \ReflectionProperty::IS_PRIVATE_SET : \ReflectionProperty::IS_READONLY)) {
+                $propertyScopes[$name][2] = $property->class;
             }
-            $propertyScopes[$name] = [$class, $name, $writeScope, $property];
 
             if (\ReflectionProperty::IS_PROTECTED & $flags) {
                 $propertyScopes["\0*\0$name"] = $propertyScopes[$name];
-            } elseif (\PHP_VERSION_ID >= 80400 && $property->getHooks()) {
-                $propertyScopes[$name][4] = true;
             }
         }
 
@@ -286,16 +298,20 @@ class Hydrator
             $class = $r->name;
 
             foreach ($r->getProperties(\ReflectionProperty::IS_PRIVATE) as $property) {
-                if (!$property->isStatic()) {
-                    $name = $property->name;
-                    if (\PHP_VERSION_ID < 80400) {
-                        $writeScope = $property->isReadOnly() ? $class : null;
-                    } else {
-                        $writeScope = $property->isPrivateSet() ? $class : null;
-                    }
-                    $propertyScopes["\0$class\0$name"] = [$class, $name, $writeScope, $property];
-                    $propertyScopes[$name] ??= [$class, $name, $writeScope, $property];
+                $flags = $property->getModifiers();
+
+                if (\ReflectionProperty::IS_STATIC & $flags) {
+                    continue;
                 }
+                $name = $property->name;
+                $access = ($flags << 2) | ($flags & \ReflectionProperty::IS_READONLY ? self::PROPERTY_NOT_BY_REF : 0);
+
+                if (\PHP_VERSION_ID >= 80400 && $h = $property->getHooks()) {
+                    $access |= self::PROPERTY_HAS_HOOKS | (isset($h['get']) && !$h['get']->returnsReference() ? self::PROPERTY_NOT_BY_REF : 0);
+                }
+
+                $propertyScopes["\0$class\0$name"] = [$class, $name, null, $access, $property];
+                $propertyScopes[$name] ??= $propertyScopes["\0$class\0$name"];
             }
         }
 

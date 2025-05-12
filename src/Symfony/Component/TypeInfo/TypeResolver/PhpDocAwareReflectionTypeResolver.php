@@ -64,36 +64,38 @@ final readonly class PhpDocAwareReflectionTypeResolver implements TypeResolverIn
             throw new UnsupportedException(\sprintf('Expected subject to be a "ReflectionProperty", a "ReflectionParameter" or a "ReflectionFunctionAbstract", "%s" given.', get_debug_type($subject)), $subject);
         }
 
-        $docComment = match (true) {
-            $subject instanceof \ReflectionProperty => $subject->isPromoted() ? $subject->getDeclaringClass()?->getConstructor()?->getDocComment() : $subject->getDocComment(),
-            $subject instanceof \ReflectionParameter => $subject->getDeclaringFunction()->getDocComment(),
-            $subject instanceof \ReflectionFunctionAbstract => $subject->getDocComment(),
-        };
-
-        if (!$docComment) {
-            return $this->reflectionTypeResolver->resolve($subject);
-        }
-
         $typeContext ??= $this->typeContextFactory->createFromReflection($subject);
 
-        $tagName = match (true) {
-            $subject instanceof \ReflectionProperty => $subject->isPromoted() ? '@param' : '@var',
-            $subject instanceof \ReflectionParameter => '@param',
-            $subject instanceof \ReflectionFunctionAbstract => '@return',
+        $docComments = match (true) {
+            $subject instanceof \ReflectionProperty => $subject->isPromoted()
+                ? ['@var' => $subject->getDocComment(), '@param' => $subject->getDeclaringClass()?->getConstructor()?->getDocComment()]
+                : ['@var' => $subject->getDocComment()],
+            $subject instanceof \ReflectionParameter => ['@param' => $subject->getDeclaringFunction()->getDocComment()],
+            $subject instanceof \ReflectionFunctionAbstract => ['@return' => $subject->getDocComment()],
         };
 
-        $tokens = new TokenIterator($this->lexer->tokenize($docComment));
-        $docNode = $this->phpDocParser->parse($tokens);
+        foreach ($docComments as $tagName => $docComment) {
+            if (!$docComment) {
+                continue;
+            }
 
-        foreach ($docNode->getTagsByName($tagName) as $tag) {
-            $tagValue = $tag->value;
+            $tokens = new TokenIterator($this->lexer->tokenize($docComment));
+            $docNode = $this->phpDocParser->parse($tokens);
 
-            if (
-                $tagValue instanceof VarTagValueNode
-                || $tagValue instanceof ParamTagValueNode && $tagName && '$'.$subject->getName() === $tagValue->parameterName
-                || $tagValue instanceof ReturnTagValueNode
-            ) {
-                return $this->stringTypeResolver->resolve((string) $tagValue, $typeContext);
+            foreach ($docNode->getTagsByName($tagName) as $tag) {
+                $tagValue = $tag->value;
+
+                if ('@var' === $tagName && $tagValue instanceof VarTagValueNode) {
+                    return $this->stringTypeResolver->resolve((string) $tagValue, $typeContext);
+                }
+
+                if ('@param' === $tagName && $tagValue instanceof ParamTagValueNode && '$'.$subject->getName() === $tagValue->parameterName) {
+                    return $this->stringTypeResolver->resolve((string) $tagValue, $typeContext);
+                }
+
+                if ('@return' === $tagName && $tagValue instanceof ReturnTagValueNode) {
+                    return $this->stringTypeResolver->resolve((string) $tagValue, $typeContext);
+                }
             }
         }
 

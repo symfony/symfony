@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
+use Composer\InstalledVersions;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 use Symfony\Component\Config\Definition\NodeInterface;
@@ -74,6 +75,26 @@ abstract class NodeDefinition implements NodeParentInterface
     public function example(string|array $example): static
     {
         return $this->attribute('example', $example);
+    }
+
+    /**
+     * Sets the documentation URI, as usually put in the "@see" tag of a doc block. This
+     * can either be a URL or a file path. You can use the placeholders {package},
+     * {version:major} and {version:minor} in the URI.
+     *
+     * @return $this
+     */
+    public function docUrl(string $uri, ?string $package = null): static
+    {
+        if ($package) {
+            preg_match('/^(\d+)\.(\d+)\.(\d+)/', InstalledVersions::getVersion($package) ?? '', $m);
+        }
+
+        return $this->attribute('docUrl', strtr($uri, [
+            '{package}' => $package ?? '',
+            '{version:major}' => $m[1] ?? '',
+            '{version:minor}' => $m[2] ?? '',
+        ]));
     }
 
     /**

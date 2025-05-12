@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Tests\Fixtures\DummyVoter;
 
 class TraceableAccessDecisionManagerTest extends TestCase
@@ -275,5 +277,49 @@ class TraceableAccessDecisionManagerTest extends TestCase
         $adm = new TraceableAccessDecisionManager($admMock);
 
         $this->assertEquals('-', $adm->getStrategy());
+    }
+
+    public function testThrowsExceptionWhenMultipleAttributesNotAllowed()
+    {
+        $accessDecisionManager = new AccessDecisionManager();
+        $traceableAccessDecisionManager = new TraceableAccessDecisionManager($accessDecisionManager);
+        /** @var TokenInterface&MockObject $tokenMock */
+        $tokenMock = $this->createMock(TokenInterface::class);
+
+        $this->expectException(InvalidArgumentException::class);
+        $traceableAccessDecisionManager->decide($tokenMock, ['attr1', 'attr2']);
+    }
+
+    /**
+     * @dataProvider allowMultipleAttributesProvider
+     */
+    public function testAllowMultipleAttributes(array $attributes, bool $allowMultipleAttributes)
+    {
+        $accessDecisionManager = new AccessDecisionManager();
+        $traceableAccessDecisionManager = new TraceableAccessDecisionManager($accessDecisionManager);
+        /** @var TokenInterface&MockObject $tokenMock */
+        $tokenMock = $this->createMock(TokenInterface::class);
+
+        $isGranted = $traceableAccessDecisionManager->decide($tokenMock, $attributes, null, null, $allowMultipleAttributes);
+
+        $this->assertFalse($isGranted);
+    }
+
+    public function allowMultipleAttributesProvider(): \Generator
+    {
+        yield [
+            ['attr1'],
+            false,
+        ];
+
+        yield [
+            ['attr1'],
+            true,
+        ];
+
+        yield [
+            ['attr1', 'attr2', 'attr3'],
+            true,
+        ];
     }
 }

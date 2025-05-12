@@ -373,17 +373,17 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertSame('default', $collectedData['normalize'][0]['name']);
         $this->assertSame('ObjectNormalizer', $collectedData['normalize'][0]['normalizer']['class']);
 
-        $this->assertEmpty($collectedData['encode']);
-        $this->assertEmpty($collectedData['deserialize']);
-        $this->assertEmpty($collectedData['denormalize']);
-        $this->assertEmpty($collectedData['decode']);
+        $this->assertSame([], $collectedData['encode']);
+        $this->assertSame([], $collectedData['deserialize']);
+        $this->assertSame([], $collectedData['denormalize']);
+        $this->assertSame([], $collectedData['decode']);
 
         $this->assertSame(4, $dataCollector->getHandledCount('api'));
 
         $collectedData = $dataCollector->getData('api');
 
-        $this->assertEmpty($collectedData['serialize']);
-        $this->assertEmpty($collectedData['normalize']);
+        $this->assertSame([], $collectedData['serialize']);
+        $this->assertSame([], $collectedData['normalize']);
 
         $this->assertSame('api', $collectedData['encode'][0]['name']);
         $this->assertSame('JsonEncoder', $collectedData['encode'][0]['encoder']['class']);

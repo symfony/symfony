@@ -119,6 +119,12 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->assertTrue($this->view->children['username']->isRendered());
     }
 
+    public function testFieldId()
+    {
+        $this->assertSame('register_username', $this->rawExtension->getFieldId($this->view->children['username']));
+        $this->assertSame('register_choice_multiple', $this->rawExtension->getFieldId($this->view->children['choice_multiple']));
+    }
+
     public function testFieldValue()
     {
         $this->assertSame('tgalopin', $this->rawExtension->getFieldValue($this->view->children['username']));

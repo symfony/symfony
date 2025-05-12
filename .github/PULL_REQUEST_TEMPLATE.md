@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | 7.3 for features / 6.4, 7.1, and 7.2 for bug fixes <!-- see below -->
+| Branch?       | 7.3 for features / 6.4, and 7.2 for bug fixes <!-- see below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
 | Deprecations? | yes/no <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->

@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="108">
                 <source>Please enter a valid date.</source>
-                <target>Por favor, ingrese una fecha valida.</target>
+                <target>Por favor, ingrese una fecha válida.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Please select a valid file.</source>

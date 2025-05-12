@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy;
 
-class Hooked
+class Hooked extends \stdClass
 {
     public int $notBacked {
         get { return 123; }

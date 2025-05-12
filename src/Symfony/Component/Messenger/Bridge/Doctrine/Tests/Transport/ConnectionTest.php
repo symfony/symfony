@@ -803,7 +803,7 @@ class ConnectionTest extends TestCase
         $connection = new Connection([], $driverConnection);
         $connection->configureSchema($schema, $driverConnection, fn () => true);
         $table = $schema->getTable('messenger_messages');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 
     /**

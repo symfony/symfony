@@ -180,7 +180,7 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>Значення повиино бути рівним {{ limit }} символу.|Значення повиино бути рівним {{ limit }} символам.|Значення повиино бути рівним {{ limit }} символам.</target>
+                <target>Значення повинно бути рівним {{ limit }} символу.|Значення повинно бути рівним {{ limit }} символам.|Значення повинно бути рівним {{ limit }} символам.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
@@ -469,6 +469,10 @@
             <trans-unit id="120">
                 <source>This value is not a valid slug.</source>
                 <target>Це значення не є дійсним slug.</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target state="needs-translation">This value is not a valid Twig template.</target>
             </trans-unit>
         </body>
     </file>

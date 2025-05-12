@@ -16,6 +16,7 @@ use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
@@ -98,6 +99,17 @@ class JsonStreamReaderTest extends TestCase
             $this->assertSame(10, $read->id);
             $this->assertSame('dummy name', $read->name);
         }, '{"id": 10, "name": "dummy name"}', Type::object(ClassicDummy::class));
+    }
+
+    public function testReadObjectWithGenerics()
+    {
+        $reader = JsonStreamReader::create(streamReadersDir: $this->streamReadersDir, lazyGhostsDir: $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithGenerics::class, $read);
+            $this->assertSame(10, $read->dummies[0]->id);
+            $this->assertSame('dummy name', $read->dummies[0]->name);
+        }, '{"dummies":[{"id":10,"name":"dummy name"}]}', Type::generic(Type::object(DummyWithGenerics::class), Type::object(ClassicDummy::class)));
     }
 
     public function testReadObjectWithStreamedName()

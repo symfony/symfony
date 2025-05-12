@@ -29,6 +29,16 @@ final class PropertyDataAccessor implements DataAccessorInterface
     ) {
     }
 
+    public function getObjectAccessor(): DataAccessorInterface
+    {
+        return $this->objectAccessor;
+    }
+
+    public function withObjectAccessor(DataAccessorInterface $accessor): self
+    {
+        return new self($accessor, $this->propertyName);
+    }
+
     public function toPhpExpr(): Expr
     {
         return (new BuilderFactory())->propertyFetch($this->objectAccessor->toPhpExpr(), $this->propertyName);

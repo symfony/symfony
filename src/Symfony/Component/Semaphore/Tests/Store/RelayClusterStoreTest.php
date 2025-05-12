@@ -24,7 +24,7 @@ class RelayClusterStoreTest extends AbstractRedisStoreTestCase
             self::markTestSkipped('The Relay\Cluster class is required.');
         }
 
-        if (getenv('REDIS_CLUSTER_HOSTS') === false) {
+        if (false === getenv('REDIS_CLUSTER_HOSTS')) {
             self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
     }

@@ -30,11 +30,11 @@ final class ObjectNode implements DataModelNodeInterface
     public function __construct(
         private ObjectType $type,
         private array $properties,
-        private bool $ghost = false,
+        private bool $mock = false,
     ) {
     }
 
-    public static function createGhost(ObjectType|UnionType $type): self
+    public static function createMock(ObjectType|UnionType $type): self
     {
         return new self($type, [], true);
     }
@@ -57,8 +57,8 @@ final class ObjectNode implements DataModelNodeInterface
         return $this->properties;
     }
 
-    public function isGhost(): bool
+    public function isMock(): bool
     {
-        return $this->ghost;
+        return $this->mock;
     }
 }

@@ -35,7 +35,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'afh',
         'agq',
         'ain',
-        'ajp',
         'ak',
         'akk',
         'akz',
@@ -150,7 +149,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'csw',
         'cu',
         'cv',
-        'cwd',
         'cy',
         'da',
         'dak',
@@ -240,7 +238,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'hak',
         'haw',
         'hax',
-        'hdn',
         'he',
         'hi',
         'hif',
@@ -266,7 +263,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'ig',
         'ii',
         'ik',
-        'ike',
         'ikt',
         'ilo',
         'inh',
@@ -451,7 +447,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'oj',
         'ojb',
         'ojc',
-        'ojg',
         'ojs',
         'ojw',
         'oka',
@@ -679,7 +674,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'afr',
         'agq',
         'ain',
-        'ajp',
         'aka',
         'akk',
         'akz',
@@ -797,7 +791,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'crs',
         'csb',
         'csw',
-        'cwd',
         'cym',
         'dak',
         'dan',
@@ -888,7 +881,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'haw',
         'hax',
         'hbs',
-        'hdn',
         'heb',
         'her',
         'hif',
@@ -910,7 +902,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'ibo',
         'ido',
         'iii',
-        'ike',
         'ikt',
         'iku',
         'ile',
@@ -1098,7 +1089,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'oci',
         'ojb',
         'ojc',
-        'ojg',
         'oji',
         'ojs',
         'ojw',
@@ -1725,7 +1715,7 @@ class LanguagesTest extends ResourceBundleTestCase
         sort($languages);
 
         $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::LANGUAGES));
+        $this->assertSame([], array_diff($languages, self::LANGUAGES));
 
         foreach (Languages::getAlpha3Names($displayLocale) as $alpha3Code => $name) {
             $alpha2Code = self::ALPHA3_TO_ALPHA2[$alpha3Code] ?? null;
@@ -1928,7 +1918,7 @@ class LanguagesTest extends ResourceBundleTestCase
         sort($languages);
 
         $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::ALPHA3_CODES));
+        $this->assertSame([], array_diff($languages, self::ALPHA3_CODES));
 
         foreach (Languages::getNames($displayLocale) as $alpha2Code => $name) {
             $alpha3Code = self::ALPHA2_TO_ALPHA3[$alpha2Code] ?? (3 === \strlen($alpha2Code) ? $alpha2Code : null);

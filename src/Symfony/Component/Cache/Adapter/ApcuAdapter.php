@@ -98,19 +98,10 @@ class ApcuAdapter extends AbstractAdapter
             return $failed;
         }
 
-        try {
-            if (false === $failures = apcu_store($values, null, $lifetime)) {
-                $failures = $values;
-            }
-
-            return array_keys($failures);
-        } catch (\Throwable $e) {
-            if (1 === \count($values)) {
-                // Workaround https://github.com/krakjoe/apcu/issues/170
-                apcu_delete(array_key_first($values));
-            }
-
-            throw $e;
+        if (false === $failures = apcu_store($values, null, $lifetime)) {
+            $failures = $values;
         }
+
+        return array_keys($failures);
     }
 }

@@ -102,7 +102,20 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof ArrayShapeNode) {
-            return Type::array();
+            $shape = [];
+            foreach ($node->items as $item) {
+                $shape[(string) $item->keyName] = [
+                    'type' => $this->getTypeFromNode($item->valueType, $typeContext),
+                    'optional' => $item->optional,
+                ];
+            }
+
+            return Type::arrayShape(
+                $shape,
+                $node->sealed,
+                $node->unsealedType?->keyType ? $this->getTypeFromNode($node->unsealedType->keyType, $typeContext) : null,
+                $node->unsealedType?->valueType ? $this->getTypeFromNode($node->unsealedType->valueType, $typeContext) : null,
+            );
         }
 
         if ($node instanceof ObjectShapeNode) {
@@ -158,7 +171,7 @@ final class StringTypeResolver implements TypeResolverInterface
                 'iterable' => Type::iterable(),
                 'mixed' => Type::mixed(),
                 'null' => Type::null(),
-                'array-key' => Type::union(Type::int(), Type::string()),
+                'array-key' => Type::arrayKey(),
                 'scalar' => Type::union(Type::int(), Type::float(), Type::string(), Type::bool()),
                 'number' => Type::union(Type::int(), Type::float()),
                 'numeric' => Type::union(Type::int(), Type::float(), Type::string()),

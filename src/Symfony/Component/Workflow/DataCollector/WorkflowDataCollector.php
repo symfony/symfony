@@ -88,31 +88,44 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
         return $i;
     }
 
+    public function hash(string $string): string
+    {
+        return hash('xxh128', $string);
+    }
+
+    public function buildMermaidLiveLink(string $name): string
+    {
+        $payload = [
+            'code' => $this->data['workflows'][$name]['dump'],
+            'mermaid' => '{"theme": "default"}',
+            'autoSync' => false,
+        ];
+
+        $compressed = zlib_encode(json_encode($payload), ZLIB_ENCODING_DEFLATE);
+
+        $suffix = rtrim(strtr(base64_encode($compressed), '+/', '-_'), '=');
+
+        return "https://mermaid.live/edit#pako:{$suffix}";
+    }
+
     protected function getCasters(): array
     {
         return [
             ...parent::getCasters(),
-            TransitionBlocker::class => function ($v, array $a, Stub $s, $isNested) {
-                unset(
-                    $a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'code')],
-                    $a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'parameters')],
-                );
+            TransitionBlocker::class => static function ($v, array $a, Stub $s) {
+                unset($a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'code')]);
+                unset($a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'parameters')]);
 
                 $s->cut += 2;
 
                 return $a;
             },
-            Marking::class => function ($v, array $a, Stub $s, $isNested) {
+            Marking::class => static function ($v, array $a) {
                 $a[Caster::PREFIX_VIRTUAL.'.places'] = array_keys($v->getPlaces());
 
                 return $a;
             },
         ];
-    }
-
-    public function hash(string $string): string
-    {
-        return hash('xxh128', $string);
     }
 
     private function getEventListeners(WorkflowInterface $workflow): array

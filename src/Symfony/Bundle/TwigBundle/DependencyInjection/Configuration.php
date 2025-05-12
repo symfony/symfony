@@ -32,7 +32,9 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('twig');
         $rootNode = $treeBuilder->getRootNode();
 
-        $rootNode->beforeNormalization()
+        $rootNode
+            ->docUrl('https://symfony.com/doc/{version:major}.{version:minor}/reference/configuration/twig.html', 'symfony/twig-bundle')
+            ->beforeNormalization()
             ->ifTrue(fn ($v) => \is_array($v) && \array_key_exists('exception_controller', $v))
             ->then(function ($v) {
                 if (isset($v['exception_controller'])) {
@@ -134,7 +136,7 @@ class Configuration implements ConfigurationInterface
                     ->example('Twig\Template')
                     ->cannotBeEmpty()
                 ->end()
-                ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
+                ->scalarNode('cache')->defaultTrue()->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->booleanNode('strict_variables')->defaultValue('%kernel.debug%')->end()

@@ -29,7 +29,7 @@ return [
         'America/Puerto_Rico' => 'témpor de Porto-Rico (Puerto Rico)',
         'Antarctica/Casey' => 'témpor de Antarctica (Casey)',
         'Antarctica/Davis' => 'témpor de Antarctica (Davis)',
-        'Antarctica/DumontDUrville' => 'témpor de Antarctica (Dumont d’Urville)',
+        'Antarctica/DumontDUrville' => 'témpor de Antarctica (Dumont-d’Urville)',
         'Antarctica/Mawson' => 'témpor de Antarctica (Mawson)',
         'Antarctica/McMurdo' => 'témpor de Antarctica (McMurdo)',
         'Antarctica/Palmer' => 'témpor de Antarctica (Palmer)',

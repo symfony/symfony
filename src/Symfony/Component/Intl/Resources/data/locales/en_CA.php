@@ -10,6 +10,7 @@ return [
         'bs_Cyrl_BA' => 'Bosnian (Cyrillic, Bosnia and Herzegovina)',
         'bs_Latn_BA' => 'Bosnian (Latin, Bosnia and Herzegovina)',
         'en_AG' => 'English (Antigua and Barbuda)',
+        'en_GS' => 'English (South Georgia and South Sandwich Islands)',
         'en_KN' => 'English (Saint Kitts and Nevis)',
         'en_LC' => 'English (Saint Lucia)',
         'en_SH' => 'English (Saint Helena)',

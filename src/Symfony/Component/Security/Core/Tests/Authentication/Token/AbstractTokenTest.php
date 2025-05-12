@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class AbstractTokenTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     /**
      * @dataProvider provideUsers
@@ -48,7 +48,7 @@ class AbstractTokenTest extends TestCase
         $user->expects($this->once())->method('eraseCredentials');
         $token->setUser($user);
 
-        $this->expectDeprecation(\sprintf('Since symfony/security-core 7.3: The "%s::eraseCredentials()" method is deprecated and will be removed in 8.0, erase credentials using the "__serialize()" method instead.', TokenInterface::class));
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/security-core 7.3: The "%s::eraseCredentials()" method is deprecated and will be removed in 8.0, erase credentials using the "__serialize()" method instead.', TokenInterface::class));
 
         $token->eraseCredentials();
     }

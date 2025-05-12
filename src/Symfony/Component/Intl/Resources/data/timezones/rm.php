@@ -199,7 +199,7 @@ return [
         'America/Yakutat' => 'temp: Stadis Unids da l’America (Yakutat)',
         'Antarctica/Casey' => 'temp: Antarctica (Casey)',
         'Antarctica/Davis' => 'temp: Antarctica (Davis)',
-        'Antarctica/DumontDUrville' => 'temp: Antarctica (Dumont d’Urville)',
+        'Antarctica/DumontDUrville' => 'temp: Antarctica (Dumont-d’Urville)',
         'Antarctica/Macquarie' => 'temp: Australia (Macquarie)',
         'Antarctica/Mawson' => 'temp: Antarctica (Mawson)',
         'Antarctica/McMurdo' => 'temp: Antarctica (Mac Murdo)',

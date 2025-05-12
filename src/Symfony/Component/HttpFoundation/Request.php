@@ -1553,10 +1553,6 @@ class Request
             return $locales[0];
         }
 
-        if ($matches = array_intersect($preferredLanguages, $locales)) {
-            return current($matches);
-        }
-
         $combinations = array_merge(...array_map($this->getLanguageCombinations(...), $preferredLanguages));
         foreach ($combinations as $combination) {
             foreach ($locales as $locale) {

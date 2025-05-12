@@ -71,6 +71,18 @@ class PostmarkApiTransportTest extends TestCase
         $this->assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
     }
 
+    public function testBypassHeaders()
+    {
+        $email = (new Email())->date(new \DateTimeImmutable());
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new PostmarkApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayNotHasKey('Headers', $payload);
+    }
+
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {

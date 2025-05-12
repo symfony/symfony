@@ -104,6 +104,10 @@ EOF
                 $io->title(
                     \sprintf('Current configuration for %s', $name === $extensionAlias ? \sprintf('extension with alias "%s"', $extensionAlias) : \sprintf('"%s"', $name))
                 );
+
+                if ($docUrl = $this->getDocUrl($extension, $container)) {
+                    $io->comment(\sprintf('Documentation at %s', $docUrl));
+                }
             }
 
             $io->writeln($this->convertToFormat([$extensionAlias => $config], $format));
@@ -268,5 +272,16 @@ EOF
     private function getAvailableFormatOptions(): array
     {
         return ['txt', 'yaml', 'json'];
+    }
+
+    private function getDocUrl(ExtensionInterface $extension, ContainerBuilder $container): ?string
+    {
+        $configuration = $extension instanceof ConfigurationInterface ? $extension : $extension->getConfiguration($container->getExtensionConfig($extension->getAlias()), $container);
+
+        return $configuration
+            ->getConfigTreeBuilder()
+            ->getRootNode()
+            ->getNode(true)
+            ->getAttribute('docUrl');
     }
 }

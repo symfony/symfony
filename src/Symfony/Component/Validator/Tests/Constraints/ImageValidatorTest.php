@@ -545,7 +545,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         ]));
 
         $this->buildViolation('The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.')
-            ->setParameter('{{ file }}', sprintf('"%s"', $this->image))
+            ->setParameter('{{ file }}', \sprintf('"%s"', $this->image))
             ->setParameter('{{ type }}', '"image/gif"')
             ->setParameter('{{ types }}', '"image/jpeg", "image/png"')
             ->setParameter('{{ name }}', '"test.gif"')

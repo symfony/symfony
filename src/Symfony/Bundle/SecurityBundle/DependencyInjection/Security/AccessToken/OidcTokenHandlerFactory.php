@@ -71,7 +71,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                 ->replaceArgument(0, $config['encryption']['keyset']);
 
             $tokenHandlerDefinition->addMethodCall(
-                'enabledJweSupport',
+                'enableJweSupport',
                 [
                     $keyset,
                     $algorithmManager,

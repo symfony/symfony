@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.2",
         "ext-redis": "*",
-        "symfony/messenger": "^7.2"
+        "symfony/messenger": "^7.3"
     },
     "require-dev": {
         "symfony/property-access": "^6.4|^7.0",

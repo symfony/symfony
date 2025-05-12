@@ -1,4 +1,5 @@
-<div id="sfwdt{{ token }}" class="sf-toolbar sf-display-none" role="region" aria-label="Symfony Web Debug Toolbar">
+<!-- START of Symfony Web Debug Toolbar -->
+<div id="sfwdt{{ token }}" class="sf-toolbar sf-toolbar-opened" role="region" aria-label="Symfony Web Debug Toolbar">
     {{ include('@WebProfiler/Profiler/toolbar.html.twig', {
         templates: {
             'request': '@WebProfiler/Profiler/cancel.html.twig'
@@ -453,60 +454,32 @@
 
                 showToolbar: function(token) {
                     var sfwdt = this.getSfwdt(token);
-                    removeClass(sfwdt, 'sf-display-none');
 
-                    if (getPreference('toolbar/displayState') == 'none') {
-                        document.getElementById('sfToolbarMainContent-' + token).style.display = 'none';
-                        document.getElementById('sfToolbarClearer-' + token).style.display = 'none';
-                        document.getElementById('sfMiniToolbar-' + token).style.display = 'block';
+                    if ('closed' === getPreference('toolbar/displayState')) {
+                        addClass(sfwdt, 'sf-toolbar-closed');
+                        removeClass(sfwdt, 'sf-toolbar-opened');
                     } else {
-                        document.getElementById('sfToolbarMainContent-' + token).style.display = 'block';
-                        document.getElementById('sfToolbarClearer-' + token).style.display = 'block';
-                        document.getElementById('sfMiniToolbar-' + token).style.display = 'none';
+                        addClass(sfwdt, 'sf-toolbar-opened');
+                        removeClass(sfwdt, 'sf-toolbar-closed');
                     }
                 },
 
                 hideToolbar: function(token) {
                     var sfwdt = this.getSfwdt(token);
-                    addClass(sfwdt, 'sf-display-none');
+                    addClass(sfwdt, 'sf-toolbar-closed');
+                    removeClass(sfwdt, 'sf-toolbar-opened');
                 },
 
                 initToolbar: function(token) {
                     this.showToolbar(token);
 
-                    var hideButton = document.getElementById('sfToolbarHideButton-' + token);
-                    var hideButtonSvg = hideButton.querySelector('svg');
-                    hideButtonSvg.setAttribute('aria-hidden', 'true');
-                    hideButtonSvg.setAttribute('focusable', 'false');
-                    addEventListener(hideButton, 'click', function (event) {
+                    var toggleButton = document.querySelector(`#sfToolbarToggleButton-${token}`);
+                    addEventListener(toggleButton, 'click', function (event) {
                         event.preventDefault();
 
-                        var p = this.parentNode;
-                        p.style.display = 'none';
-                        (p.previousElementSibling || p.previousSibling).style.display = 'none';
-                        document.getElementById('sfMiniToolbar-' + token).style.display = 'block';
-                        setPreference('toolbar/displayState', 'none');
-                    });
-
-                    var showButton = document.getElementById('sfToolbarMiniToggler-' + token);
-                    var showButtonSvg = showButton.querySelector('svg');
-                    showButtonSvg.setAttribute('aria-hidden', 'true');
-                    showButtonSvg.setAttribute('focusable', 'false');
-                    addEventListener(showButton, 'click', function (event) {
-                        event.preventDefault();
-
-                        var elem = this.parentNode;
-                        if (elem.style.display == 'none') {
-                            document.getElementById('sfToolbarMainContent-' + token).style.display = 'none';
-                            document.getElementById('sfToolbarClearer-' + token).style.display = 'none';
-                            elem.style.display = 'block';
-                        } else {
-                            document.getElementById('sfToolbarMainContent-' + token).style.display = 'block';
-                            document.getElementById('sfToolbarClearer-' + token).style.display = 'block';
-                            elem.style.display = 'none'
-                        }
-
-                        setPreference('toolbar/displayState', 'block');
+                        const newState = 'opened' === getPreference('toolbar/displayState') ? 'closed' : 'opened';
+                        setPreference('toolbar/displayState', newState);
+                        'opened' === newState ? Sfjs.showToolbar(token) : Sfjs.hideToolbar(token);
                     });
                 },
 
@@ -655,3 +628,4 @@
 
     Sfjs.loadToolbar('{{ token }}');
 /*]]>*/</script>
+<!-- END of Symfony Web Debug Toolbar -->

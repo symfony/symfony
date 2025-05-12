@@ -43,7 +43,7 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
     {
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent($content);
-        self::assertEmpty($crawler->filterXPath('//h1')->text(), '->addHtmlContent failed as expected');
+        self::assertSame('', $crawler->filterXPath('//h1')->text(), '->addHtmlContent failed as expected');
     }
 
     public function testHtml5ParserNotSameAsNativeParserForSpecificHtml()

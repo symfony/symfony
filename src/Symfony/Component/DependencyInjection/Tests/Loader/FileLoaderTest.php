@@ -39,9 +39,12 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\BarInterf
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\AliasBarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\AliasFooInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAlias;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasBothEnv;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasDevEnv;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasIdMultipleInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasMultiple;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasProdEnv;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Utils\NotAService;
 
 class FileLoaderTest extends TestCase
@@ -349,10 +352,10 @@ class FileLoaderTest extends TestCase
     /**
      * @dataProvider provideResourcesWithAsAliasAttributes
      */
-    public function testRegisterClassesWithAsAlias(string $resource, array $expectedAliases)
+    public function testRegisterClassesWithAsAlias(string $resource, array $expectedAliases, ?string $env = null)
     {
         $container = new ContainerBuilder();
-        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), $env);
         $loader->registerClasses(
             (new Definition())->setAutoconfigured(true),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
@@ -374,6 +377,15 @@ class FileLoaderTest extends TestCase
             AliasBarInterface::class => new Alias(WithAsAliasIdMultipleInterface::class),
             AliasFooInterface::class => new Alias(WithAsAliasIdMultipleInterface::class),
         ]];
+        yield 'Dev-env specific' => ['PrototypeAsAlias/WithAsAlias*Env.php', [
+            AliasFooInterface::class => new Alias(WithAsAliasDevEnv::class),
+            AliasBarInterface::class => new Alias(WithAsAliasBothEnv::class),
+        ], 'dev'];
+        yield 'Prod-env specific' => ['PrototypeAsAlias/WithAsAlias*Env.php', [
+            AliasFooInterface::class => new Alias(WithAsAliasProdEnv::class),
+            AliasBarInterface::class => new Alias(WithAsAliasBothEnv::class),
+        ], 'prod'];
+        yield 'Test-env specific' => ['PrototypeAsAlias/WithAsAlias*Env.php', [], 'test'];
     }
 
     /**

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for displaying nested options in DebugCommand
+ * Add support for strings as data for the `MoneyType`
 
 7.2
 ---

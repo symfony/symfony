@@ -246,7 +246,7 @@ class DoctrineDataCollectorTest extends TestCase
             ->getMock();
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
 
         $registry = $this->createMock(ManagerRegistry::class);
         $registry

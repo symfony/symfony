@@ -11,6 +11,10 @@ CHANGELOG
  * Add support for help definition via `AsCommand` attribute
  * Deprecate methods `Command::getDefaultName()` and `Command::getDefaultDescription()` in favor of the `#[AsCommand]` attribute
  * Add support for Markdown format in `Table`
+ * Add support for `LockableTrait` in invokable commands
+ * Deprecate returning a non-integer value from a `\Closure` function set via `Command::setCode()`
+ * Mark `#[AsCommand]` attribute as `@final`
+ * Add support for `SignalableCommandInterface` with invokable commands
 
 7.2
 ---

@@ -137,20 +137,22 @@
             {{ source('@WebProfiler/Script/Mermaid/mermaid-flowchart-v2.min.js') }}
             const isDarkMode = document.querySelector('body').classList.contains('theme-dark');
             mermaid.initialize({
-                flowchart: { useMaxWidth: false },
+                flowchart: {
+                    useMaxWidth: true,
+                },
                 securityLevel: 'loose',
-                'theme': 'base',
-                'themeVariables': {
+                theme: 'base',
+                themeVariables: {
                     darkMode: isDarkMode,
-                    'fontFamily': 'var(--font-family-system)',
-                    'fontSize': 'var(--font-size-body)',
+                    fontFamily: 'var(--font-family-system)',
+                    fontSize: 'var(--font-size-body)',
                     // the properties below don't support CSS variables
-                    'primaryColor': isDarkMode ? 'lightsteelblue' : 'aliceblue',
-                    'primaryTextColor': isDarkMode ? '#000' : '#000',
-                    'primaryBorderColor': isDarkMode ? 'steelblue' : 'lightsteelblue',
-                    'lineColor': isDarkMode ? '#939393' : '#d4d4d4',
-                    'secondaryColor': isDarkMode ? 'lightyellow' : 'lightyellow',
-                    'tertiaryColor': isDarkMode ? 'lightSalmon' : 'lightSalmon',
+                    primaryColor: isDarkMode ? 'lightsteelblue' : 'aliceblue',
+                    primaryTextColor: isDarkMode ? '#000' : '#000',
+                    primaryBorderColor: isDarkMode ? 'steelblue' : 'lightsteelblue',
+                    lineColor: isDarkMode ? '#939393' : '#d4d4d4',
+                    secondaryColor: isDarkMode ? 'lightyellow' : 'lightyellow',
+                    tertiaryColor: isDarkMode ? 'lightSalmon' : 'lightSalmon',
                 }
             });
 
@@ -275,6 +277,7 @@
                                 click {{ nodeId }} showNodeDetails{{ collector.hash(name) }}
                             {% endfor %}
                         </pre>
+                        <a href="{{ collector.buildMermaidLiveLink(name) }}">View on mermaid.live</a>
 
                         <h3>Calls</h3>
                         <table>

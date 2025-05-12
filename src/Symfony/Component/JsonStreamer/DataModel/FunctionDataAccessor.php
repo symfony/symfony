@@ -33,6 +33,16 @@ final class FunctionDataAccessor implements DataAccessorInterface
     ) {
     }
 
+    public function getObjectAccessor(): ?DataAccessorInterface
+    {
+        return $this->objectAccessor;
+    }
+
+    public function withObjectAccessor(?DataAccessorInterface $accessor): self
+    {
+        return new self($this->functionName, $this->arguments, $accessor);
+    }
+
     public function toPhpExpr(): Expr
     {
         $builder = new BuilderFactory();

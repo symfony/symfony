@@ -188,6 +188,8 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://xn--e1afmkfd.xn--80akhbyknj4f.xn--e1afmkfd/'],
             ['http://xn--espaa-rta.xn--ca-ol-fsay5a/'],
             ['http://xn--d1abbgf6aiiy.xn--p1ai/'],
+            ['http://example.xn--p1ai/'],
+            ['http://xn--d1abbgf6aiiy.example.xn--p1ai/'],
             ['http://☎.com/'],
             ['http://username:password@symfony.com'],
             ['http://user.name:password@symfony.com'],

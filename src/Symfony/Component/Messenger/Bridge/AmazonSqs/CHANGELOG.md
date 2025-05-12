@@ -4,6 +4,7 @@ CHANGELOG
 7.3
 ---
 
+ * Implement the `CloseableTransportInterface` to allow closing the transport
  * Add new `queue_attributes` and `queue_tags` options for SQS queue creation
 
 7.2

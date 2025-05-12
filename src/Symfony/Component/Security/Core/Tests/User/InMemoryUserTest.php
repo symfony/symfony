@@ -12,13 +12,13 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class InMemoryUserTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     public function testConstructorException()
     {
@@ -62,7 +62,7 @@ class InMemoryUserTest extends TestCase
     public function testEraseCredentials()
     {
         $user = new InMemoryUser('fabien', 'superpass');
-        $this->expectDeprecation(\sprintf('%sMethod %s::eraseCredentials() is deprecated since symfony/security-core 7.3', \PHP_VERSION_ID >= 80400 ? 'Unsilenced deprecation: ' : '', InMemoryUser::class));
+        $this->expectUserDeprecationMessage(\sprintf('%sMethod %s::eraseCredentials() is deprecated since symfony/security-core 7.3', \PHP_VERSION_ID >= 80400 ? 'Unsilenced deprecation: ' : '', InMemoryUser::class));
         $user->eraseCredentials();
         $this->assertEquals('superpass', $user->getPassword());
     }

@@ -199,7 +199,7 @@ return [
         'America/Yakutat' => 'aljašský čas (Yakutat)',
         'Antarctica/Casey' => 'západoaustralský čas (Casey)',
         'Antarctica/Davis' => 'čas Davisovy stanice',
-        'Antarctica/DumontDUrville' => 'čas stanice Dumonta d’Urvilla (Dumont d’Urville)',
+        'Antarctica/DumontDUrville' => 'čas stanice Dumonta d’Urvilla (Dumont-d’Urville)',
         'Antarctica/Macquarie' => 'východoaustralský čas (Macquarie)',
         'Antarctica/Mawson' => 'čas Mawsonovy stanice',
         'Antarctica/McMurdo' => 'novozélandský čas (McMurdo)',

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
 use Symfony\Component\Uid\MaxUuid;
 use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUuid;
@@ -35,7 +36,7 @@ class UuidTest extends TestCase
      */
     public function testConstructorWithInvalidUuid(string $uuid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid UUID: "'.$uuid.'".');
 
         Uuid::fromString($uuid);
@@ -58,7 +59,7 @@ class UuidTest extends TestCase
         $uuid = (string) $uuid;
         $class = Uuid::class.'V'.$uuid[14];
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid UUIDv'.$uuid[14].': "'.$uuid.'".');
 
         new $class($uuid);
@@ -381,7 +382,7 @@ class UuidTest extends TestCase
      */
     public function testFromBinaryInvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Uuid::fromBinary($ulid);
     }
@@ -408,7 +409,7 @@ class UuidTest extends TestCase
      */
     public function testFromBase58InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Uuid::fromBase58($ulid);
     }
@@ -435,7 +436,7 @@ class UuidTest extends TestCase
      */
     public function testFromBase32InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Uuid::fromBase32($ulid);
     }
@@ -462,7 +463,7 @@ class UuidTest extends TestCase
      */
     public function testFromRfc4122InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Uuid::fromRfc4122($ulid);
     }
@@ -509,7 +510,7 @@ class UuidTest extends TestCase
 
     public function testV1ToV7BeforeUnixEpochThrows()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot convert UUID to v7: its timestamp is before the Unix epoch.');
 
         (new UuidV1('9aba8000-ff00-11b0-b3db-3b3fc83afdfc'))->toV7(); // Timestamp is 1969-01-01 00:00:00.0000000

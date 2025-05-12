@@ -74,6 +74,22 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->assertNull($cookie->getValue());
     }
 
+    public function testClearRememberMeCookieMalformedCookie()
+    {
+        $this->tokenProvider->expects($this->exactly(0))
+            ->method('deleteTokenBySeries');
+
+        $this->request->cookies->set('REMEMBERME', 'malformed');
+
+        $this->handler->clearRememberMeCookie();
+
+        $this->assertTrue($this->request->attributes->has(ResponseListener::COOKIE_ATTR_NAME));
+
+        /** @var Cookie $cookie */
+        $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
+        $this->assertNull($cookie->getValue());
+    }
+
     public function testConsumeRememberMeCookieValid()
     {
         $this->tokenProvider->expects($this->any())

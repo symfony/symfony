@@ -301,6 +301,7 @@ abstract class AbstractDoctrineExtension extends Extension
                 $cacheDef->addMethodCall('setMemcached', [new Reference($this->getObjectManagerElementName(\sprintf('%s_memcached_instance', $objectManagerName)))]);
                 break;
             case 'redis':
+            case 'valkey':
                 $redisClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%'.$this->getObjectManagerElementName('cache.redis.class').'%';
                 $redisInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.redis_instance.class').'%';
                 $redisHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.redis_host').'%';

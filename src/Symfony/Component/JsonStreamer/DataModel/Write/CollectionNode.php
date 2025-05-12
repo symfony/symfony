@@ -30,6 +30,16 @@ final class CollectionNode implements DataModelNodeInterface
     ) {
     }
 
+    public function withAccessor(DataAccessorInterface $accessor): self
+    {
+        return new self($accessor, $this->type, $this->item);
+    }
+
+    public function getIdentifier(): string
+    {
+        return (string) $this->getType();
+    }
+
     public function getAccessor(): DataAccessorInterface
     {
         return $this->accessor;

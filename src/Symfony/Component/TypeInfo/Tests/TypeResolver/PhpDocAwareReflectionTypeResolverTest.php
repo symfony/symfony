@@ -41,6 +41,8 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
 
         yield [Type::array(Type::object(Dummy::class)), $reflection->getProperty('arrayOfDummies')];
         yield [Type::bool(), $reflection->getProperty('promoted')];
+        yield [Type::string(), $reflection->getProperty('promotedVar')];
+        yield [Type::string(), $reflection->getProperty('promotedVarAndParam')];
         yield [Type::object(Dummy::class), $reflection->getMethod('getNextDummy')];
         yield [Type::object(Dummy::class), $reflection->getMethod('getNextDummy')->getParameters()[0]];
         yield [Type::int(), $reflection->getProperty('aliasedInt')];

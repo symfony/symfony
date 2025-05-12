@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost;
 
-class RegularClass
+class RegularClass extends \stdClass
 {
     public function __construct(
         public int $foo,

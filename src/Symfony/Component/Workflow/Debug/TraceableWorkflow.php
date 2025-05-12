@@ -30,6 +30,7 @@ class TraceableWorkflow implements WorkflowInterface
     public function __construct(
         private readonly WorkflowInterface $workflow,
         private readonly Stopwatch $stopwatch,
+        protected readonly ?\Closure $disabled = null,
     ) {
     }
 
@@ -90,6 +91,9 @@ class TraceableWorkflow implements WorkflowInterface
 
     private function callInner(string $method, array $args): mixed
     {
+        if ($this->disabled?->__invoke()) {
+            return $this->workflow->{$method}(...$args);
+        }
         $sMethod = $this->workflow::class.'::'.$method;
         $this->stopwatch->start($sMethod, 'workflow');
 

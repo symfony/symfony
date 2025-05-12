@@ -29,6 +29,7 @@ final class MercureOptions implements MessageOptionsInterface
         private ?string $id = null,
         private ?string $type = null,
         private ?int $retry = null,
+        private ?array $content = null,
     ) {
         $this->topics = null !== $topics ? (array) $topics : null;
     }
@@ -61,6 +62,11 @@ final class MercureOptions implements MessageOptionsInterface
         return $this->retry;
     }
 
+    public function getContent(): ?array
+    {
+        return $this->content;
+    }
+
     public function toArray(): array
     {
         return [
@@ -69,6 +75,7 @@ final class MercureOptions implements MessageOptionsInterface
             'id' => $this->id,
             'type' => $this->type,
             'retry' => $this->retry,
+            'content' => $this->content,
         ];
     }
 

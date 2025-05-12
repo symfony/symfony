@@ -106,6 +106,8 @@ class UnusedTagsPass implements CompilerPassInterface
         'validator.group_provider',
         'validator.initializer',
         'workflow',
+        'object_mapper.transform_callable',
+        'object_mapper.condition_callable',
     ];
 
     public function process(ContainerBuilder $container): void

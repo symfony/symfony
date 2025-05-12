@@ -19,6 +19,7 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 
 /**
  * An in-memory cache storage.
@@ -27,13 +28,14 @@ use Symfony\Contracts\Cache\CacheInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
+class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, LoggerAwareInterface, ResettableInterface
 {
     use LoggerAwareTrait;
 
     private array $values = [];
     private array $tags = [];
     private array $expiries = [];
+    private array $subPools = [];
 
     private static \Closure $createCacheItem;
 
@@ -226,14 +228,36 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
                 }
             }
 
-            if ($this->values) {
-                return true;
-            }
+            return true;
         }
 
-        $this->values = $this->tags = $this->expiries = [];
+        foreach ($this->subPools as $pool) {
+            $pool->clear();
+        }
+
+        $this->subPools = $this->values = $this->tags = $this->expiries = [];
 
         return true;
+    }
+
+    public function withSubNamespace(string $namespace): static
+    {
+        CacheItem::validateKey($namespace);
+
+        $subPools = $this->subPools;
+
+        if (isset($subPools[$namespace])) {
+            return $subPools[$namespace];
+        }
+
+        $this->subPools = [];
+        $clone = clone $this;
+        $clone->clear();
+
+        $subPools[$namespace] = $clone;
+        $this->subPools = $subPools;
+
+        return $clone;
     }
 
     /**
@@ -261,6 +285,13 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     public function reset(): void
     {
         $this->clear();
+    }
+
+    public function __clone()
+    {
+        foreach ($this->subPools as $i => $pool) {
+            $this->subPools[$i] = clone $pool;
+        }
     }
 
     private function generateItems(array $keys, float $now, \Closure $f): \Generator
@@ -307,7 +338,9 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             try {
                 $serialized = serialize($value);
             } catch (\Exception $e) {
-                unset($this->values[$key], $this->tags[$key]);
+                if (!isset($this->expiries[$key])) {
+                    unset($this->values[$key]);
+                }
                 $type = get_debug_type($value);
                 $message = \sprintf('Failed to save key "{key}" of type %s: %s', $type, $e->getMessage());
                 CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);

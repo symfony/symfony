@@ -55,7 +55,7 @@ return [
         'America/Metlakatla' => 'АИШ рӕстӕг (Metlakatla)',
         'America/New_York' => 'АИШ рӕстӕг (New York)',
         'America/Nome' => 'АИШ рӕстӕг (Nome)',
-        'America/Noronha' => 'Бразили рӕстӕг (Noronha)',
+        'America/Noronha' => 'Бразили рӕстӕг (Fernando de Noronha)',
         'America/North_Dakota/Beulah' => 'АИШ рӕстӕг (Beulah, North Dakota)',
         'America/North_Dakota/Center' => 'АИШ рӕстӕг (Center, North Dakota)',
         'America/North_Dakota/New_Salem' => 'АИШ рӕстӕг (New Salem, North Dakota)',

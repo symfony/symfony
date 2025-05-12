@@ -368,13 +368,13 @@ class ContextListenerTest extends TestCase
         $httpKernel = $this->createMock(HttpKernelInterface::class);
 
         $listener = new ContextListener($tokenStorage, [], 'session', null, $dispatcher, null, $tokenStorage->getToken(...));
-        $this->assertEmpty($dispatcher->getListeners());
+        $this->assertSame([], $dispatcher->getListeners());
 
         $listener(new RequestEvent($httpKernel, $request, HttpKernelInterface::MAIN_REQUEST));
         $this->assertNotEmpty($dispatcher->getListeners());
 
         $listener->onKernelResponse(new ResponseEvent($httpKernel, $request, HttpKernelInterface::MAIN_REQUEST, new Response()));
-        $this->assertEmpty($dispatcher->getListeners());
+        $this->assertSame([], $dispatcher->getListeners());
     }
 
     /**

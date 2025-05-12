@@ -24,6 +24,7 @@
     ],
     "require": {
         "php": ">=8.2",
+        "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/string": "^6.4|^7.0",
         "symfony/type-info": "~7.1.9|^7.2.2"
     },

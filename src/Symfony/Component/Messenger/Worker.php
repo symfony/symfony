@@ -128,8 +128,6 @@ class Worker
                 // this should prevent multiple lower priority receivers from
                 // blocking too long before the higher priority are checked
                 if ($envelopeHandled) {
-                    gc_collect_cycles();
-
                     break;
                 }
             }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `Translator::addGlobalParameter()` to allow defining global translation parameters
+
 7.2
 ---
 

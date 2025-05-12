@@ -12,12 +12,13 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +30,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     protected static string $fixturesPath;
 
@@ -350,8 +351,10 @@ class CommandTest extends TestCase
     public function testSetCode()
     {
         $command = new \TestCommand();
-        $ret = $command->setCode(function (InputInterface $input, OutputInterface $output) {
+        $ret = $command->setCode(function (InputInterface $input, OutputInterface $output): int {
             $output->writeln('from the code...');
+
+            return 0;
         });
         $this->assertEquals($command, $ret, '->setCode() implements a fluent interface');
         $tester = new CommandTester($command);
@@ -396,8 +399,10 @@ class CommandTest extends TestCase
 
     private static function createClosure()
     {
-        return function (InputInterface $input, OutputInterface $output) {
+        return function (InputInterface $input, OutputInterface $output): int {
             $output->writeln(isset($this) ? 'bound' : 'not bound');
+
+            return 0;
         };
     }
 
@@ -411,16 +416,20 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'from the code...'.\PHP_EOL, $tester->getDisplay());
     }
 
-    public function callableMethodCommand(InputInterface $input, OutputInterface $output)
+    public function callableMethodCommand(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('from the code...');
+
+        return 0;
     }
 
     public function testSetCodeWithStaticAnonymousFunction()
     {
         $command = new \TestCommand();
-        $command->setCode(static function (InputInterface $input, OutputInterface $output) {
+        $command->setCode(static function (InputInterface $input, OutputInterface $output): int {
             $output->writeln(isset($this) ? 'bound' : 'not bound');
+
+            return 0;
         });
         $tester = new CommandTester($command);
         $tester->execute([]);
@@ -444,8 +453,8 @@ class CommandTest extends TestCase
      */
     public function testCommandAttributeWithDeprecatedMethods()
     {
-        $this->expectDeprecation('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultName()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
-        $this->expectDeprecation('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultDescription()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultName()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultDescription()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
 
         $this->assertSame('|foo|f', Php8Command::getDefaultName());
         $this->assertSame('desc', Php8Command::getDefaultDescription());
@@ -464,8 +473,8 @@ class CommandTest extends TestCase
      */
     public function testAttributeOverridesPropertyWithDeprecatedMethods()
     {
-        $this->expectDeprecation('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultName()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
-        $this->expectDeprecation('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultDescription()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultName()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultDescription()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
 
         $this->assertSame('my:command', MyAnnotatedCommand::getDefaultName());
         $this->assertSame('This is a command I wrote all by myself', MyAnnotatedCommand::getDefaultDescription());
@@ -490,10 +499,22 @@ class CommandTest extends TestCase
      */
     public function testDeprecatedMethods()
     {
-        $this->expectDeprecation('Since symfony/console 7.3: Overriding "Command::getDefaultName()" in "Symfony\Component\Console\Tests\Command\FooCommand" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
-        $this->expectDeprecation('Since symfony/console 7.3: Overriding "Command::getDefaultDescription()" in "Symfony\Component\Console\Tests\Command\FooCommand" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Overriding "Command::getDefaultName()" in "Symfony\Component\Console\Tests\Command\FooCommand" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Overriding "Command::getDefaultDescription()" in "Symfony\Component\Console\Tests\Command\FooCommand" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
 
         new FooCommand();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedNonIntegerReturnTypeFromClosureCode()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Returning a non-integer value from the command "foo" is deprecated and will throw an exception in Symfony 8.0.');
+
+        $command = new Command('foo');
+        $command->setCode(function () {});
+        $command->run(new ArrayInput([]), new NullOutput());
     }
 }
 
@@ -501,8 +522,10 @@ class CommandTest extends TestCase
 // scope.
 function createClosure()
 {
-    return function (InputInterface $input, OutputInterface $output) {
+    return function (InputInterface $input, OutputInterface $output): int {
         $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
+
+        return 0;
     };
 }
 

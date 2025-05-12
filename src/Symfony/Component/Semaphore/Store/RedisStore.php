@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
-use Relay\Relay;
 use Relay\Cluster as RelayCluster;
+use Relay\Relay;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
 use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;

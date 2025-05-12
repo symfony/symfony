@@ -911,6 +911,87 @@ YAML;
     }
 
     /**
+     * @dataProvider getForceQuotesOnValuesData
+     */
+    public function testCanForceQuotesOnValues(array $input, string $expected)
+    {
+        $this->assertSame($expected, $this->dumper->dump($input, 0, 0, Yaml::DUMP_FORCE_DOUBLE_QUOTES_ON_VALUES));
+    }
+
+    public static function getForceQuotesOnValuesData(): iterable
+    {
+        yield 'empty string' => [
+            ['foo' => ''],
+            '{ foo: \'\' }',
+        ];
+
+        yield 'double quote' => [
+            ['foo' => '"'],
+            '{ foo: "\"" }',
+        ];
+
+        yield 'single quote' => [
+            ['foo' => "'"],
+            '{ foo: "\'" }',
+        ];
+
+        yield 'line break' => [
+            ['foo' => "line\nbreak"],
+            '{ foo: "line\nbreak" }',
+        ];
+
+        yield 'tab character' => [
+            ['foo' => "tab\tcharacter"],
+            '{ foo: "tab\tcharacter" }',
+        ];
+
+        yield 'backslash' => [
+            ['foo' => "back\\slash"],
+            '{ foo: "back\\\\slash" }',
+        ];
+
+        yield 'colon' => [
+            ['foo' => 'colon: value'],
+            '{ foo: "colon: value" }',
+        ];
+
+        yield 'dash' => [
+            ['foo' => '- dash'],
+            '{ foo: "- dash" }',
+        ];
+
+        yield 'numeric' => [
+            ['foo' => 23],
+            '{ foo: 23 }',
+        ];
+
+        yield 'boolean' => [
+            ['foo' => true],
+            '{ foo: true }',
+        ];
+
+        yield 'null' => [
+            ['foo' => null],
+            '{ foo: null }',
+        ];
+
+        yield 'nested' => [
+            ['foo' => ['bar' => 'bat', 'baz' => 23]],
+            '{ foo: { bar: "bat", baz: 23 } }',
+        ];
+
+        yield 'mix of values' => [
+            ['foo' => 'bat', 'bar' => 23, 'baz' => true, 'qux' => "line\nbreak"],
+            '{ foo: "bat", bar: 23, baz: true, qux: "line\nbreak" }',
+        ];
+
+        yield 'special YAML characters' => [
+            ['foo' => 'colon: value', 'bar' => '- dash', 'baz' => '? question', 'qux' => '# hash'],
+            '{ foo: "colon: value", bar: "- dash", baz: "? question", qux: "# hash" }',
+        ];
+    }
+
+    /**
      * @dataProvider getNumericKeyData
      */
     public function testDumpInlineNumericKeyAsString(array $input, bool $inline, int $flags, string $expected)

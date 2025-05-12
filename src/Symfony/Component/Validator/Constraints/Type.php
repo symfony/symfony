@@ -32,9 +32,9 @@ class Type extends Constraint
     public string|array|null $type = null;
 
     /**
-     * @param string|string[]|array<string,mixed>|null $type    The type(s) to enforce on the value
-     * @param string[]|null                            $groups
-     * @param array<string,mixed>|null                 $options
+     * @param string|list<string>|array<string,mixed>|null $type    The type(s) to enforce on the value
+     * @param string[]|null                                $groups
+     * @param array<string,mixed>|null                     $options
      */
     #[HasNamedArguments]
     public function __construct(string|array|null $type, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)

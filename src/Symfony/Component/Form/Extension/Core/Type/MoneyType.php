@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -38,6 +39,10 @@ class MoneyType extends AbstractType
                 $options['input'],
             ))
         ;
+
+        if ('string' === $options['input']) {
+            $builder->addModelTransformer(new StringToFloatTransformer($options['scale']));
+        }
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
@@ -77,7 +82,7 @@ class MoneyType extends AbstractType
 
         $resolver->setAllowedTypes('html5', 'bool');
 
-        $resolver->setAllowedValues('input', ['float', 'integer']);
+        $resolver->setAllowedValues('input', ['float', 'integer', 'string']);
 
         $resolver->setNormalizer('grouping', static function (Options $options, $value) {
             if ($value && $options['html5']) {

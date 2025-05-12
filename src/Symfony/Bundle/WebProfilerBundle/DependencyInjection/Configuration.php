@@ -31,7 +31,9 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('web_profiler');
 
-        $treeBuilder->getRootNode()
+        $treeBuilder
+            ->getRootNode()
+            ->docUrl('https://symfony.com/doc/{version:major}.{version:minor}/reference/configuration/web_profiler.html', 'symfony/web-profiler-bundle')
             ->children()
                 ->arrayNode('toolbar')
                     ->info('Profiler toolbar configuration')

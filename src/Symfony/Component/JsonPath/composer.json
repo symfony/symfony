@@ -1,0 +1,32 @@
+{
+    "name": "symfony/json-path",
+    "type": "library",
+    "description": "Eases JSON navigation using the JSONPath syntax as described in RFC 9535",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexandre Daubois",
+            "email": "alex.daubois@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/polyfill-mbstring": "~1.0"
+    },
+    "require-dev": {
+        "symfony/json-streamer": "^7.3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\JsonPath\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

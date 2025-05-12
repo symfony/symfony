@@ -127,7 +127,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
 
             $ser = preg_replace_callback('/;O:(\d+):"/', static fn ($m) => ';O:'.(9 + $m[1]).':"Tracking\\', $ser);
             $ser = preg_replace_callback('/s:(\d+):"\0[^\0]++\0/', static fn ($m) => 's:'.($m[1] - \strlen($m[0]) + 6).':"', $ser);
-            $ser = unserialize($ser);
+            $ser = unserialize($ser, ['allowed_classes' => false]);
             $ser = @json_encode($ser, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE) ?: [];
             $ser = str_replace('"__PHP_Incomplete_Class_Name":"Tracking\\\\', '"@type":"', $ser);
             $ser = \sprintf('{"resources":%s}', $ser);

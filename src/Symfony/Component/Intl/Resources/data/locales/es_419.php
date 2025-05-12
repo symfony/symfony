@@ -11,6 +11,8 @@ return [
         'bs_Latn' => 'bosnio (latín)',
         'bs_Latn_BA' => 'bosnio (latín, Bosnia-Herzegovina)',
         'en_001' => 'inglés (mundo)',
+        'en_GS' => 'inglés (Islas Georgia del Sur y Sándwich del Sur)',
+        'en_RO' => 'inglés (Rumania)',
         'en_UM' => 'inglés (Islas Ultramarinas de EE.UU.)',
         'eo_001' => 'esperanto (mundo)',
         'eu' => 'vasco',

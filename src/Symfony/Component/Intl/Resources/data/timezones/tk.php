@@ -157,7 +157,7 @@ return [
         'America/Nassau' => 'Demirgazyk Amerika gündogar wagty (Nassau)',
         'America/New_York' => 'Demirgazyk Amerika gündogar wagty (Nýu-Ýork)',
         'America/Nome' => 'Alýaska wagty (Nom)',
-        'America/Noronha' => 'Fernandu-di-Noronýa wagty (Noronha)',
+        'America/Noronha' => 'Fernandu-di-Noronýa wagty (Fernando de Noronha)',
         'America/North_Dakota/Beulah' => 'Merkezi Amerika (Boýla, Demirgazyk Dakota)',
         'America/North_Dakota/Center' => 'Merkezi Amerika (Sentr, Demirgazyk Dakota)',
         'America/North_Dakota/New_Salem' => 'Merkezi Amerika (Nýu-Salem, Demirgazyk Dakota)',

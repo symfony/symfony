@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use phpDocumentor\Reflection\DocBlock;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback;
@@ -34,6 +35,8 @@ use Symfony\Component\TypeInfo\Type\NullableType;
  */
 class PhpDocExtractorTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     private PhpDocExtractor $extractor;
 
     protected function setUp(): void
@@ -48,6 +51,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtractLegacy($property, ?array $type, $shortDescription, $longDescription)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertEquals($type, $this->extractor->getTypes(Dummy::class, $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription(Dummy::class, $property));
         $this->assertSame($longDescription, $this->extractor->getLongDescription(Dummy::class, $property));
@@ -71,6 +76,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testParamTagTypeIsOmittedLegacy()
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertNull($this->extractor->getTypes(OmittedParamTagTypeDocBlock::class, 'omittedType'));
     }
 
@@ -90,6 +97,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testInvalidLegacy($property, $shortDescription, $longDescription)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
         $this->assertSame($longDescription, $this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
@@ -100,6 +109,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testEmptyParamAnnotationLegacy()
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', 'foo'));
         $this->assertSame('Foo.', $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', 'foo'));
         $this->assertNull($this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', 'foo'));
@@ -112,6 +123,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtractTypesWithNoPrefixesLegacy($property, ?array $type = null)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $noPrefixExtractor = new PhpDocExtractor(null, [], [], []);
 
         $this->assertEquals($type, $noPrefixExtractor->getTypes(Dummy::class, $property));
@@ -240,6 +253,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtractTypesWithCustomPrefixesLegacy($property, ?array $type = null)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $customExtractor = new PhpDocExtractor(null, ['add', 'remove'], ['is', 'can']);
 
         $this->assertEquals($type, $customExtractor->getTypes(Dummy::class, $property));
@@ -356,6 +371,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testDocBlockFallbackLegacy($property, $types)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback', $property));
     }
 
@@ -366,6 +383,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testPropertiesDefinedByTraitsLegacy(string $property, LegacyType $type)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertEquals([$type], $this->extractor->getTypes(DummyUsingTrait::class, $property));
     }
 
@@ -388,6 +407,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testMethodsDefinedByTraitsLegacy(string $property, LegacyType $type)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertEquals([$type], $this->extractor->getTypes(DummyUsingTrait::class, $property));
     }
 
@@ -410,6 +431,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testPropertiesStaticTypeLegacy(string $class, string $property, LegacyType $type)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertEquals([$type], $this->extractor->getTypes($class, $property));
     }
 
@@ -428,6 +451,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testPropertiesParentTypeLegacy(string $class, string $property, ?array $types)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertEquals($types, $this->extractor->getTypes($class, $property));
     }
 
@@ -444,11 +469,18 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testUnknownPseudoTypeLegacy()
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'scalar')], $this->extractor->getTypes(PseudoTypeDummy::class, 'unknownPseudoType'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGenericInterface()
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertNull($this->extractor->getTypes(Dummy::class, 'genericInterface'));
     }
 
@@ -459,6 +491,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtractConstructorTypesLegacy($property, ?array $type = null)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypesFromConstructor()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypeFromConstructor()" instead.');
+
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }
 
@@ -481,6 +515,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testPseudoTypesLegacy($property, array $type)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypesDummy', $property));
     }
 
@@ -506,6 +542,8 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtractPromotedPropertyLegacy(string $property, ?array $types)
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
         $this->assertEquals($types, $this->extractor->getTypes(Php80Dummy::class, $property));
     }
 

@@ -22,6 +22,8 @@ use Symfony\Component\VarExporter\ProxyHelper;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
+ * @deprecated since Symfony 7.3, native lazy objects will be used instead
+ *
  * @internal
  */
 final class LazyGhostCacheWarmer extends CacheWarmer

@@ -30,7 +30,7 @@ class Sequentially extends Composite
      */
     public function __construct(mixed $constraints = null, ?array $groups = null, mixed $payload = null)
     {
-        if (is_array($constraints) && !array_is_list($constraints)) {
+        if (\is_array($constraints) && !array_is_list($constraints)) {
             trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
         }
 

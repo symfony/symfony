@@ -56,7 +56,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->parameters()
-        ->set('serializer.mapping.cache.file', '%kernel.cache_dir%/serialization.php')
+        ->set('serializer.mapping.cache.file', '%kernel.build_dir%/serialization.php')
     ;
 
     $container->services()
@@ -130,7 +130,7 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
-                null,
+                abstract_arg('default context, set in the SerializerPass'),
                 service('property_info')->ignoreOnInvalid(),
             ])
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -1000])

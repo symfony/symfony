@@ -157,7 +157,7 @@ return [
         'America/Nassau' => 'Vzhodni čas (Nassau)',
         'America/New_York' => 'Vzhodni čas (New York)',
         'America/Nome' => 'Aljaški čas (Nome)',
-        'America/Noronha' => 'Fernando de Noronški čas (Noronha)',
+        'America/Noronha' => 'Fernando de Noronški čas (Fernando de Noronha)',
         'America/North_Dakota/Beulah' => 'Centralni čas (Beulah, Severna Dakota)',
         'America/North_Dakota/Center' => 'Centralni čas (Center, Severna Dakota)',
         'America/North_Dakota/New_Salem' => 'Centralni čas (New Salem, Severna Dakota)',

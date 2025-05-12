@@ -50,7 +50,7 @@ class CollectionTypeTest extends TestCase
     public function testGetCollectionKeyType()
     {
         $type = new CollectionType(Type::builtin(TypeIdentifier::ARRAY));
-        $this->assertEquals(Type::union(Type::int(), Type::string()), $type->getCollectionKeyType());
+        $this->assertEquals(Type::arrayKey(), $type->getCollectionKeyType());
 
         $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::bool()));
         $this->assertEquals(Type::int(), $type->getCollectionKeyType());

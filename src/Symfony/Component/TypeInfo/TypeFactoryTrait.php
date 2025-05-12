@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo;
 
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
@@ -152,7 +153,7 @@ trait TypeFactoryTrait
     public static function collection(BuiltinType|ObjectType|GenericType $type, ?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
     {
         if (!$type instanceof GenericType && (null !== $value || null !== $key)) {
-            $type = self::generic($type, $key ?? self::union(self::int(), self::string()), $value ?? self::mixed());
+            $type = self::generic($type, $key ?? self::arrayKey(), $value ?? self::mixed());
         }
 
         return new CollectionType($type, $asList);
@@ -192,6 +193,32 @@ trait TypeFactoryTrait
     public static function dict(?Type $value = null): CollectionType
     {
         return self::array($value, self::string());
+    }
+
+    /**
+     * @param array<array{type: Type, optional?: bool}|Type> $shape
+     */
+    public static function arrayShape(array $shape, bool $sealed = true, ?Type $extraKeyType = null, ?Type $extraValueType = null): ArrayShapeType
+    {
+        $shape = array_map(static function (array|Type $item): array {
+            return $item instanceof Type
+                ? ['type' => $item, 'optional' => false]
+                : ['type' => $item['type'], 'optional' => $item['optional'] ?? false];
+        }, $shape);
+
+        if ($extraKeyType || $extraValueType) {
+            $sealed = false;
+        }
+
+        $extraKeyType ??= !$sealed ? Type::arrayKey() : null;
+        $extraValueType ??= !$sealed ? Type::mixed() : null;
+
+        return new ArrayShapeType($shape, $extraKeyType, $extraValueType);
+    }
+
+    public static function arrayKey(): UnionType
+    {
+        return self::union(self::int(), self::string());
     }
 
     /**
@@ -412,7 +439,7 @@ trait TypeFactoryTrait
                 $keyTypes = array_values(array_unique($keyTypes));
                 $keyType = \count($keyTypes) > 1 ? self::union(...$keyTypes) : $keyTypes[0];
             } else {
-                $keyType = Type::union(Type::int(), Type::string());
+                $keyType = Type::arrayKey();
             }
 
             $valueType = $valueTypes ? CollectionType::mergeCollectionValueTypes($valueTypes) : Type::mixed();

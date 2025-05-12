@@ -28,7 +28,9 @@ class RedisTransportFactoryTest extends TestCase
 
         $this->assertTrue($factory->supports('redis://localhost', []));
         $this->assertTrue($factory->supports('rediss://localhost', []));
-        $this->assertTrue($factory->supports('redis:?host[host1:5000]&host[host2:5000]&host[host3:5000]&sentinel_master=test&dbindex=0', []));
+        $this->assertTrue($factory->supports('valkey://localhost', []));
+        $this->assertTrue($factory->supports('valkeys://localhost', []));
+        $this->assertTrue($factory->supports('redis:?host[host1:5000]&host[host2:5000]&host[host3:5000]&sentinel=test&dbindex=0', []));
         $this->assertFalse($factory->supports('sqs://localhost', []));
         $this->assertFalse($factory->supports('invalid-dsn', []));
     }
@@ -69,7 +71,7 @@ class RedisTransportFactoryTest extends TestCase
         if (false !== getenv('REDIS_SENTINEL_HOSTS') && false !== getenv('REDIS_SENTINEL_SERVICE')) {
             yield 'redis_sentinel' => [
                 'redis:?host['.str_replace(' ', ']&host[', getenv('REDIS_SENTINEL_HOSTS')).']',
-                ['sentinel_master' => getenv('REDIS_SENTINEL_SERVICE')],
+                ['sentinel' => getenv('REDIS_SENTINEL_SERVICE')],
             ];
         }
     }

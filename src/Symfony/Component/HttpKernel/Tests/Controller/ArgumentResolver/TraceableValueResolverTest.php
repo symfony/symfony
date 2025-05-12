@@ -32,7 +32,7 @@ class TraceableValueResolverTest extends TestCase
         foreach ($iterable as $index => $resolved) {
             $event = $stopwatch->getEvent(ResolverStub::class.'::resolve');
             $this->assertTrue($event->isStarted());
-            $this->assertEmpty($event->getPeriods());
+            $this->assertSame([], $event->getPeriods());
             switch ($index) {
                 case 0:
                     $this->assertEquals('first', $resolved);

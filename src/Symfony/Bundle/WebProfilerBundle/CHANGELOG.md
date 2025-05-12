@@ -4,6 +4,34 @@ CHANGELOG
 7.3
 ---
 
+ * Add `profiler.php` and `wdt.php` routing configuration files (use them instead of their XML equivalent)
+
+   Before:
+
+   ```yaml
+   when@dev:
+       web_profiler_wdt:
+           resource: '@WebProfilerBundle/Resources/config/routing/wdt.xml'
+           prefix: /_wdt
+
+      web_profiler_profiler:
+          resource: '@WebProfilerBundle/Resources/config/routing/profiler.xml'
+          prefix: /_profiler
+   ```
+
+   After:
+
+   ```yaml
+   when@dev:
+       web_profiler_wdt:
+           resource: '@WebProfilerBundle/Resources/config/routing/wdt.php'
+           prefix: /_wdt
+
+       web_profiler_profiler:
+           resource: '@WebProfilerBundle/Resources/config/routing/profiler.php
+           prefix: /_profiler
+   ```
+
  * Add `ajax_replace` option for replacing toolbar on AJAX requests
 
 7.2

@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportF
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
+use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
@@ -217,6 +218,9 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('services_resetter'),
             ])
+
+        ->set('messenger.listener.reset_memory_usage', ResetMemoryUsageListener::class)
+            ->tag('kernel.event_subscriber')
 
         ->set('messenger.routable_message_bus', RoutableMessageBus::class)
             ->args([

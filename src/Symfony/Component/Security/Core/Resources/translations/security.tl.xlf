@@ -72,11 +72,11 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>Napakaraming nabigong mga pagtatangka sa pag-login, pakisubukan ulit sa% minuto% minuto.</target>
+                <target>Napakaraming nabigong mga pagtatangka sa pag-login, pakisubukan ulit matapos ang %minutes% minuto.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target state="needs-review-translation">Napakaraming nabigong pagtatangka ng pag-login, mangyaring subukang muli sa loob ng %minutes% minuto.|Napakaraming nabigong pagtatangka ng pag-login, mangyaring subukang muli sa loob ng %minutes% minuto.</target>
+                <target>Napakaraming nabigong mga pagtatangka sa pag-login, pakisubukan ulit matapos ang %minutes% minuto.</target>
             </trans-unit>
         </body>
     </file>

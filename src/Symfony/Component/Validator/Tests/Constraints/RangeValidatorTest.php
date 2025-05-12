@@ -71,6 +71,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMin($value)
@@ -94,6 +95,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMax($value)
@@ -117,6 +119,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMinMax($value)
@@ -140,6 +143,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getLessThanTen
      */
     public function testInvalidValuesMin($value, $formattedValue)
@@ -176,6 +180,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getMoreThanTwenty
      */
     public function testInvalidValuesMax($value, $formattedValue)
@@ -212,6 +217,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getMoreThanTwenty
      */
     public function testInvalidValuesCombinedMax($value, $formattedValue)
@@ -251,6 +257,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getLessThanTen
      */
     public function testInvalidValuesCombinedMin($value, $formattedValue)
@@ -629,6 +636,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMinPropertyPath($value)
@@ -741,6 +749,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getMoreThanTwenty
      */
     public function testInvalidValuesCombinedMaxPropertyPath($value, $formattedValue)
@@ -792,6 +801,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getLessThanTen
      */
     public function testInvalidValuesCombinedMinPropertyPath($value, $formattedValue)

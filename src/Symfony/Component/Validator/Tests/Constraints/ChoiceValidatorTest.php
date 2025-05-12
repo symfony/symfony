@@ -92,6 +92,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideLegacyConstraintsWithChoicesArrayDoctrineStyle
      */
     public function testValidChoiceArrayDoctrineStyle(Choice $constraint)
@@ -126,6 +127,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideLegacyConstraintsWithCallbackFunctionDoctrineStyle
      */
     public function testValidChoiceCallbackFunctionDoctrineStyle(Choice $constraint)
@@ -262,6 +264,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
     }
+
     /**
      * @group legacy
      */

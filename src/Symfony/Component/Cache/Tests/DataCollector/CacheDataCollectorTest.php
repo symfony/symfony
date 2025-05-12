@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\Cache\DataCollector\CacheDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class CacheDataCollectorTest extends TestCase
 {
@@ -122,6 +123,7 @@ class CacheDataCollectorTest extends TestCase
         $this->assertEquals($stats[self::INSTANCE_NAME]['hits'], 0, 'hits');
         $this->assertEquals($stats[self::INSTANCE_NAME]['misses'], 1, 'misses');
         $this->assertEquals($stats[self::INSTANCE_NAME]['calls'], 1, 'calls');
+        $this->assertInstanceOf(Data::class, $collector->getCalls());
     }
 
     private function getCacheDataCollectorStatisticsFromEvents(array $traceableAdapterEvents)

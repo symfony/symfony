@@ -135,15 +135,21 @@ abstract class AbstractUnicodeString extends AbstractString
             } elseif (!\function_exists('iconv')) {
                 $s = preg_replace('/[^\x00-\x7F]/u', '?', $s);
             } else {
-                $s = @preg_replace_callback('/[^\x00-\x7F]/u', static function ($c) {
-                    $c = (string) iconv('UTF-8', 'ASCII//TRANSLIT', $c[0]);
+                $previousLocale = setlocale(\LC_CTYPE, 0);
+                try {
+                    setlocale(\LC_CTYPE, 'C');
+                    $s = @preg_replace_callback('/[^\x00-\x7F]/u', static function ($c) {
+                        $c = (string) iconv('UTF-8', 'ASCII//TRANSLIT', $c[0]);
 
-                    if ('' === $c && '' === iconv('UTF-8', 'ASCII//TRANSLIT', '²')) {
-                        throw new \LogicException(\sprintf('"%s" requires a translit-able iconv implementation, try installing "gnu-libiconv" if you\'re using Alpine Linux.', static::class));
-                    }
+                        if ('' === $c && '' === iconv('UTF-8', 'ASCII//TRANSLIT', '²')) {
+                            throw new \LogicException(\sprintf('"%s" requires a translit-able iconv implementation, try installing "gnu-libiconv" if you\'re using Alpine Linux.', static::class));
+                        }
 
-                    return 1 < \strlen($c) ? ltrim($c, '\'`"^~') : ('' !== $c ? $c : '?');
-                }, $s);
+                        return 1 < \strlen($c) ? ltrim($c, '\'`"^~') : ('' !== $c ? $c : '?');
+                    }, $s);
+                } finally {
+                    setlocale(\LC_CTYPE, $previousLocale);
+                }
             }
         }
 

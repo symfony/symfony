@@ -224,8 +224,8 @@ EOF
 
             $this->forceExit = true;
             try {
-                $choice = $io->choice('Please select an action', ['retry', 'delete', 'skip'], 'retry');
-                $shouldHandle = $shouldForce || 'retry' === $choice;
+                $choice = $shouldForce ? 'retry' : $io->choice('Please select an action', ['retry', 'delete', 'skip'], 'retry');
+                $shouldHandle = 'retry' === $choice;
             } finally {
                 $this->forceExit = false;
             }

@@ -5,7 +5,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 // progressIterate
-return function (InputInterface $input, OutputInterface $output) {
+return function (InputInterface $input, OutputInterface $output): int {
     $style = new SymfonyStyle($input, $output);
 
     foreach ($style->progressIterate(\range(1, 10)) as $step) {
@@ -13,4 +13,6 @@ return function (InputInterface $input, OutputInterface $output) {
     }
 
     $style->writeln('end of progressbar');
+
+    return 0;
 };

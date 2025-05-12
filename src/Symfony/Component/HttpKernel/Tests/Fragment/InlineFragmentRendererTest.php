@@ -97,7 +97,7 @@ class InlineFragmentRendererTest extends TestCase
 
         $strategy = new InlineFragmentRenderer($kernel, $dispatcher);
 
-        $this->assertEmpty($strategy->render('/', $request, ['ignore_errors' => true])->getContent());
+        $this->assertSame('', $strategy->render('/', $request, ['ignore_errors' => true])->getContent());
     }
 
     public function testRenderExceptionIgnoreErrorsWithAlt()

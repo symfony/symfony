@@ -50,6 +50,21 @@ abstract class AbstractDescriptorTestCase extends TestCase
         return static::getDescriptionTestData(ObjectsProvider::getRouteCollections());
     }
 
+    /** @dataProvider getDescribeRouteCollectionWithHttpMethodFilterTestData */
+    public function testDescribeRouteCollectionWithHttpMethodFilter(string $httpMethod, RouteCollection $routes, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $routes, ['method' => $httpMethod]);
+    }
+
+    public static function getDescribeRouteCollectionWithHttpMethodFilterTestData(): iterable
+    {
+        foreach (ObjectsProvider::getRouteCollectionsByHttpMethod() as $httpMethod => $routeCollection) {
+            foreach (static::getDescriptionTestData($routeCollection) as $testData) {
+                yield [$httpMethod, ...$testData];
+            }
+        }
+    }
+
     /** @dataProvider getDescribeRouteTestData */
     public function testDescribeRoute(Route $route, $expectedDescription)
     {
@@ -273,6 +288,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $options['is_debug'] = false;
         $options['raw_output'] = true;
         $options['raw_text'] = true;
+        $options['method'] ??= null;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
 
         if ('txt' === $this->getFormat()) {

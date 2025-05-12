@@ -470,6 +470,10 @@
                 <source>This value is not a valid slug.</source>
                 <target>This value is not a valid slug.</target>
             </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target>This value is not a valid Twig template.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

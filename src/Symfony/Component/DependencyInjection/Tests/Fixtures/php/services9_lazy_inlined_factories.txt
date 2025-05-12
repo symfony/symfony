@@ -1,18 +1,5 @@
 Array
 (
-    [Container%s/proxy-classes.php] => <?php
-
-namespace Container%s;
-
-include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
-
-class FooClassGhost1728205 extends \Bar\FooClass implements \Symfony\Component\VarExporter\LazyObjectInterface
-%A
-
-if (!\class_exists('FooClassGhost1728205', false)) {
-    \class_alias(__NAMESPACE__.'\\FooClassGhost1728205', 'FooClassGhost1728205', false);
-}
-
     [Container%s/ProjectServiceContainer.php] => <?php
 
 namespace Container%s;
@@ -45,10 +32,6 @@ class ProjectServiceContainer extends Container
         ];
 
         $this->aliases = [];
-
-        $this->privates['service_container'] = static function ($container) {
-            include_once __DIR__.'/proxy-classes.php';
-        };
     }
 
     public function compile(): void
@@ -74,9 +57,10 @@ class ProjectServiceContainer extends Container
     protected static function getLazyFooService($container, $lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $container->services['lazy_foo'] = $container->createProxy('FooClassGhost1728205', static fn () => \FooClassGhost1728205::createLazyGhost(static fn ($proxy) => self::getLazyFooService($container, $proxy)));
+            return $container->services['lazy_foo'] = new \ReflectionClass('Bar\FooClass')->newLazyGhost(static function ($proxy) use ($container) { self::getLazyFooService($container, $proxy); });
         }
 
+        include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
         include_once $container->targetDir.''.'/Fixtures/includes/foo_lazy.php';
 
         return ($lazyLoad->__construct(new \Bar\FooLazyClass()) && false ?: $lazyLoad);

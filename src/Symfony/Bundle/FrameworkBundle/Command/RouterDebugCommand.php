@@ -55,6 +55,7 @@ class RouterDebugCommand extends Command
                 new InputOption('show-aliases', null, InputOption::VALUE_NONE, 'Show aliases in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
+                new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Filter by HTTP method', '', ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> displays the configured routes:
@@ -76,6 +77,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
+        $method = strtoupper($input->getOption('method'));
         $helper = new DescriptorHelper($this->fileLinkFormatter);
         $routes = $this->router->getRouteCollection();
         $container = null;
@@ -85,7 +87,7 @@ EOF
 
         if ($name) {
             $route = $routes->get($name);
-            $matchingRoutes = $this->findRouteNameContaining($name, $routes);
+            $matchingRoutes = $this->findRouteNameContaining($name, $routes, $method);
 
             if (!$input->isInteractive() && !$route && \count($matchingRoutes) > 1) {
                 $helper->describe($io, $this->findRouteContaining($name, $routes), [
@@ -94,6 +96,7 @@ EOF
                     'show_controllers' => $input->getOption('show-controllers'),
                     'show_aliases' => $input->getOption('show-aliases'),
                     'output' => $io,
+                    'method' => $method,
                 ]);
 
                 return 0;
@@ -124,17 +127,18 @@ EOF
                 'show_aliases' => $input->getOption('show-aliases'),
                 'output' => $io,
                 'container' => $container,
+                'method' => $method,
             ]);
         }
 
         return 0;
     }
 
-    private function findRouteNameContaining(string $name, RouteCollection $routes): array
+    private function findRouteNameContaining(string $name, RouteCollection $routes, string $method): array
     {
         $foundRoutesNames = [];
         foreach ($routes as $routeName => $route) {
-            if (false !== stripos($routeName, $name)) {
+            if (false !== stripos($routeName, $name) && (!$method || !$route->getMethods() || \in_array($method, $route->getMethods(), true))) {
                 $foundRoutesNames[] = $routeName;
             }
         }

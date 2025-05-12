@@ -214,7 +214,7 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertInstanceOf(Iban::class, $alreadyPartiallyMappedCollectionConstraints[0]->constraints[1]);
 
         $readOnlyMetadata = $classMetadata->getPropertyMetadata('readOnly');
-        $this->assertEmpty($readOnlyMetadata);
+        $this->assertSame([], $readOnlyMetadata);
 
         /** @var PropertyMetadata[] $noAutoMappingMetadata */
         $noAutoMappingMetadata = $classMetadata->getPropertyMetadata('noAutoMapping');
@@ -298,7 +298,7 @@ class PropertyInfoLoaderTest extends TestCase
 
         /** @var ClassMetadata $classMetadata */
         $classMetadata = $validator->getMetadataFor(new PropertyInfoLoaderNoAutoMappingEntity());
-        $this->assertEmpty($classMetadata->getPropertyMetadata('string'));
+        $this->assertSame([], $classMetadata->getPropertyMetadata('string'));
         $this->assertCount(2, $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled')[0]->constraints);
         $this->assertSame(AutoMappingStrategy::ENABLED, $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled')[0]->getAutoMappingStrategy());
     }

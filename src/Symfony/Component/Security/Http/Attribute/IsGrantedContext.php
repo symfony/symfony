@@ -17,12 +17,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-readonly class IsGrantedContext implements AuthorizationCheckerInterface
+class IsGrantedContext implements AuthorizationCheckerInterface
 {
     public function __construct(
-        public TokenInterface $token,
-        public ?UserInterface $user,
-        private AuthorizationCheckerInterface $authorizationChecker,
+        public readonly TokenInterface $token,
+        public readonly ?UserInterface $user,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
     ) {
     }
 

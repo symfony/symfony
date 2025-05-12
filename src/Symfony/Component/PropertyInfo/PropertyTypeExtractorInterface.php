@@ -26,6 +26,8 @@ interface PropertyTypeExtractorInterface
     /**
      * Gets types of a property.
      *
+     * @deprecated since Symfony 7.3, use "getType" instead
+     *
      * @return LegacyType[]|null
      */
     public function getTypes(string $class, string $property, array $context = []): ?array;

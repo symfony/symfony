@@ -23,6 +23,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author André Matthies <matthiez@gmail.com>
+ *
+ * @deprecated since Symfony 7.3, use the Seven.io bridge instead.
  */
 final class Sms77Transport extends AbstractTransport
 {

@@ -48,9 +48,11 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
 use Symfony\Component\Workflow\WorkflowEvents;
 
 /**
@@ -75,6 +77,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
+            ->docUrl('https://symfony.com/doc/{version:major}.{version:minor}/reference/configuration/framework.html', 'symfony/framework-bundle')
             ->beforeNormalization()
                 ->ifTrue(fn ($v) => !isset($v['assets']) && isset($v['templating']) && class_exists(Package::class))
                 ->then(function ($v) {
@@ -401,6 +404,7 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->fixXmlConfig('support')
+                                ->fixXmlConfig('definition_validator')
                                 ->fixXmlConfig('place')
                                 ->fixXmlConfig('transition')
                                 ->fixXmlConfig('event_to_dispatch', 'events_to_dispatch')
@@ -430,8 +434,25 @@ class Configuration implements ConfigurationInterface
                                         ->prototype('scalar')
                                             ->cannotBeEmpty()
                                             ->validate()
-                                                ->ifTrue(fn ($v) => !class_exists($v) && !interface_exists($v, false))
+                                                ->ifTrue(static fn ($v) => !class_exists($v) && !interface_exists($v, false))
                                                 ->thenInvalid('The supported class or interface "%s" does not exist.')
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('definition_validators')
+                                        ->prototype('scalar')
+                                            ->cannotBeEmpty()
+                                            ->validate()
+                                                ->ifTrue(static fn ($v) => !class_exists($v))
+                                                ->thenInvalid('The validation class %s does not exist.')
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(static fn ($v) => !is_a($v, DefinitionValidatorInterface::class, true))
+                                                ->thenInvalid(\sprintf('The validation class %%s is not an instance of "%s".', DefinitionValidatorInterface::class))
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(static fn ($v) => 1 <= (new \ReflectionClass($v))->getConstructor()?->getNumberOfRequiredParameters())
+                                                ->thenInvalid('The %s validation class constructor must not have any arguments.')
                                             ->end()
                                         ->end()
                                     ->end()
@@ -446,7 +467,7 @@ class Configuration implements ConfigurationInterface
                                     ->variableNode('events_to_dispatch')
                                         ->defaultValue(null)
                                         ->validate()
-                                            ->ifTrue(function ($v) {
+                                            ->ifTrue(static function ($v) {
                                                 if (null === $v) {
                                                     return false;
                                                 }
@@ -473,14 +494,14 @@ class Configuration implements ConfigurationInterface
                                     ->arrayNode('places')
                                         ->beforeNormalization()
                                             ->always()
-                                            ->then(function ($places) {
+                                            ->then(static function ($places) {
                                                 if (!\is_array($places)) {
                                                     throw new InvalidConfigurationException('The "places" option must be an array in workflow configuration.');
                                                 }
 
                                                 // It's an indexed array of shape  ['place1', 'place2']
                                                 if (isset($places[0]) && \is_string($places[0])) {
-                                                    return array_map(function (string $place) {
+                                                    return array_map(static function (string $place) {
                                                         return ['name' => $place];
                                                     }, $places);
                                                 }
@@ -520,7 +541,7 @@ class Configuration implements ConfigurationInterface
                                     ->arrayNode('transitions')
                                         ->beforeNormalization()
                                             ->always()
-                                            ->then(function ($transitions) {
+                                            ->then(static function ($transitions) {
                                                 if (!\is_array($transitions)) {
                                                     throw new InvalidConfigurationException('The "transitions" option must be an array in workflow configuration.');
                                                 }
@@ -587,20 +608,20 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(function ($v) {
+                                    ->ifTrue(static function ($v) {
                                         return $v['supports'] && isset($v['support_strategy']);
                                     })
                                     ->thenInvalid('"supports" and "support_strategy" cannot be used together.')
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(function ($v) {
+                                    ->ifTrue(static function ($v) {
                                         return !$v['supports'] && !isset($v['support_strategy']);
                                     })
                                     ->thenInvalid('"supports" or "support_strategy" should be configured.')
                                 ->end()
                                 ->beforeNormalization()
                                         ->always()
-                                        ->then(function ($values) {
+                                        ->then(static function ($values) {
                                             // Special case to deal with XML when the user wants an empty array
                                             if (\array_key_exists('event_to_dispatch', $values) && null === $values['event_to_dispatch']) {
                                                 $values['events_to_dispatch'] = [];
@@ -967,6 +988,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('fallback')
                     ->fixXmlConfig('path')
                     ->fixXmlConfig('provider')
+                    ->fixXmlConfig('global')
                     ->children()
                         ->arrayNode('fallbacks')
                             ->info('Defaults to the value of "default_locale".')
@@ -1021,6 +1043,33 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->defaultValue([])
                         ->end()
+                        ->arrayNode('globals')
+                            ->info('Global parameters.')
+                            ->example(['app_version' => 3.14])
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
+                            ->arrayPrototype()
+                                ->fixXmlConfig('parameter')
+                                ->children()
+                                    ->variableNode('value')->end()
+                                    ->stringNode('message')->end()
+                                    ->arrayNode('parameters')
+                                        ->normalizeKeys(false)
+                                        ->useAttributeAsKey('name')
+                                        ->scalarPrototype()->end()
+                                    ->end()
+                                    ->stringNode('domain')->end()
+                                ->end()
+                                ->beforeNormalization()
+                                    ->ifTrue(static fn ($v) => !\is_array($v))
+                                    ->then(static fn ($v) => ['value' => $v])
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(static fn ($v) => !(isset($v['value']) xor isset($v['message'])))
+                                    ->thenInvalid('The "globals" parameter should be either a string or an array with a "value" or a "message" key')
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -1046,7 +1095,7 @@ class Configuration implements ConfigurationInterface
                             ->validate()->castToArray()->end()
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
-                        ->enumNode('email_validation_mode')->values(['html5', 'loose', 'strict'])->defaultValue('html5')->end()
+                        ->enumNode('email_validation_mode')->values((class_exists(Email::class) ? Email::VALIDATION_MODES : ['html5-allow-no-tld', 'html5', 'strict']) + ['loose'])->defaultValue('html5')->end()
                         ->arrayNode('mapping')
                             ->addDefaultsIfNotSet()
                             ->fixXmlConfig('path')
@@ -1285,6 +1334,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('directory')->defaultValue('%kernel.cache_dir%/pools/app')->end()
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
+                        ->scalarNode('default_valkey_provider')->defaultValue('valkey://localhost')->end()
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
                         ->scalarNode('default_doctrine_dbal_provider')->defaultValue('database_connection')->end()
                         ->scalarNode('default_pdo_provider')->defaultValue($willBeAvailable('doctrine/dbal', Connection::class) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null)->end()
@@ -1427,6 +1477,10 @@ class Configuration implements ConfigurationInterface
                                     ->ifTrue(fn ($v) => null !== $v && ($v < 100 || $v > 599))
                                     ->thenInvalid('The status code is not valid. Pick a value between 100 and 599.')
                                 ->end()
+                                ->defaultNull()
+                            ->end()
+                            ->scalarNode('log_channel')
+                                ->info('The channel of log message. Null to let Symfony decide.')
                                 ->defaultNull()
                             ->end()
                         ->end()
@@ -2315,8 +2369,8 @@ class Configuration implements ConfigurationInterface
                             ->canBeEnabled()
                             ->info('S/MIME encrypter configuration')
                             ->children()
-                                ->scalarNode('certificate')
-                                    ->info('Path to certificate (in PEM format without the `file://` prefix)')
+                                ->scalarNode('repository')
+                                    ->info('S/MIME certificate repository service. This service shall implement the `Symfony\Component\Mailer\EventListener\SmimeCertificateRepositoryInterface`.')
                                     ->defaultValue('')
                                     ->cannotBeEmpty()
                                 ->end()
@@ -2471,7 +2525,7 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->scalarNode('lock_factory')
                                         ->info('The service ID of the lock factory used by this limiter (or null to disable locking).')
-                                        ->defaultValue('lock.factory')
+                                        ->defaultValue('auto')
                                     ->end()
                                     ->scalarNode('cache_pool')
                                         ->info('The cache pool to use for storing the current limiter state.')
@@ -2484,7 +2538,12 @@ class Configuration implements ConfigurationInterface
                                     ->enumNode('policy')
                                         ->info('The algorithm to be used by this limiter.')
                                         ->isRequired()
-                                        ->values(['fixed_window', 'token_bucket', 'sliding_window', 'no_limit'])
+                                        ->values(['fixed_window', 'token_bucket', 'sliding_window', 'compound', 'no_limit'])
+                                    ->end()
+                                    ->arrayNode('limiters')
+                                        ->info('The limiter names to use when using the "compound" policy.')
+                                        ->beforeNormalization()->castToArray()->end()
+                                        ->scalarPrototype()->end()
                                     ->end()
                                     ->integerNode('limit')
                                         ->info('The maximum allowed hits in a fixed interval or burst.')
@@ -2503,8 +2562,8 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(fn ($v) => 'no_limit' !== $v['policy'] && !isset($v['limit']))
-                                    ->thenInvalid('A limit must be provided when using a policy different than "no_limit".')
+                                    ->ifTrue(static fn ($v) => !\in_array($v['policy'], ['no_limit', 'compound']) && !isset($v['limit']))
+                                    ->thenInvalid('A limit must be provided when using a policy different than "compound" or "no_limit".')
                                 ->end()
                             ->end()
                         ->end()

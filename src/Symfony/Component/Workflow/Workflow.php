@@ -385,7 +385,13 @@ class Workflow implements WorkflowInterface
         $this->dispatcher->dispatch($event, WorkflowEvents::ENTERED);
         $this->dispatcher->dispatch($event, \sprintf('workflow.%s.entered', $this->name));
 
-        foreach ($marking->getPlaces() as $placeName => $nbToken) {
+        $placeNames = [];
+        if ($transition) {
+            $placeNames = $transition->getTos();
+        } elseif ($this->definition->getInitialPlaces()) {
+            $placeNames = $this->definition->getInitialPlaces();
+        }
+        foreach ($placeNames as $placeName) {
             $this->dispatcher->dispatch($event, \sprintf('workflow.%s.entered.%s', $this->name, $placeName));
         }
     }

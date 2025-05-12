@@ -54,4 +54,17 @@ class CompositeNodeTest extends TestCase
 
         $this->assertSame([$collection, $object, $scalar], $composite->getNodes());
     }
+
+    public function testWithAccessor()
+    {
+        $composite = new CompositeNode(new VariableDataAccessor('data'), [
+            new ScalarNode(new VariableDataAccessor('foo'), Type::int()),
+            new ScalarNode(new VariableDataAccessor('bar'), Type::int()),
+        ]);
+        $composite = $composite->withAccessor($newAccessor = new VariableDataAccessor('baz'));
+
+        foreach ($composite->getNodes() as $node) {
+            $this->assertSame($newAccessor, $node->getAccessor());
+        }
+    }
 }

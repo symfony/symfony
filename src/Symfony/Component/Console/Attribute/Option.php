@@ -16,6 +16,7 @@ use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\String\UnicodeString;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class Option
@@ -37,9 +38,9 @@ class Option
      * @param array<string|Suggestion>|callable(CompletionInput):list<string|Suggestion> $suggestedValues The values used for input completion
      */
     public function __construct(
+        public string $description = '',
         public string $name = '',
         public array|string|null $shortcut = null,
-        public string $description = '',
         array|callable $suggestedValues = [],
     ) {
         $this->suggestedValues = \is_callable($suggestedValues) ? $suggestedValues(...) : $suggestedValues;
@@ -73,11 +74,23 @@ class Option
         }
 
         if (!$self->name) {
-            $self->name = $name;
+            $self->name = (new UnicodeString($name))->kebab();
         }
 
         $self->default = $parameter->getDefaultValue();
         $self->allowNull = $parameter->allowsNull();
+
+        if ('bool' === $self->typeName && $self->allowNull && \in_array($self->default, [true, false], true)) {
+            throw new LogicException(\sprintf('The option parameter "$%s" must not be nullable when it has a default boolean value.', $name));
+        }
+
+        if ('string' === $self->typeName && null === $self->default) {
+            throw new LogicException(\sprintf('The option parameter "$%s" must not have a default of null.', $name));
+        }
+
+        if ('array' === $self->typeName && $self->allowNull) {
+            throw new LogicException(\sprintf('The option parameter "$%s" must not be nullable.', $name));
+        }
 
         if ('bool' === $self->typeName) {
             $self->mode = InputOption::VALUE_NONE;

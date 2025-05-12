@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\RateLimiter\RateLimiterFactory;
-use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -28,9 +27,4 @@ return static function (ContainerConfigurator $container) {
                 null,
             ])
     ;
-
-    if (interface_exists(RateLimiterFactoryInterface::class)) {
-        $container->services()
-            ->alias(RateLimiterFactoryInterface::class, 'limiter');
-    }
 };

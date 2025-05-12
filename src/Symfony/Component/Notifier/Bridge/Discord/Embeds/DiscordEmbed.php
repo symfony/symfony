@@ -27,7 +27,7 @@ final class DiscordEmbed extends AbstractDiscordEmbed
      */
     public function title(string $title): static
     {
-        if (\strlen($title) > self::TITLE_LIMIT) {
+        if (mb_strlen($title, 'UTF-8') > self::TITLE_LIMIT) {
             throw new LengthException(\sprintf('Maximum length for the title is %d characters.', self::TITLE_LIMIT));
         }
 
@@ -41,7 +41,7 @@ final class DiscordEmbed extends AbstractDiscordEmbed
      */
     public function description(string $description): static
     {
-        if (\strlen($description) > self::DESCRIPTION_LIMIT) {
+        if (mb_strlen($description, 'UTF-8') > self::DESCRIPTION_LIMIT) {
             throw new LengthException(\sprintf('Maximum length for the description is %d characters.', self::DESCRIPTION_LIMIT));
         }
 

@@ -20,11 +20,16 @@ class TraceableMessageBus implements MessageBusInterface
 
     public function __construct(
         private MessageBusInterface $decoratedBus,
+        protected readonly ?\Closure $disabled = null,
     ) {
     }
 
     public function dispatch(object $message, array $stamps = []): Envelope
     {
+        if ($this->disabled?->__invoke()) {
+            return $this->decoratedBus->dispatch($message, $stamps);
+        }
+
         $envelope = Envelope::wrap($message, $stamps);
         $context = [
             'stamps' => array_merge([], ...array_values($envelope->all())),

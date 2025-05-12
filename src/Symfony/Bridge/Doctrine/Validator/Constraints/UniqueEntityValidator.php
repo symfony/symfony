@@ -197,6 +197,12 @@ class UniqueEntityValidator extends ConstraintValidator
 
             foreach ($constraint->identifierFieldNames as $identifierFieldName) {
                 $propertyValue = $this->getPropertyValue($entityClass, $identifierFieldName, current($result));
+                if ($fieldValues[$identifierFieldName] instanceof \Stringable) {
+                    $fieldValues[$identifierFieldName] = (string) $fieldValues[$identifierFieldName];
+                }
+                if ($propertyValue instanceof \Stringable) {
+                    $propertyValue = (string) $propertyValue;
+                }
                 if ($fieldValues[$identifierFieldName] !== $propertyValue) {
                     $entityMatched = false;
                     break;

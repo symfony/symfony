@@ -33,7 +33,8 @@ class ServiceSubscriberTraitTest extends TestCase
     {
         $expected = [
             LegacyTestService::class.'::aService' => Service2::class,
-            LegacyTestService::class.'::nullableService' => '?'.Service2::class,
+            LegacyTestService::class.'::nullableInAttribute' => '?'.Service2::class,
+            LegacyTestService::class.'::nullableReturnType' => '?'.Service2::class,
             new SubscribedService(LegacyTestService::class.'::withAttribute', Service2::class, true, new Required()),
         ];
 
@@ -54,7 +55,7 @@ class ServiceSubscriberTraitTest extends TestCase
         $container = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
-        $service = new class extends ParentWithMagicCall {
+        $service = new class extends LegacyParentWithMagicCall {
             use ServiceSubscriberTrait;
 
             private $container;

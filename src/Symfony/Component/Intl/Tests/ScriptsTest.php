@@ -254,7 +254,7 @@ class ScriptsTest extends ResourceBundleTestCase
         // We can't assert on exact list of scripts, as there's too many variations between locales.
         // The best we can do is to make sure getNames() returns a subset of what getScripts() returns.
         $this->assertNotEmpty($scripts);
-        $this->assertEmpty(array_diff($scripts, self::$scripts));
+        $this->assertSame([], array_diff($scripts, self::$scripts));
     }
 
     public function testGetNamesDefaultLocale()

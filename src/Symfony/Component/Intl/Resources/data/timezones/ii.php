@@ -58,7 +58,7 @@ return [
         'America/Monterrey' => 'ꃀꑭꇬꄮꈉ（Monterrey）',
         'America/New_York' => 'ꂰꇩꄮꈉ（New York）',
         'America/Nome' => 'ꂰꇩꄮꈉ（Nome）',
-        'America/Noronha' => 'ꀠꑭꄮꈉ（Noronha）',
+        'America/Noronha' => 'ꀠꑭꄮꈉ（Fernando de Noronha）',
         'America/North_Dakota/Beulah' => 'ꂰꇩꄮꈉ（Beulah, North Dakota）',
         'America/North_Dakota/Center' => 'ꂰꇩꄮꈉ（Center, North Dakota）',
         'America/North_Dakota/New_Salem' => 'ꂰꇩꄮꈉ（New Salem, North Dakota）',

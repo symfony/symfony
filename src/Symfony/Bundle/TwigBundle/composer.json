@@ -18,9 +18,9 @@
     "require": {
         "php": ">=8.2",
         "composer-runtime-api": ">=2.1",
-        "symfony/config": "^6.4|^7.0",
+        "symfony/config": "^7.3",
         "symfony/dependency-injection": "^6.4|^7.0",
-        "symfony/twig-bridge": "^6.4|^7.0",
+        "symfony/twig-bridge": "^7.3",
         "symfony/http-foundation": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
         "twig/twig": "^3.12"

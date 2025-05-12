@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -99,6 +100,32 @@ class SerializerPassTest extends TestCase
         $bindings = $definition->getBindings();
         $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
         $this->assertEquals($context, $container->getDefinition('serializer')->getArgument('$defaultContext'));
+    }
+
+    /**
+     * @testWith [{}, {}]
+     *           [{"serializer.default_context": {"enable_max_depth": true}}, {"enable_max_depth": true}]
+     *           [{".serializer.circular_reference_handler": "foo"}, {"circular_reference_handler": "foo"}]
+     *           [{".serializer.max_depth_handler": "bar"}, {"max_depth_handler": "bar"}]
+     *           [{"serializer.default_context": {"enable_max_depth": true}, ".serializer.circular_reference_handler": "foo", ".serializer.max_depth_handler": "bar"}, {"enable_max_depth": true, "circular_reference_handler": "foo", "max_depth_handler": "bar"}]
+     */
+    public function testBindObjectNormalizerDefaultContext(array $parameters, array $context)
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->register('serializer')->setArguments([null, null, []]);
+        $container->getParameterBag()->add($parameters);
+        $definition = $container->register('serializer.normalizer.object')
+            ->setClass(ObjectNormalizer::class)
+            ->addTag('serializer.normalizer')
+            ->addTag('serializer.encoder')
+        ;
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $bindings = $definition->getBindings();
+        $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
     }
 
     public function testNormalizersAndEncodersAreDecoratedAndOrderedWhenCollectingData()
@@ -567,13 +594,46 @@ class SerializerPassTest extends TestCase
         $serializerPass = new SerializerPass();
         $serializerPass->process($container);
 
-        $this->assertEmpty($definition->getBindings());
+        $bindings = $definition->getBindings();
+        $this->assertArrayHasKey('array $defaultContext', $bindings);
+        $this->assertEquals($bindings['array $defaultContext'], new BoundArgument([], false));
 
         $bindings = $container->getDefinition('n1.api')->getBindings();
         $this->assertArrayHasKey('array $defaultContext', $bindings);
         $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($defaultContext, false));
         $this->assertArrayNotHasKey('$defaultContext', $container->getDefinition('serializer')->getArguments());
         $this->assertEquals($defaultContext, $container->getDefinition('serializer.api')->getArgument('$defaultContext'));
+    }
+
+    /**
+     * @testWith [{}, {}, {}]
+     *           [{"enable_max_depth": true}, {}, {"enable_max_depth": true}]
+     *           [{}, {".serializer.circular_reference_handler": "foo"}, {"circular_reference_handler": "foo"}]
+     *           [{}, {".serializer.max_depth_handler": "bar"}, {"max_depth_handler": "bar"}]
+     *           [{"enable_max_depth": true}, {".serializer.circular_reference_handler": "foo", ".serializer.max_depth_handler": "bar"}, {"enable_max_depth": true, "circular_reference_handler": "foo", "max_depth_handler": "bar"}]
+     */
+    public function testBindNamedSerializerObjectNormalizerDefaultContext(array $defaultContext, array $parameters, array $context)
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('.serializer.named_serializers', [
+            'api' => ['default_context' => $defaultContext],
+        ]);
+
+        $container->register('serializer')->setArguments([null, null, []]);
+        $container->getParameterBag()->add($parameters);
+        $container->register('serializer.normalizer.object')
+            ->setClass(ObjectNormalizer::class)
+            ->addTag('serializer.normalizer', ['serializer' => '*'])
+            ->addTag('serializer.encoder', ['serializer' => '*'])
+        ;
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $bindings = $container->getDefinition('serializer.normalizer.object.api')->getBindings();
+        $this->assertArrayHasKey('array $defaultContext', $bindings);
+        $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
     }
 
     public function testNamedSerializersAreRegistered()

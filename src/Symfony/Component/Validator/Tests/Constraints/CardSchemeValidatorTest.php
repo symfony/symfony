@@ -31,7 +31,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new CardScheme(schemes:[]));
+        $this->validator->validate('', new CardScheme(schemes: []));
 
         $this->assertNoViolation();
     }

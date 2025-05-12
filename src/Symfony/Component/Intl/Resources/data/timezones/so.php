@@ -157,7 +157,7 @@ return [
         'America/Nassau' => 'Waqtiga Bariga ee Waqooyiga Ameerika (Nasaaw)',
         'America/New_York' => 'Waqtiga Bariga ee Waqooyiga Ameerika (Niyuu Yook)',
         'America/Nome' => 'Waqtiga Alaska (Noom)',
-        'America/Noronha' => 'Waqtiga Farnaando de Noronha',
+        'America/Noronha' => 'Waqtiga Farnaando de Noronha (Fernando de Noronha)',
         'America/North_Dakota/Beulah' => 'Waqtiga Bartamaha Waqooyiga Ameerika (Biyuulah, Waqooyiga Dakoota)',
         'America/North_Dakota/Center' => 'Waqtiga Bartamaha Waqooyiga Ameerika (Bartamaha, Waqooyiga Dakoota)',
         'America/North_Dakota/New_Salem' => 'Waqtiga Bartamaha Waqooyiga Ameerika (Niyuu Saalem, Waqooyiga Dakoota)',

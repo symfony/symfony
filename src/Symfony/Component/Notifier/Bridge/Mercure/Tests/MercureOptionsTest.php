@@ -24,12 +24,13 @@ final class MercureOptionsTest extends TestCase
             'id' => null,
             'type' => null,
             'retry' => null,
+            'content' => null,
         ]);
     }
 
     public function testConstructWithParameters()
     {
-        $options = (new MercureOptions('/topic/1', true, 'id', 'type', 1));
+        $options = (new MercureOptions('/topic/1', true, 'id', 'type', 1, ['tag' => '1234', 'body' => 'TEST']));
 
         $this->assertSame($options->toArray(), [
             'topics' => ['/topic/1'],
@@ -37,6 +38,7 @@ final class MercureOptionsTest extends TestCase
             'id' => 'id',
             'type' => 'type',
             'retry' => 1,
+            'content' => ['tag' => '1234', 'body' => 'TEST'],
         ]);
     }
 

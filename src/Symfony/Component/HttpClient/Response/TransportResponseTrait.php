@@ -30,6 +30,7 @@ use Symfony\Component\HttpClient\Internal\ClientState;
 trait TransportResponseTrait
 {
     private Canary $canary;
+    /** @var array<string, list<string>> */
     private array $headers = [];
     private array $info = [
         'response_headers' => [],

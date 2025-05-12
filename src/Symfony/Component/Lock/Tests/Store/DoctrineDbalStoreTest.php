@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
@@ -176,7 +177,13 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             yield [\Doctrine\DBAL\Platforms\PostgreSQL94Platform::class];
         }
 
-        yield [\Doctrine\DBAL\Platforms\SqlitePlatform::class];
+        if (interface_exists(Exception::class)) {
+            // DBAL 4+
+            yield [\Doctrine\DBAL\Platforms\SQLitePlatform::class];
+        } else {
+            yield [\Doctrine\DBAL\Platforms\SqlitePlatform::class];
+        }
+
         yield [\Doctrine\DBAL\Platforms\SQLServerPlatform::class];
 
         // DBAL < 4
@@ -300,6 +307,6 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $someFunction = fn () => true;
         $dbalStore->configureSchema($schema, $someFunction);
         $table = $schema->getTable('lock_keys');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 }

@@ -71,7 +71,7 @@ final class AttributeReaderTest extends TestCase
         $reader = new AttributeReader();
         $cacheRef = new \ReflectionProperty(AttributeReader::class, 'cache');
 
-        self::assertEmpty($cacheRef->getValue($reader));
+        self::assertSame([], $cacheRef->getValue($reader));
 
         $reader->forClass(FooBar::class, TimeSensitive::class);
 

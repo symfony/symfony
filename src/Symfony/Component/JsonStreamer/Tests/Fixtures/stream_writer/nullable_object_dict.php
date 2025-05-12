@@ -1,23 +1,27 @@
 <?php
 
 return static function (mixed $data, \Psr\Container\ContainerInterface $valueTransformers, array $options): \Traversable {
-    if (\is_array($data)) {
-        yield '{';
-        $prefix = '';
-        foreach ($data as $key => $value) {
-            $key = \substr(\json_encode($key), 1, -1);
-            yield "{$prefix}\"{$key}\":";
-            yield '{"@id":';
-            yield \json_encode($value->id);
-            yield ',"name":';
-            yield \json_encode($value->name);
+    try {
+        if (\is_array($data)) {
+            yield '{';
+            $prefix = '';
+            foreach ($data as $key => $value) {
+                $key = \substr(\json_encode($key), 1, -1);
+                yield "{$prefix}\"{$key}\":";
+                yield '{"@id":';
+                yield \json_encode($value->id, \JSON_THROW_ON_ERROR, 510);
+                yield ',"name":';
+                yield \json_encode($value->name, \JSON_THROW_ON_ERROR, 510);
+                yield '}';
+                $prefix = ',';
+            }
             yield '}';
-            $prefix = ',';
+        } elseif (null === $data) {
+            yield 'null';
+        } else {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value.', \get_debug_type($data)));
         }
-        yield '}';
-    } elseif (null === $data) {
-        yield 'null';
-    } else {
-        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value.', \get_debug_type($data)));
+    } catch (\JsonException $e) {
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException($e->getMessage(), 0, $e);
     }
 };

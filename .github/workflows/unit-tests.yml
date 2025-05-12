@@ -40,7 +40,7 @@ jobs:
             #mode: experimental
       fail-fast: false
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -138,10 +138,6 @@ jobs:
           echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
           echo SYMFONY_REQUIRE=">=$([ '${{ matrix.mode }}' = low-deps ] && echo 5.4 || echo $SYMFONY_VERSION)" >> $GITHUB_ENV
           [[ "${{ matrix.mode }}" = *-deps ]] && mv composer.json.phpunit composer.json || true
-
-          if [[ "${{ matrix.mode }}" = low-deps ]]; then
-            echo SYMFONY_PHPUNIT_REQUIRE="nikic/php-parser:^4.18" >> $GITHUB_ENV
-          fi
 
       - name: Install dependencies
         run: |

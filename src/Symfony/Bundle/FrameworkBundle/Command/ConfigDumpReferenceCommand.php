@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -123,6 +124,10 @@ EOF
             $message .= \sprintf(' at path "%s"', $path);
         }
 
+        if ($docUrl = $this->getExtensionDocUrl($extension)) {
+            $message .= \sprintf(' (see %s)', $docUrl);
+        }
+
         switch ($format) {
             case 'yaml':
                 $io->writeln(\sprintf('# %s', $message));
@@ -181,5 +186,19 @@ EOF
     private function getAvailableFormatOptions(): array
     {
         return ['yaml', 'xml'];
+    }
+
+    private function getExtensionDocUrl(ConfigurationInterface|ConfigurationExtensionInterface $extension): ?string
+    {
+        $kernel = $this->getApplication()->getKernel();
+        $container = $this->getContainerBuilder($kernel);
+
+        $configuration = $extension instanceof ConfigurationInterface ? $extension : $extension->getConfiguration($container->getExtensionConfig($extension->getAlias()), $container);
+
+        return $configuration
+            ->getConfigTreeBuilder()
+            ->getRootNode()
+            ->getNode(true)
+            ->getAttribute('docUrl');
     }
 }

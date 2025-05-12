@@ -157,7 +157,7 @@ return [
         'America/Nassau' => 'Sjevernoameričko istočno vrijeme (Nassau)',
         'America/New_York' => 'Sjevernoameričko istočno vrijeme (New York)',
         'America/Nome' => 'Aljaskansko vrijeme (Nome)',
-        'America/Noronha' => 'Vrijeme na ostrvu Fernando di Noronja (Noronha)',
+        'America/Noronha' => 'Vrijeme na ostrvu Fernando di Noronja (Fernando de Noronha)',
         'America/North_Dakota/Beulah' => 'Sjevernoameričko centralno vrijeme (Beulah, Sjeverna Dakota)',
         'America/North_Dakota/Center' => 'Sjevernoameričko centralno vrijeme (Center, Sjeverna Dakota)',
         'America/North_Dakota/New_Salem' => 'Sjevernoameričko centralno vrijeme (New Salem, Sjeverna Dakota)',

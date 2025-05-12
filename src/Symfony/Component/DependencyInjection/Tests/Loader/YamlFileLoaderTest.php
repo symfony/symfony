@@ -850,7 +850,7 @@ class YamlFileLoaderTest extends TestCase
         $anonymous = $container->getDefinition((string) $args['foo']);
         $this->assertEquals('Anonymous', $anonymous->getClass());
         $this->assertFalse($anonymous->isPublic());
-        $this->assertEmpty($anonymous->getInstanceofConditionals());
+        $this->assertSame([], $anonymous->getInstanceofConditionals());
 
         $this->assertFalse($container->has('Bar'));
     }

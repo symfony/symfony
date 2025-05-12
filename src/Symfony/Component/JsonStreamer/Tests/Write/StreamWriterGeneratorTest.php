@@ -25,6 +25,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithOtherDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\BooleanToStringValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\DoubleIntAndCastToStringValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\ServiceContainer;
@@ -104,6 +105,7 @@ class StreamWriterGeneratorTest extends TestCase
         yield ['nullable_object', Type::nullable(Type::object(DummyWithNameAttributes::class))];
         yield ['object_in_object', Type::object(DummyWithOtherDummies::class)];
         yield ['object_with_value_transformer', Type::object(DummyWithValueTransformerAttributes::class)];
+        yield ['self_referencing_object', Type::object(SelfReferencingDummy::class)];
 
         yield ['union', Type::union(Type::int(), Type::list(Type::enum(DummyBackedEnum::class)), Type::object(DummyWithNameAttributes::class))];
         yield ['object_with_union', Type::object(DummyWithUnionProperties::class)];
@@ -138,7 +140,7 @@ class StreamWriterGeneratorTest extends TestCase
             ->method('load')
             ->with(self::class, [], [
                 'original_type' => $type,
-                'depth' => 1,
+                'generated_classes' => [self::class => true],
             ])
             ->willReturn([]);
 

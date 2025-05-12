@@ -1804,7 +1804,7 @@ EOT;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    public function unquotedStringWithTrailingComment()
+    public static function unquotedStringWithTrailingComment()
     {
         return [
             'comment after comma' => [

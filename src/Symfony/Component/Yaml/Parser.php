@@ -1166,8 +1166,8 @@ class Parser
     {
         $offset = $cursor;
 
-        while ($cursor < strlen($this->currentLine)) {
-            if (in_array($this->currentLine[$cursor], ['[', ']', '{', '}', ',', ':'], true)) {
+        while ($cursor < \strlen($this->currentLine)) {
+            if (\in_array($this->currentLine[$cursor], ['[', ']', '{', '}', ',', ':'], true)) {
                 break;
             }
 

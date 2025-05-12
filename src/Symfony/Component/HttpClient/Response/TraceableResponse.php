@@ -34,7 +34,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
     public function __construct(
         private HttpClientInterface $client,
         private ResponseInterface $response,
-        private mixed &$content,
+        private mixed &$content = false,
         private ?StopwatchEvent $event = null,
     ) {
     }

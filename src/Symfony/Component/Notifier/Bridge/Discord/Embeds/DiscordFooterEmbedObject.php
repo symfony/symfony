@@ -25,7 +25,7 @@ final class DiscordFooterEmbedObject extends AbstractDiscordEmbedObject
      */
     public function text(string $text): static
     {
-        if (\strlen($text) > self::TEXT_LIMIT) {
+        if (mb_strlen($text, 'UTF-8') > self::TEXT_LIMIT) {
             throw new LengthException(\sprintf('Maximum length for the text is %d characters.', self::TEXT_LIMIT));
         }
 

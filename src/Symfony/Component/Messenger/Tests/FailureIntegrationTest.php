@@ -152,7 +152,7 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame(0, $transport2HandlerThatWorks->getTimesCalled());
         // one handler failed and the message is retried (resent to transport1)
         $this->assertCount(1, $transport1->getMessagesWaitingToBeReceived());
-        $this->assertEmpty($failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
 
         /*
          * Receive the message for a (final) retry
@@ -210,9 +210,9 @@ class FailureIntegrationTest extends TestCase
         // transport1 handler called for the first time
         $this->assertSame(1, $transport2HandlerThatWorks->getTimesCalled());
         // all transport should be empty
-        $this->assertEmpty($transport1->getMessagesWaitingToBeReceived());
-        $this->assertEmpty($transport2->getMessagesWaitingToBeReceived());
-        $this->assertEmpty($failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertSame([], $transport1->getMessagesWaitingToBeReceived());
+        $this->assertSame([], $transport2->getMessagesWaitingToBeReceived());
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
 
         /*
          * Dispatch the original message again
@@ -225,7 +225,7 @@ class FailureIntegrationTest extends TestCase
         $transport1HandlerThatFails->setShouldThrow(false);
         $runWorker('the_failure_transport');
         // the failure transport is empty because it worked
-        $this->assertEmpty($failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
     }
 
     public function testMultipleFailedTransportsWithoutGlobalFailureTransport()

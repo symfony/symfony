@@ -54,7 +54,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertFalse($collector->supportsRoleHierarchy());
         $this->assertCount(0, $collector->getRoles());
         $this->assertCount(0, $collector->getInheritedRoles());
-        $this->assertEmpty($collector->getUser());
+        $this->assertSame('', $collector->getUser());
         $this->assertNull($collector->getFirewall());
     }
 
@@ -73,7 +73,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertTrue($collector->supportsRoleHierarchy());
         $this->assertCount(0, $collector->getRoles());
         $this->assertCount(0, $collector->getInheritedRoles());
-        $this->assertEmpty($collector->getUser());
+        $this->assertSame('', $collector->getUser());
         $this->assertNull($collector->getFirewall());
     }
 
@@ -425,7 +425,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $dataCollector->collect(new Request(), new Response());
 
-        $this->assertEmpty($dataCollector->getVoters());
+        $this->assertSame([], $dataCollector->getVoters());
     }
 
     public static function provideRoles(): array

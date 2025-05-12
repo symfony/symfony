@@ -29,6 +29,14 @@ abstract class Type implements \Stringable
      */
     public function isSatisfiedBy(callable $specification): bool
     {
+        if ($this instanceof WrappingTypeInterface && $this->wrappedTypeIsSatisfiedBy($specification)) {
+            return true;
+        }
+
+        if ($this instanceof CompositeTypeInterface && $this->composedTypesAreSatisfiedBy($specification)) {
+            return true;
+        }
+
         return $specification($this);
     }
 
@@ -37,19 +45,17 @@ abstract class Type implements \Stringable
      */
     public function isIdentifiedBy(TypeIdentifier|string ...$identifiers): bool
     {
-        $specification = static function (Type $type) use (&$specification, $identifiers): bool {
-            if ($type instanceof WrappingTypeInterface) {
-                return $type->wrappedTypeIsSatisfiedBy($specification);
-            }
+        $specification = static fn (Type $type): bool => $type->isIdentifiedBy(...$identifiers);
 
-            if ($type instanceof CompositeTypeInterface) {
-                return $type->composedTypesAreSatisfiedBy($specification);
-            }
+        if ($this instanceof WrappingTypeInterface && $this->wrappedTypeIsSatisfiedBy($specification)) {
+            return true;
+        }
 
-            return $type->isIdentifiedBy(...$identifiers);
-        };
+        if ($this instanceof CompositeTypeInterface && $this->composedTypesAreSatisfiedBy($specification)) {
+            return true;
+        }
 
-        return $this->isSatisfiedBy($specification);
+        return false;
     }
 
     public function isNullable(): bool
@@ -75,5 +81,28 @@ abstract class Type implements \Stringable
         };
 
         return $this->isSatisfiedBy($specification);
+    }
+
+    /**
+     * Traverses the whole type tree.
+     *
+     * @return iterable<self>
+     */
+    public function traverse(bool $traverseComposite = true, bool $traverseWrapped = true): iterable
+    {
+        yield $this;
+
+        if ($this instanceof CompositeTypeInterface && $traverseComposite) {
+            foreach ($this->getTypes() as $type) {
+                yield $type;
+            }
+
+            // prevent yielding twice when having a type that is both composite and wrapped
+            return;
+        }
+
+        if ($this instanceof WrappingTypeInterface && $traverseWrapped) {
+            yield $this->getWrappedType();
+        }
     }
 }

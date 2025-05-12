@@ -13,6 +13,9 @@ $container->loadFromExtension('framework', [
             'supports' => [
                 FrameworkExtensionTestCase::class,
             ],
+            'definition_validators' => [
+                Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Validator\DefinitionValidator::class,
+            ],
             'initial_marking' => ['draft'],
             'metadata' => [
                 'title' => 'article workflow',

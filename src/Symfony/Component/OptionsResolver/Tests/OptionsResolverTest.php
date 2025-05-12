@@ -13,7 +13,7 @@ namespace Symfony\Component\OptionsResolver\Tests;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
 use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
@@ -27,7 +27,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OptionsResolverTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     private OptionsResolver $resolver;
 
@@ -1099,7 +1099,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyResolveFailsIfInvalidValueFromNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
             $resolver
@@ -1118,7 +1118,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyResolveFailsIfInvalidTypeFromNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
             $resolver
@@ -1585,7 +1585,7 @@ class OptionsResolverTest extends TestCase
             Assert::fail('Should not be called.');
         });
 
-        $this->assertEmpty($this->resolver->resolve());
+        $this->assertSame([], $this->resolver->resolve());
     }
 
     public function testAddNormalizerReturnsThis()
@@ -1768,7 +1768,7 @@ class OptionsResolverTest extends TestCase
 
         $this->resolver->clear();
 
-        $this->assertEmpty($this->resolver->resolve());
+        $this->assertSame([], $this->resolver->resolve());
     }
 
     public function testClearLazyOption()
@@ -1829,7 +1829,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setNormalizer('foo2', fn (Options $options) => '');
 
         $this->resolver->clear();
-        $this->assertEmpty($this->resolver->resolve());
+        $this->assertSame([], $this->resolver->resolve());
     }
 
     public function testArrayAccess()
@@ -2116,7 +2116,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyIsNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'database' => function (OptionsResolver $resolver) {
@@ -2131,7 +2131,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyFailsIfUndefinedNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'name' => 'default',
@@ -2153,7 +2153,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyFailsIfMissingRequiredNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'name' => 'default',
@@ -2175,7 +2175,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyFailsIfInvalidTypeNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'name' => 'default',
@@ -2199,7 +2199,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyFailsIfNotArrayIsGivenForNestedOptions()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'name' => 'default',
@@ -2221,7 +2221,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyResolveNestedOptionsWithoutDefault()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'name' => 'default',
@@ -2242,7 +2242,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyResolveNestedOptionsWithDefault()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'name' => 'default',
@@ -2269,7 +2269,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyResolveMultipleNestedOptions()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'name' => 'default',
@@ -2313,7 +2313,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyResolveLazyOptionUsingNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'version' => fn (Options $options) => $options['database']['server_version'],
@@ -2334,7 +2334,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyNormalizeNestedOptionValue()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver
             ->setDefaults([
@@ -2365,7 +2365,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testOverwrittenNestedOptionNotEvaluatedIfLazyDefault()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         // defined by superclass
         $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
@@ -2381,7 +2381,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testOverwrittenNestedOptionNotEvaluatedIfScalarDefault()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         // defined by superclass
         $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
@@ -2397,7 +2397,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testOverwrittenLazyOptionNotEvaluatedIfNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         // defined by superclass
         $this->resolver->setDefault('foo', function (Options $options) {
@@ -2415,7 +2415,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyResolveAllNestedOptionDefinitions()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         // defined by superclass
         $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
@@ -2437,7 +2437,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyNormalizeNestedValue()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         // defined by superclass
         $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
@@ -2457,7 +2457,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyFailsIfCyclicDependencyBetweenSameNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
             $resolver->setDefault('replicas', $parent['database']);
@@ -2473,7 +2473,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyFailsIfCyclicDependencyBetweenNestedOptionAndParentLazyOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'version' => fn (Options $options) => $options['database']['server_version'],
@@ -2492,7 +2492,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyFailsIfCyclicDependencyBetweenNormalizerAndNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver
             ->setDefault('name', 'default')
@@ -2513,7 +2513,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyFailsIfCyclicDependencyBetweenNestedOptions()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
             $resolver->setDefault('host', $parent['replica']['host']);
@@ -2532,7 +2532,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyGetAccessToParentOptionFromNestedOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'version' => 3.15,
@@ -2566,7 +2566,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyResolveLazyOptionWithTransitiveDefaultDependency()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'ip' => null,
@@ -2595,7 +2595,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyAccessToParentOptionFromNestedNormalizerAndLazyOption()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver->setDefaults([
             'debug' => true,
@@ -2726,7 +2726,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyInvalidValueForPrototypeDefinition()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver
             ->setDefault('connections', static function (OptionsResolver $resolver) {
@@ -2746,7 +2746,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyMissingOptionForPrototypeDefinition()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver
             ->setDefault('connections', static function (OptionsResolver $resolver) {
@@ -2777,7 +2777,7 @@ class OptionsResolverTest extends TestCase
      */
     public function testLegacyPrototypeDefinition()
     {
-        $this->expectDeprecation('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
+        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
 
         $this->resolver
             ->setDefault('connections', static function (OptionsResolver $resolver) {

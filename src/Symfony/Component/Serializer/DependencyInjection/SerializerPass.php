@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -56,17 +57,27 @@ class SerializerPass implements CompilerPassInterface
             throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the "serializer" service.');
         }
 
+        $defaultContext = [];
         if ($container->hasParameter('serializer.default_context')) {
             $defaultContext = $container->getParameter('serializer.default_context');
-            $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $defaultContext);
             $container->getParameterBag()->remove('serializer.default_context');
             $container->getDefinition('serializer')->setArgument('$defaultContext', $defaultContext);
         }
 
+        /** @var ?string $circularReferenceHandler */
+        $circularReferenceHandler = $container->hasParameter('.serializer.circular_reference_handler')
+            ? $container->getParameter('.serializer.circular_reference_handler') : null;
+
+        /** @var ?string $maxDepthHandler */
+        $maxDepthHandler = $container->hasParameter('.serializer.max_depth_handler')
+            ? $container->getParameter('.serializer.max_depth_handler') : null;
+
+        $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $defaultContext, $circularReferenceHandler, $maxDepthHandler);
+
         $this->configureSerializer($container, 'serializer', $normalizers, $encoders, 'default');
 
         if ($namedSerializers) {
-            $this->configureNamedSerializers($container);
+            $this->configureNamedSerializers($container, $circularReferenceHandler, $maxDepthHandler);
         }
     }
 
@@ -100,11 +111,22 @@ class SerializerPass implements CompilerPassInterface
         }
     }
 
-    private function bindDefaultContext(ContainerBuilder $container, array $services, array $defaultContext): void
+    private function bindDefaultContext(ContainerBuilder $container, array $services, array $defaultContext, ?string $circularReferenceHandler, ?string $maxDepthHandler): void
     {
         foreach ($services as $id) {
             $definition = $container->getDefinition((string) $id);
-            $definition->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)] + $definition->getBindings());
+
+            $context = $defaultContext;
+            if (is_a($definition->getClass(), ObjectNormalizer::class, true)) {
+                if (null !== $circularReferenceHandler) {
+                    $context += ['circular_reference_handler' => new Reference($circularReferenceHandler)];
+                }
+                if (null !== $maxDepthHandler) {
+                    $context += ['max_depth_handler' => new Reference($maxDepthHandler)];
+                }
+            }
+
+            $definition->setBindings(['array $defaultContext' => new BoundArgument($context, false)] + $definition->getBindings());
         }
     }
 
@@ -127,7 +149,7 @@ class SerializerPass implements CompilerPassInterface
         $serializerDefinition->replaceArgument(1, $encoders);
     }
 
-    private function configureNamedSerializers(ContainerBuilder $container): void
+    private function configureNamedSerializers(ContainerBuilder $container, ?string $circularReferenceHandler, ?string $maxDepthHandler): void
     {
         $defaultSerializerNameConverter = $container->hasParameter('.serializer.name_converter')
             ? $container->getParameter('.serializer.name_converter') : null;
@@ -151,7 +173,7 @@ class SerializerPass implements CompilerPassInterface
             $normalizers = $this->buildChildDefinitions($container, $serializerName, $normalizers, $config);
             $encoders = $this->buildChildDefinitions($container, $serializerName, $encoders, $config);
 
-            $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $config['default_context']);
+            $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $config['default_context'], $circularReferenceHandler, $maxDepthHandler);
 
             $container->registerChild($serializerId, 'serializer')->setArgument('$defaultContext', $config['default_context']);
             $container->registerAliasForArgument($serializerId, SerializerInterface::class, $serializerName.'.serializer');
@@ -188,7 +210,9 @@ class SerializerPass implements CompilerPassInterface
         foreach ($services as &$id) {
             $childId = $id.'.'.$serializerName;
 
-            $definition = $container->registerChild($childId, (string) $id);
+            $definition = $container->registerChild($childId, (string) $id)
+                ->setClass($container->getDefinition((string) $id)->getClass())
+            ;
 
             if (null !== $nameConverterIndex = $this->findNameConverterIndex($container, (string) $id)) {
                 $definition->replaceArgument($nameConverterIndex, new Reference($config['name_converter']));

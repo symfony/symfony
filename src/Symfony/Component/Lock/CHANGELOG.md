@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add support for `valkey:` / `valkeys:` schemes
+
 7.2
 ---
 

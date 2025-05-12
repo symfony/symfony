@@ -18,14 +18,13 @@ class SignalMapTest extends TestCase
 {
     /**
      * @requires extension pcntl
-     *
-     * @testWith [2, "SIGINT"]
-     *           [9, "SIGKILL"]
-     *           [15, "SIGTERM"]
      */
-    public function testSignalExists(int $signal, string $expected)
+    public function testSignalExists()
     {
-        $this->assertSame($expected, SignalMap::getSignalName($signal));
+        $this->assertSame('SIGINT', SignalMap::getSignalName(\SIGINT));
+        $this->assertSame('SIGKILL', SignalMap::getSignalName(\SIGKILL));
+        $this->assertSame('SIGTERM', SignalMap::getSignalName(\SIGTERM));
+        $this->assertSame('SIGSYS', SignalMap::getSignalName(\SIGSYS));
     }
 
     public function testSignalDoesNotExist()

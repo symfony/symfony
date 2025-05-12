@@ -140,6 +140,7 @@ return static function (ContainerConfigurator $container) {
                 'reset' => 'reset',
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
+        ->alias('cache.adapter.valkey', 'cache.adapter.redis')
 
         ->set('cache.adapter.redis_tag_aware', RedisTagAwareAdapter::class)
             ->abstract()
@@ -156,6 +157,7 @@ return static function (ContainerConfigurator $container) {
                 'reset' => 'reset',
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
+        ->alias('cache.adapter.valkey_tag_aware', 'cache.adapter.redis_tag_aware')
 
         ->set('cache.adapter.memcached', MemcachedAdapter::class)
             ->abstract()

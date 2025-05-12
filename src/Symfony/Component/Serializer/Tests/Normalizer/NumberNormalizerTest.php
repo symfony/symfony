@@ -52,6 +52,7 @@ class NumberNormalizerTest extends TestCase
     }
 
     /**
+     * @requires PHP 8.4
      * @requires extension bcmath
      *
      * @dataProvider normalizeGoodBcMathNumberValueProvider
@@ -149,6 +150,8 @@ class NumberNormalizerTest extends TestCase
     }
 
     /**
+     * @requires extension gmp
+     *
      * @dataProvider denormalizeGoodGmpValueProvider
      */
     public function testDenormalizeGmp(string|int $data, string $type, \GMP $expected)

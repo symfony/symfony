@@ -12,14 +12,14 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\VarDumper\Caster\ResourceCaster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 class ResourceCasterTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
     use VarDumperTestTrait;
 
     /**
@@ -33,7 +33,7 @@ class ResourceCasterTest extends TestCase
         curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
         curl_exec($ch);
 
-        $this->expectDeprecation('Since symfony/var-dumper 7.3: The "Symfony\Component\VarDumper\Caster\ResourceCaster::castCurl()" method is deprecated without replacement.');
+        $this->expectUserDeprecationMessage('Since symfony/var-dumper 7.3: The "Symfony\Component\VarDumper\Caster\ResourceCaster::castCurl()" method is deprecated without replacement.');
 
         ResourceCaster::castCurl($ch, [], new Stub(), false);
     }
@@ -47,7 +47,7 @@ class ResourceCasterTest extends TestCase
     {
         $gd = imagecreate(1, 1);
 
-        $this->expectDeprecation('Since symfony/var-dumper 7.3: The "Symfony\Component\VarDumper\Caster\ResourceCaster::castGd()" method is deprecated without replacement.');
+        $this->expectUserDeprecationMessage('Since symfony/var-dumper 7.3: The "Symfony\Component\VarDumper\Caster\ResourceCaster::castGd()" method is deprecated without replacement.');
 
         ResourceCaster::castGd($gd, [], new Stub(), false);
     }

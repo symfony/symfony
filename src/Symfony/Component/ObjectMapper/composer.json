@@ -1,0 +1,36 @@
+{
+    "name": "symfony/object-mapper",
+    "type": "library",
+    "description": "Provides a way to map an object to another object",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/container": "^2.0"
+    },
+    "require-dev": {
+        "symfony/property-access": "^7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\ObjectMapper\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "conflict": {
+      "symfony/property-access": "<7.2"
+    }
+}

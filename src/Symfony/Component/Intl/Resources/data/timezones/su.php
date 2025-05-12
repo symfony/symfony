@@ -99,7 +99,7 @@ return [
         'America/Nassau' => 'Waktu Wétan (Nassau)',
         'America/New_York' => 'Waktu Wétan (New York)',
         'America/Nome' => 'Amérika Sarikat (Nome)',
-        'America/Noronha' => 'Brasil (Noronha)',
+        'America/Noronha' => 'Brasil (Fernando de Noronha)',
         'America/North_Dakota/Beulah' => 'Waktu Tengah (Beulah, North Dakota)',
         'America/North_Dakota/Center' => 'Waktu Tengah (Center, North Dakota)',
         'America/North_Dakota/New_Salem' => 'Waktu Tengah (New Salem, North Dakota)',

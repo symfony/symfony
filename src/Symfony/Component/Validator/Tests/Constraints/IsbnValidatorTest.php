@@ -159,6 +159,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getInvalidIsbn10
      */
     public function testInvalidIsbn10($isbn, $code)
@@ -203,6 +204,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getInvalidIsbn13
      */
     public function testInvalidIsbn13($isbn, $code)

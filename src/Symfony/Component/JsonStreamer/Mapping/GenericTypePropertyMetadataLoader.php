@@ -43,10 +43,7 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
 
         foreach ($result as &$metadata) {
             $type = $metadata->getType();
-
-            if (isset($variableTypes[(string) $type])) {
-                $metadata = $metadata->withType($this->replaceVariableTypes($type, $variableTypes));
-            }
+            $metadata = $metadata->withType($this->replaceVariableTypes($type, $variableTypes));
         }
 
         return $result;
@@ -122,11 +119,11 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
         }
 
         if ($type instanceof UnionType) {
-            return new UnionType(...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes()));
+            return Type::union(...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes()));
         }
 
         if ($type instanceof IntersectionType) {
-            return new IntersectionType(...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes()));
+            return Type::intersection(...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes()));
         }
 
         if ($type instanceof CollectionType) {
@@ -134,7 +131,7 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
         }
 
         if ($type instanceof GenericType) {
-            return new GenericType(
+            return Type::generic(
                 $this->replaceVariableTypes($type->getWrappedType(), $variableTypes),
                 ...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getVariableTypes()),
             );

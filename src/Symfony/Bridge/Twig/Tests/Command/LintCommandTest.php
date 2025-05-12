@@ -94,7 +94,20 @@ class LintCommandTest extends TestCase
         $ret = $tester->execute(['filename' => [$filename], '--show-deprecations' => true], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertMatchesRegularExpression('/ERROR  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/DEPRECATION  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
+    }
+
+    public function testLintFileWithMultipleReportedDeprecation()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile("{{ foo|deprecated_filter }}\n{{ bar|deprecated_filter }}");
+
+        $ret = $tester->execute(['filename' => [$filename], '--show-deprecations' => true], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+
+        $this->assertEquals(1, $ret, 'Returns 1 in case of error');
+        $this->assertMatchesRegularExpression('/DEPRECATION  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/DEPRECATION  in \S+ \(line 2\)/', trim($tester->getDisplay()));
         $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
     }
 

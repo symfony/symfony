@@ -34,7 +34,11 @@ class CommandTesterTest extends TestCase
         $this->command = new Command('foo');
         $this->command->addArgument('command');
         $this->command->addArgument('foo');
-        $this->command->setCode(function (OutputInterface $output) { $output->writeln('foo'); });
+        $this->command->setCode(function (OutputInterface $output): int {
+            $output->writeln('foo');
+
+            return 0;
+        });
 
         $this->tester = new CommandTester($this->command);
         $this->tester->execute(['foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
@@ -94,7 +98,11 @@ class CommandTesterTest extends TestCase
         $application->setAutoExit(false);
 
         $command = new Command('foo');
-        $command->setCode(function (OutputInterface $output) { $output->writeln('foo'); });
+        $command->setCode(function (OutputInterface $output): int {
+            $output->writeln('foo');
+
+            return 0;
+        });
 
         $application->add($command);
 
@@ -114,11 +122,13 @@ class CommandTesterTest extends TestCase
 
         $command = new Command('foo');
         $command->setHelperSet(new HelperSet([new QuestionHelper()]));
-        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions, $command) {
+        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions, $command): int {
             $helper = $command->getHelper('question');
             $helper->ask($input, $output, new Question($questions[0]));
             $helper->ask($input, $output, new Question($questions[1]));
             $helper->ask($input, $output, new Question($questions[2]));
+
+            return 0;
         });
 
         $tester = new CommandTester($command);
@@ -139,11 +149,13 @@ class CommandTesterTest extends TestCase
 
         $command = new Command('foo');
         $command->setHelperSet(new HelperSet([new QuestionHelper()]));
-        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions, $command) {
+        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions, $command): int {
             $helper = $command->getHelper('question');
             $helper->ask($input, $output, new Question($questions[0], 'Bobby'));
             $helper->ask($input, $output, new Question($questions[1], 'Fine'));
             $helper->ask($input, $output, new Question($questions[2], 'France'));
+
+            return 0;
         });
 
         $tester = new CommandTester($command);
@@ -164,12 +176,14 @@ class CommandTesterTest extends TestCase
 
         $command = new Command('foo');
         $command->setHelperSet(new HelperSet([new QuestionHelper()]));
-        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions, $command) {
+        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions, $command): int {
             $helper = $command->getHelper('question');
             $helper->ask($input, $output, new ChoiceQuestion('choice', ['a', 'b']));
             $helper->ask($input, $output, new Question($questions[0]));
             $helper->ask($input, $output, new Question($questions[1]));
             $helper->ask($input, $output, new Question($questions[2]));
+
+            return 0;
         });
 
         $tester = new CommandTester($command);
@@ -191,12 +205,14 @@ class CommandTesterTest extends TestCase
 
         $command = new Command('foo');
         $command->setHelperSet(new HelperSet([new QuestionHelper()]));
-        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions, $command) {
+        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions, $command): int {
             $helper = $command->getHelper('question');
             $helper->ask($input, $output, new ChoiceQuestion('choice', ['a', 'b']));
             $helper->ask($input, $output, new Question($questions[0]));
             $helper->ask($input, $output, new Question($questions[1]));
             $helper->ask($input, $output, new Question($questions[2]));
+
+            return 0;
         });
 
         $tester = new CommandTester($command);
@@ -216,11 +232,13 @@ class CommandTesterTest extends TestCase
         ];
 
         $command = new Command('foo');
-        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions) {
+        $command->setCode(function (InputInterface $input, OutputInterface $output) use ($questions): int {
             $io = new SymfonyStyle($input, $output);
             $io->ask($questions[0]);
             $io->ask($questions[1]);
             $io->ask($questions[2]);
+
+            return 0;
         });
 
         $tester = new CommandTester($command);
@@ -235,8 +253,10 @@ class CommandTesterTest extends TestCase
         $command = new Command('foo');
         $command->addArgument('command');
         $command->addArgument('foo');
-        $command->setCode(function (OutputInterface $output) {
+        $command->setCode(function (OutputInterface $output): int {
             $output->getErrorOutput()->write('foo');
+
+            return 0;
         });
 
         $tester = new CommandTester($command);

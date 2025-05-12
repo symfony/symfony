@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
-use Relay\Relay;
 use Relay\Cluster as RelayCluster;
+use Relay\Relay;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\Store\RedisStore;
 

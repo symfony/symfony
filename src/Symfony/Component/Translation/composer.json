@@ -22,7 +22,7 @@
         "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
-        "nikic/php-parser": "^4.18|^5.0",
+        "nikic/php-parser": "^5.0",
         "symfony/config": "^6.4|^7.0",
         "symfony/console": "^6.4|^7.0",
         "symfony/dependency-injection": "^6.4|^7.0",
@@ -37,6 +37,7 @@
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
+        "nikic/php-parser": "<5.0",
         "symfony/config": "<6.4",
         "symfony/dependency-injection": "<6.4",
         "symfony/http-client-contracts": "<2.5",

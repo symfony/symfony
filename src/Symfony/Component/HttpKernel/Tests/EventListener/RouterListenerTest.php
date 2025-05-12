@@ -323,5 +323,49 @@ class RouterListenerTest extends TestCase
                 ],
             ],
         ];
+
+        yield [
+            [
+                'conference' => ['slug' => 'vienna-2024'],
+            ],
+            [
+                'slug' => 'vienna-2024',
+                '_route_mapping' => [
+                    'slug' => [
+                        'conference',
+                        'slug',
+                    ],
+                ],
+            ],
+        ];
+
+        yield [
+            [
+                'article' => [
+                    'id' => 'abc123',
+                    'date' => '2024-04-24',
+                    'slug' => 'symfony-rocks',
+                ],
+            ],
+            [
+                'id' => 'abc123',
+                'date' => '2024-04-24',
+                'slug' => 'symfony-rocks',
+                '_route_mapping' => [
+                    'id' => [
+                        'article',
+                        'id'
+                    ],
+                    'date' => [
+                        'article',
+                        'date',
+                    ],
+                    'slug' => [
+                        'article',
+                        'slug',
+                    ],
+                ],
+            ],
+        ];
     }
 }

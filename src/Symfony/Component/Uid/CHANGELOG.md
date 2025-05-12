@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add component-specific exception hierarchy
+
 7.2
 ---
 

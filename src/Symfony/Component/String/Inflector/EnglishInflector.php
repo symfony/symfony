@@ -333,6 +333,9 @@ final class EnglishInflector implements InflectorInterface
         // conspectuses (conspectus), prospectuses (prospectus)
         ['sutcep', 6, true, true, 'pectuses'],
 
+        // nexuses (nexus)
+        ['suxen', 5, false, false, 'nexuses'],
+
         // fungi (fungus), alumni (alumnus), syllabi (syllabus), radii (radius)
         ['su', 2, true, true, 'i'],
 

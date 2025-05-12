@@ -708,6 +708,30 @@ CSV;
         $this->assertSame("foo,bar\r\nhello,test\r\n", $encoder->encode($value, 'csv'));
     }
 
+    /** @dataProvider provideIterable */
+    public function testIterable(mixed $data)
+    {
+        $this->assertEquals(<<<'CSV'
+            foo,bar
+            hello,"hey ho"
+            hi,"let's go"
+
+            CSV, $this->encoder->encode($data, 'csv'));
+    }
+
+    public static function provideIterable()
+    {
+        $data = [
+            ['foo' => 'hello', 'bar' => 'hey ho'],
+            ['foo' => 'hi', 'bar' => 'let\'s go'],
+        ];
+
+        yield 'array' => [$data];
+        yield 'array iterator' => [new \ArrayIterator($data)];
+        yield 'iterator aggregate' => [new \IteratorIterator(new \ArrayIterator($data))];
+        yield 'generator' => [(fn (): \Generator => yield from $data)()];
+    }
+
     /**
      * @group legacy
      */

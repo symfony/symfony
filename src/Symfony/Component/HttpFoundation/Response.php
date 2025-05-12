@@ -317,6 +317,11 @@ class Response
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
+            if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+                $statusCode ??= $this->statusCode;
+                header(\sprintf('HTTP/%s %s %s', $this->version, $statusCode, $this->statusText), true, $statusCode);
+            }
+
             return $this;
         }
 

@@ -24,6 +24,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EntityValueResolverTest extends TestCase
@@ -75,6 +76,11 @@ class EntityValueResolverTest extends TestCase
         $request = new Request();
         $argument = $this->createArgument(null, new MapEntity(), 'arg', true);
 
+        if (class_exists(NearMissValueResolverException::class)) {
+            $this->expectException(NearMissValueResolverException::class);
+            $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
+        }
+
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
@@ -93,6 +99,11 @@ class EntityValueResolverTest extends TestCase
 
         $manager->expects($this->never())
             ->method('getRepository');
+
+        if (class_exists(NearMissValueResolverException::class)) {
+            $this->expectException(NearMissValueResolverException::class);
+            $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
+        }
 
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
@@ -123,6 +134,42 @@ class EntityValueResolverTest extends TestCase
             ->willReturn($repository);
 
         $this->assertSame([$object], $resolver->resolve($request, $argument));
+    }
+
+    /**
+     * @dataProvider idsProvider
+     */
+    public function testResolveWithIdAndTypeAlias(string|int $id)
+    {
+        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver(
+            $registry,
+            null,
+            new MapEntity(),
+            // Using \Throwable because it is an interface
+            ['Throwable' => 'stdClass'],
+        );
+
+        $request = new Request();
+        $request->attributes->set('id', $id);
+
+        $argument = $this->createArgument('Throwable', $mapEntity = new MapEntity(id: 'id'));
+
+        $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repository->expects($this->once())
+            ->method('find')
+            ->with($id)
+            ->willReturn($object = new \stdClass());
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with('stdClass')
+            ->willReturn($repository);
+
+        $this->assertSame([$object], $resolver->resolve($request, $argument));
+        // Ensure the original MapEntity object was not updated
+        $this->assertNull($mapEntity->class);
     }
 
     public function testResolveWithNullId()
@@ -225,6 +272,11 @@ class EntityValueResolverTest extends TestCase
             ->willReturn($metadata);
 
         $manager->expects($this->never())->method('getRepository');
+
+        if (class_exists(NearMissValueResolverException::class)) {
+            $this->expectException(NearMissValueResolverException::class);
+            $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
+        }
 
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
@@ -493,7 +545,6 @@ class EntityValueResolverTest extends TestCase
         } else {
             $registry->method('getManager')->willReturn($manager);
         }
-
 
         return $registry;
     }

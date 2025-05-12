@@ -76,7 +76,7 @@ class ExprBuilder
      */
     public function ifFalse(?\Closure $closure = null): static
     {
-        $this->ifPart = $closure ?? static fn ($v) => false === $v;
+        $this->ifPart = $closure ? static fn ($v) => !$closure($v) : static fn ($v) => false === $v;
         $this->allowedTypes = self::TYPE_ANY;
 
         return $this;

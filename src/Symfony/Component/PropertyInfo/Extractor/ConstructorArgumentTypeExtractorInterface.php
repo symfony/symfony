@@ -24,6 +24,8 @@ interface ConstructorArgumentTypeExtractorInterface
     /**
      * Gets types of an argument from constructor.
      *
+     * @deprecated since Symfony 7.3, use "getTypeFromConstructor" instead
+     *
      * @return LegacyType[]|null
      */
     public function getTypesFromConstructor(string $class, string $property): ?array;

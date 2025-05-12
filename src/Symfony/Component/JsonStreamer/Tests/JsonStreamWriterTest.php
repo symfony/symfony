@@ -12,11 +12,12 @@
 namespace Symfony\Component\JsonStreamer\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\JsonStreamer\Exception\MaxDepthException;
+use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
@@ -117,6 +118,18 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{"id":10,"name":"dummy name"}', $dummy, Type::object(ClassicDummy::class));
     }
 
+    public function testWriteObjectWithGenerics()
+    {
+        $nestedDummy = new DummyWithNameAttributes();
+        $nestedDummy->id = 10;
+        $nestedDummy->name = 'dummy name';
+
+        $dummy = new DummyWithGenerics();
+        $dummy->dummies = [$nestedDummy];
+
+        $this->assertWritten('{"dummies":[{"id":10,"name":"dummy name"}]}', $dummy, Type::generic(Type::object(DummyWithGenerics::class), Type::object(ClassicDummy::class)));
+    }
+
     public function testWriteObjectWithStreamedName()
     {
         $dummy = new DummyWithNameAttributes();
@@ -173,22 +186,52 @@ class JsonStreamWriterTest extends TestCase
         );
     }
 
-    public function testThrowWhenMaxDepthIsReached()
+    /**
+     * @dataProvider throwWhenMaxDepthIsReachedDataProvider
+     */
+    public function testThrowWhenMaxDepthIsReached(Type $type, mixed $data)
     {
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
 
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('Maximum stack depth exceeded');
+
+        (string) $writer->write($data, $type);
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: mixed}>
+     */
+    public static function throwWhenMaxDepthIsReachedDataProvider(): iterable
+    {
         $dummy = new SelfReferencingDummy();
         for ($i = 0; $i < 512; ++$i) {
             $tmp = new SelfReferencingDummy();
             $tmp->self = $dummy;
-
             $dummy = $tmp;
         }
 
-        $this->expectException(MaxDepthException::class);
-        $this->expectExceptionMessage('Max depth of 512 has been reached.');
+        yield [Type::object(SelfReferencingDummy::class), $dummy];
 
-        (string) $writer->write($dummy, Type::object(SelfReferencingDummy::class));
+        $dummy = new SelfReferencingDummy();
+        for ($i = 0; $i < 511; ++$i) {
+            $tmp = new SelfReferencingDummy();
+            $tmp->self = $dummy;
+            $dummy = $tmp;
+        }
+
+        yield [Type::list(Type::object(SelfReferencingDummy::class)), [$dummy]];
+        yield [Type::dict(Type::object(SelfReferencingDummy::class)), ['k' => $dummy]];
+    }
+
+    public function testThrowWhenEncodeError()
+    {
+        $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
+
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('Inf and NaN cannot be JSON encoded');
+
+        (string) $writer->write(\INF, Type::int());
     }
 
     public function testCreateStreamWriterFile()

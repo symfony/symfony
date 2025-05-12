@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "pda/pheanstalk": "^4.0",
+        "pda/pheanstalk": "^5.1|^7.0",
         "symfony/messenger": "^7.3"
     },
     "require-dev": {

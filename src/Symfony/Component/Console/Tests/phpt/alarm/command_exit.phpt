@@ -7,7 +7,6 @@ Test command that exits
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,7 +18,7 @@ while (!file_exists($vendor.'/vendor')) {
 }
 require $vendor.'/vendor/autoload.php';
 
-class MyCommand extends Command implements SignalableCommandInterface
+class MyCommand extends Command
 {
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {

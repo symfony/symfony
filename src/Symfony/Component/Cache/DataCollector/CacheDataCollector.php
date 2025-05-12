@@ -60,6 +60,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();
         $this->data['total']['statistics'] = $this->calculateTotalStatistics();
+        $this->data['instances']['calls'] = $this->cloneVar($this->data['instances']['calls']);
     }
 
     public function getName(): string

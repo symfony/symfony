@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add compact nested mapping support by using the `Yaml::DUMP_COMPACT_NESTED_MAPPING` flag
+ * Add the `Yaml::DUMP_FORCE_DOUBLE_QUOTES_ON_VALUES` flag to enforce double quotes around string values
 
 7.2
 ---

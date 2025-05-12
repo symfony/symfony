@@ -237,7 +237,7 @@ class BinaryFileResponse extends Response
                         $path = $location.substr($path, \strlen($pathPrefix));
                         // Only set X-Accel-Redirect header if a valid URI can be produced
                         // as nginx does not serve arbitrary file paths.
-                        $this->headers->set($type, $path);
+                        $this->headers->set($type, rawurlencode($path));
                         $this->maxlen = 0;
                         break;
                     }

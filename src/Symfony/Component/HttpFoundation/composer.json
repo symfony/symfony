@@ -25,6 +25,7 @@
         "doctrine/dbal": "^3.6|^4",
         "predis/predis": "^1.1|^2.0",
         "symfony/cache": "^6.4.12|^7.1.5",
+        "symfony/clock": "^6.4|^7.0",
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/mime": "^6.4|^7.0",

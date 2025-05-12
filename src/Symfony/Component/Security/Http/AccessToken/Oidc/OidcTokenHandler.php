@@ -71,14 +71,14 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         }
     }
 
-    public function enabledJweSupport(JWKSet $decryptionKeyset, AlgorithmManager $decryptionAlgorithms, bool $enforceEncryption): void
+    public function enableJweSupport(JWKSet $decryptionKeyset, AlgorithmManager $decryptionAlgorithms, bool $enforceEncryption): void
     {
         $this->decryptionKeyset = $decryptionKeyset;
         $this->decryptionAlgorithms = $decryptionAlgorithms;
         $this->enforceEncryption = $enforceEncryption;
     }
 
-    public function enabledDiscovery(CacheInterface $cache, HttpClientInterface $client, string $oidcConfigurationCacheKey, string $oidcJWKSetCacheKey): void
+    public function enableDiscovery(CacheInterface $cache, HttpClientInterface $client, string $oidcConfigurationCacheKey, string $oidcJWKSetCacheKey): void
     {
         $this->discoveryCache = $cache;
         $this->discoveryClient = $client;
@@ -143,7 +143,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             }
 
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate
-            return new UserBadge($claims[$this->claim], new FallbackUserLoader(fn () => $this->createUser($claims)), $claims);
+            return new UserBadge($claims[$this->claim], new FallbackUserLoader(function () use ($claims) {
+                $claims['user_identifier'] = $claims[$this->claim];
+
+                return $this->createUser($claims);
+            }), $claims);
         } catch (\Exception $e) {
             $this->logger?->error('An error occurred while decoding and validating the token.', [
                 'error' => $e->getMessage(),

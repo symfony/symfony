@@ -23,7 +23,11 @@ use Symfony\Component\TypeInfo\Type;
  */
 interface DataModelNodeInterface
 {
+    public function getIdentifier(): string;
+
     public function getType(): Type;
 
     public function getAccessor(): DataAccessorInterface;
+
+    public function withAccessor(DataAccessorInterface $accessor): self;
 }

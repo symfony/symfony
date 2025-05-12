@@ -224,7 +224,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $authChecker = new AuthorizationChecker(new TokenStorage(), new AccessDecisionManager((function () use (&$authChecker) {
             yield new ExpressionVoter(new ExpressionLanguage(), null, $authChecker);
             yield new RoleVoter();
-            yield new class() extends Voter {
+            yield new class extends Voter {
                 protected function supports(string $attribute, mixed $subject): bool
                 {
                     return 'POST_VIEW' === $attribute;

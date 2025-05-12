@@ -271,7 +271,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Length(
             min: 4,
             max: 4,
-            exactMessage:  'myMessage',
+            exactMessage: 'myMessage',
         );
 
         $this->validator->validate($value, $constraint);

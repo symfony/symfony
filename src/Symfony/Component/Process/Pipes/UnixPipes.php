@@ -70,7 +70,7 @@ class UnixPipes extends AbstractPipes
             return [
                 ['pty'],
                 ['pty'],
-                ['pty'],
+                ['pipe', 'w'], // stderr needs to be in a pipe to correctly split error and output, since PHP will use the same stream for both
             ];
         }
 

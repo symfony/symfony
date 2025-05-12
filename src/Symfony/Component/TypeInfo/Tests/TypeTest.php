@@ -13,6 +13,8 @@ namespace Symfony\Component\TypeInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class TypeTest extends TestCase
@@ -33,5 +35,53 @@ class TypeTest extends TestCase
         $this->assertTrue(Type::nullable(Type::int())->isNullable());
 
         $this->assertFalse(Type::int()->isNullable());
+    }
+
+    public function testIsSatisfiedBy()
+    {
+        $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(fn (Type $t): bool => 'int' === (string) $t));
+        $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(fn (Type $t): bool => $t instanceof UnionType));
+        $this->assertTrue(Type::list(Type::int())->isSatisfiedBy(fn (Type $t): bool => $t instanceof CollectionType && 'int' === (string) $t->getCollectionValueType()));
+        $this->assertFalse(Type::list(Type::int())->isSatisfiedBy(fn (Type $t): bool => 'int' === (string) $t));
+    }
+
+    public function testTraverse()
+    {
+        $this->assertEquals([Type::int()], iterator_to_array(Type::int()->traverse()));
+
+        $this->assertEquals(
+            [Type::union(Type::int(), Type::string()), Type::int(), Type::string()],
+            iterator_to_array(Type::union(Type::int(), Type::string())->traverse()),
+        );
+        $this->assertEquals(
+            [Type::union(Type::int(), Type::string())],
+            iterator_to_array(Type::union(Type::int(), Type::string())->traverse(traverseComposite: false)),
+        );
+
+        $this->assertEquals(
+            [Type::generic(Type::object(\Traversable::class), Type::string()), Type::object(\Traversable::class)],
+            iterator_to_array(Type::generic(Type::object(\Traversable::class), Type::string())->traverse()),
+        );
+        $this->assertEquals(
+            [Type::generic(Type::object(\Traversable::class), Type::string())],
+            iterator_to_array(Type::generic(Type::object(\Traversable::class), Type::string())->traverse(traverseWrapped: false)),
+        );
+
+        $this->assertEquals(
+            [Type::nullable(Type::int()), Type::int(), Type::null()],
+            iterator_to_array(Type::nullable(Type::int())->traverse()),
+        );
+        $this->assertEquals(
+            [Type::nullable(Type::int()), Type::int()],
+            iterator_to_array(Type::nullable(Type::int())->traverse(traverseComposite: false)),
+        );
+        $this->assertEquals(
+            [Type::nullable(Type::int()), Type::int(), Type::null()],
+            iterator_to_array(Type::nullable(Type::int())->traverse(traverseWrapped: false)),
+        );
+        $this->assertEquals(
+            [Type::nullable(Type::int())],
+            iterator_to_array(Type::nullable(Type::int())->traverse(traverseComposite: false, traverseWrapped: false)),
+        );
     }
 }

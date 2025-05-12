@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Relay\Relay;
 use Relay\Cluster as RelayCluster;
+use Relay\Relay;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;

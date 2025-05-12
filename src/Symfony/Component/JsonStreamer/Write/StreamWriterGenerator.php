@@ -25,10 +25,8 @@ use Symfony\Component\JsonStreamer\DataModel\Write\BackedEnumNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CollectionNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\DataModelNodeInterface;
-use Symfony\Component\JsonStreamer\DataModel\Write\ExceptionNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ObjectNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ScalarNode;
-use Symfony\Component\JsonStreamer\Exception\MaxDepthException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
@@ -37,6 +35,7 @@ use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
+use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 
@@ -49,8 +48,6 @@ use Symfony\Component\TypeInfo\Type\UnionType;
  */
 final class StreamWriterGenerator
 {
-    private const MAX_DEPTH = 512;
-
     private ?PhpAstBuilder $phpAstBuilder = null;
     private ?PhpOptimizer $phpOptimizer = null;
     private ?PrettyPrinter $phpPrinter = null;
@@ -114,12 +111,6 @@ final class StreamWriterGenerator
      */
     private function createDataModel(Type $type, DataAccessorInterface $accessor, array $options = [], array $context = []): DataModelNodeInterface
     {
-        $context['depth'] ??= 0;
-
-        if ($context['depth'] > self::MAX_DEPTH) {
-            return new ExceptionNode(MaxDepthException::class);
-        }
-
         $context['original_type'] ??= $type;
 
         if ($type instanceof UnionType) {
@@ -134,11 +125,20 @@ final class StreamWriterGenerator
             return new BackedEnumNode($accessor, $type);
         }
 
-        if ($type instanceof ObjectType && !$type instanceof EnumType) {
-            ++$context['depth'];
+        if ($type instanceof GenericType) {
+            $type = $type->getWrappedType();
+        }
 
+        if ($type instanceof ObjectType && !$type instanceof EnumType) {
+            $typeString = (string) $type;
             $className = $type->getClassName();
-            $propertiesMetadata = $this->propertyMetadataLoader->load($className, $options, ['original_type' => $type] + $context);
+
+            if ($context['generated_classes'][$typeString] ??= false) {
+                return ObjectNode::createMock($accessor, $type);
+            }
+
+            $context['generated_classes'][$typeString] = true;
+            $propertiesMetadata = $this->propertyMetadataLoader->load($className, $options, $context);
 
             try {
                 $classReflection = new \ReflectionClass($className);
@@ -180,8 +180,6 @@ final class StreamWriterGenerator
         }
 
         if ($type instanceof CollectionType) {
-            ++$context['depth'];
-
             return new CollectionNode(
                 $accessor,
                 $type,

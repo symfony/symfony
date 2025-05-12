@@ -33,7 +33,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
             'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
             'email' => 'foo@example.com',
         ];
-        $expectedUser = new OidcUser(...$claims);
+        $expectedUser = new OidcUser(...$claims, userIdentifier: $claims[$claim]);
 
         $responseMock = $this->createMock(ResponseInterface::class);
         $responseMock->expects($this->once())
@@ -52,7 +52,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
         $this->assertInstanceOf(OidcUser::class, $actualUser);
         $this->assertEquals($expectedUser, $actualUser);
         $this->assertEquals($claims, $userBadge->getAttributes());
-        $this->assertEquals($claims['sub'], $actualUser->getUserIdentifier());
+        $this->assertEquals($claims[$claim], $actualUser->getUserIdentifier());
     }
 
     public static function getClaims(): iterable

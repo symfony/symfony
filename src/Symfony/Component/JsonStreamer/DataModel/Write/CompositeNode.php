@@ -60,6 +60,16 @@ final class CompositeNode implements DataModelNodeInterface
         $this->nodes = $nodes;
     }
 
+    public function withAccessor(DataAccessorInterface $accessor): self
+    {
+        return new self($accessor, array_map(static fn (DataModelNodeInterface $n): DataModelNodeInterface => $n->withAccessor($accessor), $this->nodes));
+    }
+
+    public function getIdentifier(): string
+    {
+        return (string) $this->getType();
+    }
+
     public function getAccessor(): DataAccessorInterface
     {
         return $this->accessor;

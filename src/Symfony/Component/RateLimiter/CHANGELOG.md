@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `RateLimiterFactoryInterface`
+ * Add `CompoundRateLimiterFactory`
 
 6.4
 ---

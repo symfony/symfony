@@ -20,7 +20,7 @@
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/string": "^6.4|^7.0"
+        "symfony/string": "^7.2"
     },
     "require-dev": {
         "symfony/config": "^6.4|^7.0",

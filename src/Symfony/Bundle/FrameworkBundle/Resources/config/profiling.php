@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Debug\VirtualRequestStack;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStateChecker;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -56,5 +57,15 @@ return static function (ContainerConfigurator $container) {
         ->set('.virtual_request_stack', VirtualRequestStack::class)
             ->args([service('request_stack')])
             ->public()
+
+        ->set('profiler.state_checker', ProfilerStateChecker::class)
+            ->args([
+                service_locator(['profiler' => service('profiler')->ignoreOnUninitialized()]),
+                param('kernel.runtime_mode.web'),
+            ])
+
+        ->set('profiler.is_disabled_state_checker', 'Closure')
+            ->factory(['Closure', 'fromCallable'])
+            ->args([[service('profiler.state_checker'), 'isProfilerDisabled']])
     ;
 };

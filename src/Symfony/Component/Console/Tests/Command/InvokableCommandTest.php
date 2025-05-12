@@ -21,7 +21,9 @@ use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class InvokableCommandTest extends TestCase
 {
@@ -29,24 +31,26 @@ class InvokableCommandTest extends TestCase
     {
         $command = new Command('foo');
         $command->setCode(function (
-            #[Argument(name: 'first-name')] string $name,
+            #[Argument(name: 'very-first-name')] string $name,
             #[Argument] ?string $firstName,
             #[Argument] string $lastName = '',
             #[Argument(description: 'Short argument description')] string $bio = '',
             #[Argument(suggestedValues: [self::class, 'getSuggestedRoles'])] array $roles = ['ROLE_USER'],
-        ) {});
+        ): int {
+            return 0;
+        });
 
-        $nameInputArgument = $command->getDefinition()->getArgument('first-name');
-        self::assertSame('first-name', $nameInputArgument->getName());
+        $nameInputArgument = $command->getDefinition()->getArgument('very-first-name');
+        self::assertSame('very-first-name', $nameInputArgument->getName());
         self::assertTrue($nameInputArgument->isRequired());
 
-        $lastNameInputArgument = $command->getDefinition()->getArgument('firstName');
-        self::assertSame('firstName', $lastNameInputArgument->getName());
+        $lastNameInputArgument = $command->getDefinition()->getArgument('first-name');
+        self::assertSame('first-name', $lastNameInputArgument->getName());
         self::assertFalse($lastNameInputArgument->isRequired());
         self::assertNull($lastNameInputArgument->getDefault());
 
-        $lastNameInputArgument = $command->getDefinition()->getArgument('lastName');
-        self::assertSame('lastName', $lastNameInputArgument->getName());
+        $lastNameInputArgument = $command->getDefinition()->getArgument('last-name');
+        self::assertSame('last-name', $lastNameInputArgument->getName());
         self::assertFalse($lastNameInputArgument->isRequired());
         self::assertSame('', $lastNameInputArgument->getDefault());
 
@@ -75,7 +79,9 @@ class InvokableCommandTest extends TestCase
             #[Option(shortcut: 'v')] bool $verbose = false,
             #[Option(description: 'User groups')] array $groups = [],
             #[Option(suggestedValues: [self::class, 'getSuggestedRoles'])] array $roles = ['ROLE_USER'],
-        ) {});
+        ): int {
+            return 0;
+        });
 
         $timeoutInputOption = $command->getDefinition()->getOption('idle');
         self::assertSame('idle', $timeoutInputOption->getName());
@@ -138,6 +144,58 @@ class InvokableCommandTest extends TestCase
         $command->getDefinition();
     }
 
+    public function testExecuteHasPriorityOverInvokeMethod()
+    {
+        $command = new class extends Command {
+            public string $called;
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                $this->called = __FUNCTION__;
+
+                return 0;
+            }
+
+            public function __invoke(): int
+            {
+                $this->called = __FUNCTION__;
+
+                return 0;
+            }
+        };
+
+        $command->run(new ArrayInput([]), new NullOutput());
+        $this->assertSame('execute', $command->called);
+    }
+
+    public function testCallInvokeMethodWhenExtendingCommandClass()
+    {
+        $command = new class extends Command {
+            public string $called;
+            public function __invoke(): int
+            {
+                $this->called = __FUNCTION__;
+
+                return 0;
+            }
+        };
+
+        $command->run(new ArrayInput([]), new NullOutput());
+        $this->assertSame('__invoke', $command->called);
+    }
+
+    public function testInvalidReturnType()
+    {
+        $command = new Command('foo');
+        $command->setCode(new class {
+            public function __invoke() {}
+        });
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('The command "foo" must return an integer value in the "__invoke" method, but "null" was returned.');
+
+        $command->run(new ArrayInput([]), new NullOutput());
+    }
+
     /**
      * @dataProvider provideInputArguments
      */
@@ -149,11 +207,13 @@ class InvokableCommandTest extends TestCase
             #[Argument] ?string $b,
             #[Argument] string $c = '',
             #[Argument] array $d = [],
-        ) use ($expected) {
+        ) use ($expected): int {
             $this->assertSame($expected[0], $a);
             $this->assertSame($expected[1], $b);
             $this->assertSame($expected[2], $c);
             $this->assertSame($expected[3], $d);
+
+            return 0;
         });
 
         $command->run(new ArrayInput($parameters), new NullOutput());
@@ -176,10 +236,12 @@ class InvokableCommandTest extends TestCase
             #[Option] bool $a = true,
             #[Option] bool $b = false,
             #[Option] ?bool $c = null,
-        ) use ($expected) {
+        ) use ($expected): int {
             $this->assertSame($expected[0], $a);
             $this->assertSame($expected[1], $b);
             $this->assertSame($expected[2], $c);
+
+            return 0;
         });
 
         $command->run(new ArrayInput($parameters), new NullOutput());
@@ -199,13 +261,17 @@ class InvokableCommandTest extends TestCase
     {
         $command = new Command('foo');
         $command->setCode(function (
-            #[Option] ?string $a = null,
-            #[Option] ?string $b = 'b',
-            #[Option] ?array $c = [],
-        ) use ($expected) {
+            #[Option] string $a = '',
+            #[Option] ?string $b = '',
+            #[Option] array $c = [],
+            #[Option] array $d = ['a', 'b'],
+        ) use ($expected): int {
             $this->assertSame($expected[0], $a);
             $this->assertSame($expected[1], $b);
             $this->assertSame($expected[2], $c);
+            $this->assertSame($expected[3], $d);
+
+            return 0;
         });
 
         $command->run(new ArrayInput($parameters), new NullOutput());
@@ -213,20 +279,47 @@ class InvokableCommandTest extends TestCase
 
     public static function provideNonBinaryInputOptions(): \Generator
     {
-        yield 'defaults' => [[], [null, 'b', []]];
-        yield 'with-value' => [['--a' => 'x', '--b' => 'y', '--c' => ['z']], ['x', 'y', ['z']]];
-        yield 'without-value' => [['--a' => null, '--b' => null, '--c' => null], [null, null, null]];
+        yield 'defaults' => [[], ['', '', [], ['a', 'b']]];
+        yield 'with-value' => [['--a' => 'x', '--b' => 'y', '--c' => ['z'], '--d' => ['c', 'd']], ['x', 'y', ['z'], ['c', 'd']]];
+        yield 'without-value' => [['--b' => null], ['', null, [], ['a', 'b']]];
     }
 
-    public function testInvalidOptionDefinition()
+    /**
+     * @dataProvider provideInvalidOptionDefinitions
+     */
+    public function testInvalidOptionDefinition(callable $code, string $expectedMessage)
     {
         $command = new Command('foo');
-        $command->setCode(function (#[Option] string $a) {});
+        $command->setCode($code);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The option parameter "$a" must declare a default value.');
+        $this->expectExceptionMessage($expectedMessage);
 
         $command->getDefinition();
+    }
+
+    public static function provideInvalidOptionDefinitions(): \Generator
+    {
+        yield 'no-default' => [
+            function (#[Option] string $a) {},
+            'The option parameter "$a" must declare a default value.',
+        ];
+        yield 'nullable-bool-default-true' => [
+            function (#[Option] ?bool $a = true) {},
+            'The option parameter "$a" must not be nullable when it has a default boolean value.',
+        ];
+        yield 'nullable-bool-default-false' => [
+            function (#[Option] ?bool $a = false) {},
+            'The option parameter "$a" must not be nullable when it has a default boolean value.',
+        ];
+        yield 'nullable-string' => [
+            function (#[Option] ?string $a = null) {},
+            'The option parameter "$a" must not have a default of null.',
+        ];
+        yield 'nullable-array' => [
+            function (#[Option] ?array $a = null) {},
+            'The option parameter "$a" must not be nullable.',
+        ];
     }
 
     public function testInvalidRequiredValueOptionEvenWithDefault()

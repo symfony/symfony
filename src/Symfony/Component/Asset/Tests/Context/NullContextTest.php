@@ -20,7 +20,7 @@ class NullContextTest extends TestCase
     {
         $nullContext = new NullContext();
 
-        $this->assertEmpty($nullContext->getBasePath());
+        $this->assertSame('', $nullContext->getBasePath());
     }
 
     public function testIsSecure()

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Uid;
 
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
+
 /**
  * @internal
  *
@@ -162,7 +164,7 @@ class BinaryUtil
     {
         if (\PHP_INT_SIZE >= 8) {
             if (-self::TIME_OFFSET_INT > $time = (int) $time->format('Uu0')) {
-                throw new \InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
+                throw new InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
             }
 
             return str_pad(dechex(self::TIME_OFFSET_INT + $time), 16, '0', \STR_PAD_LEFT);
@@ -171,7 +173,7 @@ class BinaryUtil
         $time = $time->format('Uu0');
         $negative = '-' === $time[0];
         if ($negative && self::TIME_OFFSET_INT < $time = substr($time, 1)) {
-            throw new \InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
+            throw new InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
         }
         $time = self::fromBase($time, self::BASE10);
         $time = str_pad($time, 8, "\0", \STR_PAD_LEFT);

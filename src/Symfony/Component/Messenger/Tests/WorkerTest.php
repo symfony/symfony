@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\RuntimeException;
@@ -586,7 +587,7 @@ class WorkerTest extends TestCase
         $this->assertSame($expectedMessages, $handler->processedMessages);
     }
 
-    public function testGcCollectCyclesIsCalledOnMessageHandle()
+    public function testGcCollectCyclesIsCalledOnIdleWorker()
     {
         $apiMessage = new DummyMessage('API');
 
@@ -595,14 +596,63 @@ class WorkerTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
 
         $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ResetMemoryUsageListener());
+        $before = 0;
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use (&$before) {
+            static $i = 0;
+
+            $after = gc_status()['runs'];
+            if (0 === $i) {
+                $this->assertFalse($event->isWorkerIdle());
+                $this->assertSame(0, $after - $before);
+            } elseif (1 === $i) {
+                $this->assertTrue($event->isWorkerIdle());
+                $this->assertSame(1, $after - $before);
+            } elseif (3 === $i) {
+                // Wait a few idle phases before stopping.
+                $this->assertSame(1, $after - $before);
+                $event->getWorker()->stop();
+            }
+
+            ++$i;
+        }, \PHP_INT_MIN);
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
+
+        gc_collect_cycles();
+        $before = gc_status()['runs'];
+
+        $worker->run([
+            'sleep' => 0,
+        ]);
+    }
+
+    public function testMemoryUsageIsResetOnMessageHandle()
+    {
+        $apiMessage = new DummyMessage('API');
+
+        $receiver = new DummyReceiver([[new Envelope($apiMessage)]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ResetMemoryUsageListener());
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        // Allocate and deallocate 4 MB. The use of random_int() is to
+        // prevent compile-time optimization.
+        $memory = str_repeat(random_int(0, 1), 4 * 1024 * 1024);
+        unset($memory);
+
+        $before = memory_get_peak_usage();
 
         $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
         $worker->run();
 
-        $gcStatus = gc_status();
+        // This should be roughly 4 MB smaller than $before.
+        $after = memory_get_peak_usage();
 
-        $this->assertGreaterThan(0, $gcStatus['runs']);
+        $this->assertTrue($after < $before);
     }
 
     /**

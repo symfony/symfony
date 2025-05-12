@@ -55,6 +55,7 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode = $tb->getRootNode();
 
         $rootNode
+            ->docUrl('https://symfony.com/doc/{version:major}.{version:minor}/reference/configuration/security.html', 'symfony/security-bundle')
             ->beforeNormalization()
                 ->always()
                 ->then(function ($v) {

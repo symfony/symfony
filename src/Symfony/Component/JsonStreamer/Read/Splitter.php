@@ -18,7 +18,7 @@ use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @internal
+ * @experimental
  */
 final class Splitter
 {

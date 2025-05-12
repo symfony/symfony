@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Relay\Relay;
-use Relay\Cluster as RelayCluster;
 use Psr\Cache\CacheItemPoolInterface;
+use Relay\Cluster as RelayCluster;
+use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;

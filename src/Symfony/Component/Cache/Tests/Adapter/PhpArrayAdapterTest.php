@@ -42,6 +42,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         'testSaveDeferredWhenChangingValues' => 'PhpArrayAdapter is read-only.',
         'testSaveDeferredOverwrite' => 'PhpArrayAdapter is read-only.',
         'testIsHitDeferred' => 'PhpArrayAdapter is read-only.',
+        'testErrorsDontInvalidate' => 'PhpArrayAdapter is read-only.',
 
         'testExpiresAt' => 'PhpArrayAdapter does not support expiration.',
         'testExpiresAtWithNull' => 'PhpArrayAdapter does not support expiration.',
@@ -57,6 +58,8 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
         'testDefaultLifeTime' => 'PhpArrayAdapter does not allow configuring a default lifetime.',
         'testPrune' => 'PhpArrayAdapter just proxies',
+
+        'testNamespaces' => 'PhpArrayAdapter does not support namespaces.',
     ];
 
     protected static string $file;

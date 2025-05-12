@@ -456,13 +456,13 @@ class Definition
     }
 
     /**
-     * Adds a tag to the definition and marks it as excluded.
+     * Adds a "resource" tag to the definition and marks it as excluded.
      *
-     * These definitions should be processed using {@see ContainerBuilder::findExcludedServiceIds()}
+     * These definitions should be processed using {@see ContainerBuilder::findTaggedResourceIds()}
      *
      * @return $this
      */
-    public function addExcludeTag(string $name, array $attributes = []): static
+    public function addResourceTag(string $name, array $attributes = []): static
     {
         return $this->addTag($name, $attributes)
             ->addTag('container.excluded', ['source' => \sprintf('by tag "%s"', $name)])

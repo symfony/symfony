@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi isang wastong IP address.</target>
+                <target>Ang halagang ito ay hindi isang wastong IP address.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">Walang pansamantalang folder na na-configure sa php.ini, o ang naka-configure na folder ay hindi umiiral.</target>
+                <target state="needs-review-translation">Walang pansamantalang folder na na-configure sa php.ini, o ang naka-configure na folder ay hindi naroroon.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi isang wastong International Bank Account Number (IBAN).</target>
+                <target>Ang halagang ito ay hindi isang wastong International Bank Account Number (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi isang wastong Business Identifier Code (BIC).</target>
+                <target>Ang halagang ito ay hindi isang wastong Business Identifier Code (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi isang wastong UUID.</target>
+                <target>Ang halagang ito ay hindi isang wastong UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -396,79 +396,83 @@
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi wastong notasyong CIDR.</target>
+                <target>Ang halagang ito ay hindi wastong notasyon ng CIDR.</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
-                <target state="needs-review-translation">Ang halaga ng netmask ay dapat nasa pagitan ng {{ min }} at {{ max }}.</target>
+                <target>Ang halaga ng netmask ay dapat nasa pagitan ng {{ min }} at {{ max }}.</target>
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target state="needs-review-translation">Ang pangalan ng file ay masyadong mahaba. Dapat itong magkaroon ng {{ filename_max_length }} karakter o mas kaunti.|Ang pangalan ng file ay masyadong mahaba. Dapat itong magkaroon ng {{ filename_max_length }} mga karakter o mas kaunti.</target>
+                <target>Ang pangalan ng file ay masyadong mahaba. Dapat itong magkaroon ng {{ filename_max_length }} karakter o mas kaunti.|Ang pangalan ng file ay masyadong mahaba. Dapat itong magkaroon ng {{ filename_max_length }} mga karakter o mas kaunti.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target state="needs-review-translation">Ang lakas ng password ay masyadong mababa. Mangyaring gumamit ng mas malakas na password.</target>
+                <target>Ang lakas ng password ay masyadong mababa. Mangyaring gumamit ng mas malakas na password.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target state="needs-review-translation">Ang halagang ito ay naglalaman ng mga karakter na hindi pinapayagan ng kasalukuyang antas ng paghihigpit.</target>
+                <target>Ang halagang ito ay naglalaman ng mga karakter na hindi pinapayagan ng kasalukuyang antas ng paghihigpit.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
-                <target state="needs-review-translation">Hindi pinapayagan ang paggamit ng mga hindi nakikitang karakter.</target>
+                <target>Hindi pinapayagan ang paggamit ng mga hindi nakikitang karakter.</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target state="needs-review-translation">Hindi pinapayagan ang paghahalo ng mga numero mula sa iba't ibang script.</target>
+                <target>Hindi pinapayagan ang paghahalo ng mga numero mula sa iba't ibang script.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
-                <target state="needs-review-translation">Hindi pinapayagan ang paggamit ng mga nakatagong overlay na karakter.</target>
+                <target>Hindi pinapayagan ang paggamit ng mga nakatagong overlay na karakter.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-review-translation">Ang extension ng file ay hindi wasto ({{ extension }}). Ang mga pinapayagang extension ay {{ extensions }}.</target>
+                <target>Ang extension ng file ay hindi wasto ({{ extension }}). Ang mga pinapayagang extension ay {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-review-translation">Ang nakitang encoding ng karakter ay hindi wasto ({{ detected }}). Ang mga pinapayagang encoding ay {{ encodings }}.</target>
+                <target>Ang nakitang encoding ng karakter ay hindi wasto ({{ detected }}). Ang mga pinapayagang encoding ay {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi isang wastong MAC address.</target>
+                <target>Ang halagang ito ay hindi isang wastong MAC address.</target>
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target state="needs-review-translation">Kulang ang URL na ito sa top-level domain.</target>
+                <target>Ang URL na ito ay kulang ng top-level domain.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target state="needs-review-translation">Masyadong maikli ang halagang ito. Dapat itong maglaman ng hindi bababa sa isang salita.|Masyadong maikli ang halagang ito. Dapat itong maglaman ng hindi bababa sa {{ min }} salita.</target>
+                <target>Masyadong maikli ang halagang ito. Dapat itong maglaman ng hindi bababa sa isang salita.|Masyadong maikli ang halagang ito. Dapat itong maglaman ng hindi bababa sa {{ min }} salita.</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target state="needs-review-translation">Masyadong mahaba ang halagang ito. Dapat itong maglaman lamang ng isang salita.|Masyadong mahaba ang halagang ito. Dapat itong maglaman ng {{ max }} salita o mas kaunti.</target>
+                <target>Masyadong mahaba ang halagang ito. Dapat itong maglaman lamang ng isang salita.|Masyadong mahaba ang halagang ito. Dapat itong maglaman ng {{ max }} salita o mas kaunti.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi kumakatawan sa isang wastong linggo sa format ng ISO 8601.</target>
+                <target>Ang halagang ito ay hindi kumakatawan sa isang wastong linggo sa format ng ISO 8601.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi isang wastong linggo.</target>
+                <target>Ang halagang ito ay hindi isang wastong linggo.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi dapat bago sa linggo "{{ min }}".</target>
+                <target>Ang halagang ito ay hindi dapat bago sa linggo "{{ min }}".</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi dapat pagkatapos ng linggo "{{ max }}".</target>
+                <target>Ang halagang ito ay hindi dapat pagkatapos ng linggo "{{ max }}".</target>
             </trans-unit>
             <trans-unit id="120">
                 <source>This value is not a valid slug.</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi isang wastong slug.</target>
+                <target>Ang halagang ito ay hindi isang wastong slug.</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target state="needs-translation">This value is not a valid Twig template.</target>
             </trans-unit>
         </body>
     </file>

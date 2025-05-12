@@ -48,7 +48,7 @@ class OidcTokenHandlerTest extends TestCase
             'email' => 'foo@example.com',
         ];
         $token = $this->buildJWS(json_encode($claims));
-        $expectedUser = new OidcUser(...$claims);
+        $expectedUser = new OidcUser(...$claims, userIdentifier: $claims[$claim]);
 
         $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock->expects($this->never())->method('error');
@@ -67,7 +67,7 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertInstanceOf(OidcUser::class, $actualUser);
         $this->assertEquals($expectedUser, $actualUser);
         $this->assertEquals($claims, $userBadge->getAttributes());
-        $this->assertEquals($claims['sub'], $actualUser->getUserIdentifier());
+        $this->assertEquals($claims[$claim], $actualUser->getUserIdentifier());
     }
 
     public static function getClaims(): iterable

@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormErrorIterator;
 
 final class ColorTypeTest extends BaseTypeTestCase
 {
@@ -30,7 +31,8 @@ final class ColorTypeTest extends BaseTypeTestCase
 
         $form->submit($submittedValue);
 
-        $this->assertEmpty($form->getErrors());
+        $this->assertInstanceOf(FormErrorIterator::class, $form->getErrors());
+        $this->assertCount(0, $form->getErrors());
     }
 
     public static function validationShouldPassProvider(): array

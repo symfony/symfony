@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\CacheWarmer\LazyGhostCacheWarmer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 
+/**
+ * @group legacy
+ */
 class LazyGhostCacheWarmerTest extends TestCase
 {
     private string $lazyGhostsDir;

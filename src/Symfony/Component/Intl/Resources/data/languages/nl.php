@@ -14,7 +14,6 @@ return [
         'afh' => 'Afrihili',
         'agq' => 'Aghem',
         'ain' => 'Aino',
-        'ajp' => 'Zuid-Levantijns-Arabisch',
         'ak' => 'Akan',
         'akk' => 'Akkadisch',
         'akz' => 'Alabama',

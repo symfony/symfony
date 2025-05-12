@@ -117,7 +117,14 @@ class RouterListener implements EventSubscriberInterface
                 $attributes = [];
 
                 foreach ($parameters as $parameter => $value) {
-                    $attribute = $mapping[$parameter] ?? $parameter;
+                    if (!isset($mapping[$parameter])) {
+                        $attribute = $parameter;
+                    } elseif (\is_array($mapping[$parameter])) {
+                        [$attribute, $parameter] = $mapping[$parameter];
+                        $mappedAttributes[$attribute] = '';
+                    } else {
+                        $attribute = $mapping[$parameter];
+                    }
 
                     if (!isset($mappedAttributes[$attribute])) {
                         $attributes[$attribute] = $value;

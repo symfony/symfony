@@ -157,7 +157,7 @@ return [
         'America/Nassau' => 'Àkókò ìhà ìlà oòrùn (ìlú Nasaò)',
         'America/New_York' => 'Àkókò ìhà ìlà oòrùn (ìlú New York)',
         'America/Nome' => 'Àkókò Alásíkà (ìlú Nomi)',
-        'America/Noronha' => 'Aago Fenando de Norona (Noronha)',
+        'America/Noronha' => 'Aago Fenando de Norona (Fernando de Noronha)',
         'America/North_Dakota/Beulah' => 'àkókò àárín gbùngbùn (ìlú Beulà ní North Dakota)',
         'America/North_Dakota/Center' => 'àkókò àárín gbùngbùn (ìlú Senta North Dakota)',
         'America/North_Dakota/New_Salem' => 'àkókò àárín gbùngbùn (ìlú New Salem ni North Dakota)',

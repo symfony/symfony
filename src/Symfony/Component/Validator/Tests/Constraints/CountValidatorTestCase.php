@@ -71,6 +71,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getThreeOrLessElements
      */
     public function testValidValuesMax($value)
@@ -94,6 +95,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getFiveOrMoreElements
      */
     public function testValidValuesMin($value)
@@ -117,6 +119,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getFourElements
      */
     public function testValidValuesExact($value)
@@ -140,6 +143,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getFiveOrMoreElements
      */
     public function testTooManyValues($value)
@@ -180,6 +184,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getThreeOrLessElements
      */
     public function testTooFewValues($value)
@@ -220,6 +225,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getFiveOrMoreElements
      */
     public function testTooManyValuesExact($value)

@@ -18,18 +18,15 @@
     "require": {
         "php": ">=8.2",
         "ext-xml": "*",
+        "composer-runtime-api": ">=2.1",
+        "symfony/config": "^7.3",
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/twig-bridge": "^6.4|^7.0",
         "symfony/var-dumper": "^6.4|^7.0"
     },
     "require-dev": {
-        "symfony/config": "^6.4|^7.0",
         "symfony/web-profiler-bundle": "^6.4|^7.0"
-    },
-    "conflict": {
-        "symfony/config": "<6.4",
-        "symfony/dependency-injection": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\DebugBundle\\": "" },

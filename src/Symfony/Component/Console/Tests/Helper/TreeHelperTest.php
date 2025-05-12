@@ -25,7 +25,7 @@ class TreeHelperTest extends TestCase
         $tree = TreeHelper::createTree($output);
 
         $tree->render();
-        $this->assertSame(PHP_EOL, $output->fetch());
+        $this->assertSame(\PHP_EOL, $output->fetch());
     }
 
     public function testRenderSingleNode()

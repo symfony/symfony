@@ -56,6 +56,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getValidValuesWithWhitespaces
      */
     public function testValidValuesWithWhitespaces($value)
@@ -107,6 +108,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getInvalidValues
      */
     public function testInvalidValues($value)

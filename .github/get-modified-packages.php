@@ -22,7 +22,7 @@ function getPackageType(string $packageDir): string
     return match (true) {
         str_contains($packageDir, 'Symfony/Bridge/') => 'bridge',
         str_contains($packageDir, 'Symfony/Bundle/') => 'bundle',
-        preg_match('@Symfony/Component/[^/]+/Bridge/@', $packageDir) => 'component_bridge',
+        1 === preg_match('@Symfony/Component/[^/]+/Bridge/@', $packageDir) => 'component_bridge',
         str_contains($packageDir, 'Symfony/Component/') => 'component',
         str_contains($packageDir, 'Symfony/Contracts/') => 'contract',
         str_ends_with($packageDir, 'Symfony/Contracts') => 'contracts',

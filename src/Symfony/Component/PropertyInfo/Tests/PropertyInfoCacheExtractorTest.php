@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
@@ -25,6 +26,8 @@ use Symfony\Component\TypeInfo\Type;
  */
 class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
 {
+    use ExpectUserDeprecationMessageTrait;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -55,6 +58,8 @@ class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
      */
     public function testGetTypes()
     {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor::getType()" instead.');
+
         parent::testGetTypes();
         parent::testGetTypes();
     }

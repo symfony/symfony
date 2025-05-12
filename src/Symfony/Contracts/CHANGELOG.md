@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Make `HttpClientTestCase` and `TranslatorTest` compatible with PHPUnit 10+
+ * Add `NamespacedPoolInterface` to support namespace-based invalidation
 
 3.5
 ---

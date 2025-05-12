@@ -247,6 +247,6 @@ class CookieJarTest extends TestCase
         $cookieJar->set(new Cookie('foo', 'bar', null, '/', '.example.com'));
 
         $this->assertEquals(['foo' => 'bar'], $cookieJar->allValues('http://www.example.com'));
-        $this->assertEmpty($cookieJar->allValues('http://wwwexample.com'));
+        $this->assertSame([], $cookieJar->allValues('http://wwwexample.com'));
     }
 }

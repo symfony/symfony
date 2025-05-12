@@ -421,7 +421,7 @@ final class PhpAstBuilder
      */
     private function buildObjectNodeStatements(ObjectNode $node, bool $decodeFromStream, array &$context): array
     {
-        if ($node->isGhost()) {
+        if ($node->isMock()) {
             return [];
         }
 

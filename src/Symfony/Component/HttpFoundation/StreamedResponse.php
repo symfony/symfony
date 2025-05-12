@@ -56,6 +56,8 @@ class StreamedResponse extends Response
         $this->callback = static function () use ($chunks): void {
             foreach ($chunks as $chunk) {
                 echo $chunk;
+                @ob_flush();
+                flush();
             }
         };
 

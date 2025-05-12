@@ -159,7 +159,7 @@ EOLUA;
 
         foreach ($results as $id => $result) {
             if ($result instanceof \RedisException || $result instanceof \Relay\Exception || $result instanceof ErrorInterface) {
-                CacheItem::log($this->logger, 'Failed to delete key "{key}": '.$result->getMessage(), ['key' => substr($id, \strlen($this->namespace)), 'exception' => $result]);
+                CacheItem::log($this->logger, 'Failed to delete key "{key}": '.$result->getMessage(), ['key' => substr($id, \strlen($this->rootNamespace)), 'exception' => $result]);
 
                 continue;
             }

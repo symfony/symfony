@@ -589,7 +589,6 @@ class RequestTest extends TestCase
 
         $server['REDIRECT_QUERY_STRING'] = 'query=string';
         $server['REDIRECT_URL'] = '/path/info';
-        $server['SCRIPT_NAME'] = '/index.php';
         $server['QUERY_STRING'] = 'query=string';
         $server['REQUEST_URI'] = '/path/info?toto=test&1=1';
         $server['SCRIPT_NAME'] = '/index.php';
@@ -716,7 +715,6 @@ class RequestTest extends TestCase
 
         $server['REDIRECT_QUERY_STRING'] = 'query=string';
         $server['REDIRECT_URL'] = '/path/info';
-        $server['SCRIPT_NAME'] = '/index.php';
         $server['QUERY_STRING'] = 'query=string';
         $server['REQUEST_URI'] = '/path/info?toto=test&1=1';
         $server['SCRIPT_NAME'] = '/index.php';
@@ -1550,16 +1548,16 @@ class RequestTest extends TestCase
         yield '"fr" selected as first choice when no header is present' => ['fr', null, ['fr', 'en']];
         yield '"en" selected as first choice when no header is present' => ['en', null, ['en', 'fr']];
         yield '"fr_CH" selected as first choice when no header is present' => ['fr_CH', null, ['fr-ch', 'fr-fr']];
-        yield '"en_US" is selected as an exact match is found (1)' => ['en_US', 'zh, en-us; q=0.8, en; q=0.6', ['en', 'en-us']];
-        yield '"en_US" is selected as an exact match is found (2)' => ['en_US', 'ja-JP,fr_CA;q=0.7,fr;q=0.5,en_US;q=0.3', ['en_US', 'fr_FR']];
-        yield '"en" is selected as an exact match is found' => ['en', 'zh, en-us; q=0.8, en; q=0.6', ['fr', 'en']];
-        yield '"fr" is selected as an exact match is found' => ['fr', 'zh, en-us; q=0.8, fr-fr; q=0.6, fr; q=0.5', ['fr', 'en']];
+        yield '"en_US" is selected as an exact match is found' => ['en_US', 'zh, en-us; q=0.8, en; q=0.6', ['en', 'en-us']];
+        yield '"fr_FR" is selected as it has a higher priority than an exact match' => ['fr_FR', 'ja-JP,fr_CA;q=0.7,fr;q=0.5,en_US;q=0.3', ['en_US', 'fr_FR']];
+        yield '"en" is selected as an exact match is found (1)' => ['en', 'zh, en-us; q=0.8, en; q=0.6', ['fr', 'en']];
+        yield '"en" is selected as an exact match is found (2)' => ['en', 'zh, en-us; q=0.8, fr-fr; q=0.6, fr; q=0.5', ['fr', 'en']];
         yield '"en" is selected as "en-us" is a similar dialect' => ['en', 'zh, en-us; q=0.8', ['fr', 'en']];
         yield '"fr_FR" is selected as "fr_CA" is a similar dialect (1)' => ['fr_FR', 'ja-JP,fr_CA;q=0.7,fr;q=0.5', ['en_US', 'fr_FR']];
         yield '"fr_FR" is selected as "fr_CA" is a similar dialect (2)' => ['fr_FR', 'ja-JP,fr_CA;q=0.7', ['en_US', 'fr_FR']];
-        yield '"fr_FR" is selected as "fr" is a similar dialect' => ['fr_FR', 'ja-JP,fr;q=0.5', ['en_US', 'fr_FR']];
+        yield '"fr_FR" is selected as "fr" is a similar dialect (1)' => ['fr_FR', 'ja-JP,fr;q=0.5', ['en_US', 'fr_FR']];
+        yield '"fr_FR" is selected as "fr" is a similar dialect (2)' => ['fr_FR', 'ja-JP,fr;q=0.5,en_US;q=0.3', ['en_US', 'fr_FR']];
         yield '"fr_FR" is selected as "fr_CA" is a similar dialect and has a greater "q" compared to "en_US" (2)' => ['fr_FR', 'ja-JP,fr_CA;q=0.7,ru-ru;q=0.3', ['en_US', 'fr_FR']];
-        yield '"en_US" is selected it is an exact match' => ['en_US', 'ja-JP,fr;q=0.5,en_US;q=0.3', ['en_US', 'fr_FR']];
         yield '"fr_FR" is selected as "fr_CA" is a similar dialect and has a greater "q" compared to "en"' => ['fr_FR', 'ja-JP,fr_CA;q=0.7,en;q=0.5', ['en_US', 'fr_FR']];
         yield '"fr_FR" is selected as is is an exact match as well as "en_US", but with a greater "q" parameter' => ['fr_FR', 'en-us;q=0.5,fr-fr', ['en_US', 'fr_FR']];
         yield '"hi_IN" is selected as "hi_Latn_IN" is a similar dialect' => ['hi_IN', 'fr-fr,hi_Latn_IN;q=0.5', ['hi_IN', 'en_US']];

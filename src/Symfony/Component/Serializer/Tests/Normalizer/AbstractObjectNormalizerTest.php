@@ -577,7 +577,7 @@ class AbstractObjectNormalizerTest extends TestCase
                     );
                 }
 
-                throw new InvalidArgumentException(sprintf('"%s" is not handled.', $value));
+                throw new InvalidArgumentException(\sprintf('"%s" is not handled.', $value));
             }
 
             public function hasMetadataFor($value): bool

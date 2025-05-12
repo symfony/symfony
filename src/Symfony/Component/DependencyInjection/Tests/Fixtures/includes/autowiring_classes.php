@@ -14,6 +14,7 @@ require __DIR__.'/compositetype_classes.php';
 class Foo
 {
     public static int $counter = 0;
+    public int $foo = 0;
 
     #[Required]
     public function cloneFoo(?\stdClass $bar = null): static

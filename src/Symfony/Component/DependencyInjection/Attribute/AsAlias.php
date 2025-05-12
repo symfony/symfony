@@ -20,12 +20,20 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 final class AsAlias
 {
     /**
-     * @param string|null $id     The id of the alias
-     * @param bool        $public Whether to declare the alias public
+     * @var list<string>
+     */
+    public array $when = [];
+
+    /**
+     * @param string|null         $id     The id of the alias
+     * @param bool                $public Whether to declare the alias public
+     * @param string|list<string> $when   The environments under which the class will be registered as a service (i.e. "dev", "test", "prod")
      */
     public function __construct(
         public ?string $id = null,
         public bool $public = false,
+        string|array $when = [],
     ) {
+        $this->when = (array) $when;
     }
 }

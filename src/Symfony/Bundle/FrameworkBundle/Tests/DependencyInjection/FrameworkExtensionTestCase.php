@@ -15,6 +15,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Validator\DefinitionValidator;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
@@ -33,6 +34,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
@@ -68,6 +70,7 @@ use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -83,11 +86,13 @@ use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Controller\WebhookController;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\WorkflowEvents;
@@ -275,25 +280,20 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testProfilerCollectSerializerDataEnabled()
     {
-        $container = $this->createContainerFromFile('profiler_collect_serializer_data');
+        $container = $this->createContainerFromFile('profiler');
 
         $this->assertTrue($container->hasDefinition('profiler'));
         $this->assertTrue($container->hasDefinition('serializer.data_collector'));
         $this->assertTrue($container->hasDefinition('debug.serializer'));
     }
 
-    public function testProfilerCollectSerializerDataDefaultDisabled()
-    {
-        $container = $this->createContainerFromFile('profiler');
-
-        $this->assertTrue($container->hasDefinition('profiler'));
-        $this->assertFalse($container->hasDefinition('serializer.data_collector'));
-        $this->assertFalse($container->hasDefinition('debug.serializer'));
-    }
-
     public function testWorkflows()
     {
-        $container = $this->createContainerFromFile('workflows');
+        DefinitionValidator::$called = false;
+
+        $container = $this->createContainerFromFile('workflows', compile: false);
+        $container->addCompilerPass(new WorkflowValidatorPass());
+        $container->compile();
 
         $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
         $this->assertSame('workflow.abstract', $container->getDefinition('workflow.article')->getParent());
@@ -316,6 +316,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $tags['workflow'][0]['metadata'] ?? null);
 
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
+        $this->assertTrue(DefinitionValidator::$called, 'DefinitionValidator is called');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
 
@@ -409,7 +410,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "go" from place/state "first" were found on StateMachine "my_workflow".');
-        $this->createContainerFromFile('workflow_not_valid');
+        $container = $this->createContainerFromFile('workflow_not_valid', compile: false);
+        $container->addCompilerPass(new WorkflowValidatorPass());
+        $container->compile();
     }
 
     public function testWorkflowCannotHaveBothSupportsAndSupportStrategy()
@@ -614,21 +617,25 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], array_keys($configuration));
 
         $this->assertEqualsCanonicalizing([
+            'log_channel' => null,
             'log_level' => 'info',
             'status_code' => 422,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class]);
 
         $this->assertEqualsCanonicalizing([
+            'log_channel' => null,
             'log_level' => 'info',
             'status_code' => null,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class]);
 
         $this->assertEqualsCanonicalizing([
+            'log_channel' => null,
             'log_level' => 'info',
             'status_code' => null,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\ConflictHttpException::class]);
 
         $this->assertEqualsCanonicalizing([
+            'log_channel' => null,
             'log_level' => null,
             'status_code' => 500,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException::class]);
@@ -796,7 +803,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             \ARRAY_FILTER_USE_KEY
         );
 
-        $this->assertEmpty($messengerDefinitions);
+        $this->assertSame([], $messengerDefinitions);
         $this->assertFalse($container->hasDefinition('console.command.messenger_consume_messages'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_debug'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_stop_workers'));
@@ -1241,6 +1248,36 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNull($options['cache_dir']);
     }
 
+    public function testTranslatorGlobals()
+    {
+        $container = $this->createContainerFromFile('translator_globals');
+
+        $calls = $container->getDefinition('translator.default')->getMethodCalls();
+
+        $this->assertCount(5, $calls);
+        $this->assertSame(
+            ['addGlobalParameter', ['%%app_name%%', 'My application']],
+            $calls[2],
+        );
+        $this->assertSame(
+            ['addGlobalParameter', ['{app_version}', '1.2.3']],
+            $calls[3],
+        );
+        $this->assertEquals(
+            ['addGlobalParameter', ['{url}', new Definition(TranslatableMessage::class, ['url', ['scheme' => 'https://'], 'global'])]],
+            $calls[4],
+        );
+    }
+
+    public function testTranslatorWithoutGlobals()
+    {
+        $container = $this->createContainerFromFile('translator_without_globals');
+
+        $calls = $container->getDefinition('translator.default')->getMethodCalls();
+
+        $this->assertCount(2, $calls);
+    }
+
     public function testValidation()
     {
         $container = $this->createContainerFromFile('full');
@@ -1490,9 +1527,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(AttributeLoader::class, $argument[0]->getClass());
         $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.name_converter.metadata_aware')->getArgument(1));
         $this->assertEquals(new Reference('property_info', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $container->getDefinition('serializer.normalizer.object')->getArgument(3));
-        $this->assertArrayHasKey('circular_reference_handler', $container->getDefinition('serializer.normalizer.object')->getArgument(6));
-        $this->assertArrayHasKey('max_depth_handler', $container->getDefinition('serializer.normalizer.object')->getArgument(6));
-        $this->assertEquals($container->getDefinition('serializer.normalizer.object')->getArgument(6)['max_depth_handler'], new Reference('my.max.depth.handler'));
     }
 
     public function testSerializerWithoutTranslator()
@@ -1590,13 +1624,22 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testObjectNormalizerRegistered()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('full', compile: false);
+        $container->addCompilerPass(new SerializerPass());
+        $container->addCompilerPass(new ResolveBindingsPass());
+        $container->compile();
 
         $definition = $container->getDefinition('serializer.normalizer.object');
         $tag = $definition->getTag('serializer.normalizer');
 
         $this->assertEquals(ObjectNormalizer::class, $definition->getClass());
         $this->assertEquals(-1000, $tag[0]['priority']);
+
+        $this->assertEquals([
+            'enable_max_depth' => true,
+            'circular_reference_handler' => new Reference('my.circular.reference.handler'),
+            'max_depth_handler' => new Reference('my.max.depth.handler'),
+        ], $definition->getArgument(6));
     }
 
     public function testConstraintViolationListNormalizerRegistered()
@@ -1941,7 +1984,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $container = $this->createContainer(['kernel.debug' => false]);
         (new FrameworkExtension())->load([['annotations' => false, 'http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true]]], $container);
-        $this->assertEmpty($container->getDefinition('config_cache_factory')->getArguments());
+        $this->assertSame([], $container->getDefinition('config_cache_factory')->getArguments());
     }
 
     public function testLoggerAwareRegistration()

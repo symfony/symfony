@@ -28,6 +28,8 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
         'testDeleteItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testDeleteItemsInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testPrune' => 'PhpArrayAdapter just proxies',
+
+        'testNamespaces' => 'PhpArrayAdapter does not support namespaces.',
     ];
 
     protected static string $file;

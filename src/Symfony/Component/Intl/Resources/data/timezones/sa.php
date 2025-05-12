@@ -98,7 +98,7 @@ return [
         'America/Nassau' => 'उत्तर अमेरिका: पौर्व समयः (Nassau)',
         'America/New_York' => 'उत्तर अमेरिका: पौर्व समयः (New York)',
         'America/Nome' => 'संयुक्त राज्य: समय: (Nome)',
-        'America/Noronha' => 'ब्राजील समय: (Noronha)',
+        'America/Noronha' => 'ब्राजील समय: (Fernando de Noronha)',
         'America/North_Dakota/Beulah' => 'उत्तर अमेरिका: मध्य समयः (Beulah, North Dakota)',
         'America/North_Dakota/Center' => 'उत्तर अमेरिका: मध्य समयः (Center, North Dakota)',
         'America/North_Dakota/New_Salem' => 'उत्तर अमेरिका: मध्य समयः (New Salem, North Dakota)',

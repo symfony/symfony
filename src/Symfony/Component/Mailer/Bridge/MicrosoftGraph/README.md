@@ -1,11 +1,12 @@
 Microsoft Graph API Mailer
-=============
+==========================
 
 Provides Microsoft Graph API integration for Symfony Mailer.
 
 
 Prerequisites
----------
+-------------
+
 You will need to:
  * Register an application in your Microsoft Azure portal,
  * Grant this application the Microsoft Graph `Mail.Send` permission,
@@ -13,7 +14,7 @@ You will need to:
 
 
 Configuration example
----------
+---------------------
 
 ```env
 # MAILER
@@ -40,9 +41,9 @@ More details can be found in the Microsoft documentation :
 
 
 Troubleshooting
---------
-Beware that the sender email address needs to be an address of an account inside your tenant.
+---------------
 
+Beware that the sender email address needs to be an address of an account inside your tenant.
 
 Resources
 ---------

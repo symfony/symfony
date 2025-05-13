@@ -22,9 +22,8 @@
     "require": {
         "php": ">=8.1",
         "symfony/mailer": "^5.4|^6.4|^7.0",
-        "thecodingmachine/safe": "^2.5.0",
         "microsoft/microsoft-graph": "^2.0.0",
-        "symfony/cache": "6.4.x-dev"
+        "guzzlehttp/psr7": "^2.0"
     },
     "require-dev": {
         "symfony/http-client": "^5.4|^6.4|^7.0"

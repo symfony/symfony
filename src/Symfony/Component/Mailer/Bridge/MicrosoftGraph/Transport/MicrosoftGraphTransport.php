@@ -35,25 +35,16 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Contracts\Cache\CacheInterface;
 
 class MicrosoftGraphTransport implements TransportInterface
 {
     private GraphServiceClient $graphServiceClient;
 
     public function __construct(
-        private readonly string $nationalCloud,
-        private readonly string $tenantId,
-        private readonly string $clientId,
-        private readonly string $clientSecret,
-        private readonly CacheInterface $cache,
+        readonly string $nationalCloud,
+        readonly ClientCredentialContext $clientCredentialContext,
     ) {
-        $tokenRequestContext = new ClientCredentialContext(
-            $this->tenantId,
-            $this->clientId,
-            $this->clientSecret
-        );
-        $this->graphServiceClient = new GraphServiceClient($tokenRequestContext, [], $this->nationalCloud);
+        $this->graphServiceClient = new GraphServiceClient($clientCredentialContext, [], $this->nationalCloud);
     }
 
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
@@ -61,7 +52,7 @@ class MicrosoftGraphTransport implements TransportInterface
         $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
 
         if (!$message instanceof Email) {
-            throw new SendEmailError(sprintf("This mailer can only handle mails of class '%s' or it's subclasses, instance of %s passed", Email::class, $message::class));
+            throw new SendMailException(sprintf("This mailer can only handle mails of class '%s' or it's subclasses, instance of %s passed", Email::class, $message::class));
         }
 
         $this->sendMail($message);
@@ -93,12 +84,12 @@ class MicrosoftGraphTransport implements TransportInterface
 
         // From
         if (0 === \count($source->getFrom())) {
-            throw new SendEmailError("Cannot send mail without 'From'");
+            throw new SendMailException("Cannot send mail without 'From'");
         }
 
         $message->setFrom(self::convertAddressToGraphRecipient($source->getFrom()[0]));
 
-        // to
+        // To
         $message->setToRecipients(array_map(
             static fn (Address $address) => self::convertAddressToGraphRecipient($address),
             $source->getTo()
@@ -117,12 +108,18 @@ class MicrosoftGraphTransport implements TransportInterface
         ));
 
         // Subject & body
-        $message->setSubject($source->getSubject() ?? 'No subject');
-        $itemBody = new ItemBody();
-        $itemBody->setContent((string) $source->getHtmlBody());
-        $itemBody->setContentType(new BodyType(BodyType::HTML));
-        $message->setBody($itemBody);
+        $message->setSubject($source->getSubject() ?? '');
 
+        $itemBody = new ItemBody();
+        if ($source->getHtmlBody()) {
+            $itemBody->setContent((string) $source->getHtmlBody());
+            $itemBody->setContentType(new BodyType(BodyType::HTML));
+        } else {
+            $itemBody->setContent((string) $source->getTextBody());
+            $itemBody->setContentType(new BodyType(BodyType::TEXT));
+        }
+
+        $message->setBody($itemBody);
         $message->setAttachments(array_map(
             static fn (DataPart $attachment) => self::convertAttachmentGraphAttachment($attachment),
             $source->getAttachments()
@@ -153,10 +150,10 @@ class MicrosoftGraphTransport implements TransportInterface
         $fileStream = Utils::streamFor($source->bodyToString());
         \assert($fileStream instanceof Stream);
 
-        $attachment->setContentBytes($fileStream)
-            ->setContentType($source->getMediaType().'/'.$source->getMediaSubtype())
-            ->setName($filename)
-            ->setODataType('#microsoft.graph.fileAttachment');
+        $attachment->setContentBytes($fileStream);
+        $attachment->setContentType($source->getMediaType().'/'.$source->getMediaSubtype());
+        $attachment->setName($filename);
+        $attachment->setODataType('#microsoft.graph.fileAttachment');
 
         return $attachment;
     }

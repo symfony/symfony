@@ -12,7 +12,9 @@
 namespace Symfony\Component\Mailer\Bridge\MicrosoftGraph\Tests\Transport;
 
 use Microsoft\Graph\Core\NationalCloud;
-use Symfony\Component\Cache\Adapter\NullAdapter;
+use Microsoft\Kiota\Authentication\Oauth\ClientCredentialContext;
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport\MicrosoftGraphTransport;
 use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport\MicrosoftGraphTransportFactory;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
@@ -26,7 +28,7 @@ class MicrosoftGraphTransportFactoryTest extends TransportFactoryTestCase
 
     public function getFactory(): TransportFactoryInterface
     {
-        return new MicrosoftGraphTransportFactory(new NullAdapter());
+        return new MicrosoftGraphTransportFactory(null, new MockHttpClient(), new NullLogger());
     }
 
     public static function supportsProvider(): iterable
@@ -46,27 +48,27 @@ class MicrosoftGraphTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('microsoft+graph', 'default', self::USER, self::PASSWORD, null, ['tenant' => self::TENANT]),
-            new MicrosoftGraphTransport(NationalCloud::GLOBAL, self::TENANT, self::USER, self::PASSWORD, new NullAdapter()),
+            new MicrosoftGraphTransport(NationalCloud::GLOBAL, new ClientCredentialContext(self::TENANT, self::USER, self::PASSWORD)),
         ];
 
         yield [
             new Dsn('microsoft+graph', 'germany', self::USER, self::PASSWORD, null, ['tenant' => self::TENANT]),
-            new MicrosoftGraphTransport(NationalCloud::GERMANY, self::TENANT, self::USER, self::PASSWORD, new NullAdapter()),
+            new MicrosoftGraphTransport(NationalCloud::GERMANY, new ClientCredentialContext(self::TENANT, self::USER, self::PASSWORD)),
         ];
 
         yield [
             new Dsn('microsoft+graph', 'china', self::USER, self::PASSWORD, null, ['tenant' => self::TENANT]),
-            new MicrosoftGraphTransport(NationalCloud::CHINA, self::TENANT, self::USER, self::PASSWORD, new NullAdapter()),
+            new MicrosoftGraphTransport(NationalCloud::CHINA, new ClientCredentialContext(self::TENANT, self::USER, self::PASSWORD)),
         ];
 
         yield [
             new Dsn('microsoft+graph', 'us-gov', self::USER, self::PASSWORD, null, ['tenant' => self::TENANT]),
-            new MicrosoftGraphTransport(NationalCloud::US_GOV, self::TENANT, self::USER, self::PASSWORD, new NullAdapter()),
+            new MicrosoftGraphTransport(NationalCloud::US_GOV, new ClientCredentialContext(self::TENANT, self::USER, self::PASSWORD)),
         ];
 
         yield [
             new Dsn('microsoft+graph', 'us-dod', self::USER, self::PASSWORD, null, ['tenant' => self::TENANT]),
-            new MicrosoftGraphTransport(NationalCloud::US_DOD, self::TENANT, self::USER, self::PASSWORD, new NullAdapter()),
+            new MicrosoftGraphTransport(NationalCloud::US_DOD, new ClientCredentialContext(self::TENANT, self::USER, self::PASSWORD)),
         ];
     }
 

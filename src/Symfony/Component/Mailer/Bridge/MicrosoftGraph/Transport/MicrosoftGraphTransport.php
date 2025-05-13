@@ -1,5 +1,8 @@
 <?php
 
+
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -8,8 +11,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-declare(strict_types=1);
 
 namespace Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport;
 
@@ -52,7 +53,7 @@ class MicrosoftGraphTransport implements TransportInterface
         $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
 
         if (!$message instanceof Email) {
-            throw new SendMailException(\sprintf("This mailer can only handle mails of class '%s' or it's subclasses, instance of %s passed", Email::class, $message::class));
+            throw new SendMailException(\sprintf("This mailer can only handle mails of class '%s' or it's subclasses, instance of '%s' passed", Email::class, $message::class));
         }
 
         $this->sendMail($message);

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -10,6 +8,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport;
 
@@ -50,7 +50,7 @@ final class MicrosoftGraphTransportFactory extends AbstractTransportFactory
             throw new IncompleteDsnException("Transport 'microsoft+graph' requires the 'tenant' option");
         }
         if (!isset(self::CLOUD_MAP[$dsn->getHost()])) {
-            throw new InvalidArgumentException(sprintf("Transport 'microsoft+graph' one of these hosts : '%s'", implode(', ', self::CLOUD_MAP)));
+            throw new InvalidArgumentException(\sprintf("Transport 'microsoft+graph' one of these hosts : '%s'", implode(', ', self::CLOUD_MAP)));
         }
 
         return new MicrosoftGraphTransport(

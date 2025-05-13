@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -10,6 +8,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport;
 
@@ -47,12 +47,12 @@ class MicrosoftGraphTransport implements TransportInterface
         $this->graphServiceClient = new GraphServiceClient($clientCredentialContext, [], $this->nationalCloud);
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
 
         if (!$message instanceof Email) {
-            throw new SendMailException(sprintf("This mailer can only handle mails of class '%s' or it's subclasses, instance of %s passed", Email::class, $message::class));
+            throw new SendMailException(\sprintf("This mailer can only handle mails of class '%s' or it's subclasses, instance of %s passed", Email::class, $message::class));
         }
 
         $this->sendMail($message);
@@ -72,9 +72,9 @@ class MicrosoftGraphTransport implements TransportInterface
             $this->graphServiceClient->users()->byUserId($senderAddress)->sendMail()->post($body)->wait();
         } catch (ODataError $error) {
             if ('ErrorInvalidUser' === $error->getError()->getCode()) {
-                throw new SenderNotFoundException("Sender email address '".$senderAddress."' could not be found when calling the Graph API. This is usually because the email address doesn't exist in the tenant.", 404, $error);
+                throw new SenderNotFoundException("Sender email address '.".$senderAddress."' could not be found when calling the Graph API. This is usually because the email address doesn't exist in the tenant.", 404, $error);
             }
-            throw new SendMailException('Something went wrong while sending email', $error->getCode(), $error);
+            throw new SendMailException('Something went wrong while sending email.', $error->getCode(), $error);
         }
     }
 
@@ -84,7 +84,7 @@ class MicrosoftGraphTransport implements TransportInterface
 
         // From
         if (0 === \count($source->getFrom())) {
-            throw new SendMailException("Cannot send mail without 'From'");
+            throw new SendMailException("Cannot send mail without 'From'.");
         }
 
         $message->setFrom(self::convertAddressToGraphRecipient($source->getFrom()[0]));

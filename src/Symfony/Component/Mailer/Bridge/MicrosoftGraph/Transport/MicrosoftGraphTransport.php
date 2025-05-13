@@ -39,10 +39,10 @@ class MicrosoftGraphTransport implements TransportInterface
     private GraphServiceClient $graphServiceClient;
 
     public function __construct(
-        readonly string $nationalCloud,
-        readonly ClientCredentialContext $clientCredentialContext,
+        string $nationalCloud,
+        ClientCredentialContext $clientCredentialContext,
     ) {
-        $this->graphServiceClient = new GraphServiceClient($clientCredentialContext, [], $this->nationalCloud);
+        $this->graphServiceClient = new GraphServiceClient($clientCredentialContext, [], $nationalCloud);
     }
 
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage

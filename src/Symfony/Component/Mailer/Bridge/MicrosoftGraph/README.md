@@ -36,12 +36,11 @@ MAILER_DSN=microsoft+graph://CLIENT_APP_ID:SECRET@login.partner.microsoftonline.
 
 More details can be found in the Microsoft documentation :
  * [Auth Endpoints](https://learn.microsoft.com/en-us/entra/identity-platform/authentication-national-cloud#microsoft-entra-authentication-endpoints)
- * [Grpah Endpoints](https://learn.microsoft.com/en-us/graph/deployments#microsoft-graph-and-graph-explorer-service-root-endpoints)
+ * [Graph Endpoints](https://learn.microsoft.com/en-us/graph/deployments#microsoft-graph-and-graph-explorer-service-root-endpoints)
 
 
 Troubleshooting
 --------
-//TODO : erreur stack trace
 Beware that the sender email address needs to be an address of an account inside your tenant.
 
 

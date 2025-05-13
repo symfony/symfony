@@ -25,6 +25,7 @@ use Microsoft\Graph\GraphServiceClient;
 use Microsoft\Kiota\Authentication\Oauth\ClientCredentialContext;
 use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Exception\SenderNotFoundException;
 use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Exception\SendMailException;
+use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Exception\UnAuthorizedException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -73,6 +74,11 @@ class MicrosoftGraphTransport implements TransportInterface
                 throw new SenderNotFoundException("Sender email address '.".$senderAddress."' could not be found when calling the Graph API. This is usually because the email address doesn't exist in the tenant.", 404, $error);
             }
             throw new SendMailException('Something went wrong while sending email.', $error->getCode(), $error);
+        } catch (\Exception $exception) {
+            if ('unauthorized_client' === $exception->getMessage()) {
+                throw new UnAuthorizedException('Unauthorized to send email. Check your credentials.', 401, $exception);
+            }
+            throw new SendMailException('Something went wrong while sending email.', 0, $exception);
         }
     }
 

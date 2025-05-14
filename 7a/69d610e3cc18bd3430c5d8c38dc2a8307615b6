@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-05-12T09:28:18Z
+
+Could we edit existing fixtures to cover this (like `src/Symfony/Component/Config/Tests/Builder/Fixtures/AddToList.php` or any of the same folder) ?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-05-12T13:44:09Z
+
+Thanks @alexandre-daubois, I hadn't found where to test.

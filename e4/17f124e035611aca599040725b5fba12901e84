@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by santysisi at 2025-04-25T03:53:01Z
+
+I think (though I could be wrong) that the test failures are due to flaky tests.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-04-27T22:04:13Z
+
+Thanks for the PR. As said in the linked issue, I'm rather 👎  on this as the proposed `default_authenticator` option doesn't have any effect outside the context of a `Security::login()` call and its name doesn't convey this which makes it confusing to me. Even if we make it obvious in the option name, I feel like a global option is not appropriate here as the usage of `login()` is usually marginal in an app.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-04-27T22:25:12Z
+
+Thanks for your feedback @chalasr , and you're right, I should have consulted you before proceeding with the implementation. I understand your concerns about approach
+
+Do you think there's a different approach that might still address the underlying need, or would it make more sense to close this pull request?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-04-27T22:31:59Z
+
+If you agree to work on the suggested alternative which is to patch the `login()` method to basically make it exclude `remember_me` from the retrieved list of authenticators so it works seamlessly in case there's only one authenticator with rememberme configured, I'm fine with repurposing this very PR.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-04-27T22:52:30Z
+
+Yeah, I'm fine with that alternative, so I'll go ahead and make the change next weekend.
+Thank you for your suggestion.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-04-29T00:25:27Z
+
+Hi @chalasr! 👋
+
+I've updated the branch with the patch to the login() method. Since this is a patch to the login behavior, I changed the base branch from 7.3 to 6.4, and also updated the title and description of the PR to reflect the changes.
+
+If there's anything else I need to address, please let me know!
+
+Thanks ❤️
+
+Edit: I was also thinking about adding a new condition [here](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bundle/SecurityBundle/Security.php#L110) to check if the passed authenticatorName is remember_me. If so, it could trigger a deprecation notice in 7.4, and throw an error in version 8.0. What do you think about that approach?
+
+For Symfony 7.4:
+We could trigger a deprecation when an excluded authenticator (like remember_me) is passed:
+```php
+if (in_array($authenticatorName, self::SECURITY_LOGIN_EXCLUSIONS)) {
+     trigger_deprecation('symfony/security-bundle', '7.4', 'The "%s" authenticator is not allowed to be used with the "%s" method. Use a different authenticator.', $authenticatorName, __METHOD__));
+}
+```
+For Symfony 8.0:
+We can escalate this to a logic error to prevent usage entirely
+```php
+if (in_array($authenticatorName, self::SECURITY_LOGIN_EXCLUSIONS)) {
+     throw new LogicException(sprintf('The "%s" authenticator is not allowed to be used with the "%s" method. Use a different authenticator.', $authenticatorName, __METHOD__));
+}
+```
+
+---------------------------------------------------------------------------
+
+by rosier at 2025-05-07T11:39:21Z
+
+Would it be an option to always pick the first authenticator from the retrieved list of authenticators and not just when there is only one authenticator configured?  (Basically remove these lines https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bundle/SecurityBundle/Security.php#L179-L181)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-09T13:48:50Z
+
+> Would it be an option to always pick the first authenticator from the retrieved list of authenticators and not just when there is only one authenticator configured? (Basically remove these lines https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bundle/SecurityBundle/Security.php#L179-L181)
+
+Required explicitness is desired in this domain IMHO, better get a good error message than a security hole.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-09T14:00:35Z
+
+> I was also thinking about adding a new condition [here](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bundle/SecurityBundle/Security.php#L110) to check if the passed authenticatorName is remember_me. If so, it could trigger a deprecation notice in 7.4, and throw an error in version 8.0. What do you think about that approach?
+
+I get your point but I don't think it is worth it right now, we can rethink about it the day it happens

@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-12T22:07:04Z
+
+If this is acceptable - I'll add a bunch of missing tests (related to non-string scalars):
+- `int $opt = 0` _(valid)_
+- `?int $opt = null` _(valid)_
+- `?int $opt = 0` _(invalid)_
+- `int|bool = false` _(valid)_
+- `int|bool = 0` _(invalid)_
+- `float $opt = 0.0` _(valid)_
+- `?float $opt = null` _(valid)_
+- `?float $opt = 0.0` _(invalid)_
+- `float|bool = false` _(valid)_
+- `float|bool = 0.0` _(invalid)_
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-12T22:16:00Z
+
+Makes sense to me, thank you.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-12T23:40:28Z
+
+@yceruto, the full list:
+
+| No. | Signature | Definition | Usage | Value |
+|--|--|--|--|--|
+| 1 | `bool $opt = false` | `VALUE_NONE` | `<omitted>` <br> `--opt` | `false` (default) <br> `true` |
+| 2 | `bool $opt = true` | `VALUE_NONE` &<br>`VALUE_NEGATABLE` | `<omitted>` <br> `--opt` <br> `--no-opt` | `true` (default) <br> `true` <br> `false`
+| 3 | `?bool $opt = null` | `VALUE_NONE` &<br>`VALUE_NEGATABLE` | `<omitted>` <br> `--opt` <br> `--no-opt` | `null` (default) <br> `true` <br> `false`
+| 4 | `string $opt = ''` | `VALUE_REQUIRED` | `<omitted>` <br> `--opt=val` | `''` (default) <br> `'val'`
+| 5 | `?string $opt = null` | `VALUE_REQUIRED` | `<omitted>` <br> `--opt=val` | `null` (default) <br> `'val'`
+| 6 | `array $opt = []` | `VALUE_REQUIRED` &<br>`VALUE_ARRAY` | `<omitted>` <br> `--opt=val1` | `[]` (default)<br>`['val1']` |
+| 7 | `?array $opt = null` | `VALUE_REQUIRED` &<br>`VALUE_ARRAY` | `<omitted>` <br> `--opt=val1` | `null` (default)<br>`['val1']`
+| 8 | `string\|bool $opt = false` | `VALUE_OPTIONAL` | `<omitted>` <br> `--opt` <br> `--opt=val` | `false` (default)<br>`true`<br>`'val'`
+
+Any `string` can be swapped with `int` or `float`.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-13T15:19:57Z
+
+@kbond do you think/confirm we can document these rules like this? + sample table [above](https://github.com/symfony/symfony/pull/60407#issuecomment-2874575584)
+
+**Signature rules (`<type> $opt = <default-value>`)**
+ * `<type>` must be one of: `bool`, `string`, `int`, `float`, or `array`
+     * Nullable types (`?<type>`) require `<default-value>` to be `null`
+     * Union types are only allowed for `bool|string`, `bool|int`, or `bool|float`
+         * In these cases, `<default-value>` must be `false`
+ * All options must define a `<default-value>`
+
+**Definition rules**
+* `VALUE_NONE`: set for `bool` or `?bool`
+    * `VALUE_NEGATABLE`: same as `VALUE_NONE`, but only if `<default-value>` is `true` or `null`
+* `VALUE_REQUIRED`: set for non-boolean single types (`<type>`) or nullable types (`?<type>`)
+    * `VALUE_ARRAY`: same as `VALUE_REQUIRED`, but specifically for `array` type
+* `VALUE_OPTIONAL`: set only for union types combining `bool|<allowed-type>`
+
+**Usage/Value rules**
+* If the option is omitted, `<default-value>` is given
+* If passed without a value (`--opt`), `true` is given
+* If negate passed (`--no-opt`), `false` is given
+* If passed with a value (`--opt=val`), `val` is given
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-13T18:18:19Z
+
+@yceruto those rules look great to me!

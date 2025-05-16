@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-05-16T14:51:06Z
+
+Could we add some tests covering both the usage with a single `field-attr` element and with multiple ones, to ensure that both cases works, as it does not use the usual `fixXmlConfig()` call converting the XML singular name to the plural name used in formats passing an array directly ? I'm still not convinced it works fine.
+those tests should be added in FrameworkExtensionTestCase with the fixtures in the 3 formats ensuring consistent compat
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-16T15:49:27Z
+
+Test case added (I did some cleanup also)

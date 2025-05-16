@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-15T20:40:31Z
+
+Where can it be useful? Asking because if it's no longer useful in web context maybe it's no longer needed in *web*link?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2025-05-15T23:40:15Z
+
+It's deprecated but still supported by Chrome-based browsers (Firefox and Safari never implemented this and don't support speculation rules either). No need to break working apps for now.

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-05-05T13:43:09Z
+
+AFAIK, this `content` option has nothing to do with the activitystreams specification of the W3C. It has to do with https://github.com/symfony/ux/pull/1853
+
+---------------------------------------------------------------------------
+
+by stof at 2025-05-05T13:43:41Z
+
+And this means that the type added in this PR is the wrong one.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-08T13:27:41Z
+
+I have no idea how to read the code of the linked pull request in regard to the changes we want to do here. What would be the right array shape to use?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-05-12T08:32:17Z
+
+Looking at the typescript types, they actually refer to the options supported by the `Notification` constructor of the web platform: https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification#options

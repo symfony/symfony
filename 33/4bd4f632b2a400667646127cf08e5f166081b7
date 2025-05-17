@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-16T10:38:34Z
+
+Would it make sense to say that if IGNORE_ON_UNINITIALIZED_REFERENCE is used, then RUNTIME_EXCEPTION_ON_INVALID_REFERENCE is implied? Would that fix the issue?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-05-16T10:54:37Z
+
+Don’t know if it makes sense but it would also solve the issue yes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-16T12:51:59Z
+
+It would to me yes!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-16T19:32:56Z
+
+It'd be great to have the test case in the DI component instead. That'd solve the deps=low failure also.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-05-17T07:42:27Z
+
+Tests updated; failures are now unrelated!

@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Symfony\Bridge\Doctrine\ArgumentResolver;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,6 +24,7 @@ use Symfony\Bridge\Doctrine\ArgumentResolver\EntityCollectionAsset\MappingType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntityCollection;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
@@ -63,7 +74,7 @@ class EntityCollectionResolver implements ValueResolverInterface
     {
         $objectManager = $this->registry->getManagerForClass($attribute->getClass());
 
-        if (!$objectManager) {
+        if (!$objectManager instanceof EntityManagerInterface) {
             throw new \RuntimeException(sprintf('No manager found for class "%s".', $attribute->getClass()));
         }
 
@@ -145,8 +156,8 @@ class EntityCollectionResolver implements ValueResolverInterface
     ): void
     {
         foreach ($parameters as $key => $value) {
-            if (in_array($key, [MappingType::LIMIT, MappingType::PAGE, MappingType::OFFSET], true)) {
-                throw new LogicException(sprintf('Doctrine parameter "%s" is not supported.', $key));
+            if (in_array($value, [MappingType::LIMIT, MappingType::PAGE, MappingType::OFFSET], true)) {
+                throw new LogicException(sprintf('Doctrine parameter "%s" is not supported.', $value));
             }
 
             $this->addCondition(
@@ -188,7 +199,7 @@ class EntityCollectionResolver implements ValueResolverInterface
             return $additionalData[$value];
         }
 
-        if (MappingType::CURRENT_USER_EXPRESSION === $value) {
+        if ($value instanceof Expression) {
             return (new ExpressionLanguage())->evaluate($value, ['user' => $this->token->getUser()]);
         }
 

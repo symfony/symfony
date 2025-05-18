@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-17T16:08:17Z
+
+>  Generate a CSV file where the following sentence is translated in all those languages. The first column is the language, the second the translation.
+> The sentence : This value is not a valid Twig template.
+> The languages: af,ar,az,be,bg,bs,ca,cs,cy,da,de,el,es,et,eu,fa,fi,fr,gl,he,hr,hu,hy,id,it,ja,lb,lt,lv,mk,mn,my,nb,nl,nn,no,pl,pt_BR,pt,ro,ru,sk,sl,sq,sr_Cyrl,sr_Latn,sv,th,tl,tr,uk,ur,uz,vi,zh_CN,zh_TW
+
+Then I run this script:
+
+```php
+foreach (file('trans.csv') as $line) {
+    [$lang, $tr] = explode(',', rtrim($line), 2);
+
+    $file = \sprintf('src/Symfony/Component/Validator/Resources/translations/validators.%s.xlf', $lang);
+    echo $file;
+    $content = file_get_contents($file);
+    $content = str_replace(
+        '<target state="needs-translation">This value is not a valid Twig template.</target>',
+        \sprintf('<target state="needs-review-translation">%s</target>', $tr),
+        $content
+    );
+    file_put_contents($file, $content);
+}
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-17T16:24:06Z
+
+Missing translations are nice first contributions, do we really want to remove that? If yes should we trust Gemini's content blindly? Maybe ping native people who've already touched the files for review?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-17T16:58:28Z
+
+We do this since a few months now, so I'd say yes.
+They're still to validate. Carsonbot to help track.

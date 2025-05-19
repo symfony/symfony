@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-04-01T12:32:00Z
+
+@stof All your comments are addressed, I pushed a new version with "standalone" constraints as done in BrowserKit.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-04-19T14:55:59Z
+
+@GromNaN indeed, good idea of feature! I'll have a look at it a bit later when I have a some time to dig the subject on why Sebastian deprecated the feature in PHPUnit first 🙂 Thanks for the review!

@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Add support for `valkey:` / `valkeys:` schemes
- * RedisStore and MemcacheStore namespace support
+ * Add namespace support for `RedisStore` and `MemcacheStore`
 
 7.2
 ---

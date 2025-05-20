@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-05-20T06:41:57Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-20T06:53:00Z
+
+I was wondering if removing these translations could be seen as a BC break because technically they have already been part of stable releases and theoretically could have been used by developers in their applications. Are we fine with that?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-05-20T06:54:17Z
+
+> I was wondering if removing these translations could be seen as a BC break because technically they have already been part of stable releases and theoretically could have been used by developers in their applications. Are we fine with that?
+
+It cannot be a BC break as 7.3 stable has not been released yet.

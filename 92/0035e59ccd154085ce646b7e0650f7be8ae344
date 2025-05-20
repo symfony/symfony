@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-20T07:32:46Z
+
+The change looks good. 👍 We need to update the code a bit after merging it into the `7.3` branch to account for the attributes introduced in #59384.
+
+> I am not sure what to do about `BeforeTestMethodErroredSubscriber` since the test object is not available in that event. I think it's fine to leave it as is.
+
+We can access the test with PHPUnit 12.1+ (see sebastianbergmann/phpunit@9f05ceebb8d69746d1af8a90c099b15ce7b5aa1f).
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-05-20T07:57:31Z
+
+> We can access the test with PHPUnit 12.1+ (see [sebastianbergmann/phpunit@9f05cee](https://github.com/sebastianbergmann/phpunit/commit/9f05ceebb8d69746d1af8a90c099b15ce7b5aa1f)).
+
+@xabbuh Good catch, see https://github.com/symfony/symfony/compare/f1ced798e2d17c7925bd189823f7c1aca5099716..cc144272b05668f20681937e0a753d153af22fbe

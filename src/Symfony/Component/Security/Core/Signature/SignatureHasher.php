@@ -36,6 +36,7 @@ class SignatureHasher
         #[\SensitiveParameter] private string $secret,
         private ?ExpiredSignatureStorage $expiredSignaturesStorage = null,
         private ?int $maxUses = null,
+        private readonly HasherInterface $hasher = new Hasher('sha256'),
     ) {
         if (!$secret) {
             throw new InvalidArgumentException('A non-empty secret is required.');
@@ -102,7 +103,7 @@ class SignatureHasher
     public function computeSignatureHash(UserInterface $user, int $expires): string
     {
         $userIdentifier = $user->getUserIdentifier();
-        $fieldsHash = hash_init('sha256');
+        $fieldsHashContext = $this->hasher->init();
 
         foreach ($this->signatureProperties as $property) {
             $value = $this->propertyAccessor->getValue($user, $property) ?? '';
@@ -115,16 +116,16 @@ class SignatureHasher
                 throw new \InvalidArgumentException(\sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, $user::class, get_debug_type($value)));
             }
 
-            hash_update($fieldsHash, ':'.base64_encode($value));
+            $fieldsHashContext->update($value);
         }
 
-        $fieldsHash = strtr(base64_encode(hash_final($fieldsHash, true)), '+/=', '-_~');
+        $fieldsHash = $fieldsHashContext->final();
 
         return $this->generateHash($fieldsHash.':'.$expires.':'.$userIdentifier).$fieldsHash;
     }
 
     private function generateHash(string $tokenValue): string
     {
-        return strtr(base64_encode(hash_hmac('sha256', $tokenValue, $this->secret, true)), '+/=', '-_~');
+        return $this->hasher->hmac($tokenValue, $this->secret);
     }
 }

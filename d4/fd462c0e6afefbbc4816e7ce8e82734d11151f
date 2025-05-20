@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by maciekpaprocki at 2025-05-20T10:35:07Z
+
+> Hey!
+>
+> Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.3 bug fix". Could you update the PR description or change target branch? This helps core maintainers a lot.
+>
+> Cheers!
+>
+> Carsonbot
+
+Sorry bot, misspelling :)
+
+also, for whover is reviewing. I didn't add changelog as i think object mapper for now on is in preview. Please let me know if you would like me to add that.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-05-20T11:45:56Z
+
+@maciekpaprocki thanks I agree with the patch, changelog is not needed as its for features only if I'm not mistaken.

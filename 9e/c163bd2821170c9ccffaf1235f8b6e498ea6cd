@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2025-05-19T08:36:35Z
+
+cc @raffaelecarelle, as the original author of the PR. If there is something we're overlooking or you see value in the constraint that I'm missing, please feel free to share it here so we can consider it.
+
+---------------------------------------------------------------------------
+
+by ajgarlag at 2025-05-19T11:03:53Z
+
+I think PR https://github.com/symfony/symfony/pull/59383 should be reverted too
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-05-19T13:57:59Z
+
+> [!WARNING]
+> you must also update/amend the corresponding [blogpost](https://symfony.com/blog/new-in-symfony-7-3-slug-and-twig-constraints) otherwise ppl will think its a fail of release no ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-05-20T06:42:11Z
+
+PR on 6.4 to remove the translations: https://github.com/symfony/symfony/pull/60486

@@ -14,6 +14,8 @@ namespace Symfony\Component\ObjectMapper;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
+use Symfony\Component\ObjectMapper\Mapping\MapCollection;
+use Symfony\Component\ObjectMapper\Mapping\MapTree;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
@@ -25,6 +27,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * @experimental
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @author Devoton <oton.traore@gmail.com>
  */
 final class ObjectMapper implements ObjectMapperInterface
 {
@@ -55,11 +58,11 @@ final class ObjectMapper implements ObjectMapperInterface
         $mappingToObject = \is_object($target);
 
         if (!$target) {
-            throw new MappingException(\sprintf('Mapping target not found for source "%s".', get_debug_type($source)));
+            throw new MappingException(\sprintf('Mapping target not found for source \"%s\".', get_debug_type($source)));
         }
 
         if (\is_string($target) && !class_exists($target)) {
-            throw new MappingException(\sprintf('Mapping target class "%s" does not exist for source "%s".', $target, get_debug_type($source)));
+            throw new MappingException(\sprintf('Mapping target class \"%s\" does not exist for source \"%s\".', $target, get_debug_type($source)));
         }
 
         try {
@@ -73,12 +76,12 @@ final class ObjectMapper implements ObjectMapperInterface
             $mappedTarget = $this->applyTransforms($map, $mappedTarget, $mappedTarget, null);
 
             if (!\is_object($mappedTarget)) {
-                throw new MappingTransformException(\sprintf('Cannot map "%s" to a non-object target of type "%s".', get_debug_type($source), get_debug_type($mappedTarget)));
+                throw new MappingTransformException(\sprintf('Cannot map \"%s\" to a non-object target of type \"%s\".', get_debug_type($source), get_debug_type($mappedTarget)));
             }
         }
 
         if (!is_a($mappedTarget, $targetRefl->getName(), false)) {
-            throw new MappingException(\sprintf('Expected the mapped object to be an instance of "%s" but got "%s".', $targetRefl->getName(), get_debug_type($mappedTarget)));
+            throw new MappingException(\sprintf('Expected the mapped object to be an instance of \"%s\" but got \"%s\".', $targetRefl->getName(), get_debug_type($mappedTarget)));
         }
 
         $this->objectMap[$source] = $mappedTarget;
@@ -96,7 +99,6 @@ final class ObjectMapper implements ObjectMapperInterface
                 continue;
             }
 
-            // this may be filled later on see storeValue
             $ctorArguments[$parameterName] = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
         }
 
@@ -174,6 +176,58 @@ final class ObjectMapper implements ObjectMapperInterface
     {
         if ($mapping?->transform) {
             $value = $this->applyTransforms($mapping, $value, $source, $target);
+        }
+
+        if ($mapping instanceof MapCollection) {
+            if (!\is_iterable($value)) {
+                return $value;
+            }
+
+            $mappedCollection = [];
+            foreach ($value as $item) {
+                if (\is_object($item)) {
+                    $mappedCollection[] = $this->map($item, $mapping->target);
+                } else {
+                    $mappedCollection[] = $item;
+                }
+            }
+
+            return $mappedCollection;
+        }
+
+        if ($mapping instanceof MapTree) {
+            if (!\is_iterable($value)) {
+                return $value;
+            }
+
+            $mappedTree = [];
+            foreach ($value as $node) {
+                if (!\is_object($node)) {
+                    $mappedTree[] = $node;
+                    continue;
+                }
+
+                $mappedNode = $this->map($node, $mapping->target);
+
+                $children = $this->getRawValue($node, $mapping->childrenProperty);
+                $mappedChildren = [];
+
+                if (\is_iterable($children)) {
+                    foreach ($children as $child) {
+                        $mappedChildren[] = $this->map($child, $mapping->target);
+                    }
+                }
+
+                if ($this->propertyAccessor) {
+                    $this->propertyAccessor->setValue($mappedNode, $mapping->childrenProperty, $mappedChildren);
+                } else {
+                    $mappedNode->{$mapping->childrenProperty} = $mappedChildren;
+                }
+
+                $mappedTree[] = $mappedNode;
+            }
+
+            return $mappedTree;
         }
 
         if (

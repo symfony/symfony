@@ -64,13 +64,13 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
         return $this->workerStartedAt < $this->getEndOfStopTime();
     }
 
-    private function getEndOfStopTime(): float
+    private function getEndOfStopTime(): ?float
     {
         $cacheItem = $this->cachePool->getItem(self::RESTART_REQUESTED_TIMESTAMP_KEY);
 
         if (!$cacheItem->isHit()) {
             // no restart has ever been scheduled
-            return false;
+            return null;
         }
 
         return (float) $cacheItem->get();

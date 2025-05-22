@@ -50,7 +50,7 @@ class ImportMapGenerator
     /**
      * @param string[] $entrypointNames
      *
-     * @return array<string, array{path: string, type: string, preload?: bool}>
+     * @return array<string, array{path: string, type: string, integrity?: string, preload?: bool}>
      *
      * @internal
      */
@@ -83,7 +83,7 @@ class ImportMapGenerator
     /**
      * @internal
      *
-     * @return array<string, array{path: string, type: string}>
+     * @return array<string, array{path: string, type: string, integrity?: string}>
      */
     public function getRawImportMapData(): array
     {
@@ -104,9 +104,10 @@ class ImportMapGenerator
                 throw $this->createMissingImportMapAssetException($entry);
             }
 
-            $path = $asset->publicPath;
-            $data = ['path' => $path, 'type' => $entry->type->value];
-            $rawImportMapData[$entry->importName] = $data;
+            $rawImportMapData[$entry->importName] = ['path' => $asset->publicPath, 'type' => $entry->type->value];
+            if ($asset->integrity) {
+                $rawImportMapData[$entry->importName]['integrity'] = $asset->integrity;
+            }
         }
 
         return $rawImportMapData;

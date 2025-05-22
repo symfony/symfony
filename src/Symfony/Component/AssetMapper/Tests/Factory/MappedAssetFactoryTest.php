@@ -19,6 +19,7 @@ use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
+use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\MappedAsset;
@@ -148,7 +149,35 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertFalse($asset->isVendor);
     }
 
-    private function createFactory(?AssetCompilerInterface $extraCompiler = null, ?string $vendorDir = self::VENDOR_FIXTURES_DIR): MappedAssetFactory
+    public function testCreateMappedAssetWithoutIntegrity()
+    {
+        $factory = $this->createFactory();
+        $asset = $factory->createMappedAsset('file2.js', self::FIXTURES_DIR.'/dir1/file2.js');
+        $this->assertNull($asset->integrity);
+    }
+
+    public function testCreateMappedAssetWithOneIntegrityAlgorithm()
+    {
+        $factory = $this->createFactory(integrityHashAlgorithms: ['sha256']);
+        $asset = $factory->createMappedAsset('file2.js', self::FIXTURES_DIR.'/dir1/file2.js');
+        $this->assertSame('sha256-b8bze+0OP5qLVVEG0aUh25UkvNjZXLeugH9Jg7MvSz8=', $asset->integrity);
+    }
+
+    public function testCreateMappedAssetWithManyIntegrityAlgorithms()
+    {
+        $factory = $this->createFactory(integrityHashAlgorithms: ['sha256', 'sha384']);
+        $asset = $factory->createMappedAsset('file2.js', self::FIXTURES_DIR.'/dir1/file2.js');
+        $this->assertSame('sha256-b8bze+0OP5qLVVEG0aUh25UkvNjZXLeugH9Jg7MvSz8= sha384-2cpbxkWC8I4PKAhlQ+LaFmVek6qd8w35xUZ+QRGMzcSvX9SP2EgjLvKSawSmS9J7', $asset->integrity);
+    }
+
+    public function testCreateMappedAssetWithInvalidIntegrityAlgorithm()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Unsupported "sha1" algorithm(s). Supported ones are "sha256", "sha384", "sha512".');
+        $this->createFactory(integrityHashAlgorithms: ['sha1']);
+    }
+
+    private function createFactory(?AssetCompilerInterface $extraCompiler = null, ?string $vendorDir = self::VENDOR_FIXTURES_DIR, array $integrityHashAlgorithms = []): MappedAssetFactory
     {
         $compilers = [
             new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class)),
@@ -174,6 +203,7 @@ class MappedAssetFactoryTest extends TestCase
             $pathResolver,
             $compiler,
             $vendorDir,
+            $integrityHashAlgorithms,
         );
 
         // mock the AssetMapper to behave like normal: by calling back to the factory

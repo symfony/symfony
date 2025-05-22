@@ -1492,6 +1492,7 @@ class FrameworkExtension extends Extension
         $container
             ->getDefinition('asset_mapper.mapped_asset_factory')
             ->replaceArgument(2, $config['vendor_dir'])
+            ->setArgument(3, $config['importmap_integrity_algorithms'])
         ;
 
         $container

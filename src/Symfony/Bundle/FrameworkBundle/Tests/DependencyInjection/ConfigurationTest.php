@@ -148,6 +148,7 @@ class ConfigurationTest extends TestCase
                 'formats' => [],
                 'extensions' => interface_exists(CompressorInterface::class) ? CompressorInterface::DEFAULT_EXTENSIONS : [],
             ],
+            'importmap_integrity_algorithms' => [],
         ];
 
         $this->assertEquals($defaultConfig, $config['asset_mapper']);
@@ -877,6 +878,7 @@ class ConfigurationTest extends TestCase
                     'formats' => [],
                     'extensions' => interface_exists(CompressorInterface::class) ? CompressorInterface::DEFAULT_EXTENSIONS : [],
                 ],
+                'importmap_integrity_algorithms' => [],
             ],
             'cache' => [
                 'pools' => [],

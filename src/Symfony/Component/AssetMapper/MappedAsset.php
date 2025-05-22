@@ -52,6 +52,7 @@ final class MappedAsset
         private array $dependencies = [],
         private array $fileDependencies = [],
         private array $javaScriptImports = [],
+        public readonly ?string $integrity = null,
     ) {
         if (null !== $sourcePath) {
             $this->sourcePath = $sourcePath;

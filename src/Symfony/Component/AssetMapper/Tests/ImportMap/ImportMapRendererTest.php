@@ -58,6 +58,15 @@ class ImportMapRendererTest extends TestCase
                     'path' => '/assets/implicitly-added-d1g35t.js',
                     'type' => 'js',
                 ],
+                '/assets/with-integrity' => [
+                    'path' => '/assets/with-integrity-d1g35t.js',
+                    'type' => 'js',
+                    'integrity' => 'sha384-base64-hash',
+                ],
+                '/assets/without-integrity' => [
+                    'path' => '/assets/without-integrity-d1g35t.js',
+                    'type' => 'js',
+                ],
             ]);
 
         $assetPackages = $this->createMock(Packages::class);
@@ -98,12 +107,22 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString('"remote_js": "https://cdn.example.com/assets/remote-d1g35t.js"', $html);
         // both the key and value are prefixed with the subdirectory
         $this->assertStringContainsString('"/subdirectory/assets/implicitly-added": "/subdirectory/assets/implicitly-added-d1g35t.js"', $html);
+        // integrity
+        $this->assertStringContainsString('"integrity":', $html);
+        $this->assertStringContainsString('"/subdirectory/assets/with-integrity-d1g35t.js": "sha384-base64-hash"', $html);
+        $this->assertStringNotContainsString('"/subdirectory/assets/without-integrity-d1g35t.js":', $html);
     }
 
     public function testNoPolyfill()
     {
         $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', false);
         $this->assertStringNotContainsString('https://ga.jspm.io/npm:es-module-shims', $renderer->render([]));
+    }
+
+    public function testNoIntegrity()
+    {
+        $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', false);
+        $this->assertStringNotContainsString('"integrity":', $renderer->render([]));
     }
 
     public function testDefaultPolyfillUsedIfNotInImportmap()
@@ -154,26 +173,6 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString("import 'bar';", $html);
     }
 
-    private function createBasicImportMapGenerator(): ImportMapGenerator
-    {
-        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
-        $importMapGenerator->expects($this->once())
-            ->method('getImportMapData')
-            ->willReturn([
-                'app' => [
-                    'path' => 'app.js',
-                    'type' => 'js',
-                ],
-                'es-module-shims' => [
-                    'path' => 'https://polyfillUrl.example',
-                    'type' => 'js',
-                ],
-            ])
-        ;
-
-        return $importMapGenerator;
-    }
-
     public function testItAddsPreloadLinks()
     {
         $importMapGenerator = $this->createMock(ImportMapGenerator::class);
@@ -209,5 +208,25 @@ class ImportMapRendererTest extends TestCase
         $this->assertSame(['preload'], $linkProvider->getLinks()[0]->getRels());
         $this->assertSame(['as' => 'style'], $linkProvider->getLinks()[0]->getAttributes());
         $this->assertSame('/assets/styles/app-preload-d1g35t.css', $linkProvider->getLinks()[0]->getHref());
+    }
+
+    private function createBasicImportMapGenerator(): ImportMapGenerator
+    {
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
+            ->method('getImportMapData')
+            ->willReturn([
+                'app' => [
+                    'path' => 'app.js',
+                    'type' => 'js',
+                ],
+                'es-module-shims' => [
+                    'path' => 'https://polyfillUrl.example',
+                    'type' => 'js',
+                ],
+            ])
+        ;
+
+        return $importMapGenerator;
     }
 }

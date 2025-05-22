@@ -92,6 +92,10 @@ class ImportMapGeneratorTest extends TestCase
                 path: 'styles/never_imported_css.css',
                 type: ImportMapType::CSS,
             ),
+            self::createLocalEntry(
+                'js_file_with_integrity',
+                path: 'js_file_with_integrity.js',
+            ),
         ]);
 
         $importedFile1 = new MappedAsset(
@@ -142,6 +146,13 @@ class ImportMapGeneratorTest extends TestCase
             publicPathWithoutDigest: '/assets/styles/never_imported_css.css',
             publicPath: '/assets/styles/never_imported_css-d1g35t.css',
         );
+        $jsFileWithIntegrity = new MappedAsset(
+            'js_file_with_integrity.js',
+            '/path/to/js_file_with_integrity.js',
+            publicPathWithoutDigest: '/assets/js_file_with_integrity.js',
+            publicPath: '/assets/js_file_with_integrity-d1g35t.js',
+            integrity: 'sha384-base64-hash'
+        );
         $this->mockAssetMapper([
             new MappedAsset(
                 'entry1.js',
@@ -179,6 +190,7 @@ class ImportMapGeneratorTest extends TestCase
             $importedCss2,
             $importedCssInImportmap,
             $neverImportedCss,
+            $jsFileWithIntegrity,
         ]);
 
         $actualImportMapData = $manager->getImportMapData(['entry2', 'entry1']);
@@ -232,6 +244,11 @@ class ImportMapGeneratorTest extends TestCase
                 'path' => '/assets/styles/never_imported_css-d1g35t.css',
                 'type' => 'css',
             ],
+            'js_file_with_integrity' => [
+                'path' => '/assets/js_file_with_integrity-d1g35t.js',
+                'type' => 'js',
+                'integrity' => 'sha384-base64-hash',
+            ],
         ], $actualImportMapData);
 
         // now check the order
@@ -251,6 +268,7 @@ class ImportMapGeneratorTest extends TestCase
             // importmap entries never imported
             'entry3',
             'never_imported_css',
+            'js_file_with_integrity',
         ], array_keys($actualImportMapData));
     }
 
@@ -567,6 +585,31 @@ class ImportMapGeneratorTest extends TestCase
                 'app' => [
                     'path' => '/assets/app-d1g3st.js',
                     'type' => 'js',
+                ],
+            ],
+        ];
+
+        yield 'it adds integrity when it exists' => [
+            [
+                self::createLocalEntry(
+                    'app',
+                    path: './assets/app.js',
+                ),
+            ],
+            [
+                new MappedAsset(
+                    'app.js',
+                    // /fake/root is the mocked root directory
+                    '/fake/root/assets/app.js',
+                    publicPath: '/assets/app-d1g3st.js',
+                    integrity: 'sha384-base64-hash',
+                ),
+            ],
+            [
+                'app' => [
+                    'path' => '/assets/app-d1g3st.js',
+                    'type' => 'js',
+                    'integrity' => 'sha384-base64-hash',
                 ],
             ],
         ];

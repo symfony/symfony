@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+* Allow adding integrity metadata to importmaps
+
 7.3
 ---
 

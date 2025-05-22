@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Factory;
 
 use Symfony\Component\AssetMapper\AssetMapperCompiler;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
+use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
@@ -25,6 +26,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
 {
     private const PREDIGESTED_REGEX = '/-([0-9a-zA-Z]{7,128}\.digested)/';
     private const PUBLIC_DIGEST_LENGTH = 7;
+    private const INTEGRITY_HASH_ALGORITHMS = ['sha256', 'sha384', 'sha512'];
 
     private array $assetsCache = [];
     private array $assetsBeingCreated = [];
@@ -33,7 +35,11 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         private readonly PublicAssetsPathResolverInterface $assetsPathResolver,
         private readonly AssetMapperCompiler $compiler,
         private readonly string $vendorDir,
+        private readonly array $integrityHashAlgorithms = [],
     ) {
+        if ($unsupportedAlgorithms = array_diff($this->integrityHashAlgorithms, self::INTEGRITY_HASH_ALGORITHMS)) {
+            throw new LogicException(sprintf('Unsupported "%s" algorithm(s). Supported ones are "%s".', implode('", "', $unsupportedAlgorithms), implode('", "', self::INTEGRITY_HASH_ALGORITHMS)));
+        }
     }
 
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
@@ -63,6 +69,7 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
                 $asset->getDependencies(),
                 $asset->getFileDependencies(),
                 $asset->getJavaScriptImports(),
+                $this->getIntegrity($asset, $content),
             );
 
             $this->assetsCache[$logicalPath] = $asset;
@@ -130,5 +137,21 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         $vendorDir = realpath($this->vendorDir);
 
         return $sourcePath && $vendorDir && str_starts_with($sourcePath, $vendorDir);
+    }
+
+    private function getIntegrity(MappedAsset $asset, ?string $content): ?string
+    {
+        $integrity = null;
+
+        foreach ($this->integrityHashAlgorithms as $algorithm) {
+            $hash = null !== $content
+                ? hash($algorithm, $content, true)
+                : hash_file($algorithm, $asset->sourcePath, true)
+            ;
+
+            $integrity .= \sprintf('%s%s-%s', $integrity ? ' ' : '', $algorithm, base64_encode($hash));
+        }
+
+        return $integrity;
     }
 }

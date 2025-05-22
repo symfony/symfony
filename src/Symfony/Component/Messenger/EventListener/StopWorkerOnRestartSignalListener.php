@@ -32,9 +32,15 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
     ) {
     }
 
-    public function onWorkerStarted(): void
+    public function onWorkerStarted(WorkerStartedEvent $event): void
     {
         $this->workerStartedAt = microtime(true);
+
+        if ($this->shouldRestart()) {
+            $event->getWorker()->stop();
+            $remainingStopSeconds = ceil($this->getEndOfStopTime()) - time();
+            $this->logger?->info(sprintf('Worker is stopped and message processing is paused for the next %d seconds.', $remainingStopSeconds));
+        }
     }
 
     public function onWorkerRunning(WorkerRunningEvent $event): void
@@ -55,6 +61,11 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
 
     private function shouldRestart(): bool
     {
+        return $this->workerStartedAt < $this->getEndOfStopTime();
+    }
+
+    private function getEndOfStopTime(): float
+    {
         $cacheItem = $this->cachePool->getItem(self::RESTART_REQUESTED_TIMESTAMP_KEY);
 
         if (!$cacheItem->isHit()) {
@@ -62,6 +73,6 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
             return false;
         }
 
-        return $this->workerStartedAt < $cacheItem->get();
+        return (float) $cacheItem->get();
     }
 }

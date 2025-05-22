@@ -14,7 +14,9 @@ namespace Symfony\Component\Messenger\Command;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -35,7 +37,9 @@ class StopWorkersCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDefinition([])
+            ->setDefinition([
+                new InputOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Duration in seconds to keep the workers stopped'),
+            ])
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
 
@@ -44,6 +48,11 @@ class StopWorkersCommand extends Command
                 Each worker command will finish the message they are currently processing
                 and then exit. Worker commands are *not* automatically restarted: that
                 should be handled by a process control system.
+
+                Use the --duration option to keep the workers in a paused state (not processing messages) for the given duration (in seconds).
+                During this time, no messages will be handled, and the workers will not resume until the pause period has passed:
+
+                    <info>php %command.full_name% --duration=60</info>
                 EOF
             )
         ;
@@ -53,11 +62,20 @@ class StopWorkersCommand extends Command
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
+        if (null !== $duration = $input->getOption('duration')) {
+            if (!is_numeric($duration) || 0 >= $duration) {
+                throw new InvalidOptionException(\sprintf('Option "duration" must be a positive integer, "%s" passed.', $duration));
+            }
+        }
+
         $cacheItem = $this->restartSignalCachePool->getItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY);
-        $cacheItem->set(microtime(true));
+        $cacheItem->set(microtime(true) + $duration);
         $this->restartSignalCachePool->save($cacheItem);
 
         $io->success('Signal successfully sent to stop any running workers.');
+        if ($duration > 0) {
+            $io->info(sprintf('Workers will be stopped for next %s seconds.', $duration));
+        }
 
         return 0;
     }

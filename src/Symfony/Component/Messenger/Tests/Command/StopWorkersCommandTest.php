@@ -23,7 +23,7 @@ class StopWorkersCommandTest extends TestCase
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())->method('set');
+        $cacheItem->expects($this->once())->method('set')->with();
         $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
         $cachePool->expects($this->once())->method('save')->with($cacheItem);
 
@@ -31,5 +31,22 @@ class StopWorkersCommandTest extends TestCase
 
         $tester = new CommandTester($command);
         $tester->execute([]);
+    }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testItSetsCacheItemWithDurationAdded()
+    {
+        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem->expects($this->once())->method('set')->with($this->equalToWithDelta(microtime(true), 62)); // "extra" 2 seconds
+        $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
+        $cachePool->expects($this->once())->method('save')->with($cacheItem);
+
+        $command = new StopWorkersCommand($cachePool);
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--duration' => 60]);
     }
 }

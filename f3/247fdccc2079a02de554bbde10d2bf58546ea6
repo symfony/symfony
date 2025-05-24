@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-22T21:21:52Z
+
+looking at the CI failure we should probably also exclude the `SymfonyExtension` class from the PHP 7.2 linter (it requires PHPUnit 10+ which in turn requires PHP 8.1+)
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-05-23T07:27:44Z
+
+@xabbuh Don't know why I didn't do that from the start: https://github.com/symfony/symfony/compare/990d750552cd0e84af2d55076805a35ac99ea615..62da782fd3941e75bf150a52eebb6935623ad814

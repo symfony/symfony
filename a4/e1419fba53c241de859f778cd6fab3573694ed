@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-18T00:50:50Z
+
+@kbond it seems [tests failures](https://github.com/symfony/symfony/actions/runs/15090184873/job/42417607959?pr=60447) are related
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-18T01:05:35Z
+
+Ak, indeed, I'll get them fixed
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-22T23:33:00Z
+
+I opted to remove the exception message assertion rather than dig into crazy regex. If someone has a better method, let me know!

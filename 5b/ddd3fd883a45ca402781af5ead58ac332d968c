@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-05-14T09:12:58Z
+
+> I don't understand the title of the PR 😬 The code skips registering messenger when no "default" lock is configured, isn't it?
+
+yes

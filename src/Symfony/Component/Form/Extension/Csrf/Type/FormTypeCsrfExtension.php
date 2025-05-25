@@ -32,7 +32,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     public function __construct(
         private CsrfTokenManagerInterface $defaultTokenManager,
         private bool $defaultEnabled = true,
-        private string $defaultFieldName = '_token',
+        private string $defaultFieldName = '_csrf_token',
         private ?TranslatorInterface $translator = null,
         private ?string $translationDomain = null,
         private ?ServerParams $serverParams = null,

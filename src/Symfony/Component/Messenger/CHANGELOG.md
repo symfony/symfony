@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Allow any `ServiceResetterInterface` implementation in `ResetServicesListener`
- * Add `--duration` option to `messenger:stop-workers` command to keep workers in paused state.
+ * Add `--duration` option to `messenger:stop-workers` command to keep workers in paused state
 
 7.3
 ---

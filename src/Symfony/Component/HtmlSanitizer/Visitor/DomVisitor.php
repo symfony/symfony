@@ -184,5 +184,15 @@ final class DomVisitor
                 $node->setAttribute($name, $value);
             }
         }
+        if ('a' === $domNodeName
+            && $this->config->getEnsureSafeBlankTarget()
+            && '_blank' === strtolower($node->getAttribute('target') ?? '')
+        ) {            $rel = $node->getAttribute('rel') ?? '';
+            $parts = explode(' ', strtolower($rel));
+            if (!in_array('noopener', $parts, true) || !in_array('noreferrer', $parts, true)) {
+                $parts = array_unique(array_merge($parts, ['noopener', 'noreferrer']));
+                $node->setAttribute('rel', trim(implode(' ', $parts)));
+            }
+        }
     }
 }

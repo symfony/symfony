@@ -600,4 +600,57 @@ class HtmlSanitizerAllTest extends TestCase
         $sanitizer = new HtmlSanitizer($config);
         self::assertSame('<foo><div><p><a>Hello</a></p></div></foo>', $sanitizer->sanitize('<foo data-attr="value"><div class="foo"><p><a target="_blank">Hello<span> World</span></a></p></div></foo>'));
     }
+
+    /**
+     * @dataProvider provideTargetBlank
+     */
+    public function testSafeTargetBlank(array $allowedAttributes, string $input, string $expectedSanitized)
+    {
+        $sanitizer = new HtmlSanitizer((new HtmlSanitizerConfig())
+            ->allowElement('a', $allowedAttributes)
+            ->allowLinkHosts(['trusted.com'])
+        );
+
+        $sanitized = $sanitizer->sanitize($input);
+
+        $this->assertSame($expectedSanitized, $sanitized);
+    }
+
+    public static function provideTargetBlank()
+    {
+        return [
+            // No rel attribute
+            [
+                ['href', 'target', 'rel'],
+                '<a href="https://trusted.com" target="_blank">Lorem ipsum</a>',
+                '<a href="https://trusted.com" target="_blank" rel="noopener noreferrer">Lorem ipsum</a>',
+            ],
+
+            // Normal tags
+            [
+                ['href', 'target', 'rel'],
+                '<a href="https://trusted.com" target="_blank" rel="external">Lorem ipsum</a>',
+                '<a href="https://trusted.com" target="_blank" rel="external noopener noreferrer">Lorem ipsum</a>',
+            ],
+
+            // Normal tags
+            [
+                ['href', 'target'],
+                '<a href="https://trusted.com" target="_blank" rel="external">Lorem ipsum</a>',
+                '<a href="https://trusted.com" target="_blank" rel="noopener noreferrer">Lorem ipsum</a>',
+            ],
+            // Missing noreferrer
+            [
+                ['href', 'target', 'rel'],
+                '<a href="https://trusted.com" target="_blank" rel="noopener">Lorem ipsum</a>',
+                '<a href="https://trusted.com" target="_blank" rel="noopener noreferrer">Lorem ipsum</a>',
+            ],
+            // Missing noopener
+            [
+                ['href', 'target', 'rel'],
+                '<a href="https://trusted.com" target="_blank" rel="noreferrer">Lorem ipsum</a>',
+                '<a href="https://trusted.com" target="_blank" rel="noreferrer noopener">Lorem ipsum</a>',
+            ],
+        ];
+    }
 }

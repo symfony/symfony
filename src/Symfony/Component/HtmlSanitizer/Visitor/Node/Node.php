@@ -58,10 +58,7 @@ final class Node implements NodeInterface
 
     public function setAttribute(string $name, ?string $value): void
     {
-        // Always use only the first declaration (ease sanitization)
-        if (!\array_key_exists($name, $this->attributes)) {
-            $this->attributes[$name] = $value;
-        }
+        $this->attributes[$name] = $value;
     }
 
     public function addChild(NodeInterface $node): void

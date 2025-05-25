@@ -88,6 +88,12 @@ class HtmlSanitizerConfig
     private bool $allowRelativeMedias = false;
 
     /**
+     * When set to true, the sanitizer will ensure that any <a> element with target="_blank" is also accompanied
+     * by rel="noopener noreferrer" to prevent potential reverse tabnabbing vulnerabilities.
+     */
+    private bool $ensureSafeBlankTarget = true;
+
+    /**
      * Should the URL in the sanitized document be transformed to HTTPS if they are using HTTP.
      */
     private bool $forceHttpsUrls = false;
@@ -253,6 +259,17 @@ class HtmlSanitizerConfig
     {
         $clone = clone $this;
         $clone->allowRelativeMedias = $allowRelativeMedias;
+
+        return $clone;
+    }
+
+    /**
+     * Allows the use of the target="_blank" attribute without rel="noopener noreferrer".
+     */
+    public function allowUnsafeBlankTargets(): static
+    {
+        $clone = clone $this;
+        $clone->ensureSafeBlankTarget = false;
 
         return $clone;
     }
@@ -527,6 +544,11 @@ class HtmlSanitizerConfig
     public function getAllowRelativeMedias(): bool
     {
         return $this->allowRelativeMedias;
+    }
+
+    public function getEnsureSafeBlankTarget(): bool
+    {
+        return $this->ensureSafeBlankTarget;
     }
 
     public function getForceHttpsUrls(): bool

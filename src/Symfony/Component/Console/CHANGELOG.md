@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add helper resolution support for invokable commands
+
 7.3
 ---
 

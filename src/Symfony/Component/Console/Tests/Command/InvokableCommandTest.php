@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
@@ -370,6 +372,19 @@ class InvokableCommandTest extends TestCase
         $this->expectExceptionMessage('The "--a" option requires a value.');
 
         $command->run(new ArrayInput(['--a' => null]), new NullOutput());
+    }
+
+    public function testResolveHelper()
+    {
+        $command = new Command('foo');
+        $command->setApplication(new Application());
+        $command->setCode(function (FormatterHelper $formatter): int {
+            $this->assertSame('foo...', $formatter->truncate('foobar', 3));
+
+            return 0;
+        });
+
+        $command->run(new ArrayInput([]), new NullOutput());
     }
 
     public function getSuggestedRoles(CompletionInput $input): array

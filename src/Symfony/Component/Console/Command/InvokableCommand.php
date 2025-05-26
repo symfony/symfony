@@ -133,11 +133,21 @@ class InvokableCommand implements SignalableCommandInterface
                 throw new LogicException(\sprintf('The parameter "$%s" must have a named type. Untyped, Union or Intersection types are not supported.', $parameter->getName()));
             }
 
+            if ($application = $this->command->getApplication()) {
+                foreach ($application->getHelperSet() as $helper) {
+                    if ($type->getName() === $helper::class) {
+                        $parameters[] = $helper;
+
+                        continue 2;
+                    }
+                }
+            }
+
             $parameters[] = match ($type->getName()) {
                 InputInterface::class => $input,
                 OutputInterface::class => $output,
                 SymfonyStyle::class => new SymfonyStyle($input, $output),
-                Application::class => $this->command->getApplication(),
+                Application::class => $application,
                 default => throw new RuntimeException(\sprintf('Unsupported type "%s" for parameter "$%s".', $type->getName(), $parameter->getName())),
             };
         }

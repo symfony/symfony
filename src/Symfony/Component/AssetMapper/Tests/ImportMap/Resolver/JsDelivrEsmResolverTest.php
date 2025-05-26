@@ -305,7 +305,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'lodash contents', 'dependencies' => [], 'extraFiles' => []],
+                'lodash' => ['content' => 'lodash contents', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
             ],
         ];
 
@@ -318,7 +318,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'lodash contents', 'dependencies' => [], 'extraFiles' => []],
+                'lodash' => ['content' => 'lodash contents', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
             ],
         ];
 
@@ -331,7 +331,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'chart.js contents', 'dependencies' => [], 'extraFiles' => []],
+                'lodash' => ['content' => 'chart.js contents', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
             ],
         ];
 
@@ -344,7 +344,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'bootstrap.css contents', 'dependencies' => [], 'extraFiles' => []],
+                'lodash' => ['content' => 'bootstrap.css contents', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
             ],
         ];
 
@@ -369,9 +369,9 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
             [
-                'lodash' => ['content' => 'lodash contents', 'dependencies' => [], 'extraFiles' => []],
-                'chart.js/auto' => ['content' => 'chart.js contents', 'dependencies' => [], 'extraFiles' => []],
-                'bootstrap/dist/bootstrap.css' => ['content' => 'bootstrap.css contents', 'dependencies' => [], 'extraFiles' => []],
+                'lodash' => ['content' => 'lodash contents', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
+                'chart.js/auto' => ['content' => 'chart.js contents', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
+                'bootstrap/dist/bootstrap.css' => ['content' => 'bootstrap.css contents', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
             ],
         ];
 
@@ -390,6 +390,7 @@ class JsDelivrEsmResolverTest extends TestCase
                     'content' => 'import{Color as t}from"@kurkle/color";function e(){}const i=(()=',
                     'dependencies' => ['@kurkle/color'],
                     'extraFiles' => [],
+                    'hasMainFile' => true,
                 ],
             ],
         ];
@@ -409,6 +410,7 @@ class JsDelivrEsmResolverTest extends TestCase
                     'content' => 'import e from"locutus/php/strings/sprintf";console.log()',
                     'dependencies' => ['locutus/php/strings/sprintf'],
                     'extraFiles' => [],
+                    'hasMainFile' => true,
                 ],
             ],
         ];
@@ -429,6 +431,7 @@ class JsDelivrEsmResolverTest extends TestCase
                     'content' => 'as Ticks,ta as TimeScale,ia as TimeSeriesScale,oo as Title,wo as Tooltip,Ci as _adapters,us as _detectPlatform,Ye as animator,Si as controllers,tn as default,St as defaults,Pn as elements,qi as layouts,ko as plugins,na as registerables,Ps as registry,sa as scales};',
                     'dependencies' => [],
                     'extraFiles' => [],
+                    'hasMainFile' => true,
                 ],
             ],
         ];
@@ -453,6 +456,7 @@ const je="\n//# sourceURL=",Ue="\n//# sourceMappingURL=",Me=/^(text|application)
 EOF,
                     'dependencies' => [],
                     'extraFiles' => [],
+                    'hasMainFile' => true,
                 ],
             ],
         ];
@@ -471,6 +475,7 @@ EOF,
                     'content' => 'print-table-row{display:table-row!important}.d-print-table-cell{display:table-cell!important}.d-print-flex{display:flex!important}.d-print-inline-flex{display:inline-flex!important}.d-print-none{display:none!important}}',
                     'dependencies' => [],
                     'extraFiles' => [],
+                    'hasMainFile' => true,
                 ],
             ],
         ];

@@ -61,10 +61,10 @@ class RemotePackageDownloaderTest extends TestCase
                 $progressCallback
             )
             ->willReturn([
-                'foo' => ['content' => 'foo content', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff' => 'extra file contents']],
-                'bar.js/file' => ['content' => 'bar content', 'dependencies' => [], 'extraFiles' => []],
-                'baz' => ['content' => 'baz content', 'dependencies' => ['foo'], 'extraFiles' => []],
-                'different_specifier' => ['content' => 'different content', 'dependencies' => [], 'extraFiles' => []],
+                'foo' => ['content' => 'foo content', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff' => 'extra file contents'], 'hasMainFile' => true],
+                'bar.js/file' => ['content' => 'bar content', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
+                'baz' => ['content' => 'baz content', 'dependencies' => ['foo'], 'extraFiles' => [], 'hasMainFile' => true],
+                'different_specifier' => ['content' => 'different content', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
             ]);
 
         $downloader = new RemotePackageDownloader(
@@ -131,9 +131,9 @@ class RemotePackageDownloaderTest extends TestCase
         $packageResolver->expects($this->once())
             ->method('downloadPackages')
             ->willReturn([
-                'bar.js/file' => ['content' => 'new bar content', 'dependencies' => [], 'extraFiles' => []],
-                'baz' => ['content' => 'new baz content', 'dependencies' => [], 'extraFiles' => []],
-                'has-missing-extra' => ['content' => 'new content', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff' => 'extra file contents']],
+                'bar.js/file' => ['content' => 'new bar content', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
+                'baz' => ['content' => 'new baz content', 'dependencies' => [], 'extraFiles' => [], 'hasMainFile' => true],
+                'has-missing-extra' => ['content' => 'new content', 'dependencies' => [], 'extraFiles' => ['/path/to/extra-file.woff' => 'extra file contents'], 'hasMainFile' => true],
             ]);
 
         $downloader = new RemotePackageDownloader(

@@ -126,7 +126,7 @@ EOT
                 $parts['alias'] ?? null,
                 $path,
                 $input->getOption('entrypoint'),
-                ImportMapType::tryfrom($input->getOption('type')),
+                $input->getOption('type') ? ImportMapType::tryfrom($input->getOption('type')) : null,
             );
         }
 

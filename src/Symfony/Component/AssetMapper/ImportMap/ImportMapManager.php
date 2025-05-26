@@ -162,7 +162,7 @@ class ImportMapManager
 
             $newEntry = ImportMapEntry::createLocal(
                 $requireOptions->importName,
-                self::getImportMapTypeFromFilename($requireOptions->path),
+                $requireOptions->importMapType ?? self::getImportMapTypeFromFilename($requireOptions->path),
                 $path,
                 $requireOptions->entrypoint,
             );

@@ -15,4 +15,15 @@ enum ImportMapType: string
 {
     case JS = 'js';
     case CSS = 'css';
+    case FULL = 'full';
+
+    public function hasMainFile(): bool
+    {
+        if($this == self::FULL)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }

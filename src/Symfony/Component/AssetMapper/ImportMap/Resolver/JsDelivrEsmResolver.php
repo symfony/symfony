@@ -27,6 +27,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     public const URL_PATTERN_DIST_CSS = 'https://cdn.jsdelivr.net/npm/%s@%s%s';
     public const URL_PATTERN_DIST = self::URL_PATTERN_DIST_CSS.'/+esm';
     public const URL_PATTERN_ENTRYPOINT = 'https://data.jsdelivr.com/v1/packages/npm/%s@%s/entrypoints';
+    public const URL_PATTERN_FULL_DOWNLOAD = 'https://data.jsdelivr.com/v1/packages/npm/%s@%s';
 
     public const IMPORT_REGEX = '#(?:import\s*(?:[\w$]+,)?(?:(?:\{[^}]*\}|[\w$]+|\*\s*as\s+[\w$]+)\s*\bfrom\s*)?|export\s*(?:\{[^}]*\}|\*)\s*from\s*|await\simport\()("/npm/((?:@[^/]+/)?[^@]+?)(?:@([^/]+))?((?:/[^/]+)*?)/\+esm")(?:\)*)#';
 
@@ -80,7 +81,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new RuntimeException(\sprintf('Unable to find the latest version for package "%s" - try specifying the version manually.', $packageName));
             }
 
-            $pattern = $this->resolveUrlPattern($packageName, $filePath);
+            $pattern = $this->resolveUrlPattern($packageName, $filePath, $options->importMapType);
             $requiredPackages[$i][1] = $this->httpClient->request('GET', \sprintf($pattern, $packageName, $version, $filePath));
             $requiredPackages[$i][4] = $version;
 
@@ -108,7 +109,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             }
 
             $contentType = $response->getHeaders()['content-type'][0] ?? '';
-            $type = str_starts_with($contentType, 'text/css') ? ImportMapType::CSS : ImportMapType::JS;
+            $type = $options->importMapType ?? (str_starts_with($contentType, 'text/css') ? ImportMapType::CSS : ImportMapType::JS);
             $resolvedPackages[$options->packageModuleSpecifier] = new ResolvedImportMapPackage($options, $version, $type);
 
             $packagesToRequire = array_merge($packagesToRequire, $this->fetchPackageRequirementsFromImports($response->getContent()));
@@ -201,6 +202,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 'content' => $this->makeImportsBare($response->getContent(), $dependencies, $extraFiles, $entry->type, $entry->getPackagePathString()),
                 'dependencies' => $dependencies,
                 'extraFiles' => [],
+                'hasMainFile' => $entry->type->hasMainFile(),
             ];
 
             if (0 !== \count($extraFiles)) {
@@ -317,6 +319,24 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             return $content;
         }
 
+        if (ImportMapType::FULL === $type) {
+            $data = json_decode($content);
+            $getFiles = function ($section, string $path) use(&$getFiles, &$extraFiles) {
+                foreach($section as $item) {
+                    if($item->type == 'file') {
+                        $extraFiles[] = $path . $item->name;
+                    }
+                    if($item->type == 'directory') {
+                        $getFiles($item->files, $path . $item->name . '/' );
+                    }
+                }
+            };
+
+            $getFiles($data->files, '/');
+
+            return $content;
+        }
+
         preg_match_all(CssAssetUrlCompiler::ASSET_URL_PATTERN, $content, $matches);
         foreach ($matches[1] as $path) {
             if (str_starts_with($path, 'data:')) {
@@ -345,6 +365,10 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             return self::URL_PATTERN_DIST_CSS;
         }
 
+        if (ImportMapType::FULL === $type) {
+            return self::URL_PATTERN_FULL_DOWNLOAD;
+        }
+		
         return self::URL_PATTERN_DIST;
     }
 }

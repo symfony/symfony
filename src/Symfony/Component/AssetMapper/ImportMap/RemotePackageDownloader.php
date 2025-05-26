@@ -76,7 +76,10 @@ class RemotePackageDownloader
                 throw new \LogicException(\sprintf('The package "%s" was not downloaded.', $package));
             }
 
-            $this->remotePackageStorage->save($entry, $contents[$package]['content']);
+            if($contents[$package]['hasMainFile']) {
+                $this->remotePackageStorage->save($entry, $contents[$package]['content']);
+            }
+			
             foreach ($contents[$package]['extraFiles'] as $extraFilename => $extraFileContents) {
                 $this->remotePackageStorage->saveExtraFile($entry, $extraFilename, $extraFileContents);
             }

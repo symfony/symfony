@@ -1,7 +1,12 @@
 CHANGELOG
 =========
 
-7.3
+7.4
+---
+
+ * Add "full" type for a package to download all files
+
+ 7.3
 ---
 
  * Add support for pre-compressing assets with Brotli, Zstandard, Zopfli, and gzip

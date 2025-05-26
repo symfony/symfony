@@ -29,6 +29,7 @@ final class PackageRequireOptions
         ?string $importName = null,
         public readonly ?string $path = null,
         public readonly bool $entrypoint = false,
+        public readonly ?ImportMapType $importMapType = null,
     ) {
         $this->importName = $importName ?: $packageModuleSpecifier;
     }

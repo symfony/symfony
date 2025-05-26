@@ -14,6 +14,7 @@ namespace Symfony\Component\AssetMapper\Command;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -51,6 +52,7 @@ final class ImportMapRequireCommand extends Command
             ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to add')
             ->addOption('entrypoint', null, InputOption::VALUE_NONE, 'Make the packages an entrypoint?')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The local path where the package lives relative to the project root')
+            ->addOption('type', null, InputOption::VALUE_REQUIRED, 'The package type, specified for specific download.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simulate the installation of the packages')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command adds packages to <comment>importmap.php</comment> usually
@@ -124,6 +126,7 @@ EOT
                 $parts['alias'] ?? null,
                 $path,
                 $input->getOption('entrypoint'),
+                ImportMapType::tryfrom($input->getOption('type')),
             );
         }
 

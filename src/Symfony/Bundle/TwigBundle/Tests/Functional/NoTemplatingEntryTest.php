@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\FrameworkBundle\Test\HttpClientAssertionsTrait;
+use Symfony\Bundle\FrameworkBundle\Test\Traits\HttpClientAssertionsTrait;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;

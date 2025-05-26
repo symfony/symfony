@@ -11,9 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
+trigger_deprecation('symfony/framework-bundle', '7.4', 'Use Traits\<type> instead.');
 trait WebTestAssertionsTrait
 {
-    use BrowserKitAssertionsTrait;
-    use DomCrawlerAssertionsTrait;
-    use HttpClientAssertionsTrait;
+    use Traits\BrowserKitTrait;
+    use Traits\BrowserKitAssertionsTrait;
+    use Traits\DomCrawlerTrait;
+    use Traits\DomCrawlerAssertionsTrait;
+    use Traits\HttpClientTrait;
+    use Traits\HttpClientAssertionsTrait;
 }

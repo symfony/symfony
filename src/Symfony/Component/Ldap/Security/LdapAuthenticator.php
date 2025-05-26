@@ -20,6 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterf
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
+use Symfony\Component\Security\Http\RequestSupport;
 
 /**
  * This class decorates internal authenticators to add the LDAP integration.
@@ -44,9 +45,9 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
     ) {
     }
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request, ?RequestSupport $requestSupport = null): ?bool
     {
-        return $this->authenticator->supports($request);
+        return $this->authenticator->supports($request, $requestSupport);
     }
 
     public function authenticate(Request $request): Passport

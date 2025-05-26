@@ -33,6 +33,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\RequestSupport;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class CheckLdapCredentialsListenerTest extends TestCase
@@ -206,7 +207,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
 if (interface_exists(AuthenticatorInterface::class)) {
     class TestAuthenticator implements AuthenticatorInterface
     {
-        public function supports(Request $request): ?bool
+        public function supports(Request $request, ?RequestSupport $requestSupport = null): ?bool
         {
         }
 

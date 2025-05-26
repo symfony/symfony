@@ -31,6 +31,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
+use Symfony\Component\Security\Http\RequestSupport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
@@ -68,11 +69,32 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         return $this->httpUtils->generateUri($request, $this->options['login_path']);
     }
 
-    public function supports(Request $request): bool
+    /**
+     * @param RequestSupport|null $requestSupport
+     */
+    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): bool
     {
-        return ($this->options['post_only'] ? $request->isMethod('POST') : true)
-            && $this->httpUtils->checkRequestPath($request, $this->options['check_path'])
-            && ($this->options['form_only'] ? 'form' === $request->getContentTypeFormat() : true);
+        $requestSupport = 2 <= \func_num_args() ? func_get_arg(1) : null;
+
+        if ($this->options['post_only'] && !$request->isMethod('POST')) {
+            $requestSupport?->addReason('Request is not a POST while "post_only" is set.');
+
+            return false;
+        }
+
+        if (!$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            $requestSupport?->addReason('Request does not match the "check_path".');
+
+            return false;
+        }
+
+        if ($this->options['form_only'] && 'form' !== $request->getContentTypeFormat()) {
+            $requestSupport?->addReason('Request is not a form submission while "form_only" is set.');
+
+            return false;
+        }
+
+        return true;
     }
 
     public function authenticate(Request $request): Passport

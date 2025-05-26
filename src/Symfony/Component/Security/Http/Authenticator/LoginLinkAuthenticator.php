@@ -25,6 +25,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkAuthenticationException;
 use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkExceptionInterface;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
+use Symfony\Component\Security\Http\RequestSupport;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
@@ -43,10 +44,26 @@ final class LoginLinkAuthenticator extends AbstractAuthenticator implements Inte
         $this->options = $options + ['check_post_only' => false];
     }
 
-    public function supports(Request $request): ?bool
+    /**
+     * @param RequestSupport|null $requestSupport
+     */
+    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): ?bool
     {
-        return ($this->options['check_post_only'] ? $request->isMethod('POST') : true)
-            && $this->httpUtils->checkRequestPath($request, $this->options['check_route']);
+        $requestSupport = 2 <= \func_num_args() ? func_get_arg(1) : null;
+
+        if ($this->options['check_post_only'] && !$request->isMethod('POST')) {
+            $requestSupport?->addReason('Request is not a POST while "check_post_only" is set.');
+
+            return false;
+        }
+
+        if (!$this->httpUtils->checkRequestPath($request, $this->options['check_route'])) {
+            $requestSupport?->addReason('Request does not match the "check_route".');
+
+            return false;
+        }
+
+        return true;
     }
 
     public function authenticate(Request $request): Passport

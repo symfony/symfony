@@ -39,6 +39,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\RequestSupport;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -968,7 +969,7 @@ class SecurityExtensionTest extends TestCase
 
 class TestAuthenticator implements AuthenticatorInterface
 {
-    public function supports(Request $request): ?bool
+    public function supports(Request $request, ?RequestSupport $requestSupport = null): ?bool
     {
     }
 

@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticate
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\RequestSupport;
 
 /**
  * The base authenticator for authenticators to use pre-authenticated
@@ -52,20 +53,27 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
      */
     abstract protected function extractUsername(Request $request): ?string;
 
-    public function supports(Request $request): ?bool
+    /**
+     * @param RequestSupport|null $requestSupport
+     */
+    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): ?bool
     {
+        $requestSupport = 2 <= \func_num_args() ? func_get_arg(1) : null;
+
         try {
             $username = $this->extractUsername($request);
         } catch (BadCredentialsException $e) {
             $this->clearToken($e);
 
             $this->logger?->debug('Skipping pre-authenticated authenticator as a BadCredentialsException is thrown.', ['exception' => $e, 'authenticator' => static::class]);
+            $requestSupport?->addReason('Could not find the username in the request.');
 
             return false;
         }
 
         if (null === $username) {
             $this->logger?->debug('Skipping pre-authenticated authenticator no username could be extracted.', ['authenticator' => static::class]);
+            $requestSupport?->addReason('Username found in the request was empty.');
 
             return false;
         }
@@ -75,6 +83,7 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
 
         if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getFirewallName() && $token->getUserIdentifier() === $username) {
             $this->logger?->debug('Skipping pre-authenticated authenticator as the user already has an existing session.', ['authenticator' => static::class]);
+            $requestSupport?->addReason('A token already exists for the user in the session.');
 
             return false;
         }

@@ -21,6 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
+use Symfony\Component\Security\Http\RequestSupport;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
@@ -31,6 +32,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 final class TraceableAuthenticator implements AuthenticatorInterface, InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {
     private ?bool $supports = false;
+    private array $supportReasons = [];
     private ?Passport $passport = null;
     private ?float $duration = null;
     private ClassStub|string $stub;
@@ -45,6 +47,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
     {
         return [
             'supports' => $this->supports,
+            'supportReasons' => $this->supportReasons,
             'passport' => $this->passport,
             'duration' => $this->duration,
             'stub' => $this->stub ??= class_exists(ClassStub::class) ? new ClassStub($this->authenticator::class) : $this->authenticator::class,
@@ -62,9 +65,24 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
         ];
     }
 
-    public function supports(Request $request): ?bool
+    /**
+     * @param RequestSupport|null $requestSupport
+     */
+    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): ?bool
     {
-        return $this->supports = $this->authenticator->supports($request);
+        $requestSupport = 2 <= \func_num_args() ? func_get_arg(1) : new RequestSupport();
+
+        $this->supports = $this->authenticator->supports($request, $requestSupport);
+        $this->supportReasons = $requestSupport->reasons;
+
+        if ($this->supports === false) {
+            $requestSupport->result = false;
+        } else {
+            $requestSupport->result = true;
+            $requestSupport->lazy = null === $this->supports;
+        }
+
+        return $this->supports;
     }
 
     public function authenticate(Request $request): Passport

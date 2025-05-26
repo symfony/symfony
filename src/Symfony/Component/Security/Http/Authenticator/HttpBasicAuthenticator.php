@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\RequestSupport;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -49,9 +50,20 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
         return $response;
     }
 
-    public function supports(Request $request): ?bool
+    /**
+     * @param RequestSupport|null $requestSupport
+     */
+    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): ?bool
     {
-        return $request->headers->has('PHP_AUTH_USER');
+        $requestSupport = 2 <= \func_num_args() ? func_get_arg(1) : null;
+
+        if (!$request->headers->has('PHP_AUTH_USER')) {
+            $requestSupport?->addReason('Request has no basic authentication header.');
+
+            return false;
+        }
+
+        return true;
     }
 
     public function authenticate(Request $request): Passport

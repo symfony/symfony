@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Fixtures;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\RequestSupport;
 
 class DummySupportsAuthenticator extends DummyAuthenticator
 {
@@ -22,7 +23,7 @@ class DummySupportsAuthenticator extends DummyAuthenticator
         $this->supports = $supports;
     }
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request, ?RequestSupport $requestSupport = null): ?bool
     {
         return $this->supports;
     }

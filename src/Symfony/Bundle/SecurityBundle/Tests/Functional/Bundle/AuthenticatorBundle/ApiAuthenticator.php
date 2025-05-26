@@ -22,6 +22,7 @@ use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\RequestSupport;
 
 class ApiAuthenticator extends AbstractAuthenticator
 {
@@ -32,7 +33,7 @@ class ApiAuthenticator extends AbstractAuthenticator
         $this->selfLoadingUser = $selfLoadingUser;
     }
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request, ?RequestSupport $requestSupport = null): ?bool
     {
         return $request->headers->has('X-USER-EMAIL');
     }

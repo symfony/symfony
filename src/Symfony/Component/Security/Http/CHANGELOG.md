@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecate callable firewall listeners, extend `AbstractListener` or implement `FirewallListenerInterface` instead
  * Deprecate `AbstractListener::__invoke`
+ * Add ability for authenticators to explain why they didn't support a request
 
 7.3
 ---

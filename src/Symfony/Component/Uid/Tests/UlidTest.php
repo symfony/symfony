@@ -12,7 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Uid\Exception\InvalidArgumentException;
+use Symfony\Component\Uid\Exception\InvalidUidException;
 use Symfony\Component\Uid\MaxUlid;
 use Symfony\Component\Uid\NilUlid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
@@ -42,7 +42,7 @@ class UlidTest extends TestCase
 
     public function testWithInvalidUlid()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidUidException::class);
         $this->expectExceptionMessage('Invalid ULID: "this is not a ulid".');
 
         new Ulid('this is not a ulid');
@@ -152,7 +152,7 @@ class UlidTest extends TestCase
      */
     public function testFromBinaryInvalidFormat(string $ulid)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidUidException::class);
 
         Ulid::fromBinary($ulid);
     }
@@ -179,7 +179,7 @@ class UlidTest extends TestCase
      */
     public function testFromBase58InvalidFormat(string $ulid)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidUidException::class);
 
         Ulid::fromBase58($ulid);
     }
@@ -206,7 +206,7 @@ class UlidTest extends TestCase
      */
     public function testFromBase32InvalidFormat(string $ulid)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidUidException::class);
 
         Ulid::fromBase32($ulid);
     }
@@ -233,7 +233,7 @@ class UlidTest extends TestCase
      */
     public function testFromRfc4122InvalidFormat(string $ulid)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidUidException::class);
 
         Ulid::fromRfc4122($ulid);
     }

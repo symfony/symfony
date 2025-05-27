@@ -747,7 +747,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class),
                 'csrf_protection' => [
                     'enabled' => null, // defaults to csrf_protection.enabled
-                    'field_name' => '_token',
+                    'field_name' => '_csrf_token',
                     'field_attr' => ['data-controller' => 'csrf-protection'],
                     'token_id' => null,
                 ],

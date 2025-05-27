@@ -253,7 +253,7 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('enabled')->defaultNull()->end() // defaults to framework.csrf_protection.enabled
                                 ->scalarNode('token_id')->defaultNull()->end()
-                                ->scalarNode('field_name')->defaultValue('_token')->end()
+                                ->scalarNode('field_name')->defaultValue('_csrf_token')->end()
                                 ->arrayNode('field_attr')
                                     ->performNoDeepMerging()
                                     ->normalizeKeys(false)

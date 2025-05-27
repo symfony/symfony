@@ -102,7 +102,7 @@ class FormPassTest extends TestCase
 
         $container->register('form.registry', FormRegistry::class);
         $container->register('form.type_extension.csrf', FormTypeCsrfExtension::class)
-            ->setArguments([null, true, '_token', null, 'validator.translation_domain', null, [], null])
+            ->setArguments([null, true, '_csrf_token', null, 'validator.translation_domain', null, [], null])
             ->setPublic(true);
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());

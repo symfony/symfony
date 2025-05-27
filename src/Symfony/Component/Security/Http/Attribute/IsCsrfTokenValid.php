@@ -25,7 +25,7 @@ final class IsCsrfTokenValid
         /**
          * Sets the key of the request that contains the actual token value that should be validated.
          */
-        public ?string $tokenKey = '_token',
+        public ?string $tokenKey = '_csrf_token',
 
         /**
          * Sets the available http methods that can be used to validate the token.

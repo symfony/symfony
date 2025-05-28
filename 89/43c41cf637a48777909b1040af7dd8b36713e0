@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-27T08:42:22Z
+
+see https://github.com/symfony/symfony/actions/runs/15269874524/job/42942748725#step:9:12069 for the current failures
+
+---------------------------------------------------------------------------
+
+by stof at 2025-05-27T15:43:35Z
+
+shouldn't `default_middleware => false` disable the deduplicate middleware even when the lock component is enabled ?
+
+I would say this caught an actual bug.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-27T20:02:07Z
+
+@stof Yes, and that part works as expected. But we have three buses here and for the `messenger.bus.commands` and `messenger.bus.events` buses `default_middleware` is not set to `false`.

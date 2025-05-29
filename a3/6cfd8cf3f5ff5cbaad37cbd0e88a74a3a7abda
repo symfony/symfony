@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2025-05-28T08:20:26Z
+
+Congrats @pontus-mp on your 1st contribution here!
+
+In order to propagate properply the fix, could you update your PR to target the 6.4 branch?
+Therefore, the fix will be propagated by up-merge of 6.4 into 7.2 and 7.3.
+
+Thank you
+
+---------------------------------------------------------------------------
+
+by pontus-mp at 2025-05-28T09:04:05Z
+
+> In order to propagate properply the fix, could you update your PR to target the 6.4 branch?
+
+Sure! Does everything look correct now?

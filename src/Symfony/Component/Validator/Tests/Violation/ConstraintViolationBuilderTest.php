@@ -15,7 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -42,7 +44,7 @@ class ConstraintViolationBuilderTest extends TestCase
     {
         $this->builder->addViolation();
 
-        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, null, new Valid()));
+        $this->assertBuiltViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, null, new Valid()));
     }
 
     public function testAppendPropertyPath()
@@ -51,7 +53,7 @@ class ConstraintViolationBuilderTest extends TestCase
             ->atPath('foo')
             ->addViolation();
 
-        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data.foo', 'foo', null, null, new Valid()));
+        $this->assertBuiltViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data.foo', 'foo', null, null, new Valid()));
     }
 
     public function testAppendMultiplePropertyPaths()
@@ -61,7 +63,7 @@ class ConstraintViolationBuilderTest extends TestCase
             ->atPath('bar')
             ->addViolation();
 
-        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data.foo.bar', 'foo', null, null, new Valid()));
+        $this->assertBuiltViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data.foo.bar', 'foo', null, null, new Valid()));
     }
 
     public function testCodeCanBeSet()
@@ -70,7 +72,7 @@ class ConstraintViolationBuilderTest extends TestCase
             ->setCode('5')
             ->addViolation();
 
-        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, '5', new Valid()));
+        $this->assertBuiltViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, '5', new Valid()));
     }
 
     public function testCauseCanBeSet()
@@ -81,7 +83,7 @@ class ConstraintViolationBuilderTest extends TestCase
             ->setCause($cause)
             ->addViolation();
 
-        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, null, new Valid(), $cause));
+        $this->assertBuiltViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, null, new Valid(), $cause));
     }
 
     public function testTranslationDomainFalse()
@@ -96,12 +98,31 @@ class ConstraintViolationBuilderTest extends TestCase
         $builder->addViolation();
     }
 
-    private function assertViolationEquals(ConstraintViolation $expectedViolation)
+    public function testBuildViolationFromExistingViolation()
+    {
+        $originalViolation = $this->builder->getViolation();
+
+        $violation = ConstraintViolationBuilder::fromViolation($originalViolation)
+            ->setPath(PropertyPath::append('top', $originalViolation->getPropertyPath()))
+            ->setCause($cause = new \LogicException())
+            ->getViolation();
+
+        $this->assertCount(0, $this->violations);
+
+        $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'top.data', 'foo', null, null, new Valid(), $cause), $violation);
+    }
+
+    private function assertBuiltViolationEquals(ConstraintViolation $expectedViolation): void
     {
         $this->assertCount(1, $this->violations);
 
         $violation = $this->violations->get(0);
 
+        $this->assertViolationEquals($expectedViolation, $violation);
+    }
+
+    private function assertViolationEquals(ConstraintViolation $expectedViolation, ConstraintViolationInterface $violation): void
+    {
         $this->assertSame($expectedViolation->getMessage(), $violation->getMessage());
         $this->assertSame($expectedViolation->getMessageTemplate(), $violation->getMessageTemplate());
         $this->assertSame($expectedViolation->getParameters(), $violation->getParameters());

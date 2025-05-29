@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+* Add `ConstraintViolationBuilder` methods: `fromViolation()`, `setPath()`, `getViolation()`
+
 7.3
 ---
 

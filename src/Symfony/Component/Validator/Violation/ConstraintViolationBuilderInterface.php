@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Validator\Violation;
 
+use Symfony\Component\Validator\ConstraintViolationInterface;
+
 /**
- * Builds {@link \Symfony\Component\Validator\ConstraintViolationInterface}
+ * Builds {@link ConstraintViolationInterface}
  * objects.
  *
  * Use the various methods on this interface to configure the built violation.
@@ -20,6 +22,9 @@ namespace Symfony\Component\Validator\Violation;
  * execution context.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @method ConstraintViolationInterface getViolation()
+ * @method $this setPath(string $path)
  */
 interface ConstraintViolationBuilderInterface
 {
@@ -84,13 +89,13 @@ interface ConstraintViolationBuilderInterface
      * Sets the number which determines how the plural form of the violation
      * message is chosen when it is translated.
      *
-     * @param int $number The number for determining the plural form
+     * @param int|null $number The number for determining the plural form
      *
      * @return $this
      *
      * @see \Symfony\Contracts\Translation\TranslatorInterface::trans()
      */
-    public function setPlural(int $number): static;
+    public function setPlural(?int $number): static;
 
     /**
      * Sets the violation code.

@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-05-26T08:41:29Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-05-26T09:09:42Z
+
+Hello @thecaliskan,
+Thank you very much for working on this PR. Since it's a bug fix, it should target the oldest supported version, which is [currently 6.4](https://symfony.com/releases). We can change the target version before merging, but you can also force-push on the branch to apply the commit on top of the branch 6.4.
+
+In order to have all the information we need if we ever work on this part of the code again later, could you tell us the exact scenario in which you encountered the problem? Which proxy server do you use?
+
+---------------------------------------------------------------------------
+
+by thecaliskan at 2025-05-26T09:24:30Z
+
+Hello @GromNaN,
+Thank you for the feedback! 🙏
+
+I’ve updated the PR to target the 6.4 branch as requested and force-pushed the changes accordingly.
+
+The issue was encountered while running the application behind Nginx as a reverse proxy. Specifically, the problem is related to detecting the protocol version used between the client and the proxy.
+
+In Nginx, the Via header can be forwarded using the following configuration:
+
+```
+proxy_set_header Via $server_protocol;
+```
+
+This results in headers such as:
+
+```
+Via: HTTP/2.0
+```
+
+or
+
+```
+`Via: HTTP/1.1`
+```
+
+depending on the protocol version. The Symfony code tries to parse this value using a regular expression, but the original regex expected a trailing space, which is not present in Nginx’s output. This causes the match to fail and fall back to the default SERVER_PROTOCOL.
+
+This PR adjusts the regular expression to support both variants, with or without a trailing space, to ensure compatibility with real-world proxy headers such as those set by Nginx.
+
+📚 Reference:
+
+- Nginx $server_protocol variable: [Nginx documentation](https://nginx.org/en/docs/http/ngx_http_core_module.html#variables)
+
+Let me know if you'd like me to include a test case or further clarify anything.
+
+Thanks again!
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-05-26T16:28:42Z
+
+`Via: HTTP/2.0` looks invalid since it doesn’t include a pseudonym. https://httpwg.org/specs/rfc9110.html#field.via says it’s required.

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-29T12:37:04Z
+
+Can we create a doctor rule?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-05-30T06:17:36Z
+
+> Can we create a doctor rule?
+
+There is probably a PHP CS Fixer rule that we can enable.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-30T06:23:50Z
+
+Sorry I mixed up the PRs, we have the same for the documentation repo

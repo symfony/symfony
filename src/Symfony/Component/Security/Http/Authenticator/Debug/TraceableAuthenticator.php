@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
-use Symfony\Component\Security\Http\RequestSupport;
+use Symfony\Component\Security\Http\RequestDecision;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
@@ -32,7 +32,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 final class TraceableAuthenticator implements AuthenticatorInterface, InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {
     private ?bool $supports = false;
-    private array $supportReasons = [];
+    private array $requestDecisionReasons = [];
     private ?Passport $passport = null;
     private ?float $duration = null;
     private ClassStub|string $stub;
@@ -47,7 +47,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
     {
         return [
             'supports' => $this->supports,
-            'supportReasons' => $this->supportReasons,
+            'requestDecisionReasons' => $this->requestDecisionReasons,
             'passport' => $this->passport,
             'duration' => $this->duration,
             'stub' => $this->stub ??= class_exists(ClassStub::class) ? new ClassStub($this->authenticator::class) : $this->authenticator::class,
@@ -66,20 +66,20 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
     }
 
     /**
-     * @param RequestSupport|null $requestSupport
+     * @param RequestDecision|null $requestDecision
      */
-    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): ?bool
+    public function supports(Request $request, /* ?RequestDecision $requestDecision = null */): ?bool
     {
-        $requestSupport = 2 <= \func_num_args() ? func_get_arg(1) : new RequestSupport();
+        $requestDecision = 2 <= \func_num_args() ? func_get_arg(1) : new RequestDecision();
 
-        $this->supports = $this->authenticator->supports($request, $requestSupport);
-        $this->supportReasons = $requestSupport->reasons;
+        $this->supports = $this->authenticator->supports($request, $requestDecision);
+        $this->requestDecisionReasons = $requestDecision->reasons;
 
         if ($this->supports === false) {
-            $requestSupport->result = false;
+            $requestDecision->isSupported = false;
         } else {
-            $requestSupport->result = true;
-            $requestSupport->lazy = null === $this->supports;
+            $requestDecision->isSupported = true;
+            $requestDecision->isLazy = null === $this->supports;
         }
 
         return $this->supports;

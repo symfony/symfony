@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
-use Symfony\Component\Security\Http\RequestSupport;
+use Symfony\Component\Security\Http\RequestDecision;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -48,14 +48,14 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
     }
 
     /**
-     * @param RequestSupport|null $requestSupport
+     * @param RequestDecision|null $requestDecision
      */
-    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): ?bool
+    public function supports(Request $request, /* ?RequestDecision $requestDecision = null */): ?bool
     {
-        $requestSupport = 2 <= \func_num_args() ? func_get_arg(1) : null;
+        $requestDecision = 2 <= \func_num_args() ? func_get_arg(1) : null;
 
         if (null === $this->accessTokenExtractor->extractAccessToken($request)) {
-            $requestSupport?->addReason(sprintf('No token was found in the request by the %s.', $this->accessTokenExtractor::class));
+            $requestDecision?->addReason(sprintf('No token was found in the request by the %s.', $this->accessTokenExtractor::class));
 
             return false;
         }

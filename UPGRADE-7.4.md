@@ -34,13 +34,13 @@ Security
  * Deprecate callable firewall listeners, extend `AbstractListener` or implement `FirewallListenerInterface` instead
  * Deprecate `AbstractListener::__invoke`
  * Deprecate `LazyFirewallContext::__invoke()`
- * Add argument `$requestSupport` to `AuthenticatorInterface::supports()`;
+ * Add argument `$requestDecision` to `AuthenticatorInterface::supports()`;
    it should be used to report the reason a request isn't supported. E.g:
 
    ```php
-   public function supports(Request $request, ?RequestSupport $requestSupport = null): ?bool
+   public function supports(Request $request, ?RequestDecision $requestDecision = null): ?bool
    {
-       $requestSupport?->addReason('This authenticator does not support any request.');
+       $requestDecision?->addReason('This authenticator does not support any request.');
 
        return false;
    }

@@ -18,14 +18,14 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
-use Symfony\Component\Security\Http\RequestSupport;
+use Symfony\Component\Security\Http\RequestDecision;
 
 /**
  * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 class DummyAuthenticator implements AuthenticatorInterface
 {
-    public function supports(Request $request, ?RequestSupport $requestSupport = null): ?bool
+    public function supports(Request $request, ?RequestDecision $requestDecision = null): ?bool
     {
         return null;
     }

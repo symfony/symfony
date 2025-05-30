@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\RequestSupport;
+use Symfony\Component\Security\Http\RequestDecision;
 
 /**
  * The interface for all authenticators.
@@ -34,9 +34,9 @@ interface AuthenticatorInterface
      *
      * Returning null means authenticate() can be called lazily when accessing the token storage.
      *
-     * @param RequestSupport|null $requestSupport
+     * @param RequestDecision|null $requestDecision
      */
-    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): ?bool;
+    public function supports(Request $request, /* ?RequestDecision $requestDecision = null */): ?bool;
 
     /**
      * Create a passport for the current request.

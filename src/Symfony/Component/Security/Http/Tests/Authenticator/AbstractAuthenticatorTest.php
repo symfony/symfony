@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
-use Symfony\Component\Security\Http\RequestSupport;
+use Symfony\Component\Security\Http\RequestDecision;
 
 class AbstractAuthenticatorTest extends TestCase
 {
@@ -43,7 +43,7 @@ class ConcreteAuthenticator extends AbstractAuthenticator
         return parent::createToken($passport, $firewallName);
     }
 
-    public function supports(Request $request, ?RequestSupport $requestSupport = null): ?bool
+    public function supports(Request $request, ?RequestDecision $requestDecision = null): ?bool
     {
         return null;
     }

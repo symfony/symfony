@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Http;
 
-class RequestSupport
+class RequestDecision
 {
-    public bool $result;
-    public ?bool $lazy = null;
+    public bool $isSupported;
+    public ?bool $isLazy = null;
 
     /** @var list<string> */
     public array $reasons = [];

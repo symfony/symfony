@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\Security\Http\RequestSupport;
+use Symfony\Component\Security\Http\RequestDecision;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
@@ -38,20 +38,20 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
      * This default implementation handles all POST requests to the
      * login path (@see getLoginUrl()).
      *
-     * @param RequestSupport|null $requestSupport
+     * @param RequestDecision|null $requestDecision
      */
-    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): bool
+    public function supports(Request $request, /* ?RequestDecision $requestDecision = null */): bool
     {
-        $requestSupport = 2 <= \func_num_args() ? func_get_arg(1) : null;
+        $requestDecision = 2 <= \func_num_args() ? func_get_arg(1) : null;
 
         if (!$request->isMethod('POST')) {
-            $requestSupport?->addReason('Request is not a POST.');
+            $requestDecision?->addReason('Request is not a POST.');
 
             return false;
         }
 
         if ($this->getLoginUrl($request) !== $request->getBaseUrl().$request->getPathInfo()) {
-            $requestSupport?->addReason('Request does not match the login URL.');
+            $requestDecision?->addReason('Request does not match the login URL.');
 
             return false;
         }

@@ -423,7 +423,7 @@
                                         <div id="authenticator-{{ i }}" class="font-normal">
                                             {% if authenticator.supports is same as(false) %}
                                                 <div class="empty">
-                                                    {% for reason in (authenticator.supportReasons ?? []) is empty ? ['This authenticator did not support the request.'] : authenticator.supportReasons %}
+                                                    {% for reason in (authenticator.requestDecisionReasons ?? []) is empty ? ['This authenticator did not support the request.'] : authenticator.requestDecisionReasons %}
                                                         <p>{{ reason }}</p>
                                                     {% endfor %}
                                                 </div>

@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Component\Security\Http\RequestSupport;
+use Symfony\Component\Security\Http\RequestDecision;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -62,23 +62,23 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
     }
 
     /**
-     * @param RequestSupport|null $requestSupport
+     * @param RequestDecision|null $requestDecision
      */
-    public function supports(Request $request, /* ?RequestSupport $requestSupport = null */): ?bool
+    public function supports(Request $request, /* ?RequestDecision $requestDecision = null */): ?bool
     {
-        $requestSupport = 2 <= \func_num_args() ? func_get_arg(1) : null;
+        $requestDecision = 2 <= \func_num_args() ? func_get_arg(1) : null;
 
         if (
             !str_contains($request->getRequestFormat() ?? '', 'json')
             && !str_contains($request->getContentTypeFormat() ?? '', 'json')
         ) {
-            $requestSupport?->addReason('Request format is not JSON.');
+            $requestDecision?->addReason('Request format is not JSON.');
 
             return false;
         }
 
         if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
-            $requestSupport?->addReason('Request does not match the "check_path".');
+            $requestDecision?->addReason('Request does not match the "check_path".');
 
             return false;
         }

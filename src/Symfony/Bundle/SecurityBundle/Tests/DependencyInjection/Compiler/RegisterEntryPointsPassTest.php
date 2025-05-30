@@ -28,7 +28,7 @@ use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
-use Symfony\Component\Security\Http\RequestSupport;
+use Symfony\Component\Security\Http\RequestDecision;
 
 class RegisterEntryPointsPassTest extends TestCase
 {
@@ -72,7 +72,7 @@ class RegisterEntryPointsPassTest extends TestCase
 
 class CustomAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
 {
-    public function supports(Request $request, ?RequestSupport $requestSupport = null): ?bool
+    public function supports(Request $request, ?RequestDecision $requestDecision = null): ?bool
     {
         return false;
     }

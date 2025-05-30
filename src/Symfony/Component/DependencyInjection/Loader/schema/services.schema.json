@@ -352,6 +352,7 @@
         "shared": { "type": "boolean" },
         "lazy": { "oneOf": [ { "type": "boolean" }, { "$ref": "#/$defs/fqcn" } ] },
         "public": { "type": "boolean" },
+        "factory": { "$ref": "#/$defs/factoryCallable" },
         "properties": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
         "configurator": { "$ref": "#/$defs/callable" },
         "calls": { "$ref": "#/$defs/calls" },

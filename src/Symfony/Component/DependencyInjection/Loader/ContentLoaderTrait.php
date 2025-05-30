@@ -93,6 +93,7 @@ trait ContentLoaderTrait
         'shared' => 'shared',
         'lazy' => 'lazy',
         'public' => 'public',
+        'factory' => 'factory',
         'properties' => 'properties',
         'configurator' => 'configurator',
         'calls' => 'calls',

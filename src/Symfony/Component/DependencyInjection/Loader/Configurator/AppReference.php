@@ -60,6 +60,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     shared?: bool,
  *     lazy?: bool|string,
  *     public?: bool,
+ *     factory?: CallbackType,
  *     properties?: array<string, mixed>,
  *     configurator?: CallbackType,
  *     calls?: list<CallType>,

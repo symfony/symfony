@@ -28,7 +28,7 @@ final class PostalTransportFactory extends AbstractTransportFactory
 
         $host = $dsn->getHost();
         $port = $dsn->getPort();
-        $apiToken = $this->getPassword($dsn);
+        $apiToken = $this->getUser($dsn);
 
         return (new PostalApiTransport($apiToken, $host, $this->client, $this->dispatcher, $this->logger))->setPort($port);
     }

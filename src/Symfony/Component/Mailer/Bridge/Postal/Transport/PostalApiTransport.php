@@ -64,7 +64,7 @@ final class PostalApiTransport extends AbstractApiTransport
             throw new HttpTransportException('Unable to send an email: '.$result['message'].\sprintf(' (code %d).', $statusCode), $response);
         }
 
-        $sentMessage->setMessageId($result['message_id']);
+        $sentMessage->setMessageId($result['data']['message_id']);
 
         return $response;
     }

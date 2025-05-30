@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2025-05-28T10:44:22Z
+
+I'm not sure here.
+
+I get your point about "magic", but.. it _does_ supersede the private header as, according to the [RFC](https://datatracker.ietf.org/doc/html/rfc7234#section-3), a cache MUST not store any content with the no-store header.
+
+So.. as i read it, no-store/public is not something we should allow here.
+
+And there is some similar behaviour in the [setSharedMaxAge](https://github.com/symfony/symfony/blob/5e1f34ef07208d6ffc9a79ef5d397c9781489b74/src/Symfony/Component/HttpFoundation/Response.php#L841) method of HttpFoundation/Response
+
+Did i missread or missunderstood something here ?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-05-28T11:23:23Z
+
+@smnandre I sure understand your point and I know why you did implement it as I'm familiar with the RFC :). But in combination with server side caching and still control browsers handling and combinations of ESI this still a valid **_temporary_** state for the cache control headers.
+
+So you have a response which should be cached but it includes a ESI which should not be cached and requires no-store. In that case for service side caches (symfony or varnish) the response in our case is still public because else the symfony http cache and the fos http cache is skipped and dont cache it. ESI can not manipulate the original cache headers so the controller tells it to be no-store if required by such ESI, but as we still want to cache the original response it still flagged as `public` because it knows it renders that ESI. Later post cache listeners or varnish vcl after correctly caching that response replace the public with private in that case, so important part is that in this case done after the caching (outside of the PHP application):
+
+The max-age I know does the same something which we can sure not change because of BC reasons (personally would also have avoided that), but for the no-store we could still avoid such untransparent handling.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-05-28T11:28:40Z
+
+PS: If Symfony want to go the way of say we want to be strict about the RFC. It maybe would be better the handling is in the http foundation and not in the attribute listener. And so `$response->headers->addCacheControlDirective('no-store');` would already set the response to private. Then it would be consistent and not be differently between attribute or manual call.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-05-28T18:44:25Z
+
+Thanks @alexander-schranz for this detailed explanation, makes perfect sense now!

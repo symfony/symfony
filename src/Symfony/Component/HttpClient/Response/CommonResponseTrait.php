@@ -26,6 +26,8 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  */
 trait CommonResponseTrait
 {
+    use ResponseStatusCodeTrait;
+
     /**
      * @var callable|null A callback that tells whether we're waiting for response headers
      */

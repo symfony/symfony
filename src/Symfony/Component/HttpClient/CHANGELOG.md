@@ -6,6 +6,8 @@ CHANGELOG
 
  * Add IPv6 support to `NativeHttpClient`
  * Allow using HTTP/3 with the `CurlHttpClient`
+ * Add `ResponseStatusCodeTrait` that allows to check for common HTTP status codes
+
 
 7.2
 ---

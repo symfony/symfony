@@ -89,13 +89,13 @@ interface ConstraintViolationBuilderInterface
      * Sets the number which determines how the plural form of the violation
      * message is chosen when it is translated.
      *
-     * @param int|null $number The number for determining the plural form
+     * @param int $number The number for determining the plural form
      *
      * @return $this
      *
      * @see \Symfony\Contracts\Translation\TranslatorInterface::trans()
      */
-    public function setPlural(?int $number): static;
+    public function setPlural(int $number): static;
 
     /**
      * Sets the violation code.

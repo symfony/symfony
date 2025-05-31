@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `ResponseStatusCodeTrait` that allows to check for common HTTP status codes
+
 7.3
 ---
 

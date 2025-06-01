@@ -38,7 +38,7 @@ class StopWorkersCommand extends Command
     {
         $this
             ->setDefinition([
-                new InputOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Duration in seconds to keep the workers stopped'),
+                new InputOption('duration', 'd', InputOption::VALUE_REQUIRED, 'Duration in seconds during which workers are paused (not processing messages)'),
             ])
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
@@ -49,7 +49,7 @@ class StopWorkersCommand extends Command
                 and then exit. Worker commands are *not* automatically restarted: that
                 should be handled by a process control system.
 
-                Use the --duration option to keep the workers in a paused state (not processing messages) for the given duration (in seconds).
+                Use the <comment>--duration</comment> option to keep the workers in a paused state (not processing messages) for the given duration (in seconds).
                 During this time, no messages will be handled, and the workers will not resume until the pause period has passed:
 
                     <info>php %command.full_name% --duration=60</info>
@@ -74,7 +74,7 @@ class StopWorkersCommand extends Command
 
         $io->success('Signal successfully sent to stop any running workers.');
         if ($duration > 0) {
-            $io->info(sprintf('Workers will be stopped for next %s seconds.', $duration));
+            $io->info(sprintf('Workers will be paused for %s seconds.', $duration));
         }
 
         return 0;

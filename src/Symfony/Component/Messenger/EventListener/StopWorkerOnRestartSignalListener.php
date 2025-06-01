@@ -39,7 +39,7 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
         if ($this->shouldRestart()) {
             $event->getWorker()->stop();
             $remainingStopSeconds = ceil($this->getEndOfStopTime()) - time();
-            $this->logger?->info(sprintf('Worker is stopped and message processing is paused for the next %d seconds.', $remainingStopSeconds));
+            $this->logger?->info(sprintf('The worker is paused and message processing will resume in %d seconds.', $remainingStopSeconds));
         }
     }
 

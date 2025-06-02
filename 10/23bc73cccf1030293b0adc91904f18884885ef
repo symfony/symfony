@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-06-01T20:40:28Z
+
+Does it also fix the other issue from the [comment](https://github.com/symfony/symfony/issues/60602#issuecomment-2925165425)?
+
+> there is also a problem with closing the web profiler toolbar.
+> the Close Toolbar icon does not work
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-06-01T22:35:29Z
+
+@xabbuh I haven't noticed any problem other than this. The close icon seems to work as expected. Without more info I can't really say.

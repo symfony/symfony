@@ -12,7 +12,7 @@ The function requires at least 3 arguments:
  - the name of the Composer package that is triggering the deprecation
  - the version of the package that introduced the deprecation
  - the message of the deprecation
- - more arguments can be provided: they will be inserted in the message using `printf()` formatting
+ - more arguments can be provided: they will be inserted in the message using `vsprintf()` formatting
 
 Example:
 ```php

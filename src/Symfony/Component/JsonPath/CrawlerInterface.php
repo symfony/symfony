@@ -19,7 +19,7 @@ use Symfony\Component\JsonPath\Exception\JsonCrawlerException;
  *
  * @experimental
  */
-interface JsonCrawlerInterface
+interface CrawlerInterface
 {
     /**
      * @return list<array|string|float|int|bool|null>

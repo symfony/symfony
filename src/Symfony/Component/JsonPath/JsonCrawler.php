@@ -28,7 +28,7 @@ use Symfony\Component\JsonStreamer\Read\Splitter;
  *
  * @experimental
  */
-final class JsonCrawler implements JsonCrawlerInterface
+final class JsonCrawler implements CrawlerInterface
 {
     private const RFC9535_FUNCTIONS = [
         'length' => true,
@@ -40,12 +40,14 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     /**
      * @param resource|string $raw
+     *
+     * @throws \TypeError When the input is not a string or a resource
      */
     public function __construct(
         private readonly mixed $raw,
     ) {
         if (!\is_string($raw) && !\is_resource($raw)) {
-            throw new InvalidArgumentException(\sprintf('Expected string or resource, got "%s".', get_debug_type($raw)));
+            throw new \TypeError(\sprintf('Expected string or resource, got "%s".', get_debug_type($raw)));
         }
     }
 

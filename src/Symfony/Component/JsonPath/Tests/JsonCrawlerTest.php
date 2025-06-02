@@ -22,7 +22,7 @@ class JsonCrawlerTest extends TestCase
 {
     public function testNotStringOrResourceThrows()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Expected string or resource, got "int".');
 
         new JsonCrawler(42);

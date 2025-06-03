@@ -123,7 +123,7 @@ class Connection
             $job = $this->client->useTube($this->tube)->put(
                 $message,
                 PheanstalkInterface::DEFAULT_PRIORITY,
-                (int) ($delay / 1000),
+                $delay / 1000,
                 $this->ttr
             );
         } catch (Exception $exception) {

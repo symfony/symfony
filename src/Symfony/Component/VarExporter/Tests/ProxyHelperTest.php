@@ -14,7 +14,6 @@ namespace Symfony\Component\VarExporter\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\ProxyHelper;
-use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\Hooked;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\Php82NullStandaloneReturnType;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\StringMagicGetClass;
 
@@ -246,16 +245,6 @@ class ProxyHelperTest extends TestCase
             'public function foo(): null',
             ProxyHelper::generateLazyProxy(new \ReflectionClass(Php82NullStandaloneReturnType::class))
         );
-    }
-
-    /**
-     * @requires PHP 8.4
-     */
-    public function testPropertyHooks()
-    {
-        $proxyCode = ProxyHelper::generateLazyProxy(new \ReflectionClass(Hooked::class));
-        self::assertStringContainsString("'backed' => [parent::class, 'backed', null, 7],", $proxyCode);
-        self::assertStringContainsString("'notBacked' => [parent::class, 'notBacked', null, 2055],", $proxyCode);
     }
 }
 

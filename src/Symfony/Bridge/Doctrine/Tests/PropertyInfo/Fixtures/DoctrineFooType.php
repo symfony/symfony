@@ -41,7 +41,7 @@ class DoctrineFooType extends Type
             throw new ConversionException(sprintf('Expected "%s", got "%s"', 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\Foo', get_debug_type($value)));
         }
 
-        return $value->bar;
+        return $foo->bar;
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform): ?Foo

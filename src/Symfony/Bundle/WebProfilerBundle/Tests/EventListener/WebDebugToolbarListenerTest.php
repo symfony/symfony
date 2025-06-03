@@ -63,7 +63,6 @@ class WebDebugToolbarListenerTest extends TestCase
     public function testHtmlRedirectionIsIntercepted($statusCode)
     {
         $response = new Response('Some content', $statusCode);
-        $response->headers->set('Location', 'https://example.com/');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
         $event = new ResponseEvent($this->createMock(Kernel::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
 
@@ -77,7 +76,6 @@ class WebDebugToolbarListenerTest extends TestCase
     public function testNonHtmlRedirectionIsNotIntercepted()
     {
         $response = new Response('Some content', '301');
-        $response->headers->set('Location', 'https://example.com/');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
         $event = new ResponseEvent($this->createMock(Kernel::class), new Request([], [], ['_format' => 'json']), HttpKernelInterface::MAIN_REQUEST, $response);
 
@@ -141,7 +139,6 @@ class WebDebugToolbarListenerTest extends TestCase
     public function testToolbarIsNotInjectedOnRedirection($statusCode)
     {
         $response = new Response('<html><head></head><body></body></html>', $statusCode);
-        $response->headers->set('Location', 'https://example.com/');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
         $event = new ResponseEvent($this->createMock(Kernel::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
 

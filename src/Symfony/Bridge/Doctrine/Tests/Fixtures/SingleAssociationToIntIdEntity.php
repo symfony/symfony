@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
 
 #[Entity]
@@ -22,7 +21,6 @@ class SingleAssociationToIntIdEntity
 {
     public function __construct(
         #[Id, OneToOne(cascade: ['ALL'])]
-        #[JoinColumn(nullable: false)]
         protected SingleIntIdNoToStringEntity $entity,
 
         #[Column(nullable: true)]

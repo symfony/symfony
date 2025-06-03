@@ -40,7 +40,6 @@ return [
         'Thaa' => 'thaana',
         'Thai' => 'thailandese',
         'Tibt' => 'tibetan',
-        'Zinh' => 'hereditate',
         'Zmth' => 'notation mathematic',
         'Zsye' => 'emoji',
         'Zsym' => 'symbolos',

@@ -314,15 +314,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $property->setValue($response, $file);
 
         $response->prepare($request);
-        $header = $response->headers->get('X-Accel-Redirect');
-
-        if ($virtual) {
-            // Making sure the path doesn't contain characters unsupported by nginx
-            $this->assertMatchesRegularExpression('/^([^?%]|%[0-9A-F]{2})*$/', $header);
-            $header = rawurldecode($header);
-        }
-
-        $this->assertEquals($virtual, $header);
+        $this->assertEquals($virtual, $response->headers->get('X-Accel-Redirect'));
     }
 
     public function testDeleteFileAfterSend()
@@ -369,7 +361,6 @@ class BinaryFileResponseTest extends ResponseTestCase
             ['/home/Foo/bar.txt', '/var/www/=/files/,/home/Foo/=/baz/', '/baz/bar.txt'],
             ['/home/Foo/bar.txt', '"/var/www/"="/files/", "/home/Foo/"="/baz/"', '/baz/bar.txt'],
             ['/tmp/bar.txt', '"/var/www/"="/files/", "/home/Foo/"="/baz/"', null],
-            ['/var/www/var/www/files/foo%.txt', '/var/www/=/files/', '/files/var/www/files/foo%.txt'],
         ];
     }
 

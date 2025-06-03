@@ -53,7 +53,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
     public function testNoDumpedXML()
     {
-        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'no_dump.yml', 'debug' => true]);
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true, 'debug.container.dump' => false]);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
@@ -139,18 +139,14 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $tester->setInputs(['0']);
         $tester->run(['command' => 'debug:container', '--tag' => 'kernel.'], ['decorated' => false]);
 
-        $this->assertStringMatchesFormat(<<<EOTXT
-
-             Select one of the following tags to display its information:
-            %A
-              [%d] kernel.reset
-            %A
-
-            Symfony Container Services Tagged with "kernel.%a" Tag
-            %A
-            EOTXT,
-            $tester->getDisplay()
-        );
+        $this->assertStringContainsString('Select one of the following tags to display its information', $tester->getDisplay());
+        $this->assertStringContainsString('[0] kernel.event_subscriber', $tester->getDisplay());
+        $this->assertStringContainsString('[1] kernel.locale_aware', $tester->getDisplay());
+        $this->assertStringContainsString('[2] kernel.cache_warmer', $tester->getDisplay());
+        $this->assertStringContainsString('[3] kernel.fragment_renderer', $tester->getDisplay());
+        $this->assertStringContainsString('[4] kernel.reset', $tester->getDisplay());
+        $this->assertStringContainsString('[5] kernel.cache_clearer', $tester->getDisplay());
+        $this->assertStringContainsString('Symfony Container Services Tagged with "kernel.event_subscriber" Tag', $tester->getDisplay());
     }
 
     public function testDescribeEnvVars()

@@ -33,11 +33,10 @@ jobs:
             mode: low-deps
           - php: '8.3'
           - php: '8.4'
-          - php: '8.5'
             #mode: experimental
       fail-fast: false
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout
@@ -92,18 +91,12 @@ jobs:
 
           # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
           if [[ ! "${{ matrix.mode }}" = *-deps ]]; then
-              cd .github
-              composer install
-              php ./build-packages.php HEAD^ $SYMFONY_VERSION src/Symfony/Bridge/PhpUnit
-              cd ..
+              php .github/build-packages.php HEAD^ $SYMFONY_VERSION src/Symfony/Bridge/PhpUnit
           else
             echo SYMFONY_DEPRECATIONS_HELPER=weak >> $GITHUB_ENV
             cp composer.json composer.json.orig
             echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json
-            cd .github
-            composer install
-            php ./build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | grep -v src/Symfony/Component/Intl/Resources/emoji)
-            cd ..
+            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | grep -v src/Symfony/Component/Intl/Resources/emoji)
             mv composer.json composer.json.phpunit
             mv composer.json.orig composer.json
           fi

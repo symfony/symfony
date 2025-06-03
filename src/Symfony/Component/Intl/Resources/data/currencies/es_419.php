@@ -30,14 +30,6 @@ return [
             'NIO',
             'córdoba nicaragüense',
         ],
-        'SLE' => [
-            'SLE',
-            'leone',
-        ],
-        'SLL' => [
-            'SLL',
-            'leones (1964—2022)',
-        ],
         'THB' => [
             'THB',
             'baht tailandes',
@@ -52,7 +44,7 @@ return [
         ],
         'VND' => [
             'VND',
-            'dong vietnamita',
+            'dong',
         ],
     ],
 ];

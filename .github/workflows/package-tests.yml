@@ -11,7 +11,7 @@ permissions:
 jobs:
   verify:
     name: Verify Packages
-    runs-on: ubuntu-24.04
+    runs-on: Ubuntu-20.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

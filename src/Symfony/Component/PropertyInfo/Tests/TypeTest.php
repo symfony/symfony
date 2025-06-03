@@ -75,7 +75,7 @@ class TypeTest extends TestCase
         $this->assertTrue($firstValueType->isCollection());
         $this->assertEquals(Type::BUILTIN_TYPE_ARRAY, $secondValueType->getBuiltinType());
         $this->assertFalse($secondValueType->isNullable());
-        $this->assertTrue($secondValueType->isCollection());
+        $this->assertTrue($firstValueType->isCollection());
     }
 
     public function testInvalidCollectionValueArgument()

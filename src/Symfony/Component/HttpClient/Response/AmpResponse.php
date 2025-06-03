@@ -179,17 +179,19 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     /**
      * @param AmpClientState $multi
      */
-    private static function perform(ClientState $multi, ?array $responses = null): void
+    private static function perform(ClientState $multi, ?array &$responses = null): void
     {
-        foreach ($responses ?? [] as $response) {
-            try {
-                if ($response->info['start_time']) {
-                    $response->info['total_time'] = microtime(true) - $response->info['start_time'];
-                    ($response->onProgress)();
+        if ($responses) {
+            foreach ($responses as $response) {
+                try {
+                    if ($response->info['start_time']) {
+                        $response->info['total_time'] = microtime(true) - $response->info['start_time'];
+                        ($response->onProgress)();
+                    }
+                } catch (\Throwable $e) {
+                    $multi->handlesActivity[$response->id][] = null;
+                    $multi->handlesActivity[$response->id][] = $e;
                 }
-            } catch (\Throwable $e) {
-                $multi->handlesActivity[$response->id][] = null;
-                $multi->handlesActivity[$response->id][] = $e;
             }
         }
     }
@@ -329,14 +331,16 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             $request->setTlsHandshakeTimeout($originRequest->getTlsHandshakeTimeout());
             $request->setTransferTimeout($originRequest->getTransferTimeout());
 
-            if (303 === $status || \in_array($status, [301, 302], true) && 'POST' === $response->getRequest()->getMethod()) {
-                // Do like curl and browsers: turn POST to GET on 301, 302 and 303
+            if (\in_array($status, [301, 302, 303], true)) {
                 $originRequest->removeHeader('transfer-encoding');
                 $originRequest->removeHeader('content-length');
                 $originRequest->removeHeader('content-type');
 
-                $info['http_method'] = 'HEAD' === $response->getRequest()->getMethod() ? 'HEAD' : 'GET';
-                $request->setMethod($info['http_method']);
+                // Do like curl and browsers: turn POST to GET on 301, 302 and 303
+                if ('POST' === $response->getRequest()->getMethod() || 303 === $status) {
+                    $info['http_method'] = 'HEAD' === $response->getRequest()->getMethod() ? 'HEAD' : 'GET';
+                    $request->setMethod($info['http_method']);
+                }
             } else {
                 $request->setBody(AmpBody::rewind($response->getRequest()->getBody()));
             }

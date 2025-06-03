@@ -436,7 +436,7 @@ return [
         ],
         'PHP' => [
             '₱',
-            'Ego Piso obodo Philippine',
+            'Ego piso obodo Philippine',
         ],
         'PKR' => [
             'PKR',

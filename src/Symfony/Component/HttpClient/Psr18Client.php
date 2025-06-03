@@ -90,11 +90,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
             $body = $request->getBody();
 
             if ($body->isSeekable()) {
-                try {
-                    $body->seek(0);
-                } catch (\RuntimeException) {
-                    // ignore
-                }
+                $body->seek(0);
             }
 
             $options = [
@@ -140,11 +136,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         $stream = $this->streamFactory->createStream($content);
 
         if ($stream->isSeekable()) {
-            try {
-                $stream->seek(0);
-            } catch (\RuntimeException) {
-                // ignore
-            }
+            $stream->seek(0);
         }
 
         return $stream;

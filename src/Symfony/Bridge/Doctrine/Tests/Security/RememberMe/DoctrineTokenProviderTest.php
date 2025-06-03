@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Doctrine\Tests\Security\RememberMe;
+namespace Security\RememberMe;
 
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
@@ -117,16 +117,17 @@ class DoctrineTokenProviderTest extends TestCase
         $this->assertFalse($provider->verifyToken($token, $oldValue));
     }
 
-    protected function bootstrapProvider(): DoctrineTokenProvider
+    /**
+     * @return DoctrineTokenProvider
+     */
+    private function bootstrapProvider()
     {
         $config = ORMSetup::createConfiguration(true);
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
 
-        if (!class_exists(\Doctrine\Persistence\Mapping\Driver\AnnotationDriver::class)) { // doctrine/persistence >= 3.0
-            $config->setLazyGhostObjectEnabled(true);
-        }
+        $config->setLazyGhostObjectEnabled(true);
 
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',

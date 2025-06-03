@@ -16,15 +16,15 @@ return [
         ],
         'AFN' => [
             'AFN',
-            'afgani afgano',
+            'afgani',
         ],
         'ALL' => [
             'ALL',
-            'lek albanés',
+            'lek',
         ],
         'AMD' => [
             'AMD',
-            'dram armenio',
+            'dram',
         ],
         'ANG' => [
             'ANG',
@@ -32,7 +32,7 @@ return [
         ],
         'AOA' => [
             'AOA',
-            'kuanza angoleño',
+            'kuanza',
         ],
         'AOK' => [
             'AOK',
@@ -92,7 +92,7 @@ return [
         ],
         'BDT' => [
             'BDT',
-            'taka bangladesí',
+            'taka',
         ],
         'BEC' => [
             'BEC',
@@ -172,7 +172,7 @@ return [
         ],
         'BTN' => [
             'BTN',
-            'gultrum butanés',
+            'gultrum',
         ],
         'BUK' => [
             'BUK',
@@ -180,7 +180,7 @@ return [
         ],
         'BWP' => [
             'BWP',
-            'pula botsuano',
+            'pula',
         ],
         'BYB' => [
             'BYB',
@@ -232,7 +232,7 @@ return [
         ],
         'CNY' => [
             'CNY',
-            'yuan renminbi',
+            'yuan',
         ],
         'COP' => [
             'COP',
@@ -316,7 +316,7 @@ return [
         ],
         'ERN' => [
             'ERN',
-            'nakfa eritreo',
+            'nakfa',
         ],
         'ESA' => [
             'ESA',
@@ -332,7 +332,7 @@ return [
         ],
         'ETB' => [
             'ETB',
-            'bir etíope',
+            'bir',
         ],
         'EUR' => [
             '€',
@@ -364,7 +364,7 @@ return [
         ],
         'GEL' => [
             'GEL',
-            'lari georgiano',
+            'lari',
         ],
         'GHC' => [
             'GHC',
@@ -372,7 +372,7 @@ return [
         ],
         'GHS' => [
             'GHS',
-            'cedi ghanés',
+            'cedi',
         ],
         'GIP' => [
             'GIP',
@@ -380,7 +380,7 @@ return [
         ],
         'GMD' => [
             'GMD',
-            'dalasi gambiano',
+            'dalasi',
         ],
         'GNF' => [
             'GNF',
@@ -428,7 +428,7 @@ return [
         ],
         'HRK' => [
             'HRK',
-            'kuna croata',
+            'kuna',
         ],
         'HTG' => [
             'HTG',
@@ -484,7 +484,7 @@ return [
         ],
         'JPY' => [
             'JPY',
-            'yen japonés',
+            'yen',
         ],
         'KES' => [
             'KES',
@@ -492,11 +492,11 @@ return [
         ],
         'KGS' => [
             'KGS',
-            'som kirguís',
+            'som',
         ],
         'KHR' => [
             'KHR',
-            'riel camboyano',
+            'riel',
         ],
         'KMF' => [
             'KMF',
@@ -524,7 +524,7 @@ return [
         ],
         'LAK' => [
             'LAK',
-            'kip laosiano',
+            'kip',
         ],
         'LBP' => [
             'LBP',
@@ -588,7 +588,7 @@ return [
         ],
         'MGA' => [
             'MGA',
-            'ariari malgache',
+            'ariari',
         ],
         'MGF' => [
             'MGF',
@@ -604,15 +604,15 @@ return [
         ],
         'MMK' => [
             'MMK',
-            'kiat de Myanmar',
+            'kiat',
         ],
         'MNT' => [
             'MNT',
-            'tugrik mongol',
+            'tugrik',
         ],
         'MOP' => [
             'MOP',
-            'pataca macaense',
+            'pataca de Macao',
         ],
         'MRO' => [
             'MRO',
@@ -620,7 +620,7 @@ return [
         ],
         'MRU' => [
             'MRU',
-            'uguiya mauritano',
+            'uguiya',
         ],
         'MTL' => [
             'MTL',
@@ -636,7 +636,7 @@ return [
         ],
         'MVR' => [
             'MVR',
-            'rufiya maldiva',
+            'rufiya',
         ],
         'MWK' => [
             'MWK',
@@ -656,7 +656,7 @@ return [
         ],
         'MYR' => [
             'MYR',
-            'ringit malasio',
+            'ringit',
         ],
         'MZE' => [
             'MZE',
@@ -668,7 +668,7 @@ return [
         ],
         'MZN' => [
             'MZN',
-            'metical mozambiqueño',
+            'metical',
         ],
         'NAD' => [
             'NAD',
@@ -676,7 +676,7 @@ return [
         ],
         'NGN' => [
             'NGN',
-            'naira nigeriano',
+            'naira',
         ],
         'NIC' => [
             'NIC',
@@ -724,7 +724,7 @@ return [
         ],
         'PGK' => [
             'PGK',
-            'kina papú',
+            'kina',
         ],
         'PHP' => [
             'PHP',
@@ -736,7 +736,7 @@ return [
         ],
         'PLN' => [
             'PLN',
-            'esloti polaco',
+            'esloti',
         ],
         'PLZ' => [
             'PLZ',
@@ -828,11 +828,11 @@ return [
         ],
         'SLE' => [
             'SLE',
-            'leona sierraleonesa',
+            'leona',
         ],
         'SLL' => [
             'SLL',
-            'leona sierraleonesa (1964–2022)',
+            'leona (1964—2022)',
         ],
         'SOS' => [
             'SOS',
@@ -856,7 +856,7 @@ return [
         ],
         'STN' => [
             'STN',
-            'dobra santotomense',
+            'dobra',
         ],
         'SUR' => [
             'SUR',
@@ -872,11 +872,11 @@ return [
         ],
         'SZL' => [
             'SZL',
-            'lilangeni esuatiní',
+            'lilangeni',
         ],
         'THB' => [
             '฿',
-            'bat tailandés',
+            'bat',
         ],
         'TJR' => [
             'TJR',
@@ -900,7 +900,7 @@ return [
         ],
         'TOP' => [
             'TOP',
-            'paanga tongano',
+            'paanga',
         ],
         'TPE' => [
             'TPE',
@@ -928,7 +928,7 @@ return [
         ],
         'UAH' => [
             'UAH',
-            'grivna ucraniana',
+            'grivna',
         ],
         'UAK' => [
             'UAK',
@@ -972,7 +972,7 @@ return [
         ],
         'UZS' => [
             'UZS',
-            'sum uzbeko',
+            'sum',
         ],
         'VEB' => [
             'VEB',
@@ -988,15 +988,15 @@ return [
         ],
         'VND' => [
             '₫',
-            'dong vietnamita',
+            'dong',
         ],
         'VUV' => [
             'VUV',
-            'vatu vanuatense',
+            'vatu',
         ],
         'WST' => [
             'WST',
-            'tala samoano',
+            'tala',
         ],
         'XAF' => [
             'XAF',
@@ -1060,7 +1060,7 @@ return [
         ],
         'ZAR' => [
             'ZAR',
-            'rand sudafricano',
+            'rand',
         ],
         'ZMK' => [
             'ZMK',

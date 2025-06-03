@@ -84,7 +84,7 @@ return [
         ],
         'BAM' => [
             'KM',
-            'bosanskohercegovačka konvertibilna marka',
+            'bosansko-hercegovačka konvertibilna marka',
         ],
         'BBD' => [
             'BBD',
@@ -336,7 +336,7 @@ return [
         ],
         'EUR' => [
             '€',
-            'evro',
+            'Evro',
         ],
         'FIM' => [
             'FIM',
@@ -924,7 +924,7 @@ return [
         ],
         'TTD' => [
             'TTD',
-            'trinidadskotobaški dolar',
+            'Trinidad-tobagoški dolar',
         ],
         'TWD' => [
             'NT$',

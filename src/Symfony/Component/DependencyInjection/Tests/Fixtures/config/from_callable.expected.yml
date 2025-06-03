@@ -8,7 +8,5 @@ services:
         class: stdClass
         public: true
         lazy: true
-        arguments: [['@bar', do]]
+        arguments: [[!service { class: stdClass }, do]]
         factory: [Closure, fromCallable]
-    bar:
-        class: stdClass

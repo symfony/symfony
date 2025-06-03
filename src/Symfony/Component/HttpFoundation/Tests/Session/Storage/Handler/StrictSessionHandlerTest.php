@@ -130,7 +130,6 @@ class StrictSessionHandlerTest extends TestCase
         $handler->expects($this->never())->method('write');
         $handler->expects($this->once())->method('destroy')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
-        $proxy->open('path', 'name');
 
         $this->assertFalse($proxy->validateId('id'));
         $this->assertSame('', $proxy->read('id'));
@@ -145,7 +144,6 @@ class StrictSessionHandlerTest extends TestCase
         $handler->expects($this->never())->method('write');
         $handler->expects($this->once())->method('destroy')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
-        $proxy->open('path', 'name');
 
         $this->assertSame('data', $proxy->read('id'));
         $this->assertTrue($proxy->write('id', ''));
@@ -157,7 +155,6 @@ class StrictSessionHandlerTest extends TestCase
         $handler->expects($this->once())->method('destroy')
             ->with('id')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
-        $proxy->open('path', 'name');
 
         $this->assertTrue($proxy->destroy('id'));
     }
@@ -169,7 +166,6 @@ class StrictSessionHandlerTest extends TestCase
             ->with('id')->willReturn('');
         $handler->expects($this->once())->method('destroy')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
-        $proxy->open('path', 'name');
 
         $this->assertSame('', $proxy->read('id'));
         $this->assertTrue($proxy->destroy('id'));
@@ -185,7 +181,6 @@ class StrictSessionHandlerTest extends TestCase
         $handler->expects($this->once())->method('destroy')
             ->with('id')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
-        $proxy->open('path', 'name');
 
         $this->assertSame('', $proxy->read('id'));
         $this->assertTrue($proxy->write('id', 'data'));

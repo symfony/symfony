@@ -15,7 +15,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTestCase
@@ -55,7 +54,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         if (\extension_loaded('intl')) {
             ini_set('intl.use_exceptions', $this->initialTestCaseUseException);
-            ini_set('intl.error_level', $this->initialTestCaseErrorLevel);
+            ini_set('intl.error_level', $this->initialTestCaseUseException);
         }
     }
 
@@ -237,10 +236,6 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
     public function testReverseTransformFromDifferentLocale()
     {
-        if (version_compare(Intl::getIcuVersion(), '71.1', '>')) {
-            $this->markTestSkipped('ICU version 71.1 or lower is required.');
-        }
-
         \Locale::setDefault('en_US');
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
@@ -344,11 +339,12 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $transformer->reverseTransform('20107-03-21 12:34:56');
     }
 
-    /**
-     * @requires extension intl
-     */
     public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
     {
+        if (!\extension_loaded('intl')) {
+            $this->markTestSkipped('intl extension is not loaded');
+        }
+
         $errorLevel = ini_set('intl.error_level', \E_WARNING);
 
         try {
@@ -360,11 +356,12 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         }
     }
 
-    /**
-     * @requires extension intl
-     */
     public function testReverseTransformWrapsIntlErrorsWithExceptions()
     {
+        if (!\extension_loaded('intl')) {
+            $this->markTestSkipped('intl extension is not loaded');
+        }
+
         $initialUseExceptions = ini_set('intl.use_exceptions', 1);
 
         try {
@@ -376,11 +373,12 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         }
     }
 
-    /**
-     * @requires extension intl
-     */
     public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
     {
+        if (!\extension_loaded('intl')) {
+            $this->markTestSkipped('intl extension is not loaded');
+        }
+
         $initialUseExceptions = ini_set('intl.use_exceptions', 1);
         $initialErrorLevel = ini_set('intl.error_level', \E_WARNING);
 

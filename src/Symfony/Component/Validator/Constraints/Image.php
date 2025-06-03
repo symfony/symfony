@@ -64,7 +64,7 @@ class Image extends File
      */
     protected static $errorNames = self::ERROR_NAMES;
 
-    public $mimeTypes;
+    public $mimeTypes = 'image/*';
     public $minWidth;
     public $maxWidth;
     public $maxHeight;
@@ -140,9 +140,7 @@ class Image extends File
         ?string $allowPortraitMessage = null,
         ?string $corruptedMessage = null,
         ?array $groups = null,
-        mixed $payload = null,
-        array|string|null $extensions = null,
-        ?string $extensionsMessage = null,
+        mixed $payload = null
     ) {
         parent::__construct(
             $options,
@@ -165,9 +163,7 @@ class Image extends File
             $uploadExtensionErrorMessage,
             $uploadErrorMessage,
             $groups,
-            $payload,
-            $extensions,
-            $extensionsMessage,
+            $payload
         );
 
         $this->minWidth = $minWidth ?? $this->minWidth;
@@ -195,10 +191,6 @@ class Image extends File
         $this->allowLandscapeMessage = $allowLandscapeMessage ?? $this->allowLandscapeMessage;
         $this->allowPortraitMessage = $allowPortraitMessage ?? $this->allowPortraitMessage;
         $this->corruptedMessage = $corruptedMessage ?? $this->corruptedMessage;
-
-        if (null === $this->mimeTypes && [] === $this->extensions) {
-            $this->mimeTypes = 'image/*';
-        }
 
         if (!\in_array('image/*', (array) $this->mimeTypes, true) && !\array_key_exists('mimeTypesMessage', $options ?? []) && null === $mimeTypesMessage) {
             $this->mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';

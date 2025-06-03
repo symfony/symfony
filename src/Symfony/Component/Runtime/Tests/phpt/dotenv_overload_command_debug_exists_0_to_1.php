@@ -20,8 +20,6 @@ $_SERVER['APP_RUNTIME_OPTIONS'] = [
 
 require __DIR__.'/autoload.php';
 
-return static fn (Command $command, OutputInterface $output, array $context): Command => $command->setCode(static function () use ($output, $context): int {
+return static fn (Command $command, OutputInterface $output, array $context): Command => $command->setCode(static function () use ($output, $context): void {
     $output->writeln($context['DEBUG_ENABLED']);
-
-    return 0;
 });

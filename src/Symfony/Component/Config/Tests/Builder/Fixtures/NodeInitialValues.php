@@ -38,13 +38,7 @@ class NodeInitialValues implements ConfigurationInterface
                             ->arrayPrototype()
                                 ->fixXmlConfig('option')
                                 ->children()
-                                    ->scalarNode('dsn')
-                                        ->info(<<<'INFO'
-                                            The DSN to use. This is a required option.
-                                            The info is used to describe the DSN,
-                                            it can be multi-line.
-                                            INFO)
-                                        ->end()
+                                    ->scalarNode('dsn')->end()
                                     ->scalarNode('serializer')->defaultNull()->end()
                                     ->arrayNode('options')
                                         ->normalizeKeys(false)

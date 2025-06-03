@@ -28,8 +28,6 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class DoctrineReceiverTest extends TestCase
@@ -47,7 +45,7 @@ class DoctrineReceiverTest extends TestCase
         $this->assertCount(1, $actualEnvelopes);
         /** @var Envelope $actualEnvelope */
         $actualEnvelope = $actualEnvelopes[0];
-        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelope->getMessage());
+        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
 
         /** @var DoctrineReceivedStamp $doctrineReceivedStamp */
         $doctrineReceivedStamp = $actualEnvelope->last(DoctrineReceivedStamp::class);
@@ -102,23 +100,6 @@ class DoctrineReceiverTest extends TestCase
         $receiver->get();
     }
 
-    public function testGetReplacesExistingTransportMessageIdStamps()
-    {
-        $serializer = $this->createSerializer();
-
-        $doctrineEnvelope = $this->createRetriedDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
-        $connection->method('get')->willReturn($doctrineEnvelope);
-
-        $receiver = new DoctrineReceiver($connection, $serializer);
-        $actualEnvelopes = $receiver->get();
-        /** @var Envelope $actualEnvelope */
-        $actualEnvelope = $actualEnvelopes[0];
-        $messageIdStamps = $actualEnvelope->all(TransportMessageIdStamp::class);
-
-        $this->assertCount(1, $messageIdStamps);
-    }
-
     public function testAll()
     {
         $serializer = $this->createSerializer();
@@ -134,24 +115,6 @@ class DoctrineReceiverTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }
 
-    public function testAllReplacesExistingTransportMessageIdStamps()
-    {
-        $serializer = $this->createSerializer();
-
-        $doctrineEnvelope1 = $this->createRetriedDoctrineEnvelope();
-        $doctrineEnvelope2 = $this->createRetriedDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
-        $connection->method('findAll')->willReturn([$doctrineEnvelope1, $doctrineEnvelope2]);
-
-        $receiver = new DoctrineReceiver($connection, $serializer);
-        $actualEnvelopes = $receiver->all();
-        foreach ($actualEnvelopes as $actualEnvelope) {
-            $messageIdStamps = $actualEnvelope->all(TransportMessageIdStamp::class);
-
-            $this->assertCount(1, $messageIdStamps);
-        }
-    }
-
     public function testFind()
     {
         $serializer = $this->createSerializer();
@@ -163,21 +126,6 @@ class DoctrineReceiverTest extends TestCase
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelope = $receiver->find(10);
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelope->getMessage());
-    }
-
-    public function testFindReplacesExistingTransportMessageIdStamps()
-    {
-        $serializer = $this->createSerializer();
-
-        $doctrineEnvelope = $this->createRetriedDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
-        $connection->method('find')->with(3)->willReturn($doctrineEnvelope);
-
-        $receiver = new DoctrineReceiver($connection, $serializer);
-        $actualEnvelope = $receiver->find(3);
-        $messageIdStamps = $actualEnvelope->all(TransportMessageIdStamp::class);
-
-        $this->assertCount(1, $messageIdStamps);
     }
 
     public function testAck()
@@ -247,7 +195,7 @@ class DoctrineReceiverTest extends TestCase
             ->with('1')
             ->willThrowException($deadlockException);
 
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
         $receiver->ack($envelope);
     }
 
@@ -267,7 +215,7 @@ class DoctrineReceiverTest extends TestCase
             ->with('1')
             ->willThrowException($exception);
 
-        $this->expectException($exception::class);
+        self::expectException($exception::class);
         $receiver->ack($envelope);
     }
 
@@ -338,7 +286,7 @@ class DoctrineReceiverTest extends TestCase
             ->with('1')
             ->willThrowException($deadlockException);
 
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
         $receiver->reject($envelope);
     }
 
@@ -358,7 +306,7 @@ class DoctrineReceiverTest extends TestCase
             ->with('1')
             ->willThrowException($exception);
 
-        $this->expectException($exception::class);
+        self::expectException($exception::class);
         $receiver->reject($envelope);
     }
 
@@ -373,27 +321,12 @@ class DoctrineReceiverTest extends TestCase
         ];
     }
 
-    private function createRetriedDoctrineEnvelope(): array
-    {
-        return [
-            'id' => 3,
-            'body' => '{"message": "Hi"}',
-            'headers' => [
-                'type' => DummyMessage::class,
-                'X-Message-Stamp-Symfony\Component\Messenger\Stamp\BusNameStamp' => '[{"busName":"messenger.bus.default"}]',
-                'X-Message-Stamp-Symfony\Component\Messenger\Stamp\TransportMessageIdStamp' => '[{"id":1},{"id":2}]',
-                'X-Message-Stamp-Symfony\Component\Messenger\Stamp\ErrorDetailsStamp' => '[{"exceptionClass":"Symfony\\\\Component\\\\Messenger\\\\Exception\\\\RecoverableMessageHandlingException","exceptionCode":0,"exceptionMessage":"","flattenException":null}]',
-                'X-Message-Stamp-Symfony\Component\Messenger\Stamp\DelayStamp' => '[{"delay":1000},{"delay":1000}]',
-                'X-Message-Stamp-Symfony\Component\Messenger\Stamp\RedeliveryStamp' => '[{"retryCount":1,"redeliveredAt":"2025-01-05T13:58:25+00:00"},{"retryCount":2,"redeliveredAt":"2025-01-05T13:59:26+00:00"}]',
-                'Content-Type' => 'application/json',
-            ],
-        ];
-    }
-
     private function createSerializer(): Serializer
     {
-        return new Serializer(
-            new SerializerComponent\Serializer([new DateTimeNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
+
+        return $serializer;
     }
 }

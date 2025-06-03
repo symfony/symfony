@@ -686,10 +686,6 @@ return [
             'MUR',
             'Rupee Mauritius',
         ],
-        'MVP' => [
-            'MVP',
-            'Rupee Maldives (1947–1981)',
-        ],
         'MVR' => [
             'MVR',
             'Rufiyaa Maldives',

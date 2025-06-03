@@ -32,6 +32,7 @@ return [
         'kgp' => 'kaingang',
         'krc' => 'karachái bálkaro',
         'kum' => 'cumuco',
+        'lo' => 'lao',
         'mga' => 'irlandés medieval',
         'nan' => 'min nan (Chino)',
         'nr' => 'ndebele meridional',

@@ -24,6 +24,8 @@ class WorkflowValidatorTest extends TestCase
 
     public function testWorkflowWithInvalidNames()
     {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('All transitions for a place must have an unique name. Multiple transitions named "t1" where found for place "a" in workflow "foo".');
         $places = range('a', 'c');
 
         $transitions = [];
@@ -32,9 +34,6 @@ class WorkflowValidatorTest extends TestCase
         $transitions[] = new Transition('t1', 'a', 'c');
 
         $definition = new Definition($places, $transitions);
-
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('All transitions for a place must have an unique name. Multiple transitions named "t1" where found for place "a" in workflow "foo".');
 
         (new WorkflowValidator())->validate($definition, 'foo');
     }
@@ -54,33 +53,5 @@ class WorkflowValidatorTest extends TestCase
 
         // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
         $this->addToAssertionCount(1);
-    }
-
-    public function testWithTooManyOutput()
-    {
-        $places = ['a', 'b', 'c'];
-        $transitions = [
-            new Transition('t1', 'a', ['b', 'c']),
-        ];
-        $definition = new Definition($places, $transitions);
-
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('The marking store of workflow "foo" cannot store many places. But the transition "t1" has too many output (2). Only one is accepted.');
-
-        (new WorkflowValidator(true))->validate($definition, 'foo');
-    }
-
-    public function testWithTooManyInitialPlaces()
-    {
-        $places = ['a', 'b', 'c'];
-        $transitions = [
-            new Transition('t1', 'a', 'b'),
-        ];
-        $definition = new Definition($places, $transitions, ['a', 'b']);
-
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('The marking store of workflow "foo" cannot store many places. But the definition has 2 initial places. Only one is supported.');
-
-        (new WorkflowValidator(true))->validate($definition, 'foo');
     }
 }

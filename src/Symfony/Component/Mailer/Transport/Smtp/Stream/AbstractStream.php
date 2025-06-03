@@ -80,14 +80,15 @@ abstract class AbstractStream
 
         $line = @fgets($this->out);
         if ('' === $line || false === $line) {
-            if (stream_get_meta_data($this->out)['timed_out']) {
+            $metas = stream_get_meta_data($this->out);
+            if ($metas['timed_out']) {
                 throw new TransportException(sprintf('Connection to "%s" timed out.', $this->getReadConnectionDescription()));
             }
-            if (feof($this->out)) { // don't use "eof" metadata, it's not accurate on Windows
+            if ($metas['eof']) {
                 throw new TransportException(sprintf('Connection to "%s" has been closed unexpectedly.', $this->getReadConnectionDescription()));
             }
             if (false === $line) {
-                throw new TransportException(sprintf('Unable to read from connection to "%s": ', $this->getReadConnectionDescription().error_get_last()['message'] ?? ''));
+                throw new TransportException(sprintf('Unable to read from connection to "%s": ', $this->getReadConnectionDescription()).error_get_last()['message']);
             }
         }
 

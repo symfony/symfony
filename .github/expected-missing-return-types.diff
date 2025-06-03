@@ -66,6 +66,16 @@ diff --git a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
 +    public function getTime(): float
      {
          $time = 0;
+diff --git a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
+--- a/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
++++ b/src/Symfony/Bridge/Doctrine/DataFixtures/ContainerAwareLoader.php
+@@ -38,5 +38,5 @@ class ContainerAwareLoader extends Loader
+      * @return void
+      */
+-    public function addFixture(FixtureInterface $fixture)
++    public function addFixture(FixtureInterface $fixture): void
+     {
+         if ($fixture instanceof ContainerAwareInterface) {
 diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php
 --- a/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php
 +++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/AbstractDoctrineExtension.php
@@ -215,14 +225,14 @@ diff --git a/src/Symfony/Bridge/Doctrine/Messenger/DoctrineClearEntityManagerWor
 diff --git a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 --- a/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
 +++ b/src/Symfony/Bridge/Doctrine/Security/RememberMe/DoctrineTokenProvider.php
-@@ -72,5 +72,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -70,5 +70,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function deleteTokenBySeries(string $series)
 +    public function deleteTokenBySeries(string $series): void
      {
          $sql = 'DELETE FROM rememberme_token WHERE series=:series';
-@@ -102,5 +102,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
+@@ -100,5 +100,5 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
       * @return void
       */
 -    public function createNewToken(PersistentTokenInterface $token)
@@ -653,14 +663,14 @@ diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExt
 diff --git a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 --- a/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
 +++ b/src/Symfony/Bundle/FrameworkBundle/FrameworkBundle.php
-@@ -97,5 +97,5 @@ class FrameworkBundle extends Bundle
+@@ -96,5 +96,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function boot()
 +    public function boot(): void
      {
          $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
-@@ -128,5 +128,5 @@ class FrameworkBundle extends Bundle
+@@ -121,5 +121,5 @@ class FrameworkBundle extends Bundle
       * @return void
       */
 -    public function build(ContainerBuilder $container)
@@ -1049,7 +1059,7 @@ diff --git a/src/Symfony/Bundle/TwigBundle/DependencyInjection/Configurator/Envi
 diff --git a/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php b/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php
 --- a/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php
 +++ b/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php
-@@ -42,5 +42,5 @@ class TwigExtension extends Extension
+@@ -41,5 +41,5 @@ class TwigExtension extends Extension
       * @return void
       */
 -    public function load(array $configs, ContainerBuilder $container)
@@ -3766,7 +3776,7 @@ diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByAc
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php b/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php
 --- a/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/ResolveBindingsPass.php
-@@ -40,5 +40,5 @@ class ResolveBindingsPass extends AbstractRecursivePass
+@@ -39,5 +39,5 @@ class ResolveBindingsPass extends AbstractRecursivePass
       * @return void
       */
 -    public function process(ContainerBuilder $container)
@@ -3925,7 +3935,7 @@ diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfo
 +    public function reset(): void
      {
          $services = $this->services + $this->privates;
-@@ -342,5 +342,5 @@ class Container implements ContainerInterface, ResetInterface
+@@ -341,5 +341,5 @@ class Container implements ContainerInterface, ResetInterface
       * @return mixed
       */
 -    protected function load(string $file)
@@ -4703,21 +4713,21 @@ diff --git a/src/Symfony/Component/DomCrawler/Field/TextareaFormField.php b/src/
 diff --git a/src/Symfony/Component/DomCrawler/Form.php b/src/Symfony/Component/DomCrawler/Form.php
 --- a/src/Symfony/Component/DomCrawler/Form.php
 +++ b/src/Symfony/Component/DomCrawler/Form.php
-@@ -248,5 +248,5 @@ class Form extends Link implements \ArrayAccess
+@@ -249,5 +249,5 @@ class Form extends Link implements \ArrayAccess
       * @return void
       */
 -    public function remove(string $name)
 +    public function remove(string $name): void
      {
          $this->fields->remove($name);
-@@ -270,5 +270,5 @@ class Form extends Link implements \ArrayAccess
+@@ -271,5 +271,5 @@ class Form extends Link implements \ArrayAccess
       * @return void
       */
 -    public function set(FormField $field)
 +    public function set(FormField $field): void
      {
          $this->fields->add($field);
-@@ -357,5 +357,5 @@ class Form extends Link implements \ArrayAccess
+@@ -358,5 +358,5 @@ class Form extends Link implements \ArrayAccess
       * @throws \LogicException If given node is not a button or input or does not have a form ancestor
       */
 -    protected function setNode(\DOMElement $node)
@@ -5180,56 +5190,56 @@ diff --git a/src/Symfony/Component/Filesystem/Filesystem.php b/src/Symfony/Compo
 +    public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = false): void
      {
          foreach ($this->toIterable($files) as $file) {
-@@ -245,5 +245,5 @@ class Filesystem
+@@ -241,5 +241,5 @@ class Filesystem
       * @throws IOException When the change fails
       */
 -    public function chown(string|iterable $files, string|int $user, bool $recursive = false)
 +    public function chown(string|iterable $files, string|int $user, bool $recursive = false): void
      {
          foreach ($this->toIterable($files) as $file) {
-@@ -277,5 +277,5 @@ class Filesystem
+@@ -269,5 +269,5 @@ class Filesystem
       * @throws IOException When the change fails
       */
 -    public function chgrp(string|iterable $files, string|int $group, bool $recursive = false)
 +    public function chgrp(string|iterable $files, string|int $group, bool $recursive = false): void
      {
          foreach ($this->toIterable($files) as $file) {
-@@ -303,5 +303,5 @@ class Filesystem
+@@ -295,5 +295,5 @@ class Filesystem
       * @throws IOException When origin cannot be renamed
       */
 -    public function rename(string $origin, string $target, bool $overwrite = false)
 +    public function rename(string $origin, string $target, bool $overwrite = false): void
      {
          // we check that target does not exist
-@@ -345,5 +345,5 @@ class Filesystem
+@@ -337,5 +337,5 @@ class Filesystem
       * @throws IOException When symlink fails
       */
 -    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false)
 +    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): void
      {
          self::assertFunctionExists('symlink');
-@@ -384,5 +384,5 @@ class Filesystem
+@@ -376,5 +376,5 @@ class Filesystem
       * @throws IOException           When link fails, including if link already exists
       */
 -    public function hardlink(string $originFile, string|iterable $targetFiles)
 +    public function hardlink(string $originFile, string|iterable $targetFiles): void
      {
          self::assertFunctionExists('link');
-@@ -542,5 +542,5 @@ class Filesystem
+@@ -534,5 +534,5 @@ class Filesystem
       * @throws IOException When file type is unknown
       */
 -    public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = [])
 +    public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = []): void
      {
          $targetDir = rtrim($targetDir, '/\\');
-@@ -668,5 +668,5 @@ class Filesystem
+@@ -660,5 +660,5 @@ class Filesystem
       * @throws IOException if the file cannot be written to
       */
 -    public function dumpFile(string $filename, $content)
 +    public function dumpFile(string $filename, $content): void
      {
          if (\is_array($content)) {
-@@ -719,5 +719,5 @@ class Filesystem
+@@ -707,5 +707,5 @@ class Filesystem
       * @throws IOException If the file is not writable
       */
 -    public function appendToFile(string $filename, $content/* , bool $lock = false */)
@@ -7053,7 +7063,7 @@ diff --git a/src/Symfony/Component/HttpClient/DecoratorTrait.php b/src/Symfony/C
 diff --git a/src/Symfony/Component/HttpClient/HttpClientTrait.php b/src/Symfony/Component/HttpClient/HttpClientTrait.php
 --- a/src/Symfony/Component/HttpClient/HttpClientTrait.php
 +++ b/src/Symfony/Component/HttpClient/HttpClientTrait.php
-@@ -708,5 +708,5 @@ trait HttpClientTrait
+@@ -685,5 +685,5 @@ trait HttpClientTrait
       * @return string
       */
 -    private static function removeDotSegments(string $path)
@@ -7093,7 +7103,7 @@ diff --git a/src/Symfony/Component/HttpClient/ScopingHttpClient.php b/src/Symfon
 diff --git a/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php b/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php
 --- a/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php
 +++ b/src/Symfony/Component/HttpFoundation/BinaryFileResponse.php
-@@ -366,5 +366,5 @@ class BinaryFileResponse extends Response
+@@ -362,5 +362,5 @@ class BinaryFileResponse extends Response
       * @return void
       */
 -    public static function trustXSendfileTypeHeader()
@@ -7227,98 +7237,98 @@ diff --git a/src/Symfony/Component/HttpFoundation/ParameterBag.php b/src/Symfony
 diff --git a/src/Symfony/Component/HttpFoundation/Request.php b/src/Symfony/Component/HttpFoundation/Request.php
 --- a/src/Symfony/Component/HttpFoundation/Request.php
 +++ b/src/Symfony/Component/HttpFoundation/Request.php
-@@ -275,5 +275,5 @@ class Request
+@@ -274,5 +274,5 @@ class Request
       * @return void
       */
 -    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
 +    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
      {
          $this->request = new InputBag($request);
-@@ -446,5 +446,5 @@ class Request
+@@ -434,5 +434,5 @@ class Request
       * @return void
       */
 -    public static function setFactory(?callable $callable)
 +    public static function setFactory(?callable $callable): void
      {
          self::$requestFactory = $callable;
-@@ -552,5 +552,5 @@ class Request
+@@ -540,5 +540,5 @@ class Request
       * @return void
       */
 -    public function overrideGlobals()
 +    public function overrideGlobals(): void
      {
          $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), '', '&')));
-@@ -594,5 +594,5 @@ class Request
+@@ -582,5 +582,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet)
 +    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
      {
          self::$trustedProxies = array_reduce($proxies, function ($proxies, $proxy) {
-@@ -637,5 +637,5 @@ class Request
+@@ -625,5 +625,5 @@ class Request
       * @return void
       */
 -    public static function setTrustedHosts(array $hostPatterns)
 +    public static function setTrustedHosts(array $hostPatterns): void
      {
          self::$trustedHostPatterns = array_map(fn ($hostPattern) => sprintf('{%s}i', $hostPattern), $hostPatterns);
-@@ -685,5 +685,5 @@ class Request
+@@ -673,5 +673,5 @@ class Request
       * @return void
       */
 -    public static function enableHttpMethodParameterOverride()
 +    public static function enableHttpMethodParameterOverride(): void
      {
          self::$httpMethodParameterOverride = true;
-@@ -772,5 +772,5 @@ class Request
+@@ -760,5 +760,5 @@ class Request
       * @return void
       */
 -    public function setSession(SessionInterface $session)
 +    public function setSession(SessionInterface $session): void
      {
          $this->session = $session;
-@@ -1195,5 +1195,5 @@ class Request
+@@ -1183,5 +1183,5 @@ class Request
       * @return void
       */
 -    public function setMethod(string $method)
 +    public function setMethod(string $method): void
      {
          $this->method = null;
-@@ -1318,5 +1318,5 @@ class Request
+@@ -1306,5 +1306,5 @@ class Request
       * @return void
       */
 -    public function setFormat(?string $format, string|array $mimeTypes)
 +    public function setFormat(?string $format, string|array $mimeTypes): void
      {
          if (null === static::$formats) {
-@@ -1350,5 +1350,5 @@ class Request
+@@ -1338,5 +1338,5 @@ class Request
       * @return void
       */
 -    public function setRequestFormat(?string $format)
 +    public function setRequestFormat(?string $format): void
      {
          $this->format = $format;
-@@ -1382,5 +1382,5 @@ class Request
+@@ -1370,5 +1370,5 @@ class Request
       * @return void
       */
 -    public function setDefaultLocale(string $locale)
 +    public function setDefaultLocale(string $locale): void
      {
          $this->defaultLocale = $locale;
-@@ -1404,5 +1404,5 @@ class Request
+@@ -1392,5 +1392,5 @@ class Request
       * @return void
       */
 -    public function setLocale(string $locale)
 +    public function setLocale(string $locale): void
      {
          $this->setPhpDefaultLocale($this->locale = $locale);
-@@ -1761,5 +1761,5 @@ class Request
+@@ -1749,5 +1749,5 @@ class Request
       * @return string
       */
 -    protected function prepareRequestUri()
 +    protected function prepareRequestUri(): string
      {
          $requestUri = '';
-@@ -1931,5 +1931,5 @@ class Request
+@@ -1919,5 +1919,5 @@ class Request
       * @return void
       */
 -    protected static function initializeFormats()
@@ -8447,28 +8457,28 @@ diff --git a/src/Symfony/Component/HttpKernel/HttpCache/Esi.php b/src/Symfony/Co
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 --- a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-@@ -249,5 +249,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -248,5 +248,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return void
       */
 -    public function terminate(Request $request, Response $response)
 +    public function terminate(Request $request, Response $response): void
      {
          // Do not call any listeners in case of a cache hit.
-@@ -469,5 +469,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -468,5 +468,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return Response
       */
 -    protected function forward(Request $request, bool $catch = false, ?Response $entry = null)
 +    protected function forward(Request $request, bool $catch = false, ?Response $entry = null): Response
      {
          $this->surrogate?->addSurrogateCapability($request);
-@@ -603,5 +603,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -602,5 +602,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @throws \Exception
       */
 -    protected function store(Request $request, Response $response)
 +    protected function store(Request $request, Response $response): void
      {
          try {
-@@ -681,5 +681,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -680,5 +680,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return void
       */
 -    protected function processResponseBody(Request $request, Response $response)
@@ -8485,7 +8495,7 @@ diff --git a/src/Symfony/Component/HttpKernel/HttpCache/ResponseCacheStrategy.ph
 +    public function add(Response $response): void
      {
          ++$this->embeddedResponses;
-@@ -117,5 +117,5 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
+@@ -102,5 +102,5 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
       * @return void
       */
 -    public function update(Response $response)
@@ -8923,23 +8933,6 @@ diff --git a/src/Symfony/Component/Intl/Data/Bundle/Writer/BundleWriterInterface
 -    public function write(string $path, string $locale, mixed $data);
 +    public function write(string $path, string $locale, mixed $data): void;
  }
-diff --git a/src/Symfony/Component/Intl/Transliterator/EmojiTransliterator.php b/src/Symfony/Component/Intl/Transliterator/EmojiTransliterator.php
---- a/src/Symfony/Component/Intl/Transliterator/EmojiTransliterator.php
-+++ b/src/Symfony/Component/Intl/Transliterator/EmojiTransliterator.php
-@@ -74,5 +74,5 @@ if (!class_exists(\Transliterator::class)) {
-          */
-         #[\ReturnTypeWillChange]
--        public function getErrorCode(): int|false
-+        public function getErrorCode(): int
-         {
-             return isset($this->transliterator) ? $this->transliterator->getErrorCode() : 0;
-@@ -83,5 +83,5 @@ if (!class_exists(\Transliterator::class)) {
-          */
-         #[\ReturnTypeWillChange]
--        public function getErrorMessage(): string|false
-+        public function getErrorMessage(): string
-         {
-             return isset($this->transliterator) ? $this->transliterator->getErrorMessage() : '';
 diff --git a/src/Symfony/Component/Intl/Util/IntlTestHelper.php b/src/Symfony/Component/Intl/Util/IntlTestHelper.php
 --- a/src/Symfony/Component/Intl/Util/IntlTestHelper.php
 +++ b/src/Symfony/Component/Intl/Util/IntlTestHelper.php
@@ -10052,14 +10045,14 @@ diff --git a/src/Symfony/Component/Process/Exception/ProcessTimedOutException.ph
 diff --git a/src/Symfony/Component/Process/ExecutableFinder.php b/src/Symfony/Component/Process/ExecutableFinder.php
 --- a/src/Symfony/Component/Process/ExecutableFinder.php
 +++ b/src/Symfony/Component/Process/ExecutableFinder.php
-@@ -35,5 +35,5 @@ class ExecutableFinder
+@@ -27,5 +27,5 @@ class ExecutableFinder
       * @return void
       */
 -    public function setSuffixes(array $suffixes)
 +    public function setSuffixes(array $suffixes): void
      {
          $this->suffixes = $suffixes;
-@@ -45,5 +45,5 @@ class ExecutableFinder
+@@ -37,5 +37,5 @@ class ExecutableFinder
       * @return void
       */
 -    public function addSuffix(string $suffix)
@@ -11632,14 +11625,14 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.p
 diff --git a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/GetSetMethodNormalizer.php
-@@ -168,5 +168,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+@@ -166,5 +166,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
      {
          $setter = 'set'.$attribute;
-@@ -182,5 +182,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
+@@ -180,5 +180,5 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
      }
  
 -    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = [])
@@ -11685,14 +11678,14 @@ diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
 diff --git a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 --- a/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php
-@@ -156,5 +156,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
+@@ -150,5 +150,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
       * @return void
       */
 -    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
 +    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
      {
          try {
-@@ -189,5 +189,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
+@@ -183,5 +183,5 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      }
  
 -    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = [])
@@ -13287,7 +13280,7 @@ diff --git a/src/Symfony/Component/Validator/ObjectInitializerInterface.php b/sr
 diff --git a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 --- a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 +++ b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
-@@ -294,5 +294,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
+@@ -295,5 +295,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
       * @psalm-return T
       */
 -    abstract protected function createValidator();

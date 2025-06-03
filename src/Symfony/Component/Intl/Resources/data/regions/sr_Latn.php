@@ -28,7 +28,7 @@ return [
         'BI' => 'Burundi',
         'BJ' => 'Benin',
         'BL' => 'Sveti Bartolomej',
-        'BM' => 'Bermudi',
+        'BM' => 'Bermuda',
         'BN' => 'Brunej',
         'BO' => 'Bolivija',
         'BQ' => 'Karipska Holandija',

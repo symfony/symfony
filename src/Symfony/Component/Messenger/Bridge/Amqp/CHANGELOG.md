@@ -17,7 +17,6 @@ CHANGELOG
  * Implement the `CloseableTransportInterface` to allow closing the AMQP connection
  * Add option `delay[arguments]` in the transport definition
 
-
 6.0
 ---
 

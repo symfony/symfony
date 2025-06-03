@@ -127,10 +127,6 @@ final class LokaliseProvider implements ProviderInterface
             $keysIds += $this->getKeysIds($keysToDelete, $domain);
         }
 
-        if (!$keysIds) {
-            return;
-        }
-
         $response = $this->client->request('DELETE', 'keys', [
             'json' => ['keys' => array_values($keysIds)],
         ]);
@@ -261,10 +257,6 @@ final class LokaliseProvider implements ProviderInterface
                     }, []),
                 ];
             }
-        }
-
-        if (!$keysToUpdate) {
-            return;
         }
 
         $response = $this->client->request('PUT', 'keys', [

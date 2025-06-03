@@ -145,11 +145,7 @@ final class HttplugWaitLoop
         }
 
         if ($body->isSeekable()) {
-            try {
-                $body->seek(0);
-            } catch (\RuntimeException) {
-                // ignore
-            }
+            $body->seek(0);
         }
 
         return $psrResponse->withBody($body);

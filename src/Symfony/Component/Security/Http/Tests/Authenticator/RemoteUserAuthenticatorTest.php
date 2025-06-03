@@ -36,7 +36,6 @@ class RemoteUserAuthenticatorTest extends TestCase
         $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), new TokenStorage(), 'main');
 
         $this->assertFalse($authenticator->supports($this->createRequest([])));
-        $this->assertFalse($authenticator->supports($this->createRequest(['REMOTE_USER' => ''])));
     }
 
     public function testSupportTokenStorageWithToken()

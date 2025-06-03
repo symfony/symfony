@@ -50,11 +50,10 @@ class CsrfProtectionListenerTest extends TestCase
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(true);
 
-        $badge = new CsrfTokenBadge('authenticator_token_id', 'abc123');
-        $event = $this->createEvent($this->createPassport($badge));
+        $event = $this->createEvent($this->createPassport(new CsrfTokenBadge('authenticator_token_id', 'abc123')));
         $this->listener->checkPassport($event);
 
-        $this->assertTrue($badge->isResolved());
+        $this->expectNotToPerformAssertions();
     }
 
     public function testInvalidCsrfToken()

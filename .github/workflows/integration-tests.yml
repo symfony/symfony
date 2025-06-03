@@ -19,7 +19,7 @@ jobs:
 
   tests:
     name: Integration
-    runs-on: ubuntu-24.04
+    runs-on: Ubuntu-20.04
 
     strategy:
       matrix:
@@ -81,26 +81,6 @@ jobs:
           REDIS_MASTER_HOST: redis
           REDIS_MASTER_SET: redis_sentinel
           REDIS_SENTINEL_QUORUM: 1
-      redis-primary:
-        image: bitnami/redis:latest
-        ports:
-          - 16381:6379
-        env:
-          ALLOW_EMPTY_PASSWORD: "yes"
-          REDIS_REPLICATION_MODE: "master"
-        options: >-
-          --name=redis-primary
-      redis-replica:
-        image: bitnami/redis:latest
-        ports:
-          - 16382:6379
-        env:
-          ALLOW_EMPTY_PASSWORD: "yes"
-          REDIS_REPLICATION_MODE: "slave"
-          REDIS_MASTER_HOST: redis-primary
-          REDIS_MASTER_PORT_NUMBER: "6379"
-        options: >-
-          --name=redis-replica
       memcached:
         image: memcached:1.6.5
         ports:
@@ -172,7 +152,7 @@ jobs:
         run: |
           echo "::group::apt-get update"
           sudo wget -O - https://packages.couchbase.com/clients/c/repos/deb/couchbase.key | sudo apt-key add -
-          echo "deb https://packages.couchbase.com/clients/c/repos/deb/ubuntu2404 noble noble/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
+          echo "deb https://packages.couchbase.com/clients/c/repos/deb/ubuntu2004 focal focal/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
           sudo apt-get update
           echo "::endgroup::"
 
@@ -259,7 +239,6 @@ jobs:
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
           REDIS_SENTINEL_HOSTS: 'unreachable-host:26379 localhost:26379 localhost:26379'
           REDIS_SENTINEL_SERVICE: redis_sentinel
-          REDIS_REPLICATION_HOSTS: 'localhost:16382 localhost:16381'
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
           MESSENGER_SQS_DSN: "sqs://localhost:4566/messages?sslmode=disable&poll_timeout=0.01"

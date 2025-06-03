@@ -17,7 +17,6 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdSender;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
-use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 final class BeanstalkdSenderTest extends TestCase
@@ -28,21 +27,13 @@ final class BeanstalkdSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')
-            ->with($encoded['body'], $encoded['headers'], 0)
-            ->willReturn('1')
-        ;
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0);
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturn($encoded);
 
         $sender = new BeanstalkdSender($connection, $serializer);
-        $actualEnvelope = $sender->send($envelope);
-
-        /** @var TransportMessageIdStamp $transportMessageIdStamp */
-        $transportMessageIdStamp = $actualEnvelope->last(TransportMessageIdStamp::class);
-        $this->assertNotNull($transportMessageIdStamp);
-        $this->assertSame('1', $transportMessageIdStamp->getId());
+        $sender->send($envelope);
     }
 
     public function testSendWithDelay()

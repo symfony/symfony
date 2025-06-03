@@ -65,10 +65,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         } elseif (empty($data)) {
             $data = [[]];
         } else {
-            if ($data instanceof \Traversable) {
-                // Generators can only be iterated once — convert to array to allow multiple traversals
-                $data = iterator_to_array($data);
-            }
             // Sequential arrays of arrays are considered as collections
             $i = 0;
             foreach ($data as $key => $value) {

@@ -124,7 +124,7 @@ return [
         'Prti' => 'Qoraalka Parthian',
         'Qaag' => 'Qoraalka Sawgiga',
         'Rjng' => 'Dadka Rejan',
-        'Rohg' => 'Hanifi',
+        'Rohg' => 'Hanifi Rohingya',
         'Runr' => 'Dadka Rejang',
         'Samr' => 'Dadka Samaritan',
         'Sarb' => 'Crabiyaankii Hore ee Wuqooyi',

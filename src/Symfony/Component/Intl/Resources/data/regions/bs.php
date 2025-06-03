@@ -107,7 +107,6 @@ return [
         'IL' => 'Izrael',
         'IM' => 'Ostrvo Man',
         'IN' => 'Indija',
-        'IO' => 'Britanska Teritorija u Indijskom Okeanu',
         'IQ' => 'Irak',
         'IR' => 'Iran',
         'IS' => 'Island',

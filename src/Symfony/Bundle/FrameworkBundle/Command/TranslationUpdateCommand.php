@@ -19,6 +19,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -62,10 +63,6 @@ class TranslationUpdateCommand extends Command
     public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, ?string $defaultTransPath = null, ?string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
     {
         parent::__construct();
-
-        if (!method_exists($writer, 'getFormats')) {
-            throw new \InvalidArgumentException(sprintf('The writer class "%s" does not implement the "getFormats()" method.', $writer::class));
-        }
 
         $this->writer = $writer;
         $this->reader = $reader;
@@ -127,6 +124,13 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
+        $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
+
+        if ('translation:update' === $input->getFirstArgument()) {
+            $errorIo->caution('Command "translation:update" is deprecated since version 5.4 and will be removed in Symfony 6.0. Use "translation:extract" instead.');
+        }
+
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 

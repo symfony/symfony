@@ -58,21 +58,15 @@ final class RateLimiterFactory
     protected static function configureOptions(OptionsResolver $options): void
     {
         $intervalNormalizer = static function (Options $options, string $interval): \DateInterval {
-            // Create DateTimeImmutable from unix timesatmp, so the default timezone is ignored and we don't need to
-            // deal with quirks happening when modifying dates using a timezone with DST.
-            $now = \DateTimeImmutable::createFromFormat('U', time());
-
             try {
-                $nowPlusInterval = @$now->modify('+' . $interval);
-            } catch (\DateMalformedStringException $e) {
-                throw new \LogicException(\sprintf('Cannot parse interval "%s", please use a valid unit as described on https://www.php.net/datetime.formats.relative.', $interval), 0, $e);
-            }
+                return (new \DateTimeImmutable())->diff(new \DateTimeImmutable('+'.$interval));
+            } catch (\Exception $e) {
+                if (!preg_match('/Failed to parse time string \(\+([^)]+)\)/', $e->getMessage(), $m)) {
+                    throw $e;
+                }
 
-            if (!$nowPlusInterval) {
-                throw new \LogicException(\sprintf('Cannot parse interval "%s", please use a valid unit as described on https://www.php.net/datetime.formats.relative.', $interval));
+                throw new \LogicException(sprintf('Cannot parse interval "%s", please use a valid unit as described on https://www.php.net/datetime.formats.relative.', $m[1]));
             }
-
-            return $now->diff($nowPlusInterval);
         };
 
         $options

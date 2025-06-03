@@ -284,9 +284,7 @@ EOF
             return $matchingServices[0];
         }
 
-        natsort($matchingServices);
-
-        return $io->choice('Select one of the following services to display its information', array_values($matchingServices));
+        return $io->choice('Select one of the following services to display its information', $matchingServices);
     }
 
     private function findProperTagName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $container, string $tagName): string
@@ -304,9 +302,7 @@ EOF
             return $matchingTags[0];
         }
 
-        natsort($matchingTags);
-
-        return $io->choice('Select one of the following tags to display its information', array_values($matchingTags));
+        return $io->choice('Select one of the following tags to display its information', $matchingTags);
     }
 
     private function findServiceIdsContaining(ContainerBuilder $container, string $name, bool $showHidden): array

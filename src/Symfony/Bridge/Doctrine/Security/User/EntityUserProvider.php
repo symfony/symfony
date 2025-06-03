@@ -100,8 +100,6 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
         if ($refreshedUser instanceof Proxy && !$refreshedUser->__isInitialized()) {
             $refreshedUser->__load();
-        } elseif (\PHP_VERSION_ID >= 80400 && ($r = new \ReflectionClass($refreshedUser))->isUninitializedLazyObject($refreshedUser)) {
-            $r->initializeLazyObject($refreshedUser);
         }
 
         return $refreshedUser;

@@ -306,9 +306,13 @@ return [
             'SDP',
             'gamle sudanske pund',
         ],
+        'SLE' => [
+            'SLE',
+            'sierraleonske leonar',
+        ],
         'SLL' => [
             'SLL',
-            'sierraleonsk leone (1964—2022)',
+            'sierraleonske leonar (1964—2022)',
         ],
         'SUR' => [
             'SUR',

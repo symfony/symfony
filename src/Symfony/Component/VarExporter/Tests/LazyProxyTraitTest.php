@@ -18,10 +18,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
-use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\AbstractHooked;
-use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\AsymmetricVisibility;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\FinalPublicClass;
-use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\Hooked;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\ReadOnlyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\StringMagicGetClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\TestClass;
@@ -299,89 +296,6 @@ class LazyProxyTraitTest extends TestCase
         $output = $serializer->normalize($object);
 
         $this->assertSame(['property' => 'property', 'method' => 'method'], $output);
-    }
-
-    /**
-     * @requires PHP 8.4
-     */
-    public function testConcretePropertyHooks()
-    {
-        $initialized = false;
-        $object = $this->createLazyProxy(Hooked::class, function () use (&$initialized) {
-            $initialized = true;
-
-            return new Hooked();
-        });
-
-        $this->assertSame(123, $object->notBacked);
-        $this->assertFalse($initialized);
-        $this->assertSame(234, $object->backed);
-        $this->assertTrue($initialized);
-
-        $initialized = false;
-        $object = $this->createLazyProxy(Hooked::class, function () use (&$initialized) {
-            $initialized = true;
-
-            return new Hooked();
-        });
-
-        $object->backed = 345;
-        $this->assertTrue($initialized);
-        $this->assertSame(345, $object->backed);
-    }
-
-    /**
-     * @requires PHP 8.4
-     */
-    public function testAbstractPropertyHooks()
-    {
-        $initialized = false;
-        $object = $this->createLazyProxy(AbstractHooked::class, function () use (&$initialized) {
-            $initialized = true;
-
-            return new class extends AbstractHooked {
-                public string $foo = 'Foo';
-                public string $bar = 'Bar';
-            };
-        });
-
-        $this->assertSame('Foo', $object->foo);
-        $this->assertSame('Bar', $object->bar);
-        $this->assertTrue($initialized);
-
-        $initialized = false;
-        $object = $this->createLazyProxy(AbstractHooked::class, function () use (&$initialized) {
-            $initialized = true;
-
-            return new class extends AbstractHooked {
-                public string $foo = 'Foo';
-                public string $bar = 'Bar';
-            };
-        });
-
-        $this->assertSame('Bar', $object->bar);
-        $this->assertSame('Foo', $object->foo);
-        $this->assertTrue($initialized);
-    }
-
-    /**
-     * @requires PHP 8.4
-     */
-    public function testAsymmetricVisibility()
-    {
-        $object = $this->createLazyProxy(AsymmetricVisibility::class, function () {
-            return new AsymmetricVisibility(123, 234);
-        });
-
-        $this->assertSame(123, $object->foo);
-        $this->assertSame(234, $object->getBar());
-
-        $object = $this->createLazyProxy(AsymmetricVisibility::class, function () {
-            return new AsymmetricVisibility(123, 234);
-        });
-
-        $this->assertSame(234, $object->getBar());
-        $this->assertSame(123, $object->foo);
     }
 
     /**

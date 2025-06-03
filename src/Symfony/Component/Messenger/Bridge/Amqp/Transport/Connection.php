@@ -31,7 +31,6 @@ class Connection
         'x-max-length-bytes',
         'x-max-priority',
         'x-message-ttl',
-        'x-delivery-limit',
     ];
 
     /**

@@ -60,22 +60,21 @@ class PeriodicalTriggerTest extends TestCase
     /**
      * @dataProvider getInvalidIntervals
      */
-    public function testInvalidInterval($interval, $expectedExceptionMessage)
+    public function testInvalidInterval($interval)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
 
         new PeriodicalTrigger($interval, $now = new \DateTimeImmutable(), $now->modify('1 day'));
     }
 
     public static function getInvalidIntervals(): iterable
     {
-        yield ['wrong', 'Unknown or bad format (wrong) at position 0 (w): The timezone could not be found in the database'];
-        yield ['3600.5', 'Unknown or bad format (3600.5) at position 5 (5): Unexpected character'];
-        yield ['-3600', 'Unknown or bad format (-3600) at position 3 (0): Unexpected character'];
-        yield [-3600, 'The "$interval" argument must be greater than zero.'];
-        yield ['0', 'The "$interval" argument must be greater than zero.'];
-        yield [0, 'The "$interval" argument must be greater than zero.'];
+        yield ['wrong'];
+        yield ['3600.5'];
+        yield ['-3600'];
+        yield [-3600];
+        yield ['0'];
+        yield [0];
     }
 
     /**
@@ -108,9 +107,9 @@ class PeriodicalTriggerTest extends TestCase
     /**
      * @dataProvider providerGetNextRunDates
      */
-    public function testGetNextRunDates(\DateTimeImmutable $from, TriggerInterface $trigger, array $expected, int $count)
+    public function testGetNextRunDates(\DateTimeImmutable $from, TriggerInterface $trigger, array $expected, int $count = 0)
     {
-        $this->assertEquals($expected, $this->getNextRunDates($from, $trigger, $count));
+        $this->assertEquals($expected, $this->getNextRunDates($from, $trigger, $count ?? \count($expected)));
     }
 
     public static function providerGetNextRunDates(): iterable

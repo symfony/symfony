@@ -36,8 +36,6 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertInstanceOf(StreamConnection::class, $connection);
 
         $redisHost = explode(':', $redisHost);
-        $connectionParameters = $connection->getParameters()->toArray();
-
         $params = [
             'scheme' => 'tcp',
             'host' => $redisHost[0],
@@ -48,12 +46,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
             'tcp_nodelay' => true,
             'database' => '1',
         ];
-
-        if (isset($connectionParameters['conn_uid'])) {
-            $params['conn_uid'] = $connectionParameters['conn_uid']; // if present, the value cannot be predicted
-        }
-
-        $this->assertSame($params, $connectionParameters);
+        $this->assertSame($params, $connection->getParameters()->toArray());
     }
 
     public function testCreateSslConnection()
@@ -67,8 +60,6 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertInstanceOf(StreamConnection::class, $connection);
 
         $redisHost = explode(':', $redisHost);
-        $connectionParameters = $connection->getParameters()->toArray();
-
         $params = [
             'scheme' => 'tls',
             'host' => $redisHost[0],
@@ -80,12 +71,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
             'tcp_nodelay' => true,
             'database' => '1',
         ];
-
-        if (isset($connectionParameters['conn_uid'])) {
-            $params['conn_uid'] = $connectionParameters['conn_uid']; // if present, the value cannot be predicted
-        }
-
-        $this->assertSame($params, $connectionParameters);
+        $this->assertSame($params, $connection->getParameters()->toArray());
     }
 
     public function testAclUserPasswordAuth()

@@ -444,31 +444,27 @@
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target>Nilai ini terlalu pendek. Seharusnya berisi setidaknya satu kata.|Nilai ini terlalu pendek. Seharusnya berisi setidaknya {{ min }} kata.</target>
+                <target state="needs-translation">This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target>Nilai ini terlalu panjang. Seharusnya hanya berisi satu kata.|Nilai ini terlalu panjang. Seharusnya berisi {{ max }} kata atau kurang.</target>
+                <target state="needs-translation">This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target>Nilai ini tidak mewakili minggu yang valid dalam format ISO 8601.</target>
+                <target state="needs-translation">This value does not represent a valid week in the ISO 8601 format.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target>Nilai ini bukan minggu yang valid.</target>
+                <target state="needs-translation">This value is not a valid week.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target>Nilai ini tidak boleh sebelum minggu "{{ min }}".</target>
+                <target state="needs-translation">This value should not be before week "{{ min }}".</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target>Nilai ini tidak boleh setelah minggu "{{ max }}".</target>
-            </trans-unit>
-            <trans-unit id="121">
-                <source>This value is not a valid Twig template.</source>
-                <target state="needs-review-translation">Nilai ini bukan templat Twig yang valid.</target>
+                <target state="needs-translation">This value should not be after week "{{ max }}".</target>
             </trans-unit>
         </body>
     </file>

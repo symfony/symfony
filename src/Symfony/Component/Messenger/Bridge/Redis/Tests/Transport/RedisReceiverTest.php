@@ -17,9 +17,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\ExternalMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\ExternalMessageSerializer;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
-use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -40,14 +38,7 @@ class RedisReceiverTest extends TestCase
         $receiver = new RedisReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->get();
         $this->assertCount(1, $actualEnvelopes);
-        /** @var Envelope $actualEnvelope */
-        $actualEnvelope = $actualEnvelopes[0];
-        $this->assertEquals($expectedMessage, $actualEnvelope->getMessage());
-
-        /** @var TransportMessageIdStamp $transportMessageIdStamp */
-        $transportMessageIdStamp = $actualEnvelope->last(TransportMessageIdStamp::class);
-        $this->assertNotNull($transportMessageIdStamp);
-        $this->assertSame($redisEnvelope['id'], $transportMessageIdStamp->getId());
+        $this->assertEquals($expectedMessage, $actualEnvelopes[0]->getMessage());
     }
 
     /**

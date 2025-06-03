@@ -228,7 +228,7 @@ return [
         ],
         'GTQ' => [
             'GTQ',
-            'Guatemalaanse kwetsal',
+            'Guatemalaanse quetzal',
         ],
         'GYD' => [
             'GYD',

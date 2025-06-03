@@ -36,33 +36,29 @@ final class TransTokenParser extends AbstractTokenParser
         $vars = new ArrayExpression([], $lineno);
         $domain = null;
         $locale = null;
-        $parseExpression = method_exists($this->parser, 'parseExpression')
-            ? $this->parser->parseExpression(...)
-            : $this->parser->getExpressionParser()->parseExpression(...);
-
         if (!$stream->test(Token::BLOCK_END_TYPE)) {
             if ($stream->test('count')) {
                 // {% trans count 5 %}
                 $stream->next();
-                $count = $parseExpression();
+                $count = $this->parser->getExpressionParser()->parseExpression();
             }
 
             if ($stream->test('with')) {
                 // {% trans with vars %}
                 $stream->next();
-                $vars = $parseExpression();
+                $vars = $this->parser->getExpressionParser()->parseExpression();
             }
 
             if ($stream->test('from')) {
                 // {% trans from "messages" %}
                 $stream->next();
-                $domain = $parseExpression();
+                $domain = $this->parser->getExpressionParser()->parseExpression();
             }
 
             if ($stream->test('into')) {
                 // {% trans into "fr" %}
                 $stream->next();
-                $locale = $parseExpression();
+                $locale = $this->parser->getExpressionParser()->parseExpression();
             } elseif (!$stream->test(Token::BLOCK_END_TYPE)) {
                 throw new SyntaxError('Unexpected token. Twig was looking for the "with", "from", or "into" keyword.', $stream->getCurrent()->getLine(), $stream->getSourceContext());
             }

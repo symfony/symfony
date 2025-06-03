@@ -254,10 +254,6 @@ return [
             'CSD',
             'Serbia dinaar (2002–2006)',
         ],
-        'CSK' => [
-            'CSK',
-            'Tšehhoslovakkia kõva kroon',
-        ],
         'CUC' => [
             'CUC',
             'Kuuba konverteeritav peeso',
@@ -1026,10 +1022,6 @@ return [
             'YER',
             'Jeemeni riaal',
         ],
-        'YUD' => [
-            'YUD',
-            'Jugoslaavia kõva dinaar (1966–1990)',
-        ],
         'YUM' => [
             'YUM',
             'Jugoslaavia uus dinaar (1994–2002)',
@@ -1037,10 +1029,6 @@ return [
         'YUN' => [
             'YUN',
             'Jugoslaavia konverteeritav dinaar (1990–1992)',
-        ],
-        'YUR' => [
-            'YUR',
-            'Jugoslaavia reformitud dinaar (1992–1993)',
         ],
         'ZAR' => [
             'ZAR',

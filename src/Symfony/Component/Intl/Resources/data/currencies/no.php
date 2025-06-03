@@ -900,11 +900,11 @@ return [
         ],
         'SLE' => [
             'SLE',
-            'sierraleonsk leone',
+            'sierraleonske leone',
         ],
         'SLL' => [
             'SLL',
-            'sierraleonsk leone (1964–2022)',
+            'sierraleonske leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

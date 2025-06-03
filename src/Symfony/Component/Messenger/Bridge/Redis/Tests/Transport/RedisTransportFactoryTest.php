@@ -66,12 +66,10 @@ class RedisTransportFactoryTest extends TestCase
             ['stream' => 'bar', 'delete_after_ack' => true],
         ];
 
-        if (false !== getenv('REDIS_SENTINEL_HOSTS') && false !== getenv('REDIS_SENTINEL_SERVICE')) {
-            yield 'redis_sentinel' => [
-                'redis:?host['.str_replace(' ', ']&host[', getenv('REDIS_SENTINEL_HOSTS')).']',
-                ['sentinel_master' => getenv('REDIS_SENTINEL_SERVICE')],
-            ];
-        }
+        yield 'redis_sentinel' => [
+            'redis:?host['.str_replace(' ', ']&host[', getenv('REDIS_SENTINEL_HOSTS')).']',
+            ['sentinel_master' => getenv('REDIS_SENTINEL_SERVICE')],
+        ];
     }
 
     private function skipIfRedisUnavailable()

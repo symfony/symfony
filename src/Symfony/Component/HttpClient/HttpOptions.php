@@ -156,8 +156,6 @@ class HttpOptions
     }
 
     /**
-     * @param callable(int, int, array, \Closure|null=):void $callback
-     *
      * @return $this
      */
     public function setOnProgress(callable $callback): static

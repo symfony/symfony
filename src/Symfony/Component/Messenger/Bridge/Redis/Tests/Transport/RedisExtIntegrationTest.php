@@ -450,7 +450,7 @@ class RedisExtIntegrationTest extends TestCase
     private function skipIfRedisClusterUnavailable()
     {
         try {
-            new \RedisCluster(null, getenv('REDIS_CLUSTER_HOST') ? explode(' ', getenv('REDIS_CLUSTER_HOST')) : []);
+            new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
         } catch (\Exception $e) {
             self::markTestSkipped($e->getMessage());
         }

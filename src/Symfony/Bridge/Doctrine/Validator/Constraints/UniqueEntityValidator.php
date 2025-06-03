@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
-use Doctrine\ORM\Mapping\ClassMetadata as OrmClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
@@ -70,10 +69,10 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         if ($constraint->em) {
-            try {
-                $em = $this->registry->getManager($constraint->em);
-            } catch (\InvalidArgumentException $e) {
-                throw new ConstraintDefinitionException(sprintf('Object manager "%s" does not exist.', $constraint->em), 0, $e);
+            $em = $this->registry->getManager($constraint->em);
+
+            if (!$em) {
+                throw new ConstraintDefinitionException(sprintf('Object manager "%s" does not exist.', $constraint->em));
             }
         } else {
             $em = $this->registry->getManagerForClass($entity::class);
@@ -93,11 +92,7 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException(sprintf('The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.', $fieldName));
             }
 
-            if (property_exists(OrmClassMetadata::class, 'propertyAccessors')) {
-                $fieldValue = $class->propertyAccessors[$fieldName]->getValue($entity);
-            } else {
-                $fieldValue = $class->reflFields[$fieldName]->getValue($entity);
-            }
+            $fieldValue = $class->reflFields[$fieldName]->getValue($entity);
 
             if (null === $fieldValue && $this->ignoreNullForField($constraint, $fieldName)) {
                 $hasIgnorableNullValue = true;
@@ -107,7 +102,7 @@ class UniqueEntityValidator extends ConstraintValidator
 
             $criteria[$fieldName] = $fieldValue;
 
-            if (\is_object($criteria[$fieldName]) && $class->hasAssociation($fieldName)) {
+            if (null !== $criteria[$fieldName] && $class->hasAssociation($fieldName)) {
                 /* Ensure the Proxy is initialized before using reflection to
                  * read its identifiers. This is necessary because the wrapped
                  * getter methods in the Proxy are being bypassed.

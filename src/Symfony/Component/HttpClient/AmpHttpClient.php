@@ -118,7 +118,6 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         }
 
         $request = new Request(implode('', $url), $method);
-        $request->setBodySizeLimit(0);
 
         if ($options['http_version']) {
             $request->setProtocolVersions(match ((float) $options['http_version']) {

@@ -640,22 +640,15 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function isPropertyWritable(object $object, string $property): bool
     {
-        if ($object instanceof \stdClass && property_exists($object, $property)) {
-            return true;
-        }
-
         $mutatorForArray = $this->getWriteInfo($object::class, $property, []);
-        if (PropertyWriteInfo::TYPE_PROPERTY === $mutatorForArray->getType()) {
-            return $mutatorForArray->getVisibility() === 'public';
-        }
 
-        if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType()) {
+        if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType() || ($object instanceof \stdClass && property_exists($object, $property))) {
             return true;
         }
 
         $mutator = $this->getWriteInfo($object::class, $property, '');
 
-        return PropertyWriteInfo::TYPE_NONE !== $mutator->getType();
+        return PropertyWriteInfo::TYPE_NONE !== $mutator->getType() || ($object instanceof \stdClass && property_exists($object, $property));
     }
 
     /**

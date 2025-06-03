@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
-use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
-use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -464,140 +462,6 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $httpClient->request('GET', 'http:/localhost:8057/');
     }
 
-    public function testNoPrivateNetwork()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-        $client = new NoPrivateNetworkHttpClient($client);
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Host "localhost" is blocked');
-
-        $client->request('GET', 'http://localhost:8888');
-    }
-
-    public function testNoPrivateNetworkWithResolve()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-        $client = new NoPrivateNetworkHttpClient($client);
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Host "symfony.com" is blocked');
-
-        $client->request('GET', 'http://symfony.com', ['resolve' => ['symfony.com' => '127.0.0.1']]);
-    }
-
-    public function testNoPrivateNetworkWithResolveAndRedirect()
-    {
-        DnsMock::withMockedHosts([
-            'localhost' => [
-                [
-                    'host' => 'localhost',
-                    'class' => 'IN',
-                    'ttl' => 15,
-                    'type' => 'A',
-                    'ip' => '127.0.0.1',
-                ],
-            ],
-            'symfony.com' => [
-                [
-                    'host' => 'symfony.com',
-                    'class' => 'IN',
-                    'ttl' => 15,
-                    'type' => 'A',
-                    'ip' => '10.0.0.1',
-                ],
-            ],
-        ]);
-
-        $client = $this->getHttpClient(__FUNCTION__);
-        $client = new NoPrivateNetworkHttpClient($client, '10.0.0.1/32');
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Host "symfony.com" is blocked');
-
-        $client->request('GET', 'http://localhost:8057/302?location=https://symfony.com/');
-    }
-
-    public function testNoPrivateNetwork304()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-        $client = new NoPrivateNetworkHttpClient($client, '104.26.14.6/32');
-        $response = $client->request('GET', 'http://localhost:8057/304', [
-            'headers' => ['If-Match' => '"abc"'],
-            'buffer' => false,
-        ]);
-
-        $this->assertSame(304, $response->getStatusCode());
-        $this->assertSame('', $response->getContent(false));
-    }
-
-    public function testNoPrivateNetwork302()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-        $client = new NoPrivateNetworkHttpClient($client, '104.26.14.6/32');
-        $response = $client->request('GET', 'http://localhost:8057/302/relative');
-
-        $body = $response->toArray();
-
-        $this->assertSame('/', $body['REQUEST_URI']);
-        $this->assertNull($response->getInfo('redirect_url'));
-
-        $response = $client->request('GET', 'http://localhost:8057/302/relative', [
-            'max_redirects' => 0,
-        ]);
-
-        $this->assertSame(302, $response->getStatusCode());
-        $this->assertSame('http://localhost:8057/', $response->getInfo('redirect_url'));
-    }
-
-    public function testNoPrivateNetworkStream()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-
-        $response = $client->request('GET', 'http://localhost:8057');
-        $client = new NoPrivateNetworkHttpClient($client, '104.26.14.6/32');
-
-        $response = $client->request('GET', 'http://localhost:8057');
-        $chunks = $client->stream($response);
-        $result = [];
-
-        foreach ($chunks as $r => $chunk) {
-            if ($chunk->isTimeout()) {
-                $result[] = 't';
-            } elseif ($chunk->isLast()) {
-                $result[] = 'l';
-            } elseif ($chunk->isFirst()) {
-                $result[] = 'f';
-            }
-        }
-
-        $this->assertSame($response, $r);
-        $this->assertSame(['f', 'l'], $result);
-
-        $chunk = null;
-        $i = 0;
-
-        foreach ($client->stream($response) as $chunk) {
-            ++$i;
-        }
-
-        $this->assertSame(1, $i);
-        $this->assertTrue($chunk->isLast());
-    }
-
-    public function testNoRedirectWithInvalidLocation()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-
-        $response = $client->request('GET', 'http://localhost:8057/302?location=localhost:8067');
-
-        $this->assertSame(302, $response->getStatusCode());
-
-        $response = $client->request('GET', 'http://localhost:8057/302?location=http:localhost');
-
-        $this->assertSame(302, $response->getStatusCode());
-    }
-
     /**
      * @dataProvider getRedirectWithAuthTests
      */
@@ -650,62 +514,5 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->assertSame(['abc' => 'def', 'content-type' => 'application/json', 'REQUEST_METHOD' => 'POST'], $response->toArray());
-    }
-
-    public function testHeadRequestWithClosureBody()
-    {
-        $p = TestHttpServer::start(8067);
-
-        try {
-            $client = $this->getHttpClient(__FUNCTION__);
-
-            $response = $client->request('HEAD', 'http://localhost:8057/head', [
-                'body' => fn () => '',
-            ]);
-            $headers = $response->getHeaders();
-        } finally {
-            $p->stop();
-        }
-
-        $this->assertArrayHasKey('x-request-vars', $headers);
-
-        $vars = json_decode($headers['x-request-vars'][0], true);
-        $this->assertIsArray($vars);
-        $this->assertSame('HEAD', $vars['REQUEST_METHOD']);
-    }
-
-    /**
-     * @testWith [301]
-     *           [302]
-     *           [303]
-     */
-    public function testPostToGetRedirect(int $status)
-    {
-        $p = TestHttpServer::start(8067);
-
-        try {
-            $client = $this->getHttpClient(__FUNCTION__);
-
-            $response = $client->request('POST', 'http://localhost:8057/custom?status=' . $status . '&headers[]=Location%3A%20%2F');
-            $body = $response->toArray();
-        } finally {
-            $p->stop();
-        }
-
-        $this->assertSame('GET', $body['REQUEST_METHOD']);
-        $this->assertSame('/', $body['REQUEST_URI']);
-    }
-
-    public function testResponseCanBeProcessedAfterClientReset()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://127.0.0.1:8057/timeout-body');
-        $stream = $client->stream($response);
-
-        $response->getStatusCode();
-        $client->reset();
-        $stream->current();
-
-        $this->addToAssertionCount(1);
     }
 }

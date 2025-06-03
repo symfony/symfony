@@ -500,11 +500,11 @@ return [
         ],
         'SLE' => [
             'SLE',
-            'Leone qullqi de Sierra Leona',
+            'Leone de Sierra Leona',
         ],
         'SLL' => [
             'SLL',
-            'Leone qullqi de Sierra Leona (1964–2022)',
+            'Leone de Sierra Leona (1964—2022)',
         ],
         'SOS' => [
             'SOS',

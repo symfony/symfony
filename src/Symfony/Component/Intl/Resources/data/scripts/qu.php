@@ -27,6 +27,7 @@ return [
         'Hebr' => 'Hebreo Simi',
         'Hira' => 'Hiragana',
         'Hrkt' => 'Japones silabico sananpakuna',
+        'Jamo' => 'Jamo',
         'Jpan' => 'Japones Simi',
         'Kana' => 'Katakana',
         'Khmr' => 'Khmer',

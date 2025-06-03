@@ -2,29 +2,13 @@
 
 return [
     'Names' => [
-        'BMD' => [
-            'BMD',
-            'Doolaara Beermudaa',
-        ],
         'BRL' => [
             'R$',
             'Brazilian Real',
         ],
-        'BZD' => [
-            'BZD',
-            'Doolaara Beliizee',
-        ],
-        'CAD' => [
-            'CA$',
-            'Doolaara Kanaadaa',
-        ],
         'CNY' => [
             'CN¥',
             'Chinese Yuan Renminbi',
-        ],
-        'CRC' => [
-            'CRC',
-            'Koloonii Kostaa Rikaa',
         ],
         'ETB' => [
             'Br',
@@ -52,7 +36,7 @@ return [
         ],
         'USD' => [
             'US$',
-            'Doolaara Ameerikaa',
+            'US Dollar',
         ],
     ],
 ];

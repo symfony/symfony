@@ -169,29 +169,33 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @requires extension memcached
+     * @dataProvider provideDsnWithOptions
      */
-    public function testOptionsFromDsnWinOverAdditionallyPassedOptions()
+    public function testDsnWithOptions(string $dsn, array $options, array $expectedOptions)
     {
-        $client = MemcachedAdapter::createConnection('memcached://localhost:11222?retry_timeout=10', [
-            \Memcached::OPT_RETRY_TIMEOUT => 8,
-        ]);
+        $client = MemcachedAdapter::createConnection($dsn, $options);
 
-        $this->assertSame(10, $client->getOption(\Memcached::OPT_RETRY_TIMEOUT));
+        foreach ($expectedOptions as $option => $expect) {
+            $this->assertSame($expect, $client->getOption($option));
+        }
     }
 
-    /**
-     * @requires extension memcached
-     */
-    public function testOptionsFromDsnAndAdditionallyPassedOptionsAreMerged()
+    public static function provideDsnWithOptions(): iterable
     {
-        $client = MemcachedAdapter::createConnection('memcached://localhost:11222?socket_recv_size=1&socket_send_size=2', [
-            \Memcached::OPT_RETRY_TIMEOUT => 8,
-        ]);
+        if (!class_exists(\Memcached::class)) {
+            self::markTestSkipped('Extension memcached required.');
+        }
 
-        $this->assertSame(1, $client->getOption(\Memcached::OPT_SOCKET_RECV_SIZE));
-        $this->assertSame(2, $client->getOption(\Memcached::OPT_SOCKET_SEND_SIZE));
-        $this->assertSame(8, $client->getOption(\Memcached::OPT_RETRY_TIMEOUT));
+        yield [
+            'memcached://localhost:11222?retry_timeout=10',
+            [\Memcached::OPT_RETRY_TIMEOUT => 8],
+            [\Memcached::OPT_RETRY_TIMEOUT => 10],
+        ];
+        yield [
+            'memcached://localhost:11222?socket_recv_size=1&socket_send_size=2',
+            [\Memcached::OPT_RETRY_TIMEOUT => 8],
+            [\Memcached::OPT_SOCKET_RECV_SIZE => 1, \Memcached::OPT_SOCKET_SEND_SIZE => 2, \Memcached::OPT_RETRY_TIMEOUT => 8],
+        ];
     }
 
     public function testClear()

@@ -15,7 +15,6 @@ use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Attribute\FirstClassTwigCallableReady;
 use Twig\Node\BodyNode;
-use Twig\Node\EmptyNode;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
@@ -29,15 +28,13 @@ class TwigNodeProvider
 {
     public static function getModule($content)
     {
-        $emptyNodeExists = class_exists(EmptyNode::class);
-
         return new ModuleNode(
             new BodyNode([new ConstantExpression($content, 0)]),
             null,
-            $emptyNodeExists ? new EmptyNode() : new ArrayExpression([], 0),
-            $emptyNodeExists ? new EmptyNode() : new ArrayExpression([], 0),
-            $emptyNodeExists ? new EmptyNode() : new ArrayExpression([], 0),
-            $emptyNodeExists ? new EmptyNode() : null,
+            new ArrayExpression([], 0),
+            new ArrayExpression([], 0),
+            new ArrayExpression([], 0),
+            null,
             new Source('', '')
         );
     }

@@ -28,7 +28,6 @@ class CheckCircularReferencesPass implements CompilerPassInterface
 {
     private array $currentPath;
     private array $checkedNodes;
-    private array $checkedLazyNodes;
 
     /**
      * Checks the ContainerBuilder object for circular references.
@@ -60,36 +59,22 @@ class CheckCircularReferencesPass implements CompilerPassInterface
             $node = $edge->getDestNode();
             $id = $node->getId();
 
-            if (!empty($this->checkedNodes[$id])) {
-                continue;
-            }
+            if (empty($this->checkedNodes[$id])) {
+                // Don't check circular references for lazy edges
+                if (!$node->getValue() || (!$edge->isLazy() && !$edge->isWeak())) {
+                    $searchKey = array_search($id, $this->currentPath);
+                    $this->currentPath[] = $id;
 
-            $isLeaf = !!$node->getValue();
-            $isConcrete = !$edge->isLazy() && !$edge->isWeak();
+                    if (false !== $searchKey) {
+                        throw new ServiceCircularReferenceException($id, \array_slice($this->currentPath, $searchKey));
+                    }
 
-            // Skip already checked lazy services if they are still lazy. Will not gain any new information.
-            if (!empty($this->checkedLazyNodes[$id]) && (!$isLeaf || !$isConcrete)) {
-                continue;
-            }
-
-            // Process concrete references, otherwise defer check circular references for lazy edges.
-            if (!$isLeaf || $isConcrete) {
-                $searchKey = array_search($id, $this->currentPath);
-                $this->currentPath[] = $id;
-
-                if (false !== $searchKey) {
-                    throw new ServiceCircularReferenceException($id, \array_slice($this->currentPath, $searchKey));
+                    $this->checkOutEdges($node->getOutEdges());
                 }
 
-                $this->checkOutEdges($node->getOutEdges());
-
                 $this->checkedNodes[$id] = true;
-                unset($this->checkedLazyNodes[$id]);
-            } else {
-                $this->checkedLazyNodes[$id] = true;
+                array_pop($this->currentPath);
             }
-
-            array_pop($this->currentPath);
         }
     }
 }

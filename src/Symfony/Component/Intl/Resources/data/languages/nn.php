@@ -20,6 +20,7 @@ return [
         'ebu' => 'embu',
         'egy' => 'gammalegyptisk',
         'elx' => 'elamite',
+        'fil' => 'filippinsk',
         'fro' => 'gammalfransk',
         'frs' => 'austfrisisk',
         'fur' => 'friulisk',

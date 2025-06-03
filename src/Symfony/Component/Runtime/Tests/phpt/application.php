@@ -18,10 +18,8 @@ require __DIR__.'/autoload.php';
 
 return function (array $context) {
     $command = new Command('go');
-    $command->setCode(function (InputInterface $input, OutputInterface $output) use ($context): int {
+    $command->setCode(function (InputInterface $input, OutputInterface $output) use ($context) {
         $output->write('OK Application '.$context['SOME_VAR']);
-
-        return 0;
     });
 
     $app = new Application();

@@ -24,7 +24,7 @@ return [
         ],
         'AOA' => [
             'AOA',
-            'IKwanza yaseAngola',
+            'I-Kwanza yase-Angola',
         ],
         'ARS' => [
             'ARS',
@@ -108,11 +108,11 @@ return [
         ],
         'CDF' => [
             'CDF',
-            'IFranc yaseCongo',
+            'I-Franc yaseCongo',
         ],
         'CHF' => [
             'CHF',
-            'IFranc yaseSwirtzeland',
+            'I-Franc yaseSwitzerland',
         ],
         'CLP' => [
             'CLP',
@@ -188,7 +188,7 @@ return [
         ],
         'FKP' => [
             'FKP',
-            'IPonti yaseFalkland Islands',
+            'Iponti yaseFalkland Islands',
         ],
         'GBP' => [
             '£',
@@ -200,7 +200,7 @@ return [
         ],
         'GHS' => [
             'GHS',
-            'ICedi yaseGhana',
+            'I-Cedi yaseGhana',
         ],
         'GIP' => [
             'GIP',
@@ -208,11 +208,11 @@ return [
         ],
         'GMD' => [
             'GMD',
-            'IDalasi yaseGambia',
+            'I-Dalasi yaseGambia',
         ],
         'GNF' => [
             'GNF',
-            'IFranc yaseGuinea',
+            'I-Franc yaseGuinea',
         ],
         'GTQ' => [
             'GTQ',
@@ -264,7 +264,7 @@ return [
         ],
         'ISK' => [
             'ISK',
-            'IKróna yaseIceland',
+            'I-Króna yase-Iceland',
         ],
         'JMD' => [
             'JMD',
@@ -400,7 +400,7 @@ return [
         ],
         'NGN' => [
             'NGN',
-            'INaira yaseNigeria',
+            'I-Naira yaseNigeria',
         ],
         'NIO' => [
             'NIO',
@@ -408,7 +408,7 @@ return [
         ],
         'NOK' => [
             'NOK',
-            'IKrone yaseNorway',
+            'I-Krone yaseNorway',
         ],
         'NPR' => [
             'NPR',
@@ -488,7 +488,7 @@ return [
         ],
         'SEK' => [
             'SEK',
-            'IKrona yaseSweden',
+            'I-Krona yaseSweden',
         ],
         'SGD' => [
             'SGD',
@@ -520,7 +520,7 @@ return [
         ],
         'STN' => [
             'STN',
-            'IDobra yaseSão Tomé & Príncipe',
+            'I-Dobra yaseSão Tomé & Príncipe',
         ],
         'SYP' => [
             'SYP',
@@ -604,7 +604,7 @@ return [
         ],
         'XAF' => [
             'FCFA',
-            'ICFA Franc yaseCentral Africa',
+            'Central African CFA Franc',
         ],
         'XCD' => [
             'EC$',
@@ -612,7 +612,7 @@ return [
         ],
         'XOF' => [
             'F CFA',
-            'ICFA Franc yaseWest Africa',
+            'West African CFA Franc',
         ],
         'XPF' => [
             'CFPF',

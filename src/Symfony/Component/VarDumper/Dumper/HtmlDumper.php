@@ -663,7 +663,7 @@ pre.sf-dump:after {
    height: 0;
    clear: both;
 }
-pre.sf-dump .sf-dump-ellipsization {
+pre.sf-dump span {
     display: inline-flex;
 }
 pre.sf-dump a {
@@ -681,12 +681,16 @@ pre.sf-dump img {
     background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAAHUlEQVQY02O8zAABilCaiQEN0EeA8QuUcX9g3QEAAjcC5piyhyEAAAAASUVORK5CYII=) #D3D3D3;
 }
 pre.sf-dump .sf-dump-ellipsis {
+    display: inline-block;
+    overflow: visible;
     text-overflow: ellipsis;
+    max-width: 5em;
     white-space: nowrap;
     overflow: hidden;
+    vertical-align: top;
 }
-pre.sf-dump .sf-dump-ellipsis-tail {
-    flex-shrink: 0;
+pre.sf-dump .sf-dump-ellipsis+.sf-dump-ellipsis {
+    max-width: none;
 }
 pre.sf-dump code {
     display:inline;
@@ -859,75 +863,66 @@ EOHTML
             return sprintf('<a class=sf-dump-ref href=#%s-ref%s title="%d occurrences">%s</a>', $this->dumpId, $r, 1 + $attr['count'], $v);
         }
 
-        $dumpClasses = ['sf-dump-'.$style];
-        $dumpTitle = '';
-
         if ('const' === $style && isset($attr['value'])) {
-            $dumpTitle = esc(\is_scalar($attr['value']) ? $attr['value'] : json_encode($attr['value']));
+            $style .= sprintf(' title="%s"', esc(\is_scalar($attr['value']) ? $attr['value'] : json_encode($attr['value'])));
         } elseif ('public' === $style) {
-            $dumpTitle = empty($attr['dynamic']) ? 'Public property' : 'Runtime added dynamic property';
+            $style .= sprintf(' title="%s"', empty($attr['dynamic']) ? 'Public property' : 'Runtime added dynamic property');
         } elseif ('str' === $style && 1 < $attr['length']) {
-            $dumpTitle = sprintf('%d%s characters', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
+            $style .= sprintf(' title="%d%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
         } elseif ('note' === $style && 0 < ($attr['depth'] ?? 0) && false !== $c = strrpos($value, '\\')) {
+            $style .= ' title=""';
             $attr += [
                 'ellipsis' => \strlen($value) - $c,
                 'ellipsis-type' => 'note',
                 'ellipsis-tail' => 1,
             ];
         } elseif ('protected' === $style) {
-            $dumpTitle = 'Protected property';
+            $style .= ' title="Protected property"';
         } elseif ('meta' === $style && isset($attr['title'])) {
-            $dumpTitle = esc($this->utf8Encode($attr['title']));
+            $style .= sprintf(' title="%s"', esc($this->utf8Encode($attr['title'])));
         } elseif ('private' === $style) {
-            $dumpTitle = sprintf('Private property defined in class:&#10;`%s`', esc($this->utf8Encode($attr['class'])));
+            $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', esc($this->utf8Encode($attr['class'])));
         }
 
         if (isset($attr['ellipsis'])) {
-            $dumpClasses[] = 'sf-dump-ellipsization';
-            $ellipsisClass = 'sf-dump-ellipsis';
+            $class = 'sf-dump-ellipsis';
             if (isset($attr['ellipsis-type'])) {
-                $ellipsisClass .= ' sf-dump-ellipsis-'.$attr['ellipsis-type'];
+                $class = sprintf('"%s sf-dump-ellipsis-%s"', $class, $attr['ellipsis-type']);
             }
             $label = esc(substr($value, -$attr['ellipsis']));
-            $dumpTitle = $v."\n".$dumpTitle;
-            $v = sprintf('<span class="%s">%s</span>', $ellipsisClass, substr($v, 0, -\strlen($label)));
+            $style = str_replace(' title="', " title=\"$v\n", $style);
+            $v = sprintf('<span class=%s>%s</span>', $class, substr($v, 0, -\strlen($label)));
 
             if (!empty($attr['ellipsis-tail'])) {
                 $tail = \strlen(esc(substr($value, -$attr['ellipsis'], $attr['ellipsis-tail'])));
-                $v .= sprintf('<span class="%s">%s</span><span class="sf-dump-ellipsis-tail">%s</span>', $ellipsisClass, substr($label, 0, $tail), substr($label, $tail));
+                $v .= sprintf('<span class=%s>%s</span>%s', $class, substr($label, 0, $tail), substr($label, $tail));
             } else {
-                $v .= sprintf('<span class="sf-dump-ellipsis-tail">%s</span>', $label);
+                $v .= $label;
             }
         }
 
         $map = static::$controlCharsMap;
-        $v = sprintf(
-            '<span class=%s%s%1$s%s>%s</span>',
-            1 === count($dumpClasses) ? '' : '"',
-            implode(' ', $dumpClasses),
-            $dumpTitle ? ' title="'.$dumpTitle.'"' : '',
-            preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
-                $s = $b = '<span class="sf-dump-default';
-                $c = $c[$i = 0];
-                if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
-                    $s .= ' sf-dump-ns';
-                }
-                $s .= '">';
-                do {
-                    if (("\r" === $c[$i] || "\n" === $c[$i]) !== $ns) {
-                        $s .= '</span>'.$b;
-                        if ($ns = !$ns) {
-                            $s .= ' sf-dump-ns';
-                        }
-                        $s .= '">';
+        $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
+            $s = $b = '<span class="sf-dump-default';
+            $c = $c[$i = 0];
+            if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
+                $s .= ' sf-dump-ns';
+            }
+            $s .= '">';
+            do {
+                if (("\r" === $c[$i] || "\n" === $c[$i]) !== $ns) {
+                    $s .= '</span>'.$b;
+                    if ($ns = !$ns) {
+                        $s .= ' sf-dump-ns';
                     }
+                    $s .= '">';
+                }
 
-                    $s .= $map[$c[$i]] ?? sprintf('\x%02X', \ord($c[$i]));
-                } while (isset($c[++$i]));
+                $s .= $map[$c[$i]] ?? sprintf('\x%02X', \ord($c[$i]));
+            } while (isset($c[++$i]));
 
-                return $s.'</span>';
-            }, $v)
-        );
+            return $s.'</span>';
+        }, $v).'</span>';
 
         if (!($attr['binary'] ?? false)) {
             $v = preg_replace_callback(static::$unicodeCharsRx, function ($c) {

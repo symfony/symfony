@@ -52,8 +52,6 @@ class MigratingSessionHandlerTest extends TestCase
 
     public function testDestroy()
     {
-        $this->dualHandler->open('/path/to/save/location', 'xyz');
-
         $sessionId = 'xyz';
 
         $this->currentHandler->expects($this->once())

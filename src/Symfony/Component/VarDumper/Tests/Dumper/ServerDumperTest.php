@@ -39,8 +39,8 @@ class ServerDumperTest extends TestCase
 
     public function testDump()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Skip transient test on Windows');
+        if ('True' === getenv('APPVEYOR')) {
+            $this->markTestSkipped('Skip transient test on AppVeyor');
         }
 
         $wrappedDumper = $this->createMock(DataDumperInterface::class);

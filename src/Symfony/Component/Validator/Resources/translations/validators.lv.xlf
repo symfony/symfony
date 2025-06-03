@@ -452,23 +452,19 @@
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target>Šī vērtība neatspoguļo nedēļu ISO 8601 formatā.</target>
+                <target state="needs-translation">This value does not represent a valid week in the ISO 8601 format.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target>Šī vērtība nav derīga nedēļa.</target>
+                <target state="needs-translation">This value is not a valid week.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target>Šai vērtībai nevajadzētu būt pirms "{{ min }}" nedēļas.</target>
+                <target state="needs-translation">This value should not be before week "{{ min }}".</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target>Šai vērtībai nevajadzētu būt pēc "{{ max }}" nedēļas.</target>
-            </trans-unit>
-            <trans-unit id="121">
-                <source>This value is not a valid Twig template.</source>
-                <target>Šī vērtība nav derīgs Twig šablons.</target>
+                <target state="needs-translation">This value should not be after week "{{ max }}".</target>
             </trans-unit>
         </body>
     </file>

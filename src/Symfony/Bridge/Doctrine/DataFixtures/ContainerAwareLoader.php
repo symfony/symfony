@@ -29,14 +29,15 @@ trigger_deprecation('symfony/dependency-injection', '6.4', '"%s" is deprecated, 
  */
 class ContainerAwareLoader extends Loader
 {
-    use AddFixtureImplementation;
-
     public function __construct(
         private readonly ContainerInterface $container,
     ) {
     }
 
-    private function doAddFixture(FixtureInterface $fixture): void
+    /**
+     * @return void
+     */
+    public function addFixture(FixtureInterface $fixture)
     {
         if ($fixture instanceof ContainerAwareInterface) {
             $fixture->setContainer($this->container);

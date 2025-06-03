@@ -492,11 +492,11 @@ return [
         ],
         'ILR' => [
             'ILR',
-            'Secel Iosraeleach (1980–1985)',
+            'Sheqel Iosraeleach (1980–1985)',
         ],
         'ILS' => [
             '₪',
-            'Secel ùr Iosraeleach',
+            'Sheqel ùr Iosraeleach',
         ],
         'INR' => [
             '₹',
@@ -1085,10 +1085,6 @@ return [
         'XCD' => [
             'EC$',
             'Dolar Caraibeach earach',
-        ],
-        'XCG' => [
-            'Cg.',
-            'Gulden Caraibeach',
         ],
         'XEU' => [
             'XEU',

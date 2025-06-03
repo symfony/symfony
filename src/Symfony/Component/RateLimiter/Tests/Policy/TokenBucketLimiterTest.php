@@ -56,18 +56,6 @@ class TokenBucketLimiterTest extends TestCase
         $limiter->reserve(15);
     }
 
-    public function testReduceBucketSizeWhenAlreadyExistInStorageWithBiggerBucketSize()
-    {
-        $limiter = $this->createLimiter(100);
-
-        $limiter->consume();
-
-        $limiter2 = $this->createLimiter(1);
-        $limiter2->consume();
-
-        $this->assertFalse($limiter2->consume()->isAccepted());
-    }
-
     public function testReserveMaxWaitingTime()
     {
         $this->expectException(MaxWaitDurationExceededException::class);

@@ -11,9 +11,7 @@ services:
             - container.decorator: { id: bar, inner: b }
         file: file.php
         lazy: true
-        arguments: ['@b']
-    b:
-        class: Class1
+        arguments: [!service { class: Class1 }]
     bar:
         alias: foo
         public: true

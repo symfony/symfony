@@ -332,7 +332,7 @@ return [
         ],
         'LSL' => [
             'LSL',
-            'Loti Lesotho',
+            'Lesotho Loti',
         ],
         'LYD' => [
             'LYD',
@@ -440,7 +440,7 @@ return [
         ],
         'PHP' => [
             '₱',
-            'Peso Filipina',
+            'Piso Filipina',
         ],
         'PKR' => [
             'PKR',

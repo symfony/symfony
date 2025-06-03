@@ -202,11 +202,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
         }
 
         if ($stream->isSeekable()) {
-            try {
-                $stream->seek(0);
-            } catch (\RuntimeException) {
-                // ignore
-            }
+            $stream->seek(0);
         }
 
         return $stream;
@@ -278,11 +274,7 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
             $body = $request->getBody();
 
             if ($body->isSeekable()) {
-                try {
-                    $body->seek(0);
-                } catch (\RuntimeException) {
-                    // ignore
-                }
+                $body->seek(0);
             }
 
             $options = [

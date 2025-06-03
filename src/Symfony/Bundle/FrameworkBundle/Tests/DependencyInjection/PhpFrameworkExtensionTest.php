@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
@@ -245,32 +244,5 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectExceptionMessageMatches('/^The argument "2" doesn\'t exist.*\.$/');
 
         $container->getDefinition('limiter.without_lock')->getArgument(2);
-    }
-
-    /**
-     * @dataProvider emailValidationModeProvider
-     */
-    public function testValidatorEmailValidationMode(string $mode)
-    {
-        $this->expectNotToPerformAssertions();
-
-        $this->createContainerFromClosure(function (ContainerBuilder $container) use ($mode) {
-            $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'validation' => [
-                    'email_validation_mode' => $mode,
-                ],
-            ]);
-        });
-    }
-
-    public static function emailValidationModeProvider()
-    {
-        foreach (Email::VALIDATION_MODES as $mode) {
-            yield [$mode];
-        }
     }
 }

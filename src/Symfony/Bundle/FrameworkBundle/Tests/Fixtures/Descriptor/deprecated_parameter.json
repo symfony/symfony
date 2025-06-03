@@ -1,0 +1,4 @@
+{
+    "deprecated_foo": "bar",
+    "_deprecation": "Since symfony\/framework-bundle 6.4: The parameter \"deprecated_foo\" is deprecated."
+}

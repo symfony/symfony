@@ -25,23 +25,19 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class TemplateIterator implements \IteratorAggregate
 {
-    private KernelInterface $kernel;
     private \Traversable $templates;
-    private array $paths;
-    private ?string $defaultPath;
-    private array $namePatterns;
 
     /**
      * @param array       $paths        Additional Twig paths to warm
      * @param string|null $defaultPath  The directory where global templates can be stored
      * @param string[]    $namePatterns Pattern of file names
      */
-    public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null, array $namePatterns = [])
-    {
-        $this->kernel = $kernel;
-        $this->paths = $paths;
-        $this->defaultPath = $defaultPath;
-        $this->namePatterns = $namePatterns;
+    public function __construct(
+        private KernelInterface $kernel,
+        private array $paths = [],
+        private ?string $defaultPath = null,
+        private array $namePatterns = [],
+    ) {
     }
 
     public function getIterator(): \Traversable
@@ -78,7 +74,7 @@ class TemplateIterator implements \IteratorAggregate
      *
      * @return string[]
      */
-    private function findTemplatesInDirectory(string $dir, string $namespace = null, array $excludeDirs = []): array
+    private function findTemplatesInDirectory(string $dir, ?string $namespace = null, array $excludeDirs = []): array
     {
         if (!is_dir($dir)) {
             return [];

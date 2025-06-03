@@ -21,10 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $controllerLocator = $container->findDefinition('argument_resolver.controller_locator');
         $controllers = $controllerLocator->getArgument(0);
@@ -32,9 +29,13 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
         foreach ($controllers as $controller => $argumentRef) {
             $argumentLocator = $container->getDefinition((string) $argumentRef->getValues()[0]);
 
+            if ($argumentLocator->getFactory()) {
+                $argumentLocator = $container->getDefinition($argumentLocator->getFactory()[0]);
+            }
+
             if (!$argumentLocator->getArgument(0)) {
                 // remove empty argument locators
-                $reason = sprintf('Removing service-argument resolver for controller "%s": no corresponding services exist for the referenced types.', $controller);
+                $reason = \sprintf('Removing service-argument resolver for controller "%s": no corresponding services exist for the referenced types.', $controller);
             } else {
                 // any methods listed for call-at-instantiation cannot be actions
                 $reason = false;
@@ -47,7 +48,7 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
                 $controllerDef = $container->getDefinition($id);
                 foreach ($controllerDef->getMethodCalls() as [$method]) {
                     if (0 === strcasecmp($action, $method)) {
-                        $reason = sprintf('Removing method "%s" of service "%s" from controller candidates: the method is called at instantiation, thus cannot be an action.', $action, $id);
+                        $reason = \sprintf('Removing method "%s" of service "%s" from controller candidates: the method is called at instantiation, thus cannot be an action.', $action, $id);
                         break;
                     }
                 }

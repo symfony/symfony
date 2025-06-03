@@ -31,17 +31,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class TraceableResponse implements ResponseInterface, StreamableInterface
 {
-    private HttpClientInterface $client;
-    private ResponseInterface $response;
-    private mixed $content;
-    private ?StopwatchEvent $event;
-
-    public function __construct(HttpClientInterface $client, ResponseInterface $response, &$content, StopwatchEvent $event = null)
-    {
-        $this->client = $client;
-        $this->response = $response;
-        $this->content = &$content;
-        $this->event = $event;
+    public function __construct(
+        private HttpClientInterface $client,
+        private ResponseInterface $response,
+        private mixed &$content = false,
+        private ?StopwatchEvent $event = null,
+    ) {
     }
 
     public function __sleep(): array
@@ -57,7 +52,9 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
     public function __destruct()
     {
         try {
-            $this->response->__destruct();
+            if (method_exists($this->response, '__destruct')) {
+                $this->response->__destruct();
+            }
         } finally {
             if ($this->event?->isStarted()) {
                 $this->event->stop();
@@ -132,7 +129,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
         }
     }
 
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         return $this->response->getInfo($type);
     }
@@ -171,7 +168,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
 
         foreach ($responses as $r) {
             if (!$r instanceof self) {
-                throw new \TypeError(sprintf('"%s::stream()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', TraceableHttpClient::class, get_debug_type($r)));
+                throw new \TypeError(\sprintf('"%s::stream()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', TraceableHttpClient::class, get_debug_type($r)));
             }
 
             $traceableMap[$r->response] = $r;

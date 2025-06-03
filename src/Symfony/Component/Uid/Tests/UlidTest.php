@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
 use Symfony\Component\Uid\MaxUlid;
 use Symfony\Component\Uid\NilUlid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
@@ -41,7 +42,7 @@ class UlidTest extends TestCase
 
     public function testWithInvalidUlid()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid ULID: "this is not a ulid".');
 
         new Ulid('this is not a ulid');
@@ -151,12 +152,12 @@ class UlidTest extends TestCase
      */
     public function testFromBinaryInvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Ulid::fromBinary($ulid);
     }
 
-    public static function provideInvalidBinaryFormat()
+    public static function provideInvalidBinaryFormat(): array
     {
         return [
             ['01EW2RYKDCT2SAK454KBR2QG08'],
@@ -178,12 +179,12 @@ class UlidTest extends TestCase
      */
     public function testFromBase58InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Ulid::fromBase58($ulid);
     }
 
-    public static function provideInvalidBase58Format()
+    public static function provideInvalidBase58Format(): array
     {
         return [
             ["\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"],
@@ -205,12 +206,12 @@ class UlidTest extends TestCase
      */
     public function testFromBase32InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Ulid::fromBase32($ulid);
     }
 
-    public static function provideInvalidBase32Format()
+    public static function provideInvalidBase32Format(): array
     {
         return [
             ["\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"],
@@ -232,12 +233,12 @@ class UlidTest extends TestCase
      */
     public function testFromRfc4122InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Ulid::fromRfc4122($ulid);
     }
 
-    public static function provideInvalidRfc4122Format()
+    public static function provideInvalidRfc4122Format(): array
     {
         return [
             ["\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"],
@@ -289,5 +290,10 @@ class UlidTest extends TestCase
     public function testNewMaxUlid()
     {
         $this->assertSame('7ZZZZZZZZZZZZZZZZZZZZZZZZZ', (string) new MaxUlid());
+    }
+
+    public function testToString()
+    {
+        $this->assertSame('01HK77WP8T7107EZH9CNAES202', (new Ulid('01HK77WP8T7107EZH9CNAES202'))->toString());
     }
 }

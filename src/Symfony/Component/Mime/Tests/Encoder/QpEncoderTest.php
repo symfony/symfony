@@ -169,7 +169,7 @@ class QpEncoderTest extends TestCase
         $encoder = new QpEncoder();
         foreach (range(0, 32) as $ordinal) {
             $char = \chr($ordinal);
-            $this->assertEquals(sprintf('=%02X', $ordinal), $encoder->encodeString($char));
+            $this->assertEquals(\sprintf('=%02X', $ordinal), $encoder->encodeString($char));
         }
     }
 
@@ -185,7 +185,7 @@ class QpEncoderTest extends TestCase
         // According to Rule (1 & 2)
         $encoder = new QpEncoder();
         foreach (range(127, 255) as $ordinal) {
-            $this->assertSame(sprintf('=%02X', $ordinal), $encoder->encodeString(\chr($ordinal), 'iso-8859-1'));
+            $this->assertSame(\sprintf('=%02X', $ordinal), $encoder->encodeString(\chr($ordinal), 'iso-8859-1'));
         }
     }
 

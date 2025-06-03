@@ -1086,6 +1086,10 @@ return [
             'EC$',
             'East Caribbean Dollar',
         ],
+        'XCG' => [
+            'Cg.',
+            'Caribbean guilder',
+        ],
         'XEU' => [
             'XEU',
             'European Currency Unit',
@@ -1162,9 +1166,13 @@ return [
             'ZWD',
             'Zimbabwean Dollar (1980–2008)',
         ],
+        'ZWG' => [
+            'ZWG',
+            'Zimbabwean Gold',
+        ],
         'ZWL' => [
             'ZWL',
-            'Zimbabwean Dollar (2009)',
+            'Zimbabwean Dollar (2009–2024)',
         ],
         'ZWR' => [
             'ZWR',

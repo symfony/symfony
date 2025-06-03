@@ -12,13 +12,18 @@
 namespace Symfony\Component\Notifier\Bridge\Mattermost\Tests;
 
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class MattermostTransportFactoryTest extends TransportFactoryTestCase
+final class MattermostTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): MattermostTransportFactory
     {
         return new MattermostTransportFactory();

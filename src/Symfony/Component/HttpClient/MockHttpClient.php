@@ -35,7 +35,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
     /**
      * @param callable|callable[]|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
      */
-    public function __construct(callable|iterable|ResponseInterface $responseFactory = null, ?string $baseUri = 'https://example.com')
+    public function __construct(callable|iterable|ResponseInterface|null $responseFactory = null, ?string $baseUri = 'https://example.com')
     {
         $this->setResponseFactory($responseFactory);
         $this->defaultOptions['base_uri'] = $baseUri;
@@ -78,13 +78,13 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         ++$this->requestsCount;
 
         if (!$response instanceof ResponseInterface) {
-            throw new TransportException(sprintf('The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "%s" given.', get_debug_type($response)));
+            throw new TransportException(\sprintf('The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "%s" given.', get_debug_type($response)));
         }
 
         return MockResponse::fromRequest($method, $url, $options, $response);
     }
 
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof ResponseInterface) {
             $responses = [$responses];
@@ -106,10 +106,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         return $clone;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->requestsCount = 0;
     }

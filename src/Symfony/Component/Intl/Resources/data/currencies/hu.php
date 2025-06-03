@@ -264,7 +264,7 @@ return [
         ],
         'CSD' => [
             'CSD',
-            'szerb dinár',
+            'szerb dinár (2002–2006)',
         ],
         'CSK' => [
             'CSK',
@@ -436,7 +436,7 @@ return [
         ],
         'HNL' => [
             'HNL',
-            'hodurasi lempira',
+            'hondurasi lempira',
         ],
         'HRD' => [
             'HRD',
@@ -480,7 +480,7 @@ return [
         ],
         'IRR' => [
             'IRR',
-            'iráni rial',
+            'iráni riál',
         ],
         'ISK' => [
             'ISK',
@@ -616,7 +616,7 @@ return [
         ],
         'MKD' => [
             'MKD',
-            'macedon dínár',
+            'macedón dénár',
         ],
         'MKN' => [
             'MKN',
@@ -728,7 +728,7 @@ return [
         ],
         'OMR' => [
             'OMR',
-            'ománi rial',
+            'ománi riál',
         ],
         'PAB' => [
             'PAB',
@@ -776,7 +776,7 @@ return [
         ],
         'QAR' => [
             'QAR',
-            'katari rial',
+            'katari riál',
         ],
         'RHD' => [
             'RHD',
@@ -792,7 +792,7 @@ return [
         ],
         'RSD' => [
             'RSD',
-            'szerb dínár',
+            'szerb dinár',
         ],
         'RUB' => [
             'RUB',
@@ -808,7 +808,7 @@ return [
         ],
         'SAR' => [
             'SAR',
-            'szaúdi riyal',
+            'szaúdi riál',
         ],
         'SBD' => [
             'SBD',
@@ -850,9 +850,13 @@ return [
             'SKK',
             'Szlovák korona',
         ],
+        'SLE' => [
+            'SLE',
+            'Sierra Leone-i leone',
+        ],
         'SLL' => [
             'SLL',
-            'Sierra Leone-i leone',
+            'Sierra Leone-i leone (1964–2022)',
         ],
         'SOS' => [
             'SOS',
@@ -984,11 +988,11 @@ return [
         ],
         'UYU' => [
             'UYU',
-            'uruguay-i peso',
+            'uruguayi peso',
         ],
         'UZS' => [
             'UZS',
-            'üzbegisztáni szum',
+            'üzbegisztáni szom',
         ],
         'VEB' => [
             'VEB',
@@ -1056,7 +1060,7 @@ return [
         ],
         'YER' => [
             'YER',
-            'jemeni rial',
+            'jemeni riál',
         ],
         'YUD' => [
             'YUD',

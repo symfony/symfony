@@ -21,19 +21,20 @@ class AutoAliasServicePassTest extends TestCase
 {
     public function testProcessWithMissingParameter()
     {
-        $this->expectException(ParameterNotFoundException::class);
         $container = new ContainerBuilder();
 
         $container->register('example')
             ->addTag('auto_alias', ['format' => '%non_existing%.example']);
 
         $pass = new AutoAliasServicePass();
+
+        $this->expectException(ParameterNotFoundException::class);
+
         $pass->process($container);
     }
 
     public function testProcessWithMissingFormat()
     {
-        $this->expectException(InvalidArgumentException::class);
         $container = new ContainerBuilder();
 
         $container->register('example')
@@ -41,6 +42,9 @@ class AutoAliasServicePassTest extends TestCase
         $container->setParameter('existing', 'mysql');
 
         $pass = new AutoAliasServicePass();
+
+        $this->expectException(InvalidArgumentException::class);
+
         $pass->process($container);
     }
 

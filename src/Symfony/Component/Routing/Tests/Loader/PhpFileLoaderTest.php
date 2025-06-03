@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Routing\Route;
@@ -99,6 +99,31 @@ class PhpFileLoaderTest extends TestCase
         $defaultsRoute = $routes->get('defaults');
 
         $this->assertSame('/defaults', $defaultsRoute->getPath());
+        $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
+        $this->assertSame('html', $defaultsRoute->getDefault('_format'));
+    }
+
+    public function testLoadingRouteWithCollectionDefaults()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('collection-defaults.php');
+
+        $this->assertCount(2, $routes);
+
+        $defaultsRoute = $routes->get('defaultsA');
+        $this->assertSame(['GET'], $defaultsRoute->getMethods());
+        $this->assertArrayHasKey('attribute', $defaultsRoute->getDefaults());
+        $this->assertTrue($defaultsRoute->getDefault('_stateless'));
+        $this->assertSame('/defaultsA', $defaultsRoute->getPath());
+        $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
+        $this->assertSame('html', $defaultsRoute->getDefault('_format'));
+
+        // The second route has a specific method and is not stateless, overwriting the collection settings
+        $defaultsRoute = $routes->get('defaultsB');
+        $this->assertSame(['POST'], $defaultsRoute->getMethods());
+        $this->assertArrayHasKey('attribute', $defaultsRoute->getDefaults());
+        $this->assertFalse($defaultsRoute->getDefault('_stateless'));
+        $this->assertSame('/defaultsB', $defaultsRoute->getPath());
         $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
         $this->assertSame('html', $defaultsRoute->getDefault('_format'));
     }
@@ -292,6 +317,16 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
 
+    public function testAddingRouteWithHosts()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('route-with-hosts.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/route-with-hosts-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
     public function testImportingAliases()
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
@@ -311,8 +346,8 @@ class PhpFileLoaderTest extends TestCase
         new LoaderResolver([
             $loader = new PhpFileLoader($locator),
             new Psr4DirectoryLoader($locator),
-            new class() extends AnnotationClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }
@@ -336,8 +371,8 @@ class PhpFileLoaderTest extends TestCase
     {
         new LoaderResolver([
             $loader = new PhpFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
-            new class() extends AnnotationClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }

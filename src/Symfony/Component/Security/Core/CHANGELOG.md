@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `UserAuthorizationCheckerInterface` to test user authorization without relying on the session
+ * Add `OfflineTokenInterface` to mark tokens that do not represent the currently logged-in user
+ * Deprecate `UserInterface::eraseCredentials()` and `TokenInterface::eraseCredentials()`,
+   erase credentials e.g. using `__serialize()` instead
+ * Add ability for voters to explain their vote
+ * Add support for voting on closures
+ * Add `OAuth2User` with OAuth2 Access Token Introspection support for `OAuth2TokenHandler`
+
+7.2
+---
+
+ * Make `AccessDecisionStrategyTestCase` compatible with PHPUnit 10+
+ * Add `$token` argument to `UserCheckerInterface::checkPostAuth()`
+ * Deprecate argument `$secret` of `RememberMeToken`
+ * Deprecate returning an empty string in `UserInterface::getUserIdentifier()`
+
+7.0
+---
+
+ * Remove the `Security` class, use `Symfony\Bundle\SecurityBundle\Security` instead
+ * Require explicit argument when calling `TokenStorage::setToken()`
+ * Change argument `$lastUsed` of `TokenProviderInterface::updateToken()` to accept `DateTimeInterface`
+
 6.4
 ---
 

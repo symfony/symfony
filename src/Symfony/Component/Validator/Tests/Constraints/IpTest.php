@@ -24,11 +24,14 @@ class IpTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $ip = new Ip(['normalizer' => 'trim']);
+        $ip = new Ip(normalizer: 'trim');
 
         $this->assertEquals('trim', $ip->normalizer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -36,6 +39,9 @@ class IpTest extends TestCase
         new Ip(['normalizer' => 'Unknown Callable']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

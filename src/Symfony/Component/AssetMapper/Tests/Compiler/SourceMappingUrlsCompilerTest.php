@@ -12,7 +12,6 @@
 namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
 use Symfony\Component\AssetMapper\MappedAsset;
@@ -26,18 +25,18 @@ class SourceMappingUrlsCompilerTest extends TestCase
     {
         $assetMapper = $this->createMock(AssetMapperInterface::class);
         $assetMapper->expects($this->any())
-            ->method('getAsset')
+            ->method('getAssetFromSourcePath')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
-                    'foo.js.map' => new MappedAsset($path,
+                    '/project/assets/foo.js.map' => new MappedAsset('foo.js.map',
                         publicPathWithoutDigest: '/assets/foo.js.map',
                         publicPath: '/assets/foo.123456.js.map',
                     ),
-                    'styles/bar.css.map' => new MappedAsset($path,
+                    '/project/assets/styles/bar.css.map' => new MappedAsset('styles/bar.css.map',
                         publicPathWithoutDigest: '/assets/styles/bar.css.map',
                         publicPath: '/assets/styles/bar.abcd123.css.map',
                     ),
-                    'sourcemaps/baz.css.map' => new MappedAsset($path,
+                    '/project/assets/sourcemaps/baz.css.map' => new MappedAsset('sourcemaps/baz.css.map',
                         publicPathWithoutDigest: '/assets/sourcemaps/baz.css.map',
                         publicPath: '/assets/sourcemaps/baz.987fedc.css.map',
                     ),
@@ -47,14 +46,12 @@ class SourceMappingUrlsCompilerTest extends TestCase
 
         $compiler = new SourceMappingUrlsCompiler();
         $asset = new MappedAsset($sourceLogicalName,
+            '/project/assets/'.$sourceLogicalName,
             publicPathWithoutDigest: '/assets/'.$sourceLogicalName,
         );
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
-        $assetDependencyLogicalPaths = array_map(fn (AssetDependency $dependency) => $dependency->asset->logicalPath, $asset->getDependencies());
+        $assetDependencyLogicalPaths = array_map(fn (MappedAsset $dependency) => $dependency->logicalPath, $asset->getDependencies());
         $this->assertSame($expectedDependencies, $assetDependencyLogicalPaths);
-        if ($expectedDependencies) {
-            $this->assertTrue($asset->getDependencies()[0]->isContentDependency);
-        }
     }
 
     public static function provideCompileTests(): iterable

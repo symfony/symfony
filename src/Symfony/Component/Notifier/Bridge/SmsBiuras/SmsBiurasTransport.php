@@ -28,11 +28,6 @@ final class SmsBiurasTransport extends AbstractTransport
 {
     protected const HOST = 'savitarna.smsbiuras.lt';
 
-    private string $uid;
-    private string $apiKey;
-    private string $from;
-    private bool $testMode;
-
     private const ERROR_CODES = [
         1 => 'The message was processed and sent to the mobile operator. But delivery confirmations have not yet been returned.',
         2 => 'SMS not delivered.',
@@ -47,19 +42,20 @@ final class SmsBiurasTransport extends AbstractTransport
         999 => 'Unknown Error',
     ];
 
-    public function __construct(string $uid, #[\SensitiveParameter] string $apiKey, string $from, bool $testMode, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->uid = $uid;
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-        $this->testMode = $testMode;
-
+    public function __construct(
+        private string $uid,
+        #[\SensitiveParameter] private string $apiKey,
+        private string $from,
+        private bool $testMode,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('smsbiuras://%s?from=%s%s', $this->getEndpoint(), $this->from, $this->testMode ? '&test_mode=1' : '');
+        return \sprintf('smsbiuras://%s?from=%s%s', $this->getEndpoint(), $this->from, $this->testMode ? '&test_mode=1' : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -73,7 +69,7 @@ final class SmsBiurasTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/api?', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api?', $this->getEndpoint());
 
         $response = $this->client->request('GET', $endpoint, [
             'query' => [

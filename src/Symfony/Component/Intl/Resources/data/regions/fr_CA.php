@@ -3,8 +3,10 @@
 return [
     'Names' => [
         'AX' => 'îles d’Åland',
+        'BN' => 'Brunéi',
         'BV' => 'île Bouvet',
         'BY' => 'Bélarus',
+        'BZ' => 'Bélize',
         'CC' => 'îles Cocos (Keeling)',
         'CK' => 'îles Cook',
         'CX' => 'île Christmas',
@@ -12,8 +14,8 @@ return [
         'FO' => 'îles Féroé',
         'HM' => 'îles Heard et McDonald',
         'IM' => 'île de Man',
-        'IO' => 'territoire britannique de l’océan Indien',
         'KG' => 'Kirghizistan',
+        'KN' => 'Saint‑Kitts‑et‑Nevis',
         'LR' => 'Libéria',
         'MF' => 'Saint-Martin (France)',
         'MM' => 'Myanmar',
@@ -26,6 +28,7 @@ return [
         'TL' => 'Timor-Leste',
         'UM' => 'îles mineures éloignées des États-Unis',
         'VA' => 'Cité du Vatican',
+        'VE' => 'Vénézuéla',
         'VG' => 'îles Vierges britanniques',
         'VI' => 'îles Vierges américaines',
         'VN' => 'Vietnam',

@@ -2,9 +2,21 @@
 
 return [
     'Names' => [
+        'AED' => [
+            'AED',
+            'dirham del Emiratos Arabe Unite',
+        ],
+        'AFN' => [
+            'AFN',
+            'afghani',
+        ],
         'ALL' => [
             'ALL',
             'lek albanese',
+        ],
+        'AMD' => [
+            'AMD',
+            'dram armenie',
         ],
         'ANG' => [
             'ANG',
@@ -26,6 +38,10 @@ return [
             'AWG',
             'florino aruban',
         ],
+        'AZN' => [
+            'AZN',
+            'manat azeri',
+        ],
         'BAM' => [
             'BAM',
             'marco convertibile de Bosnia-Herzegovina',
@@ -34,9 +50,17 @@ return [
             'BBD',
             'dollar barbadian',
         ],
+        'BDT' => [
+            'BDT',
+            'taka bengalese',
+        ],
         'BGN' => [
             'BGN',
             'lev bulgare',
+        ],
+        'BHD' => [
+            'BHD',
+            'dinar bahreini',
         ],
         'BIF' => [
             'BIF',
@@ -45,6 +69,10 @@ return [
         'BMD' => [
             'BMD',
             'dollar bermudan',
+        ],
+        'BND' => [
+            'BND',
+            'dollar de Brunei',
         ],
         'BOB' => [
             'BOB',
@@ -57,6 +85,10 @@ return [
         'BSD' => [
             'BSD',
             'dollar bahamian',
+        ],
+        'BTN' => [
+            'BTN',
+            'ngultrum bhutanese',
         ],
         'BWP' => [
             'BWP',
@@ -85,6 +117,10 @@ return [
         'CLP' => [
             'CLP',
             'peso chilen',
+        ],
+        'CNH' => [
+            'CNH',
+            'yuan chinese (extracontinental)',
         ],
         'CNY' => [
             'CN¥',
@@ -174,6 +210,10 @@ return [
             '£',
             'libra sterling',
         ],
+        'GEL' => [
+            'GEL',
+            'lari georgian',
+        ],
         'GHS' => [
             'GHS',
             'cedi ghanese',
@@ -198,6 +238,10 @@ return [
             'GYD',
             'dollar guyanese',
         ],
+        'HKD' => [
+            'HK$',
+            'dollar hongkongese',
+        ],
         'HNL' => [
             'HNL',
             'lempira hondurese',
@@ -214,13 +258,29 @@ return [
             'HUF',
             'forint hungare',
         ],
+        'IDR' => [
+            'IDR',
+            'rupia indonesian',
+        ],
         'IEP' => [
             'IEP',
             'Libra irlandese',
         ],
+        'ILS' => [
+            '₪',
+            'nove shekel israeli',
+        ],
         'INR' => [
             '₹',
             'rupia indian',
+        ],
+        'IQD' => [
+            'IQD',
+            'dinar iraqi',
+        ],
+        'IRR' => [
+            'IRR',
+            'rial iranian',
         ],
         'ISK' => [
             'ISK',
@@ -230,6 +290,10 @@ return [
             'JMD',
             'dollar jamaican',
         ],
+        'JOD' => [
+            'JOD',
+            'dinar jordan',
+        ],
         'JPY' => [
             'JP¥',
             'yen japonese',
@@ -238,17 +302,57 @@ return [
             'KES',
             'shilling kenyan',
         ],
+        'KGS' => [
+            'KGS',
+            'som kirghiz',
+        ],
+        'KHR' => [
+            'KHR',
+            'riel cambodgian',
+        ],
         'KMF' => [
             'KMF',
             'franco comorian',
+        ],
+        'KPW' => [
+            'KPW',
+            'won nordkorean',
+        ],
+        'KRW' => [
+            '₩',
+            'won sudkorean',
+        ],
+        'KWD' => [
+            'KWD',
+            'dinar kuwaiti',
         ],
         'KYD' => [
             'KYD',
             'dollar del Insulas Caiman',
         ],
+        'KZT' => [
+            'KZT',
+            'tenge kazakh',
+        ],
+        'LAK' => [
+            'LAK',
+            'kip laotian',
+        ],
+        'LBP' => [
+            'LBP',
+            'libra libanese',
+        ],
+        'LKR' => [
+            'LKR',
+            'rupia de Sri Lanka',
+        ],
         'LRD' => [
             'LRD',
             'dollar liberian',
+        ],
+        'LSL' => [
+            'LSL',
+            'loti de Lesotho',
         ],
         'LYD' => [
             'LYD',
@@ -270,6 +374,18 @@ return [
             'MKD',
             'denar macedonie',
         ],
+        'MMK' => [
+            'MMK',
+            'kyat de Myanmar',
+        ],
+        'MNT' => [
+            'MNT',
+            'tugrik mongol',
+        ],
+        'MOP' => [
+            'MOP',
+            'pataca de Macao',
+        ],
         'MRO' => [
             'MRO',
             'ouguiya mauritan (1973–2017)',
@@ -282,6 +398,10 @@ return [
             'MUR',
             'rupia mauritian',
         ],
+        'MVR' => [
+            'MVR',
+            'rufiyaa del Maldivas',
+        ],
         'MWK' => [
             'MWK',
             'kwacha malawian',
@@ -289,6 +409,10 @@ return [
         'MXN' => [
             'MX$',
             'peso mexican',
+        ],
+        'MYR' => [
+            'MYR',
+            'ringgit malay',
         ],
         'MZN' => [
             'MZN',
@@ -314,9 +438,17 @@ return [
             'NOK',
             'corona norvegian',
         ],
+        'NPR' => [
+            'NPR',
+            'rupia nepalese',
+        ],
         'NZD' => [
             'NZ$',
             'dollar neozelandese',
+        ],
+        'OMR' => [
+            'OMR',
+            'rial omani',
         ],
         'PAB' => [
             'PAB',
@@ -330,6 +462,14 @@ return [
             'PGK',
             'kina papuan',
         ],
+        'PHP' => [
+            '₱',
+            'peso philippin',
+        ],
+        'PKR' => [
+            'PKR',
+            'rupia pakistani',
+        ],
         'PLN' => [
             'PLN',
             'zloty polonese',
@@ -337,6 +477,10 @@ return [
         'PYG' => [
             'PYG',
             'guarani paraguayan',
+        ],
+        'QAR' => [
+            'QAR',
+            'rial qatari',
         ],
         'RON' => [
             'RON',
@@ -354,6 +498,10 @@ return [
             'RWF',
             'franco ruandese',
         ],
+        'SAR' => [
+            'SAR',
+            'rial saudi',
+        ],
         'SBD' => [
             'SBD',
             'dollar del insulas Salomon',
@@ -370,13 +518,21 @@ return [
             'SEK',
             'corona svedese',
         ],
+        'SGD' => [
+            'SGD',
+            'dollar singaporese',
+        ],
         'SHP' => [
             'SHP',
             'libra de St. Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'leone sierraleonese',
+        ],
         'SLL' => [
             'SLL',
-            'leone sierraleonese',
+            'leone sierraleonese (1964—2022)',
         ],
         'SOS' => [
             'SOS',
@@ -394,9 +550,25 @@ return [
             'STN',
             'dobra de São Tomé e Príncipe',
         ],
+        'SYP' => [
+            'SYP',
+            'libra syriac',
+        ],
         'SZL' => [
             'SZL',
             'lilangeni swazilandese',
+        ],
+        'THB' => [
+            'THB',
+            'baht thailandese',
+        ],
+        'TJS' => [
+            'TJS',
+            'somoni tajik',
+        ],
+        'TMT' => [
+            'TMT',
+            'manat turkmen',
         ],
         'TND' => [
             'TND',
@@ -406,9 +578,17 @@ return [
             'TOP',
             'paʻanga tongan',
         ],
+        'TRY' => [
+            'TRY',
+            'lira turc',
+        ],
         'TTD' => [
             'TTD',
             'dollar de Trinidad e Tobago',
+        ],
+        'TWD' => [
+            'NT$',
+            'nove dollar taiwanese',
         ],
         'TZS' => [
             'TZS',
@@ -430,6 +610,10 @@ return [
             'UYU',
             'peso uruguayan',
         ],
+        'UZS' => [
+            'UZS',
+            'som uzbek',
+        ],
         'VEF' => [
             'VEF',
             'bolivar venezuelan (2008–2018)',
@@ -437,6 +621,10 @@ return [
         'VES' => [
             'VES',
             'bolivar venezuelan',
+        ],
+        'VND' => [
+            '₫',
+            'dong vietnamese',
         ],
         'VUV' => [
             'VUV',
@@ -461,6 +649,10 @@ return [
         'XPF' => [
             'CFPF',
             'franco CFP',
+        ],
+        'YER' => [
+            'YER',
+            'rial yemeni',
         ],
         'ZAR' => [
             'ZAR',

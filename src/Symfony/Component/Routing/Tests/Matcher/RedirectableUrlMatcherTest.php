@@ -41,13 +41,15 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
 
     public function testRedirectWhenNoSlashForNonSafeMethod()
     {
-        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
         $context = new RequestContext();
         $context->setMethod('POST');
         $matcher = $this->getUrlMatcher($coll, $context);
+
+        $this->expectException(ResourceNotFoundException::class);
+
         $matcher->match('/foo');
     }
 
@@ -209,8 +211,11 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals(['_route' => 'a', 'a' => 'aaa'], $matcher->match('/fr-fr/'));
     }
 
-    protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
+    protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)
     {
-        return $this->getMockForAbstractClass(RedirectableUrlMatcher::class, [$routes, $context ?? new RequestContext()]);
+        return $this->getMockBuilder(RedirectableUrlMatcher::class)
+            ->setConstructorArgs([$routes, $context ?? new RequestContext()])
+            ->onlyMethods(['redirect'])
+            ->getMock();
     }
 }

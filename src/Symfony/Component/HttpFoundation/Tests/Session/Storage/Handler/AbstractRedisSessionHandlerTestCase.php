@@ -16,8 +16,6 @@ use Relay\Relay;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
 /**
- * @requires extension redis
- *
  * @group time-sensitive
  */
 abstract class AbstractRedisSessionHandlerTestCase extends TestCase
@@ -31,8 +29,6 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
         }
@@ -89,6 +85,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     public function testDestroySession()
     {
+        $this->storage->open('', 'test');
         $this->redisClient->set(self::PREFIX.'id', 'foo');
 
         $this->assertTrue((bool) $this->redisClient->exists(self::PREFIX.'id'));

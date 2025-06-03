@@ -14,6 +14,8 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 use AsyncAws\Core\Exception\Http\HttpException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -26,22 +28,17 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class AmazonSqsTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ResetInterface
+class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface, ResetInterface
 {
     private SerializerInterface $serializer;
-    private Connection $connection;
-    private ?ReceiverInterface $receiver;
-    private ?SenderInterface $sender;
 
-    /**
-     * @param MessageCountAwareInterface&ReceiverInterface|null $receiver
-     */
-    public function __construct(Connection $connection, SerializerInterface $serializer = null, ReceiverInterface $receiver = null, SenderInterface $sender = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+        private (ReceiverInterface&MessageCountAwareInterface)|null $receiver = null,
+        private ?SenderInterface $sender = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
-        $this->receiver = $receiver;
-        $this->sender = $sender;
     }
 
     public function get(): iterable
@@ -57,6 +54,14 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
     public function reject(Envelope $envelope): void
     {
         $this->getReceiver()->reject($envelope);
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        $receiver = $this->getReceiver();
+        if ($receiver instanceof KeepaliveReceiverInterface) {
+            $receiver->keepalive($envelope, $seconds);
+        }
     }
 
     public function getMessageCount(): int
@@ -78,10 +83,7 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
         }
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         try {
             $this->connection->reset();
@@ -90,10 +92,12 @@ class AmazonSqsTransport implements TransportInterface, SetupableTransportInterf
         }
     }
 
-    /**
-     * @return MessageCountAwareInterface&ReceiverInterface
-     */
-    private function getReceiver(): ReceiverInterface
+    public function close(): void
+    {
+        $this->reset();
+    }
+
+    private function getReceiver(): MessageCountAwareInterface&ReceiverInterface
     {
         return $this->receiver ??= new AmazonSqsReceiver($this->connection, $this->serializer);
     }

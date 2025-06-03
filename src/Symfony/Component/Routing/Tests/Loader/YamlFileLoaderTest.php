@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
@@ -49,10 +49,12 @@ class YamlFileLoaderTest extends TestCase
     /**
      * @dataProvider getPathsToInvalidFiles
      */
-    public function testLoadThrowsExceptionWithInvalidFile($filePath)
+    public function testLoadThrowsExceptionWithInvalidFile(string $filePath)
     {
-        $this->expectException(\InvalidArgumentException::class);
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
+        $this->expectException(\InvalidArgumentException::class);
+
         $loader->load($filePath);
     }
 
@@ -151,9 +153,11 @@ class YamlFileLoaderTest extends TestCase
 
     public function testOverrideControllerInDefaults()
     {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" key and the defaults key "_controller" for "app_blog"/');
-        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
+
         $loader->load('override_defaults.yml');
     }
 
@@ -183,9 +187,11 @@ class YamlFileLoaderTest extends TestCase
 
     public function testImportWithOverriddenController()
     {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" key and the defaults key "_controller" for "_static"/');
-        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
+
         $loader->load('import_override_defaults.yml');
     }
 
@@ -396,10 +402,11 @@ class YamlFileLoaderTest extends TestCase
 
     public function testRequirementsWithoutPlaceholderName()
     {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "\\d+" of route "foo"');
 
-        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load('requirements_without_placeholder_name.yml');
     }
 
@@ -443,6 +450,16 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
 
+    public function testAddingRouteWithHosts()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('route-with-hosts.yml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/route-with-hosts-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
     public function testWhenEnv()
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
@@ -463,6 +480,48 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yaml'), $routes);
     }
 
+    public function testPriorityWithPrefix()
+    {
+        new LoaderResolver([
+            $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/localized')),
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
+                {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $routes = $loader->load('localized-prefix.yml');
+
+        $this->assertSame(2, $routes->getPriority('important.cs'));
+        $this->assertSame(2, $routes->getPriority('important.en'));
+        $this->assertSame(1, $routes->getPriority('also_important'));
+    }
+
+    public function testPriorityWithHost()
+    {
+        new LoaderResolver([
+            $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/locale_and_host')),
+            new class extends AttributeClassLoader {
+                protected function configureRoute(
+                    Route $route,
+                    \ReflectionClass $class,
+                    \ReflectionMethod $method,
+                    object $annot,
+                ): void {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $routes = $loader->load('priorized-host.yml');
+
+        $this->assertSame(2, $routes->getPriority('important.cs'));
+        $this->assertSame(2, $routes->getPriority('important.en'));
+        $this->assertSame(1, $routes->getPriority('also_important'));
+    }
+
     /**
      * @dataProvider providePsr4ConfigFiles
      */
@@ -472,8 +531,8 @@ class YamlFileLoaderTest extends TestCase
         new LoaderResolver([
             $loader = new YamlFileLoader($locator),
             new Psr4DirectoryLoader($locator),
-            new class() extends AnnotationClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }
@@ -497,8 +556,8 @@ class YamlFileLoaderTest extends TestCase
     {
         new LoaderResolver([
             $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
-            new class() extends AnnotationClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }

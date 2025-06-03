@@ -128,7 +128,7 @@ class TraceableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals('Route matches!', $traces[1]['log']);
     }
 
-    protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
+    protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)
     {
         return new TraceableUrlMatcher($routes, $context ?? new RequestContext());
     }

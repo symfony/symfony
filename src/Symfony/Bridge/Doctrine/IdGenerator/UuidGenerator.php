@@ -22,11 +22,11 @@ use Symfony\Component\Uid\Uuid;
 
 final class UuidGenerator extends AbstractIdGenerator
 {
-    private UuidFactory $protoFactory;
+    private readonly UuidFactory $protoFactory;
     private UuidFactory|NameBasedUuidFactory|RandomBasedUuidFactory|TimeBasedUuidFactory $factory;
     private ?string $entityGetter = null;
 
-    public function __construct(UuidFactory $factory = null)
+    public function __construct(?UuidFactory $factory = null)
     {
         $this->protoFactory = $this->factory = $factory ?? new UuidFactory();
     }
@@ -52,7 +52,7 @@ final class UuidGenerator extends AbstractIdGenerator
         return $this->factory->create();
     }
 
-    public function nameBased(string $entityGetter, Uuid|string $namespace = null): static
+    public function nameBased(string $entityGetter, Uuid|string|null $namespace = null): static
     {
         $clone = clone $this;
         $clone->factory = $clone->protoFactory->nameBased($namespace);
@@ -70,7 +70,7 @@ final class UuidGenerator extends AbstractIdGenerator
         return $clone;
     }
 
-    public function timeBased(Uuid|string $node = null): static
+    public function timeBased(Uuid|string|null $node = null): static
     {
         $clone = clone $this;
         $clone->factory = $clone->protoFactory->timeBased($node);

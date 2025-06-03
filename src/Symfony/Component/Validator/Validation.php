@@ -24,7 +24,7 @@ final class Validation
     /**
      * Creates a callable chain of constraints.
      */
-    public static function createCallable(Constraint|ValidatorInterface $constraintOrValidator = null, Constraint ...$constraints): callable
+    public static function createCallable(Constraint|ValidatorInterface|null $constraintOrValidator = null, Constraint ...$constraints): callable
     {
         $validator = self::createIsValidCallable($constraintOrValidator, ...$constraints);
 
@@ -40,9 +40,9 @@ final class Validation
     /**
      * Creates a callable that returns true/false instead of throwing validation exceptions.
      *
-     * @return callable(mixed $value, ConstraintViolationListInterface &$violations = null): bool
+     * @return callable(mixed $value, ?ConstraintViolationListInterface &$violations = null): bool
      */
-    public static function createIsValidCallable(Constraint|ValidatorInterface $constraintOrValidator = null, Constraint ...$constraints): callable
+    public static function createIsValidCallable(Constraint|ValidatorInterface|null $constraintOrValidator = null, Constraint ...$constraints): callable
     {
         $validator = $constraintOrValidator;
 
@@ -53,7 +53,7 @@ final class Validation
 
         $validator ??= self::createValidator();
 
-        return static function (mixed $value, ConstraintViolationListInterface &$violations = null) use ($constraints, $validator): bool {
+        return static function (mixed $value, ?ConstraintViolationListInterface &$violations = null) use ($constraints, $validator): bool {
             $violations = $validator->validate($value, $constraints);
 
             return 0 === $violations->count();

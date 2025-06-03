@@ -58,6 +58,11 @@ class TransportTest extends TestCase
             'roundrobin(dummy://a failover(dummy://b dummy://a) dummy://b)',
             new RoundRobinTransport([$transportA, new FailoverTransport([$transportB, $transportA]), $transportB]),
         ];
+
+        yield 'round robin transport with retry period' => [
+            'roundrobin(dummy://a dummy://b)?retry_period=15',
+            new RoundRobinTransport([$transportA, $transportB], 15),
+        ];
     }
 
     /**
@@ -100,7 +105,7 @@ class TransportTest extends TestCase
     }
 }
 
-class DummyTransport implements Transport\TransportInterface
+class DummyTransport implements TransportInterface
 {
     private string $host;
 
@@ -109,7 +114,7 @@ class DummyTransport implements Transport\TransportInterface
         $this->host = $host;
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         throw new \BadMethodCallException('This method newer should be called.');
     }

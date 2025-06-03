@@ -56,7 +56,7 @@ return [
         ],
         'ARL' => [
             'ARL',
-            'ARL',
+            'Peso Ley na hAirgintíne (1970–1983)',
         ],
         'ARM' => [
             'ARM',
@@ -97,10 +97,6 @@ return [
         'BAM' => [
             'BAM',
             'Marg Inmhalartaithe na Boisnia-Heirseagaivéine',
-        ],
-        'BAN' => [
-            'BAN',
-            'BAN',
         ],
         'BBD' => [
             'BBD',
@@ -153,10 +149,6 @@ return [
         'BOB' => [
             'BOB',
             'Boliviano',
-        ],
-        'BOL' => [
-            'BOL',
-            'BOL',
         ],
         'BOP' => [
             'BOP',
@@ -234,9 +226,17 @@ return [
             'CDF',
             'Franc an Chongó',
         ],
+        'CHE' => [
+            'CHE',
+            'Euro WIR',
+        ],
         'CHF' => [
             'CHF',
             'Franc na hEilvéise',
+        ],
+        'CHW' => [
+            'CHW',
+            'Franc WIR',
         ],
         'CLE' => [
             'CLE',
@@ -261,10 +261,6 @@ return [
         'COP' => [
             'COP',
             'Peso na Colóime',
-        ],
-        'COU' => [
-            'COU',
-            'COU',
         ],
         'CRC' => [
             'CRC',
@@ -341,14 +337,6 @@ return [
         'ERN' => [
             'ERN',
             'Nakfa na hEiritré',
-        ],
-        'ESA' => [
-            'ESA',
-            'ESA',
-        ],
-        'ESB' => [
-            'ESB',
-            'ESB',
         ],
         'ESP' => [
             'ESP',
@@ -530,14 +518,6 @@ return [
             'KPW',
             'Won na Cóiré Thuaidh',
         ],
-        'KRH' => [
-            'KRH',
-            'KRH',
-        ],
-        'KRO' => [
-            'KRO',
-            'KRO',
-        ],
         'KRW' => [
             '₩',
             'Won na Cóiré Theas',
@@ -625,10 +605,6 @@ return [
         'MKD' => [
             'MKD',
             'Denar na Macadóine',
-        ],
-        'MKN' => [
-            'MKN',
-            'MKN',
         ],
         'MLF' => [
             'MLF',
@@ -858,9 +834,13 @@ return [
             'SKK',
             'Koruna na Slóvaice',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone Shiarra Leon',
+        ],
         'SLL' => [
             'SLL',
-            'Leone Shiarra Leon',
+            'Leone Shiarra Leon (1964—2022)',
         ],
         'SOS' => [
             'SOS',
@@ -1050,10 +1030,6 @@ return [
             'CFPF',
             'Franc CFP',
         ],
-        'XRE' => [
-            'XRE',
-            'XRE',
-        ],
         'YDD' => [
             'YDD',
             'Dínear Éimin',
@@ -1076,7 +1052,7 @@ return [
         ],
         'YUR' => [
             'YUR',
-            'YUR',
+            'Dinar Leasaithe na hIúgsláive (1992–1993)',
         ],
         'ZAL' => [
             'ZAL',
@@ -1105,6 +1081,10 @@ return [
         'ZWD' => [
             'ZWD',
             'Dollar Siombábach (1980–2008)',
+        ],
+        'ZWL' => [
+            'ZWL',
+            'Dollar na Siombáibe (2009)',
         ],
     ],
 ];

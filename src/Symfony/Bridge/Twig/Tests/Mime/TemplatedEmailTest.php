@@ -43,12 +43,14 @@ class TemplatedEmailTest extends TestCase
             ->textTemplate('text.txt.twig')
             ->htmlTemplate('text.html.twig')
             ->context($context = ['a' => 'b'])
+            ->locale($locale = 'fr_FR')
         ;
 
         $email = unserialize(serialize($email));
         $this->assertEquals('text.txt.twig', $email->getTextTemplate());
         $this->assertEquals('text.html.twig', $email->getHtmlTemplate());
         $this->assertEquals($context, $email->getContext());
+        $this->assertEquals($locale, $email->getLocale());
     }
 
     public function testSymfonySerialize()
@@ -58,6 +60,7 @@ class TemplatedEmailTest extends TestCase
         $e->to('you@example.com');
         $e->textTemplate('email.txt.twig');
         $e->htmlTemplate('email.html.twig');
+        $e->locale('en');
         $e->context(['foo' => 'bar']);
         $e->addPart(new DataPart('Some Text file', 'test.txt'));
         $expected = clone $e;
@@ -66,6 +69,7 @@ class TemplatedEmailTest extends TestCase
 {
     "htmlTemplate": "email.html.twig",
     "textTemplate": "email.txt.twig",
+    "locale": "en",
     "context": {
         "foo": "bar"
     },
@@ -95,8 +99,7 @@ class TemplatedEmailTest extends TestCase
             }
         ]
     },
-    "body": null,
-    "message": null
+    "body": null
 }
 EOF;
 

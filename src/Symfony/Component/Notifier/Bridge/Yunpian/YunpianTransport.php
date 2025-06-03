@@ -29,18 +29,17 @@ class YunpianTransport extends AbstractTransport
 {
     protected const HOST = 'sms.yunpian.com';
 
-    private string $apiKey;
-
-    public function __construct(#[\SensitiveParameter] string $apiKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiKey = $apiKey;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $apiKey,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('yunpian://%s', $this->getEndpoint());
+        return \sprintf('yunpian://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -55,10 +54,10 @@ class YunpianTransport extends AbstractTransport
         }
 
         if ('' !== $message->getFrom()) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
+            throw new InvalidArgumentException(\sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
-        $endpoint = sprintf('https://%s/v2/sms/single_send.json', self::HOST);
+        $endpoint = \sprintf('https://%s/v2/sms/single_send.json', self::HOST);
         $response = $this->client->request('POST', $endpoint, [
             'body' => [
                 'apikey' => $this->apiKey,
@@ -74,7 +73,7 @@ class YunpianTransport extends AbstractTransport
         }
 
         if (isset($data['code']) && 0 !== (int) $data['code']) {
-            throw new TransportException(sprintf('Unable to send SMS: "Code: "%s". Message: "%s"".', $data['code'], $data['msg'] ?? 'Unknown reason'), $response);
+            throw new TransportException(\sprintf('Unable to send SMS: "Code: "%s". Message: "%s"".', $data['code'], $data['msg'] ?? 'Unknown reason'), $response);
         }
 
         return new SentMessage($message, (string) $this);

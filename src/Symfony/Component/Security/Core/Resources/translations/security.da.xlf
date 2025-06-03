@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="da" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
@@ -8,11 +8,11 @@
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
-                <target>Loginoplysninger kan ikke findes.</target>
+                <target>Loginoplysninger kunne ikke findes.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
-                <target>Godkendelsesanmodning kan ikke behandles på grund af et systemfejl.</target>
+                <target>Godkendelsesanmodningen kunne ikke behandles på grund af en systemfejl.</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>
@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
-                <target>Cookie er allerede brugt af en anden.</target>
+                <target>Cookie er allerede blevet brugt af en anden.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
@@ -32,19 +32,19 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>No authentication provider found to support the authentication token.</source>
-                <target>Ingen godkendelsesudbyder er fundet til understøttelsen af godkendelsestoken.</target>
+                <target>Ingen godkendelsesudbyder blev fundet til at understøtte godkendelsestoken.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>Ingen session tilgængelig, sessionen er enten udløbet eller cookies er ikke aktiveret.</target>
+                <target>Ingen session er tilgængelig. Den er enten udløbet eller cookies er ikke aktiveret.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
-                <target>Ingen token kan findes.</target>
+                <target>Ingen token kunne findes.</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Brugernavn kan ikke findes.</target>
+                <target>Brugernavn kunne ikke findes.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
@@ -64,19 +64,19 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>For mange fejlede login forsøg, prøv venligst senere.</target>
+                <target>For mange mislykkede loginforsøg. Prøv venligst igen senere.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
-                <target>Ugyldigt eller udløbet login link.</target>
+                <target>Ugyldigt eller udløbet login-link.</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>For mange fejlede login forsøg, prøv igen om %minutes% minut.</target>
+                <target>For mange mislykkede loginforsøg. Prøv venligst igen om %minutes% minut.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target>For mange fejlede login forsøg, prøv igen om %minutes% minutter.</target>
+                <target state="needs-review-translation">For mange mislykkede loginforsøg, prøv igen om %minutes% minutter.</target>
             </trans-unit>
         </body>
     </file>

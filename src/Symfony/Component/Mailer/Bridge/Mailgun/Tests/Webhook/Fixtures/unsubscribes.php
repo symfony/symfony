@@ -6,6 +6,6 @@ $wh = new MailerEngagementEvent(MailerEngagementEvent::UNSUBSCRIBE, 'Ase7i2zsRYe
 $wh->setRecipientEmail('alice@example.com');
 $wh->setTags(['my_tag_1', 'my_tag_2']);
 $wh->setMetadata(['my_var_1' => 'Mailgun Variable #1', 'my-var-2' => 'awesome']);
-$wh->setDate(\DateTimeImmutable::createFromFormat('U.u', 1521243339.873676));
+$wh->setDate(\DateTimeImmutable::createFromFormat('U.u', '1521243339.873676'));
 
 return $wh;

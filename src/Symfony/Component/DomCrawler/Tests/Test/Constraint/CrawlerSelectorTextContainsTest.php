@@ -13,7 +13,6 @@ namespace Symfony\Component\DomCrawler\Tests\Test\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorTextContains;
 
@@ -25,21 +24,25 @@ class CrawlerSelectorTextContainsTest extends TestCase
         $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foobar'), '', true));
         $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
         $this->assertFalse($constraint->evaluate(new Crawler('<html><head></head><body>Bar'), '', true));
+    }
 
-        try {
-            $constraint->evaluate(new Crawler('<html><head><title>Bar'));
+    public function testDoesNotMatchIfNodeTextIsNotExpectedValue()
+    {
+        $constraint = new CrawlerSelectorTextContains('title', 'Foo');
 
-            $this->fail();
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the text \"Bar\" of the node matching selector \"title\" contains \"Foo\".\n", TestFailure::exceptionToString($e));
-        }
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the text "Bar" of the node matching selector "title" contains "Foo".');
 
-        try {
-            $constraint->evaluate(new Crawler('<html><head></head><body>Bar'));
+        $constraint->evaluate(new Crawler('<html><head><title>Bar'));
+    }
 
-            $this->fail();
-        } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Crawler has a node matching selector \"title\".\n", TestFailure::exceptionToString($e));
-        }
+    public function testDoesNotMatchIfNodeDoesNotExist()
+    {
+        $constraint = new CrawlerSelectorTextContains('title', 'Foo');
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Crawler has a node matching selector "title".');
+
+        $constraint->evaluate(new Crawler('<html><head></head><body>Bar'));
     }
 }

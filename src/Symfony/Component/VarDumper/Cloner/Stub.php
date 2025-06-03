@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
+use Symfony\Component\VarDumper\Cloner\Internal\NoDefault;
+
 /**
  * Represents the main properties of a PHP variable.
  *
@@ -31,14 +33,14 @@ class Stub
     public const ARRAY_ASSOC = 1;
     public const ARRAY_INDEXED = 2;
 
-    public $type = self::TYPE_REF;
-    public $class = '';
-    public $value;
-    public $cut = 0;
-    public $handle = 0;
-    public $refCount = 0;
-    public $position = 0;
-    public $attr = [];
+    public int $type = self::TYPE_REF;
+    public string|int|null $class = '';
+    public mixed $value = null;
+    public int $cut = 0;
+    public int $handle = 0;
+    public int $refCount = 0;
+    public int $position = 0;
+    public array $attr = [];
 
     private static array $defaultProperties = [];
 
@@ -50,15 +52,20 @@ class Stub
         $properties = [];
 
         if (!isset(self::$defaultProperties[$c = static::class])) {
-            self::$defaultProperties[$c] = get_class_vars($c);
+            $reflection = new \ReflectionClass($c);
+            self::$defaultProperties[$c] = [];
 
-            foreach ((new \ReflectionClass($c))->getStaticProperties() as $k => $v) {
-                unset(self::$defaultProperties[$c][$k]);
+            foreach ($reflection->getProperties() as $p) {
+                if ($p->isStatic()) {
+                    continue;
+                }
+
+                self::$defaultProperties[$c][$p->name] = $p->hasDefaultValue() ? $p->getDefaultValue() : ($p->hasType() ? NoDefault::NoDefault : null);
             }
         }
 
         foreach (self::$defaultProperties[$c] as $k => $v) {
-            if ($this->$k !== $v) {
+            if (NoDefault::NoDefault === $v || $this->$k !== $v) {
                 $properties[] = $k;
             }
         }

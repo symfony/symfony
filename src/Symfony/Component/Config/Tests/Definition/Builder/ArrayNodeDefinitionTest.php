@@ -190,6 +190,16 @@ class ArrayNodeDefinitionTest extends TestCase
         );
     }
 
+    public function testCanBeEnabledWithInfo()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node->canBeEnabled('Some info about disabling this node');
+
+        $child = $this->getField($node, 'children')['enabled'];
+
+        $this->assertEquals('Some info about disabling this node', $this->getField($child, 'attributes')['info']);
+    }
+
     public function testCanBeDisabled()
     {
         $node = new ArrayNodeDefinition('root');
@@ -206,6 +216,16 @@ class ArrayNodeDefinitionTest extends TestCase
         $enabledNode = $nodeChildren['enabled'];
         $this->assertTrue($this->getField($enabledNode, 'default'));
         $this->assertTrue($this->getField($enabledNode, 'defaultValue'));
+    }
+
+    public function testCanBeDisabledWithInfo()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node->canBeDisabled('Some info about disabling this node');
+
+        $child = $this->getField($node, 'children')['enabled'];
+
+        $this->assertEquals('Some info about disabling this node', $this->getField($child, 'attributes')['info']);
     }
 
     public function testIgnoreExtraKeys()
@@ -239,7 +259,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->children()
                 ->scalarNode('value')
                     ->beforeNormalization()
-                        ->ifTrue(fn ($value) => empty($value))
+                        ->ifTrue(fn ($value) => !$value)
                         ->thenUnset()
                     ->end()
                 ->end()
@@ -265,6 +285,12 @@ class ArrayNodeDefinitionTest extends TestCase
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('boolean'), $node->booleanPrototype());
+    }
+
+    public function testPrototypeString()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $this->assertEquals($node->prototype('string'), $node->stringPrototype());
     }
 
     public function testPrototypeInteger()

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Uid;
 
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
+
 /**
  * A v7 UUID is lexicographically sortable and contains a 48-bit timestamp and 74 extra unique bits.
  *
@@ -28,7 +30,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
     private static array $seedParts;
     private static int $seedIndex = 0;
 
-    public function __construct(string $uuid = null)
+    public function __construct(?string $uuid = null)
     {
         if (null === $uuid) {
             $this->uid = static::generate();
@@ -49,13 +51,13 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
         return \DateTimeImmutable::createFromFormat('U.v', substr_replace($time, '.', -3, 0));
     }
 
-    public static function generate(\DateTimeInterface $time = null): string
+    public static function generate(?\DateTimeInterface $time = null): string
     {
         if (null === $mtime = $time) {
             $time = microtime(false);
             $time = substr($time, 11).substr($time, 2, 3);
         } elseif (0 > $time = $time->format('Uv')) {
-            throw new \InvalidArgumentException('The timestamp must be positive.');
+            throw new InvalidArgumentException('The timestamp must be positive.');
         }
 
         if ($time > self::$time || (null !== $mtime && $time !== self::$time)) {
@@ -64,6 +66,17 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
             self::$rand[1] &= 0x03FF;
             self::$time = $time;
         } else {
+            // Within the same ms, we increment the rand part by a random 24-bit number.
+            // Instead of getting this number from random_bytes(), which is slow, we get
+            // it by sha512-hashing self::$seed. This produces 64 bytes of entropy,
+            // which we need to split in a list of 24-bit numbers. unpack() first splits
+            // them into 16 x 32-bit numbers; we take the first byte of each of these
+            // numbers to get 5 extra 24-bit numbers. Then, we consume those numbers
+            // one-by-one and run this logic every 21 iterations.
+            // self::$rand holds the random part of the UUID, split into 5 x 16-bit
+            // numbers for x86 portability. We increment this random part by the next
+            // 24-bit number in the self::$seedParts list and decrement self::$seedIndex.
+
             if (!self::$seedIndex) {
                 $s = unpack('l*', self::$seed = hash('sha512', self::$seed, true));
                 $s[] = ($s[1] >> 8 & 0xFF0000) | ($s[2] >> 16 & 0xFF00) | ($s[3] >> 24 & 0xFF);
@@ -75,7 +88,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
                 self::$seedIndex = 21;
             }
 
-            self::$rand[5] = 0xFFFF & $carry = self::$rand[5] + (self::$seedParts[self::$seedIndex--] & 0xFFFFFF);
+            self::$rand[5] = 0xFFFF & $carry = self::$rand[5] + 1 + (self::$seedParts[self::$seedIndex--] & 0xFFFFFF);
             self::$rand[4] = 0xFFFF & $carry = self::$rand[4] + ($carry >> 16);
             self::$rand[3] = 0xFFFF & $carry = self::$rand[3] + ($carry >> 16);
             self::$rand[2] = 0xFFFF & $carry = self::$rand[2] + ($carry >> 16);
@@ -102,7 +115,7 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
             $time = bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10));
         }
 
-        return substr_replace(sprintf('%012s-%04x-%04x-%04x%04x%04x',
+        return substr_replace(\sprintf('%012s-%04x-%04x-%04x%04x%04x',
             $time,
             0x7000 | (self::$rand[1] << 2) | (self::$rand[2] >> 14),
             0x8000 | (self::$rand[2] & 0x3FFF),

@@ -5,7 +5,6 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
-
     <parameters>
         <parameter key="env(REDIS_URL)">redis://paas.com</parameter>
     </parameters>
@@ -18,7 +17,10 @@
             <framework:resource name="bar">flock</framework:resource>
             <framework:resource name="baz">semaphore</framework:resource>
             <framework:resource name="baz">flock</framework:resource>
-            <framework:resource name="qux">%env(REDIS_URL)%</framework:resource>
+            <framework:resource name="qux">%env(REDIS_DSN)%</framework:resource>
+            <framework:resource name="corge">in-memory</framework:resource>
+            <framework:resource name="grault">mysql:host=localhost;dbname=test</framework:resource>
+            <framework:resource name="garply">null</framework:resource>
         </framework:lock>
     </framework:config>
 </container>

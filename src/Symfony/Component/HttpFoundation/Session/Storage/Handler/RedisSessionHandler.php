@@ -44,7 +44,7 @@ class RedisSessionHandler extends AbstractSessionHandler
         array $options = [],
     ) {
         if ($diff = array_diff(array_keys($options), ['prefix', 'ttl'])) {
-            throw new \InvalidArgumentException(sprintf('The following options are not supported "%s".', implode(', ', $diff)));
+            throw new \InvalidArgumentException(\sprintf('The following options are not supported "%s".', implode(', ', $diff)));
         }
 
         $this->prefix = $options['prefix'] ?? 'sf_s';

@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmsFactorTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): SmsFactorTransport
+    public static function createTransport(?HttpClientInterface $client = null): SmsFactorTransport
     {
         return (new SmsFactorTransport('TOKEN', 'MY_COMPANY', SmsFactorPushType::Alert, $client ?? new MockHttpClient()))->setHost('host.test');
     }

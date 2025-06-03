@@ -134,16 +134,17 @@ class XmlDumper extends Dumper
         foreach ($tags as $name => $tags) {
             foreach ($tags as $attributes) {
                 $tag = $this->document->createElement('tag');
-                if (!\array_key_exists('name', $attributes)) {
-                    $tag->setAttribute('name', $name);
-                } else {
-                    $tag->appendChild($this->document->createTextNode($name));
-                }
 
                 // Check if we have recursive attributes
                 if (array_filter($attributes, \is_array(...))) {
+                    $tag->setAttribute('name', $name);
                     $this->addTagRecursiveAttributes($tag, $attributes);
                 } else {
+                    if (!\array_key_exists('name', $attributes)) {
+                        $tag->setAttribute('name', $name);
+                    } else {
+                        $tag->appendChild($this->document->createTextNode($name));
+                    }
                     foreach ($attributes as $key => $value) {
                         $tag->setAttribute($key, $value ?? '');
                     }
@@ -421,9 +422,9 @@ class XmlDumper extends Dumper
             case $value instanceof Parameter:
                 return '%'.$value.'%';
             case $value instanceof \UnitEnum:
-                return sprintf('%s::%s', $value::class, $value->name);
+                return \sprintf('%s::%s', $value::class, $value->name);
             case \is_object($value) || \is_resource($value):
-                throw new RuntimeException(sprintf('Unable to dump a service container if a parameter is an object or a resource, got "%s".', get_debug_type($value)));
+                throw new RuntimeException(\sprintf('Unable to dump a service container if a parameter is an object or a resource, got "%s".', get_debug_type($value)));
             default:
                 return (string) $value;
         }

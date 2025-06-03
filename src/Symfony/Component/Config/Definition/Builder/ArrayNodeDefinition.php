@@ -23,21 +23,21 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
  */
 class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinitionInterface
 {
-    protected $performDeepMerging = true;
-    protected $ignoreExtraKeys = false;
-    protected $removeExtraKeys = true;
-    protected $children = [];
-    protected $prototype;
-    protected $atLeastOne = false;
-    protected $allowNewKeys = true;
-    protected $key;
-    protected $removeKeyItem;
-    protected $addDefaults = false;
-    protected $addDefaultChildren = false;
-    protected $nodeBuilder;
-    protected $normalizeKeys = true;
+    protected bool $performDeepMerging = true;
+    protected bool $ignoreExtraKeys = false;
+    protected bool $removeExtraKeys = true;
+    protected array $children = [];
+    protected NodeDefinition $prototype;
+    protected bool $atLeastOne = false;
+    protected bool $allowNewKeys = true;
+    protected ?string $key = null;
+    protected bool $removeKeyItem = false;
+    protected bool $addDefaults = false;
+    protected int|string|array|false|null $addDefaultChildren = false;
+    protected NodeBuilder $nodeBuilder;
+    protected bool $normalizeKeys = true;
 
-    public function __construct(?string $name, NodeParentInterface $parent = null)
+    public function __construct(?string $name, ?NodeParentInterface $parent = null)
     {
         parent::__construct($name, $parent);
 
@@ -45,10 +45,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $this->trueEquivalent = [];
     }
 
-    /**
-     * @return void
-     */
-    public function setBuilder(NodeBuilder $builder)
+    public function setBuilder(NodeBuilder $builder): void
     {
         $this->nodeBuilder = $builder;
     }
@@ -74,6 +71,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     public function scalarPrototype(): ScalarNodeDefinition
     {
         return $this->prototype('scalar');
+    }
+
+    public function stringPrototype(): StringNodeDefinition
+    {
+        return $this->prototype('string');
     }
 
     public function booleanPrototype(): BooleanNodeDefinition
@@ -126,7 +128,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @return $this
      */
-    public function addDefaultChildrenIfNoneSet(int|string|array $children = null): static
+    public function addDefaultChildrenIfNoneSet(int|string|array|null $children = null): static
     {
         $this->addDefaultChildren = $children;
 
@@ -169,7 +171,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @return $this
      */
-    public function fixXmlConfig(string $singular, string $plural = null): static
+    public function fixXmlConfig(string $singular, ?string $plural = null): static
     {
         $this->normalization()->remap($singular, $plural);
 
@@ -237,11 +239,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * enableableArrayNode: {enabled: false, ...}  # The config is disabled
      * enableableArrayNode: false                  # The config is disabled
      *
+     * @param string|null $info A description of what happens when the node is enabled or disabled
+     *
      * @return $this
      */
-    public function canBeEnabled(): static
+    public function canBeEnabled(/* ?string $info = null */): static
     {
-        $this
+        $disabledNode = $this
             ->addDefaultsIfNotSet()
             ->treatFalseLike(['enabled' => false])
             ->treatTrueLike(['enabled' => true])
@@ -259,6 +263,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                     ->defaultFalse()
         ;
 
+        $info = 1 <= \func_num_args() ? func_get_arg(0) : null;
+        if ($info) {
+            $disabledNode->info($info);
+        }
+
         return $this;
     }
 
@@ -267,11 +276,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * By default, the section is enabled.
      *
+     * @param string|null $info A description of what happens when the node is enabled or disabled
+     *
      * @return $this
      */
-    public function canBeDisabled(): static
+    public function canBeDisabled(/* ?string $info = null */): static
     {
-        $this
+        $enabledNode = $this
             ->addDefaultsIfNotSet()
             ->treatFalseLike(['enabled' => false])
             ->treatTrueLike(['enabled' => true])
@@ -280,6 +291,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 ->booleanNode('enabled')
                     ->defaultTrue()
         ;
+
+        $info = 1 <= \func_num_args() ? func_get_arg(0) : null;
+        if ($info) {
+            $enabledNode->info($info);
+        }
 
         return $this;
     }
@@ -374,7 +390,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
             if ($this->default) {
                 if (!\is_array($this->defaultValue)) {
-                    throw new \InvalidArgumentException(sprintf('%s: the default value of an array node has to be an array.', $node->getPath()));
+                    throw new \InvalidArgumentException(\sprintf('%s: the default value of an array node has to be an array.', $node->getPath()));
                 }
 
                 $node->setDefaultValue($this->defaultValue);
@@ -425,61 +441,57 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a concrete node.
      *
-     * @return void
-     *
      * @throws InvalidDefinitionException
      */
-    protected function validateConcreteNode(ArrayNode $node)
+    protected function validateConcreteNode(ArrayNode $node): void
     {
         $path = $node->getPath();
 
         if (null !== $this->key) {
-            throw new InvalidDefinitionException(sprintf('->useAttributeAsKey() is not applicable to concrete nodes at path "%s".', $path));
+            throw new InvalidDefinitionException(\sprintf('->useAttributeAsKey() is not applicable to concrete nodes at path "%s".', $path));
         }
 
         if (false === $this->allowEmptyValue) {
-            throw new InvalidDefinitionException(sprintf('->cannotBeEmpty() is not applicable to concrete nodes at path "%s".', $path));
+            throw new InvalidDefinitionException(\sprintf('->cannotBeEmpty() is not applicable to concrete nodes at path "%s".', $path));
         }
 
         if (true === $this->atLeastOne) {
-            throw new InvalidDefinitionException(sprintf('->requiresAtLeastOneElement() is not applicable to concrete nodes at path "%s".', $path));
+            throw new InvalidDefinitionException(\sprintf('->requiresAtLeastOneElement() is not applicable to concrete nodes at path "%s".', $path));
         }
 
         if ($this->default) {
-            throw new InvalidDefinitionException(sprintf('->defaultValue() is not applicable to concrete nodes at path "%s".', $path));
+            throw new InvalidDefinitionException(\sprintf('->defaultValue() is not applicable to concrete nodes at path "%s".', $path));
         }
 
         if (false !== $this->addDefaultChildren) {
-            throw new InvalidDefinitionException(sprintf('->addDefaultChildrenIfNoneSet() is not applicable to concrete nodes at path "%s".', $path));
+            throw new InvalidDefinitionException(\sprintf('->addDefaultChildrenIfNoneSet() is not applicable to concrete nodes at path "%s".', $path));
         }
     }
 
     /**
      * Validate the configuration of a prototype node.
      *
-     * @return void
-     *
      * @throws InvalidDefinitionException
      */
-    protected function validatePrototypeNode(PrototypedArrayNode $node)
+    protected function validatePrototypeNode(PrototypedArrayNode $node): void
     {
         $path = $node->getPath();
 
         if ($this->addDefaults) {
-            throw new InvalidDefinitionException(sprintf('->addDefaultsIfNotSet() is not applicable to prototype nodes at path "%s".', $path));
+            throw new InvalidDefinitionException(\sprintf('->addDefaultsIfNotSet() is not applicable to prototype nodes at path "%s".', $path));
         }
 
         if (false !== $this->addDefaultChildren) {
             if ($this->default) {
-                throw new InvalidDefinitionException(sprintf('A default value and default children might not be used together at path "%s".', $path));
+                throw new InvalidDefinitionException(\sprintf('A default value and default children might not be used together at path "%s".', $path));
             }
 
             if (null !== $this->key && (null === $this->addDefaultChildren || \is_int($this->addDefaultChildren) && $this->addDefaultChildren > 0)) {
-                throw new InvalidDefinitionException(sprintf('->addDefaultChildrenIfNoneSet() should set default children names as ->useAttributeAsKey() is used at path "%s".', $path));
+                throw new InvalidDefinitionException(\sprintf('->addDefaultChildrenIfNoneSet() should set default children names as ->useAttributeAsKey() is used at path "%s".', $path));
             }
 
             if (null === $this->key && (\is_string($this->addDefaultChildren) || \is_array($this->addDefaultChildren))) {
-                throw new InvalidDefinitionException(sprintf('->addDefaultChildrenIfNoneSet() might not set default children names as ->useAttributeAsKey() is not used at path "%s".', $path));
+                throw new InvalidDefinitionException(\sprintf('->addDefaultChildrenIfNoneSet() might not set default children names as ->useAttributeAsKey() is not used at path "%s".', $path));
             }
         }
     }
@@ -504,7 +516,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             : substr($nodePath, 0, $pathSeparatorPos);
 
         if (null === $node = ($this->children[$firstPathSegment] ?? null)) {
-            throw new \RuntimeException(sprintf('Node with name "%s" does not exist in the current node "%s".', $firstPathSegment, $this->name));
+            throw new \RuntimeException(\sprintf('Node with name "%s" does not exist in the current node "%s".', $firstPathSegment, $this->name));
         }
 
         if (false === $pathSeparatorPos) {

@@ -64,9 +64,8 @@
             <http-basic />
         </firewall>
 
-        <firewall name="with_user_checker" provider="default">
+        <firewall name="with_user_checker" provider="default" user-checker="app.user_checker">
             <http-basic />
-            <user-checker>app.user_checker</user-checker>
         </firewall>
 
         <role id="ROLE_ADMIN">ROLE_USER</role>

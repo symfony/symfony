@@ -1,6 +1,6 @@
 <?php
 
-/** @var $loader \Symfony\Component\Routing\Loader\PhpFileLoader */
+/** @var \Symfony\Component\Routing\Loader\PhpFileLoader $loader */
 /** @var \Symfony\Component\Routing\RouteCollection $collection */
 $collection = $loader->import('validpattern.php');
 $collection->addDefaults([

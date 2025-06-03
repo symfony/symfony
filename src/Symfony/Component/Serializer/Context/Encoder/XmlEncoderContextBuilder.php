@@ -144,4 +144,28 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     {
         return $this->with(XmlEncoder::VERSION, $version);
     }
+
+    /**
+     * Configures whether to wrap strings within CDATA sections.
+     */
+    public function withCdataWrapping(?bool $cdataWrapping): static
+    {
+        return $this->with(XmlEncoder::CDATA_WRAPPING, $cdataWrapping);
+    }
+
+    /**
+     * Configures the pattern used to evaluate if a CDATA section should be added.
+     */
+    public function withCdataWrappingPattern(?string $cdataWrappingPattern): static
+    {
+        return $this->with(XmlEncoder::CDATA_WRAPPING_PATTERN, $cdataWrappingPattern);
+    }
+
+    /**
+     * Configures whether to ignore empty attributes.
+     */
+    public function withIgnoreEmptyAttributes(?bool $ignoreEmptyAttributes): static
+    {
+        return $this->with(XmlEncoder::IGNORE_EMPTY_ATTRIBUTES, $ignoreEmptyAttributes);
+    }
 }

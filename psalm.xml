@@ -9,6 +9,8 @@
     errorBaseline=".github/psalm/psalm.baseline.xml"
     findUnusedBaselineEntry="false"
     findUnusedCode="false"
+    findUnusedIssueHandlerSuppression="false"
+    ensureOverrideAttribute="false"
 >
     <projectFiles>
         <directory name="src" />
@@ -16,7 +18,8 @@
             <directory name="src/Symfony/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/*/Tests" />
-            <directory name="src/Symfony/Component/Intl/Resources/emoji/" />
+            <directory name="src/Symfony/Component/Intl/Resources/data/" />
+            <directory name="src/Symfony/Component/Emoji/Resources/data/" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
@@ -30,6 +33,8 @@
                 <referencedClass name="UnitEnum"/>
                 <!-- These classes have been added in PHP 8.2 -->
                 <referencedClass name="Random\*"/>
+                <!-- These classes have been added in PHP 8.4 -->
+                <referencedClass name="BcMath\Number"/>
             </errorLevel>
         </UndefinedClass>
         <UndefinedDocblockClass>

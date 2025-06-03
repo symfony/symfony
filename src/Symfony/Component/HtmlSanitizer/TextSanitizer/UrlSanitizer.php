@@ -29,7 +29,7 @@ final class UrlSanitizer
      *
      * It also transforms the URL to HTTPS if requested.
      */
-    public static function sanitize(?string $input, array $allowedSchemes = null, bool $forceHttps = false, array $allowedHosts = null, bool $allowRelative = false): ?string
+    public static function sanitize(?string $input, ?array $allowedSchemes = null, bool $forceHttps = false, ?array $allowedHosts = null, bool $allowRelative = false): ?string
     {
         if (!$input) {
             return null;
@@ -94,7 +94,17 @@ final class UrlSanitizer
         }
 
         try {
-            return UriString::parse($url);
+            $parsedUrl = UriString::parse($url);
+
+            if (preg_match('/\s/', $url)) {
+                return null;
+            }
+
+            if (isset($parsedUrl['host']) && self::decodeUnreservedCharacters($parsedUrl['host']) !== $parsedUrl['host']) {
+                return null;
+            }
+
+            return $parsedUrl;
         } catch (SyntaxError) {
             return null;
         }
@@ -126,11 +136,23 @@ final class UrlSanitizer
     {
         // Check each chunk of the domain is valid
         foreach ($trustedParts as $key => $trustedPart) {
-            if ($uriParts[$key] !== $trustedPart) {
+            if (!\array_key_exists($key, $uriParts) || $uriParts[$key] !== $trustedPart) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Implementation borrowed from League\Uri\Encoder::decodeUnreservedCharacters().
+     */
+    private static function decodeUnreservedCharacters(string $host): string
+    {
+        return preg_replace_callback(
+            ',%(2[1-9A-Fa-f]|[3-7][0-9A-Fa-f]|61|62|64|65|66|7[AB]|5F),',
+            static fn (array $matches): string => rawurldecode($matches[0]),
+            $host
+        );
     }
 }

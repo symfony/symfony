@@ -174,9 +174,13 @@ return [
             'SHP',
             'Paunɛ ya Sántu elena',
         ],
+        'SLE' => [
+            'SLE',
+            'Leonɛ',
+        ],
         'SLL' => [
             'SLL',
-            'Leonɛ',
+            'Leonɛ (1964—2022)',
         ],
         'SOS' => [
             'SOS',

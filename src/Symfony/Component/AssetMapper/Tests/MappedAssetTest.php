@@ -12,7 +12,7 @@
 namespace Symfony\Component\AssetMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\AssetMapper\AssetDependency;
+use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 class MappedAssetTest extends TestCase
@@ -46,11 +46,20 @@ class MappedAssetTest extends TestCase
         $mainAsset = new MappedAsset('file.js');
 
         $assetFoo = new MappedAsset('foo.js');
-        $dependency = new AssetDependency($assetFoo, false, false);
-        $mainAsset->addDependency($dependency);
+        $mainAsset->addDependency($assetFoo);
         $mainAsset->addFileDependency('/path/to/foo.js');
 
-        $this->assertSame([$dependency], $mainAsset->getDependencies());
+        $this->assertSame([$assetFoo], $mainAsset->getDependencies());
         $this->assertSame(['/path/to/foo.js'], $mainAsset->getFileDependencies());
+    }
+
+    public function testAddJavaScriptImports()
+    {
+        $mainAsset = new MappedAsset('file.js');
+
+        $javaScriptImport = new JavaScriptImport('/the_import', assetLogicalPath: 'foo.js', assetSourcePath: '/path/to/foo.js', isLazy: true);
+        $mainAsset->addJavaScriptImport($javaScriptImport);
+
+        $this->assertSame([$javaScriptImport], $mainAsset->getJavaScriptImports());
     }
 }

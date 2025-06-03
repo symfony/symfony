@@ -576,6 +576,31 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         );
     }
 
+    public function testSingleChoiceWithPreferredIsNotDuplicated()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
+            'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
+            'preferred_choices' => ['&b'],
+            'duplicate_preferred_choices' => false,
+            'multiple' => false,
+            'expanded' => false,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['separator' => '-- sep --', 'attr' => ['class' => 'my&class']],
+            '/select
+    [@name="name"]
+    [@class="my&class form-control"]
+    [not(@required)]
+    [
+        ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+    ]
+    [count(./option)=3]
+'
+        );
+    }
+
     public function testSingleChoiceWithSelectedPreferred()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
@@ -2772,7 +2797,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar form-control" data-foo="bar" value="value">', $html);
+        $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar form-control" data-foo="bar" value="value" />', $html);
     }
 
     public function testWidgetAttributeNameRepeatedIfTrue()
@@ -2784,7 +2809,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" class="form-control" value="value">', $html);
+        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" class="form-control" value="value" />', $html);
     }
 
     public function testButtonAttributes()
@@ -2844,8 +2869,6 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 
     public function testWeekSingleText()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
             'widget' => 'single_text',
@@ -2864,8 +2887,6 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 
     public function testWeekSingleTextNoHtml5()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
             'widget' => 'single_text',
@@ -2885,8 +2906,6 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 
     public function testWeekChoices()
     {
-        $this->requiresFeatureSet(404);
-
         $data = ['year' => (int) date('Y'), 'week' => 1];
 
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', $data, [
@@ -2913,8 +2932,6 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 
     public function testWeekText()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '2000-W01', [
             'input' => 'string',
             'widget' => 'text',

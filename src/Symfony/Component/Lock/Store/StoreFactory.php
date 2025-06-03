@@ -50,7 +50,7 @@ class StoreFactory
                 return new ZookeeperStore($connection);
 
             case !\is_string($connection):
-                throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', get_debug_type($connection)));
+                throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', get_debug_type($connection)));
             case 'flock' === $connection:
                 return new FlockStore();
 
@@ -62,6 +62,8 @@ class StoreFactory
 
             case str_starts_with($connection, 'redis:'):
             case str_starts_with($connection, 'rediss:'):
+            case str_starts_with($connection, 'valkey:'):
+            case str_starts_with($connection, 'valkeys:'):
             case str_starts_with($connection, 'memcached:'):
                 if (!class_exists(AbstractAdapter::class)) {
                     throw new InvalidArgumentException('Unsupported Redis or Memcached DSN. Try running "composer require symfony/cache".');
@@ -106,8 +108,11 @@ class StoreFactory
 
             case 'in-memory' === $connection:
                 return new InMemoryStore();
+
+            case 'null' === $connection:
+                return new NullStore();
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection));
+        throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
     }
 }

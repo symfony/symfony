@@ -21,7 +21,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
 {
     abstract public static function getDoctype(): string;
 
-    protected function createCrawler($node = null, string $uri = null, string $baseHref = null, bool $useHtml5Parser = true)
+    protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null, bool $useHtml5Parser = true)
     {
         return new Crawler($node, $uri, $baseHref, $useHtml5Parser);
     }
@@ -184,6 +184,10 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createCrawler();
         $crawler->addContent($this->getDoctype().'<html><meta http-equiv="Content-Type" content="text/html; charset=unicode" /><div class="foo"></html></html>');
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() ignores bad charset');
+
+        $crawler = $this->createCrawler();
+        $crawler->addContent($this->getDoctype().'<html><script>var foo = "bär";</script></html>', 'text/html; charset=UTF-8');
+        $this->assertEquals('var foo = "bär";', $crawler->filterXPath('//script')->text(), '->addContent() does not interfere with script content');
     }
 
     /**
@@ -1025,6 +1029,29 @@ HTML;
 
         $notFound = $foo->closest('.not-found');
         $this->assertNull($notFound);
+    }
+
+    public function testClosestWithOrphanedNode()
+    {
+        $html = <<<'HTML'
+<html lang="en">
+<body>
+    <div id="foo" class="newFoo ok">
+        <div class="lorem1 ko"></div>
+    </div>
+</body>
+</html>
+HTML;
+
+        $crawler = $this->createCrawler($this->getDoctype().$html);
+        $foo = $crawler->filter('#foo');
+
+        $fooNode = $foo->getNode(0);
+
+        $fooNode->parentNode->replaceChild($fooNode->ownerDocument->createElement('ol'), $fooNode);
+
+        $body = $foo->closest('body');
+        $this->assertNull($body);
     }
 
     public function testOuterHtml()

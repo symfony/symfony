@@ -13,6 +13,8 @@ namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class AddressTest extends TestCase
 {
@@ -32,7 +34,7 @@ class AddressTest extends TestCase
 
     public function testConstructorWithInvalidAddress()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(RfcComplianceException::class);
         new Address('fab   pot@symfony.com');
     }
 
@@ -41,6 +43,14 @@ class AddressTest extends TestCase
         $this->assertSame($a = new Address('fabien@symfony.com'), Address::create($a));
         $this->assertSame($b = new Address('helene@symfony.com', 'Helene'), Address::create($b));
         $this->assertEquals($a, Address::create('fabien@symfony.com'));
+    }
+
+    public function testCreateWithInvalidFormat()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not parse "<fabien@symfony" to a "Symfony\Component\Mime\Address" instance.');
+
+        Address::create('<fabien@symfony');
     }
 
     /**
@@ -69,6 +79,13 @@ class AddressTest extends TestCase
         $this->assertSame([$fabien, $helene], Address::createArray([$fabien, $helene]));
 
         $this->assertEquals([$fabien], Address::createArray(['fabien@symfony.com']));
+    }
+
+    public function testUnicodeLocalpart()
+    {
+        /* dømi means example and is reserved by the .fo registry */
+        $this->assertFalse((new Address('info@dømi.fo'))->hasUnicodeLocalpart());
+        $this->assertTrue((new Address('dømi@dømi.fo'))->hasUnicodeLocalpart());
     }
 
     public function testCreateArrayWrongArg()

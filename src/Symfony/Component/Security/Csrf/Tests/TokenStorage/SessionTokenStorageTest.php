@@ -94,8 +94,10 @@ class SessionTokenStorageTest extends TestCase
 
     public function testGetNonExistingTokenFromActiveSession()
     {
-        $this->expectException(TokenNotFoundException::class);
         $this->session->start();
+
+        $this->expectException(TokenNotFoundException::class);
+
         $this->storage->getToken('token_id');
     }
 

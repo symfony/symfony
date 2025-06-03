@@ -28,7 +28,7 @@ class UndefinedFunctionErrorEnhancerTest extends TestCase
         $error = $enhancer->enhance(new \Error($originalMessage));
 
         $this->assertInstanceOf(UndefinedFunctionError::class, $error);
-        // class names are case insensitive and PHP do not return the same
+        // class names are case-insensitive and PHP do not return the same
         $this->assertSame(strtolower($enhancedMessage), strtolower($error->getMessage()));
         $this->assertSame(realpath(__FILE__), $error->getFile());
         $this->assertSame($expectedLine, $error->getLine());
@@ -39,19 +39,19 @@ class UndefinedFunctionErrorEnhancerTest extends TestCase
         return [
             [
                 'Call to undefined function test_namespaced_function()',
-                "Attempted to call function \"test_namespaced_function\" from the global namespace.\nDid you mean to call \"\\symfony\\component\\errorhandler\\tests\\errorenhancer\\test_namespaced_function\"?",
+                "Attempted to call undefined function \"test_namespaced_function\" from the global namespace.\nDid you mean to call \"\\symfony\\component\\errorhandler\\tests\\errorenhancer\\test_namespaced_function\"?",
             ],
             [
                 'Call to undefined function Foo\\Bar\\Baz\\test_namespaced_function()',
-                "Attempted to call function \"test_namespaced_function\" from namespace \"Foo\\Bar\\Baz\".\nDid you mean to call \"\\symfony\\component\\errorhandler\\tests\\errorenhancer\\test_namespaced_function\"?",
+                "Attempted to call undefined function \"test_namespaced_function\" from namespace \"Foo\\Bar\\Baz\".\nDid you mean to call \"\\symfony\\component\\errorhandler\\tests\\errorenhancer\\test_namespaced_function\"?",
             ],
             [
                 'Call to undefined function foo()',
-                'Attempted to call function "foo" from the global namespace.',
+                'Attempted to call undefined function "foo" from the global namespace.',
             ],
             [
                 'Call to undefined function Foo\\Bar\\Baz\\foo()',
-                'Attempted to call function "foo" from namespace "Foo\Bar\Baz".',
+                'Attempted to call undefined function "foo" from namespace "Foo\Bar\Baz".',
             ],
         ];
     }

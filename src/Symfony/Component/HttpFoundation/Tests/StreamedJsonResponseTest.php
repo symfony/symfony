@@ -30,6 +30,23 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"_embedded":{"articles":["Article 1","Article 2","Article 3"],"news":["News 1","News 2","News 3"]}}', $content);
     }
 
+    public function testResponseSimpleGenerator()
+    {
+        $content = $this->createSendResponse($this->generatorSimple('Article'));
+
+        $this->assertSame('["Article 1","Article 2","Article 3"]', $content);
+    }
+
+    public function testResponseNestedGenerator()
+    {
+        $content = $this->createSendResponse((function (): iterable {
+            yield 'articles' => $this->generatorSimple('Article');
+            yield 'news' => $this->generatorSimple('News');
+        })());
+
+        $this->assertSame('{"articles":["Article 1","Article 2","Article 3"],"news":["News 1","News 2","News 3"]}', $content);
+    }
+
     public function testResponseEmptyList()
     {
         $content = $this->createSendResponse(
@@ -115,14 +132,14 @@ class StreamedJsonResponseTest extends TestCase
     {
         $arrayObject = new \ArrayObject(['__symfony_json__' => '__symfony_json__']);
 
-        $iteratorAggregate = new class() implements \IteratorAggregate {
+        $iteratorAggregate = new class implements \IteratorAggregate {
             public function getIterator(): \Traversable
             {
                 return new \ArrayIterator(['__symfony_json__']);
             }
         };
 
-        $jsonSerializable = new class() implements \IteratorAggregate, \JsonSerializable {
+        $jsonSerializable = new class implements \IteratorAggregate, \JsonSerializable {
             public function getIterator(): \Traversable
             {
                 return new \ArrayIterator(['This should be ignored']);
@@ -170,7 +187,7 @@ class StreamedJsonResponseTest extends TestCase
 
     public function testPlaceholderAsObjectStructure()
     {
-        $object = new class() {
+        $object = new class {
             public $__symfony_json__ = 'foo';
             public $bar = '__symfony_json__';
         };
@@ -220,9 +237,9 @@ class StreamedJsonResponseTest extends TestCase
     }
 
     /**
-     * @param mixed[] $data
+     * @param iterable<mixed> $data
      */
-    private function createSendResponse(array $data): string
+    private function createSendResponse(iterable $data): string
     {
         $response = new StreamedJsonResponse($data);
 

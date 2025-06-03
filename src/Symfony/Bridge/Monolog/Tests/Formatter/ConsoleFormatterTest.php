@@ -35,7 +35,7 @@ class ConsoleFormatterTest extends TestCase
         $tests = [
             'record with DateTime object in datetime field' => [
                 'record' => RecordFactory::create(datetime: $currentDateTime),
-                'expectedMessage' => sprintf(
+                'expectedMessage' => \sprintf(
                     "%s <fg=cyan>WARNING  </> <comment>[test]</> test\n",
                     $currentDateTime->format(ConsoleFormatter::SIMPLE_DATE)
                 ),
@@ -47,8 +47,8 @@ class ConsoleFormatterTest extends TestCase
                 'record' => [
                     'message' => 'test',
                     'context' => [],
-                    'level' => Logger::WARNING,
-                    'level_name' => Logger::getLevelName(Logger::WARNING),
+                    'level' => Level::Warning,
+                    'level_name' => Logger::getLevelName(Level::Warning),
                     'channel' => 'test',
                     'datetime' => '2019-01-01T00:42:00+00:00',
                     'extra' => [],

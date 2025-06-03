@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 /**
@@ -21,7 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
  */
 class ButtonTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ButtonType';
+    public const TESTED_TYPE = ButtonType::class;
 
     public function testCreateButtonInstances()
     {

@@ -179,6 +179,8 @@ Symfony\Component\Form\Tests\Command\FooType (foo)
                      }       %s
                    ]         %s
  ---------------- -----------%s
+  Nested Options   -         %s
+ ---------------- -----------%s
 
 TXT
             , $tester->getDisplay(true));

@@ -44,7 +44,7 @@ class MockSplFileInfo extends \SplFileInfo
             $this->setRelativePath($defaults['relativePath']);
             $this->setRelativePathname($defaults['relativePathname']);
         } else {
-            throw new \RuntimeException(sprintf('Incorrect parameter "%s"', $param));
+            throw new \RuntimeException(\sprintf('Incorrect parameter "%s"', $param));
         }
     }
 

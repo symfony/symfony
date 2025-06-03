@@ -18,16 +18,13 @@ use Doctrine\ORM\Mapping\Id;
 #[Entity]
 class SingleStringIdEntity
 {
-    #[Id, Column(type: 'string')]
-    protected $id;
+    public function __construct(
+        #[Id, Column]
+        protected string $id,
 
-    #[Column(type: 'string')]
-    public $name;
-
-    public function __construct($id, $name)
-    {
-        $this->id = $id;
-        $this->name = $name;
+        #[Column]
+        public string $name,
+    ) {
     }
 
     public function __toString(): string

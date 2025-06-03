@@ -18,20 +18,18 @@ use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
  */
 final class CompoundLimiter implements LimiterInterface
 {
-    private array $limiters;
-
     /**
      * @param LimiterInterface[] $limiters
      */
-    public function __construct(array $limiters)
-    {
+    public function __construct(
+        private array $limiters,
+    ) {
         if (!$limiters) {
-            throw new \LogicException(sprintf('"%s::%s()" require at least one limiter.', self::class, __METHOD__));
+            throw new \LogicException(\sprintf('"%s::%s()" require at least one limiter.', self::class, __METHOD__));
         }
-        $this->limiters = $limiters;
     }
 
-    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
         throw new ReserveNotSupportedException(__CLASS__);
     }
@@ -42,7 +40,11 @@ final class CompoundLimiter implements LimiterInterface
         foreach ($this->limiters as $limiter) {
             $rateLimit = $limiter->consume($tokens);
 
-            if (null === $minimalRateLimit || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
+            if (
+                null === $minimalRateLimit
+                || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()
+                || ($minimalRateLimit->isAccepted() && !$rateLimit->isAccepted())
+            ) {
                 $minimalRateLimit = $rateLimit;
             }
         }

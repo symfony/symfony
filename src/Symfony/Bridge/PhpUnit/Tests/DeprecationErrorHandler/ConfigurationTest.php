@@ -249,8 +249,8 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    public static function provideDataForToleratesForGroup() {
-
+    public static function provideDataForToleratesForGroup(): iterable
+    {
         yield 'total threshold not reached' => ['max[total]=1', [
             'unsilenced' => 0,
             'self' => 0,
@@ -463,6 +463,9 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(json_encode($expected, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
     }
 
+    /**
+     * @requires PHPUnit < 10
+     */
     public function testBaselineGenerationWithDeprecationTriggeredByDebugClassLoader()
     {
         $filename = $this->createFile();
@@ -474,7 +477,7 @@ class ConfigurationTest extends TestCase
         $trace[2] = [
             'class' => DebugClassLoader::class,
             'function' => 'testBaselineGenerationWithDeprecationTriggeredByDebugClassLoader',
-            'args' => [self::class]
+            'args' => [self::class],
         ];
 
         $deprecation = new Deprecation('Deprecation by debug class loader', $trace, '');
@@ -525,7 +528,7 @@ class ConfigurationTest extends TestCase
         $this->expectException(\ErrorException::class);
         $this->expectExceptionMessageMatches('/[Ff]ailed to open stream: Permission denied/');
 
-        set_error_handler(static function (int $errno, string $errstr, string $errfile = null, int $errline = null): bool {
+        set_error_handler(static function (int $errno, string $errstr, ?string $errfile = null, ?int $errline = null): bool {
             if ($errno & (E_WARNING | E_WARNING)) {
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
             }

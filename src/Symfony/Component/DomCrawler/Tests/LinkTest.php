@@ -75,7 +75,7 @@ class LinkTest extends TestCase
     public function testGetUri($url, $currentUri, $expected)
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML(sprintf('<html><a href="%s">foo</a></html>', $url));
+        $dom->loadHTML(\sprintf('<html><a href="%s">foo</a></html>', $url));
         $link = new Link($dom->getElementsByTagName('a')->item(0), $currentUri);
 
         $this->assertEquals($expected, $link->getUri());
@@ -87,7 +87,7 @@ class LinkTest extends TestCase
     public function testGetUriOnArea($url, $currentUri, $expected)
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML(sprintf('<html><map><area href="%s" /></map></html>', $url));
+        $dom->loadHTML(\sprintf('<html><map><area href="%s" /></map></html>', $url));
         $link = new Link($dom->getElementsByTagName('area')->item(0), $currentUri);
 
         $this->assertEquals($expected, $link->getUri());
@@ -99,7 +99,7 @@ class LinkTest extends TestCase
     public function testGetUriOnLink($url, $currentUri, $expected)
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML(sprintf('<html><head><link href="%s" /></head></html>', $url));
+        $dom->loadHTML(\sprintf('<html><head><link href="%s" /></head></html>', $url));
         $link = new Link($dom->getElementsByTagName('link')->item(0), $currentUri);
 
         $this->assertEquals($expected, $link->getUri());

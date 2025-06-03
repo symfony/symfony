@@ -332,7 +332,7 @@ return [
         ],
         'LSL' => [
             'LSL',
-            'Lesotho Loti',
+            'Loti Lesotho',
         ],
         'LYD' => [
             'LYD',
@@ -440,7 +440,7 @@ return [
         ],
         'PHP' => [
             '₱',
-            'Piso Filipina',
+            'Peso Filipina',
         ],
         'PKR' => [
             'PKR',
@@ -502,9 +502,13 @@ return [
             'SHP',
             'Pound Santa Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone Sierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'Leone Sierra Leone',
+            'Leone Sierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

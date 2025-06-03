@@ -24,17 +24,12 @@ use Symfony\Component\Notifier\Notifier;
  */
 class SendFailedMessageToNotifierListener implements EventSubscriberInterface
 {
-    private Notifier $notifier;
-
-    public function __construct(Notifier $notifier)
-    {
-        $this->notifier = $notifier;
+    public function __construct(
+        private Notifier $notifier,
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function onMessageFailed(WorkerMessageFailedEvent $event)
+    public function onMessageFailed(WorkerMessageFailedEvent $event): void
     {
         if ($event->willRetry()) {
             return;
@@ -42,11 +37,12 @@ class SendFailedMessageToNotifierListener implements EventSubscriberInterface
 
         $throwable = $event->getThrowable();
         if ($throwable instanceof HandlerFailedException) {
-            $throwable = $throwable->getNestedExceptions()[0];
+            $exceptions = $throwable->getWrappedExceptions();
+            $throwable = $exceptions[array_key_first($exceptions)];
         }
         $envelope = $event->getEnvelope();
         $notification = Notification::fromThrowable($throwable)->importance(Notification::IMPORTANCE_HIGH);
-        $notification->subject(sprintf('A "%s" message has just failed: %s.', $envelope->getMessage()::class, $notification->getSubject()));
+        $notification->subject(\sprintf('A "%s" message has just failed: %s.', $envelope->getMessage()::class, $notification->getSubject()));
 
         $this->notifier->send($notification, ...$this->notifier->getAdminRecipients());
     }

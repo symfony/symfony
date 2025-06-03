@@ -29,9 +29,13 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Lokalise\LokaliseProviderFactory::class,
             'package' => 'symfony/lokalise-translation-provider',
         ],
+        'phrase' => [
+            'class' => Bridge\Phrase\PhraseProviderFactory::class,
+            'package' => 'symfony/phrase-translation-provider',
+        ],
     ];
 
-    public function __construct(Dsn $dsn, string $name = null, array $supported = [])
+    public function __construct(Dsn $dsn, ?string $name = null, array $supported = [])
     {
         $provider = $dsn->getScheme();
         if (false !== $pos = strpos($provider, '+')) {
@@ -39,14 +43,14 @@ class UnsupportedSchemeException extends LogicException
         }
         $package = self::SCHEME_TO_PACKAGE_MAP[$provider] ?? null;
         if ($package && !class_exists($package['class'])) {
-            parent::__construct(sprintf('Unable to synchronize translations via "%s" as the provider is not installed. Try running "composer require %s".', $provider, $package['package']));
+            parent::__construct(\sprintf('Unable to synchronize translations via "%s" as the provider is not installed. Try running "composer require %s".', $provider, $package['package']));
 
             return;
         }
 
-        $message = sprintf('The "%s" scheme is not supported', $dsn->getScheme());
+        $message = \sprintf('The "%s" scheme is not supported', $dsn->getScheme());
         if ($name && $supported) {
-            $message .= sprintf('; supported schemes for translation provider "%s" are: "%s"', $name, implode('", "', $supported));
+            $message .= \sprintf('; supported schemes for translation provider "%s" are: "%s"', $name, implode('", "', $supported));
         }
 
         parent::__construct($message.'.');

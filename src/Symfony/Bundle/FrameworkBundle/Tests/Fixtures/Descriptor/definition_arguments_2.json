@@ -32,6 +32,24 @@
         {
             "name": "tag2",
             "parameters": []
+        },
+        {
+            "name": "tag3",
+            "parameters": {
+                "array_attr": [
+                    "foo",
+                    "bar",
+                    [
+                        [
+                            [
+                                [
+                                    "ccc"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            }
         }
     ],
     "usages": []

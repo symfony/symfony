@@ -40,8 +40,8 @@ class ProfilerListenerTest extends TestCase
             ->willReturn($profile);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $mainRequest = $this->createMock(Request::class);
-        $subRequest = $this->createMock(Request::class);
+        $mainRequest = new Request();
+        $subRequest = new Request();
         $response = $this->createMock(Response::class);
 
         $requestStack = new RequestStack();

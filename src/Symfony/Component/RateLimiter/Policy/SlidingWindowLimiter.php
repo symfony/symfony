@@ -12,7 +12,7 @@
 namespace Symfony\Component\RateLimiter\Policy;
 
 use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
+use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Reservation;
@@ -34,25 +34,27 @@ final class SlidingWindowLimiter implements LimiterInterface
 {
     use ResetLimiterTrait;
 
-    private int $limit;
     private int $interval;
 
-    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
-    {
+    public function __construct(
+        string $id,
+        private int $limit,
+        \DateInterval $interval,
+        StorageInterface $storage,
+        ?LockInterface $lock = null,
+    ) {
         $this->storage = $storage;
         $this->lock = $lock;
         $this->id = $id;
-        $this->limit = $limit;
         $this->interval = TimeUtil::dateIntervalToSeconds($interval);
     }
 
-    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
-        throw new ReserveNotSupportedException(__CLASS__);
-    }
+        if ($tokens > $this->limit) {
+            throw new \InvalidArgumentException(\sprintf('Cannot reserve more tokens (%d) than the size of the rate limiter (%d).', $tokens, $this->limit));
+        }
 
-    public function consume(int $tokens = 1): RateLimit
-    {
         $this->lock?->acquire(true);
 
         try {
@@ -63,21 +65,48 @@ final class SlidingWindowLimiter implements LimiterInterface
                 $window = SlidingWindow::createFromPreviousWindow($window, $this->interval);
             }
 
+            $now = microtime(true);
             $hitCount = $window->getHitCount();
             $availableTokens = $this->getAvailableTokens($hitCount);
-            if ($availableTokens < $tokens) {
-                return new RateLimit($availableTokens, $window->getRetryAfter(), false, $this->limit);
-            }
+            if (0 === $tokens) {
+                $resetDuration = $window->calculateTimeForTokens($this->limit, $window->getHitCount());
+                $resetTime = \DateTimeImmutable::createFromFormat('U', $availableTokens ? floor($now) : floor($now + $resetDuration));
 
-            $window->add($tokens);
+                return new Reservation($now, new RateLimit($availableTokens, $resetTime, true, $this->limit));
+            }
+            if ($availableTokens >= $tokens) {
+                $window->add($tokens);
+
+                $reservation = new Reservation($now, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->limit));
+            } else {
+                $waitDuration = $window->calculateTimeForTokens($this->limit, $tokens);
+
+                if (null !== $maxTime && $waitDuration > $maxTime) {
+                    // process needs to wait longer than set interval
+                    throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
+                }
+
+                $window->add($tokens);
+
+                $reservation = new Reservation($now + $waitDuration, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
+            }
 
             if (0 < $tokens) {
                 $this->storage->save($window);
             }
-
-            return new RateLimit($this->getAvailableTokens($window->getHitCount()), $window->getRetryAfter(), true, $this->limit);
         } finally {
             $this->lock?->release();
+        }
+
+        return $reservation;
+    }
+
+    public function consume(int $tokens = 1): RateLimit
+    {
+        try {
+            return $this->reserve($tokens, 0)->getRateLimit();
+        } catch (MaxWaitDurationExceededException $e) {
+            return $e->getRateLimit();
         }
     }
 

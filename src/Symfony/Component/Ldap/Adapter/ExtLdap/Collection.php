@@ -20,15 +20,13 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Collection implements CollectionInterface
 {
-    private Connection $connection;
-    private Query $search;
     /** @var list<Entry> */
     private array $entries;
 
-    public function __construct(Connection $connection, Query $search)
-    {
-        $this->connection = $connection;
-        $this->search = $search;
+    public function __construct(
+        private Connection $connection,
+        private Query $search,
+    ) {
     }
 
     public function toArray(): array
@@ -125,9 +123,9 @@ class Collection implements CollectionInterface
     private function cleanupAttributes(array $entry): array
     {
         $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + [
-                'count' => null,
-                'dn' => null,
-            ]);
+            'count' => null,
+            'dn' => null,
+        ]);
         array_walk($attributes, function (&$value) {
             unset($value['count']);
         });

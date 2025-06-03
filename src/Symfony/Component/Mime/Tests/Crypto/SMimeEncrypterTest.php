@@ -103,7 +103,7 @@ class SMimeEncrypterTest extends SMimeTestCase
                 'file://'.$this->samplesDir.'encrypt.crt',
                 'file://'.$this->samplesDir.'encrypt.key'
             ),
-            sprintf('Decryption of the message failed. Internal error "%s".', openssl_error_string())
+            \sprintf('Decryption of the message failed. Internal error "%s".', openssl_error_string())
         );
         $this->assertEquals(str_replace("\r", '', $originalMessage->toString()), str_replace("\r", '', file_get_contents($outputFile)));
     }

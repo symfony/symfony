@@ -12,6 +12,8 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
@@ -19,6 +21,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\AbstractDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+use Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -88,7 +91,7 @@ array:25 [
     +foo: ""…3
     +"bar": "bar"
   }
-  "closure" => Closure(\$a, PDO &\$b = null) {#%d
+  "closure" => Closure(\$a, ?PDO &\$b = null) {#%d
     class: "Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest"
     this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {#%d …}
     file: "%s%eTests%eFixtures%edumb-var.php"
@@ -302,6 +305,21 @@ EOTXT
         putenv('DUMP_STRING_LENGTH=');
     }
 
+    /**
+     * @requires PHP 8.4
+     */
+    public function testVirtualProperties()
+    {
+        $this->assertDumpEquals(<<<EODUMP
+            Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty {
+              +firstName: "John"
+              +lastName: "Doe"
+              +fullName: ~ string
+              -noType: ~
+            }
+            EODUMP, new VirtualProperty());
+    }
+
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+');
@@ -341,14 +359,12 @@ stream resource {@{$ref}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: {
       %sTwig.php:2 {
-        __TwigTemplate_VarDumperFixture_u75a09->doDisplay(array \$context, array \$blocks = [])
+        __TwigTemplate_VarDumperFixture_u75a09->doDisplay(array \$context, array \$blocks = []): array
         › foo bar
         ›   twig source
         › 
       }
-      %s%eTemplate.php:%d { …}
-      %s%eTemplate.php:%d { …}
-      %s%eTemplate.php:%d { …}
+      %A%eTemplate.php:%d { …}
       %s%eTests%eDumper%eCliDumperTest.php:%d { …}
 %A  }
   }
@@ -417,7 +433,7 @@ EOTXT
   \e[0;38;5;208m"\e[38;5;113mfoo\e[0;38;5;208m" => "\e[1;38;5;113mbar\e[0;38;5;208m"\e[m
 \e[0;38;5;208m]\e[m
 
-EOTXT
+EOTXT,
         ];
 
         yield [[], AbstractDumper::DUMP_LIGHT_ARRAY, "\e[0;38;5;208m[]\e[m\n"];
@@ -430,7 +446,7 @@ EOTXT
   \e[0;38;5;208m"\e[38;5;113mfoo\e[0;38;5;208m" => "\e[1;38;5;113mbar\e[0;38;5;208m"\e[m
 \e[0;38;5;208m]\e[m
 
-EOTXT
+EOTXT,
         ];
 
         yield [[], 0, "\e[0;38;5;208m[]\e[m\n"];
@@ -479,7 +495,7 @@ EOTXT
             ],
             [
                 'bar' => 123,
-            ]
+            ],
         ]);
 
         $dumper = new CliDumper();
@@ -498,5 +514,35 @@ EOTXT
             ,
             $dump
         );
+    }
+
+    public function testFileLinkFormat()
+    {
+        if (!class_exists(FileLinkFormatter::class)) {
+            $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
+        }
+
+        $data = new Data([
+            [
+                new ClassStub(self::class),
+            ],
+        ]);
+
+        $ide = $_ENV['SYMFONY_IDE'] ?? null;
+        $_ENV['SYMFONY_IDE'] = 'vscode';
+
+        try {
+            $dumper = new CliDumper();
+            $dumper->setColors(true);
+            $dump = $dumper->dump($data, true);
+
+            $this->assertStringMatchesFormat('%svscode:%sCliDumperTest%s', $dump);
+        } finally {
+            if (null === $ide) {
+                unset($_ENV['SYMFONY_IDE']);
+            } else {
+                $_ENV['SYMFONY_IDE'] = $ide;
+            }
+        }
     }
 }

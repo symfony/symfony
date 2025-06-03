@@ -14,25 +14,24 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
 
 #[Entity]
 class SingleAssociationToIntIdEntity
 {
-    #[Id, OneToOne(targetEntity: SingleIntIdNoToStringEntity::class, cascade: ['ALL'])]
-    protected $entity;
+    public function __construct(
+        #[Id, OneToOne(cascade: ['ALL'])]
+        #[JoinColumn(nullable: false)]
+        protected SingleIntIdNoToStringEntity $entity,
 
-    #[Column(type: 'string', nullable: true)]
-    public $name;
-
-    public function __construct(SingleIntIdNoToStringEntity $entity, $name)
-    {
-        $this->entity = $entity;
-        $this->name = $name;
+        #[Column(nullable: true)]
+        public ?string $name,
+    ) {
     }
 
     public function __toString(): string
     {
-        return (string) $this->name;
+        return $this->name;
     }
 }

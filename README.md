@@ -1,5 +1,5 @@
 <p align="center"><a href="https://symfony.com" target="_blank">
-    <img src="https://symfony.com/logos/symfony_black_02.svg">
+    <img src="https://symfony.com/logos/symfony_dynamic_01.svg" alt="Symfony Logo">
 </a></p>
 
 [Symfony][1] is a **PHP framework** for web and console applications and a set
@@ -17,19 +17,22 @@ Installation
 Sponsor
 -------
 
-Symfony 6.4 is [backed][27] by
-- [SensioLabs][28]
-- [packagist.com][29]
+Symfony 7.2 is [backed][27] by
+- [Sulu][29]
+- [Rector][30]
 
-As the creator of Symfony, **SensioLabs** supports companies using Symfony,
-with an offering encompassing consultancy, expertise, services, training, and
-technical assistance to ensure the success of web application development projects.
+**Sulu** is the CMS for Symfony developers. It provides pre-built content-management
+features while giving developers the freedom to build, deploy, and maintain custom
+solutions using full-stack Symfony. Sulu is ideal for creating complex websites,
+integrating external tools, and building custom-built solutions.
 
-Private **Packagist.com** is a fast, reliable, and secure Composer repository for
-your private packages. It mirrors all your open-source dependencies for better
-availability and monitors them for security vulnerabilities.
+**Rector** helps successful and growing companies to get the most of the code
+they already have. Including upgrading to the latest Symfony LTS. They deliver
+automated refactoring, reduce maintenance costs, speed up feature delivery, and
+transform legacy code into a strategic asset. They can handle the dirty work,
+so you can focus on the features.
 
-Help Symfony by [sponsoring][30] its development!
+Help Symfony by [sponsoring][28] its development!
 
 Documentation
 -------------
@@ -92,6 +95,6 @@ and supported by [Symfony contributors][19].
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
-[28]: https://sensiolabs.com
-[29]: https://packagist.com
-[30]: https://symfony.com/sponsor
+[28]: https://symfony.com/sponsor
+[29]: https://sulu.io
+[30]: https://getrector.com

@@ -53,6 +53,8 @@ class CompleteCommandTest extends TestCase
 
     public function testAdditionalShellSupport()
     {
+        $this->expectNotToPerformAssertions();
+
         $this->command = new CompleteCommand(['supported' => BashCompletionOutput::class]);
         $this->command->setApplication($this->application);
         $this->tester = new CommandTester($this->command);
@@ -61,8 +63,6 @@ class CompleteCommandTest extends TestCase
 
         // verify that the default set of shells is still supported
         $this->execute(['--shell' => 'bash', '--current' => '1', '--input' => ['bin/console']]);
-
-        $this->assertTrue(true);
     }
 
     /**
@@ -119,9 +119,9 @@ class CompleteCommandTest extends TestCase
 
     public static function provideCompleteCommandInputDefinitionInputs()
     {
-        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
+        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
         yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
-        yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
+        yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
         yield 'custom-aliased' => [['bin/console', 'ahoy'], ['Fabien', 'Robin', 'Wouter']];
     }
 

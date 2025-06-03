@@ -11,26 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\AutowiringTypes;
 
-use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class AutowiredServices
 {
-    private ?Reader $annotationReader;
-    private EventDispatcherInterface $dispatcher;
-    private CacheItemPoolInterface $cachePool;
-
-    public function __construct(Reader $annotationReader = null, EventDispatcherInterface $dispatcher, CacheItemPoolInterface $cachePool)
-    {
-        $this->annotationReader = $annotationReader;
-        $this->dispatcher = $dispatcher;
-        $this->cachePool = $cachePool;
-    }
-
-    public function getAnnotationReader()
-    {
-        return $this->annotationReader;
+    public function __construct(
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly CacheItemPoolInterface $cachePool,
+    ) {
     }
 
     public function getDispatcher()

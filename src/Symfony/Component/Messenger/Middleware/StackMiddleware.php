@@ -24,7 +24,7 @@ class StackMiddleware implements MiddlewareInterface, StackInterface
     /**
      * @param iterable<mixed, MiddlewareInterface>|MiddlewareInterface|null $middlewareIterator
      */
-    public function __construct(iterable|MiddlewareInterface $middlewareIterator = null)
+    public function __construct(iterable|MiddlewareInterface|null $middlewareIterator = null)
     {
         $this->stack = new MiddlewareStack();
 

@@ -25,16 +25,17 @@ use Twig\Environment;
  */
 class TwigErrorRenderer implements ErrorRendererInterface
 {
-    private Environment $twig;
     private HtmlErrorRenderer $fallbackErrorRenderer;
     private \Closure|bool $debug;
 
     /**
      * @param bool|callable $debug The debugging mode as a boolean or a callable that should return it
      */
-    public function __construct(Environment $twig, HtmlErrorRenderer $fallbackErrorRenderer = null, bool|callable $debug = false)
-    {
-        $this->twig = $twig;
+    public function __construct(
+        private Environment $twig,
+        ?HtmlErrorRenderer $fallbackErrorRenderer = null,
+        bool|callable $debug = false,
+    ) {
         $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();
         $this->debug = \is_bool($debug) ? $debug : $debug(...);
     }
@@ -68,7 +69,7 @@ class TwigErrorRenderer implements ErrorRendererInterface
 
     private function findTemplate(int $statusCode): ?string
     {
-        $template = sprintf('@Twig/Exception/error%s.html.twig', $statusCode);
+        $template = \sprintf('@Twig/Exception/error%s.html.twig', $statusCode);
         if ($this->twig->getLoader()->exists($template)) {
             return $template;
         }

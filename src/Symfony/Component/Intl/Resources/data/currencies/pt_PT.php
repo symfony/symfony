@@ -550,9 +550,13 @@ return [
             'SHP',
             'libra santa-helenense',
         ],
+        'SLE' => [
+            'SLE',
+            'leone de Serra Leoa',
+        ],
         'SLL' => [
             'SLL',
-            'leone de Serra Leoa',
+            'leone de Serra Leoa (1964—2022)',
         ],
         'SOS' => [
             'SOS',

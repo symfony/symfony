@@ -19,21 +19,34 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 final class MercureOptions implements MessageOptionsInterface
 {
     private ?array $topics;
-    private bool $private;
-    private ?string $id;
-    private ?string $type;
-    private ?int $retry;
 
     /**
      * @param string|string[]|null $topics
+     * @param array{
+     *     badge?: string,
+     *     body?: string,
+     *     data?: mixed,
+     *     dir?: 'auto'|'ltr'|'rtl',
+     *     icon?: string,
+     *     image?: string,
+     *     lang?: string,
+     *     renotify?: bool,
+     *     requireInteraction?: bool,
+     *     silent?: bool,
+     *     tag?: string,
+     *     timestamp?: int,
+     *     vibrate?: int|list<int>,
+     * }|null $content
      */
-    public function __construct(string|array $topics = null, bool $private = false, string $id = null, string $type = null, int $retry = null)
-    {
+    public function __construct(
+        string|array|null $topics = null,
+        private bool $private = false,
+        private ?string $id = null,
+        private ?string $type = null,
+        private ?int $retry = null,
+        private ?array $content = null,
+    ) {
         $this->topics = null !== $topics ? (array) $topics : null;
-        $this->private = $private;
-        $this->id = $id;
-        $this->type = $type;
-        $this->retry = $retry;
     }
 
     /**
@@ -64,6 +77,28 @@ final class MercureOptions implements MessageOptionsInterface
         return $this->retry;
     }
 
+    /**
+     * @return array{
+     *      badge?: string,
+     *      body?: string,
+     *      data?: mixed,
+     *      dir?: 'auto'|'ltr'|'rtl',
+     *      icon?: string,
+     *      image?: string,
+     *      lang?: string,
+     *      renotify?: bool,
+     *      requireInteraction?: bool,
+     *      silent?: bool,
+     *      tag?: string,
+     *      timestamp?: int,
+     *      vibrate?: int|list<int>,
+     *  }|null
+     */
+    public function getContent(): ?array
+    {
+        return $this->content;
+    }
+
     public function toArray(): array
     {
         return [
@@ -72,6 +107,7 @@ final class MercureOptions implements MessageOptionsInterface
             'id' => $this->id,
             'type' => $this->type,
             'retry' => $this->retry,
+            'content' => $this->content,
         ];
     }
 

@@ -28,11 +28,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class AmazonSnsTransport extends AbstractTransport
 {
-    private SnsClient $snsClient;
-
-    public function __construct(SnsClient $snsClient, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->snsClient = $snsClient;
+    public function __construct(
+        private SnsClient $snsClient,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -40,7 +40,7 @@ final class AmazonSnsTransport extends AbstractTransport
     {
         $configuration = $this->snsClient->getConfiguration();
 
-        return sprintf('sns://%s?region=%s', $this->getEndpoint(), $configuration->get('region'));
+        return \sprintf('sns://%s?region=%s', $this->getEndpoint(), $configuration->get('region'));
     }
 
     public function supports(MessageInterface $message): bool
@@ -51,11 +51,11 @@ final class AmazonSnsTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$this->supports($message)) {
-            throw new UnsupportedMessageTypeException(__CLASS__, sprintf('"%s" or "%s"', SmsMessage::class, ChatMessage::class), $message);
+            throw new UnsupportedMessageTypeException(__CLASS__, \sprintf('"%s" or "%s"', SmsMessage::class, ChatMessage::class), $message);
         }
 
         if ($message instanceof SmsMessage && '' !== $message->getFrom()) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
+            throw new InvalidArgumentException(\sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
         if ($message instanceof ChatMessage && $message->getOptions() instanceof AmazonSnsOptions) {

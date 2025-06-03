@@ -24,13 +24,14 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EntityValueResolverTest extends TestCase
 {
     public function testResolveWithoutClass()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -42,7 +43,7 @@ class EntityValueResolverTest extends TestCase
 
     public function testResolveWithoutAttribute()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry, null, new MapEntity(disabled: true));
 
@@ -63,41 +64,46 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
+    /**
+     * @group legacy
+     */
     public function testResolveWithNoIdAndDataOptional()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
         $request = new Request();
         $argument = $this->createArgument(null, new MapEntity(), 'arg', true);
 
+        if (class_exists(NearMissValueResolverException::class)) {
+            $this->expectException(NearMissValueResolverException::class);
+            $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
+        }
+
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
     public function testResolveWithStripNulls()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
         $request = new Request();
         $request->attributes->set('arg', null);
-        $argument = $this->createArgument('stdClass', new MapEntity(stripNull: true), 'arg', true);
+        $argument = $this->createArgument('stdClass', new MapEntity(mapping: ['arg'], stripNull: true), 'arg', true);
 
-        $metadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
-        $metadata->expects($this->once())
-            ->method('hasField')
-            ->with('arg')
-            ->willReturn(true);
-
-        $manager->expects($this->once())
-            ->method('getClassMetadata')
-            ->with('stdClass')
-            ->willReturn($metadata);
+        $manager->expects($this->never())
+            ->method('getClassMetadata');
 
         $manager->expects($this->never())
             ->method('getRepository');
+
+        if (class_exists(NearMissValueResolverException::class)) {
+            $this->expectException(NearMissValueResolverException::class);
+            $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
+        }
 
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
@@ -107,7 +113,7 @@ class EntityValueResolverTest extends TestCase
      */
     public function testResolveWithId(string|int $id)
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -116,7 +122,7 @@ class EntityValueResolverTest extends TestCase
 
         $argument = $this->createArgument('stdClass', new MapEntity(id: 'id'));
 
-        $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repository = $this->createMock(ObjectRepository::class);
         $repository->expects($this->once())
             ->method('find')
             ->with($id)
@@ -130,36 +136,86 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], $resolver->resolve($request, $argument));
     }
 
-    public function testResolveWithNullId()
+    /**
+     * @dataProvider idsProvider
+     */
+    public function testResolveWithIdAndTypeAlias(string|int $id)
     {
         $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver(
+            $registry,
+            null,
+            new MapEntity(),
+            // Using \Throwable because it is an interface
+            ['Throwable' => 'stdClass'],
+        );
+
+        $request = new Request();
+        $request->attributes->set('id', $id);
+
+        $argument = $this->createArgument('Throwable', $mapEntity = new MapEntity(id: 'id'));
+
+        $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repository->expects($this->once())
+            ->method('find')
+            ->with($id)
+            ->willReturn($object = new \stdClass());
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with('stdClass')
+            ->willReturn($repository);
+
+        $this->assertSame([$object], $resolver->resolve($request, $argument));
+        // Ensure the original MapEntity object was not updated
+        $this->assertNull($mapEntity->class);
+    }
+
+    public function testResolveWithNullId()
+    {
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
         $request = new Request();
         $request->attributes->set('id', null);
 
-        $argument = $this->createArgument(isNullable: true);
+        $argument = $this->createArgument(isNullable: true, entity: new MapEntity(id: 'id'));
+
+        $this->assertSame([null], $resolver->resolve($request, $argument));
+    }
+
+    public function testResolveWithArrayIdNullValue()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('nullValue', null);
+
+        $argument = $this->createArgument(entity: new MapEntity(id: ['nullValue']), isNullable: true);
 
         $this->assertSame([null], $resolver->resolve($request, $argument));
     }
 
     public function testResolveWithConversionFailedException()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
         $request = new Request();
         $request->attributes->set('id', 'test');
 
-        $argument = $this->createArgument('stdClass', new MapEntity(id: 'id'));
+        $argument = $this->createArgument('stdClass', new MapEntity(id: 'id', message: 'Test'));
 
-        $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repository = $this->createMock(ObjectRepository::class);
         $repository->expects($this->once())
             ->method('find')
             ->with('test')
-            ->will($this->throwException(new ConversionException()));
+            ->willThrowException(new ConversionException());
 
         $manager->expects($this->once())
             ->method('getRepository')
@@ -167,13 +223,14 @@ class EntityValueResolverTest extends TestCase
             ->willReturn($repository);
 
         $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Test');
 
         $resolver->resolve($request, $argument);
     }
 
     public function testUsedProperIdentifier()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -194,9 +251,12 @@ class EntityValueResolverTest extends TestCase
         yield ['foo'];
     }
 
+    /**
+     * @group legacy
+     */
     public function testResolveGuessOptional()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -205,7 +265,7 @@ class EntityValueResolverTest extends TestCase
 
         $argument = $this->createArgument('stdClass', new MapEntity(), 'arg', true);
 
-        $metadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $manager->expects($this->once())
             ->method('getClassMetadata')
             ->with('stdClass')
@@ -213,12 +273,17 @@ class EntityValueResolverTest extends TestCase
 
         $manager->expects($this->never())->method('getRepository');
 
+        if (class_exists(NearMissValueResolverException::class)) {
+            $this->expectException(NearMissValueResolverException::class);
+            $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
+        }
+
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
     public function testResolveWithMappingAndExclude()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -231,18 +296,10 @@ class EntityValueResolverTest extends TestCase
             new MapEntity(mapping: ['foo' => 'Foo'], exclude: ['bar'])
         );
 
-        $metadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
-        $metadata->expects($this->once())
-            ->method('hasField')
-            ->with('Foo')
-            ->willReturn(true);
+        $manager->expects($this->never())
+            ->method('getClassMetadata');
 
-        $manager->expects($this->once())
-            ->method('getClassMetadata')
-            ->with('stdClass')
-            ->willReturn($metadata);
-
-        $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repository = $this->createMock(ObjectRepository::class);
         $repository->expects($this->once())
             ->method('findOneBy')
             ->with(['Foo' => 1])
@@ -256,9 +313,45 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], $resolver->resolve($request, $argument));
     }
 
+    public function testResolveWithRouteMapping()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('conference', 'vienna-2024');
+        $request->attributes->set('article', ['title' => 'foo']);
+        $request->attributes->set('_route_mapping', ['slug' => 'conference']);
+
+        $argument1 = $this->createArgument('Conference', new MapEntity('Conference'), 'conference');
+        $argument2 = $this->createArgument('Article', new MapEntity('Article'), 'article');
+
+        $manager->expects($this->never())
+            ->method('getClassMetadata');
+
+        $conference = new \stdClass();
+        $article = new \stdClass();
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->any())
+            ->method('findOneBy')
+            ->willReturnCallback(static fn ($v) => match ($v) {
+                ['slug' => 'vienna-2024'] => $conference,
+                ['title' => 'foo'] => $article,
+            });
+
+        $manager->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($repository);
+
+        $this->assertSame([$conference], $resolver->resolve($request, $argument1));
+        $this->assertSame([$article], $resolver->resolve($request, $argument2));
+    }
+
     public function testExceptionWithExpressionIfNoLanguageAvailable()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -276,9 +369,9 @@ class EntityValueResolverTest extends TestCase
 
     public function testExpressionFailureReturns404()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
-        $language = $this->getMockBuilder(ExpressionLanguage::class)->getMock();
+        $language = $this->createMock(ExpressionLanguage::class);
         $resolver = new EntityValueResolver($registry, $language);
 
         $this->expectException(NotFoundHttpException::class);
@@ -290,13 +383,14 @@ class EntityValueResolverTest extends TestCase
             'arg1'
         );
 
-        $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repository = $this->createMock(ObjectRepository::class);
         // find should not be attempted on this repository as a fallback
         $repository->expects($this->never())
             ->method('find');
 
         $manager->expects($this->once())
             ->method('getRepository')
+            ->with(\stdClass::class)
             ->willReturn($repository);
 
         $language->expects($this->once())
@@ -308,9 +402,9 @@ class EntityValueResolverTest extends TestCase
 
     public function testExpressionMapsToArgument()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
-        $language = $this->getMockBuilder(ExpressionLanguage::class)->getMock();
+        $language = $this->createMock(ExpressionLanguage::class);
         $resolver = new EntityValueResolver($registry, $language);
 
         $request = new Request();
@@ -321,19 +415,21 @@ class EntityValueResolverTest extends TestCase
             'arg1'
         );
 
-        $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repository = $this->createMock(ObjectRepository::class);
         // find should not be attempted on this repository as a fallback
         $repository->expects($this->never())
             ->method('find');
 
         $manager->expects($this->once())
             ->method('getRepository')
+            ->with(\stdClass::class)
             ->willReturn($repository);
 
         $language->expects($this->once())
             ->method('evaluate')
             ->with('repository.findOneByCustomMethod(id)', [
                 'repository' => $repository,
+                'request' => $request,
                 'id' => 5,
             ])
             ->willReturn($object = new \stdClass());
@@ -341,11 +437,53 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], $resolver->resolve($request, $argument));
     }
 
+    public function testExpressionMapsToIterableArgument()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $language = $this->createMock(ExpressionLanguage::class);
+        $resolver = new EntityValueResolver($registry, $language);
+
+        $request = new Request();
+        $request->attributes->set('id', 5);
+        $request->query->set('sort', 'ASC');
+        $request->query->set('limit', 10);
+        $argument = $this->createArgument(
+            'iterable',
+            new MapEntity(
+                class: \stdClass::class,
+                expr: $expr = 'repository.findBy({"author": id}, {"createdAt": request.query.get("sort", "DESC")}, request.query.getInt("limit", 10))',
+            ),
+            'arg1',
+        );
+
+        $repository = $this->createMock(ObjectRepository::class);
+        // find should not be attempted on this repository as a fallback
+        $repository->expects($this->never())
+            ->method('find');
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with(\stdClass::class)
+            ->willReturn($repository);
+
+        $language->expects($this->once())
+            ->method('evaluate')
+            ->with($expr, [
+                'repository' => $repository,
+                'request' => $request,
+                'id' => 5,
+            ])
+            ->willReturn($objects = [new \stdClass(), new \stdClass()]);
+
+        $this->assertSame([$objects], $resolver->resolve($request, $argument));
+    }
+
     public function testExpressionSyntaxErrorThrowsException()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
-        $language = $this->getMockBuilder(ExpressionLanguage::class)->getMock();
+        $language = $this->createMock(ExpressionLanguage::class);
         $resolver = new EntityValueResolver($registry, $language);
 
         $request = new Request();
@@ -355,18 +493,19 @@ class EntityValueResolverTest extends TestCase
             'arg1'
         );
 
-        $repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repository = $this->createMock(ObjectRepository::class);
         // find should not be attempted on this repository as a fallback
         $repository->expects($this->never())
             ->method('find');
 
         $manager->expects($this->once())
             ->method('getRepository')
+            ->with(\stdClass::class)
             ->willReturn($repository);
 
         $language->expects($this->once())
             ->method('evaluate')
-            ->will($this->throwException(new SyntaxError('syntax error message', 10)));
+            ->willThrowException(new SyntaxError('syntax error message', 10));
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('syntax error message around position 10');
@@ -375,7 +514,7 @@ class EntityValueResolverTest extends TestCase
 
     public function testAlreadyResolved()
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -387,22 +526,25 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
-    private function createArgument(string $class = null, MapEntity $entity = null, string $name = 'arg', bool $isNullable = false): ArgumentMetadata
+    private function createArgument(?string $class = null, ?MapEntity $entity = null, string $name = 'arg', bool $isNullable = false): ArgumentMetadata
     {
         return new ArgumentMetadata($name, $class ?? \stdClass::class, false, false, null, $isNullable, $entity ? [$entity] : []);
     }
 
-    private function createRegistry(ObjectManager $manager = null): ManagerRegistry&MockObject
+    private function createRegistry(?ObjectManager $manager = null): ManagerRegistry&MockObject
     {
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $registry = $this->createMock(ManagerRegistry::class);
 
         $registry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($manager);
 
-        $registry->expects($this->any())
-            ->method('getManager')
-            ->willReturn($manager);
+        if (null === $manager) {
+            $registry->method('getManager')
+                ->willThrowException(new \InvalidArgumentException());
+        } else {
+            $registry->method('getManager')->willReturn($manager);
+        }
 
         return $registry;
     }

@@ -24,7 +24,7 @@ class ClassStub extends ConstStub
      * @param string   $identifier A PHP identifier, e.g. a class, method, interface, etc. name
      * @param callable $callable   The callable targeted by the identifier when it is ambiguous or not a real PHP identifier
      */
-    public function __construct(string $identifier, callable|array|string $callable = null)
+    public function __construct(string $identifier, callable|array|string|null $callable = null)
     {
         $this->value = $identifier;
 
@@ -56,7 +56,7 @@ class ClassStub extends ConstStub
             }
 
             if (str_contains($identifier, "@anonymous\0")) {
-                $this->value = $identifier = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', fn ($m) => class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0], $identifier);
+                $this->value = $identifier = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)?[0-9a-fA-F]++/', fn ($m) => class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0], $identifier);
             }
 
             if (null !== $callable && $r instanceof \ReflectionFunctionAbstract) {
@@ -85,10 +85,7 @@ class ClassStub extends ConstStub
         }
     }
 
-    /**
-     * @return mixed
-     */
-    public static function wrapCallable(mixed $callable)
+    public static function wrapCallable(mixed $callable): mixed
     {
         if (\is_object($callable) || !\is_callable($callable)) {
             return $callable;

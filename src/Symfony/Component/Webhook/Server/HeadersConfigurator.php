@@ -25,7 +25,7 @@ final class HeadersConfigurator implements RequestConfiguratorInterface
     ) {
     }
 
-    public function configure(RemoteEvent $event, string $secret, HttpOptions $options): void
+    public function configure(RemoteEvent $event, #[\SensitiveParameter] string $secret, HttpOptions $options): void
     {
         $options->setHeaders([
             $this->eventHeaderName => $event->getName(),

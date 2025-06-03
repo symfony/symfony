@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
+use Relay\Cluster as RelayCluster;
 use Relay\Relay;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
@@ -24,9 +24,9 @@ abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
     ];
 
-    protected static \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis;
+    protected static \Redis|Relay|RelayCluster|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis;
 
-    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface
     {
         return new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
@@ -34,12 +34,12 @@ abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
     public static function setUpBeforeClass(): void
     {
         if (!\extension_loaded('redis')) {
-            throw new SkippedTestSuiteError('Extension redis required.');
+            self::markTestSkipped('Extension redis required.');
         }
         try {
             (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
         } catch (\Exception $e) {
-            throw new SkippedTestSuiteError(getenv('REDIS_HOST').': '.$e->getMessage());
+            self::markTestSkipped(getenv('REDIS_HOST').': '.$e->getMessage());
         }
     }
 

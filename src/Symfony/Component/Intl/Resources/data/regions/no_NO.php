@@ -37,7 +37,7 @@ return [
         'BT' => 'Bhutan',
         'BV' => 'Bouvetøya',
         'BW' => 'Botswana',
-        'BY' => 'Hviterussland',
+        'BY' => 'Belarus',
         'BZ' => 'Belize',
         'CA' => 'Canada',
         'CC' => 'Kokosøyene',

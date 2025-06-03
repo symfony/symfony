@@ -31,20 +31,18 @@ final class Checkpoint implements CheckpointInterface
     public function acquire(\DateTimeImmutable $now): bool
     {
         if ($this->lock && !$this->lock->acquire()) {
-            // Reset local state if a Lock is acquired by another Worker.
+            // Reset local state if a Lock is acquired by another Worker and state is not shared through cache.
             $this->reset = true;
 
             return false;
         }
 
-        if ($this->reset) {
-            $this->reset = false;
-            $this->save($now, -1);
-        }
-
         if ($this->cache) {
             [$this->time, $this->index, $this->from] = $this->cache->get($this->name, fn () => [$now, -1, $now]) + [2 => $now];
             $this->save($this->time, $this->index);
+        } elseif ($this->reset) {
+            $this->reset = false;
+            $this->save($now, -1);
         }
 
         $this->time ??= $now;

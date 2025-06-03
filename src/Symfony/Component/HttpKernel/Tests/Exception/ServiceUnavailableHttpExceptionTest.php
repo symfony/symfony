@@ -45,7 +45,7 @@ class ServiceUnavailableHttpExceptionTest extends HttpExceptionTest
         $this->assertSame($headers, $exception->getHeaders());
     }
 
-    protected function createException(string $message = '', \Throwable $previous = null, int $code = 0, array $headers = []): HttpException
+    protected function createException(string $message = '', ?\Throwable $previous = null, int $code = 0, array $headers = []): HttpException
     {
         return new ServiceUnavailableHttpException(null, $message, $previous, $code, $headers);
     }

@@ -27,10 +27,10 @@ class LinkTest extends TestCase
             ->withAttribute('me', 'you')
         ;
 
-        $this->assertEquals('http://www.google.com', $link->getHref());
+        $this->assertSame('http://www.google.com', $link->getHref());
         $this->assertContains('next', $link->getRels());
         $this->assertArrayHasKey('me', $link->getAttributes());
-        $this->assertEquals('you', $link->getAttributes()['me']);
+        $this->assertSame('you', $link->getAttributes()['me']);
     }
 
     public function testCanRemoveValues()
@@ -44,8 +44,8 @@ class LinkTest extends TestCase
         $link = $link->withoutAttribute('me')
             ->withoutRel('next');
 
-        $this->assertEquals('http://www.google.com', $link->getHref());
-        $this->assertFalse(\in_array('next', $link->getRels()));
+        $this->assertSame('http://www.google.com', $link->getHref());
+        $this->assertFalse(\in_array('next', $link->getRels(), true));
         $this->assertArrayNotHasKey('me', $link->getAttributes());
     }
 
@@ -65,7 +65,7 @@ class LinkTest extends TestCase
     {
         $link = new Link('next', 'http://www.google.com');
 
-        $this->assertEquals('http://www.google.com', $link->getHref());
+        $this->assertSame('http://www.google.com', $link->getHref());
         $this->assertContains('next', $link->getRels());
     }
 

@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -32,7 +33,6 @@ class AccessListenerTest extends TestCase
 {
     public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
     {
-        $this->expectException(AccessDeniedException::class);
         $request = new Request();
 
         $accessMap = $this->createMock(AccessMapInterface::class);
@@ -43,11 +43,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $token = new class() extends AbstractToken {
-            public function getCredentials(): mixed
-            {
-            }
-        };
+        $token = new class extends AbstractToken {};
 
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage
@@ -69,6 +65,8 @@ class AccessListenerTest extends TestCase
             $accessDecisionManager,
             $accessMap
         );
+
+        $this->expectException(AccessDeniedException::class);
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
@@ -131,7 +129,6 @@ class AccessListenerTest extends TestCase
 
     public function testHandleWhenTheSecurityTokenStorageHasNoToken()
     {
-        $this->expectException(AccessDeniedException::class);
         $tokenStorage = new TokenStorage();
         $request = new Request();
 
@@ -154,6 +151,8 @@ class AccessListenerTest extends TestCase
             $accessMap,
             false
         );
+
+        $this->expectException(AccessDeniedException::class);
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
@@ -237,7 +236,7 @@ class AccessListenerTest extends TestCase
         $accessDecisionManager
             ->expects($this->once())
             ->method('decide')
-            ->with($this->equalTo($authenticatedToken), $this->equalTo(['foo' => 'bar', 'bar' => 'baz']), $this->equalTo($request), true)
+            ->with($this->equalTo($authenticatedToken), $this->equalTo(['foo' => 'bar', 'bar' => 'baz']), $this->equalTo($request), new AccessDecision(), true)
             ->willReturn(true)
         ;
 

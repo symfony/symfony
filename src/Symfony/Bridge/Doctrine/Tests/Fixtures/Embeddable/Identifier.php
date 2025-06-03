@@ -16,9 +16,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Embeddable]
 class Identifier
 {
-    /**
-     * @var int
-     */
-    #[ORM\Id, ORM\Column(type: 'integer')]
-    protected $value;
+    #[ORM\Id, ORM\Column]
+    protected int $value;
 }

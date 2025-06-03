@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -33,34 +34,30 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
 use Symfony\Component\Messenger\RoutableMessageBus;
+use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Worker;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
 #[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
-class ConsumeMessagesCommand extends Command
+class ConsumeMessagesCommand extends Command implements SignalableCommandInterface
 {
-    private RoutableMessageBus $routableBus;
-    private ContainerInterface $receiverLocator;
-    private EventDispatcherInterface $eventDispatcher;
-    private ?LoggerInterface $logger;
-    private array $receiverNames;
-    private ?ResetServicesListener $resetServicesListener;
-    private array $busIds;
-    private ?ContainerInterface $rateLimiterLocator;
+    private const DEFAULT_KEEPALIVE_INTERVAL = 5;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [], ContainerInterface $rateLimiterLocator = null)
-    {
-        $this->routableBus = $routableBus;
-        $this->receiverLocator = $receiverLocator;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->logger = $logger;
-        $this->receiverNames = $receiverNames;
-        $this->resetServicesListener = $resetServicesListener;
-        $this->busIds = $busIds;
-        $this->rateLimiterLocator = $rateLimiterLocator;
+    private ?Worker $worker = null;
 
+    public function __construct(
+        private RoutableMessageBus $routableBus,
+        private ContainerInterface $receiverLocator,
+        private EventDispatcherInterface $eventDispatcher,
+        private ?LoggerInterface $logger = null,
+        private array $receiverNames = [],
+        private ?ResetServicesListener $resetServicesListener = null,
+        private array $busIds = [],
+        private ?ContainerInterface $rateLimiterLocator = null,
+        private ?array $signals = null,
+    ) {
         parent::__construct();
     }
 
@@ -79,6 +76,8 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
+                new InputOption('all', null, InputOption::VALUE_NONE, 'Consume messages from all receivers'),
+                new InputOption('keepalive', null, InputOption::VALUE_OPTIONAL, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -119,24 +118,42 @@ Use the --queues option to limit a receiver to only certain queues (only support
 Use the --no-reset option to prevent services resetting after each message (may lead to leaking services' state between messages):
 
     <info>php %command.full_name% <receiver-name> --no-reset</info>
+
+Use the --all option to consume from all receivers:
+
+    <info>php %command.full_name% --all</info>
 EOF
             )
         ;
     }
 
-    /**
-     * @return void
-     */
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        if ($input->hasParameterOption('--keepalive')) {
+            $this->getApplication()->setAlarmInterval((int) ($input->getOption('keepalive') ?? self::DEFAULT_KEEPALIVE_INTERVAL));
+        }
+    }
+
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
+        if ($input->getOption('all')) {
+            return;
+        }
+
         if ($this->receiverNames && !$input->getArgument('receivers')) {
+            if (1 === \count($this->receiverNames)) {
+                $input->setArgument('receivers', $this->receiverNames);
+
+                return;
+            }
+
             $io->block('Which transports/receivers do you want to consume?', null, 'fg=white;bg=blue', ' ', true);
 
             $io->writeln('Choose which receivers you want to consume messages from in order of priority.');
             if (\count($this->receiverNames) > 1) {
-                $io->writeln(sprintf('Hint: to consume from multiple, use a list of their names, e.g. <comment>%s</comment>', implode(', ', $this->receiverNames)));
+                $io->writeln(\sprintf('Hint: to consume from multiple, use a list of their names, e.g. <comment>%s</comment>', implode(', ', $this->receiverNames)));
             }
 
             $question = new ChoiceQuestion('Select receivers to consume:', $this->receiverNames, 0);
@@ -154,17 +171,26 @@ EOF
     {
         $receivers = [];
         $rateLimiters = [];
-        foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
+        $receiverNames = $input->getOption('all') ? $this->receiverNames : $input->getArgument('receivers');
+        foreach ($receiverNames as $receiverName) {
             if (!$this->receiverLocator->has($receiverName)) {
-                $message = sprintf('The receiver "%s" does not exist.', $receiverName);
+                $message = \sprintf('The receiver "%s" does not exist.', $receiverName);
                 if ($this->receiverNames) {
-                    $message .= sprintf(' Valid receivers are: %s.', implode(', ', $this->receiverNames));
+                    $message .= \sprintf(' Valid receivers are: %s.', implode(', ', $this->receiverNames));
                 }
 
                 throw new RuntimeException($message);
             }
 
-            $receivers[$receiverName] = $this->receiverLocator->get($receiverName);
+            $receiver = $this->receiverLocator->get($receiverName);
+            if ($receiver instanceof SyncTransport) {
+                $idx = array_search($receiverName, $receiverNames);
+                unset($receiverNames[$idx]);
+
+                continue;
+            }
+
+            $receivers[$receiverName] = $receiver;
             if ($this->rateLimiterLocator?->has($receiverName)) {
                 $rateLimiters[$receiverName] = $this->rateLimiterLocator->get($receiverName);
             }
@@ -177,7 +203,7 @@ EOF
         $stopsWhen = [];
         if (null !== $limit = $input->getOption('limit')) {
             if (!is_numeric($limit) || 0 >= $limit) {
-                throw new InvalidOptionException(sprintf('Option "limit" must be a positive integer, "%s" passed.', $limit));
+                throw new InvalidOptionException(\sprintf('Option "limit" must be a positive integer, "%s" passed.', $limit));
             }
 
             $stopsWhen[] = "processed {$limit} messages";
@@ -196,7 +222,7 @@ EOF
 
         if (null !== $timeLimit = $input->getOption('time-limit')) {
             if (!is_numeric($timeLimit) || 0 >= $timeLimit) {
-                throw new InvalidOptionException(sprintf('Option "time-limit" must be a positive integer, "%s" passed.', $timeLimit));
+                throw new InvalidOptionException(\sprintf('Option "time-limit" must be a positive integer, "%s" passed.', $timeLimit));
             }
 
             $stopsWhen[] = "been running for {$timeLimit}s";
@@ -206,7 +232,7 @@ EOF
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
-        $io->success(sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 1 ? 's' : '', implode(', ', $receiverNames)));
+        $io->success(\sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 1 ? 's' : '', implode(', ', $receiverNames)));
 
         if ($stopsWhen) {
             $last = array_pop($stopsWhen);
@@ -222,14 +248,19 @@ EOF
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
+        $this->worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
         ];
         if ($queues = $input->getOption('queues')) {
             $options['queues'] = $queues;
         }
-        $worker->run($options);
+
+        try {
+            $this->worker->run($options);
+        } finally {
+            $this->worker = null;
+        }
 
         return 0;
     }
@@ -245,6 +276,32 @@ EOF
         if ($input->mustSuggestOptionValuesFor('bus')) {
             $suggestions->suggestValues($this->busIds);
         }
+    }
+
+    public function getSubscribedSignals(): array
+    {
+        return $this->signals ?? (\extension_loaded('pcntl') ? [\SIGTERM, \SIGINT, \SIGQUIT, \SIGALRM] : []);
+    }
+
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    {
+        if (!$this->worker) {
+            return false;
+        }
+
+        if (\SIGALRM === $signal) {
+            $this->logger?->debug('Sending keepalive request.', ['transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+            $this->worker->keepalive($this->getApplication()->getAlarmInterval());
+
+            return false;
+        }
+
+        $this->logger?->info('Received signal {signal}.', ['signal' => $signal, 'transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+        $this->worker->stop();
+
+        return false;
     }
 
     private function convertToBytes(string $memoryLimit): int

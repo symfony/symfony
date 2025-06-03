@@ -53,7 +53,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
     public function testNoDumpedXML()
     {
-        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true, 'debug.container.dump' => false]);
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'no_dump.yml', 'debug' => true]);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
@@ -139,14 +139,18 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $tester->setInputs(['0']);
         $tester->run(['command' => 'debug:container', '--tag' => 'kernel.'], ['decorated' => false]);
 
-        $this->assertStringContainsString('Select one of the following tags to display its information', $tester->getDisplay());
-        $this->assertStringContainsString('[0] kernel.event_subscriber', $tester->getDisplay());
-        $this->assertStringContainsString('[1] kernel.locale_aware', $tester->getDisplay());
-        $this->assertStringContainsString('[2] kernel.cache_warmer', $tester->getDisplay());
-        $this->assertStringContainsString('[3] kernel.fragment_renderer', $tester->getDisplay());
-        $this->assertStringContainsString('[4] kernel.reset', $tester->getDisplay());
-        $this->assertStringContainsString('[5] kernel.cache_clearer', $tester->getDisplay());
-        $this->assertStringContainsString('Symfony Container Services Tagged with "kernel.event_subscriber" Tag', $tester->getDisplay());
+        $this->assertStringMatchesFormat(<<<EOTXT
+
+             Select one of the following tags to display its information:
+            %A
+              [%d] kernel.reset
+            %A
+
+            Symfony Container Services Tagged with "kernel.%a" Tag
+            %A
+            EOTXT,
+            $tester->getDisplay()
+        );
     }
 
     public function testDescribeEnvVars()
@@ -205,7 +209,7 @@ TXT
     public function testGetDeprecation()
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
-        $path = sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
+        $path = \sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
         touch($path);
         file_put_contents($path, serialize([[
             'type' => 16384,
@@ -235,7 +239,7 @@ TXT
     public function testGetDeprecationNone()
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
-        $path = sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
+        $path = \sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
         touch($path);
         file_put_contents($path, serialize([]));
 
@@ -254,7 +258,7 @@ TXT
     public function testGetDeprecationNoFile()
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
-        $path = sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
+        $path = \sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
         @unlink($path);
 
         $application = new Application(static::$kernel);
@@ -269,7 +273,7 @@ TXT
         $this->assertStringContainsString('[WARNING] The deprecation file does not exist', $tester->getDisplay());
     }
 
-    public static function provideIgnoreBackslashWhenFindingService()
+    public static function provideIgnoreBackslashWhenFindingService(): array
     {
         return [
             [BackslashClass::class],
@@ -297,7 +301,7 @@ TXT
         }
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         $serviceId = 'console.command.container_debug';
         $hiddenServiceId = '.console.command.container_debug.lazy';
@@ -340,5 +344,23 @@ TXT
             ['--format', ''],
             ['txt', 'xml', 'json', 'md'],
         ];
+    }
+
+    public function testShowArgumentsProvidedShouldTriggerDeprecation()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+        $path = \sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
+        @unlink($path);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', 'name' => 'router', '--show-arguments' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('[WARNING] The "--show-arguments" option is deprecated.', $tester->getDisplay());
     }
 }

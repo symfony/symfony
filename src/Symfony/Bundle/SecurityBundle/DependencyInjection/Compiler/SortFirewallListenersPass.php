@@ -62,7 +62,7 @@ class SortFirewallListenersPass implements CompilerPassInterface
             $class = $def->getClass();
 
             if (!$r = $container->getReflectionClass($class)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
             }
 
             $priority = 0;

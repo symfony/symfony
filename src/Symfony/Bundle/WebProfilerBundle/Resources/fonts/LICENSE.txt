@@ -1,0 +1,6 @@
+JetBrains Mono typeface (https://www.jetbrains.com/lp/mono/) is available
+under the SIL Open Font License 1.1 and can be used free of charge, for both
+commercial and non-commercial purposes. You do not need to give credit to
+JetBrains, although we will appreciate it very much if you do.
+
+Licence: https://github.com/JetBrains/JetBrainsMono/blob/master/OFL.txt

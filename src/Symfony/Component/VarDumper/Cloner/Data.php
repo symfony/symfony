@@ -115,16 +115,13 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
     public function getIterator(): \Traversable
     {
         if (!\is_array($value = $this->getValue())) {
-            throw new \LogicException(sprintf('"%s" object holds non-iterable type "%s".', self::class, get_debug_type($value)));
+            throw new \LogicException(\sprintf('"%s" object holds non-iterable type "%s".', self::class, get_debug_type($value)));
         }
 
         yield from $value;
     }
 
-    /**
-     * @return mixed
-     */
-    public function __get(string $key)
+    public function __get(string $key): mixed
     {
         if (null !== $data = $this->seek($key)) {
             $item = $this->getStub($data->data[$data->position][$data->key]);
@@ -168,7 +165,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
             return (string) $value;
         }
 
-        return sprintf('%s (count=%d)', $this->getType(), \count($value));
+        return \sprintf('%s (count=%d)', $this->getType(), \count($value));
     }
 
     /**
@@ -265,10 +262,8 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
 
     /**
      * Dumps data with a DumperInterface dumper.
-     *
-     * @return void
      */
-    public function dump(DumperInterface $dumper)
+    public function dump(DumperInterface $dumper): void
     {
         $refs = [0];
         $cursor = new Cursor();
@@ -375,7 +370,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
                     break;
 
                 default:
-                    throw new \RuntimeException(sprintf('Unexpected Stub type: "%s".', $item->type));
+                    throw new \RuntimeException(\sprintf('Unexpected Stub type: "%s".', $item->type));
             }
         } elseif ('array' === $type) {
             $dumper->enterHash($cursor, Cursor::HASH_INDEXED, 0, false);

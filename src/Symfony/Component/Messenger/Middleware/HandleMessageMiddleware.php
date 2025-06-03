@@ -64,9 +64,9 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
                 /** @var AckStamp $ackStamp */
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {
-                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor) {
+                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor) {
                         if (null !== $e) {
-                            $e = new HandlerFailedException($envelope, [$e]);
+                            $e = new HandlerFailedException($envelope, [$handlerDescriptor->getName() => $e]);
                         } else {
                             $envelope = $envelope->with(HandledStamp::fromDescriptor($handlerDescriptor, $result));
                         }
@@ -77,7 +77,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                     $result = $this->callHandler($handler, $message, $ack, $envelope->last(HandlerArgumentsStamp::class));
 
                     if (!\is_int($result) || 0 > $result) {
-                        throw new LogicException(sprintf('A handler implementing BatchHandlerInterface must return the size of the current batch as a positive integer, "%s" returned from "%s".', \is_int($result) ? $result : get_debug_type($result), get_debug_type($batchHandler)));
+                        throw new LogicException(\sprintf('A handler implementing BatchHandlerInterface must return the size of the current batch as a positive integer, "%s" returned from "%s".', \is_int($result) ? $result : get_debug_type($result), get_debug_type($batchHandler)));
                     }
 
                     if (!$ack->isAcknowledged()) {
@@ -95,7 +95,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 $envelope = $envelope->with($handledStamp);
                 $this->logger?->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {
-                $exceptions[] = $e;
+                $exceptions[$handlerDescriptor->getName()] = $e;
             }
         }
 
@@ -107,14 +107,14 @@ class HandleMessageMiddleware implements MiddlewareInterface
                     $handler = $stamp->getHandlerDescriptor()->getBatchHandler();
                     $handler->flush($flushStamp->force());
                 } catch (\Throwable $e) {
-                    $exceptions[] = $e;
+                    $exceptions[$stamp->getHandlerDescriptor()->getName()] = $e;
                 }
             }
         }
 
         if (null === $handler && !$alreadyHandled) {
             if (!$this->allowNoHandlers) {
-                throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $context['class']));
+                throw new NoHandlerForMessageException(\sprintf('No handler for message "%s".', $context['class']));
             }
 
             $this->logger?->info('No handler for message {class}', $context);
@@ -139,7 +139,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
         return false;
     }
 
-    private function callHandler(callable $handler, object $message, ?Acknowledger $ack, ?HandlerArgumentsStamp $handlerArgumentsStamp): mixed
+    private function callHandler(\Closure $handler, object $message, ?Acknowledger $ack, ?HandlerArgumentsStamp $handlerArgumentsStamp): mixed
     {
         $arguments = [$message];
         if (null !== $ack) {

@@ -8,7 +8,7 @@ return [
         ],
         'AED' => [
             'AED',
-            'Birleşik Arap Emirlikleri Dirhemi',
+            'Birleşik Arap Emirlikleri dirhemi',
         ],
         'AFA' => [
             'AFA',
@@ -16,7 +16,7 @@ return [
         ],
         'AFN' => [
             'AFN',
-            'Afganistan Afganisi',
+            'Afganistan afganisi',
         ],
         'ALK' => [
             'ALK',
@@ -24,19 +24,19 @@ return [
         ],
         'ALL' => [
             'ALL',
-            'Arnavutluk Leki',
+            'Arnavutluk leki',
         ],
         'AMD' => [
             'AMD',
-            'Ermenistan Dramı',
+            'Ermenistan dramı',
         ],
         'ANG' => [
             'ANG',
-            'Hollanda Antilleri Guldeni',
+            'Hollanda Antilleri guldeni',
         ],
         'AOA' => [
             'AOA',
-            'Angola Kvanzası',
+            'Angola kvanzası',
         ],
         'AOK' => [
             'AOK',
@@ -68,7 +68,7 @@ return [
         ],
         'ARS' => [
             'ARS',
-            'Arjantin Pesosu',
+            'Arjantin pesosu',
         ],
         'ATS' => [
             'ATS',
@@ -76,11 +76,11 @@ return [
         ],
         'AUD' => [
             'AU$',
-            'Avustralya Doları',
+            'Avustralya doları',
         ],
         'AWG' => [
             'AWG',
-            'Aruba Florini',
+            'Aruba florini',
         ],
         'AZM' => [
             'AZM',
@@ -88,7 +88,7 @@ return [
         ],
         'AZN' => [
             'AZN',
-            'Azerbaycan Manatı',
+            'Azerbaycan manatı',
         ],
         'BAD' => [
             'BAD',
@@ -96,7 +96,7 @@ return [
         ],
         'BAM' => [
             'BAM',
-            'Konvertibl Bosna Hersek Markı',
+            'Konvertibl Bosna Hersek markı',
         ],
         'BAN' => [
             'BAN',
@@ -104,11 +104,11 @@ return [
         ],
         'BBD' => [
             'BBD',
-            'Barbados Doları',
+            'Barbados doları',
         ],
         'BDT' => [
             'BDT',
-            'Bangladeş Takası',
+            'Bangladeş takası',
         ],
         'BEC' => [
             'BEC',
@@ -132,7 +132,7 @@ return [
         ],
         'BGN' => [
             'BGN',
-            'Bulgar Levası',
+            'Bulgar levası',
         ],
         'BGO' => [
             'BGO',
@@ -140,23 +140,23 @@ return [
         ],
         'BHD' => [
             'BHD',
-            'Bahreyn Dinarı',
+            'Bahreyn dinarı',
         ],
         'BIF' => [
             'BIF',
-            'Burundi Frangı',
+            'Burundi frangı',
         ],
         'BMD' => [
             'BMD',
-            'Bermuda Doları',
+            'Bermuda doları',
         ],
         'BND' => [
             'BND',
-            'Brunei Doları',
+            'Brunei doları',
         ],
         'BOB' => [
             'BOB',
-            'Bolivya Bolivyanosu',
+            'Bolivya bolivyanosu',
         ],
         'BOL' => [
             'BOL',
@@ -184,7 +184,7 @@ return [
         ],
         'BRL' => [
             'R$',
-            'Brezilya Reali',
+            'Brezilya reali',
         ],
         'BRN' => [
             'BRN',
@@ -200,11 +200,11 @@ return [
         ],
         'BSD' => [
             'BSD',
-            'Bahama Doları',
+            'Bahama doları',
         ],
         'BTN' => [
             'BTN',
-            'Butan Ngultrumu',
+            'Butan ngultrumu',
         ],
         'BUK' => [
             'BUK',
@@ -212,7 +212,7 @@ return [
         ],
         'BWP' => [
             'BWP',
-            'Botsvana Pulası',
+            'Botsvana pulası',
         ],
         'BYB' => [
             'BYB',
@@ -220,7 +220,7 @@ return [
         ],
         'BYN' => [
             'BYN',
-            'Belarus Rublesi',
+            'Belarus rublesi',
         ],
         'BYR' => [
             'BYR',
@@ -228,15 +228,15 @@ return [
         ],
         'BZD' => [
             'BZD',
-            'Belize Doları',
+            'Belize doları',
         ],
         'CAD' => [
             'CA$',
-            'Kanada Doları',
+            'Kanada doları',
         ],
         'CDF' => [
             'CDF',
-            'Kongo Frangı',
+            'Kongo frangı',
         ],
         'CHE' => [
             'CHE',
@@ -244,7 +244,7 @@ return [
         ],
         'CHF' => [
             'CHF',
-            'İsviçre Frangı',
+            'İsviçre frangı',
         ],
         'CHW' => [
             'CHW',
@@ -260,11 +260,11 @@ return [
         ],
         'CLP' => [
             'CLP',
-            'Şili Pesosu',
+            'Şili pesosu',
         ],
         'CNH' => [
             'CNH',
-            'Çin Yuanı (offshore)',
+            'Çin yuanı (offshore)',
         ],
         'CNX' => [
             'CNX',
@@ -272,11 +272,11 @@ return [
         ],
         'CNY' => [
             'CN¥',
-            'Çin Yuanı',
+            'Çin yuanı',
         ],
         'COP' => [
             'COP',
-            'Kolombiya Pesosu',
+            'Kolombiya pesosu',
         ],
         'COU' => [
             'COU',
@@ -284,7 +284,7 @@ return [
         ],
         'CRC' => [
             'CRC',
-            'Kosta Rika Kolonu',
+            'Kosta Rika kolonu',
         ],
         'CSD' => [
             'CSD',
@@ -296,15 +296,15 @@ return [
         ],
         'CUC' => [
             'CUC',
-            'Konvertibl Küba Pesosu',
+            'Konvertibl Küba pesosu',
         ],
         'CUP' => [
             'CUP',
-            'Küba Pesosu',
+            'Küba pesosu',
         ],
         'CVE' => [
             'CVE',
-            'Cape Verde Esküdosu',
+            'Cape Verde esküdosu',
         ],
         'CYP' => [
             'CYP',
@@ -312,7 +312,7 @@ return [
         ],
         'CZK' => [
             'CZK',
-            'Çek Korunası',
+            'Çek korunası',
         ],
         'DDM' => [
             'DDM',
@@ -324,19 +324,19 @@ return [
         ],
         'DJF' => [
             'DJF',
-            'Cibuti Frangı',
+            'Cibuti frangı',
         ],
         'DKK' => [
             'DKK',
-            'Danimarka Kronu',
+            'Danimarka kronu',
         ],
         'DOP' => [
             'DOP',
-            'Dominik Pesosu',
+            'Dominik pesosu',
         ],
         'DZD' => [
             'DZD',
-            'Cezayir Dinarı',
+            'Cezayir dinarı',
         ],
         'ECS' => [
             'ECS',
@@ -352,11 +352,11 @@ return [
         ],
         'EGP' => [
             'EGP',
-            'Mısır Lirası',
+            'Mısır lirası',
         ],
         'ERN' => [
             'ERN',
-            'Eritre Nakfası',
+            'Eritre nakfası',
         ],
         'ESA' => [
             'ESA',
@@ -372,7 +372,7 @@ return [
         ],
         'ETB' => [
             'ETB',
-            'Etiyopya Birri',
+            'Etiyopya birri',
         ],
         'EUR' => [
             '€',
@@ -384,11 +384,11 @@ return [
         ],
         'FJD' => [
             'FJD',
-            'Fiji Doları',
+            'Fiji doları',
         ],
         'FKP' => [
             'FKP',
-            'Falkland Adaları Lirası',
+            'Falkland Adaları lirası',
         ],
         'FRF' => [
             'FRF',
@@ -396,7 +396,7 @@ return [
         ],
         'GBP' => [
             '£',
-            'İngiliz Sterlini',
+            'İngiliz sterlini',
         ],
         'GEK' => [
             'GEK',
@@ -404,7 +404,7 @@ return [
         ],
         'GEL' => [
             'GEL',
-            'Gürcistan Larisi',
+            'Gürcistan larisi',
         ],
         'GHC' => [
             'GHC',
@@ -412,19 +412,19 @@ return [
         ],
         'GHS' => [
             'GHS',
-            'Gana Sedisi',
+            'Gana sedisi',
         ],
         'GIP' => [
             'GIP',
-            'Cebelitarık Lirası',
+            'Cebelitarık lirası',
         ],
         'GMD' => [
             'GMD',
-            'Gambiya Dalasisi',
+            'Gambiya dalasisi',
         ],
         'GNF' => [
             'GNF',
-            'Gine Frangı',
+            'Gine frangı',
         ],
         'GNS' => [
             'GNS',
@@ -440,7 +440,7 @@ return [
         ],
         'GTQ' => [
             'GTQ',
-            'Guatemala Quetzalı',
+            'Guatemala quetzalı',
         ],
         'GWE' => [
             'GWE',
@@ -452,15 +452,15 @@ return [
         ],
         'GYD' => [
             'GYD',
-            'Guyana Doları',
+            'Guyana doları',
         ],
         'HKD' => [
             'HK$',
-            'Hong Kong Doları',
+            'Hong Kong doları',
         ],
         'HNL' => [
             'HNL',
-            'Honduras Lempirası',
+            'Honduras lempirası',
         ],
         'HRD' => [
             'HRD',
@@ -468,19 +468,19 @@ return [
         ],
         'HRK' => [
             'HRK',
-            'Hırvatistan Kunası',
+            'Hırvatistan kunası',
         ],
         'HTG' => [
             'HTG',
-            'Haiti Gurdu',
+            'Haiti gurdu',
         ],
         'HUF' => [
             'HUF',
-            'Macar Forinti',
+            'Macar forinti',
         ],
         'IDR' => [
             'IDR',
-            'Endonezya Rupisi',
+            'Endonezya rupisi',
         ],
         'IEP' => [
             'IEP',
@@ -496,19 +496,19 @@ return [
         ],
         'ILS' => [
             '₪',
-            'Yeni İsrail Şekeli',
+            'Yeni İsrail şekeli',
         ],
         'INR' => [
             '₹',
-            'Hindistan Rupisi',
+            'Hindistan rupisi',
         ],
         'IQD' => [
             'IQD',
-            'Irak Dinarı',
+            'Irak dinarı',
         ],
         'IRR' => [
             'IRR',
-            'İran Riyali',
+            'İran riyali',
         ],
         'ISJ' => [
             'ISJ',
@@ -516,7 +516,7 @@ return [
         ],
         'ISK' => [
             'ISK',
-            'İzlanda Kronu',
+            'İzlanda kronu',
         ],
         'ITL' => [
             'ITL',
@@ -524,35 +524,35 @@ return [
         ],
         'JMD' => [
             'JMD',
-            'Jamaika Doları',
+            'Jamaika doları',
         ],
         'JOD' => [
             'JOD',
-            'Ürdün Dinarı',
+            'Ürdün dinarı',
         ],
         'JPY' => [
             '¥',
-            'Japon Yeni',
+            'Japon yeni',
         ],
         'KES' => [
             'KES',
-            'Kenya Şilini',
+            'Kenya şilini',
         ],
         'KGS' => [
             'KGS',
-            'Kırgızistan Somu',
+            'Kırgızistan somu',
         ],
         'KHR' => [
             'KHR',
-            'Kamboçya Rieli',
+            'Kamboçya rieli',
         ],
         'KMF' => [
             'KMF',
-            'Komorlar Frangı',
+            'Komorlar frangı',
         ],
         'KPW' => [
             'KPW',
-            'Kuzey Kore Wonu',
+            'Kuzey Kore wonu',
         ],
         'KRH' => [
             'KRH',
@@ -564,39 +564,39 @@ return [
         ],
         'KRW' => [
             '₩',
-            'Güney Kore Wonu',
+            'Güney Kore wonu',
         ],
         'KWD' => [
             'KWD',
-            'Kuveyt Dinarı',
+            'Kuveyt dinarı',
         ],
         'KYD' => [
             'KYD',
-            'Cayman Adaları Doları',
+            'Cayman Adaları doları',
         ],
         'KZT' => [
             'KZT',
-            'Kazakistan Tengesi',
+            'Kazakistan tengesi',
         ],
         'LAK' => [
             'LAK',
-            'Laos Kipi',
+            'Laos kipi',
         ],
         'LBP' => [
             'LBP',
-            'Lübnan Lirası',
+            'Lübnan lirası',
         ],
         'LKR' => [
             'LKR',
-            'Sri Lanka Rupisi',
+            'Sri Lanka rupisi',
         ],
         'LRD' => [
             'LRD',
-            'Liberya Doları',
+            'Liberya doları',
         ],
         'LSL' => [
             'LSL',
-            'Lesotho Lotisi',
+            'Lesotho lotisi',
         ],
         'LTL' => [
             'LTL',
@@ -628,11 +628,11 @@ return [
         ],
         'LYD' => [
             'LYD',
-            'Libya Dinarı',
+            'Libya dinarı',
         ],
         'MAD' => [
             'MAD',
-            'Fas Dirhemi',
+            'Fas dirhemi',
         ],
         'MAF' => [
             'MAF',
@@ -648,11 +648,11 @@ return [
         ],
         'MDL' => [
             'MDL',
-            'Moldova Leyi',
+            'Moldova leyi',
         ],
         'MGA' => [
             'MGA',
-            'Madagaskar Ariarisi',
+            'Madagaskar ariarisi',
         ],
         'MGF' => [
             'MGF',
@@ -660,7 +660,7 @@ return [
         ],
         'MKD' => [
             'MKD',
-            'Makedonya Dinarı',
+            'Makedonya dinarı',
         ],
         'MKN' => [
             'MKN',
@@ -672,15 +672,15 @@ return [
         ],
         'MMK' => [
             'MMK',
-            'Myanmar Kyatı',
+            'Myanmar kyatı',
         ],
         'MNT' => [
             'MNT',
-            'Moğolistan Tugriki',
+            'Moğolistan tugriki',
         ],
         'MOP' => [
             'MOP',
-            'Makao Patakası',
+            'Makao patakası',
         ],
         'MRO' => [
             'MRO',
@@ -688,7 +688,7 @@ return [
         ],
         'MRU' => [
             'MRU',
-            'Moritanya Ugiyası',
+            'Moritanya ugiyası',
         ],
         'MTL' => [
             'MTL',
@@ -700,7 +700,7 @@ return [
         ],
         'MUR' => [
             'MUR',
-            'Mauritius Rupisi',
+            'Mauritius rupisi',
         ],
         'MVP' => [
             'MVP',
@@ -708,15 +708,15 @@ return [
         ],
         'MVR' => [
             'MVR',
-            'Maldiv Rufiyaası',
+            'Maldiv rufiyaası',
         ],
         'MWK' => [
             'MWK',
-            'Malavi Kvaçası',
+            'Malavi kvaçası',
         ],
         'MXN' => [
             'MX$',
-            'Meksika Pesosu',
+            'Meksika pesosu',
         ],
         'MXP' => [
             'MXP',
@@ -728,7 +728,7 @@ return [
         ],
         'MYR' => [
             'MYR',
-            'Malezya Ringgiti',
+            'Malezya ringgiti',
         ],
         'MZE' => [
             'MZE',
@@ -740,15 +740,15 @@ return [
         ],
         'MZN' => [
             'MZN',
-            'Mozambik Metikali',
+            'Mozambik metikali',
         ],
         'NAD' => [
             'NAD',
-            'Namibya Doları',
+            'Namibya doları',
         ],
         'NGN' => [
             'NGN',
-            'Nijerya Nairası',
+            'Nijerya nairası',
         ],
         'NIC' => [
             'NIC',
@@ -756,7 +756,7 @@ return [
         ],
         'NIO' => [
             'NIO',
-            'Nikaragua Kordobası',
+            'Nikaragua kordobası',
         ],
         'NLG' => [
             'NLG',
@@ -764,23 +764,23 @@ return [
         ],
         'NOK' => [
             'NOK',
-            'Norveç Kronu',
+            'Norveç kronu',
         ],
         'NPR' => [
             'NPR',
-            'Nepal Rupisi',
+            'Nepal rupisi',
         ],
         'NZD' => [
             'NZ$',
-            'Yeni Zelanda Doları',
+            'Yeni Zelanda doları',
         ],
         'OMR' => [
             'OMR',
-            'Umman Riyali',
+            'Umman riyali',
         ],
         'PAB' => [
             'PAB',
-            'Panama Balboası',
+            'Panama balboası',
         ],
         'PEI' => [
             'PEI',
@@ -788,7 +788,7 @@ return [
         ],
         'PEN' => [
             'PEN',
-            'Peru Solü',
+            'Peru solü',
         ],
         'PES' => [
             'PES',
@@ -796,19 +796,19 @@ return [
         ],
         'PGK' => [
             'PGK',
-            'Papua Yeni Gine Kinası',
+            'Papua Yeni Gine kinası',
         ],
         'PHP' => [
             'PHP',
-            'Filipinler Pesosu',
+            'Filipinler pesosu',
         ],
         'PKR' => [
             'PKR',
-            'Pakistan Rupisi',
+            'Pakistan rupisi',
         ],
         'PLN' => [
             'PLN',
-            'Polonya Zlotisi',
+            'Polonya zlotisi',
         ],
         'PLZ' => [
             'PLZ',
@@ -820,11 +820,11 @@ return [
         ],
         'PYG' => [
             'PYG',
-            'Paraguay Guaranisi',
+            'Paraguay guaranisi',
         ],
         'QAR' => [
             'QAR',
-            'Katar Riyali',
+            'Katar riyali',
         ],
         'RHD' => [
             'RHD',
@@ -836,15 +836,15 @@ return [
         ],
         'RON' => [
             'RON',
-            'Romen Leyi',
+            'Romen leyi',
         ],
         'RSD' => [
             'RSD',
-            'Sırp Dinarı',
+            'Sırp dinarı',
         ],
         'RUB' => [
             'RUB',
-            'Rus Rublesi',
+            'Rus rublesi',
         ],
         'RUR' => [
             'RUR',
@@ -852,19 +852,19 @@ return [
         ],
         'RWF' => [
             'RWF',
-            'Ruanda Frangı',
+            'Ruanda frangı',
         ],
         'SAR' => [
             'SAR',
-            'Suudi Arabistan Riyali',
+            'Suudi Arabistan riyali',
         ],
         'SBD' => [
             'SBD',
-            'Solomon Adaları Doları',
+            'Solomon Adaları doları',
         ],
         'SCR' => [
             'SCR',
-            'Seyşeller Rupisi',
+            'Seyşeller rupisi',
         ],
         'SDD' => [
             'SDD',
@@ -872,7 +872,7 @@ return [
         ],
         'SDG' => [
             'SDG',
-            'Sudan Lirası',
+            'Sudan lirası',
         ],
         'SDP' => [
             'SDP',
@@ -880,15 +880,15 @@ return [
         ],
         'SEK' => [
             'SEK',
-            'İsveç Kronu',
+            'İsveç kronu',
         ],
         'SGD' => [
             'SGD',
-            'Singapur Doları',
+            'Singapur doları',
         ],
         'SHP' => [
             'SHP',
-            'Saint Helena Lirası',
+            'Saint Helena lirası',
         ],
         'SIT' => [
             'SIT',
@@ -898,17 +898,21 @@ return [
             'SKK',
             'Slovak Korunası',
         ],
+        'SLE' => [
+            'SLE',
+            'Sierra Leone leonesi',
+        ],
         'SLL' => [
             'SLL',
-            'Sierra Leone Leonesi',
+            'Sierra Leone leonesi (1964–2022)',
         ],
         'SOS' => [
             'SOS',
-            'Somali Şilini',
+            'Somali şilini',
         ],
         'SRD' => [
             'SRD',
-            'Surinam Doları',
+            'Surinam doları',
         ],
         'SRG' => [
             'SRG',
@@ -916,7 +920,7 @@ return [
         ],
         'SSP' => [
             'SSP',
-            'Güney Sudan Lirası',
+            'Güney Sudan lirası',
         ],
         'STD' => [
             'STD',
@@ -924,7 +928,7 @@ return [
         ],
         'STN' => [
             'STN',
-            'Sao Tome ve Principe Dobrası',
+            'Sao Tome ve Principe dobrası',
         ],
         'SUR' => [
             'SUR',
@@ -936,15 +940,15 @@ return [
         ],
         'SYP' => [
             'SYP',
-            'Suriye Lirası',
+            'Suriye lirası',
         ],
         'SZL' => [
             'SZL',
-            'Svaziland Lilangenisi',
+            'Svaziland lilangenisi',
         ],
         'THB' => [
             '฿',
-            'Tayland Bahtı',
+            'Tayland bahtı',
         ],
         'TJR' => [
             'TJR',
@@ -952,7 +956,7 @@ return [
         ],
         'TJS' => [
             'TJS',
-            'Tacikistan Somonisi',
+            'Tacikistan somonisi',
         ],
         'TMM' => [
             'TMM',
@@ -960,15 +964,15 @@ return [
         ],
         'TMT' => [
             'TMT',
-            'Türkmenistan Manatı',
+            'Türkmenistan manatı',
         ],
         'TND' => [
             'TND',
-            'Tunus Dinarı',
+            'Tunus dinarı',
         ],
         'TOP' => [
             'TOP',
-            'Tonga Paʻangası',
+            'Tonga paʻangası',
         ],
         'TPE' => [
             'TPE',
@@ -980,23 +984,23 @@ return [
         ],
         'TRY' => [
             '₺',
-            'Türk Lirası',
+            'Türk lirası',
         ],
         'TTD' => [
             'TTD',
-            'Trinidad ve Tobago Doları',
+            'Trinidad ve Tobago doları',
         ],
         'TWD' => [
             'NT$',
-            'Yeni Tayvan Doları',
+            'Yeni Tayvan doları',
         ],
         'TZS' => [
             'TZS',
-            'Tanzanya Şilini',
+            'Tanzanya şilini',
         ],
         'UAH' => [
             'UAH',
-            'Ukrayna Grivnası',
+            'Ukrayna grivnası',
         ],
         'UAK' => [
             'UAK',
@@ -1008,11 +1012,11 @@ return [
         ],
         'UGX' => [
             'UGX',
-            'Uganda Şilini',
+            'Uganda şilini',
         ],
         'USD' => [
             '$',
-            'ABD Doları',
+            'ABD doları',
         ],
         'USN' => [
             'USN',
@@ -1032,11 +1036,11 @@ return [
         ],
         'UYU' => [
             'UYU',
-            'Uruguay Pesosu',
+            'Uruguay pesosu',
         ],
         'UZS' => [
             'UZS',
-            'Özbekistan Somu',
+            'Özbekistan somu',
         ],
         'VEB' => [
             'VEB',
@@ -1048,11 +1052,11 @@ return [
         ],
         'VES' => [
             'VES',
-            'Venezuela Bolivarı',
+            'Venezuela bolivarı',
         ],
         'VND' => [
             '₫',
-            'Vietnam Dongu',
+            'Vietnam dongu',
         ],
         'VNN' => [
             'VNN',
@@ -1060,19 +1064,19 @@ return [
         ],
         'VUV' => [
             'VUV',
-            'Vanuatu Vatusu',
+            'Vanuatu vatusu',
         ],
         'WST' => [
             'WST',
-            'Samoa Talası',
+            'Samoa talası',
         ],
         'XAF' => [
             'FCFA',
-            'Orta Afrika CFA Frangı',
+            'Orta Afrika CFA frangı',
         ],
         'XCD' => [
             'EC$',
-            'Doğu Karayip Doları',
+            'Doğu Karayip doları',
         ],
         'XEU' => [
             'XEU',
@@ -1088,11 +1092,11 @@ return [
         ],
         'XOF' => [
             'F CFA',
-            'Batı Afrika CFA Frangı',
+            'Batı Afrika CFA frangı',
         ],
         'XPF' => [
             'CFPF',
-            'CFP Frangı',
+            'CFP frangı',
         ],
         'XRE' => [
             'XRE',
@@ -1104,7 +1108,7 @@ return [
         ],
         'YER' => [
             'YER',
-            'Yemen Riyali',
+            'Yemen riyali',
         ],
         'YUD' => [
             'YUD',
@@ -1128,7 +1132,7 @@ return [
         ],
         'ZAR' => [
             'ZAR',
-            'Güney Afrika Randı',
+            'Güney Afrika randı',
         ],
         'ZMK' => [
             'ZMK',
@@ -1136,7 +1140,7 @@ return [
         ],
         'ZMW' => [
             'ZMW',
-            'Zambiya Kvaçası',
+            'Zambiya kvaçası',
         ],
         'ZRN' => [
             'ZRN',

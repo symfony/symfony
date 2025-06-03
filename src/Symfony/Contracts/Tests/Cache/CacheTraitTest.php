@@ -43,9 +43,7 @@ class CacheTraitTest extends TestCase
         $cache->expects($this->once())
             ->method('save');
 
-        $callback = function (CacheItemInterface $item) {
-            return 'computed data';
-        };
+        $callback = fn (CacheItemInterface $item) => 'computed data';
 
         $cache->get('key', $callback);
     }
@@ -71,7 +69,7 @@ class CacheTraitTest extends TestCase
             ->method('save');
 
         $callback = function (CacheItemInterface $item) {
-            $this->assertTrue(false, 'This code should never be reached');
+            $this->fail('This code should never be reached');
         };
 
         $cache->get('key', $callback);
@@ -101,9 +99,7 @@ class CacheTraitTest extends TestCase
         $cache->expects($this->once())
             ->method('save');
 
-        $callback = function (CacheItemInterface $item) {
-            return 'computed data';
-        };
+        $callback = fn (CacheItemInterface $item) => 'computed data';
 
         $cache->get('key', $callback, \INF);
     }
@@ -114,9 +110,7 @@ class CacheTraitTest extends TestCase
             ->onlyMethods(['getItem', 'save'])
             ->getMock();
 
-        $callback = function (CacheItemInterface $item) {
-            return 'computed data';
-        };
+        $callback = fn (CacheItemInterface $item) => 'computed data';
 
         $this->expectException(\InvalidArgumentException::class);
         $cache->get('key', $callback, -2);

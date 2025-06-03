@@ -514,9 +514,13 @@ return [
             'SHP',
             'Sterlina e Ishullit të Shën-Helenës',
         ],
+        'SLE' => [
+            'SLE',
+            'Leoni i Siera-Leones',
+        ],
         'SLL' => [
             'SLL',
-            'Leoni i Sierra-Leones',
+            'Leoni i Siera-Leones (1964–2022)',
         ],
         'SOS' => [
             'SOS',

@@ -68,8 +68,9 @@ class JsonSerializableNormalizerTest extends TestCase
 
     public function testCircularNormalize()
     {
-        $this->expectException(CircularReferenceException::class);
         $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
+
+        $this->expectException(CircularReferenceException::class);
 
         $this->serializer
             ->expects($this->once())

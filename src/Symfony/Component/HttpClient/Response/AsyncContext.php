@@ -27,24 +27,23 @@ final class AsyncContext
 {
     /** @var callable|null */
     private $passthru;
-    private HttpClientInterface $client;
     private ResponseInterface $response;
     private array $info = [];
-    /** @var resource|null */
-    private $content;
-    private int $offset;
 
     /**
      * @param resource|null $content
      */
-    public function __construct(?callable &$passthru, HttpClientInterface $client, ResponseInterface &$response, array &$info, $content, int $offset)
-    {
+    public function __construct(
+        ?callable &$passthru,
+        private HttpClientInterface $client,
+        ResponseInterface &$response,
+        array &$info,
+        private $content,
+        private int $offset,
+    ) {
         $this->passthru = &$passthru;
-        $this->client = $client;
         $this->response = &$response;
         $this->info = &$info;
-        $this->content = $content;
-        $this->offset = $offset;
     }
 
     /**
@@ -97,7 +96,7 @@ final class AsyncContext
         if (\is_callable($pause = $this->response->getInfo('pause_handler'))) {
             $pause($duration);
         } elseif (0 < $duration) {
-            usleep(1E6 * $duration);
+            usleep((int) (1E6 * $duration));
         }
     }
 
@@ -116,7 +115,7 @@ final class AsyncContext
     /**
      * Returns the current info of the response.
      */
-    public function getInfo(string $type = null): mixed
+    public function getInfo(?string $type = null): mixed
     {
         if (null !== $type) {
             return $this->info[$type] ?? $this->response->getInfo($type);
@@ -167,7 +166,7 @@ final class AsyncContext
         }
         if (0 < ($info['max_duration'] ?? 0) && 0 < ($info['total_time'] ?? 0)) {
             if (0 >= $options['max_duration'] = $info['max_duration'] - $info['total_time']) {
-                throw new TransportException(sprintf('Max duration was reached for "%s".', $info['url']));
+                throw new TransportException(\sprintf('Max duration was reached for "%s".', $info['url']));
             }
         }
 
@@ -189,7 +188,7 @@ final class AsyncContext
      *
      * @param ?callable(ChunkInterface, self): ?\Iterator $passthru
      */
-    public function passthru(callable $passthru = null): void
+    public function passthru(?callable $passthru = null): void
     {
         $this->passthru = $passthru ?? static function ($chunk, $context) {
             $context->passthru = null;

@@ -18,7 +18,7 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\SerializerModelFixture;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Twig\Environment;
@@ -49,7 +49,7 @@ class SerializerExtensionTest extends TestCase
 
     private function getTwig(string $template): Environment
     {
-        $meta = new ClassMetadataFactory(new AnnotationLoader());
+        $meta = new ClassMetadataFactory(new AttributeLoader());
         $runtime = new SerializerRuntime(new Serializer([new ObjectNormalizer($meta)], [new JsonEncoder(), new YamlEncoder()]));
 
         $mockRuntimeLoader = $this->createMock(RuntimeLoaderInterface::class);

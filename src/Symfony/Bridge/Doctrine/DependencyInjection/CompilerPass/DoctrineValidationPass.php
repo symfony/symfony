@@ -21,17 +21,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class DoctrineValidationPass implements CompilerPassInterface
 {
-    private string $managerType;
-
-    public function __construct(string $managerType)
-    {
-        $this->managerType = $managerType;
+    public function __construct(
+        private readonly string $managerType,
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->updateValidatorMappingFiles($container, 'xml', 'xml');
         $this->updateValidatorMappingFiles($container, 'yaml', 'yml');

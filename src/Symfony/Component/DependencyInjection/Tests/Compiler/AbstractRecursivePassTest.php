@@ -35,7 +35,7 @@ class AbstractRecursivePassTest extends TestCase
             ->register('foo', \stdClass::class)
             ->setFactory([new Reference('child'), 'createFactory']);
 
-        $pass = new class() extends AbstractRecursivePass {
+        $pass = new class extends AbstractRecursivePass {
             public \ReflectionMethod $actual;
 
             protected function processValue($value, $isRoot = false): mixed
@@ -61,7 +61,7 @@ class AbstractRecursivePassTest extends TestCase
             ->setAbstract(true);
         $container->setDefinition('foo', new ChildDefinition('parent'));
 
-        $pass = new class() extends AbstractRecursivePass {
+        $pass = new class extends AbstractRecursivePass {
             public \ReflectionMethod $actual;
 
             protected function processValue($value, $isRoot = false): mixed
@@ -87,7 +87,7 @@ class AbstractRecursivePassTest extends TestCase
             ->setAbstract(true);
         $container->setDefinition('foo', new ChildDefinition('parent'));
 
-        $pass = new class() extends AbstractRecursivePass {
+        $pass = new class extends AbstractRecursivePass {
             public \ReflectionMethod $actual;
 
             protected function processValue($value, $isRoot = false): mixed
@@ -107,13 +107,13 @@ class AbstractRecursivePassTest extends TestCase
 
     public function testGetConstructorDefinitionNoClass()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid service "foo": the class is not set.');
-
         $container = new ContainerBuilder();
         $container->register('foo');
 
-        (new class() extends AbstractRecursivePass {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid service "foo": the class is not set.');
+
+        (new class extends AbstractRecursivePass {
             protected function processValue($value, $isRoot = false): mixed
             {
                 if ($value instanceof Definition && 'foo' === $this->currentId) {

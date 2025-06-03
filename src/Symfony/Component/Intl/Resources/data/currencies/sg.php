@@ -170,9 +170,13 @@ return [
             'SHP',
             'pôndo tî Zûâ Sênt-Helêna',
         ],
+        'SLE' => [
+            'SLE',
+            'leône tî Sierâ-Leône',
+        ],
         'SLL' => [
             'SLL',
-            'leône tî Sierâ-Leône',
+            'leône tî Sierâ-Leône (1964—2022)',
         ],
         'SOS' => [
             'SOS',

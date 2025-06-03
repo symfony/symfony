@@ -29,7 +29,7 @@ trait UnserializableTestTrait
     {
         $store = $this->getStore();
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $store->save($key);
         $this->assertTrue($store->exists($key));

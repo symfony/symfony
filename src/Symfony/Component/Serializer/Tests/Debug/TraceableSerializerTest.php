@@ -56,7 +56,7 @@ class TraceableSerializerTest extends TestCase
             ->with('data', 'format', $this->isType('array'))
             ->willReturn('decoded');
 
-        $traceableSerializer = new TraceableSerializer($serializer, new SerializerDataCollector());
+        $traceableSerializer = new TraceableSerializer($serializer, new SerializerDataCollector(), 'default');
 
         $this->assertSame('serialized', $traceableSerializer->serialize('data', 'format'));
         $this->assertSame('deserialized', $traceableSerializer->deserialize('data', 'type', 'format'));
@@ -68,33 +68,35 @@ class TraceableSerializerTest extends TestCase
 
     public function testCollectData()
     {
+        $serializerName = uniqid('name', true);
+
         $dataCollector = $this->createMock(SerializerDataCollector::class);
         $dataCollector
             ->expects($this->once())
             ->method('collectSerialize')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDeserialize')
-            ->with($this->isType('string'), 'data', 'type', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isType('string'), 'data', 'type', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectNormalize')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDenormalize')
-            ->with($this->isType('string'), 'data', 'type', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isType('string'), 'data', 'type', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectEncode')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDecode')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
 
-        $traceableSerializer = new TraceableSerializer(new Serializer(), $dataCollector);
+        $traceableSerializer = new TraceableSerializer(new Serializer(), $dataCollector, $serializerName);
 
         $traceableSerializer->serialize('data', 'format');
         $traceableSerializer->deserialize('data', 'type', 'format');
@@ -117,7 +119,7 @@ class TraceableSerializerTest extends TestCase
             });
         }
 
-        $traceableSerializer = new TraceableSerializer($serializer, new SerializerDataCollector());
+        $traceableSerializer = new TraceableSerializer($serializer, new SerializerDataCollector(), 'default');
 
         $traceableSerializer->serialize('data', 'format');
         $traceableSerializer->deserialize('data', 'format', 'type');
@@ -140,7 +142,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return 'deserialized';
     }
 
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return 'normalized';
     }
@@ -150,17 +152,17 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return ['*' => false];
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return true;
     }
 
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         return 'denormalized';
     }
 
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return true;
     }

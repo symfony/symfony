@@ -39,10 +39,10 @@
             <div class="block-exception">
                 <h1>Redirection Intercepted</h1>
 
-                {% set absolute_url = host in location ? location : host ~ location %}
+                {% set absolute_url = absolute_url(location) %}
                 <p>This request redirects to <strong>{{ absolute_url }}</strong></p>
 
-                <p><a class="btn" href="{{ location }}">Follow redirect</a></p>
+                <p><a class="btn" href="{{ absolute_url }}">Follow redirect</a></p>
 
                 <p class="sf-redirection-help">
                     The redirect was intercepted by the Symfony Web Debug toolbar to help debugging.

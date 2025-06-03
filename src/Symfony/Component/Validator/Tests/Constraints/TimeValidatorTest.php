@@ -60,6 +60,19 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidTimes
+     */
+    public function testValidTimesWithNewLine(string $time)
+    {
+        $this->validator->validate($time."\n", new Time());
+
+        $this->buildViolation('This value is not a valid time.')
+            ->setParameter('{{ value }}', '"'.$time."\n".'"')
+            ->setCode(Time::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidTimes()
     {
         return [
@@ -74,11 +87,22 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidTimesWithoutSeconds(string $time)
     {
-        $this->validator->validate($time, new Time([
-            'withSeconds' => false,
-        ]));
+        $this->validator->validate($time, new Time(withSeconds: false));
 
         $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getValidTimesWithoutSeconds
+     */
+    public function testValidTimesWithoutSecondsWithNewLine(string $time)
+    {
+        $this->validator->validate($time."\n", new Time(withSeconds: false));
+
+        $this->buildViolation('This value is not a valid time.')
+            ->setParameter('{{ value }}', '"'.$time."\n".'"')
+            ->setCode(Time::INVALID_FORMAT_ERROR)
+            ->assertRaised();
     }
 
     public static function getValidTimesWithoutSeconds()
@@ -117,9 +141,7 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidTimes($time, $code)
     {
-        $constraint = new Time([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Time(message: 'myMessage');
 
         $this->validator->validate($time, $constraint);
 

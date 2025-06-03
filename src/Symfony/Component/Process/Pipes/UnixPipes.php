@@ -22,16 +22,12 @@ use Symfony\Component\Process\Process;
  */
 class UnixPipes extends AbstractPipes
 {
-    private ?bool $ttyMode;
-    private bool $ptyMode;
-    private bool $haveReadSupport;
-
-    public function __construct(?bool $ttyMode, bool $ptyMode, mixed $input, bool $haveReadSupport)
-    {
-        $this->ttyMode = $ttyMode;
-        $this->ptyMode = $ptyMode;
-        $this->haveReadSupport = $haveReadSupport;
-
+    public function __construct(
+        private ?bool $ttyMode,
+        private bool $ptyMode,
+        mixed $input,
+        private bool $haveReadSupport,
+    ) {
         parent::__construct($input);
     }
 
@@ -74,7 +70,7 @@ class UnixPipes extends AbstractPipes
             return [
                 ['pty'],
                 ['pty'],
-                ['pty'],
+                ['pipe', 'w'], // stderr needs to be in a pipe to correctly split error and output, since PHP will use the same stream for both
             ];
         }
 

@@ -47,13 +47,13 @@ class StreamedJsonResponse extends StreamedResponse
     private const PLACEHOLDER = '__symfony_json__';
 
     /**
-     * @param mixed[]                        $data            JSON Data containing PHP generators which will be streamed as list of data
+     * @param mixed[]                        $data            JSON Data containing PHP generators which will be streamed as list of data or a Generator
      * @param int                            $status          The HTTP status code (200 "OK" by default)
      * @param array<string, string|string[]> $headers         An array of HTTP headers
      * @param int                            $encodingOptions Flags for the json_encode() function
      */
     public function __construct(
-        private readonly array $data,
+        private readonly iterable $data,
         int $status = 200,
         array $headers = [],
         private int $encodingOptions = JsonResponse::DEFAULT_ENCODING_OPTIONS,
@@ -67,10 +67,34 @@ class StreamedJsonResponse extends StreamedResponse
 
     private function stream(): void
     {
-        $generators = [];
-        $structure = $this->data;
+        $jsonEncodingOptions = \JSON_THROW_ON_ERROR | $this->encodingOptions;
+        $keyEncodingOptions = $jsonEncodingOptions & ~\JSON_NUMERIC_CHECK;
 
-        array_walk_recursive($structure, function (&$item, $key) use (&$generators) {
+        $this->streamData($this->data, $jsonEncodingOptions, $keyEncodingOptions);
+    }
+
+    private function streamData(mixed $data, int $jsonEncodingOptions, int $keyEncodingOptions): void
+    {
+        if (\is_array($data)) {
+            $this->streamArray($data, $jsonEncodingOptions, $keyEncodingOptions);
+
+            return;
+        }
+
+        if (is_iterable($data) && !$data instanceof \JsonSerializable) {
+            $this->streamIterable($data, $jsonEncodingOptions, $keyEncodingOptions);
+
+            return;
+        }
+
+        echo json_encode($data, $jsonEncodingOptions);
+    }
+
+    private function streamArray(array $data, int $jsonEncodingOptions, int $keyEncodingOptions): void
+    {
+        $generators = [];
+
+        array_walk_recursive($data, function (&$item, $key) use (&$generators) {
             if (self::PLACEHOLDER === $key) {
                 // if the placeholder is already in the structure it should be replaced with a new one that explode
                 // works like expected for the structure
@@ -88,56 +112,51 @@ class StreamedJsonResponse extends StreamedResponse
             }
         });
 
-        $jsonEncodingOptions = \JSON_THROW_ON_ERROR | $this->encodingOptions;
-        $keyEncodingOptions = $jsonEncodingOptions & ~\JSON_NUMERIC_CHECK;
-
-        $jsonParts = explode('"'.self::PLACEHOLDER.'"', json_encode($structure, $jsonEncodingOptions));
+        $jsonParts = explode('"'.self::PLACEHOLDER.'"', json_encode($data, $jsonEncodingOptions));
 
         foreach ($generators as $index => $generator) {
             // send first and between parts of the structure
             echo $jsonParts[$index];
 
-            if ($generator instanceof \JsonSerializable || !$generator instanceof \Traversable) {
-                // the placeholders, JsonSerializable and none traversable items in the structure are rendered here
-                echo json_encode($generator, $jsonEncodingOptions);
-
-                continue;
-            }
-
-            $isFirstItem = true;
-            $startTag = '[';
-
-            foreach ($generator as $key => $item) {
-                if ($isFirstItem) {
-                    $isFirstItem = false;
-                    // depending on the first elements key the generator is detected as a list or map
-                    // we can not check for a whole list or map because that would hurt the performance
-                    // of the streamed response which is the main goal of this response class
-                    if (0 !== $key) {
-                        $startTag = '{';
-                    }
-
-                    echo $startTag;
-                } else {
-                    // if not first element of the generic, a separator is required between the elements
-                    echo ',';
-                }
-
-                if ('{' === $startTag) {
-                    echo json_encode((string) $key, $keyEncodingOptions).':';
-                }
-
-                echo json_encode($item, $jsonEncodingOptions);
-            }
-
-            if ($isFirstItem) { // indicates that the generator was empty
-                echo '[';
-            }
-
-            echo '[' === $startTag ? ']' : '}';
+            $this->streamData($generator, $jsonEncodingOptions, $keyEncodingOptions);
         }
 
         // send last part of the structure
         echo $jsonParts[array_key_last($jsonParts)];
+    }
+
+    private function streamIterable(iterable $iterable, int $jsonEncodingOptions, int $keyEncodingOptions): void
+    {
+        $isFirstItem = true;
+        $startTag = '[';
+
+        foreach ($iterable as $key => $item) {
+            if ($isFirstItem) {
+                $isFirstItem = false;
+                // depending on the first elements key the generator is detected as a list or map
+                // we can not check for a whole list or map because that would hurt the performance
+                // of the streamed response which is the main goal of this response class
+                if (0 !== $key) {
+                    $startTag = '{';
+                }
+
+                echo $startTag;
+            } else {
+                // if not first element of the generic, a separator is required between the elements
+                echo ',';
+            }
+
+            if ('{' === $startTag) {
+                echo json_encode((string) $key, $keyEncodingOptions).':';
+            }
+
+            $this->streamData($item, $jsonEncodingOptions, $keyEncodingOptions);
+        }
+
+        if ($isFirstItem) { // indicates that the generator was empty
+            echo '[';
+        }
+
+        echo '[' === $startTag ? ']' : '}';
     }
 }

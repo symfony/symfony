@@ -13,12 +13,12 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Cont
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class AnnotatedController
 {
     #[Route('/null_request', name: 'null_request')]
-    public function requestDefaultNullAction(Request $request = null): Response
+    public function requestDefaultNullAction(?Request $request = null): Response
     {
         return new Response($request ? $request::class : null);
     }

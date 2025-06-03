@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\String;
+namespace Symfony\Component\String\Tests\Slugger;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -19,7 +19,7 @@ class AsciiSluggerTest extends TestCase
     /**
      * @dataProvider provideSlugTests
      */
-    public function testSlug(string $expected, string $string, string $separator = '-', string $locale = null)
+    public function testSlug(string $expected, string $string, string $separator = '-', ?string $locale = null)
     {
         $slugger = new AsciiSlugger();
 
@@ -105,5 +105,20 @@ class AsciiSluggerTest extends TestCase
             'un 😺, 🐈‍⬛, et un 🦁 vont au 🏞️',
             'undefined_locale', // Behaves the same as if emoji support is disabled
         ];
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testSlugEmojiWithSetLocale()
+    {
+        if (!setlocale(LC_ALL, 'C.UTF-8')) {
+            $this->markTestSkipped('Unable to switch to the "C.UTF-8" locale.');
+        }
+
+        $slugger = new AsciiSlugger();
+        $slugger = $slugger->withEmoji(true);
+
+        $this->assertSame('a-and-a-go-to', (string) $slugger->slug('a 😺, 🐈‍⬛, and a 🦁 go to 🏞️... 😍 🎉 💛', '-'));
     }
 }

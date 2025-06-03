@@ -82,7 +82,8 @@ class TranslationDebugCommandTest extends TestCase
     {
         $this->fs->remove($this->translationDir);
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationDir);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
 
@@ -118,7 +119,6 @@ class TranslationDebugCommandTest extends TestCase
 
     public function testDebugInvalidDirectory()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())
             ->method('getBundle')
@@ -126,6 +126,9 @@ class TranslationDebugCommandTest extends TestCase
             ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester([], [], $kernel);
+
+        $this->expectException(\InvalidArgumentException::class);
+
         $tester->execute(['locale' => 'en', 'bundle' => 'dir']);
     }
 
@@ -148,7 +151,8 @@ class TranslationDebugCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationDir);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
     }
@@ -158,12 +162,12 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandTester(array $extractedMessages = [], array $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
+    private function createCommandTester(array $extractedMessages = [], array $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
     {
         return new CommandTester($this->createCommand($extractedMessages, $loadedMessages, $kernel, $transPaths, $codePaths));
     }
 
-    private function createCommand(array $extractedMessages = [], array $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = [], ExtractorInterface $extractor = null, array $bundles = [], array $enabledLocales = []): TranslationDebugCommand
+    private function createCommand(array $extractedMessages = [], array $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = [], ?ExtractorInterface $extractor = null, array $bundles = [], array $enabledLocales = []): TranslationDebugCommand
     {
         $translator = $this->createMock(Translator::class);
         $translator
@@ -269,7 +273,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'locale' => [
             [''],

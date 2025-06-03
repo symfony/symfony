@@ -41,8 +41,12 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsRoutingConditionService extends AutoconfigureTag
 {
+    /**
+     * @param string|null $alias    The alias of the service to use it in routing condition expressions
+     * @param int         $priority Defines a priority that allows the routing condition service to override a service with the same alias
+     */
     public function __construct(
-        string $alias = null,
+        ?string $alias = null,
         int $priority = 0,
     ) {
         parent::__construct('routing.condition_service', ['alias' => $alias, 'priority' => $priority]);

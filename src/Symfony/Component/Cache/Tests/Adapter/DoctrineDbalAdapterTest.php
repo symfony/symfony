@@ -15,15 +15,17 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 use Doctrine\DBAL\Driver\Middleware;
+use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
-use PHPUnit\Framework\SkippedTestSuiteError;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
-use Symfony\Component\Cache\Tests\Fixtures\DriverWrapper;
 
 /**
+ * @requires extension pdo_sqlite
+ *
  * @group time-sensitive
  */
 class DoctrineDbalAdapterTest extends AdapterTestCase
@@ -32,10 +34,6 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (!\extension_loaded('pdo_sqlite')) {
-            throw new SkippedTestSuiteError('Extension pdo_sqlite required.');
-        }
-
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
     }
 
@@ -51,6 +49,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchemaDecoratedDbalDriver()
     {
+        if (file_exists(self::$dbFile)) {
+            @unlink(self::$dbFile);
+        }
+
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig());
         if (!interface_exists(Middleware::class)) {
             $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
@@ -59,7 +61,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $middleware = $this->createMock(Middleware::class);
         $middleware
             ->method('wrap')
-            ->willReturn(new DriverWrapper($connection->getDriver()));
+            ->willReturn(new class($connection->getDriver()) extends AbstractDriverMiddleware {});
 
         $config = $this->getDbalConfig();
         $config->setMiddlewares([$middleware]);
@@ -76,6 +78,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchema()
     {
+        if (file_exists(self::$dbFile)) {
+            @unlink(self::$dbFile);
+        }
+
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig());
         $schema = new Schema();
 
@@ -86,6 +92,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchemaDifferentDbalConnection()
     {
+        if (file_exists(self::$dbFile)) {
+            @unlink(self::$dbFile);
+        }
+
         $otherConnection = $this->createConnectionMock();
         $schema = new Schema();
 
@@ -96,6 +106,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchemaTableExists()
     {
+        if (file_exists(self::$dbFile)) {
+            @unlink(self::$dbFile);
+        }
+
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig());
         $schema = new Schema();
         $schema->createTable('cache_items');
@@ -103,17 +117,16 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $adapter = new DoctrineDbalAdapter($connection);
         $adapter->configureSchema($schema, $connection, fn () => true);
         $table = $schema->getTable('cache_items');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 
     /**
-     * @dataProvider provideDsn
+     * @dataProvider provideDsnWithSQLite
      */
-    public function testDsn(string $dsn, string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
         try {
             $pool = new DoctrineDbalAdapter($dsn);
-            $pool->createTable();
 
             $item = $pool->getItem('key');
             $item->set('value');
@@ -125,12 +138,35 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         }
     }
 
-    public static function provideDsn()
+    public static function provideDsnWithSQLite()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
-        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
-        yield ['sqlite://localhost/:memory:'];
+        yield 'SQLite file' => ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
+        yield 'SQLite3 file' => ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
+        yield 'SQLite in memory' => ['sqlite://localhost/:memory:'];
+    }
+
+    /**
+     * @requires extension pdo_pgsql
+     *
+     * @group integration
+     */
+    public function testDsnWithPostgreSQL()
+    {
+        if (!$host = getenv('POSTGRES_HOST')) {
+            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+        }
+
+        try {
+            $pool = new DoctrineDbalAdapter('pgsql://postgres:password@'.$host);
+
+            $item = $pool->getItem('key');
+            $item->set('value');
+            $this->assertTrue($pool->save($item));
+        } finally {
+            $pdo = new \PDO('pgsql:host='.$host.';user=postgres;password=password');
+            $pdo->exec('DROP TABLE IF EXISTS cache_items');
+        }
     }
 
     protected function isPruned(DoctrineDbalAdapter $cache, string $name): bool
@@ -140,12 +176,12 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
         /** @var Connection $conn */
         $conn = $connProp->getValue($cache);
-        $result = $conn->executeQuery('SELECT 1 FROM cache_items WHERE item_id LIKE ?', [sprintf('%%%s', $name)]);
+        $result = $conn->executeQuery('SELECT 1 FROM cache_items WHERE item_id LIKE ?', [\sprintf('%%%s', $name)]);
 
         return 1 !== (int) $result->fetchOne();
     }
 
-    private function createConnectionMock()
+    private function createConnectionMock(): Connection&MockObject
     {
         $connection = $this->createMock(Connection::class);
         $driver = $this->createMock(AbstractMySQLDriver::class);
@@ -156,12 +192,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         return $connection;
     }
 
-    private function getDbalConfig()
+    private function getDbalConfig(): Configuration
     {
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         return $config;
     }

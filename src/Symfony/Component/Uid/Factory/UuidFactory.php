@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Uid\Factory;
 
+use Symfony\Component\Uid\Exception\LogicException;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV4;
@@ -26,7 +27,7 @@ class UuidFactory
     private ?Uuid $timeBasedNode;
     private ?Uuid $nameBasedNamespace;
 
-    public function __construct(string|int $defaultClass = UuidV6::class, string|int $timeBasedClass = UuidV6::class, string|int $nameBasedClass = UuidV5::class, string|int $randomBasedClass = UuidV4::class, Uuid|string $timeBasedNode = null, Uuid|string $nameBasedNamespace = null)
+    public function __construct(string|int $defaultClass = UuidV6::class, string|int $timeBasedClass = UuidV6::class, string|int $nameBasedClass = UuidV5::class, string|int $randomBasedClass = UuidV4::class, Uuid|string|null $timeBasedNode = null, Uuid|string|null $nameBasedNamespace = null)
     {
         if (null !== $timeBasedNode && !$timeBasedNode instanceof Uuid) {
             $timeBasedNode = Uuid::fromString($timeBasedNode);
@@ -56,7 +57,7 @@ class UuidFactory
         return new RandomBasedUuidFactory($this->randomBasedClass);
     }
 
-    public function timeBased(Uuid|string $node = null): TimeBasedUuidFactory
+    public function timeBased(Uuid|string|null $node = null): TimeBasedUuidFactory
     {
         $node ??= $this->timeBasedNode;
 
@@ -67,12 +68,15 @@ class UuidFactory
         return new TimeBasedUuidFactory($this->timeBasedClass, $node);
     }
 
-    public function nameBased(Uuid|string $namespace = null): NameBasedUuidFactory
+    /**
+     * @throws LogicException When no namespace is defined
+     */
+    public function nameBased(Uuid|string|null $namespace = null): NameBasedUuidFactory
     {
         $namespace ??= $this->nameBasedNamespace;
 
         if (null === $namespace) {
-            throw new \LogicException(sprintf('A namespace should be defined when using "%s()".', __METHOD__));
+            throw new LogicException(\sprintf('A namespace should be defined when using "%s()".', __METHOD__));
         }
 
         return new NameBasedUuidFactory($this->nameBasedClass, $this->getNamespace($namespace));

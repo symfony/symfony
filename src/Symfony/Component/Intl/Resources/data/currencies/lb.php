@@ -822,9 +822,13 @@ return [
             'SKK',
             'Slowakesch Kroun',
         ],
+        'SLE' => [
+            'SLE',
+            'Sierra-leonesche Leone',
+        ],
         'SLL' => [
             'SLL',
-            'Sierra-leonesche Leone',
+            'Sierra-leonesche Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

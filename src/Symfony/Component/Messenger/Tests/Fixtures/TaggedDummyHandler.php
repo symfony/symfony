@@ -15,4 +15,10 @@ class TaggedDummyHandler
     public function handleSecondMessage(SecondMessage $message)
     {
     }
+
+    #[AsMessageHandler(fromTransport: 'a')]
+    #[AsMessageHandler(fromTransport: 'b')]
+    public function handleThirdMessage(ThirdMessage $message): void
+    {
+    }
 }

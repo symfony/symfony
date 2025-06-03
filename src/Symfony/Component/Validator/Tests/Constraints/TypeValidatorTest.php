@@ -26,7 +26,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $constraint = new Type(['type' => 'integer']);
+        $constraint = new Type(type: 'integer');
 
         $this->validator->validate(null, $constraint);
 
@@ -35,7 +35,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 
     public function testEmptyIsValidIfString()
     {
-        $constraint = new Type(['type' => 'string']);
+        $constraint = new Type(type: 'string');
 
         $this->validator->validate('', $constraint);
 
@@ -44,10 +44,10 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 
     public function testEmptyIsInvalidIfNoString()
     {
-        $constraint = new Type([
-            'type' => 'integer',
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Type(
+            type: 'integer',
+            message: 'myMessage',
+        );
 
         $this->validator->validate('', $constraint);
 
@@ -63,7 +63,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidValues($value, $type)
     {
-        $constraint = new Type(['type' => $type]);
+        $constraint = new Type(type: $type);
 
         $this->validator->validate($value, $constraint);
 
@@ -97,6 +97,10 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             [1.5, 'finite-number'],
             ['12345', 'string'],
             [[], 'array'],
+            [[], 'list'],
+            [[1, 2, 3], 'list'],
+            [['abc' => 1], 'associative_array'],
+            [[1 => 1], 'associative_array'],
             [$object, 'object'],
             [$object, 'stdClass'],
             [$file, 'resource'],
@@ -119,10 +123,10 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValues($value, $type, $valueAsString)
     {
-        $constraint = new Type([
-            'type' => $type,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Type(
+            type: $type,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($value, $constraint);
 
@@ -166,6 +170,12 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             [$file, 'float', 'resource'],
             [$file, 'string', 'resource'],
             [$file, 'object', 'resource'],
+            [[1 => 1], 'list', 'array'],
+            [['abc' => 1], 'list', 'array'],
+            ['abcd1', 'list', '"abcd1"'],
+            [[], 'associative_array', 'array'],
+            [[1, 2, 3], 'associative_array', 'array'],
+            ['abcd1', 'associative_array', '"abcd1"'],
             ['12a34', 'digit', '"12a34"'],
             ['1a#23', 'alnum', '"1a#23"'],
             ['abcd1', 'alpha', '"abcd1"'],
@@ -185,7 +195,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidValuesMultipleTypes($value, array $types)
     {
-        $constraint = new Type(['type' => $types]);
+        $constraint = new Type(type: $types);
 
         $this->validator->validate($value, $constraint);
 
@@ -200,12 +210,9 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider provideConstraintsWithMultipleTypes
-     */
-    public function testInvalidValuesMultipleTypes(Type $constraint)
+    public function testInvalidValuesMultipleTypes()
     {
-        $this->validator->validate('12345', $constraint);
+        $this->validator->validate('12345', new Type(type: ['boolean', 'array'], message: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"12345"')
@@ -214,13 +221,21 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public static function provideConstraintsWithMultipleTypes()
+    /**
+     * @group legacy
+     */
+    public function testInvalidValuesMultipleTypesDoctrineStyle()
     {
-        yield 'Doctrine style' => [new Type([
+        $this->validator->validate('12345', new Type([
             'type' => ['boolean', 'array'],
             'message' => 'myMessage',
-        ])];
-        yield 'named arguments' => [new Type(type: ['boolean', 'array'], message: 'myMessage')];
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"12345"')
+            ->setParameter('{{ type }}', implode('|', ['boolean', 'array']))
+            ->setCode(Type::INVALID_TYPE_ERROR)
+            ->assertRaised();
     }
 
     protected static function createFile()

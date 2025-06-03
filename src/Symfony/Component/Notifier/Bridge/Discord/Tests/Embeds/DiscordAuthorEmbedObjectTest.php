@@ -38,6 +38,6 @@ final class DiscordAuthorEmbedObjectTest extends TestCase
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the name is 256 characters.');
 
-        (new DiscordAuthorEmbedObject())->name(str_repeat('h', 257));
+        (new DiscordAuthorEmbedObject())->name(str_repeat('š', 257));
     }
 }

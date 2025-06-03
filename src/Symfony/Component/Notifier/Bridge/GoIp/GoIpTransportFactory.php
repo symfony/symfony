@@ -33,7 +33,7 @@ final class GoIpTransportFactory extends AbstractTransportFactory
         $password = $this->getPassword($dsn);
 
         if (0 === ($simSlot = (int) $dsn->getRequiredOption('sim_slot'))) {
-            throw new InvalidArgumentException(sprintf('The provided SIM-Slot: "%s" is not valid.', $simSlot));
+            throw new InvalidArgumentException(\sprintf('The provided SIM-Slot: "%s" is not valid.', $simSlot));
         }
 
         return (new GoIpTransport($username, $password, $simSlot, $this->client, $this->dispatcher))

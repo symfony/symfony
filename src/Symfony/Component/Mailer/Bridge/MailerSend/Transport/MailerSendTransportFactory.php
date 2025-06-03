@@ -30,7 +30,7 @@ final class MailerSendTransportFactory extends AbstractTransportFactory
 
             'mailersend', 'mailersend+smtp' => new MailerSendSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $this->dispatcher, $this->logger),
 
-            default => throw new UnsupportedSchemeException($dsn, 'mailersend', $this->getSupportedSchemes())
+            default => throw new UnsupportedSchemeException($dsn, 'mailersend', $this->getSupportedSchemes()),
         };
     }
 

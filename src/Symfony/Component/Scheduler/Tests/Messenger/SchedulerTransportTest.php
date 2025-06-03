@@ -46,17 +46,16 @@ class SchedulerTransportTest extends TestCase
             $this->assertSame('id'.$i + 1, $stamp->messageContext->id);
         }
 
-        $this->assertEmpty($messages);
+        $this->assertSame([], $messages);
     }
 
     public function testAddsStampToInnerRedispatchMessageEnvelope()
     {
         $generator = $this->createMock(MessageGeneratorInterface::class);
         $generator->method('getMessages')->willReturnCallback(function (): \Generator {
-            yield new MessageContext('default', 'id', $this->createMock(TriggerInterface::class), new \DateTimeImmutable()) =>
-                new RedispatchMessage(new \stdClass(), ['transport']);
+            yield new MessageContext('default', 'id', $this->createMock(TriggerInterface::class), new \DateTimeImmutable()) => new RedispatchMessage(new \stdClass(), ['transport']);
         });
-        $envelopes = \iterator_to_array((new SchedulerTransport($generator))->get());
+        $envelopes = iterator_to_array((new SchedulerTransport($generator))->get());
 
         $stamp = $envelopes[0]->getMessage()->envelope->last(ScheduledStamp::class);
 

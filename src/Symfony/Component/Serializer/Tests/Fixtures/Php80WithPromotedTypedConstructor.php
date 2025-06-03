@@ -13,7 +13,10 @@ namespace Symfony\Component\Serializer\Tests\Fixtures;
 
 final class Php80WithPromotedTypedConstructor
 {
-    public function __construct(public bool $bool)
-    {
+    public function __construct(
+        public bool $bool,
+        public string $string,
+        public int $int,
+    ) {
     }
 }

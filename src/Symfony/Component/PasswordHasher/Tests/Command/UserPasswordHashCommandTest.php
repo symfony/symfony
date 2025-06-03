@@ -277,10 +277,11 @@ EOTXT
 
     public function testThrowsExceptionOnNoConfiguredHashers()
     {
+        $tester = new CommandTester(new UserPasswordHashCommand($this->getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('There are no configured password hashers for the "security" extension.');
 
-        $tester = new CommandTester(new UserPasswordHashCommand($this->getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));
         $tester->execute([
             'password' => 'password',
         ], ['interactive' => false]);

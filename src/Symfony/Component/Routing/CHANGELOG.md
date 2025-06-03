@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Allow aliases and deprecations in `#[Route]` attribute
+ * Add the `Requirement::MONGODB_ID` constant to validate MongoDB ObjectIDs in hexadecimal format
+
+7.2
+---
+
+ * Add the `Requirement::UID_RFC9562` constant to validate UUIDs in the RFC 9562 format
+ * Deprecate the `AttributeClassLoader::$routeAnnotationClass` property
+
+7.1
+---
+
+ * Add `{foo:bar}` syntax to define a mapping between a route parameter and its corresponding request attribute
+
+7.0
+---
+
+ * Add argument `$routeParameters` to `UrlMatcher::handleRouteRequirements()`
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove `AnnotationClassLoader`, use `AttributeClassLoader` instead
+ * Remove `AnnotationDirectoryLoader`, use `AttributeDirectoryLoader` instead
+ * Remove `AnnotationFileLoader`, use `AttributeFileLoader` instead
+
 6.4
 ---
 
@@ -8,6 +34,11 @@ CHANGELOG
  * Add native return type to `AnnotationClassLoader::setResolver()`
  * Deprecate Doctrine annotations support in favor of native attributes
  * Change the constructor signature of `AnnotationClassLoader` to `__construct(?string $env = null)`, passing an annotation reader as first argument is deprecated
+ * Deprecate `AnnotationClassLoader`, use `AttributeClassLoader` instead
+ * Deprecate `AnnotationDirectoryLoader`, use `AttributeDirectoryLoader` instead
+ * Deprecate `AnnotationFileLoader`, use `AttributeFileLoader` instead
+ * Add `AddExpressionLanguageProvidersPass` (moved from `FrameworkBundle`)
+ * Add aliases for all classes in the `Annotation` namespace to `Attribute`
 
 6.2
 ---

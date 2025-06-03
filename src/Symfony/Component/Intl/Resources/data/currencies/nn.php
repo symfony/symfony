@@ -8,7 +8,7 @@ return [
         ],
         'AFA' => [
             'AFA',
-            'afghani (1927–2002)',
+            'afghanske afghani (1927–2002)',
         ],
         'AOK' => [
             'AOK',
@@ -34,13 +34,17 @@ return [
             'ATS',
             'austerrikske schilling',
         ],
-        'AZM' => [
-            'AZM',
-            'aserbaijanske manat',
+        'AWG' => [
+            'AWG',
+            'arubiske florinar',
         ],
         'BAD' => [
             'BAD',
-            'bosnisk-hercegovinske dinarar',
+            'bosnisk-hercegovinske dinarar (1992–1994)',
+        ],
+        'BAN' => [
+            'BAN',
+            'nye bosnisk-hercegovinske dinarar (1994–1997)',
         ],
         'BEC' => [
             'BEC',
@@ -88,15 +92,23 @@ return [
         ],
         'BYB' => [
             'BYB',
-            'kviterussiske nye rublar (1994–1999)',
+            'belarusiske nye rublar (1994–1999)',
         ],
         'BYN' => [
             'BYN',
-            'nye kviterussiske rublar',
+            'nye belarusiske rublar',
         ],
         'BYR' => [
             'BYR',
-            'kviterussiske rublar (2000–2016)',
+            'belarusiske rublar (2000–2016)',
+        ],
+        'CHE' => [
+            'CHE',
+            'WIR-euro',
+        ],
+        'CHW' => [
+            'CHW',
+            'WIR-franc',
         ],
         'COP' => [
             'COP',
@@ -152,7 +164,7 @@ return [
         ],
         'IDR' => [
             'IDR',
-            'indonesiske rupiar',
+            'indonesiske rupiahar',
         ],
         'ILS' => [
             'ILS',
@@ -214,13 +226,17 @@ return [
             'MKD',
             'makedonske denarar',
         ],
-        'MRU' => [
-            'MRU',
-            'mauritanske ouguiya',
+        'MKN' => [
+            'MKN',
+            'makedonske denarar (1992–1993)',
         ],
         'MUR' => [
             'MUR',
             'mauritiske rupiar',
+        ],
+        'MVP' => [
+            'MVP',
+            'maldiviske rupiar',
         ],
         'MXP' => [
             'MXP',
@@ -290,6 +306,10 @@ return [
             'SDP',
             'gamle sudanske pund',
         ],
+        'SLL' => [
+            'SLL',
+            'sierraleonsk leone (1964—2022)',
+        ],
         'SUR' => [
             'SUR',
             'sovjetiske rublar',
@@ -302,10 +322,6 @@ return [
             'TJR',
             'tadsjikiske rublar',
         ],
-        'TMM' => [
-            'TMM',
-            'turkmensk manat (1993–2009)',
-        ],
         'TND' => [
             'TND',
             'tunisiske dinarar',
@@ -313,6 +329,10 @@ return [
         'TRL' => [
             'TRL',
             'gamle tyrkiske lire',
+        ],
+        'TRY' => [
+            'TRY',
+            'tyrkiske lira',
         ],
         'USS' => [
             'USS',

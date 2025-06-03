@@ -25,7 +25,7 @@ class AbstractObjectNormalizerContextBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->contextBuilder = new class() extends AbstractObjectNormalizerContextBuilder {};
+        $this->contextBuilder = new class extends AbstractObjectNormalizerContextBuilder {};
     }
 
     /**

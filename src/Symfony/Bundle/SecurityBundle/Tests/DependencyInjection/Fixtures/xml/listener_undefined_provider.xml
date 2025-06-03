@@ -15,7 +15,7 @@
 
         <sec:firewalls>
             <sec:firewall name="main">
-                <sec:form_login provider="undefined" />
+                <sec:form-login provider="undefined" />
             </sec:firewall>
         </sec:firewalls>
     </sec:config>

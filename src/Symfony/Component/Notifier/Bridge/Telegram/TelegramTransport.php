@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Telegram;
 
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\MultipleExclusiveOptionsUsedException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -33,25 +33,36 @@ final class TelegramTransport extends AbstractTransport
 {
     protected const HOST = 'api.telegram.org';
 
-    private string $token;
-    private ?string $chatChannel;
+    private const EXCLUSIVE_OPTIONS = [
+        'message_id',
+        'callback_query_id',
+        'photo',
+        'location',
+        'audio',
+        'document',
+        'video',
+        'animation',
+        'venue',
+        'contact',
+        'sticker',
+    ];
 
-    public function __construct(#[\SensitiveParameter] string $token, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
-        $this->chatChannel = $channel;
-        $this->client = $client;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        private ?string $chatChannel = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
         if (null === $this->chatChannel) {
-            return sprintf('telegram://%s', $this->getEndpoint());
+            return \sprintf('telegram://%s', $this->getEndpoint());
         }
 
-        return sprintf('telegram://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
+        return \sprintf('telegram://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
     }
 
     public function supports(MessageInterface $message): bool
@@ -69,23 +80,48 @@ final class TelegramTransport extends AbstractTransport
         }
 
         $options = $message->getOptions()?->toArray() ?? [];
+        $optionsContainer = 'json';
         $options['chat_id'] ??= $message->getRecipientId() ?: $this->chatChannel;
-        $options['text'] = $message->getSubject();
+        $text = $message->getSubject();
 
         if (!isset($options['parse_mode']) || TelegramOptions::PARSE_MODE_MARKDOWN_V2 === $options['parse_mode']) {
             $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
-            $options['text'] = preg_replace('/([_*\[\]()~`>#+\-=|{}.!])/', '\\\\$1', $message->getSubject());
+            /*
+             * Just replace the obvious chars according to Telegram documentation.
+             * Do not try to find pairs or replace chars, that occur in pairs like
+             *  - *bold text*
+             *  - _italic text_
+             *  - __underlined text__
+             *  - various notations of images, f. ex. [title](url)
+             *  - `code samples`.
+             *
+             * These formats should be taken care of when the message is constructed.
+             *
+             * @see https://core.telegram.org/bots/api#markdownv2-style
+             */
+            $text = preg_replace('/([.!#>+-=|{}~])/', '\\\\$1', $text);
         }
 
-        if (isset($options['photo'])) {
-            $options['caption'] = $options['text'];
-            unset($options['text']);
+        if (isset($options['upload'])) {
+            foreach ($options['upload'] as $option => $path) {
+                $options[$option] = fopen($path, 'r');
+            }
+            $optionsContainer = 'body';
+            unset($options['upload']);
         }
 
-        $endpoint = sprintf('https://%s/bot%s/%s', $this->getEndpoint(), $this->token, $this->getPath($options));
+        $messageOption = $this->getTextOption($options);
+        if (null !== $messageOption) {
+            $options[$messageOption] = $text;
+        }
+        $method = $this->getPath($options);
+        $this->ensureExclusiveOptionsNotDuplicated($options);
+        $options = $this->expandOptions($options, 'contact', 'location', 'venue');
+
+        $endpoint = \sprintf('https://%s/bot%s/%s', $this->getEndpoint(), $this->token, $method);
 
         $response = $this->client->request('POST', $endpoint, [
-            'json' => array_filter($options),
+            $optionsContainer => array_filter($options),
         ]);
 
         try {
@@ -97,7 +133,7 @@ final class TelegramTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $result = $response->toArray(false);
 
-            throw new TransportException('Unable to '.$this->getAction($options).' the Telegram message: '.$result['description'].sprintf(' (code %d).', $result['error_code']), $response);
+            throw new TransportException('Unable to '.$this->getAction($options).' the Telegram message: '.$result['description'].\sprintf(' (code %d).', $result['error_code']), $response);
         }
 
         $success = $response->toArray(false);
@@ -116,6 +152,14 @@ final class TelegramTransport extends AbstractTransport
             isset($options['message_id']) => 'editMessageText',
             isset($options['callback_query_id']) => 'answerCallbackQuery',
             isset($options['photo']) => 'sendPhoto',
+            isset($options['location']) => 'sendLocation',
+            isset($options['audio']) => 'sendAudio',
+            isset($options['document']) => 'sendDocument',
+            isset($options['video']) => 'sendVideo',
+            isset($options['animation']) => 'sendAnimation',
+            isset($options['venue']) => 'sendVenue',
+            isset($options['contact']) => 'sendContact',
+            isset($options['sticker']) => 'sendSticker',
             default => 'sendMessage',
         };
     }
@@ -127,5 +171,44 @@ final class TelegramTransport extends AbstractTransport
             isset($options['callback_query_id']) => 'answer callback query',
             default => 'post',
         };
+    }
+
+    private function getTextOption(array $options): ?string
+    {
+        return match (true) {
+            isset($options['photo']) => 'caption',
+            isset($options['audio']) => 'caption',
+            isset($options['document']) => 'caption',
+            isset($options['video']) => 'caption',
+            isset($options['animation']) => 'caption',
+            isset($options['sticker']) => null,
+            isset($options['location']) => null,
+            isset($options['venue']) => null,
+            isset($options['contact']) => null,
+            default => 'text',
+        };
+    }
+
+    private function expandOptions(array $options, string ...$optionsForExpand): array
+    {
+        foreach ($optionsForExpand as $optionForExpand) {
+            if (isset($options[$optionForExpand])) {
+                if (\is_array($options[$optionForExpand])) {
+                    $options = array_merge($options, $options[$optionForExpand]);
+                }
+                unset($options[$optionForExpand]);
+            }
+        }
+
+        return $options;
+    }
+
+    private function ensureExclusiveOptionsNotDuplicated(array $options): void
+    {
+        $usedOptions = array_keys($options);
+        $usedExclusiveOptions = array_intersect($usedOptions, self::EXCLUSIVE_OPTIONS);
+        if (\count($usedExclusiveOptions) > 1) {
+            throw new MultipleExclusiveOptionsUsedException($usedExclusiveOptions, self::EXCLUSIVE_OPTIONS);
+        }
     }
 }

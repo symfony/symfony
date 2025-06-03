@@ -17,8 +17,6 @@ namespace Symfony\Component\Ldap;
  */
 class Entry
 {
-    private string $dn;
-
     /**
      * @var array<string, array>
      */
@@ -32,10 +30,10 @@ class Entry
     /**
      * @param array<string, array> $attributes
      */
-    public function __construct(string $dn, array $attributes = [])
-    {
-        $this->dn = $dn;
-
+    public function __construct(
+        private string $dn,
+        array $attributes = [],
+    ) {
         foreach ($attributes as $key => $attribute) {
             $this->setAttribute($key, $attribute);
         }
@@ -96,10 +94,8 @@ class Entry
 
     /**
      * Sets a value for the given attribute.
-     *
-     * @return void
      */
-    public function setAttribute(string $name, array $value)
+    public function setAttribute(string $name, array $value): void
     {
         $this->attributes[$name] = $value;
         $this->lowerMap[strtolower($name)] = $name;
@@ -107,10 +103,8 @@ class Entry
 
     /**
      * Removes a given attribute.
-     *
-     * @return void
      */
-    public function removeAttribute(string $name)
+    public function removeAttribute(string $name): void
     {
         unset($this->attributes[$name]);
         unset($this->lowerMap[strtolower($name)]);

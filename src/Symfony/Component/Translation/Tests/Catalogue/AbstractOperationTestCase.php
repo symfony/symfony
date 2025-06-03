@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests\Catalogue;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
@@ -67,6 +68,16 @@ abstract class AbstractOperationTestCase extends TestCase
                 new MessageCatalogue('en'),
                 new MessageCatalogue('en')
             )->getResult()
+        );
+    }
+
+    public function testSourceAndTargetWithDifferentLocales()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Operated catalogues must belong to the same locale.');
+        $this->createOperation(
+            new MessageCatalogue('en'),
+            new MessageCatalogue('fr')
         );
     }
 

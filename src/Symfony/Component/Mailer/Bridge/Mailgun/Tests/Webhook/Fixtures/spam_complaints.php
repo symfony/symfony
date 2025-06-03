@@ -6,6 +6,6 @@ $wh = new MailerEngagementEvent(MailerEngagementEvent::SPAM, '-Agny091SquKnsrW2N
 $wh->setRecipientEmail('alice@example.com');
 $wh->setTags(['my_tag_1', 'my_tag_2']);
 $wh->setMetadata(['my_var_1' => 'Mailgun Variable #1', 'my-var-2' => 'awesome']);
-$wh->setDate(\DateTimeImmutable::createFromFormat('U.u', 1521233123.501324));
+$wh->setDate(\DateTimeImmutable::createFromFormat('U.u', '1521233123.501324'));
 
 return $wh;

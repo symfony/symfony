@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -25,6 +26,8 @@ interface SenderInterface
      * like delivery delay.
      *
      * If applicable, the returned Envelope should contain a TransportMessageIdStamp.
+     *
+     * @throws ExceptionInterface
      */
     public function send(Envelope $envelope): Envelope;
 }

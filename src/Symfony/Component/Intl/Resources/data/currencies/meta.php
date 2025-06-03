@@ -273,6 +273,7 @@ return [
         'WST',
         'XAF',
         'XCD',
+        'XCG',
         'XEU',
         'XFO',
         'XFU',
@@ -292,6 +293,7 @@ return [
         'ZRN',
         'ZRZ',
         'ZWD',
+        'ZWG',
         'ZWL',
         'ZWR',
     ],
@@ -948,6 +950,7 @@ return [
         'YUM' => 891,
         'ZMK' => 894,
         'TWD' => 901,
+        'ZWG' => 924,
         'SLE' => 925,
         'VED' => 926,
         'UYW' => 927,
@@ -1582,7 +1585,10 @@ return [
         901 => [
             'TWD',
         ],
-        925 => [
+        924 => [
+            'ZWG',
+        ],
+        [
             'SLE',
         ],
         [

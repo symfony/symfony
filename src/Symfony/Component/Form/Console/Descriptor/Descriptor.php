@@ -46,7 +46,7 @@ abstract class Descriptor implements DescriptorInterface
             null === $object => $this->describeDefaults($options),
             $object instanceof ResolvedFormTypeInterface => $this->describeResolvedFormType($object, $options),
             $object instanceof OptionsResolver => $this->describeOption($object, $options),
-            default => throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object))),
+            default => throw new \InvalidArgumentException(\sprintf('Object of type "%s" is not describable.', get_debug_type($object))),
         };
     }
 
@@ -118,6 +118,7 @@ abstract class Descriptor implements DescriptorInterface
             'allowedValues' => 'getAllowedValues',
             'normalizers' => 'getNormalizers',
             'deprecation' => 'getDeprecation',
+            'nestedOptions' => 'getNestedOptions',
         ];
 
         foreach ($map as $key => $method) {
@@ -128,7 +129,7 @@ abstract class Descriptor implements DescriptorInterface
             }
         }
 
-        if (isset($definition['deprecation']) && isset($definition['deprecation']['message']) && \is_string($definition['deprecation']['message'])) {
+        if (isset($definition['deprecation']['message']) && \is_string($definition['deprecation']['message'])) {
             $definition['deprecationMessage'] = strtr($definition['deprecation']['message'], ['%name%' => $option]);
             $definition['deprecationPackage'] = $definition['deprecation']['package'];
             $definition['deprecationVersion'] = $definition['deprecation']['version'];

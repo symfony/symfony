@@ -1,0 +1,45 @@
+{
+    "name": "symfony/type-info",
+    "type": "library",
+    "description": "Extracts PHP types information.",
+    "keywords": [
+        "type",
+        "phpdoc",
+        "phpstan",
+        "symfony"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathias Arlaud",
+            "email": "mathias.arlaud@gmail.com"
+        },
+        {
+            "name": "Baptiste LEDUC",
+            "email": "baptiste.leduc@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/container": "^1.1|^2.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "phpstan/phpdoc-parser": "^1.30|^2.0"
+    },
+    "conflict": {
+        "phpstan/phpdoc-parser": "<1.30"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\TypeInfo\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

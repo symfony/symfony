@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
 {
     private ?CustomConfig $customConfig;
 
-    public function __construct(CustomConfig $customConfig = null)
+    public function __construct(?CustomConfig $customConfig = null)
     {
         $this->customConfig = $customConfig;
     }

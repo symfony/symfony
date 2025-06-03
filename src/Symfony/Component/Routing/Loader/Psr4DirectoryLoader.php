@@ -15,6 +15,7 @@ use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\DirectoryAwareLoaderInterface;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -36,19 +37,23 @@ final class Psr4DirectoryLoader extends Loader implements DirectoryAwareLoaderIn
     /**
      * @param array{path: string, namespace: string} $resource
      */
-    public function load(mixed $resource, string $type = null): ?RouteCollection
+    public function load(mixed $resource, ?string $type = null): ?RouteCollection
     {
         $path = $this->locator->locate($resource['path'], $this->currentDirectory);
         if (!is_dir($path)) {
             return new RouteCollection();
         }
 
+        if (!preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+\\\)++$/', trim($resource['namespace'], '\\').'\\')) {
+            throw new InvalidArgumentException(\sprintf('Namespace "%s" is not a valid PSR-4 prefix.', $resource['namespace']));
+        }
+
         return $this->loadFromDirectory($path, trim($resource['namespace'], '\\'));
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
-        return ('attribute' === $type || 'annotation' === $type) && \is_array($resource) && isset($resource['path'], $resource['namespace']);
+        return 'attribute' === $type && \is_array($resource) && isset($resource['path'], $resource['namespace']);
     }
 
     public function forDirectory(string $currentDirectory): static

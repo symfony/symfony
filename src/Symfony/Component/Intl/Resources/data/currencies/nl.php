@@ -904,7 +904,7 @@ return [
         ],
         'SLL' => [
             'SLL',
-            'Sierraleoonse leone (1964—2022)',
+            'Sierra Leoonse leone (1964–2022)',
         ],
         'SOS' => [
             'SOS',
@@ -1085,6 +1085,10 @@ return [
         'XCD' => [
             'EC$',
             'Oost-Caribische dollar',
+        ],
+        'XCG' => [
+            'Cg.',
+            'Caribische gulden',
         ],
         'XEU' => [
             'XEU',

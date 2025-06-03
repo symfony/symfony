@@ -1,6 +1,36 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add support for `\Relay\Cluster` in `RedisAdapter`
+ * Add support for `valkey:` / `valkeys:` schemes
+ * Add support for namespace-based invalidation
+ * Rename options "redis_cluster" and "redis_sentinel" to "cluster" and "sentinel" respectively
+
+7.2
+---
+
+ * `igbinary_serialize()` is no longer used instead of `serialize()` by default when the igbinary extension is installed,
+   due to behavior compatibilities between the two
+ * Add optional `Psr\Clock\ClockInterface` parameter to `ArrayAdapter`
+
+7.1
+---
+
+ * Add option `sentinel_master` as an alias for `redis_sentinel`
+ * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter`
+ * Add support for URL encoded characters in Couchbase DSN
+ * Add support for using DSN with PDOAdapter
+ * The algorithm for the default cache namespace changed from SHA256 to XXH128
+
+7.0
+---
+
+ * Add parameter `$isSameDatabase` to `DoctrineDbalAdapter::configureSchema()`
+ * Drop support for Postgres < 9.5 and SQL Server < 2008 in `DoctrineDbalAdapter`
+
 6.4
 ---
 

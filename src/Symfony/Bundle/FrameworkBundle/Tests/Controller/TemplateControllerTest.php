@@ -21,6 +21,19 @@ use Twig\Loader\ArrayLoader;
  */
 class TemplateControllerTest extends TestCase
 {
+    public function testMethodSignaturesMatch()
+    {
+        $ref = new \ReflectionClass(TemplateController::class);
+
+        $templateActionRef = $ref->getMethod('templateAction');
+        $invokeRef = $ref->getMethod('__invoke');
+
+        $this->assertSame(
+            array_map(strval(...), $templateActionRef->getParameters()),
+            array_map(strval(...), $invokeRef->getParameters()),
+        );
+    }
+
     public function testTwig()
     {
         $twig = $this->createMock(Environment::class);
@@ -32,13 +45,23 @@ class TemplateControllerTest extends TestCase
         $this->assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
-    public function testNoTwig()
+    public function testNoTwigTemplateActionMethod()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('You cannot use the TemplateController if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
         $controller = new TemplateController();
 
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('You cannot use the TemplateController if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
+
         $controller->templateAction('mytemplate')->getContent();
+    }
+
+    public function testNoTwigInvokeMethod()
+    {
+        $controller = new TemplateController();
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('You cannot use the TemplateController if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
+
         $controller('mytemplate')->getContent();
     }
 
@@ -72,6 +95,26 @@ class TemplateControllerTest extends TestCase
         $controller = new TemplateController($twig);
 
         $this->assertSame(201, $controller->templateAction($templateName, null, null, null, [], $statusCode)->getStatusCode());
+        $this->assertSame(201, $controller($templateName, null, null, null, [], $statusCode)->getStatusCode());
+
         $this->assertSame(200, $controller->templateAction($templateName)->getStatusCode());
+        $this->assertSame(200, $controller($templateName)->getStatusCode());
+    }
+
+    public function testHeaders()
+    {
+        $templateName = 'image.svg.twig';
+
+        $loader = new ArrayLoader();
+        $loader->setTemplate($templateName, '<svg></svg>');
+
+        $twig = new Environment($loader);
+        $controller = new TemplateController($twig);
+
+        $this->assertSame('image/svg+xml', $controller->templateAction($templateName, headers: ['Content-Type' => 'image/svg+xml'])->headers->get('Content-Type'));
+        $this->assertSame('image/svg+xml', $controller($templateName, headers: ['Content-Type' => 'image/svg+xml'])->headers->get('Content-Type'));
+
+        $this->assertNull($controller->templateAction($templateName)->headers->get('Content-Type'));
+        $this->assertNull($controller($templateName)->headers->get('Content-Type'));
     }
 }

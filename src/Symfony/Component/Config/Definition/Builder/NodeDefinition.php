@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
+use Composer\InstalledVersions;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 use Symfony\Component\Config\Definition\NodeInterface;
@@ -22,23 +23,23 @@ use Symfony\Component\Config\Definition\NodeInterface;
  */
 abstract class NodeDefinition implements NodeParentInterface
 {
-    protected $name;
-    protected $normalization;
-    protected $validation;
-    protected $defaultValue;
-    protected $default = false;
-    protected $required = false;
-    protected $deprecation = [];
-    protected $merge;
-    protected $allowEmptyValue = true;
-    protected $nullEquivalent;
-    protected $trueEquivalent = true;
-    protected $falseEquivalent = false;
-    protected $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR;
-    protected $parent;
-    protected $attributes = [];
+    protected ?string $name = null;
+    protected NormalizationBuilder $normalization;
+    protected ValidationBuilder $validation;
+    protected mixed $defaultValue;
+    protected bool $default = false;
+    protected bool $required = false;
+    protected array $deprecation = [];
+    protected MergeBuilder $merge;
+    protected bool $allowEmptyValue = true;
+    protected mixed $nullEquivalent = null;
+    protected mixed $trueEquivalent = true;
+    protected mixed $falseEquivalent = false;
+    protected string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR;
+    protected NodeParentInterface|NodeInterface|null $parent;
+    protected array $attributes = [];
 
-    public function __construct(?string $name, NodeParentInterface $parent = null)
+    public function __construct(?string $name, ?NodeParentInterface $parent = null)
     {
         $this->parent = $parent;
         $this->name = $name;
@@ -77,6 +78,26 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
+     * Sets the documentation URI, as usually put in the "@see" tag of a doc block. This
+     * can either be a URL or a file path. You can use the placeholders {package},
+     * {version:major} and {version:minor} in the URI.
+     *
+     * @return $this
+     */
+    public function docUrl(string $uri, ?string $package = null): static
+    {
+        if ($package) {
+            preg_match('/^(\d+)\.(\d+)\.(\d+)/', InstalledVersions::getVersion($package) ?? '', $m);
+        }
+
+        return $this->attribute('docUrl', strtr($uri, [
+            '{package}' => $package ?? '',
+            '{version:major}' => $m[1] ?? '',
+            '{version:minor}' => $m[2] ?? '',
+        ]));
+    }
+
+    /**
      * Sets an attribute on the node.
      *
      * @return $this
@@ -90,8 +111,10 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Returns the parent node.
+     *
+     * @return NodeParentInterface|NodeBuilder|self|ArrayNodeDefinition|VariableNodeDefinition
      */
-    public function end(): NodeParentInterface|NodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition|null
+    public function end(): NodeParentInterface
     {
         return $this->parent;
     }

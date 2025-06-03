@@ -13,6 +13,7 @@ namespace Symfony\Component\HtmlSanitizer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerAction;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 class HtmlSanitizerAllTest extends TestCase
@@ -309,6 +310,12 @@ class HtmlSanitizerAllTest extends TestCase
                 'Lorem ipsum  ',
             ],
 
+            // Processing instructions
+            [
+                'Lorem ipsum<?div x?>foo',
+                'Lorem ipsumfoo',
+            ],
+
             // Normal tags
             [
                 '<abbr>Lorem ipsum</abbr>',
@@ -427,8 +434,8 @@ class HtmlSanitizerAllTest extends TestCase
                 '<hr />',
             ],
             [
-                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title">',
-                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title" />',
+                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title" height="150" width="300">',
+                '<img src="/img/example.jpg" alt="Image alternative text" title="Image title" height="150" width="300" />',
             ],
             [
                 '<img src="http://trusted.com/img/example.jpg" alt="Image alternative text" title="Image title" />',
@@ -560,5 +567,37 @@ class HtmlSanitizerAllTest extends TestCase
         foreach ($cases as $case) {
             yield $case[0] => $case;
         }
+    }
+
+    public function testUnlimitedLength()
+    {
+        $sanitizer = new HtmlSanitizer((new HtmlSanitizerConfig())->withMaxInputLength(-1));
+
+        $input = str_repeat('a', 10_000_000);
+
+        $sanitized = $sanitizer->sanitize($input);
+
+        $this->assertSame(\strlen($input), \strlen($sanitized));
+    }
+
+    public function testBlockByDefault()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->defaultAction(HtmlSanitizerAction::Block)
+            ->allowElement('p');
+
+        $sanitizer = new HtmlSanitizer($config);
+        self::assertSame('<p>Hello</p>', $sanitizer->sanitize('<foo><div><p><a target="_blank">Hello</a></p></div></foo>'));
+    }
+
+    public function testAllowByDefault()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->defaultAction(HtmlSanitizerAction::Allow)
+            ->allowElement('p')
+            ->dropElement('span');
+
+        $sanitizer = new HtmlSanitizer($config);
+        self::assertSame('<foo><div><p><a>Hello</a></p></div></foo>', $sanitizer->sanitize('<foo data-attr="value"><div class="foo"><p><a target="_blank">Hello<span> World</span></a></p></div></foo>'));
     }
 }

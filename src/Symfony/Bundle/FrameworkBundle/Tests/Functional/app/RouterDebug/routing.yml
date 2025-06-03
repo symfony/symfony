@@ -13,3 +13,6 @@ routerdebug_session_logout:
 routerdebug_test:
     path:     /test
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::welcomeAction }
+
+my_custom_alias:
+    alias: routerdebug_test

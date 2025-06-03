@@ -23,14 +23,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  */
 class PasswordHasherFactory implements PasswordHasherFactoryInterface
 {
-    private array $passwordHashers;
-
     /**
      * @param array<string, PasswordHasherInterface|array> $passwordHashers
      */
-    public function __construct(array $passwordHashers)
-    {
-        $this->passwordHashers = $passwordHashers;
+    public function __construct(
+        private array $passwordHashers,
+    ) {
     }
 
     public function getPasswordHasher(string|PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user): PasswordHasherInterface
@@ -39,7 +37,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
 
         if ($user instanceof PasswordHasherAwareInterface && null !== $hasherName = $user->getPasswordHasherName()) {
             if (!\array_key_exists($hasherName, $this->passwordHashers)) {
-                throw new \RuntimeException(sprintf('The password hasher "%s" was not configured.', $hasherName));
+                throw new \RuntimeException(\sprintf('The password hasher "%s" was not configured.', $hasherName));
             }
 
             $hasherKey = $hasherName;
@@ -53,7 +51,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
         }
 
         if (null === $hasherKey) {
-            throw new \RuntimeException(sprintf('No password hasher has been configured for account "%s".', \is_object($user) ? get_debug_type($user) : $user));
+            throw new \RuntimeException(\sprintf('No password hasher has been configured for account "%s".', \is_object($user) ? get_debug_type($user) : $user));
         }
 
         if (!$this->passwordHashers[$hasherKey] instanceof PasswordHasherInterface) {
@@ -70,6 +68,14 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
      */
     private function createHasher(array $config, bool $isExtra = false): PasswordHasherInterface
     {
+        if (isset($config['instance'])) {
+            if (!isset($config['migrate_from'])) {
+                return $config['instance'];
+            }
+
+            $config = $this->getMigratingPasswordConfig($config);
+        }
+
         if (isset($config['algorithm'])) {
             $rawConfig = $config;
             $config = $this->getHasherConfigFromAlgorithm($config);
@@ -126,24 +132,8 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
             ];
         }
 
-        if ($frompasswordHashers = ($config['migrate_from'] ?? false)) {
-            unset($config['migrate_from']);
-            $hasherChain = [$this->createHasher($config, true)];
-
-            foreach ($frompasswordHashers as $name) {
-                if ($hasher = $this->passwordHashers[$name] ?? false) {
-                    $hasher = $hasher instanceof PasswordHasherInterface ? $hasher : $this->createHasher($hasher, true);
-                } else {
-                    $hasher = $this->createHasher(['algorithm' => $name], true);
-                }
-
-                $hasherChain[] = $hasher;
-            }
-
-            return [
-                'class' => MigratingPasswordHasher::class,
-                'arguments' => $hasherChain,
-            ];
+        if ($config['migrate_from'] ?? false) {
+            return $this->getMigratingPasswordConfig($config);
         }
 
         switch ($config['algorithm']) {
@@ -196,7 +186,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                     $config['algorithm'] = 'native';
                     $config['native_algorithm'] = \PASSWORD_ARGON2I;
                 } else {
-                    throw new LogicException(sprintf('Algorithm "argon2i" is not available. Use "%s" instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id" or "auto' : 'auto'));
+                    throw new LogicException(\sprintf('Algorithm "argon2i" is not available. Use "%s" instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id" or "auto' : 'auto'));
                 }
 
                 return $this->getHasherConfigFromAlgorithm($config);
@@ -208,7 +198,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                     $config['algorithm'] = 'native';
                     $config['native_algorithm'] = \PASSWORD_ARGON2ID;
                 } else {
-                    throw new LogicException(sprintf('Algorithm "argon2id" is not available. Either use "%s", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
+                    throw new LogicException(\sprintf('Algorithm "argon2id" is not available; use "%s" or libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
                 }
 
                 return $this->getHasherConfigFromAlgorithm($config);
@@ -221,6 +211,28 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                 $config['encode_as_base64'] ?? true,
                 $config['iterations'] ?? 5000,
             ],
+        ];
+    }
+
+    private function getMigratingPasswordConfig(array $config): array
+    {
+        $frompasswordHashers = $config['migrate_from'];
+        unset($config['migrate_from']);
+        $hasherChain = [$this->createHasher($config, true)];
+
+        foreach ($frompasswordHashers as $name) {
+            if ($hasher = $this->passwordHashers[$name] ?? false) {
+                $hasher = $hasher instanceof PasswordHasherInterface ? $hasher : $this->createHasher($hasher, true);
+            } else {
+                $hasher = $this->createHasher(['algorithm' => $name], true);
+            }
+
+            $hasherChain[] = $hasher;
+        }
+
+        return [
+            'class' => MigratingPasswordHasher::class,
+            'arguments' => $hasherChain,
         ];
     }
 }

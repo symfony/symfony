@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class HandleTraitTest extends TestCase
@@ -54,6 +55,20 @@ class HandleTraitTest extends TestCase
         $bus->expects($this->once())->method('dispatch')->willReturn($envelope);
 
         $this->assertSame('result', $queryBus->query($envelope));
+    }
+
+    public function testHandleWithStamps()
+    {
+        $bus = $this->createMock(MessageBus::class);
+        $queryBus = new TestQueryBus($bus);
+        $stamp = $this->createMock(StampInterface::class);
+
+        $query = new DummyMessage('Hello');
+        $bus->expects($this->once())->method('dispatch')->with($query, [$stamp])->willReturn(
+            new Envelope($query, [new HandledStamp('result', 'DummyHandler::__invoke')])
+        );
+
+        $queryBus->query($query, [$stamp]);
     }
 
     public function testHandleThrowsOnNoHandledStamp()
@@ -96,8 +111,8 @@ class TestQueryBus
         }
     }
 
-    public function query($query): string
+    public function query($query, array $stamps = []): string
     {
-        return $this->handle($query);
+        return $this->handle($query, $stamps);
     }
 }

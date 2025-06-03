@@ -12,14 +12,14 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 /**
  * Test AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES.
  */
 trait SkipUninitializedValuesTestTrait
 {
-    abstract protected function getNormalizerForSkipUninitializedValues(): NormalizerInterface;
+    abstract protected function getNormalizerForSkipUninitializedValues(): AbstractObjectNormalizer;
 
     /**
      * @dataProvider skipUninitializedValuesFlagProvider
@@ -31,9 +31,18 @@ trait SkipUninitializedValuesTestTrait
         $normalizer = $this->getNormalizerForSkipUninitializedValues();
         $result = $normalizer->normalize($object, null, $context);
         $this->assertSame(['initialized' => 'value'], $result);
+
+        $normalizer->denormalize(
+            ['unInitialized' => 'value'],
+            TypedPropertiesObjectWithGetters::class,
+            null,
+            ['object_to_populate' => $objectToPopulate = new TypedPropertiesObjectWithGetters(), 'deep_object_to_populate' => true] + $context
+        );
+
+        $this->assertSame('value', $objectToPopulate->getUninitialized());
     }
 
-    public function skipUninitializedValuesFlagProvider(): iterable
+    public static function skipUninitializedValuesFlagProvider(): iterable
     {
         yield 'passed manually' => [['skip_uninitialized_values' => true, 'groups' => ['foo']]];
         yield 'using default context value' => [['groups' => ['foo']]];

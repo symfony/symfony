@@ -472,7 +472,7 @@ return [
         ],
         'MDL' => [
             'MDL',
-            'leu moldavo',
+            'leu moldovo',
         ],
         'MGA' => [
             'MGA',
@@ -662,9 +662,13 @@ return [
             'SHP',
             'libra de Santa Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'leone de Serra Leoa',
+        ],
         'SLL' => [
             'SLL',
-            'leone de Serra Leoa',
+            'leone de Serra Leoa (1964–2022)',
         ],
         'SOS' => [
             'SOS',

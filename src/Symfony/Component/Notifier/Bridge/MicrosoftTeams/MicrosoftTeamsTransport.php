@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -30,18 +29,17 @@ final class MicrosoftTeamsTransport extends AbstractTransport
 {
     protected const ENDPOINT = 'outlook.office.com';
 
-    private string $path;
-
-    public function __construct(string $path, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->path = $path;
-
+    public function __construct(
+        private string $path,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('microsoftteams://%s%s', $this->getEndpoint(), $this->path);
+        return \sprintf('microsoftteams://%s%s', $this->getEndpoint(), $this->path);
     }
 
     public function supports(MessageInterface $message): bool
@@ -62,7 +60,7 @@ final class MicrosoftTeamsTransport extends AbstractTransport
         $options['text'] ??= $message->getSubject();
 
         $path = $message->getRecipientId() ?? $this->path;
-        $endpoint = sprintf('https://%s%s', $this->getEndpoint(), $path);
+        $endpoint = \sprintf('https://%s%s', $this->getEndpoint(), $path);
         $response = $this->client->request('POST', $endpoint, [
             'json' => $options,
         ]);
@@ -77,14 +75,14 @@ final class MicrosoftTeamsTransport extends AbstractTransport
         if (null === $requestId) {
             $originalContent = $message->getSubject();
 
-            throw new TransportException(sprintf('Unable to post the Microsoft Teams message: "%s" (request-id not found).', $originalContent), $response);
+            throw new TransportException(\sprintf('Unable to post the Microsoft Teams message: "%s" (request-id not found).', $originalContent), $response);
         }
 
         if (200 !== $statusCode) {
             $errorMessage = $response->getContent(false);
             $originalContent = $message->getSubject();
 
-            throw new TransportException(sprintf('Unable to post the Microsoft Teams message: "%s" (%s : "%s").', $originalContent, $requestId, $errorMessage), $response);
+            throw new TransportException(\sprintf('Unable to post the Microsoft Teams message: "%s" (%s : "%s").', $originalContent, $requestId, $errorMessage), $response);
         }
 
         $message = new SentMessage($message, (string) $this);

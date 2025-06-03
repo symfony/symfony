@@ -174,9 +174,13 @@ return [
             'SHP',
             'Ɛlɛni-Senu Livri',
         ],
+        'SLE' => [
+            'SLE',
+            'siyeralewɔni Lewɔni',
+        ],
         'SLL' => [
             'SLL',
-            'siyeralewɔni Lewɔni',
+            'siyeralewɔni Lewɔni (1964—2022)',
         ],
         'SOS' => [
             'SOS',

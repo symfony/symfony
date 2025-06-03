@@ -25,21 +25,26 @@ class SchemeRequestMatcherTest extends TestCase
         $httpRequest = Request::create('');
         $httpsRequest = Request::create('', 'get', [], [], [], ['HTTPS' => 'on']);
 
+        $matcher = new SchemeRequestMatcher($matcherScheme);
         if ($isMatch) {
             if ('https' === $requestScheme) {
-                $matcher = new SchemeRequestMatcher($matcherScheme);
                 $this->assertFalse($matcher->matches($httpRequest));
                 $this->assertTrue($matcher->matches($httpsRequest));
             } else {
-                $matcher = new SchemeRequestMatcher($matcherScheme);
                 $this->assertFalse($matcher->matches($httpsRequest));
                 $this->assertTrue($matcher->matches($httpRequest));
             }
         } else {
-            $matcher = new SchemeRequestMatcher($matcherScheme);
             $this->assertFalse($matcher->matches($httpRequest));
             $this->assertFalse($matcher->matches($httpsRequest));
         }
+    }
+
+    public function testAlwaysMatchesOnParamsHeaders()
+    {
+        $matcher = new SchemeRequestMatcher([]);
+        $request = Request::create('sftp://example.com');
+        $this->assertTrue($matcher->matches($request));
     }
 
     public static function getData()

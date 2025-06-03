@@ -29,7 +29,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
     protected bool $catch = false;
     protected array $backendRequest;
 
-    public function __construct($body, $status, $headers, \Closure $customizer = null, EventDispatcher $eventDispatcher = null)
+    public function __construct($body, $status, $headers, ?\Closure $customizer = null, ?EventDispatcher $eventDispatcher = null)
     {
         $this->body = $body;
         $this->status = $status;
@@ -72,7 +72,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return $this->callController(...);
     }
 
-    public function getArguments(Request $request, callable $controller, \ReflectionFunctionAbstract $reflector = null): array
+    public function getArguments(Request $request, callable $controller, ?\ReflectionFunctionAbstract $reflector = null): array
     {
         return [$request];
     }

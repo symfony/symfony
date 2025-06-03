@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="ca" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>Massa intents d'inici de sessió fallits, torneu-ho a provar més tard.</target>
+                <target>Massa intents d'inici de sessió fallits, si us plau torneu-ho a provar més tard.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
@@ -72,11 +72,11 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>Massa intents d'inici de sessió fallits, torneu-ho a provar en %minutes% minut.</target>
+                <target>Massa intents d'inici de sessió fallits, si us plau torneu-ho a provar en %minutes% minut.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target>Massa intents d'inici de sessió fallits, torneu-ho a provar en %minutes% minuts.</target>
+                <target>Massa intents d'inici de sessió fallits, si us plau torneu-ho a provar en %minutes% minuts.</target>
             </trans-unit>
         </body>
     </file>

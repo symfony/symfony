@@ -14,7 +14,7 @@ if ('cli' !== \PHP_SAPI) {
 }
 
 // load new map
-$data = json_decode(file_get_contents('https://cdn.jsdelivr.net/gh/jshttp/mime-db@v1.49.0/db.json'), true);
+$data = json_decode(file_get_contents('https://cdn.jsdelivr.net/gh/jshttp/mime-db/db.json'), true);
 $new = [];
 foreach ($data as $mimeType => $mimeTypeInformation) {
     if (!array_key_exists('extensions', $mimeTypeInformation)) {
@@ -69,6 +69,7 @@ $data = $pre;
 // reverse map
 // we prefill the extensions with some preferences for content-types
 $exts = [
+    'aac' => ['audio/aac'],
     'asice' => ['application/vnd.etsi.asic-e+zip'],
     'bz2' => ['application/x-bz2'],
     'csv' => ['text/csv'],
@@ -90,9 +91,12 @@ $exts = [
     'mid' => ['audio/midi'],
     'mov' => ['video/quicktime'],
     'mp3' => ['audio/mpeg'],
+    'mp4' => ['video/mp4'],
+    'mpg4' => ['video/mpg4'],
     'ogg' => ['audio/ogg'],
     'pdf' => ['application/pdf'],
     'php' => ['application/x-php'],
+    'png' => ['image/png'],
     'ppt' => ['application/vnd.ms-powerpoint'],
     'rar' => ['application/x-rar-compressed'],
     'hqx' => ['application/stuffit'],
@@ -106,6 +110,8 @@ $exts = [
     'wma' => ['audio/x-ms-wma'],
     'wmv' => ['audio/x-ms-wmv'],
     'xls' => ['application/vnd.ms-excel'],
+    'yml' => ['application/yaml'],
+    'yaml' => ['application/yaml'], // Yaml must be set after to be first on application/yaml
     'zip' => ['application/zip'],
 ];
 
@@ -158,7 +164,7 @@ foreach (explode("\n", $data) as $line) {
     $state = 1;
 }
 
-$updated = preg_replace('{Updated from upstream on .+?\.}', 'Updated from upstream on '.date('Y-m-d'), $updated, -1);
+$updated = preg_replace('{Updated from upstream on .+?\.}', sprintf('Updated from upstream on %s.', date('Y-m-d')), $updated, -1);
 
 file_put_contents($output, rtrim($updated, "\n")."\n");
 

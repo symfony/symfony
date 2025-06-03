@@ -23,13 +23,10 @@ use Twig\TokenParser\TokenParserInterface;
  */
 final class StopwatchExtension extends AbstractExtension
 {
-    private ?Stopwatch $stopwatch;
-    private bool $enabled;
-
-    public function __construct(Stopwatch $stopwatch = null, bool $enabled = true)
-    {
-        $this->stopwatch = $stopwatch;
-        $this->enabled = $enabled;
+    public function __construct(
+        private ?Stopwatch $stopwatch = null,
+        private bool $enabled = true,
+    ) {
     }
 
     public function getStopwatch(): Stopwatch

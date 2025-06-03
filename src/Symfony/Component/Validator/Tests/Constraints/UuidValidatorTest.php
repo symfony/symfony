@@ -44,8 +44,9 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsUuidConstraintCompatibleType()
     {
+        $constraint = $this->createStub(Constraint::class);
+
         $this->expectException(UnexpectedTypeException::class);
-        $constraint = $this->getMockForAbstractClass(Constraint::class);
 
         $this->validator->validate('216fff40-98d9-11e3-a5e2-0800200c9a66', $constraint);
     }
@@ -92,7 +93,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidStrictUuidsWithWhitespaces($uuid, $versions = null)
     {
-        $constraint = new Uuid(['normalizer' => 'trim']);
+        $constraint = new Uuid(normalizer: 'trim');
 
         if (null !== $versions) {
             $constraint->versions = $versions;
@@ -130,9 +131,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidStrictUuids($uuid, $code, $versions = null)
     {
-        $constraint = new Uuid([
-            'message' => 'testMessage',
-        ]);
+        $constraint = new Uuid(message: 'testMessage');
 
         if (null !== $versions) {
             $constraint->versions = $versions;
@@ -194,9 +193,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidNonStrictUuids($uuid)
     {
-        $constraint = new Uuid([
-            'strict' => false,
-        ]);
+        $constraint = new Uuid(strict: false);
 
         $this->validator->validate($uuid, $constraint);
 
@@ -225,10 +222,10 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidNonStrictUuids($uuid, $code)
     {
-        $constraint = new Uuid([
-            'strict' => false,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Uuid(
+            strict: false,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($uuid, $constraint);
 
@@ -269,9 +266,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
      */
     public function testTimeBasedUuid(string $uid, bool $expectedTimeBased)
     {
-        $constraint = new Uuid([
-            'versions' => Uuid::TIME_BASED_VERSIONS,
-        ]);
+        $constraint = new Uuid(versions: Uuid::TIME_BASED_VERSIONS);
 
         $this->validator->validate($uid, $constraint);
 

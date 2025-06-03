@@ -23,8 +23,9 @@ class DoctrineDbalCacheAdapterSchemaListener extends AbstractSchemaListener
     /**
      * @param iterable<mixed, DoctrineDbalAdapter> $dbalAdapters
      */
-    public function __construct(private iterable $dbalAdapters)
-    {
+    public function __construct(
+        private readonly iterable $dbalAdapters,
+    ) {
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void

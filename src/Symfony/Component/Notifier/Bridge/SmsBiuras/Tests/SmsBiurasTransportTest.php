@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SmsBiurasTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): SmsBiurasTransport
+    public static function createTransport(?HttpClientInterface $client = null): SmsBiurasTransport
     {
         return new SmsBiurasTransport('uid', 'api_key', 'from', true, $client ?? new MockHttpClient());
     }
@@ -60,7 +60,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $message, $expected): ResponseInterface {
             $this->assertSame('GET', $method);
-            $this->assertSame(sprintf(
+            $this->assertSame(\sprintf(
                 'https://savitarna.smsbiuras.lt/api?uid=uid&apikey=api_key&message=%s&from=from&test=%s&to=%s',
                 rawurlencode($message->getSubject()),
                 $expected,

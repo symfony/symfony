@@ -12,13 +12,16 @@
 namespace Symfony\Component\Notifier\Bridge\RocketChat\Tests;
 
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class RocketChatTransportFactoryTest extends TransportFactoryTestCase
+final class RocketChatTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): RocketChatTransportFactory
     {
         return new RocketChatTransportFactory();

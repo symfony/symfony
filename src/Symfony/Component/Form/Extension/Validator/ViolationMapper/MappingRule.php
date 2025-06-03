@@ -19,15 +19,11 @@ use Symfony\Component\Form\FormInterface;
  */
 class MappingRule
 {
-    private FormInterface $origin;
-    private string $propertyPath;
-    private string $targetPath;
-
-    public function __construct(FormInterface $origin, string $propertyPath, string $targetPath)
-    {
-        $this->origin = $origin;
-        $this->propertyPath = $propertyPath;
-        $this->targetPath = $targetPath;
+    public function __construct(
+        private FormInterface $origin,
+        private string $propertyPath,
+        private string $targetPath,
+    ) {
     }
 
     public function getOrigin(): FormInterface
@@ -68,7 +64,7 @@ class MappingRule
 
         foreach ($childNames as $childName) {
             if (!$target->has($childName)) {
-                throw new ErrorMappingException(sprintf('The child "%s" of "%s" mapped by the rule "%s" in "%s" does not exist.', $childName, $target->getName(), $this->targetPath, $this->origin->getName()));
+                throw new ErrorMappingException(\sprintf('The child "%s" of "%s" mapped by the rule "%s" in "%s" does not exist.', $childName, $target->getName(), $this->targetPath, $this->origin->getName()));
             }
             $target = $target->get($childName);
         }

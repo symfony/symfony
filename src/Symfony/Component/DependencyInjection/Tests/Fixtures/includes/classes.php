@@ -83,7 +83,7 @@ class MethodCallClass
 
 class DummyProxyDumper implements DumperInterface
 {
-    public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null, string $id = null): bool
+    public function isProxyCandidate(Definition $definition, ?bool &$asGhostObject = null, ?string $id = null): bool
     {
         $asGhostObject = false;
 

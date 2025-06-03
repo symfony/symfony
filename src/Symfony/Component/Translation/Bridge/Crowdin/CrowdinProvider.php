@@ -31,35 +31,31 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class CrowdinProvider implements ProviderInterface
 {
-    private HttpClientInterface $client;
-    private LoaderInterface $loader;
-    private LoggerInterface $logger;
-    private XliffFileDumper $xliffFileDumper;
-    private string $defaultLocale;
-    private string $endpoint;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, XliffFileDumper $xliffFileDumper, string $defaultLocale, string $endpoint)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->xliffFileDumper = $xliffFileDumper;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private XliffFileDumper $xliffFileDumper,
+        private string $defaultLocale,
+        private string $endpoint,
+    ) {
     }
 
     public function __toString(): string
     {
-        return sprintf('crowdin://%s', $this->endpoint);
+        return \sprintf('crowdin://%s', $this->endpoint);
     }
 
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $fileList = $this->getFileList();
+        $languageMapping = $this->getLanguageMapping();
 
         $responses = [];
 
         foreach ($translatorBag->getCatalogues() as $catalogue) {
+            $locale = $catalogue->getLocale();
+
             foreach ($catalogue->getDomains() as $domain) {
                 if (0 === \count($catalogue->all($domain))) {
                     continue;
@@ -86,14 +82,14 @@ final class CrowdinProvider implements ProviderInterface
                         continue;
                     }
 
-                    $responses[] = $this->uploadTranslations($fileId, $domain, $content, $catalogue->getLocale());
+                    $responses[] = $this->uploadTranslations($fileId, $domain, $content, $languageMapping[$locale] ?? $locale);
                 }
             }
         }
 
         foreach ($responses as $response) {
             if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(sprintf('Unable to upload translations to Crowdin: "%s".', $response->getContent(false)));
+                $this->logger->error(\sprintf('Unable to upload translations to Crowdin: "%s".', $response->getContent(false)));
 
                 if (500 <= $statusCode) {
                     throw new ProviderException('Unable to upload translations to Crowdin.', $response);
@@ -105,11 +101,10 @@ final class CrowdinProvider implements ProviderInterface
     public function read(array $domains, array $locales): TranslatorBag
     {
         $fileList = $this->getFileList();
+        $languageMapping = $this->getLanguageMapping();
 
         $translatorBag = new TranslatorBag();
         $responses = [];
-
-        $localeLanguageMap = $this->mapLocalesToLanguageId($locales);
 
         foreach ($domains as $domain) {
             $fileId = $this->getFileIdByDomain($fileList, $domain);
@@ -120,7 +115,7 @@ final class CrowdinProvider implements ProviderInterface
 
             foreach ($locales as $locale) {
                 if ($locale !== $this->defaultLocale) {
-                    $response = $this->exportProjectTranslations($localeLanguageMap[$locale], $fileId);
+                    $response = $this->exportProjectTranslations($languageMapping[$locale] ?? $locale, $fileId);
                 } else {
                     $response = $this->downloadSourceFile($fileId);
                 }
@@ -133,13 +128,13 @@ final class CrowdinProvider implements ProviderInterface
         $downloads = [];
         foreach ($responses as [$response, $locale, $domain]) {
             if (204 === $response->getStatusCode()) {
-                $this->logger->error(sprintf('No content in exported file: "%s".', $response->getContent(false)));
+                $this->logger->error(\sprintf('No content in exported file: "%s".', $response->getContent(false)));
 
                 continue;
             }
 
             if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(sprintf('Unable to export file: "%s".', $response->getContent(false)));
+                $this->logger->error(\sprintf('Unable to export file: "%s".', $response->getContent(false)));
 
                 if (500 <= $statusCode) {
                     throw new ProviderException('Unable to export file.', $response);
@@ -154,7 +149,7 @@ final class CrowdinProvider implements ProviderInterface
 
         foreach ($downloads as [$response, $locale, $domain]) {
             if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(sprintf('Unable to download file content: "%s".', $response->getContent(false)));
+                $this->logger->error(\sprintf('Unable to download file content: "%s".', $response->getContent(false)));
 
                 if (500 <= $statusCode) {
                     throw new ProviderException('Unable to download file content.', $response);
@@ -175,10 +170,6 @@ final class CrowdinProvider implements ProviderInterface
         $responses = [];
 
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$defaultCatalogue) {
-            $defaultCatalogue = $translatorBag->getCatalogues()[0];
-        }
 
         foreach ($defaultCatalogue->all() as $domain => $messages) {
             $fileId = $this->getFileIdByDomain($fileList, $domain);
@@ -204,7 +195,7 @@ final class CrowdinProvider implements ProviderInterface
             }
 
             if (204 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->warning(sprintf('Unable to delete string: "%s".', $response->getContent(false)));
+                $this->logger->warning(\sprintf('Unable to delete string: "%s".', $response->getContent(false)));
 
                 if (500 <= $statusCode) {
                     throw new ProviderException('Unable to delete string.', $response);
@@ -215,7 +206,7 @@ final class CrowdinProvider implements ProviderInterface
 
     private function getFileIdByDomain(array $filesMap, string $domain): ?int
     {
-        return $filesMap[sprintf('%s.%s', $domain, 'xlf')] ?? null;
+        return $filesMap[\sprintf('%s.%s', $domain, 'xlf')] ?? null;
     }
 
     private function mapStrings(int $fileId): array
@@ -249,15 +240,15 @@ final class CrowdinProvider implements ProviderInterface
         $response = $this->client->request('POST', 'files', [
             'json' => [
                 'storageId' => $storageId,
-                'name' => sprintf('%s.%s', $domain, 'xlf'),
+                'name' => \sprintf('%s.%s', $domain, 'xlf'),
             ],
         ]);
 
         if (201 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to create a File in Crowdin for domain "%s": "%s".', $domain, $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to create a File in Crowdin for domain "%s": "%s".', $domain, $response->getContent(false)));
 
             if (500 <= $statusCode) {
-                throw new ProviderException(sprintf('Unable to create a File in Crowdin for domain "%s".', $domain), $response);
+                throw new ProviderException(\sprintf('Unable to create a File in Crowdin for domain "%s".', $domain), $response);
             }
 
             return null;
@@ -281,10 +272,10 @@ final class CrowdinProvider implements ProviderInterface
         ]);
 
         if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to update file in Crowdin for file ID "%d" and domain "%s": "%s".', $fileId, $domain, $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to update file in Crowdin for file ID "%d" and domain "%s": "%s".', $fileId, $domain, $response->getContent(false)));
 
             if (500 <= $statusCode) {
-                throw new ProviderException(sprintf('Unable to update file in Crowdin for file ID "%d" and domain "%s".', $fileId, $domain), $response);
+                throw new ProviderException(\sprintf('Unable to update file in Crowdin for file ID "%d" and domain "%s".', $fileId, $domain), $response);
             }
 
             return null;
@@ -329,7 +320,7 @@ final class CrowdinProvider implements ProviderInterface
          * @see https://developer.crowdin.com/api/v2/#operation/api.projects.files.download.get (Crowdin API)
          * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.files.download.get (Crowdin Enterprise API)
          */
-        return $this->client->request('GET', sprintf('files/%d/download', $fileId));
+        return $this->client->request('GET', \sprintf('files/%d/download', $fileId));
     }
 
     private function listStrings(int $fileId, int $limit, int $offset): array
@@ -347,7 +338,7 @@ final class CrowdinProvider implements ProviderInterface
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderException(sprintf('Unable to list strings for file "%d".', $fileId), $response);
+            throw new ProviderException(\sprintf('Unable to list strings for file "%d".', $fileId), $response);
         }
 
         return $response->toArray()['data'];
@@ -370,14 +361,14 @@ final class CrowdinProvider implements ProviderInterface
          */
         $response = $this->client->request('POST', '../../storages', [
             'headers' => [
-                'Crowdin-API-FileName' => urlencode(sprintf('%s.%s', $domain, 'xlf')),
+                'Crowdin-API-FileName' => urlencode(\sprintf('%s.%s', $domain, 'xlf')),
                 'Content-Type' => 'application/octet-stream',
             ],
             'body' => $content,
         ]);
 
         if (201 !== $response->getStatusCode()) {
-            throw new ProviderException(sprintf('Unable to add a Storage in Crowdin for domain "%s".', $domain), $response);
+            throw new ProviderException(\sprintf('Unable to add a Storage in Crowdin for domain "%s".', $domain), $response);
         }
 
         return $response->toArray()['data']['id'];
@@ -406,37 +397,24 @@ final class CrowdinProvider implements ProviderInterface
         return $result;
     }
 
-    private function mapLocalesToLanguageId(array $locales): array
+    private function getLanguageMapping(): array
     {
         /**
-         * We cannot query by locales, we need to fetch all and filter out the relevant ones.
-         *
-         * @see https://developer.crowdin.com/api/v2/#operation/api.languages.getMany (Crowdin API)
-         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.languages.getMany (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.get (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.get (Crowdin Enterprise API)
          */
-        $response = $this->client->request('GET', '../../languages?limit=500');
+        $response = $this->client->request('GET', '');
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderException('Unable to list set languages.', $response);
+            throw new ProviderException('Unable to get project info.', $response);
         }
 
-        $localeLanguageMap = [];
-        foreach ($response->toArray()['data'] as $language) {
-            foreach (['locale', 'osxLocale', 'id'] as $key) {
-                if (\in_array($language['data'][$key], $locales, true)) {
-                    $localeLanguageMap[$language['data'][$key]] = $language['data']['id'];
-                }
-            }
+        $projectInfo = $response->toArray()['data'];
+        $mapping = [];
+        foreach ($projectInfo['languageMapping'] ?? [] as $key => $value) {
+            $mapping[$value['locale']] = $key;
         }
 
-        if (\count($localeLanguageMap) !== \count($locales)) {
-            $message = implode('", "', array_diff($locales, array_keys($localeLanguageMap)));
-            $message = sprintf('Unable to find all requested locales: "%s" not found.', $message);
-            $this->logger->error($message);
-
-            throw new ProviderException($message, $response);
-        }
-
-        return $localeLanguageMap;
+        return $mapping;
     }
 }

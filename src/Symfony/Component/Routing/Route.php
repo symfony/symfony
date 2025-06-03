@@ -412,20 +412,31 @@ class Route implements \Serializable
 
     private function extractInlineDefaultsAndRequirements(string $pattern): string
     {
-        if (false === strpbrk($pattern, '?<')) {
+        if (false === strpbrk($pattern, '?<:')) {
             return $pattern;
         }
 
-        return preg_replace_callback('#\{(!?)([\w\x80-\xFF]++)(<.*?>)?(\?[^\}]*+)?\}#', function ($m) {
-            if (isset($m[4][0])) {
-                $this->setDefault($m[2], '?' !== $m[4] ? substr($m[4], 1) : null);
+        $mapping = $this->getDefault('_route_mapping') ?? [];
+
+        $pattern = preg_replace_callback('#\{(!?)([\w\x80-\xFF]++)(:([\w\x80-\xFF]++)(\.[\w\x80-\xFF]++)?)?(<.*?>)?(\?[^\}]*+)?\}#', function ($m) use (&$mapping) {
+            if (isset($m[7][0])) {
+                $this->setDefault($m[2], '?' !== $m[7] ? substr($m[7], 1) : null);
             }
-            if (isset($m[3][0])) {
-                $this->setRequirement($m[2], substr($m[3], 1, -1));
+            if (isset($m[6][0])) {
+                $this->setRequirement($m[2], substr($m[6], 1, -1));
+            }
+            if (isset($m[4][0])) {
+                $mapping[$m[2]] = isset($m[5][0]) ? [$m[4], substr($m[5], 1)] : $mapping[$m[2]] = [$m[4], $m[2]];
             }
 
             return '{'.$m[1].$m[2].'}';
         }, $pattern);
+
+        if ($mapping) {
+            $this->setDefault('_route_mapping', $mapping);
+        }
+
+        return $pattern;
     }
 
     private function sanitizeRequirement(string $key, string $regex): string
@@ -445,7 +456,7 @@ class Route implements \Serializable
         }
 
         if ('' === $regex) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
+            throw new \InvalidArgumentException(\sprintf('Routing requirement for "%s" cannot be empty.', $key));
         }
 
         return $regex;

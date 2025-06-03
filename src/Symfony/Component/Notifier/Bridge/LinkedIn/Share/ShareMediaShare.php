@@ -38,7 +38,7 @@ class ShareMediaShare extends AbstractLinkedInShare
         self::REGISTER,
     ];
 
-    public function __construct(string $text, array $attributes = [], string $inferredLocale = null, bool $landingPage = false, string $landingPageTitle = null, string $landingPageUrl = null)
+    public function __construct(string $text, array $attributes = [], ?string $inferredLocale = null, bool $landingPage = false, ?string $landingPageTitle = null, ?string $landingPageUrl = null)
     {
         $this->options['description'] = [
             'text' => $text,
@@ -54,8 +54,8 @@ class ShareMediaShare extends AbstractLinkedInShare
         }
 
         if (null !== $landingPageTitle) {
-            if (!\in_array($landingPageTitle, self::ALL)) {
-                throw new LogicException(sprintf('"%s" is not valid option, available options are "%s".', $landingPageTitle, implode(', ', self::ALL)));
+            if (!\in_array($landingPageTitle, self::ALL, true)) {
+                throw new LogicException(\sprintf('"%s" is not valid option, available options are "%s".', $landingPageTitle, implode(', ', self::ALL)));
             }
 
             $this->options['landingPage']['landingPageTitle'] = $landingPageTitle;

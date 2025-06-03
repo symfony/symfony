@@ -92,7 +92,6 @@ return [
         'IE' => 'Irilandi',
         'IL' => 'Isiraheli',
         'IN' => 'Ubuhindi',
-        'IO' => 'Intara y’Ubwongereza yo mu birwa by’Abahindi',
         'IQ' => 'Iraki',
         'IR' => 'Irani',
         'IS' => 'Ayisilandi',

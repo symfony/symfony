@@ -1,18 +1,27 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="sq" datatype="plaintext" original="file.ext">
+        <header>
+            <note>
+                Për fjalët e huaja, të cilat nuk kanë përkthim të drejtpërdrejtë, ju lutemi të ndiqni rregullat e mëposhtme:
+                  a) në rast se emri është akronim i përdorur gjerësisht si i përveçëm, atëherë, emri lakohet pa thonjëza dhe mbaresa shkruhet me vizë ndarëse. Gjinia gjykohet sipas rastit. Shembull: JSON-i (mashkullore)
+                  b) në rast se emri është akronim i papërdorur gjerësisht si i përveçëm, atëherë, emri lakohet pa thonjëza dhe mbaresa shkruhet me vizë ndarëse. Gjinia është femërore. Shembull: URL-ja (femërore)
+                  c) në rast se emri duhet lakuar për shkak të rasës në fjali, atëherë, emri lakohet pa thonjëza dhe mbaresa shkruhet me vizë ndarëse. Shembull: host-i, prej host-it
+                  d) në rast se emri nuk duhet lakuar për shkak të trajtës në fjali, atëherë, emri rrethohet me thonjëzat “”. Shembull: “locale”
+            </note>
+        </header>
         <body>
             <trans-unit id="28">
                 <source>This form should not contain extra fields.</source>
-                <target>Kjo formë nuk duhet të përmbajë fusha shtesë.</target>
+                <target>Ky formular nuk duhet të përmbajë fusha shtesë.</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file.</source>
-                <target>Skedari i ngarkuar ishte shumë i madh. Ju lutemi provoni të ngarkoni një skedar më të vogël.</target>
+                <target>Skeda e ngarkuar ishte shumë e madhe. Ju lutemi provoni të ngarkoni një skedë më të vogël.</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>Vlera CSRF është e pavlefshme. Ju lutemi provoni të ridërgoni formën.</target>
+                <target>Vlera CSRF është e pavlefshme. Ju lutemi provoni të ridërgoni formularin.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
@@ -24,7 +33,7 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
-                <target>Opsioni i zgjedhur është i pavlefshëm.</target>
+                <target>Alternativa e zgjedhur është e pavlefshme.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>The collection is invalid.</source>
@@ -40,11 +49,11 @@
             </trans-unit>
             <trans-unit id="105">
                 <source>Please select a valid currency.</source>
-                <target>Ju lutemi zgjidhni një monedhë të vlefshme.</target>
+                <target>Ju lutemi zgjidhni një valutë të vlefshme.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>Please choose a valid date interval.</source>
-                <target>Ju lutemi zgjidhni një interval të vlefshëm të datës.</target>
+                <target>Ju lutemi zgjidhni një interval të vlefshëm.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Please enter a valid date and time.</source>
@@ -56,7 +65,7 @@
             </trans-unit>
             <trans-unit id="109">
                 <source>Please select a valid file.</source>
-                <target>Ju lutemi zgjidhni një skedar të vlefshëm.</target>
+                <target>Ju lutemi zgjidhni një skedë të vlefshme.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
@@ -68,11 +77,11 @@
             </trans-unit>
             <trans-unit id="112">
                 <source>Please select a valid language.</source>
-                <target>Please select a valid language.</target>
+                <target>Ju lutemi zgjidhni një gjuhë të vlefshme.</target>
             </trans-unit>
             <trans-unit id="113">
                 <source>Please select a valid locale.</source>
-                <target>Ju lutemi zgjidhni një lokale të vlefshme.</target>
+                <target>Ju lutemi zgjidhni një “locale” të vlefshme.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>Please enter a valid money amount.</source>
@@ -96,7 +105,7 @@
             </trans-unit>
             <trans-unit id="119">
                 <source>Please enter a valid time.</source>
-                <target>Ju lutemi shkruani një kohë të vlefshme.</target>
+                <target>Ju lutemi shkruani një orë të vlefshme.</target>
             </trans-unit>
             <trans-unit id="120">
                 <source>Please select a valid timezone.</source>
@@ -120,15 +129,15 @@
             </trans-unit>
             <trans-unit id="125">
                 <source>Please enter a valid email address.</source>
-                <target>Ju lutemi shkruani një adresë të vlefshme emaili.</target>
+                <target>Ju lutemi shkruani një adresë të vlefshme email-i.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>Please select a valid option.</source>
-                <target>Ju lutemi zgjidhni një opsion të vlefshëm.</target>
+                <target>Ju lutemi zgjidhni një alternativë të vlefshme.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>Please select a valid range.</source>
-                <target>Ju lutemi zgjidhni një diapazon të vlefshëm.</target>
+                <target>Ju lutemi zgjidhni një seri të vlefshme.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>Please enter a valid week.</source>

@@ -3,12 +3,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Symfony\Contracts\Service\Attribute\SubscribedService;
+use Symfony\Contracts\Service\ServiceMethodsSubscriberTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
 class TestServiceSubscriberParent implements ServiceSubscriberInterface
 {
-    use ServiceSubscriberTrait;
+    use ServiceMethodsSubscriberTrait;
 
     public function publicFunction1(): SomeClass
     {

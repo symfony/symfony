@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\SubNamespace;
 
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/my/child/controller', name: 'my_child_controller_')]
 final class MyChildController extends MyAbstractController

@@ -18,6 +18,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
@@ -128,7 +129,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             $configs[] = array_values($configDef->getArguments());
         }
 
-        // the IDs of the services are case sensitive or insensitive depending on
+        // the IDs of the services are case-sensitive or insensitive depending on
         // the Symfony version. Transform them to lowercase to simplify tests.
         $configs[0][2] = strtolower($configs[0][2]);
         $configs[2][2] = strtolower($configs[2][2]);
@@ -137,7 +138,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             [
                 'simple',
                 'security.user_checker',
-                '.security.request_matcher.h5ibf38',
+                \count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? '.security.request_matcher.rud_2nr' : '.security.request_matcher.h5ibf38',
                 false,
                 false,
                 '',
@@ -187,7 +188,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             [
                 'host',
                 'security.user_checker',
-                '.security.request_matcher.bcmu4fb',
+                \count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? '.security.request_matcher.ap9sh8g' : '.security.request_matcher.bcmu4fb',
                 true,
                 false,
                 'security.user.provider.concrete.default',
@@ -242,7 +243,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             ],
         ], $listeners);
 
-        $this->assertFalse($container->hasAlias(UserCheckerInterface::class, 'No user checker alias is registered when custom user checker services are registered'));
+        $this->assertFalse($container->hasAlias(UserCheckerInterface::class), 'No user checker alias is registered when custom user checker services are registered');
     }
 
     public function testFirewallRequestMatchers()

@@ -94,7 +94,7 @@ class CookieJarTest extends TestCase
     {
         $timestamp = time() + 3600;
         $date = gmdate('D, d M Y H:i:s \G\M\T', $timestamp);
-        $setCookies = [sprintf('foo=foo; expires=%s; domain=.symfony.com; path=/, bar=bar; domain=.blog.symfony.com, PHPSESSID=id; expires=%1$s', $date)];
+        $setCookies = [\sprintf('foo=foo; expires=%s; domain=.symfony.com; path=/, bar=bar; domain=.blog.symfony.com, PHPSESSID=id; expires=%1$s', $date)];
 
         $cookieJar = new CookieJar();
         $cookieJar->updateFromSetCookie($setCookies);
@@ -247,6 +247,6 @@ class CookieJarTest extends TestCase
         $cookieJar->set(new Cookie('foo', 'bar', null, '/', '.example.com'));
 
         $this->assertEquals(['foo' => 'bar'], $cookieJar->allValues('http://www.example.com'));
-        $this->assertEmpty($cookieJar->allValues('http://wwwexample.com'));
+        $this->assertSame([], $cookieJar->allValues('http://wwwexample.com'));
     }
 }

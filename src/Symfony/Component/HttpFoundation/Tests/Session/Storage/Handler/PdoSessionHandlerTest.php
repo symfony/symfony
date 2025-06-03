@@ -30,7 +30,6 @@ class PdoSessionHandlerTest extends TestCase
         if ($this->dbFile) {
             @unlink($this->dbFile);
         }
-        parent::tearDown();
     }
 
     protected function getPersistentSqliteDsn()
@@ -224,6 +223,7 @@ class PdoSessionHandlerTest extends TestCase
     {
         // wrong method sequence that should no happen, but still works
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage->open('', 'sid');
         $storage->write('id', 'data');
         $storage->write('other_id', 'other_data');
         $storage->destroy('inexistent');
@@ -352,7 +352,7 @@ class PdoSessionHandlerTest extends TestCase
         $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
         $pdoSessionHandler->configureSchema($schema, fn () => true);
         $table = $schema->getTable('sessions');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 
     public static function provideUrlDsnPairs()
@@ -408,7 +408,7 @@ class MockPdo extends \PDO
     private ?string $driverName;
     private bool|int $errorMode;
 
-    public function __construct(string $driverName = null, int $errorMode = null)
+    public function __construct(?string $driverName = null, ?int $errorMode = null)
     {
         $this->driverName = $driverName;
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;

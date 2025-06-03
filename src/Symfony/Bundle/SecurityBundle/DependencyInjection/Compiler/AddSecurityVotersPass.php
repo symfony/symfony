@@ -29,10 +29,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('security.access.decision_manager')) {
             return;
@@ -52,7 +49,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
             if (!is_a($class, VoterInterface::class, true)) {
-                throw new LogicException(sprintf('"%s" must implement the "%s" when used as a voter.', $class, VoterInterface::class));
+                throw new LogicException(\sprintf('"%s" must implement the "%s" when used as a voter.', $class, VoterInterface::class));
             }
 
             if ($debug) {

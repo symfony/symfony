@@ -20,11 +20,12 @@ class CheckReferenceValidityPassTest extends TestCase
 {
     public function testProcessDetectsReferenceToAbstractDefinition()
     {
-        $this->expectException(\RuntimeException::class);
         $container = new ContainerBuilder();
 
         $container->register('a')->setAbstract(true);
         $container->register('b')->addArgument(new Reference('a'));
+
+        $this->expectException(\RuntimeException::class);
 
         $this->process($container);
     }

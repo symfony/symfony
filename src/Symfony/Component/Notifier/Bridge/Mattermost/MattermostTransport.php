@@ -26,22 +26,19 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MattermostTransport extends AbstractTransport
 {
-    private string $token;
-    private string $channel;
-    private ?string $path;
-
-    public function __construct(#[\SensitiveParameter] string $token, string $channel, string $path = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->token = $token;
-        $this->channel = $channel;
-        $this->path = $path;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $token,
+        private string $channel,
+        private ?string $path = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('mattermost://%s?channel=%s', $this->getEndpoint(), $this->channel);
+        return \sprintf('mattermost://%s?channel=%s', $this->getEndpoint(), $this->channel);
     }
 
     public function supports(MessageInterface $message): bool
@@ -62,7 +59,7 @@ final class MattermostTransport extends AbstractTransport
         $options['message'] = $message->getSubject();
         $options['channel_id'] ??= $message->getRecipientId() ?: $this->channel;
 
-        $endpoint = sprintf('https://%s/api/v4/posts', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/v4/posts', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->token,
@@ -78,7 +75,7 @@ final class MattermostTransport extends AbstractTransport
         if (201 !== $statusCode) {
             $result = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to post the Mattermost message: %s (%s).', $result['message'], $result['id']), $response);
+            throw new TransportException(\sprintf('Unable to post the Mattermost message: %s (%s).', $result['message'], $result['id']), $response);
         }
 
         $success = $response->toArray(false);

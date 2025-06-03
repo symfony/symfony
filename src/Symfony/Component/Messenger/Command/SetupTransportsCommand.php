@@ -28,21 +28,14 @@ use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 #[AsCommand(name: 'messenger:setup-transports', description: 'Prepare the required infrastructure for the transport')]
 class SetupTransportsCommand extends Command
 {
-    private ContainerInterface $transportLocator;
-    private array $transportNames;
-
-    public function __construct(ContainerInterface $transportLocator, array $transportNames = [])
-    {
-        $this->transportLocator = $transportLocator;
-        $this->transportNames = $transportNames;
-
+    public function __construct(
+        private ContainerInterface $transportLocator,
+        private array $transportNames = [],
+    ) {
         parent::__construct();
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('transport', InputArgument::OPTIONAL, 'Name of the transport to setup', null)
@@ -67,18 +60,23 @@ EOF
         // do we want to set up only one transport?
         if ($transport = $input->getArgument('transport')) {
             if (!$this->transportLocator->has($transport)) {
-                throw new \RuntimeException(sprintf('The "%s" transport does not exist.', $transport));
+                throw new \RuntimeException(\sprintf('The "%s" transport does not exist.', $transport));
             }
             $transportNames = [$transport];
         }
 
         foreach ($transportNames as $id => $transportName) {
             $transport = $this->transportLocator->get($transportName);
-            if ($transport instanceof SetupableTransportInterface) {
+            if (!$transport instanceof SetupableTransportInterface) {
+                $io->note(\sprintf('The "%s" transport does not support setup.', $transportName));
+                continue;
+            }
+
+            try {
                 $transport->setup();
-                $io->success(sprintf('The "%s" transport was set up successfully.', $transportName));
-            } else {
-                $io->note(sprintf('The "%s" transport does not support setup.', $transportName));
+                $io->success(\sprintf('The "%s" transport was set up successfully.', $transportName));
+            } catch (\Exception $e) {
+                throw new \RuntimeException(\sprintf('An error occurred while setting up the "%s" transport: ', $transportName).$e->getMessage(), 0, $e);
             }
         }
 
@@ -89,8 +87,6 @@ EOF
     {
         if ($input->mustSuggestArgumentValuesFor('transport')) {
             $suggestions->suggestValues($this->transportNames);
-
-            return;
         }
     }
 }

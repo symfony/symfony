@@ -74,7 +74,7 @@ class AutowireTest extends TestCase
     /**
      * @see testCanOnlySetOneParameter
      */
-    private static function provideMultipleParameters(): iterable
+    public static function provideMultipleParameters(): iterable
     {
         yield [['service' => 'id', 'expression' => 'expr']];
 

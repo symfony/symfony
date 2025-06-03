@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Fixtures;
 
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
@@ -26,10 +25,10 @@ class ServerRequest extends Message implements ServerRequestInterface
     public function __construct(
         string $version = '1.1',
         array $headers = [],
-        StreamInterface $body = null,
+        ?StreamInterface $body = null,
         private readonly string $requestTarget = '/',
         private readonly string $method = 'GET',
-        UriInterface|string $uri = null,
+        UriInterface|string|null $uri = null,
         private readonly array $server = [],
         private readonly array $cookies = [],
         private readonly array $query = [],

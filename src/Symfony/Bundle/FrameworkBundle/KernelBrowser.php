@@ -34,14 +34,11 @@ class KernelBrowser extends HttpKernelBrowser
     private bool $profiler = false;
     private bool $reboot = true;
 
-    public function __construct(KernelInterface $kernel, array $server = [], History $history = null, CookieJar $cookieJar = null)
+    public function __construct(KernelInterface $kernel, array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
         parent::__construct($kernel, $server, $history, $cookieJar);
     }
 
-    /**
-     * Returns the container.
-     */
     public function getContainer(): ContainerInterface
     {
         $container = $this->kernel->getContainer();
@@ -49,9 +46,6 @@ class KernelBrowser extends HttpKernelBrowser
         return $container->has('test.service_container') ? $container->get('test.service_container') : $container;
     }
 
-    /**
-     * Returns the kernel.
-     */
     public function getKernel(): KernelInterface
     {
         return $this->kernel;
@@ -62,7 +56,7 @@ class KernelBrowser extends HttpKernelBrowser
      */
     public function getProfile(): HttpProfile|false|null
     {
-        if (null === $this->response || !$this->getContainer()->has('profiler')) {
+        if (!isset($this->response) || !$this->getContainer()->has('profiler')) {
             return false;
         }
 
@@ -73,10 +67,8 @@ class KernelBrowser extends HttpKernelBrowser
      * Enables the profiler for the very next request.
      *
      * If the profiler is not enabled, the call to this method does nothing.
-     *
-     * @return void
      */
-    public function enableProfiler()
+    public function enableProfiler(): void
     {
         if ($this->getContainer()->has('profiler')) {
             $this->profiler = true;
@@ -88,20 +80,16 @@ class KernelBrowser extends HttpKernelBrowser
      *
      * By default, the Client reboots the Kernel for each request. This method
      * allows to keep the same kernel across requests.
-     *
-     * @return void
      */
-    public function disableReboot()
+    public function disableReboot(): void
     {
         $this->reboot = false;
     }
 
     /**
      * Enables kernel reboot between requests.
-     *
-     * @return void
      */
-    public function enableReboot()
+    public function enableReboot(): void
     {
         $this->reboot = true;
     }
@@ -112,24 +100,18 @@ class KernelBrowser extends HttpKernelBrowser
      *
      * @return $this
      */
-    public function loginUser(object $user, string $firewallContext = 'main'/* , array $tokenAttributes = [] */): static
+    public function loginUser(object $user, string $firewallContext = 'main', array $tokenAttributes = []): static
     {
-        $tokenAttributes = 2 < \func_num_args() ? func_get_arg(2) : [];
-
         if (!interface_exists(UserInterface::class)) {
-            throw new \LogicException(sprintf('"%s" requires symfony/security-core to be installed. Try running "composer require symfony/security-core".', __METHOD__));
+            throw new \LogicException(\sprintf('"%s" requires symfony/security-core to be installed. Try running "composer require symfony/security-core".', __METHOD__));
         }
 
         if (!$user instanceof UserInterface) {
-            throw new \LogicException(sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, get_debug_type($user)));
+            throw new \LogicException(\sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, get_debug_type($user)));
         }
 
         $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
         $token->setAttributes($tokenAttributes);
-        // required for compatibility with Symfony 5.4
-        if (method_exists($token, 'isAuthenticated')) {
-            $token->setAuthenticated(true, false);
-        }
 
         $container = $this->getContainer();
         $container->get('security.untracked_token_storage')->setToken($token);

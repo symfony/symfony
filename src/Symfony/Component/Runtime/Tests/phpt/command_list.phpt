@@ -23,8 +23,8 @@ Usage:
   command [options] [arguments]
 
 Options:
-  -h, --help            Display %s
-  -q, --quiet           Do not output any message
+  -h, --help            Display %A
+  -q, --quiet           %s
   -V, --version         Display this application version
       --ansi%A
   -n, --no-interaction  Do not ask any interactive question

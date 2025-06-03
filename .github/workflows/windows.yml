@@ -1,0 +1,131 @@
+name: Windows
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: x86 / minimal-exts / lowest-php
+
+    defaults:
+      run:
+        shell: pwsh
+
+    runs-on: windows-2022
+
+    env:
+      COMPOSER_NO_INTERACTION: '1'
+      SYMFONY_DEPRECATIONS_HELPER: 'strict'
+      ANSICON: '121x90 (121x90)'
+      SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE: '1'
+
+    steps:
+      - name: Setup Git
+        run: |
+          git config --global core.autocrlf false
+          git config --global user.email ""
+          git config --global user.name "Symfony"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup PHP
+        run: |
+          $env:Path = 'c:\php;' + $env:Path
+          mkdir c:\php && cd c:\php
+          iwr -outf php-8.2.0-Win32-vs16-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-Win32-vs16-x86.zip
+          7z x php-8.2.0-Win32-vs16-x86.zip -y >nul
+          cd ext
+          iwr -outf php_apcu-5.1.22-8.2-ts-vs16-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.22-8.2-ts-vs16-x86.zip
+          7z x php_apcu-5.1.22-8.2-ts-vs16-x86.zip -y >nul
+          iwr -outf php_redis-6.0.0-dev-8.2-ts-vs16-x86.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-6.0.0-dev-8.2-ts-vs16-x86.zip
+          7z x php_redis-6.0.0-dev-8.2-ts-vs16-x86.zip -y >nul
+          cd ..
+          Copy php.ini-development php.ini-min
+          "memory_limit=-1" >> php.ini-min
+          "serialize_precision=-1" >> php.ini-min
+          "max_execution_time=1200" >> php.ini-min
+          "post_max_size=2047M" >> php.ini-min
+          "upload_max_filesize=2047M" >> php.ini-min
+          "date.timezone=`"America/Los_Angeles`"" >> php.ini-min
+          "extension_dir=ext" >> php.ini-min
+          "extension=php_xsl.dll" >> php.ini-min
+          "extension=php_mbstring.dll" >> php.ini-min
+          Copy php.ini-min php.ini-max
+          "zend_extension=php_opcache.dll" >> php.ini-max
+          "opcache.enable_cli=1" >> php.ini-max
+          "extension=php_openssl.dll" >> php.ini-max
+          "extension=php_apcu.dll" >> php.ini-max
+          "extension=php_igbinary.dll" >> php.ini-max
+          "extension=php_redis.dll" >> php.ini-max
+          "apc.enable_cli=1" >> php.ini-max
+          "extension=php_intl.dll" >> php.ini-max
+          "extension=php_fileinfo.dll" >> php.ini-max
+          "extension=php_pdo_sqlite.dll" >> php.ini-max
+          "extension=php_curl.dll" >> php.ini-max
+          "extension=php_sodium.dll" >> php.ini-max
+          Copy php.ini-max php.ini
+          cd ${{ github.workspace }}
+          iwr -outf composer.phar https://getcomposer.org/download/latest-stable/composer.phar
+
+      - name: Install dependencies
+        id: setup
+        run: |
+          $env:Path = 'c:\php;' + $env:Path
+          mkdir $env:APPDATA\Composer && Copy .github\composer-config.json $env:APPDATA\Composer\config.json
+
+          $env:SYMFONY_VERSION=(Select-String -CaseSensitive -Pattern " VERSION =" -SimpleMatch -Path src/Symfony/Component/HttpKernel/Kernel.php | Select Line | Select-String -Pattern "([0-9][0-9]*\.[0-9])").Matches.Value
+          $env:COMPOSER_ROOT_VERSION=$env:SYMFONY_VERSION + ".x-dev"
+
+          php .github/build-packages.php HEAD^ $env:SYMFONY_VERSION src\Symfony\Bridge\PhpUnit
+          php composer.phar update --no-progress --ansi
+
+      - name: Install PHPUnit
+        run: |
+          $env:Path = 'c:\php;' + $env:Path
+
+          php phpunit install
+
+      - name: Install memurai-developer
+        run: |
+          choco install --no-progress memurai-developer
+
+      - name: Run tests (minimal extensions)
+        if: always() && steps.setup.outcome == 'success'
+        run: |
+          $env:Path = 'c:\php;' + $env:Path
+          $env:SYMFONY_PHPUNIT_SKIPPED_TESTS = 'phpunit.skipped'
+          $x = 0
+
+          Copy c:\php\php.ini-min c:\php\php.ini
+          Remove-Item -Path src\Symfony\Bridge\PhpUnit -Recurse
+          mv src\Symfony\Component\HttpClient\phpunit.xml.dist src\Symfony\Component\HttpClient\phpunit.xml
+          php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || ($x = 1)
+          # HttpClient tests need to run separately, they block when run with other components' tests concurrently
+          php phpunit src\Symfony\Component\HttpClient || ($x = 1)
+
+          exit $x
+
+      - name: Run tests
+        if: always() && steps.setup.outcome == 'success'
+        run: |
+          $env:Path = 'c:\php;' + $env:Path
+          $env:SYMFONY_PHPUNIT_SKIPPED_TESTS = 'phpunit.skipped'
+          $x = 0
+
+          Copy c:\php\php.ini-max c:\php\php.ini
+          php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || ($x = 1)
+          # HttpClient tests need to run separately, they block when run with other components' tests concurrently
+          php phpunit src\Symfony\Component\HttpClient || ($x = 1)
+
+          exit $x

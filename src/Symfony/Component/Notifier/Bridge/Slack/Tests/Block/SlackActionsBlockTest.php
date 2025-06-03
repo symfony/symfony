@@ -19,8 +19,9 @@ final class SlackActionsBlockTest extends TestCase
     public function testCanBeInstantiated()
     {
         $actions = new SlackActionsBlock();
-        $actions->button('first button text', 'https://example.org')
+        $actions->button('first button text', 'https://example.org', null, 'test-value')
             ->button('second button text', 'https://example.org/slack', 'danger')
+            ->button('third button text', null, null, 'test-value-3')
         ;
 
         $this->assertSame([
@@ -33,6 +34,7 @@ final class SlackActionsBlockTest extends TestCase
                         'text' => 'first button text',
                     ],
                     'url' => 'https://example.org',
+                    'value' => 'test-value'
                 ],
                 [
                     'type' => 'button',
@@ -43,6 +45,14 @@ final class SlackActionsBlockTest extends TestCase
                     'url' => 'https://example.org/slack',
                     'style' => 'danger',
                 ],
+                [
+                    'type' => 'button',
+                    'text' => [
+                        'type' => 'plain_text',
+                        'text' => 'third button text',
+                    ],
+                    'value' => 'test-value-3',
+                ]
             ],
         ], $actions->toArray());
     }

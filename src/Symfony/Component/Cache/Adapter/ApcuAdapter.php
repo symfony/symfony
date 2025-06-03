@@ -20,13 +20,15 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 class ApcuAdapter extends AbstractAdapter
 {
-    private ?MarshallerInterface $marshaller;
-
     /**
      * @throws CacheException if APCu is not enabled
      */
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $version = null, MarshallerInterface $marshaller = null)
-    {
+    public function __construct(
+        string $namespace = '',
+        int $defaultLifetime = 0,
+        ?string $version = null,
+        private ?MarshallerInterface $marshaller = null,
+    ) {
         if (!static::isSupported()) {
             throw new CacheException('APCu is not enabled.');
         }
@@ -43,14 +45,9 @@ class ApcuAdapter extends AbstractAdapter
                 apcu_add($version.'@'.$namespace, null);
             }
         }
-
-        $this->marshaller = $marshaller;
     }
 
-    /**
-     * @return bool
-     */
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         return \function_exists('apcu_fetch') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL);
     }
@@ -82,7 +79,7 @@ class ApcuAdapter extends AbstractAdapter
     protected function doClear(string $namespace): bool
     {
         return isset($namespace[0]) && class_exists(\APCUIterator::class, false) && ('cli' !== \PHP_SAPI || filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL))
-            ? apcu_delete(new \APCUIterator(sprintf('/^%s/', preg_quote($namespace, '/')), \APC_ITER_KEY))
+            ? apcu_delete(new \APCUIterator(\sprintf('/^%s/', preg_quote($namespace, '/')), \APC_ITER_KEY))
             : apcu_clear_cache();
     }
 
@@ -101,19 +98,10 @@ class ApcuAdapter extends AbstractAdapter
             return $failed;
         }
 
-        try {
-            if (false === $failures = apcu_store($values, null, $lifetime)) {
-                $failures = $values;
-            }
-
-            return array_keys($failures);
-        } catch (\Throwable $e) {
-            if (1 === \count($values)) {
-                // Workaround https://github.com/krakjoe/apcu/issues/170
-                apcu_delete(array_key_first($values));
-            }
-
-            throw $e;
+        if (false === $failures = apcu_store($values, null, $lifetime)) {
+            $failures = $values;
         }
+
+        return array_keys($failures);
     }
 }

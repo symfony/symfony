@@ -69,7 +69,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     public function testUpgradeWithUpgrader()
     {
-        $passwordUpgrader = $this->getMockForAbstractClass(TestMigratingUserProvider::class);
+        $passwordUpgrader = $this->createMock(TestMigratingUserProvider::class);
         $passwordUpgrader->expects($this->once())
             ->method('upgradePassword')
             ->with($this->user, 'new-hash')
@@ -81,7 +81,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     public function testUpgradeWithoutUpgrader()
     {
-        $userLoader = $this->getMockForAbstractClass(TestMigratingUserProvider::class);
+        $userLoader = $this->createMock(TestMigratingUserProvider::class);
         $userLoader->expects($this->any())->method('loadUserByIdentifier')->willReturn($this->user);
 
         $userLoader->expects($this->exactly(2))
@@ -150,8 +150,6 @@ class DummyTestMigratingUserProvider extends TestMigratingUserProvider
 abstract class TestPasswordAuthenticatedUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
     abstract public function getPassword(): ?string;
-
-    abstract public function getSalt(): ?string;
 }
 
 class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
@@ -161,21 +159,13 @@ class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
         return null;
     }
 
-    public function getSalt(): ?string
-    {
-        return null;
-    }
-
     public function getRoles(): array
     {
         return [];
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
-    {
-    }
-
-    public function getUsername(): string
     {
     }
 

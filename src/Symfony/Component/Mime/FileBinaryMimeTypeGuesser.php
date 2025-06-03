@@ -21,8 +21,6 @@ use Symfony\Component\Mime\Exception\LogicException;
  */
 class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
 {
-    private string $cmd;
-
     /**
      * The $cmd pattern must contain a "%s" string that will be replaced
      * with the file name to guess.
@@ -31,9 +29,9 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @param string $cmd The command to run to get the MIME type of a file
      */
-    public function __construct(string $cmd = 'file -b --mime -- %s 2>/dev/null')
-    {
-        $this->cmd = $cmd;
+    public function __construct(
+        private string $cmd = 'file -b --mime -- %s 2>/dev/null',
+    ) {
     }
 
     public function isGuesserSupported(): bool
@@ -58,17 +56,17 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
     public function guessMimeType(string $path): ?string
     {
         if (!is_file($path) || !is_readable($path)) {
-            throw new InvalidArgumentException(sprintf('The "%s" file does not exist or is not readable.', $path));
+            throw new InvalidArgumentException(\sprintf('The "%s" file does not exist or is not readable.', $path));
         }
 
         if (!$this->isGuesserSupported()) {
-            throw new LogicException(sprintf('The "%s" guesser is not supported.', __CLASS__));
+            throw new LogicException(\sprintf('The "%s" guesser is not supported.', __CLASS__));
         }
 
         ob_start();
 
         // need to use --mime instead of -i. see #6641
-        passthru(sprintf($this->cmd, escapeshellarg((str_starts_with($path, '-') ? './' : '').$path)), $return);
+        passthru(\sprintf($this->cmd, escapeshellarg((str_starts_with($path, '-') ? './' : '').$path)), $return);
         if ($return > 0) {
             ob_end_clean();
 

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
-use Symfony\Component\Serializer\Annotation\Context;
-use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Attribute\Context;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 final class ObjectDummyWithContextAttribute

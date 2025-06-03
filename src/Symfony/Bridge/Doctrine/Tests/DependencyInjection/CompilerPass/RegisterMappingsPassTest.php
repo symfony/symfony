@@ -20,9 +20,11 @@ class RegisterMappingsPassTest extends TestCase
 {
     public function testNoDriverParmeterException()
     {
+        $container = $this->createBuilder();
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not find the manager name parameter in the container. Tried the following parameter names: "manager.param.one", "manager.param.two"');
-        $container = $this->createBuilder();
+
         $this->process($container, [
             'manager.param.one',
             'manager.param.two',

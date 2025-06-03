@@ -29,12 +29,12 @@ final class FormThemeTokenParser extends AbstractTokenParser
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $form = $this->parser->getExpressionParser()->parseExpression();
+        $form = $this->parser->parseExpression();
         $only = false;
 
         if ($this->parser->getStream()->test(Token::NAME_TYPE, 'with')) {
             $this->parser->getStream()->next();
-            $resources = $this->parser->getExpressionParser()->parseExpression();
+            $resources = $this->parser->parseExpression();
 
             if ($this->parser->getStream()->nextIf(Token::NAME_TYPE, 'only')) {
                 $only = true;
@@ -42,13 +42,13 @@ final class FormThemeTokenParser extends AbstractTokenParser
         } else {
             $resources = new ArrayExpression([], $stream->getCurrent()->getLine());
             do {
-                $resources->addElement($this->parser->getExpressionParser()->parseExpression());
+                $resources->addElement($this->parser->parseExpression());
             } while (!$stream->test(Token::BLOCK_END_TYPE));
         }
 
         $stream->expect(Token::BLOCK_END_TYPE);
 
-        return new FormThemeNode($form, $resources, $lineno, $this->getTag(), $only);
+        return new FormThemeNode($form, $resources, $lineno, $only);
     }
 
     public function getTag(): string

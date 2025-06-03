@@ -29,7 +29,7 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
     private int $opsLimit;
     private int $memLimit;
 
-    public function __construct(int $opsLimit = null, int $memLimit = null)
+    public function __construct(?int $opsLimit = null, ?int $memLimit = null)
     {
         if (!self::isSupported()) {
             throw new LogicException('Libsodium is not available. You should either install the sodium extension or use a different password hasher.');

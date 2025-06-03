@@ -13,7 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 
 /**
@@ -28,9 +28,9 @@ class DateIntervalNormalizerTest extends TestCase
         $this->normalizer = new DateIntervalNormalizer();
     }
 
-    public static function dataProviderISO()
+    public static function dataProviderISO(): array
     {
-        $data = [
+        return [
             ['P%YY%MM%DDT%HH%IM%SS', 'P00Y00M00DT00H00M00S', 'PT0S'],
             ['P%yY%mM%dDT%hH%iM%sS', 'P0Y0M0DT0H0M0S', 'PT0S'],
             ['P%yY%mM%dDT%hH%iM%sS', 'P10Y2M3DT16H5M6S', 'P10Y2M3DT16H5M6S'],
@@ -43,8 +43,6 @@ class DateIntervalNormalizerTest extends TestCase
             ['%rP%yY%mM%dD', '-P10Y2M3D', '-P10Y2M3DT0H'],
             ['%rP%yY%mM%dD', 'P10Y2M3D', 'P10Y2M3DT0H'],
         ];
-
-        return $data;
     }
 
     public function testSupportsNormalization()
@@ -118,28 +116,38 @@ class DateIntervalNormalizerTest extends TestCase
         $this->assertDateIntervalEquals($this->getInterval('P0Y0M0DT12H34M0S'), $normalizer->denormalize('PT12H34M', \DateInterval::class));
     }
 
+    public function testDenormalizeIntervalWithBothWeeksAndDays()
+    {
+        $input = 'P1W1D';
+        $interval = $this->normalizer->denormalize($input, \DateInterval::class, null, [
+            DateIntervalNormalizer::FORMAT_KEY => '%rP%yY%mM%wW%dDT%hH%iM%sS',
+        ]);
+        $this->assertDateIntervalEquals($this->getInterval($input), $interval);
+        $this->assertSame(8, $interval->d);
+    }
+
     public function testDenormalizeExpectsString()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize(1234, \DateInterval::class);
     }
 
     public function testDenormalizeNonISO8601IntervalStringThrowsException()
     {
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('Expected a valid ISO 8601 interval string.');
         $this->normalizer->denormalize('10 years 2 months 3 days', \DateInterval::class, null);
     }
 
     public function testDenormalizeInvalidDataThrowsException()
     {
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize('invalid interval', \DateInterval::class);
     }
 
     public function testDenormalizeFormatMismatchThrowsException()
     {
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => 'P%yY%mM%dD']);
     }
 

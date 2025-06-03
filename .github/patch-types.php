@@ -23,8 +23,10 @@ foreach ($loader->getClassMap() as $class => $file) {
             }
             // no break;
         case false !== strpos($file, '/vendor/'):
+        case false !== strpos($file, '/src/Symfony/Bridge/Doctrine/Logger/DbalLogger.php'):
+        case false !== strpos($file, '/src/Symfony/Bridge/Doctrine/Middleware/Debug/'):
+        case false !== strpos($file, '/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php'):
         case false !== strpos($file, '/src/Symfony/Bridge/PhpUnit/'):
-        case false !== strpos($file, '/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/ContainerAwareController.php'):
         case false !== strpos($file, '/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Validation/Article.php'):
         case false !== strpos($file, '/src/Symfony/Component/Cache/Tests/Fixtures/DriverWrapper.php'):
         case false !== strpos($file, '/src/Symfony/Component/Config/Tests/Fixtures/BadFileName.php'):
@@ -44,6 +46,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/TestServiceSubscriberIntersectionWithTrait.php'):
         case false !== strpos($file, '/src/Symfony/Component/ErrorHandler/Tests/Fixtures/'):
+        case false !== strpos($file, '/src/Symfony/Component/HttpClient/Internal/'):
         case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Answer.php'):
         case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Number.php'):
         case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Suit.php'):
@@ -56,6 +59,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/NotLoadableClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/ReflectionIntersectionTypeFixture.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/ReflectionUnionTypeWithIntersectionFixture.php'):
+        case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/VirtualProperty.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Internal'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/Cache/Traits/RelayProxy.php'):

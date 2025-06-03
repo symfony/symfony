@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="pt" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
-                <target>Ocorreu uma excepção durante a autenticação.</target>
+                <target>Ocorreu uma exceção durante a autenticação.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
-                <target>O pedido de autenticação não foi concluído devido a um problema no sistema.</target>
+                <target>A autenticação não foi concluída devido a um problema no sistema.</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>
@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Não possui privilégios para aceder a este recurso.</target>
+                <target>Sem privilégios para solicitar este recurso.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>
@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>Não existe sessão disponível, esta expirou ou os cookies estão desativados.</target>
+                <target>Nenhuma sessão disponível, esta expirou ou os cookies estão desativados.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
@@ -44,7 +44,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Nome de utilizador não encontrado.</target>
+                <target>Nome de usuário não encontrado.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
@@ -60,11 +60,11 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
-                <target>A conta está trancada.</target>
+                <target>A conta está bloqueada.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>Várias tentativas de login falhadas, por favor tente mais tarde.</target>
+                <target>Muitas tentativas de login sem sucesso, por favor, tente mais tarde.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
@@ -72,11 +72,11 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>Demasiadas tentativas de login, tente novamente num minuto.</target>
+                <target>Muitas tentativas de login sem sucesso, por favor, tente novamente novamente em 1 minuto.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target>Demasiadas tentativas de login, tente novamente em %minutes% minutos.</target>
+                <target>Muitas tentativas de login sem sucesso, por favor, tente novamente em %minutes% minutos.</target>
             </trans-unit>
         </body>
     </file>

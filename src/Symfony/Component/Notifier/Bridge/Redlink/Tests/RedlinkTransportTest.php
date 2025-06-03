@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class RedlinkTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): RedlinkTransport
+    public static function createTransport(?HttpClientInterface $client = null): RedlinkTransport
     {
         return (new RedlinkTransport(
             'testApiToken',

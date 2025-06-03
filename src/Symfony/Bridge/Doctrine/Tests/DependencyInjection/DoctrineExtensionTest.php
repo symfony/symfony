@@ -28,8 +28,6 @@ class DoctrineExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->extension = $this
             ->getMockBuilder(AbstractDoctrineExtension::class)
             ->onlyMethods([
@@ -58,7 +56,6 @@ class DoctrineExtensionTest extends TestCase
 
     public function testFixManagersAutoMappingsWithTwoAutomappings()
     {
-        $this->expectException(\LogicException::class);
         $emConfigs = [
             'em1' => [
                 'auto_mapping' => true,
@@ -75,6 +72,8 @@ class DoctrineExtensionTest extends TestCase
 
         $reflection = new \ReflectionClass($this->extension);
         $method = $reflection->getMethod('fixManagersAutoMappings');
+
+        $this->expectException(\LogicException::class);
 
         $method->invoke($this->extension, $emConfigs, $bundles);
     }
@@ -174,23 +173,7 @@ class DoctrineExtensionTest extends TestCase
         ], $expectedEm2));
     }
 
-    public function testMappingTypeDetection()
-    {
-        $container = $this->createContainer();
-
-        $reflection = new \ReflectionClass($this->extension);
-        $method = $reflection->getMethod('detectMappingType');
-
-        // The ordinary fixtures contain annotation
-        $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures', $container);
-        $this->assertSame($mappingType, 'attribute');
-
-        // In the attribute folder, attributes are used
-        $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures/Attribute', $container);
-        $this->assertSame($mappingType, 'attribute');
-    }
-
-    public static function providerBasicDrivers()
+    public static function providerBasicDrivers(): array
     {
         return [
             ['doctrine.orm.cache.apc.class',       ['type' => 'apc']],
@@ -255,8 +238,6 @@ class DoctrineExtensionTest extends TestCase
 
     public function testUnrecognizedCacheDriverException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('"unrecognized_type" is an unrecognized Doctrine cache driver.');
         $cacheName = 'metadata_cache';
         $container = $this->createContainer();
         $objectManager = [
@@ -266,10 +247,13 @@ class DoctrineExtensionTest extends TestCase
             ],
         ];
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"unrecognized_type" is an unrecognized Doctrine cache driver.');
+
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
     }
 
-    public static function providerBundles()
+    public static function providerBundles(): iterable
     {
         yield ['AnnotationsBundle', 'attribute', '/Entity'];
         yield ['AnnotationsOneLineBundle', 'attribute', '/Entity'];

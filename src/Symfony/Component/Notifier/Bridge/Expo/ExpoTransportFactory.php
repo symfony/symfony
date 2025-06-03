@@ -28,7 +28,7 @@ final class ExpoTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'expo', $this->getSupportedSchemes());
         }
 
-        $token = $dsn->getUser($dsn);
+        $token = $dsn->getUser();
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

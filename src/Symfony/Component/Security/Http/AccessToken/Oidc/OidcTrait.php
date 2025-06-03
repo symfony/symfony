@@ -24,7 +24,7 @@ trait OidcTrait
 {
     private function createUser(array $claims): OidcUser
     {
-        if (!\function_exists(\Symfony\Component\String\u::class)) {
+        if (!\function_exists('Symfony\Component\String\u')) {
             throw new \LogicException('You cannot use the "OidcUserInfoTokenHandler" since the String component is not installed. Try running "composer require symfony/string".');
         }
 

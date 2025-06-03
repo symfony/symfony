@@ -137,8 +137,7 @@ class ConsoleLoggerTest extends TestCase
     public function testThrowsOnInvalidLevel()
     {
         $this->expectException(InvalidArgumentException::class);
-        $logger = $this->getLogger();
-        $logger->log('invalid level', 'Foo');
+        $this->getLogger()->log('invalid level', 'Foo');
     }
 
     public function testContextReplacement()
@@ -152,11 +151,7 @@ class ConsoleLoggerTest extends TestCase
 
     public function testObjectCastToString()
     {
-        if (method_exists($this, 'createPartialMock')) {
-            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
-        } else {
-            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
-        }
+        $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         $dummy->method('__toString')->willReturn('DUMMY');
 
         $this->getLogger()->warning($dummy);

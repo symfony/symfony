@@ -23,20 +23,21 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @internal
+ * @final
  */
 class TraceableEncoder implements EncoderInterface, DecoderInterface, SerializerAwareInterface
 {
     public function __construct(
         private EncoderInterface|DecoderInterface $encoder,
         private SerializerDataCollector $dataCollector,
+        private readonly string $serializerName = 'default',
     ) {
     }
 
     public function encode(mixed $data, string $format, array $context = []): string
     {
         if (!$this->encoder instanceof EncoderInterface) {
-            throw new \BadMethodCallException(sprintf('The "%s()" method cannot be called as nested encoder doesn\'t implements "%s".', __METHOD__, EncoderInterface::class));
+            throw new \BadMethodCallException(\sprintf('The "%s()" method cannot be called as nested encoder doesn\'t implements "%s".', __METHOD__, EncoderInterface::class));
         }
 
         $startTime = microtime(true);
@@ -44,7 +45,7 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
         $time = microtime(true) - $startTime;
 
         if ($traceId = ($context[TraceableSerializer::DEBUG_TRACE_ID] ?? null)) {
-            $this->dataCollector->collectEncoding($traceId, $this->encoder::class, $time);
+            $this->dataCollector->collectEncoding($traceId, $this->encoder::class, $time, $this->serializerName);
         }
 
         return $encoded;
@@ -62,7 +63,7 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
     public function decode(string $data, string $format, array $context = []): mixed
     {
         if (!$this->encoder instanceof DecoderInterface) {
-            throw new \BadMethodCallException(sprintf('The "%s()" method cannot be called as nested encoder doesn\'t implements "%s".', __METHOD__, DecoderInterface::class));
+            throw new \BadMethodCallException(\sprintf('The "%s()" method cannot be called as nested encoder doesn\'t implements "%s".', __METHOD__, DecoderInterface::class));
         }
 
         $startTime = microtime(true);
@@ -70,7 +71,7 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
         $time = microtime(true) - $startTime;
 
         if ($traceId = ($context[TraceableSerializer::DEBUG_TRACE_ID] ?? null)) {
-            $this->dataCollector->collectDecoding($traceId, $this->encoder::class, $time);
+            $this->dataCollector->collectDecoding($traceId, $this->encoder::class, $time, $this->serializerName);
         }
 
         return $encoded;

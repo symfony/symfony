@@ -23,12 +23,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SimpleTextinTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'test_from'): SimpleTextinTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'test_from'): SimpleTextinTransport
     {
         return new SimpleTextinTransport('test_api_key', $from, $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'no zero at start if phone number' => ['+0'];
         yield 'phone number too short' => ['+1'];
@@ -47,7 +47,7 @@ final class SimpleTextinTransportTest extends TransportTestCase
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
@@ -87,7 +87,7 @@ final class SimpleTextinTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function validFromProvider(): iterable
+    public static function validFromProvider(): iterable
     {
         yield ['+11'];
         yield ['+112'];

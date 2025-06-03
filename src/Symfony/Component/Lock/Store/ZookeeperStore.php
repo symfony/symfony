@@ -27,11 +27,9 @@ class ZookeeperStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private \Zookeeper $zookeeper;
-
-    public function __construct(\Zookeeper $zookeeper)
-    {
-        $this->zookeeper = $zookeeper;
+    public function __construct(
+        private \Zookeeper $zookeeper,
+    ) {
     }
 
     public static function createConnection(#[\SensitiveParameter] string $dsn): \Zookeeper
@@ -56,10 +54,7 @@ class ZookeeperStore implements PersistingStoreInterface
         return new \Zookeeper(implode(',', $hosts));
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         if ($this->exists($key)) {
             return;
@@ -74,10 +69,7 @@ class ZookeeperStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         if (!$this->exists($key)) {
             return;
@@ -102,10 +94,7 @@ class ZookeeperStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         // do nothing, zookeeper locks forever.
     }

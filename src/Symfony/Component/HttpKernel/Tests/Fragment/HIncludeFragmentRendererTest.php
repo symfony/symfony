@@ -13,9 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
-use Symfony\Component\HttpKernel\UriSigner;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
@@ -32,7 +32,7 @@ class HIncludeFragmentRendererTest extends TestCase
     {
         $strategy = new HIncludeFragmentRenderer(null, new UriSigner('foo'));
 
-        $this->assertEquals('<hx:include src="/_fragment?_hash=BP%2BOzCD5MRUI%2BHJpgPDOmoju00FnzLhP3TGcSHbbBLs%3D&amp;_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller"></hx:include>', $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'))->getContent());
+        $this->assertMatchesRegularExpression('#^<hx:include src="/_fragment\?_hash=.+&amp;_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller"></hx:include>$#', $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'))->getContent());
     }
 
     public function testRenderWithUri()

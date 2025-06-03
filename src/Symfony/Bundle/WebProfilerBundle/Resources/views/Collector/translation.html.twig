@@ -156,6 +156,27 @@
         {% endblock messages %}
     {% endif %}
 
+    {% if collector.globalParameters|default([]) %}
+        <h2>Global parameters</h2>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Message ID</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for id, value in collector.globalParameters %}
+                <tr>
+                    <td class="font-normal text-small nowrap">{{ id }}</td>
+                    <td class="font-normal text-small nowrap">{{ profiler_dump(value) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
 {% endblock %}
 
 {% macro render_table(messages, is_fallback) %}

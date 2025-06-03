@@ -24,7 +24,7 @@ class UrlSanitizerTest extends TestCase
         $this->assertSame($expected, UrlSanitizer::sanitize($input, $allowedSchemes, $forceHttps, $allowedHosts, $allowRelative));
     }
 
-    public static function provideSanitize()
+    public static function provideSanitize(): iterable
     {
         // Simple accepted cases
         yield [
@@ -33,7 +33,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -42,7 +42,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -51,7 +51,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'http://trusted.com/link.php',
+            'expected' => 'http://trusted.com/link.php',
         ];
 
         yield [
@@ -60,7 +60,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'https://trusted.com/link.php',
+            'expected' => 'https://trusted.com/link.php',
         ];
 
         yield [
@@ -69,7 +69,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+            'expected' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
         ];
 
         yield [
@@ -78,7 +78,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'https://trusted.com/link.php',
+            'expected' => 'https://trusted.com/link.php',
         ];
 
         yield [
@@ -87,7 +87,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'https://trusted.com/link.php',
+            'expected' => 'https://trusted.com/link.php',
         ];
 
         yield [
@@ -96,7 +96,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'http://trusted.com/link.php',
+            'expected' => 'http://trusted.com/link.php',
         ];
 
         yield [
@@ -105,7 +105,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+            'expected' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
         ];
 
         // Simple filtered cases
@@ -115,7 +115,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -124,7 +124,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -133,7 +133,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => true,
-            'output' => 'http:link.php',
+            'expected' => 'http:link.php',
         ];
 
         yield [
@@ -142,7 +142,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -151,7 +151,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -160,7 +160,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -169,7 +169,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -178,7 +178,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -187,7 +187,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         // Allow null host (data scheme for instance)
@@ -197,7 +197,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com', null],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+            'expected' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
         ];
 
         // Force HTTPS
@@ -207,7 +207,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => true,
             'allowRelative' => false,
-            'output' => 'https://trusted.com/link.php',
+            'expected' => 'https://trusted.com/link.php',
         ];
 
         yield [
@@ -216,7 +216,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => true,
             'allowRelative' => false,
-            'output' => 'https://trusted.com/link.php',
+            'expected' => 'https://trusted.com/link.php',
         ];
 
         yield [
@@ -225,7 +225,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => true,
             'allowRelative' => false,
-            'output' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+            'expected' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
         ];
 
         yield [
@@ -234,7 +234,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com', null],
             'forceHttps' => true,
             'allowRelative' => false,
-            'output' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+            'expected' => 'data:text/plain;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
         ];
 
         // Domain matching
@@ -244,7 +244,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'https://subdomain.trusted.com/link.php',
+            'expected' => 'https://subdomain.trusted.com/link.php',
         ];
 
         yield [
@@ -253,7 +253,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
 
         yield [
@@ -262,7 +262,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => 'https://deep.subdomain.trusted.com/link.php',
+            'expected' => 'https://deep.subdomain.trusted.com/link.php',
         ];
 
         yield [
@@ -271,7 +271,16 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'https://trusted.com/link.php',
+            'allowedSchemes' => ['http', 'https'],
+            'allowedHosts' => ['subdomain.trusted.com', 'trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'https://trusted.com/link.php',
         ];
 
         // Allow relative
@@ -281,7 +290,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => true,
             'allowRelative' => true,
-            'output' => '/link.php',
+            'expected' => '/link.php',
         ];
 
         yield [
@@ -290,7 +299,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => true,
             'allowRelative' => false,
-            'output' => null,
+            'expected' => null,
         ];
     }
 
@@ -358,10 +367,10 @@ class UrlSanitizerTest extends TestCase
             'non-special://:@untrusted.com/x' => ['scheme' => 'non-special', 'host' => 'untrusted.com'],
             'http:foo.com' => ['scheme' => 'http', 'host' => null],
             "	   :foo.com   \n" => null,
-            ' foo.com  ' => ['scheme' => null, 'host' => null],
+            ' foo.com  ' => null,
             'a:	 foo.com' => null,
-            'http://f:21/ b ? d # e ' => ['scheme' => 'http', 'host' => 'f'],
-            'lolscheme:x x#x x' => ['scheme' => 'lolscheme', 'host' => null],
+            'http://f:21/ b ? d # e ' => null,
+            'lolscheme:x x#x x' => null,
             'http://f:/c' => ['scheme' => 'http', 'host' => 'f'],
             'http://f:0/c' => ['scheme' => 'http', 'host' => 'f'],
             'http://f:00000000000000/c' => ['scheme' => 'http', 'host' => 'f'],
@@ -434,7 +443,7 @@ class UrlSanitizerTest extends TestCase
             'javascript:example.com/' => ['scheme' => 'javascript', 'host' => null],
             'mailto:example.com/' => ['scheme' => 'mailto', 'host' => null],
             '/a/b/c' => ['scheme' => null, 'host' => null],
-            '/a/ /c' => ['scheme' => null, 'host' => null],
+            '/a/ /c' => null,
             '/a%2fc' => ['scheme' => null, 'host' => null],
             '/a/%2f/c' => ['scheme' => null, 'host' => null],
             '#β' => ['scheme' => null, 'host' => null],
@@ -495,10 +504,10 @@ class UrlSanitizerTest extends TestCase
             'http://example.com/你好你好' => ['scheme' => 'http', 'host' => 'example.com'],
             'http://example.com/‥/foo' => ['scheme' => 'http', 'host' => 'example.com'],
             "http://example.com/\u{feff}/foo" => ['scheme' => 'http', 'host' => 'example.com'],
-            "http://example.com\u{002f}\u{202e}\u{002f}\u{0066}\u{006f}\u{006f}\u{002f}\u{202d}\u{002f}\u{0062}\u{0061}\u{0072}\u{0027}\u{0020}" => ['scheme' => 'http', 'host' => 'example.com'],
+            "http://example.com\u{002f}\u{202e}\u{002f}\u{0066}\u{006f}\u{006f}\u{002f}\u{202d}\u{002f}\u{0062}\u{0061}\u{0072}\u{0027}\u{0020}" => null,
             'http://www.google.com/foo?bar=baz#' => ['scheme' => 'http', 'host' => 'www.google.com'],
-            'http://www.google.com/foo?bar=baz# »' => ['scheme' => 'http', 'host' => 'www.google.com'],
-            'data:test# »' => ['scheme' => 'data', 'host' => null],
+            'http://www.google.com/foo?bar=baz# »' => null,
+            'data:test# »' => null,
             'http://www.google.com' => ['scheme' => 'http', 'host' => 'www.google.com'],
             'http://192.0x00A80001' => ['scheme' => 'http', 'host' => '192.0x00A80001'],
             'http://www/foo%2Ehtml' => ['scheme' => 'http', 'host' => 'www'],
@@ -559,8 +568,8 @@ class UrlSanitizerTest extends TestCase
             'http://你好你好' => ['scheme' => 'http', 'host' => '你好你好'],
             'https://faß.ExAmPlE/' => ['scheme' => 'https', 'host' => 'faß.ExAmPlE'],
             'sc://faß.ExAmPlE/' => ['scheme' => 'sc', 'host' => 'faß.ExAmPlE'],
-            'http://%30%78%63%30%2e%30%32%35%30.01' => ['scheme' => 'http', 'host' => '%30%78%63%30%2e%30%32%35%30.01'],
-            'http://%30%78%63%30%2e%30%32%35%30.01%2e' => ['scheme' => 'http', 'host' => '%30%78%63%30%2e%30%32%35%30.01%2e'],
+            'http://%30%78%63%30%2e%30%32%35%30.01' => null,
+            'http://%30%78%63%30%2e%30%32%35%30.01%2e' => null,
             'http://０Ｘｃ０．０２５０．０１' => ['scheme' => 'http', 'host' => '０Ｘｃ０．０２５０．０１'],
             'http://./' => ['scheme' => 'http', 'host' => '.'],
             'http://../' => ['scheme' => 'http', 'host' => '..'],
@@ -680,7 +689,7 @@ class UrlSanitizerTest extends TestCase
             'urn:ietf:rfc:2648' => ['scheme' => 'urn', 'host' => null],
             'tag:joe@example.org,2001:foo/bar' => ['scheme' => 'tag', 'host' => null],
             'non-special://%E2%80%A0/' => ['scheme' => 'non-special', 'host' => '%E2%80%A0'],
-            'non-special://H%4fSt/path' => ['scheme' => 'non-special', 'host' => 'H%4fSt'],
+            'non-special://H%4fSt/path' => null,
             'non-special://[1:2:0:0:5:0:0:0]/' => ['scheme' => 'non-special', 'host' => '[1:2:0:0:5:0:0:0]'],
             'non-special://[1:2:0:0:0:0:0:3]/' => ['scheme' => 'non-special', 'host' => '[1:2:0:0:0:0:0:3]'],
             'non-special://[1:2::3]:80/' => ['scheme' => 'non-special', 'host' => '[1:2::3]'],
@@ -706,11 +715,11 @@ class UrlSanitizerTest extends TestCase
             'test-a-colon-slash-slash-b.html' => ['scheme' => null, 'host' => null],
             'http://example.org/test?a#bc' => ['scheme' => 'http', 'host' => 'example.org'],
             'http:\\/\\/f:b\\/c' => ['scheme' => 'http', 'host' => null],
-            'http:\\/\\/f: \\/c' => ['scheme' => 'http', 'host' => null],
+            'http:\\/\\/f: \\/c' => null,
             'http:\\/\\/f:fifty-two\\/c' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/f:999999\\/c' => ['scheme' => 'http', 'host' => null],
             'non-special:\\/\\/f:999999\\/c' => ['scheme' => 'non-special', 'host' => null],
-            'http:\\/\\/f: 21 \\/ b ? d # e ' => ['scheme' => 'http', 'host' => null],
+            'http:\\/\\/f: 21 \\/ b ? d # e ' => null,
             'http:\\/\\/[1::2]:3:4' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/2001::1' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/2001::1]' => ['scheme' => 'http', 'host' => null],
@@ -734,8 +743,8 @@ class UrlSanitizerTest extends TestCase
             'http:@:www.example.com' => ['scheme' => 'http', 'host' => null],
             'http:\\/@:www.example.com' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/@:www.example.com' => ['scheme' => 'http', 'host' => null],
-            'http:\\/\\/example example.com' => ['scheme' => 'http', 'host' => null],
-            'http:\\/\\/Goo%20 goo%7C|.com' => ['scheme' => 'http', 'host' => null],
+            'http:\\/\\/example example.com' => null,
+            'http:\\/\\/Goo%20 goo%7C|.com' => null,
             'http:\\/\\/[]' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/[:]' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/GOO\\u00a0\\u3000goo.com' => ['scheme' => 'http', 'host' => null],
@@ -752,8 +761,8 @@ class UrlSanitizerTest extends TestCase
             'http:\\/\\/hello%00' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/192.168.0.257' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/%3g%78%63%30%2e%30%32%35%30%2E.01' => ['scheme' => 'http', 'host' => null],
-            'http:\\/\\/192.168.0.1 hello' => ['scheme' => 'http', 'host' => null],
-            'https:\\/\\/x x:12' => ['scheme' => 'https', 'host' => null],
+            'http:\\/\\/192.168.0.1 hello' => null,
+            'https:\\/\\/x x:12' => null,
             'http:\\/\\/[www.google.com]\\/' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/[google.com]' => ['scheme' => 'http', 'host' => null],
             'http:\\/\\/[::1.2.3.4x]' => ['scheme' => 'http', 'host' => null],
@@ -763,7 +772,7 @@ class UrlSanitizerTest extends TestCase
             '..\\/i' => ['scheme' => null, 'host' => null],
             '\\/i' => ['scheme' => null, 'host' => null],
             'sc:\\/\\/\\u0000\\/' => ['scheme' => 'sc', 'host' => null],
-            'sc:\\/\\/ \\/' => ['scheme' => 'sc', 'host' => null],
+            'sc:\\/\\/ \\/' => null,
             'sc:\\/\\/@\\/' => ['scheme' => 'sc', 'host' => null],
             'sc:\\/\\/te@s:t@\\/' => ['scheme' => 'sc', 'host' => null],
             'sc:\\/\\/:\\/' => ['scheme' => 'sc', 'host' => null],

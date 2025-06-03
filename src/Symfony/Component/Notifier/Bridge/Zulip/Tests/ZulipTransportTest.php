@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class ZulipTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): ZulipTransport
+    public static function createTransport(?HttpClientInterface $client = null): ZulipTransport
     {
         return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $client ?? new MockHttpClient()))->setHost('test.host');
     }

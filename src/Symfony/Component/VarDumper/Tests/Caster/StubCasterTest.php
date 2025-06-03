@@ -16,10 +16,12 @@ use Symfony\Component\VarDumper\Caster\ArgsStub;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\LinkStub;
 use Symfony\Component\VarDumper\Caster\ScalarStub;
+use Symfony\Component\VarDumper\Caster\VirtualStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\FooInterface;
+use Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty;
 
 class StubCasterTest extends TestCase
 {
@@ -101,6 +103,40 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
+    /**
+     * @requires PHP 8.4
+     */
+    public function testVirtualPropertyStub()
+    {
+        $class = new \ReflectionClass(VirtualProperty::class);
+        $args = [new VirtualStub($class->getProperty('fullName'))];
+
+        $expectedDump = <<<'EODUMP'
+array:1 [
+  0 => ~ string
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $args);
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testVirtualPropertyWithoutTypeStub()
+    {
+        $class = new \ReflectionClass(VirtualProperty::class);
+        $args = [new VirtualStub($class->getProperty('noType'))];
+
+        $expectedDump = <<<'EODUMP'
+array:1 [
+  0 => ~
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $args);
+    }
+
     public function testLinkStub()
     {
         $var = [new LinkStub(__CLASS__, 0, __FILE__)];
@@ -155,7 +191,7 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-  <span class=sf-dump-index>0</span> => "<a href="%sFooInterface.php:10" rel="noopener noreferrer"><span class=sf-dump-str title="39 characters">hello(?stdClass $a, stdClass $b = null)</span></a>"
+  <span class=sf-dump-index>0</span> => "<a href="%sFooInterface.php:10" rel="noopener noreferrer"><span class=sf-dump-str title="40 characters">hello(?stdClass $a, ?stdClass $b = null)</span></a>"
 </samp>]
 </bar>
 EODUMP;
@@ -175,8 +211,8 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-  <span class=sf-dump-index>0</span> => "<span class=sf-dump-str title="Symfony\Component\VarDumper\Tests\Caster\NotExisting
-52 characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-class">Symfony\Component\VarDumper\Tests\Caster</span><span class="sf-dump-ellipsis sf-dump-ellipsis-class">\</span>NotExisting</span>"
+  <span class=sf-dump-index>0</span> => "<span class="sf-dump-str sf-dump-ellipsization" title="Symfony\Component\VarDumper\Tests\Caster\NotExisting
+52 characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-class">Symfony\Component\VarDumper\Tests\Caster</span><span class="sf-dump-ellipsis sf-dump-ellipsis-class">\</span><span class="sf-dump-ellipsis-tail">NotExisting</span></span>"
 </samp>]
 </bar>
 EODUMP;
@@ -206,7 +242,7 @@ EODUMP;
 
     public function testClassStubWithAnonymousClass()
     {
-        $var = [new ClassStub((new class() extends \Exception {
+        $var = [new ClassStub((new class extends \Exception {
         })::class)];
 
         $cloner = new VarCloner();
@@ -217,7 +253,7 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-  <span class=sf-dump-index>0</span> => "<a href="%sStubCasterTest.php:209" rel="noopener noreferrer"><span class=sf-dump-str title="19 characters">Exception@anonymous</span></a>"
+  <span class=sf-dump-index>0</span> => "<a href="%sStubCasterTest.php:245" rel="noopener noreferrer"><span class=sf-dump-str title="19 characters">Exception@anonymous</span></a>"
 </samp>]
 </bar>
 EODUMP;

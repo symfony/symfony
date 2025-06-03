@@ -22,12 +22,11 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  */
 class ContainerConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
-    private ContainerInterface $container;
     private array $validators;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container,
+    ) {
         $this->validators = [];
     }
 
@@ -44,7 +43,7 @@ class ContainerConstraintValidatorFactory implements ConstraintValidatorFactoryI
                 $this->validators[$name] = $this->container->get($name);
             } else {
                 if (!class_exists($name)) {
-                    throw new ValidatorException(sprintf('Constraint validator "%s" does not exist or is not enabled. Check the "validatedBy" method in your constraint class "%s".', $name, get_debug_type($constraint)));
+                    throw new ValidatorException(\sprintf('Constraint validator "%s" does not exist or is not enabled. Check the "validatedBy" method in your constraint class "%s".', $name, get_debug_type($constraint)));
                 }
 
                 $this->validators[$name] = new $name();

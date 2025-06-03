@@ -23,7 +23,7 @@ class MissingConstructorArgumentsException extends RuntimeException
     public function __construct(
         string $message,
         int $code = 0,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
         private array $missingArguments = [],
         private ?string $class = null,
     ) {

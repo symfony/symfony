@@ -14,8 +14,10 @@ namespace Symfony\Component\AssetMapper\Factory;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Decorates the asset factory to load MappedAssets from cache when possible.
@@ -35,7 +37,7 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
         $configCache = new ConfigCache($cachePath, $this->debug);
 
         if ($configCache->isFresh()) {
-            return unserialize(file_get_contents($cachePath));
+            return unserialize((new Filesystem())->readFile($cachePath));
         }
 
         $mappedAsset = $this->innerFactory->createMappedAsset($logicalPath, $sourcePath);
@@ -63,12 +65,12 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
         $resources = array_map(fn (string $path) => is_dir($path) ? new DirectoryResource($path) : new FileResource($path), $mappedAsset->getFileDependencies());
         $resources[] = new FileResource($mappedAsset->sourcePath);
 
-        foreach ($mappedAsset->getDependencies() as $dependency) {
-            if (!$dependency->isContentDependency) {
-                continue;
-            }
+        foreach ($mappedAsset->getDependencies() as $assetDependency) {
+            $resources = array_merge($resources, $this->collectResourcesFromAsset($assetDependency));
+        }
 
-            $resources = array_merge($resources, $this->collectResourcesFromAsset($dependency->asset));
+        foreach ($mappedAsset->getJavaScriptImports() as $import) {
+            $resources[] = new FileExistenceResource($import->assetSourcePath);
         }
 
         return $resources;

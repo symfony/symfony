@@ -11,6 +11,7 @@
 
 namespace Symfony\Contracts\HttpClient\Test;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -25,7 +26,17 @@ abstract class HttpClientTestCase extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
+        if (!\function_exists('ob_gzhandler')) {
+            static::markTestSkipped('The "ob_gzhandler" function is not available.');
+        }
+
         TestHttpServer::start();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        TestHttpServer::stop(8067);
+        TestHttpServer::stop(8077);
     }
 
     abstract protected function getHttpClient(string $testCase): HttpClientInterface;
@@ -724,6 +735,18 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
+    public function testIPv6Resolve()
+    {
+        TestHttpServer::start(-8087);
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://symfony.com:8087/', [
+            'resolve' => ['symfony.com' => '::1'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testNotATimeout()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -1003,6 +1026,7 @@ abstract class HttpClientTestCase extends TestCase
     /**
      * @requires extension zlib
      */
+    #[RequiresPhpExtension('zlib')]
     public function testAutoEncodingRequest()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -1076,6 +1100,7 @@ abstract class HttpClientTestCase extends TestCase
     /**
      * @requires extension zlib
      */
+    #[RequiresPhpExtension('zlib')]
     public function testUserlandEncodingRequest()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -1098,6 +1123,7 @@ abstract class HttpClientTestCase extends TestCase
     /**
      * @requires extension zlib
      */
+    #[RequiresPhpExtension('zlib')]
     public function testGzipBroken()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -1137,5 +1163,34 @@ abstract class HttpClientTestCase extends TestCase
 
         $response = $client2->request('GET', '/');
         $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testBindToPort()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057', ['bindto' => '127.0.0.1:9876']);
+        $response->getStatusCode();
+
+        $vars = $response->toArray();
+
+        self::assertSame('127.0.0.1', $vars['REMOTE_ADDR']);
+        self::assertSame('9876', $vars['REMOTE_PORT']);
+    }
+
+    public function testBindToPortV6()
+    {
+        TestHttpServer::start(-8087);
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://[::1]:8087', ['bindto' => '[::1]:9876']);
+        $response->getStatusCode();
+
+        $vars = $response->toArray();
+
+        self::assertSame('::1', $vars['REMOTE_ADDR']);
+
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            self::assertSame('9876', $vars['REMOTE_PORT']);
+        }
     }
 }

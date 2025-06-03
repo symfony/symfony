@@ -220,7 +220,7 @@ return [
         ],
         'BYN' => [
             'BYN',
-            'ruble bielorús',
+            'ruble belarús',
         ],
         'BYR' => [
             'BYR',
@@ -890,9 +890,13 @@ return [
             'SKK',
             'corona eslovaca',
         ],
+        'SLE' => [
+            'SLE',
+            'leone de Sierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'leone de Sierra Leone',
+            'leone de Sierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

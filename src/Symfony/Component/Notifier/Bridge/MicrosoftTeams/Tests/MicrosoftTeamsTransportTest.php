@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class MicrosoftTeamsTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): MicrosoftTeamsTransport
+    public static function createTransport(?HttpClientInterface $client = null): MicrosoftTeamsTransport
     {
         return (new MicrosoftTeamsTransport('/testPath', $client ?? new MockHttpClient()))->setHost('host.test');
     }

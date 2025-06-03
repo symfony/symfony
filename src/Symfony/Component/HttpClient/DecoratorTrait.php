@@ -25,7 +25,7 @@ trait DecoratorTrait
 {
     private HttpClientInterface $client;
 
-    public function __construct(HttpClientInterface $client = null)
+    public function __construct(?HttpClientInterface $client = null)
     {
         $this->client = $client ?? HttpClient::create();
     }
@@ -35,7 +35,7 @@ trait DecoratorTrait
         return $this->client->request($method, $url, $options);
     }
 
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
     {
         return $this->client->stream($responses, $timeout);
     }
@@ -48,10 +48,7 @@ trait DecoratorTrait
         return $clone;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         if ($this->client instanceof ResetInterface) {
             $this->client->reset();

@@ -141,7 +141,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('locale: en', $tester->getDisplay());
         $this->assertStringContainsString('secret: test', $tester->getDisplay());
         $this->assertStringContainsString('cookie_httponly: true', $tester->getDisplay());
-        $this->assertStringContainsString('ide: '.($_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? 'null'), $tester->getDisplay());
+        $this->assertStringContainsString('ide: '.$debug ? ($_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? 'null') : 'null', $tester->getDisplay());
     }
 
     /**
@@ -155,7 +155,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $kernelCacheDir = self::$kernel->getContainer()->getParameter('kernel.cache_dir');
-        $this->assertStringContainsString(sprintf("dsn: 'file:%s/profiler'", $kernelCacheDir), $tester->getDisplay());
+        $this->assertStringContainsString(\sprintf("dsn: 'file:%s/profiler'", $kernelCacheDir), $tester->getDisplay());
     }
 
     /**

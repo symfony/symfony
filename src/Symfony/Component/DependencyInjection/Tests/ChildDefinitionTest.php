@@ -91,8 +91,9 @@ class ChildDefinitionTest extends TestCase
 
     public function testReplaceArgumentShouldRequireIntegerIndex()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $def = new ChildDefinition('foo');
+
+        $this->expectException(\InvalidArgumentException::class);
 
         $def->replaceArgument('0', 'foo');
     }
@@ -118,11 +119,12 @@ class ChildDefinitionTest extends TestCase
 
     public function testGetArgumentShouldCheckBounds()
     {
-        $this->expectException(\OutOfBoundsException::class);
         $def = new ChildDefinition('foo');
 
         $def->setArguments([0 => 'foo']);
         $def->replaceArgument(0, 'foo');
+
+        $this->expectException(\OutOfBoundsException::class);
 
         $def->getArgument(1);
     }

@@ -1,10 +1,44 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add encryption support to `OidcTokenHandler` (JWE)
+ * Replace `$hideAccountStatusExceptions` argument with `$exposeSecurityErrors` in `AuthenticatorManager` constructor
+ * Add argument `$identifierNormalizer` to `UserBadge::__construct()` to allow normalizing the identifier
+ * Support hashing the hashed password using crc32c when putting the user in the session
+ * Add support for closures in `#[IsGranted]`
+ * Add `OAuth2TokenHandler` with OAuth2 Token Introspection support for `AccessTokenAuthenticator`
+ * Add discovery support to `OidcTokenHandler` and `OidcUserInfoTokenHandler`
+
+7.2
+---
+
+ * Pass the current token to the `checkPostAuth()` method of user checkers
+ * Deprecate argument `$secret` of `RememberMeAuthenticator`
+ * Deprecate passing an empty string as `$userIdentifier` argument to `UserBadge` constructor
+ * Allow passing passport attributes to the `UserAuthenticatorInterface::authenticateUser()` method
+
+7.1
+---
+
+ * Add `#[IsCsrfTokenValid]` attribute
+ * Add CAS 2.0 access token handler
+ * Make empty username or empty password on form login attempts throw `BadCredentialsException`
+
+7.0
+---
+
+ * Add argument `$badgeFqcn` to `Passport::addBadge()`
+ * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
+ * Throw when calling the constructor of `DefaultLoginRateLimiter` with an empty secret
+
 6.4
 ---
 
  * `UserValueResolver` no longer implements `ArgumentValueResolverInterface`
+ * Deprecate calling the constructor of `DefaultLoginRateLimiter` with an empty secret
 
 6.3
 ---

@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures;
 
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/test', utf8: true)]
 class Utf8ActionControllers

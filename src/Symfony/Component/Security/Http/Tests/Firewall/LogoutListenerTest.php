@@ -122,8 +122,6 @@ class LogoutListenerTest extends TestCase
 
     public function testNoResponseSet()
     {
-        $this->expectException(\RuntimeException::class);
-
         [$listener, , $httpUtils, $options] = $this->getListener();
 
         $request = new Request();
@@ -133,6 +131,8 @@ class LogoutListenerTest extends TestCase
             ->with($request, $options['logout_path'])
             ->willReturn(true);
 
+        $this->expectException(\RuntimeException::class);
+
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
@@ -141,7 +141,6 @@ class LogoutListenerTest extends TestCase
      */
     public function testCsrfValidationFails($invalidToken)
     {
-        $this->expectException(LogoutException::class);
         $tokenManager = $this->getTokenManager();
 
         [$listener, , $httpUtils, $options] = $this->getListener(null, $tokenManager);
@@ -159,6 +158,8 @@ class LogoutListenerTest extends TestCase
         $tokenManager
             ->method('isTokenValid')
             ->willReturn(false);
+
+        $this->expectException(LogoutException::class);
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }

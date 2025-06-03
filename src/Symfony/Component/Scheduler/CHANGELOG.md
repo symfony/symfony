@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `TriggerNormalizer`
+ * Throw exception when multiple schedule provider services are registered under the same scheduler name
+
+7.2
+---
+
+ * Add capability to skip missed periodic tasks, only the last schedule will be called
+ * Add MessageHandler returned result to `PostRunEvent`
+
 6.4
 ---
 
@@ -11,6 +23,11 @@ CHANGELOG
  * Add `AbstractTriggerDecorator`
  * Make `ScheduledStamp` "send-able"
  * Add `ScheduledStamp` to `RedispatchMessage`
+ * Allow modifying Schedule instances at runtime
+ * Add `MessageProviderInterface` to trigger unique messages at runtime
+ * Add `PreRunEvent` and `PostRunEvent` events
+ * Add `DispatchSchedulerEventListener`
+ * Add `FailureEvent` event
 
 6.3
 ---

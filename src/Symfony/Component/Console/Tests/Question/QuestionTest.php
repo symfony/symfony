@@ -20,7 +20,6 @@ class QuestionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->question = new Question('Test question');
     }
 
@@ -157,7 +156,7 @@ class QuestionTest extends TestCase
     public function testSetAutocompleterValuesWithTraversable()
     {
         $question1 = new Question('Test question 1');
-        $iterator1 = $this->getMockForAbstractClass(\IteratorAggregate::class);
+        $iterator1 = $this->createMock(\IteratorAggregate::class);
         $iterator1
             ->expects($this->once())
             ->method('getIterator')
@@ -165,7 +164,7 @@ class QuestionTest extends TestCase
         $question1->setAutocompleterValues($iterator1);
 
         $question2 = new Question('Test question 2');
-        $iterator2 = $this->getMockForAbstractClass(\IteratorAggregate::class);
+        $iterator2 = $this->createMock(\IteratorAggregate::class);
         $iterator2
             ->expects($this->once())
             ->method('getIterator')

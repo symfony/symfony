@@ -22,13 +22,10 @@ use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
  */
 final class HttpKernelRuntime
 {
-    private FragmentHandler $handler;
-    private ?FragmentUriGeneratorInterface $fragmentUriGenerator;
-
-    public function __construct(FragmentHandler $handler, FragmentUriGeneratorInterface $fragmentUriGenerator = null)
-    {
-        $this->handler = $handler;
-        $this->fragmentUriGenerator = $fragmentUriGenerator;
+    public function __construct(
+        private FragmentHandler $handler,
+        private ?FragmentUriGeneratorInterface $fragmentUriGenerator = null,
+    ) {
     }
 
     /**
@@ -57,7 +54,7 @@ final class HttpKernelRuntime
     public function generateFragmentUri(ControllerReference $controller, bool $absolute = false, bool $strict = true, bool $sign = true): string
     {
         if (null === $this->fragmentUriGenerator) {
-            throw new \LogicException(sprintf('An instance of "%s" must be provided to use "%s()".', FragmentUriGeneratorInterface::class, __METHOD__));
+            throw new \LogicException(\sprintf('An instance of "%s" must be provided to use "%s()".', FragmentUriGeneratorInterface::class, __METHOD__));
         }
 
         return $this->fragmentUriGenerator->generate($controller, null, $absolute, $strict, $sign);

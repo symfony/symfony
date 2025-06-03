@@ -28,10 +28,7 @@ use Symfony\Component\Finder\Glob;
 class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 {
     private string $prefix;
-    private string $pattern;
-    private bool $recursive;
     private string $hash;
-    private bool $forExclusion;
     private array $excludedPrefixes;
     private int $globBrace;
 
@@ -42,18 +39,20 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $prefix, string $pattern, bool $recursive, bool $forExclusion = false, array $excludedPrefixes = [])
-    {
+    public function __construct(
+        string $prefix,
+        private string $pattern,
+        private bool $recursive,
+        private bool $forExclusion = false,
+        array $excludedPrefixes = [],
+    ) {
         ksort($excludedPrefixes);
         $resolvedPrefix = realpath($prefix) ?: (file_exists($prefix) ? $prefix : false);
-        $this->pattern = $pattern;
-        $this->recursive = $recursive;
-        $this->forExclusion = $forExclusion;
         $this->excludedPrefixes = $excludedPrefixes;
         $this->globBrace = \defined('GLOB_BRACE') ? \GLOB_BRACE : 0;
 
         if (false === $resolvedPrefix) {
-            throw new \InvalidArgumentException(sprintf('The path "%s" does not exist.', $prefix));
+            throw new \InvalidArgumentException(\sprintf('The path "%s" does not exist.', $prefix));
         }
 
         $this->prefix = $resolvedPrefix;

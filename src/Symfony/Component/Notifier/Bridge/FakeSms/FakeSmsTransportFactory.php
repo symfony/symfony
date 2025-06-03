@@ -17,6 +17,8 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author James Hemery <james@yieldstudio.fr>
@@ -25,15 +27,13 @@ use Symfony\Component\Notifier\Transport\Dsn;
  */
 final class FakeSmsTransportFactory extends AbstractTransportFactory
 {
-    private ?MailerInterface $mailer;
-    private ?LoggerInterface $logger;
-
-    public function __construct(MailerInterface $mailer = null, LoggerInterface $logger = null)
-    {
-        parent::__construct();
-
-        $this->mailer = $mailer;
-        $this->logger = $logger;
+    public function __construct(
+        private ?MailerInterface $mailer = null,
+        private ?LoggerInterface $logger = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+    ) {
+        parent::__construct($dispatcher, $client);
     }
 
     public function create(Dsn $dsn): FakeSmsEmailTransport|FakeSmsLoggerTransport
@@ -49,7 +49,7 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
             $to = $dsn->getRequiredOption('to');
             $from = $dsn->getRequiredOption('from');
 
-            return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
+            return (new FakeSmsEmailTransport($this->mailer, $to, $from, $this->client, $this->dispatcher))->setHost($mailerTransport);
         }
 
         if ('fakesms+logger' === $scheme) {
@@ -57,7 +57,7 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
                 $this->throwMissingDependencyException($scheme, LoggerInterface::class, 'psr/log');
             }
 
-            return new FakeSmsLoggerTransport($this->logger);
+            return new FakeSmsLoggerTransport($this->logger, $this->client, $this->dispatcher);
         }
 
         throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
@@ -70,6 +70,6 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
 
     private function throwMissingDependencyException(string $scheme, string $missingDependency, string $suggestedPackage): void
     {
-        throw new LogicException(sprintf('Cannot create a transport for scheme "%s" without providing an implementation of "%s". Try running "composer require "%s"".', $scheme, $missingDependency, $suggestedPackage));
+        throw new LogicException(\sprintf('Cannot create a transport for scheme "%s" without providing an implementation of "%s". Try running "composer require "%s"".', $scheme, $missingDependency, $suggestedPackage));
     }
 }

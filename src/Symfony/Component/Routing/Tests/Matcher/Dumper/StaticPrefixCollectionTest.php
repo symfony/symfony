@@ -47,7 +47,7 @@ class StaticPrefixCollectionTest extends TestCase
 root
 prefix_segment
 leading_segment
-EOF
+EOF,
             ],
             'Nested - small group' => [
                 [
@@ -60,7 +60,7 @@ root
 /prefix/segment/
 -> prefix_segment
 -> leading_segment
-EOF
+EOF,
             ],
             'Nested - contains item at intersection' => [
                 [
@@ -73,7 +73,7 @@ root
 /prefix/segment/
 -> prefix_segment
 -> leading_segment
-EOF
+EOF,
             ],
             'Simple one level nesting' => [
                 [
@@ -88,7 +88,7 @@ root
 -> nested_segment
 -> some_segment
 -> other_segment
-EOF
+EOF,
             ],
             'Retain matching order with groups' => [
                 [
@@ -110,7 +110,7 @@ root
 -> dd
 -> ee
 -> ff
-EOF
+EOF,
             ],
             'Retain complex matching order with groups at base' => [
                 [
@@ -142,7 +142,7 @@ EOF
 -> -> ee
 -> -> ff
 -> parent
-EOF
+EOF,
             ],
 
             'Group regardless of segments' => [
@@ -163,7 +163,7 @@ EOF
 -> g1
 -> g2
 -> g3
-EOF
+EOF,
             ],
         ];
     }

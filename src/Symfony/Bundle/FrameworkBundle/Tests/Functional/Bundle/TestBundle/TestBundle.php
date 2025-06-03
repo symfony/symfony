@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle;
 
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection\AnnotationReaderPass;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection\Config\CustomConfig;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -25,7 +24,7 @@ class TestBundle extends Bundle
     {
         parent::build($container);
 
-        /** @var $extension DependencyInjection\TestExtension */
+        /** @var DependencyInjection\TestExtension $extension */
         $extension = $container->getExtension('test');
 
         if (!$container->getParameterBag() instanceof FrozenParameterBag) {

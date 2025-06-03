@@ -16,20 +16,16 @@ use Symfony\Component\Mailer\Event\MessageEvents;
 
 final class EmailCount extends Constraint
 {
-    private int $expectedValue;
-    private ?string $transport;
-    private bool $queued;
-
-    public function __construct(int $expectedValue, string $transport = null, bool $queued = false)
-    {
-        $this->expectedValue = $expectedValue;
-        $this->transport = $transport;
-        $this->queued = $queued;
+    public function __construct(
+        private int $expectedValue,
+        private ?string $transport = null,
+        private bool $queued = false,
+    ) {
     }
 
     public function toString(): string
     {
-        return sprintf('%shas %s "%d" emails', $this->transport ? $this->transport.' ' : '', $this->queued ? 'queued' : 'sent', $this->expectedValue);
+        return \sprintf('%shas %s "%d" emails', $this->transport ? $this->transport.' ' : '', $this->queued ? 'queued' : 'sent', $this->expectedValue);
     }
 
     /**
@@ -45,7 +41,7 @@ final class EmailCount extends Constraint
      */
     protected function failureDescription($events): string
     {
-        return sprintf('the Transport %s (%d %s)', $this->toString(), $this->countEmails($events), $this->queued ? 'queued' : 'sent');
+        return \sprintf('the Transport %s (%d %s)', $this->toString(), $this->countEmails($events), $this->queued ? 'queued' : 'sent');
     }
 
     private function countEmails(MessageEvents $events): int

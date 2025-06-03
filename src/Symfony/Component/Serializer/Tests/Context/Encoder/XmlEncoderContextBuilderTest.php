@@ -29,8 +29,6 @@ class XmlEncoderContextBuilderTest extends TestCase
 
     /**
      * @dataProvider withersDataProvider
-     *
-     * @param array<string, mixed> $values
      */
     public function testWithers(array $values)
     {
@@ -47,14 +45,14 @@ class XmlEncoderContextBuilderTest extends TestCase
             ->withStandalone($values[XmlEncoder::STANDALONE])
             ->withTypeCastAttributes($values[XmlEncoder::TYPE_CAST_ATTRIBUTES])
             ->withVersion($values[XmlEncoder::VERSION])
+            ->withCdataWrapping($values[XmlEncoder::CDATA_WRAPPING])
+            ->withCdataWrappingPattern($values[XmlEncoder::CDATA_WRAPPING_PATTERN])
+            ->withIgnoreEmptyAttributes($values[XmlEncoder::IGNORE_EMPTY_ATTRIBUTES])
             ->toArray();
 
         $this->assertSame($values, $context);
     }
 
-    /**
-     * @return iterable<array{0: array<string, mixed>|}>
-     */
     public static function withersDataProvider(): iterable
     {
         yield 'With values' => [[
@@ -70,6 +68,9 @@ class XmlEncoderContextBuilderTest extends TestCase
             XmlEncoder::STANDALONE => false,
             XmlEncoder::TYPE_CAST_ATTRIBUTES => true,
             XmlEncoder::VERSION => '1.0',
+            XmlEncoder::CDATA_WRAPPING => false,
+            XmlEncoder::CDATA_WRAPPING_PATTERN => '/[<>&"\']/',
+            XmlEncoder::IGNORE_EMPTY_ATTRIBUTES => true,
         ]];
 
         yield 'With null values' => [[
@@ -85,6 +86,9 @@ class XmlEncoderContextBuilderTest extends TestCase
             XmlEncoder::STANDALONE => null,
             XmlEncoder::TYPE_CAST_ATTRIBUTES => null,
             XmlEncoder::VERSION => null,
+            XmlEncoder::CDATA_WRAPPING => null,
+            XmlEncoder::CDATA_WRAPPING_PATTERN => null,
+            XmlEncoder::IGNORE_EMPTY_ATTRIBUTES => null,
         ]];
     }
 }

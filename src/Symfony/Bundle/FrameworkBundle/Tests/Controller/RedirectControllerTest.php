@@ -103,7 +103,7 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
     }
 
-    public static function provider()
+    public static function provider(): array
     {
         return [
             [true, false, false, false, 301, ['additional-parameter' => 'value']],
@@ -183,6 +183,20 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals(307, $returnResponse->getStatusCode());
     }
 
+    public function testProtocolRelative()
+    {
+        $request = new Request();
+        $controller = new RedirectController();
+
+        $returnResponse = $controller->urlRedirectAction($request, '//foo.bar/');
+        $this->assertRedirectUrl($returnResponse, 'http://foo.bar/');
+        $this->assertSame(302, $returnResponse->getStatusCode());
+
+        $returnResponse = $controller->urlRedirectAction($request, '//foo.bar/', false, 'https');
+        $this->assertRedirectUrl($returnResponse, 'https://foo.bar/');
+        $this->assertSame(302, $returnResponse->getStatusCode());
+    }
+
     public function testUrlRedirectDefaultPorts()
     {
         $host = 'www.example.com';
@@ -210,7 +224,7 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
-    public static function urlRedirectProvider()
+    public static function urlRedirectProvider(): array
     {
         return [
             // Standard ports
@@ -262,7 +276,7 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
-    public static function pathQueryParamsProvider()
+    public static function pathQueryParamsProvider(): array
     {
         return [
             ['http://www.example.com/base/redirect-path', '/redirect-path',  ''],

@@ -43,10 +43,55 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('new_value', $test);
 
         $test = $this->getTestBuilder()
+            ->ifTrue(fn () => 1)
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('new_value', $test);
+
+        $test = $this->getTestBuilder()
             ->ifTrue(fn () => false)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('value', $test);
+
+        $test = $this->getTestBuilder()
+            ->ifTrue(fn () => 0)
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('value', $test);
+    }
+
+    public function testIfFalseExpression()
+    {
+        $test = $this->getTestBuilder()
+            ->ifFalse()
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('new_value', $test, ['key' => false]);
+
+        $test = $this->getTestBuilder()
+            ->ifFalse(fn ($v) => 'value' === $v)
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('value', $test);
+
+        $test = $this->getTestBuilder()
+            ->ifFalse(fn ($v) => 1)
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('value', $test);
+
+        $test = $this->getTestBuilder()
+            ->ifFalse(fn ($v) => 'other_value' === $v)
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('new_value', $test);
+
+        $test = $this->getTestBuilder()
+            ->ifFalse(fn ($v) => 0)
+            ->then($this->returnClosure('new_value'))
+            ->end();
+        $this->assertFinalizedValueIs('new_value', $test);
     }
 
     public function testIfStringExpression()
@@ -223,7 +268,7 @@ class ExprBuilderTest extends TestCase
      * @param array|null $config The config you want to use for the finalization, if nothing provided
      *                           a simple ['key'=>'value'] will be used
      */
-    protected function finalizeTestBuilder(NodeDefinition $nodeDefinition, array $config = null): array
+    protected function finalizeTestBuilder(NodeDefinition $nodeDefinition, ?array $config = null): array
     {
         return $nodeDefinition
             ->end()

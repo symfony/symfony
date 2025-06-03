@@ -29,18 +29,14 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 #[AsCommand(name: 'cache:pool:delete', description: 'Delete an item from a cache pool')]
 final class CachePoolDeleteCommand extends Command
 {
-    private Psr6CacheClearer $poolClearer;
-    private ?array $poolNames;
-
     /**
      * @param string[]|null $poolNames
      */
-    public function __construct(Psr6CacheClearer $poolClearer, array $poolNames = null)
-    {
+    public function __construct(
+        private Psr6CacheClearer $poolClearer,
+        private ?array $poolNames = null,
+    ) {
         parent::__construct();
-
-        $this->poolClearer = $poolClearer;
-        $this->poolNames = $poolNames;
     }
 
     protected function configure(): void
@@ -67,16 +63,16 @@ EOF
         $cachePool = $this->poolClearer->getPool($pool);
 
         if (!$cachePool->hasItem($key)) {
-            $io->note(sprintf('Cache item "%s" does not exist in cache pool "%s".', $key, $pool));
+            $io->note(\sprintf('Cache item "%s" does not exist in cache pool "%s".', $key, $pool));
 
             return 0;
         }
 
         if (!$cachePool->deleteItem($key)) {
-            throw new \Exception(sprintf('Cache item "%s" could not be deleted.', $key));
+            throw new \Exception(\sprintf('Cache item "%s" could not be deleted.', $key));
         }
 
-        $io->success(sprintf('Cache item "%s" was successfully deleted.', $key));
+        $io->success(\sprintf('Cache item "%s" was successfully deleted.', $key));
 
         return 0;
     }

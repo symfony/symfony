@@ -16,6 +16,7 @@ use AsyncAws\Core\Exception\Http\ServerException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceivedStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceiver;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransport;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
@@ -38,7 +39,6 @@ class AmazonSqsTransportTest extends TestCase
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
-        // Mocking the concrete receiver class because mocking multiple interfaces is deprecated
         $this->receiver = $this->createMock(AmazonSqsReceiver::class);
         $this->sender = $this->createMock(SenderInterface::class);
 
@@ -152,7 +152,32 @@ class AmazonSqsTransportTest extends TestCase
         $this->transport->reset();
     }
 
-    private function getTransport(SerializerInterface $serializer = null, Connection $connection = null)
+    public function testKeepalive()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class),
+        );
+
+        $connection->expects($this->once())->method('keepalive')->with('123', 10);
+        $transport->keepalive(new Envelope(new DummyMessage('foo'), [new AmazonSqsReceivedStamp('123')]), 10);
+    }
+
+    public function testKeepaliveWhenASqsExceptionOccurs()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class),
+        );
+
+        $exception = $this->createHttpException();
+        $connection->expects($this->once())->method('keepalive')->with('123')->willThrowException($exception);
+
+        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        $transport->keepalive(new Envelope(new DummyMessage('foo'), [new AmazonSqsReceivedStamp('123')]));
+    }
+
+    private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null)
     {
         $serializer ??= $this->createMock(SerializerInterface::class);
         $connection ??= $this->createMock(Connection::class);
@@ -163,7 +188,7 @@ class AmazonSqsTransportTest extends TestCase
     private function createHttpException(): HttpException
     {
         $response = $this->createMock(ResponseInterface::class);
-        $response->method('getInfo')->willReturnCallback(static function (string $type = null) {
+        $response->method('getInfo')->willReturnCallback(static function (?string $type = null) {
             $info = [
                 'http_code' => 500,
                 'url' => 'https://symfony.com',

@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\PagerDuty\Tests;
 
 use Symfony\Component\Notifier\Bridge\PagerDuty\PagerDutyTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class PagerDutyTransportFactoryTest extends TransportFactoryTestCase
+final class PagerDutyTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): PagerDutyTransportFactory
     {
         return new PagerDutyTransportFactory();

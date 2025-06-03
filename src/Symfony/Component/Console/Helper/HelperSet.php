@@ -35,10 +35,7 @@ class HelperSet implements \IteratorAggregate
         }
     }
 
-    /**
-     * @return void
-     */
-    public function set(HelperInterface $helper, string $alias = null)
+    public function set(HelperInterface $helper, ?string $alias = null): void
     {
         $this->helpers[$helper->getName()] = $helper;
         if (null !== $alias) {
@@ -64,7 +61,7 @@ class HelperSet implements \IteratorAggregate
     public function get(string $name): HelperInterface
     {
         if (!$this->has($name)) {
-            throw new InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
+            throw new InvalidArgumentException(\sprintf('The helper "%s" is not defined.', $name));
         }
 
         return $this->helpers[$name];

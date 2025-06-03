@@ -1,0 +1,32 @@
+<?php
+
+return [
+    'Names' => [
+        'Africa/Abidjan' => 'Gwzlinzveihci Byauhcunj Sizgenh (Abidjan)',
+        'Africa/Accra' => 'Gwzlinzveihci Byauhcunj Sizgenh (Accra)',
+        'Africa/Bamako' => 'Gwzlinzveihci Byauhcunj Sizgenh (Bamako)',
+        'Africa/Banjul' => 'Gwzlinzveihci Byauhcunj Sizgenh (Banjul)',
+        'Africa/Bissau' => 'Gwzlinzveihci Byauhcunj Sizgenh (Bissau)',
+        'Africa/Conakry' => 'Gwzlinzveihci Byauhcunj Sizgenh (Conakry)',
+        'Africa/Dakar' => 'Gwzlinzveihci Byauhcunj Sizgenh (Dakar)',
+        'Africa/Freetown' => 'Gwzlinzveihci Byauhcunj Sizgenh (Freetown)',
+        'Africa/Lome' => 'Gwzlinzveihci Byauhcunj Sizgenh (Lome)',
+        'Africa/Monrovia' => 'Gwzlinzveihci Byauhcunj Sizgenh (Monrovia)',
+        'Africa/Nouakchott' => 'Gwzlinzveihci Byauhcunj Sizgenh (Nouakchott)',
+        'Africa/Ouagadougou' => 'Gwzlinzveihci Byauhcunj Sizgenh (Ouagadougou)',
+        'Africa/Sao_Tome' => 'Gwzlinzveihci Byauhcunj Sizgenh (São Tomé)',
+        'America/Danmarkshavn' => 'Gwzlinzveihci Byauhcunj Sizgenh (Danmarkshavn)',
+        'Antarctica/Troll' => 'Gwzlinzveihci Byauhcunj Sizgenh (Troll)',
+        'Asia/Shanghai' => 'Cunghgoz Sizgenh (Shanghai)',
+        'Asia/Urumqi' => 'Cunghgoz Sizgenh (Urumqi)',
+        'Atlantic/Reykjavik' => 'Gwzlinzveihci Byauhcunj Sizgenh (Reykjavik)',
+        'Atlantic/St_Helena' => 'Gwzlinzveihci Byauhcunj Sizgenh (St. Helena)',
+        'Etc/GMT' => 'Gwzlinzveihci Byauhcunj Sizgenh',
+        'Europe/Dublin' => 'Gwzlinzveihci Byauhcunj Sizgenh (Dublin)',
+        'Europe/Guernsey' => 'Gwzlinzveihci Byauhcunj Sizgenh (Guernsey)',
+        'Europe/Isle_of_Man' => 'Gwzlinzveihci Byauhcunj Sizgenh (Isle of Man)',
+        'Europe/Jersey' => 'Gwzlinzveihci Byauhcunj Sizgenh (Jersey)',
+        'Europe/London' => 'Gwzlinzveihci Byauhcunj Sizgenh (London)',
+    ],
+    'Meta' => [],
+];

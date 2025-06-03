@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 require_once __DIR__.'/../Fixtures/includes/AcmeExtension.php';
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -23,6 +22,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
@@ -30,8 +30,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 
 class PhpFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
@@ -48,6 +46,38 @@ class PhpFileLoaderTest extends TestCase
         $loader->load(__DIR__.'/../Fixtures/php/simple.php');
 
         $this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a PHP file resource');
+    }
+
+    public function testPrependExtensionConfigWithLoadMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $container->prependExtensionConfig('acme', ['foo' => 'bar']);
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()), true);
+        $loader->load('config/config_builder.php');
+
+        $expected = [
+            ['color' => 'red'],
+            ['color' => 'blue'],
+            ['foo' => 'bar'],
+        ];
+        $this->assertSame($expected, $container->getExtensionConfig('acme'));
+    }
+
+    public function testPrependExtensionConfigWithImportMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $container->prependExtensionConfig('acme', ['foo' => 'bar']);
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()), true);
+        $loader->import('config/config_builder.php');
+
+        $expected = [
+            ['color' => 'red'],
+            ['color' => 'blue'],
+            ['foo' => 'bar'],
+        ];
+        $this->assertSame($expected, $container->getExtensionConfig('acme'));
     }
 
     public function testConfigServices()
@@ -213,13 +243,31 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/when_env.php');
     }
 
-    /**
-     * @group legacy
-     */
+    public function testNotWhenEnv()
+    {
+        $this->expectNotToPerformAssertions();
+
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $loader->load($fixtures.'/config/not_when_env.php');
+    }
+
+    public function testUsingBothWhenAndNotWhenEnv()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using both #[When] and #[WhenNot] attributes on the same target is not allowed.');
+
+        $loader->load($fixtures.'/config/when_not_when_env.php');
+    }
+
     public function testServiceWithServiceLocatorArgument()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Using integers as keys in a "service_locator()" argument is deprecated. The keys will default to the IDs of the original services in 7.0.');
-
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
         $loader->load($fixtures.'/config/services_with_service_locator_argument.php');
@@ -235,5 +283,15 @@ class PhpFileLoaderTest extends TestCase
 
         $values = ['foo' => new Definition(\stdClass::class), 'bar' => new Definition(\stdClass::class)];
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_inline_service')->getArguments());
+    }
+
+    public function testConfigBuilderEnvConfigurator()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()), true);
+        $loader->load('config/config_builder_env_configurator.php');
+
+        $this->assertIsString($container->getExtensionConfig('acme')[0]['color']);
     }
 }

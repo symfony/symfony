@@ -83,9 +83,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidLanguages($language)
     {
-        $constraint = new Language([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Language(message: 'myMessage');
 
         $this->validator->validate($language, $constraint);
 
@@ -108,9 +106,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidAlpha3Languages($language)
     {
-        $this->validator->validate($language, new Language([
-            'alpha3' => true,
-        ]));
+        $this->validator->validate($language, new Language(alpha3: true));
 
         $this->assertNoViolation();
     }
@@ -129,10 +125,10 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidAlpha3Languages($language)
     {
-        $constraint = new Language([
-            'alpha3' => true,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Language(
+            alpha3: true,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($language, $constraint);
 
@@ -172,9 +168,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         \Locale::setDefault('fr_FR');
         $existingLanguage = 'en';
 
-        $this->validator->validate($existingLanguage, new Language([
-            'message' => 'aMessage',
-        ]));
+        $this->validator->validate($existingLanguage, new Language(message: 'aMessage'));
 
         $this->assertNoViolation();
     }

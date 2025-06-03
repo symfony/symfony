@@ -18,15 +18,19 @@ use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Mailer\Bridge\Postmark\RemoteEvent\PostmarkPayloadConverter;
-use Symfony\Component\Webhook\Client\AbstractRequestParser;
-use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\RemoteEvent\Event\Mailer\AbstractMailerEvent;
 use Symfony\Component\RemoteEvent\Exception\ParseException;
+use Symfony\Component\Webhook\Client\AbstractRequestParser;
+use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class PostmarkRequestParser extends AbstractRequestParser
 {
     public function __construct(
         private readonly PostmarkPayloadConverter $converter,
+
+        // https://postmarkapp.com/support/article/800-ips-for-firewalls#webhooks
+        // localhost is added for testing
+        private readonly array $allowedIPs = ['3.134.147.250', '50.31.156.6', '50.31.156.77', '18.217.206.57', '127.0.0.1'],
     ) {
     }
 
@@ -34,22 +38,18 @@ final class PostmarkRequestParser extends AbstractRequestParser
     {
         return new ChainRequestMatcher([
             new MethodRequestMatcher('POST'),
-            // https://postmarkapp.com/support/article/800-ips-for-firewalls#webhooks
-            // localhost is added for testing
-            new IpsRequestMatcher(['3.134.147.250', '50.31.156.6', '50.31.156.77', '18.217.206.57', '127.0.0.1']),
+            new IpsRequestMatcher($this->allowedIPs),
             new IsJsonRequestMatcher(),
         ]);
     }
 
-    protected function doParse(Request $request, string $secret): ?AbstractMailerEvent
+    protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
         $payload = $request->toArray();
         if (
             !isset($payload['RecordType'])
             || !isset($payload['MessageID'])
             || !(isset($payload['Recipient']) || isset($payload['Email']))
-            || !isset($payload['Metadata'])
-            || !isset($payload['Tag'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }

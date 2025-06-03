@@ -19,6 +19,9 @@ namespace Symfony\Component\Scheduler\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsSchedule
 {
+    /**
+     * @param string $name The name of the schedule that will be used when creating tasks
+     */
     public function __construct(
         public string $name = 'default',
     ) {

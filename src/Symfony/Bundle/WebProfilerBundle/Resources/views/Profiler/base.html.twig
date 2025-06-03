@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="{{ _charset }}">
-        <meta name="robots" content="noindex,nofollow">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta charset="{{ _charset }}" />
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="view-transition" content="same-origin">
         <title>{% block title %}Symfony Profiler{% endblock %}</title>
 
         {% set request_collector = profile is defined ? profile.collectors.request|default(null) : null %}
@@ -36,6 +37,10 @@
             }
 
             document.body.classList.add(localStorage.getItem('symfony/profiler/width') || 'width-normal');
+
+            document.body.classList.add(
+                (navigator.appVersion.indexOf('Win') !== -1) ? 'windows' : (navigator.appVersion.indexOf('Mac') !== -1) ? 'macos' : 'linux'
+            );
         </script>
 
         {% block body '' %}

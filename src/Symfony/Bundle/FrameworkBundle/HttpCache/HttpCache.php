@@ -27,20 +27,20 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class HttpCache extends BaseHttpCache
 {
-    protected $cacheDir;
-    protected $kernel;
+    protected ?string $cacheDir = null;
 
     private ?StoreInterface $store = null;
-    private ?SurrogateInterface $surrogate;
     private array $options;
 
     /**
      * @param $cache The cache directory (default used if null) or the storage instance
      */
-    public function __construct(KernelInterface $kernel, string|StoreInterface $cache = null, SurrogateInterface $surrogate = null, array $options = null)
-    {
-        $this->kernel = $kernel;
-        $this->surrogate = $surrogate;
+    public function __construct(
+        protected KernelInterface $kernel,
+        string|StoreInterface|null $cache = null,
+        private ?SurrogateInterface $surrogate = null,
+        ?array $options = null,
+    ) {
         $this->options = $options ?? [];
 
         if ($cache instanceof StoreInterface) {
@@ -60,7 +60,7 @@ class HttpCache extends BaseHttpCache
         parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge($this->options, $this->getOptions()));
     }
 
-    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
+    protected function forward(Request $request, bool $catch = false, ?Response $entry = null): Response
     {
         $this->getKernel()->boot();
         $this->getKernel()->getContainer()->set('cache', $this);

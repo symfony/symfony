@@ -34,7 +34,7 @@ class RememberMeAuthenticatorTest extends TestCase
     {
         $this->rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
         $this->tokenStorage = new TokenStorage();
-        $this->authenticator = new RememberMeAuthenticator($this->rememberMeHandler, 's3cr3t', $this->tokenStorage, '_remember_me_cookie');
+        $this->authenticator = new RememberMeAuthenticator($this->rememberMeHandler, $this->tokenStorage, '_remember_me_cookie');
     }
 
     public function testSupportsTokenStorageWithToken()
@@ -86,17 +86,19 @@ class RememberMeAuthenticatorTest extends TestCase
 
     public function testAuthenticateWithoutOldToken()
     {
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => base64_encode('foo:bar')]);
+
         $this->expectException(AuthenticationException::class);
 
-        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => base64_encode('foo:bar')]);
         $this->authenticator->authenticate($request);
     }
 
     public function testAuthenticateWithTokenWithoutDelimiter()
     {
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'invalid']);
+
         $this->expectException(AuthenticationException::class);
 
-        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'invalid']);
         $this->authenticator->authenticate($request);
     }
 }

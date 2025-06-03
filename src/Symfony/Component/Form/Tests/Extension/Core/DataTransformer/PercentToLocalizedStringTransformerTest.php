@@ -20,8 +20,17 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 {
     private string $defaultLocale;
 
+    private $initialTestCaseUseException;
+    private $initialTestCaseErrorLevel;
+
     protected function setUp(): void
     {
+        // Normalize intl. configuration settings.
+        if (\extension_loaded('intl')) {
+            $this->initialTestCaseUseException = ini_set('intl.use_exceptions', 0);
+            $this->initialTestCaseErrorLevel = ini_set('intl.error_level', 0);
+        }
+
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
     }
@@ -29,6 +38,11 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
+
+        if (\extension_loaded('intl')) {
+            ini_set('intl.use_exceptions', $this->initialTestCaseUseException);
+            ini_set('intl.error_level', $this->initialTestCaseErrorLevel);
+        }
     }
 
     public function testTransform()
@@ -87,7 +101,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(2, $transformer->reverseTransform('200'));
     }
 
-    public static function reverseTransformWithRoundingProvider()
+    public static function reverseTransformWithRoundingProvider(): array
     {
         return [
             // towards positive infinity (1.6 -> 2, -1.6 -> -1)
@@ -474,6 +488,56 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer = new PercentToLocalizedStringTransformer(2, null, \NumberFormatter::ROUND_HALFUP, true);
 
         $this->assertEquals(0.1234, $transformer->reverseTransform('12.34'));
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
+    {
+        $errorLevel = ini_set('intl.error_level', \E_WARNING);
+
+        try {
+            $this->expectException(TransformationFailedException::class);
+            $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
+            $transformer->reverseTransform('invalid_number');
+        } finally {
+            ini_set('intl.error_level', $errorLevel);
+        }
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testReverseTransformWrapsIntlErrorsWithExceptions()
+    {
+        $initialUseExceptions = ini_set('intl.use_exceptions', 1);
+
+        try {
+            $this->expectException(TransformationFailedException::class);
+            $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
+            $transformer->reverseTransform('invalid_number');
+        } finally {
+            ini_set('intl.use_exceptions', $initialUseExceptions);
+        }
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
+    {
+        $initialUseExceptions = ini_set('intl.use_exceptions', 1);
+        $initialErrorLevel = ini_set('intl.error_level', \E_WARNING);
+
+        try {
+            $this->expectException(TransformationFailedException::class);
+            $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
+            $transformer->reverseTransform('invalid_number');
+        } finally {
+            ini_set('intl.use_exceptions', $initialUseExceptions);
+            ini_set('intl.error_level', $initialErrorLevel);
+        }
     }
 }
 

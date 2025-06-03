@@ -32,41 +32,41 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
  */
 class MultiplierRetryStrategy implements RetryStrategyInterface
 {
-    private int $maxRetries;
-    private int $delayMilliseconds;
-    private float $multiplier;
-    private int $maxDelayMilliseconds;
-
     /**
      * @param int   $maxRetries           The maximum number of times to retry
      * @param int   $delayMilliseconds    Amount of time to delay (or the initial value when multiplier is used)
      * @param float $multiplier           Multiplier to apply to the delay each time a retry occurs
      * @param int   $maxDelayMilliseconds Maximum delay to allow (0 means no maximum)
+     * @param float $jitter               Randomness to apply to the delay (between 0 and 1)
      */
-    public function __construct(int $maxRetries = 3, int $delayMilliseconds = 1000, float $multiplier = 1, int $maxDelayMilliseconds = 0)
-    {
-        $this->maxRetries = $maxRetries;
-
+    public function __construct(
+        private int $maxRetries = 3,
+        private int $delayMilliseconds = 1000,
+        private float $multiplier = 1,
+        private int $maxDelayMilliseconds = 0,
+        private float $jitter = 0.1,
+    ) {
         if ($delayMilliseconds < 0) {
-            throw new InvalidArgumentException(sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMilliseconds));
+            throw new InvalidArgumentException(\sprintf('Delay must be greater than or equal to zero: "%s" given.', $delayMilliseconds));
         }
-        $this->delayMilliseconds = $delayMilliseconds;
 
         if ($multiplier < 1) {
-            throw new InvalidArgumentException(sprintf('Multiplier must be greater than zero: "%s" given.', $multiplier));
+            throw new InvalidArgumentException(\sprintf('Multiplier must be greater than zero: "%s" given.', $multiplier));
         }
-        $this->multiplier = $multiplier;
 
         if ($maxDelayMilliseconds < 0) {
-            throw new InvalidArgumentException(sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMilliseconds));
+            throw new InvalidArgumentException(\sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMilliseconds));
         }
-        $this->maxDelayMilliseconds = $maxDelayMilliseconds;
+
+        if ($jitter < 0 || $jitter > 1) {
+            throw new InvalidArgumentException(\sprintf('Jitter must be between 0 and 1: "%s" given.', $jitter));
+        }
     }
 
     /**
      * @param \Throwable|null $throwable The cause of the failed handling
      */
-    public function isRetryable(Envelope $message, \Throwable $throwable = null): bool
+    public function isRetryable(Envelope $message, ?\Throwable $throwable = null): bool
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
@@ -76,16 +76,21 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
     /**
      * @param \Throwable|null $throwable The cause of the failed handling
      */
-    public function getWaitingTime(Envelope $message, \Throwable $throwable = null): int
+    public function getWaitingTime(Envelope $message, ?\Throwable $throwable = null): int
     {
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
         $delay = $this->delayMilliseconds * $this->multiplier ** $retries;
 
+        if ($this->jitter > 0) {
+            $randomness = (int) min(\PHP_INT_MAX, $delay * $this->jitter);
+            $delay += random_int(-$randomness, +$randomness);
+        }
+
         if ($delay > $this->maxDelayMilliseconds && 0 !== $this->maxDelayMilliseconds) {
             return $this->maxDelayMilliseconds;
         }
 
-        return (int) ceil($delay);
+        return (int) min(\PHP_INT_MAX, ceil($delay));
     }
 }

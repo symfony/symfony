@@ -24,11 +24,9 @@ use Symfony\Component\Security\Core\Exception\LazyResponseException;
  */
 final class LazyResponseEvent extends RequestEvent
 {
-    private parent $event;
-
-    public function __construct(parent $event)
-    {
-        $this->event = $event;
+    public function __construct(
+        private parent $event,
+    ) {
     }
 
     public function setResponse(Response $response): never

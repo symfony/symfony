@@ -22,6 +22,8 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @final
+ *
+ * @internal since Symfony 7.3
  */
 class ExceptionCaster
 {
@@ -42,31 +44,22 @@ class ExceptionCaster
         \E_USER_ERROR => 'E_USER_ERROR',
         \E_USER_WARNING => 'E_USER_WARNING',
         \E_USER_NOTICE => 'E_USER_NOTICE',
-        \E_STRICT => 'E_STRICT',
+        2048 => 'E_STRICT',
     ];
 
     private static array $framesCache = [];
 
-    /**
-     * @return array
-     */
-    public static function castError(\Error $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
+    public static function castError(\Error $e, array $a, Stub $stub, bool $isNested, int $filter = 0): array
     {
         return self::filterExceptionArray($stub->class, $a, "\0Error\0", $filter);
     }
 
-    /**
-     * @return array
-     */
-    public static function castException(\Exception $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
+    public static function castException(\Exception $e, array $a, Stub $stub, bool $isNested, int $filter = 0): array
     {
         return self::filterExceptionArray($stub->class, $a, "\0Exception\0", $filter);
     }
 
-    /**
-     * @return array
-     */
-    public static function castErrorException(\ErrorException $e, array $a, Stub $stub, bool $isNested)
+    public static function castErrorException(\ErrorException $e, array $a, Stub $stub, bool $isNested): array
     {
         if (isset($a[$s = Caster::PREFIX_PROTECTED.'severity'], self::$errorTypes[$a[$s]])) {
             $a[$s] = new ConstStub(self::$errorTypes[$a[$s]], $a[$s]);
@@ -75,10 +68,7 @@ class ExceptionCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, bool $isNested)
+    public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, bool $isNested): array
     {
         $trace = Caster::PREFIX_VIRTUAL.'trace';
         $prefix = Caster::PREFIX_PROTECTED;
@@ -96,10 +86,7 @@ class ExceptionCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castSilencedErrorContext(SilencedErrorContext $e, array $a, Stub $stub, bool $isNested)
+    public static function castSilencedErrorContext(SilencedErrorContext $e, array $a, Stub $stub, bool $isNested): array
     {
         $sPrefix = "\0".SilencedErrorContext::class."\0";
 
@@ -126,10 +113,7 @@ class ExceptionCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, bool $isNested)
+    public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, bool $isNested): array
     {
         if (!$isNested) {
             return $a;
@@ -192,7 +176,7 @@ class ExceptionCaster
             } else {
                 $label = substr_replace($prefix, "title=Stack level $j.", 2, 0).$lastCall;
             }
-            $a[substr_replace($label, sprintf('separator=%s&', $frame instanceof EnumStub ? ' ' : ':'), 2, 0)] = $frame;
+            $a[substr_replace($label, \sprintf('separator=%s&', $frame instanceof EnumStub ? ' ' : ':'), 2, 0)] = $frame;
 
             $lastCall = $call;
         }
@@ -203,10 +187,7 @@ class ExceptionCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, bool $isNested)
+    public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, bool $isNested): array
     {
         if (!$isNested) {
             return $a;
@@ -235,12 +216,12 @@ class ExceptionCaster
                 $ellipsis = $ellipsis->attr['ellipsis'] ?? 0;
 
                 if (is_file($f['file']) && 0 <= self::$srcContext) {
-                    if (!empty($f['class']) && (is_subclass_of($f['class'], 'Twig\Template') || is_subclass_of($f['class'], 'Twig_Template')) && method_exists($f['class'], 'getDebugInfo')) {
+                    if (!empty($f['class']) && is_subclass_of($f['class'], 'Twig\Template')) {
                         $template = null;
                         if (isset($f['object'])) {
                             $template = $f['object'];
                         } elseif ((new \ReflectionClass($f['class']))->isInstantiable()) {
-                            $template = unserialize(sprintf('O:%d:"%s":0:{}', \strlen($f['class']), $f['class']));
+                            $template = unserialize(\sprintf('O:%d:"%s":0:{}', \strlen($f['class']), $f['class']));
                         }
                         if (null !== $template) {
                             $ellipsis = 0;
@@ -264,7 +245,7 @@ class ExceptionCaster
                             $ellipsis += 1 + \strlen($f['line']);
                         }
                     }
-                    $srcAttr .= sprintf('&separator= &file=%s&line=%d', rawurlencode($f['file']), $f['line']);
+                    $srcAttr .= \sprintf('&separator= &file=%s&line=%d', rawurlencode($f['file']), $f['line']);
                 } else {
                     $srcAttr .= '&separator=:';
                 }
@@ -289,13 +270,10 @@ class ExceptionCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castFlattenException(FlattenException $e, array $a, Stub $stub, bool $isNested)
+    public static function castFlattenException(FlattenException $e, array $a, Stub $stub, bool $isNested): array
     {
         if ($isNested) {
-            $k = sprintf(Caster::PATTERN_PRIVATE, FlattenException::class, 'traceAsString');
+            $k = \sprintf(Caster::PATTERN_PRIVATE, FlattenException::class, 'traceAsString');
             $a[$k] = new CutStub($a[$k]);
         }
 
@@ -323,7 +301,7 @@ class ExceptionCaster
         unset($a[$xPrefix.'string'], $a[Caster::PREFIX_DYNAMIC.'xdebug_message']);
 
         if (isset($a[Caster::PREFIX_PROTECTED.'message']) && str_contains($a[Caster::PREFIX_PROTECTED.'message'], "@anonymous\0")) {
-            $a[Caster::PREFIX_PROTECTED.'message'] = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', fn ($m) => class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0], $a[Caster::PREFIX_PROTECTED.'message']);
+            $a[Caster::PREFIX_PROTECTED.'message'] = preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)?[0-9a-fA-F]++/', fn ($m) => class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0], $a[Caster::PREFIX_PROTECTED.'message']);
         }
 
         if (isset($a[Caster::PREFIX_PROTECTED.'file'], $a[Caster::PREFIX_PROTECTED.'line'])) {
@@ -411,7 +389,7 @@ class ExceptionCaster
                 }
             }
             $c->attr['lang'] = $lang;
-            $srcLines[sprintf("\0~separator=› &%d\0", $i + $line - $srcContext)] = $c;
+            $srcLines[\sprintf("\0~separator=› &%d\0", $i + $line - $srcContext)] = $c;
         }
 
         return new EnumStub($srcLines);

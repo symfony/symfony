@@ -131,7 +131,7 @@ class PsrHttpFactoryTest extends TestCase
 
     private function createUploadedFile(string $content, string $originalName, string $mimeType, int $error): UploadedFile
     {
-        $path = tempnam($this->tmpDir, uniqid());
+        $path = $this->createTempFile();
         file_put_contents($path, $content);
 
         return new UploadedFile($path, $originalName, $mimeType, $error, true);
@@ -182,7 +182,7 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testCreateResponseFromBinaryFile()
     {
-        $path = tempnam($this->tmpDir, uniqid());
+        $path = $this->createTempFile();
         file_put_contents($path, 'Binary');
 
         $response = new BinaryFileResponse($path);
@@ -194,7 +194,7 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testCreateResponseFromBinaryFileWithRange()
     {
-        $path = tempnam($this->tmpDir, uniqid());
+        $path = $this->createTempFile();
         file_put_contents($path, 'Binary');
 
         $request = new Request();
@@ -219,14 +219,14 @@ class PsrHttpFactoryTest extends TestCase
             [],
             [],
             [
-            'f1' => $file,
-            'f2' => ['name' => null, 'type' => null, 'tmp_name' => null, 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0],
-          ],
+                'f1' => $file,
+                'f2' => ['name' => null, 'type' => null, 'tmp_name' => null, 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0],
+            ],
             [
-            'REQUEST_METHOD' => 'POST',
-            'HTTP_HOST' => 'dunglas.fr',
-            'HTTP_X_SYMFONY' => '2.8',
-          ],
+                'REQUEST_METHOD' => 'POST',
+                'HTTP_HOST' => 'dunglas.fr',
+                'HTTP_X_SYMFONY' => '2.8',
+            ],
             'Content'
         );
 
@@ -286,5 +286,10 @@ class PsrHttpFactoryTest extends TestCase
         $factory = new Psr17Factory();
 
         return new PsrHttpFactory($factory, $factory, $factory, $factory);
+    }
+
+    private function createTempFile(): string
+    {
+        return tempnam($this->tmpDir, 'sftest');
     }
 }

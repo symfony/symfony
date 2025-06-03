@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 interface ChannelInterface
 {
-    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void;
+    public function notify(Notification $notification, RecipientInterface $recipient, ?string $transportName = null): void;
 
     public function supports(Notification $notification, RecipientInterface $recipient): bool;
 }

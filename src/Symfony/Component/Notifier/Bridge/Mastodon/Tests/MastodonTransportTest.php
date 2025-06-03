@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class MastodonTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): MastodonTransport
+    public static function createTransport(?HttpClientInterface $client = null): MastodonTransport
     {
         return (new MastodonTransport('testAccessToken', $client ?? new MockHttpClient()))->setHost('host.test');
     }

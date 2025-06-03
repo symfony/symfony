@@ -14,10 +14,12 @@ namespace Symfony\Component\Console\Messenger;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class RunCommandContext extends RunCommandMessage
+final class RunCommandContext
 {
-    public function __construct(RunCommandMessage $message, public readonly int $exitCode, public readonly string $output)
-    {
-        parent::__construct($message->input, $message->throwOnFailure, $message->catchExceptions);
+    public function __construct(
+        public readonly RunCommandMessage $message,
+        public readonly int $exitCode,
+        public readonly string $output,
+    ) {
     }
 }

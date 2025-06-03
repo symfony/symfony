@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ContactEveryoneTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): ContactEveryoneTransport
+    public static function createTransport(?HttpClientInterface $client = null): ContactEveryoneTransport
     {
         return new ContactEveryoneTransport('API_TOKEN', 'Symfony', 'Foo', $client ?? new MockHttpClient());
     }

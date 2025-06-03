@@ -2,7 +2,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @author Jesse Rushlow <jr@rushlow.dev>

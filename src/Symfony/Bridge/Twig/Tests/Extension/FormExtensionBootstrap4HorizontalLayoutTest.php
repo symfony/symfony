@@ -13,13 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
-use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 /**
  * Class providing test cases for the Bootstrap 4 Twig form theme.
@@ -28,86 +22,31 @@ use Twig\Loader\FilesystemLoader;
  */
 class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4HorizontalLayoutTestCase
 {
-    use RuntimeLoaderProvider;
-
     protected array $testableFeatures = [
         'choice_attr',
     ];
 
-    private FormRenderer $renderer;
-
-    protected function setUp(): void
+    protected function getTemplatePaths(): array
     {
-        parent::setUp();
-
-        $loader = new FilesystemLoader([
+        return [
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
-        ]);
+        ];
+    }
 
-        $environment = new Environment($loader, ['strict_variables' => true]);
-        $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addExtension(new FormExtension());
+    protected function getTwigExtensions(): array
+    {
+        return [
+            new TranslationExtension(new StubTranslator()),
+            new FormExtension(),
+        ];
+    }
 
-        $rendererEngine = new TwigRendererEngine([
+    protected function getThemes(): array
+    {
+        return [
             'bootstrap_4_horizontal_layout.html.twig',
             'custom_widgets.html.twig',
-        ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
-        $this->registerTwigRuntimeLoader($environment, $this->renderer);
-    }
-
-    protected function renderForm(FormView $view, array $vars = [])
-    {
-        return $this->renderer->renderBlock($view, 'form', $vars);
-    }
-
-    protected function renderLabel(FormView $view, $label = null, array $vars = [])
-    {
-        if (null !== $label) {
-            $vars += ['label' => $label];
-        }
-
-        return $this->renderer->searchAndRenderBlock($view, 'label', $vars);
-    }
-
-    protected function renderHelp(FormView $view)
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'help');
-    }
-
-    protected function renderErrors(FormView $view)
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'errors');
-    }
-
-    protected function renderWidget(FormView $view, array $vars = [])
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
-    }
-
-    protected function renderRow(FormView $view, array $vars = [])
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'row', $vars);
-    }
-
-    protected function renderRest(FormView $view, array $vars = [])
-    {
-        return $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
-    }
-
-    protected function renderStart(FormView $view, array $vars = [])
-    {
-        return $this->renderer->renderBlock($view, 'form_start', $vars);
-    }
-
-    protected function renderEnd(FormView $view, array $vars = [])
-    {
-        return $this->renderer->renderBlock($view, 'form_end', $vars);
-    }
-
-    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
-    {
-        $this->renderer->setTheme($view, $themes, $useDefaultThemes);
+        ];
     }
 }

@@ -21,16 +21,13 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 final class ReverseContainer
 {
-    private Container $serviceContainer;
-    private ContainerInterface $reversibleLocator;
-    private string $tagName;
     private \Closure $getServiceId;
 
-    public function __construct(Container $serviceContainer, ContainerInterface $reversibleLocator, string $tagName = 'container.reversible')
-    {
-        $this->serviceContainer = $serviceContainer;
-        $this->reversibleLocator = $reversibleLocator;
-        $this->tagName = $tagName;
+    public function __construct(
+        private Container $serviceContainer,
+        private ContainerInterface $reversibleLocator,
+        private string $tagName = 'container.reversible',
+    ) {
         $this->getServiceId = \Closure::bind(fn (object $service): ?string => array_search($service, $this->services, true) ?: array_search($service, $this->privates, true) ?: null, $serviceContainer, Container::class);
     }
 
@@ -66,7 +63,7 @@ final class ReverseContainer
         }
 
         if (isset($this->serviceContainer->getRemovedIds()[$id])) {
-            throw new ServiceNotFoundException($id, null, null, [], sprintf('The "%s" service is private and cannot be accessed by reference. You should either make it public, or tag it as "%s".', $id, $this->tagName));
+            throw new ServiceNotFoundException($id, null, null, [], \sprintf('The "%s" service is private and cannot be accessed by reference. You should either make it public, or tag it as "%s".', $id, $this->tagName));
         }
 
         return $this->serviceContainer->get($id);

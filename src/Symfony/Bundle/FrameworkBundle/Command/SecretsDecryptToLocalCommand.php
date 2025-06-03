@@ -28,14 +28,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'secrets:decrypt-to-local', description: 'Decrypt all secrets and stores them in the local vault')]
 final class SecretsDecryptToLocalCommand extends Command
 {
-    private AbstractVault $vault;
-    private ?AbstractVault $localVault;
-
-    public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
-    {
-        $this->vault = $vault;
-        $this->localVault = $localVault;
-
+    public function __construct(
+        private AbstractVault $vault,
+        private ?AbstractVault $localVault = null,
+    ) {
         parent::__construct();
     }
 
@@ -48,7 +44,7 @@ The <info>%command.name%</info> command decrypts all secrets and copies them in 
 
     <info>%command.full_name%</info>
 
-When the option <info>--force</info> is provided, secrets that already exist in the local vault are overriden.
+When the <info>--force</info> option is provided, secrets that already exist in the local vault are overridden.
 
     <info>%command.full_name% --force</info>
 EOF
@@ -68,7 +64,7 @@ EOF
 
         $secrets = $this->vault->list(true);
 
-        $io->comment(sprintf('%d secret%s found in the vault.', \count($secrets), 1 !== \count($secrets) ? 's' : ''));
+        $io->comment(\sprintf('%d secret%s found in the vault.', \count($secrets), 1 !== \count($secrets) ? 's' : ''));
 
         $skipped = 0;
         if (!$input->getOption('force')) {
@@ -82,19 +78,25 @@ EOF
 
         if ($skipped > 0) {
             $io->warning([
-                sprintf('%d secret%s already overridden in the local vault and will be skipped.', $skipped, 1 !== $skipped ? 's are' : ' is'),
+                \sprintf('%d secret%s already overridden in the local vault and will be skipped.', $skipped, 1 !== $skipped ? 's are' : ' is'),
                 'Use the --force flag to override these.',
             ]);
         }
 
+        $hadErrors = false;
         foreach ($secrets as $k => $v) {
             if (null === $v) {
-                $io->error($this->vault->getLastMessage() ?? sprintf('Secret "%s" has been skipped as there was an error reading it.', $k));
+                $io->error($this->vault->getLastMessage() ?? \sprintf('Secret "%s" has been skipped as there was an error reading it.', $k));
+                $hadErrors = true;
                 continue;
             }
 
             $this->localVault->seal($k, $v);
             $io->note($this->localVault->getLastMessage());
+        }
+
+        if ($hadErrors) {
+            return 1;
         }
 
         return 0;

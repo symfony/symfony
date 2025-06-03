@@ -41,6 +41,6 @@ TEMPLATE;
             }
         });
 
-        file_put_contents($path.'/'.$locale.'.php', sprintf($template, VarExporter::export($data)));
+        file_put_contents($path.'/'.$locale.'.php', \sprintf($template, VarExporter::export($data)));
     }
 }

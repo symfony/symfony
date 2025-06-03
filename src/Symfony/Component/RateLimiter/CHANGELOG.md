@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `RateLimiterFactoryInterface`
+ * Add `CompoundRateLimiterFactory`
+
+6.4
+---
+
+ * Add `SlidingWindowLimiter::reserve()`
+
 6.2
 ---
 

@@ -52,7 +52,7 @@ final class ShareContentShare extends AbstractLinkedInShare
         self::LIVE_VIDEO,
     ];
 
-    public function __construct(string $text, array $attributes = [], string $inferredLocale = null, ShareMediaShare $media = null, string $primaryLandingPageUrl = null, string $shareMediaCategory = self::NONE)
+    public function __construct(string $text, array $attributes = [], ?string $inferredLocale = null, ?ShareMediaShare $media = null, ?string $primaryLandingPageUrl = null, string $shareMediaCategory = self::NONE)
     {
         $this->options['shareCommentary'] = [
             'attributes' => $attributes,
@@ -72,8 +72,8 @@ final class ShareContentShare extends AbstractLinkedInShare
         }
 
         if ($shareMediaCategory) {
-            if (!\in_array($shareMediaCategory, self::ALL)) {
-                throw new LogicException(sprintf('"%s" is not valid option, available options are "%s".', $shareMediaCategory, implode(', ', self::ALL)));
+            if (!\in_array($shareMediaCategory, self::ALL, true)) {
+                throw new LogicException(\sprintf('"%s" is not valid option, available options are "%s".', $shareMediaCategory, implode(', ', self::ALL)));
             }
 
             $this->options['shareMediaCategory'] = $shareMediaCategory;

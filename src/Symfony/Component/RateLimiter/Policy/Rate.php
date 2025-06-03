@@ -20,13 +20,10 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  */
 final class Rate
 {
-    private \DateInterval $refillTime;
-    private int $refillAmount;
-
-    public function __construct(\DateInterval $refillTime, int $refillAmount = 1)
-    {
-        $this->refillTime = $refillTime;
-        $this->refillAmount = $refillAmount;
+    public function __construct(
+        private \DateInterval $refillTime,
+        private int $refillAmount = 1,
+    ) {
     }
 
     public static function perSecond(int $rate = 1): self
@@ -97,6 +94,18 @@ final class Rate
         $cycles = floor($duration / TimeUtil::dateIntervalToSeconds($this->refillTime));
 
         return $cycles * $this->refillAmount;
+    }
+
+    /**
+     * Calculates total amount in seconds of refill intervals during $duration (for maintain strict refill frequency).
+     *
+     * @param float $duration interval in seconds
+     */
+    public function calculateRefillInterval(float $duration): int
+    {
+        $cycleTime = TimeUtil::dateIntervalToSeconds($this->refillTime);
+
+        return floor($duration / $cycleTime) * $cycleTime;
     }
 
     public function __toString(): string

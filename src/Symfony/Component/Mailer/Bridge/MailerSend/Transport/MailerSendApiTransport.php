@@ -29,18 +29,18 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class MailerSendApiTransport extends AbstractApiTransport
 {
-    private string $key;
-
-    public function __construct(#[\SensitiveParameter] string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
-        return sprintf('mailersend+api://%s', $this->getEndpoint());
+        return \sprintf('mailersend+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -63,11 +63,11 @@ final class MailerSendApiTransport extends AbstractApiTransport
         try {
             $result = '' !== $content ? $response->toArray(false) : null;
         } catch (JsonException $e) {
-            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $content, $statusCode), $response, 0, $e);
+            throw new HttpTransportException(\sprintf('Unable to send an email: "%s" (code %d).', $content, $statusCode), $response, 0, $e);
         }
 
         if (202 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? '').sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? '').\sprintf(' (code %d).', $statusCode), $response);
         }
 
         if (isset($result['warnings'][0]['type']) && 'ALL_SUPPRESSED' === $result['warnings'][0]['type']) {

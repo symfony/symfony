@@ -23,22 +23,20 @@ namespace Symfony\Component\Config\Resource;
  */
 class FileExistenceResource implements SelfCheckingResourceInterface
 {
-    private string $resource;
-
     private bool $exists;
 
     /**
      * @param string $resource The file path to the resource
      */
-    public function __construct(string $resource)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        private string $resource,
+    ) {
         $this->exists = file_exists($resource);
     }
 
     public function __toString(): string
     {
-        return $this->resource;
+        return 'existence.'.$this->resource;
     }
 
     public function getResource(): string

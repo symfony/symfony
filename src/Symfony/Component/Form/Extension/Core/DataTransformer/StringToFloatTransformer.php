@@ -19,11 +19,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class StringToFloatTransformer implements DataTransformerInterface
 {
-    private ?int $scale;
-
-    public function __construct(int $scale = null)
-    {
-        $this->scale = $scale;
+    public function __construct(
+        private ?int $scale = null,
+    ) {
     }
 
     public function transform(mixed $value): ?float

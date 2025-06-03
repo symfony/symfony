@@ -37,7 +37,7 @@ final class MailjetRequestParser extends AbstractRequestParser
         ]);
     }
 
-    protected function doParse(Request $request, string $secret): ?AbstractMailerEvent
+    protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
         try {
             return $this->converter->convert($request->toArray());

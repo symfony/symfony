@@ -25,7 +25,7 @@ class StateMachineGraphvizDumper extends GraphvizDumper
      *  * node: The default options for nodes (places)
      *  * edge: The default options for edges
      */
-    public function dump(Definition $definition, Marking $marking = null, array $options = []): string
+    public function dump(Definition $definition, ?Marking $marking = null, array $options = []): string
     {
         $withMetadata = $options['with-metadata'] ?? false;
 
@@ -89,7 +89,7 @@ class StateMachineGraphvizDumper extends GraphvizDumper
 
         foreach ($edges as $id => $edges) {
             foreach ($edges as $edge) {
-                $code .= sprintf(
+                $code .= \sprintf(
                     "  place_%s -> place_%s [label=\"%s\" style=\"%s\"%s];\n",
                     $this->dotize($id),
                     $this->dotize($edge['to']),

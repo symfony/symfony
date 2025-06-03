@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Clock\DatePoint;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 
 class DateTimeTypeTest extends BaseTypeTestCase
 {
-    use ExpectDeprecationTrait;
-
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
+    public const TESTED_TYPE = DateTimeType::class;
 
     private string $defaultLocale;
 
@@ -61,6 +61,37 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
 
         $this->assertEquals($dateTime, $form->getData());
+    }
+
+    public function testSubmitDatePoint()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'date_widget' => 'choice',
+            'years' => [2010],
+            'time_widget' => 'choice',
+            'input' => 'date_point',
+        ]);
+
+        $input = [
+            'date' => [
+                'day' => '2',
+                'month' => '6',
+                'year' => '2010',
+            ],
+            'time' => [
+                'hour' => '3',
+                'minute' => '4',
+            ],
+        ];
+
+        $form->submit($input);
+
+        $this->assertInstanceOf(DatePoint::class, $form->getData());
+        $datePoint = DatePoint::createFromMutable(new \DateTime('2010-06-02 03:04:00 UTC'));
+        $this->assertEquals($datePoint, $form->getData());
+        $this->assertEquals($input, $form->getViewData());
     }
 
     public function testSubmitDateTimeImmutable()
@@ -710,6 +741,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => $widget,
             'empty_data' => $emptyData,
+            'years' => range(2018, (int) date('Y')),
         ]);
         $form->submit(null);
 
@@ -751,28 +783,20 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $this->assertSame('14/01/2018 21:29:00 +00:00', $form->getData());
     }
 
-    /**
-     * @group legacy
-     */
     public function testDateTimeInputTimezoneNotMatchingModelTimezone()
     {
-        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
-        // $this->expectException(LogicException::class);
-        // $this->expectExceptionMessage('Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using a "DateTime" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
 
         $this->factory->create(static::TESTED_TYPE, new \DateTime('now', new \DateTimeZone('UTC')), [
             'model_timezone' => 'Europe/Berlin',
         ]);
     }
 
-    /**
-     * @group legacy
-     */
     public function testDateTimeImmutableInputTimezoneNotMatchingModelTimezone()
     {
-        $this->expectDeprecation('Since symfony/form 6.4: Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is deprecated.');
-        // $this->expectException(LogicException::class);
-        // $this->expectExceptionMessage('Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using a "DateTimeImmutable" instance with a timezone ("UTC") not matching the configured model timezone "Europe/Berlin" is not supported.');
 
         $this->factory->create(static::TESTED_TYPE, new \DateTimeImmutable('now', new \DateTimeZone('UTC')), [
             'input' => 'datetime_immutable',

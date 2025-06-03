@@ -22,6 +22,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('debug.security.access.decision_manager.inner'),
             ])
+            ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
 
         ->set('debug.security.voter.vote_listener', VoteListener::class)
             ->args([
@@ -36,6 +37,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.logout_url_generator'),
             ])
             ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => 'reset'])
         ->alias('security.firewall', 'debug.security.firewall')
     ;
 };

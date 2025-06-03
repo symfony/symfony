@@ -14,20 +14,31 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\EqualToValidator;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\TypedDummy;
+use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
 class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
+    use IcuCompatibilityTrait;
+    use InvalidComparisonToValueTestTrait;
+    use ThrowsOnInvalidStringDatesTestTrait;
+    use ValidComparisonToValueTrait;
+
     protected function createValidator(): EqualToValidator
     {
         return new EqualToValidator();
     }
 
-    protected static function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(?array $options = null): Constraint
     {
-        return new EqualTo($options);
+        if (null !== $options) {
+            return new EqualTo(...$options);
+        }
+
+        return new EqualTo();
     }
 
     protected function getErrorCode(): ?string
@@ -61,17 +72,47 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return [
             [1, '1', 2, '2', 'int'],
             ['22', '"22"', '333', '"333"', 'string'],
-            [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
-            [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
-            [new \DateTime('2001-01-01 UTC'), 'Jan 1, 2001, 12:00 AM', '2000-01-01 UTC', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
+            [new \DateTime('2001-01-01'), self::normalizeIcuSpaces("Jan 1, 2001, 12:00\u{202F}AM"), new \DateTime('2000-01-01'), self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
+            [new \DateTime('2001-01-01'), self::normalizeIcuSpaces("Jan 1, 2001, 12:00\u{202F}AM"), '2000-01-01', self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
+            [new \DateTime('2001-01-01 UTC'), self::normalizeIcuSpaces("Jan 1, 2001, 12:00\u{202F}AM"), '2000-01-01 UTC', self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
             [new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
         ];
     }
 
-    public static function provideComparisonsToNullValueAtPropertyPath()
+    public function testCompareWithNullValueAtPropertyAt()
     {
-        return [
-            [5, '5', false],
-        ];
+        $constraint = $this->createConstraint(['propertyPath' => 'value']);
+        $constraint->message = 'Constraint Message';
+
+        $object = new ComparisonTest_Class(null);
+        $this->setObject($object);
+
+        $this->validator->validate(5, $constraint);
+
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', '5')
+            ->setParameter('{{ compared_value }}', 'null')
+            ->setParameter('{{ compared_value_type }}', 'null')
+            ->setParameter('{{ compared_value_path }}', 'value')
+            ->setCode($this->getErrorCode())
+            ->assertRaised();
+    }
+
+    public function testCompareWithUninitializedPropertyAtPropertyPath()
+    {
+        $this->setObject(new TypedDummy());
+
+        $this->validator->validate(5, $this->createConstraint([
+            'message' => 'Constraint Message',
+            'propertyPath' => 'value',
+        ]));
+
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', '5')
+            ->setParameter('{{ compared_value }}', 'null')
+            ->setParameter('{{ compared_value_type }}', 'null')
+            ->setParameter('{{ compared_value_path }}', 'value')
+            ->setCode($this->getErrorCode())
+            ->assertRaised();
     }
 }

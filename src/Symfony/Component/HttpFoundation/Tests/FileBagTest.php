@@ -32,27 +32,12 @@ class FileBagTest extends TestCase
     public function testShouldConvertsUploadedFiles()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
+        $name = basename($tmpFile);
+
+        $file = new UploadedFile($tmpFile, $name, 'text/plain');
 
         $bag = new FileBag(['file' => [
-            'name' => basename($tmpFile),
-            'type' => 'text/plain',
-            'tmp_name' => $tmpFile,
-            'error' => 0,
-            'size' => null,
-        ]]);
-
-        $this->assertEquals($file, $bag->get('file'));
-    }
-
-    public function testShouldConvertsUploadedFilesPhp81()
-    {
-        $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
-
-        $bag = new FileBag(['file' => [
-            'name' => basename($tmpFile),
-            'full_path' => basename($tmpFile),
+            'name' => $name,
             'type' => 'text/plain',
             'tmp_name' => $tmpFile,
             'error' => 0,
@@ -104,12 +89,13 @@ class FileBagTest extends TestCase
     public function testShouldConvertUploadedFilesWithPhpBug()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
+        $name = basename($tmpFile);
+        $file = new UploadedFile($tmpFile, $name, 'text/plain');
 
         $bag = new FileBag([
             'child' => [
                 'name' => [
-                    'file' => basename($tmpFile),
+                    'file' => $name,
                 ],
                 'type' => [
                     'file' => 'text/plain',
@@ -133,12 +119,13 @@ class FileBagTest extends TestCase
     public function testShouldConvertNestedUploadedFilesWithPhpBug()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
+        $name = basename($tmpFile);
+        $file = new UploadedFile($tmpFile, $name, 'text/plain');
 
         $bag = new FileBag([
             'child' => [
                 'name' => [
-                    'sub' => ['file' => basename($tmpFile)],
+                    'sub' => ['file' => $name],
                 ],
                 'type' => [
                     'sub' => ['file' => 'text/plain'],
@@ -162,11 +149,54 @@ class FileBagTest extends TestCase
     public function testShouldNotConvertNestedUploadedFiles()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
+        $name = basename($tmpFile);
+        $file = new UploadedFile($tmpFile, $name, 'text/plain');
         $bag = new FileBag(['image' => ['file' => $file]]);
 
         $files = $bag->all();
         $this->assertEquals($file, $files['image']['file']);
+    }
+
+    public function testWebkitDirectoryUpload()
+    {
+        $file1 = __DIR__.'/File/Fixtures/webkitdirectory/test.txt';
+        $file2 = __DIR__.'/File/Fixtures/webkitdirectory/nested/test.txt';
+
+        $bag = new FileBag([
+            'child' => [
+                'name' => [
+                    'test.txt',
+                    'test.txt',
+                ],
+                'full_path' => [
+                    'webkitdirectory/test.txt',
+                    'webkitdirectory/nested/test.txt',
+                ],
+                'type' => [
+                    'text/plain',
+                    'text/plain',
+                ],
+                'tmp_name' => [
+                    $file1,
+                    $file2,
+                ],
+                'error' => [
+                    0, 0,
+                ],
+                'size' => [
+                    null, null,
+                ],
+            ],
+        ]);
+
+        /** @var UploadedFile[] */
+        $files = $bag->get('child');
+
+        $this->assertEquals('test.txt', $files[0]->getClientOriginalName());
+        $this->assertEquals('test.txt', $files[1]->getClientOriginalName());
+
+        $this->assertEquals('webkitdirectory/test.txt', $files[0]->getClientOriginalPath());
+        $this->assertEquals('webkitdirectory/nested/test.txt', $files[1]->getClientOriginalPath());
     }
 
     protected function createTempFile()

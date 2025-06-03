@@ -6,7 +6,7 @@ class BarOptionalArgument
 {
     public $foo;
 
-    public function __construct(\stdClass $foo = null)
+    public function __construct(?\stdClass $foo = null)
     {
         $this->foo = $foo;
     }

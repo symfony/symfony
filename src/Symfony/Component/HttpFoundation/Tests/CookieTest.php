@@ -87,6 +87,19 @@ class CookieTest extends TestCase
         $this->assertSame(0, $cookie->getExpiresTime());
     }
 
+    public function testMinimalParameters()
+    {
+        $constructedCookie = new Cookie('foo');
+
+        $createdCookie = Cookie::create('foo');
+
+        $cookie = new Cookie('foo', null, 0, '/', null, null, true, false, 'lax');
+
+        $this->assertEquals($constructedCookie, $cookie);
+
+        $this->assertEquals($createdCookie, $cookie);
+    }
+
     public function testGetValue()
     {
         $value = 'MyValue';
@@ -187,6 +200,17 @@ class CookieTest extends TestCase
         $this->assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns whether the cookie is only transmitted over HTTP');
     }
 
+    public function testIsPartitioned()
+    {
+        $cookie = new Cookie('foo', 'bar', 0, '/', '.myfoodomain.com', true, true, false, 'Lax', true);
+
+        $this->assertTrue($cookie->isPartitioned());
+
+        $cookie = Cookie::create('foo')->withPartitioned(true);
+
+        $this->assertTrue($cookie->isPartitioned());
+    }
+
     public function testCookieIsNotCleared()
     {
         $cookie = Cookie::create('foo', 'bar', time() + 3600 * 24);
@@ -262,6 +286,20 @@ class CookieTest extends TestCase
             ->withSameSite(null);
         $this->assertEquals($expected, (string) $cookie, '->__toString() returns string representation of a cleared cookie if value is NULL');
 
+        $expected = 'foo=deleted; expires='.gmdate('D, d M Y H:i:s T', $expire = time() - 31536001).'; Max-Age=0; path=/admin/; domain=.myfoodomain.com; secure; httponly; samesite=none; partitioned';
+        $cookie = new Cookie('foo', null, 1, '/admin/', '.myfoodomain.com', true, true, false, 'none', true);
+        $this->assertEquals($expected, (string) $cookie, '->__toString() returns string representation of a cleared cookie if value is NULL');
+
+        $cookie = Cookie::create('foo')
+            ->withExpires(1)
+            ->withPath('/admin/')
+            ->withDomain('.myfoodomain.com')
+            ->withSecure(true)
+            ->withHttpOnly(true)
+            ->withSameSite('none')
+            ->withPartitioned(true);
+        $this->assertEquals($expected, (string) $cookie, '->__toString() returns string representation of a cleared cookie if value is NULL');
+
         $expected = 'foo=bar; path=/; httponly; samesite=lax';
         $cookie = Cookie::create('foo', 'bar');
         $this->assertEquals($expected, (string) $cookie);
@@ -313,6 +351,9 @@ class CookieTest extends TestCase
         $cookie = Cookie::fromString('foo=bar', true);
         $this->assertEquals(Cookie::create('foo', 'bar', 0, '/', null, false, false, false, null), $cookie);
 
+        $cookie = Cookie::fromString('foo=bar=', true);
+        $this->assertEquals(Cookie::create('foo', 'bar=', 0, '/', null, false, false, false, null), $cookie);
+
         $cookie = Cookie::fromString('foo', true);
         $this->assertEquals(Cookie::create('foo', null, 0, '/', null, false, false, false, null), $cookie);
 
@@ -321,6 +362,9 @@ class CookieTest extends TestCase
 
         $cookie = Cookie::fromString('foo_cookie=foo==; expires=Tue, 22 Sep 2020 06:27:09 GMT; path=/');
         $this->assertEquals(Cookie::create('foo_cookie', 'foo==', strtotime('Tue, 22 Sep 2020 06:27:09 GMT'), '/', null, false, false, true, null), $cookie);
+
+        $cookie = Cookie::fromString('foo_cookie=foo==; expires=Tue, 22 Sep 2020 06:27:09 GMT; path=/; secure; httponly; samesite=none; partitioned');
+        $this->assertEquals(new Cookie('foo_cookie', 'foo==', strtotime('Tue, 22 Sep 2020 06:27:09 GMT'), '/', null, true, true, true, 'none', true), $cookie);
     }
 
     public function testFromStringWithHttpOnly()

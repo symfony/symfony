@@ -23,14 +23,11 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  */
 class VariableNode extends BaseNode implements PrototypeNodeInterface
 {
-    protected $defaultValueSet = false;
-    protected $defaultValue;
-    protected $allowEmptyValue = true;
+    protected bool $defaultValueSet = false;
+    protected mixed $defaultValue = null;
+    protected bool $allowEmptyValue = true;
 
-    /**
-     * @return void
-     */
-    public function setDefaultValue(mixed $value)
+    public function setDefaultValue(mixed $value): void
     {
         $this->defaultValueSet = true;
         $this->defaultValue = $value;
@@ -52,26 +49,18 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      * Sets if this node is allowed to have an empty value.
      *
      * @param bool $boolean True if this entity will accept empty values
-     *
-     * @return void
      */
-    public function setAllowEmptyValue(bool $boolean)
+    public function setAllowEmptyValue(bool $boolean): void
     {
         $this->allowEmptyValue = $boolean;
     }
 
-    /**
-     * @return void
-     */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return void
-     */
-    protected function validateType(mixed $value)
+    protected function validateType(mixed $value): void
     {
     }
 
@@ -80,7 +69,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
         // deny environment variables only when using custom validators
         // this avoids ever passing an empty value to final validation closures
         if (!$this->allowEmptyValue && $this->isHandlingPlaceholder() && $this->finalValidationClosures) {
-            $e = new InvalidConfigurationException(sprintf('The path "%s" cannot contain an environment variable when empty values are not allowed by definition and are validated.', $this->getPath()));
+            $e = new InvalidConfigurationException(\sprintf('The path "%s" cannot contain an environment variable when empty values are not allowed by definition and are validated.', $this->getPath()));
             if ($hint = $this->getInfo()) {
                 $e->addHint($hint);
             }
@@ -90,7 +79,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
         }
 
         if (!$this->allowEmptyValue && $this->isValueEmpty($value)) {
-            $ex = new InvalidConfigurationException(sprintf('The path "%s" cannot contain an empty value, but got %s.', $this->getPath(), json_encode($value)));
+            $ex = new InvalidConfigurationException(\sprintf('The path "%s" cannot contain an empty value, but got %s.', $this->getPath(), json_encode($value)));
             if ($hint = $this->getInfo()) {
                 $ex->addHint($hint);
             }
@@ -123,6 +112,6 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function isValueEmpty(mixed $value): bool
     {
-        return empty($value);
+        return !$value;
     }
 }

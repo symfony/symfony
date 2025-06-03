@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+  <parameter key="integer">12</parameter>
+  <parameter key="string" deprecated="Since symfony/framework-bundle 6.4: The parameter &quot;string&quot; is deprecated.">Hello world!</parameter>
+</parameters>

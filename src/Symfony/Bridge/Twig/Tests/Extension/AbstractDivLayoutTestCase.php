@@ -619,6 +619,13 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         );
     }
 
+    public static function themeBlockInheritanceProvider(): array
+    {
+        return [
+            [['theme.html.twig']],
+        ];
+    }
+
     /**
      * @dataProvider themeInheritanceProvider
      */
@@ -663,6 +670,13 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         );
     }
 
+    public static function themeInheritanceProvider(): array
+    {
+        return [
+            [['parent_label.html.twig'], ['child_label.html.twig']],
+        ];
+    }
+
     /**
      * The block "_name_child_label" should be overridden in the theme of the
      * implemented driver.
@@ -691,9 +705,9 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     public function testChoiceRowWithCustomBlock()
     {
         $form = $this->factory->createNamedBuilder('name_c', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', 'a', [
-                'choices' => ['ChoiceA' => 'a', 'ChoiceB' => 'b'],
-                'expanded' => true,
-            ])
+            'choices' => ['ChoiceA' => 'a', 'ChoiceB' => 'b'],
+            'expanded' => true,
+        ])
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -852,6 +866,56 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     ]
     [count(./input)=3]
     [count(./label)=1]
+'
+        );
+    }
+
+    public function testSingleChoiceWithoutDuplicatePreferredIsSelected()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&d', [
+            'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c', 'Choice&D' => '&d'],
+            'preferred_choices' => ['&b', '&d'],
+            'duplicate_preferred_choices' => false,
+            'multiple' => false,
+            'expanded' => false,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['separator' => '-- sep --'],
+            '/select
+    [@name="name"]
+    [
+        ./option[@value="&d"][@selected="selected"]
+        /following-sibling::option[@disabled="disabled"][.="-- sep --"]
+        /following-sibling::option[@value="&a"][not(@selected)]
+        /following-sibling::option[@value="&c"][not(@selected)]
+    ]
+    [count(./option)=5]
+'
+        );
+    }
+
+    public function testSingleChoiceWithoutDuplicateNotPreferredIsSelected()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&d', [
+            'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c', 'Choice&D' => '&d'],
+            'preferred_choices' => ['&b', '&d'],
+            'duplicate_preferred_choices' => true,
+            'multiple' => false,
+            'expanded' => false,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['separator' => '-- sep --'],
+            '/select
+    [@name="name"]
+    [
+        ./option[@value="&d"][not(@selected)]
+        /following-sibling::option[@disabled="disabled"][.="-- sep --"]
+        /following-sibling::option[@value="&a"][not(@selected)]
+        /following-sibling::option[@value="&b"][not(@selected)]
+        /following-sibling::option[@value="&c"][not(@selected)]
+        /following-sibling::option[@value="&d"][@selected="selected"]
+    ]
+    [count(./option)=7]
 '
         );
     }

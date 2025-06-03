@@ -36,7 +36,7 @@ class LockStoreSchemaListenerTest extends TestCase
             ->method('configureSchema')
             ->with($schema, fn () => true);
 
-        $subscriber = new LockStoreSchemaListener([$lockStore]);
+        $subscriber = new LockStoreSchemaListener((static fn () => yield $lockStore)());
         $subscriber->postGenerateSchema($event);
     }
 }

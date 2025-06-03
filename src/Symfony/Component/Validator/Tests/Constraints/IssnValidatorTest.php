@@ -119,10 +119,10 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
      */
     public function testCaseSensitiveIssns($issn)
     {
-        $constraint = new Issn([
-            'caseSensitive' => true,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Issn(
+            caseSensitive: true,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($issn, $constraint);
 
@@ -137,10 +137,10 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
      */
     public function testRequireHyphenIssns($issn)
     {
-        $constraint = new Issn([
-            'requireHyphen' => true,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Issn(
+            requireHyphen: true,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($issn, $constraint);
 
@@ -167,9 +167,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidIssn($issn, $code)
     {
-        $constraint = new Issn([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Issn(message: 'myMessage');
 
         $this->validator->validate($issn, $constraint);
 

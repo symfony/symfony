@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Form\DependencyInjection\FormPass;
+use Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension;
 use Symfony\Component\Form\FormRegistry;
 
 /**
@@ -93,6 +94,25 @@ class FormPassTest extends TestCase
             ],
             $cmdDefinition->getArgument(1)
         );
+    }
+
+    public function testAddTaggedTypesToCsrfTypeExtension()
+    {
+        $container = $this->createContainerBuilder();
+
+        $container->register('form.registry', FormRegistry::class);
+        $container->register('form.type_extension.csrf', FormTypeCsrfExtension::class)
+            ->setArguments([null, true, '_token', null, 'validator.translation_domain', null, [], null])
+            ->setPublic(true);
+
+        $container->setDefinition('form.extension', $this->createExtensionDefinition());
+        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type', ['csrf_token_id' => 'the_token_id']);
+        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type');
+
+        $container->compile();
+
+        $csrfDefinition = $container->getDefinition('form.type_extension.csrf');
+        $this->assertSame([__CLASS__.'_Type1' => 'the_token_id'], $csrfDefinition->getArgument(7));
     }
 
     /**

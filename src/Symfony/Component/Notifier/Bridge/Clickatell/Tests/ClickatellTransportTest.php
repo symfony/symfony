@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ClickatellTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = null): ClickatellTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $from = null): ClickatellTransport
     {
         return new ClickatellTransport('authToken', $from, $client ?? new MockHttpClient());
     }

@@ -27,18 +27,17 @@ final class FakeChatLoggerTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->logger = $logger;
-
+    public function __construct(
+        private LoggerInterface $logger,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('fakechat+logger://%s', $this->getEndpoint());
+        return \sprintf('fakechat+logger://%s', $this->getEndpoint());
     }
 
     public function supports(MessageInterface $message): bool
@@ -57,10 +56,10 @@ final class FakeChatLoggerTransport extends AbstractTransport
 
         $subject = 'New Chat message without specified recipient!';
         if (null !== $message->getRecipientId()) {
-            $subject = sprintf('New Chat message for recipient: %s', $message->getRecipientId());
+            $subject = \sprintf('New Chat message for recipient: %s', $message->getRecipientId());
         }
 
-        $this->logger->info(sprintf('%s: %s', $subject, $message->getSubject()));
+        $this->logger->info(\sprintf('%s: %s', $subject, $message->getSubject()));
 
         return new SentMessage($message, (string) $this);
     }

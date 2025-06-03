@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Service\ResetInterface;
@@ -28,14 +27,9 @@ abstract class KernelTestCase extends TestCase
     use MailerAssertionsTrait;
     use NotificationAssertionsTrait;
 
-    protected static $class;
-
-    /**
-     * @var KernelInterface
-     */
-    protected static $kernel;
-
-    protected static $booted = false;
+    protected static ?string $class = null;
+    protected static ?KernelInterface $kernel = null;
+    protected static bool $booted = false;
 
     protected function tearDown(): void
     {
@@ -52,11 +46,11 @@ abstract class KernelTestCase extends TestCase
     protected static function getKernelClass(): string
     {
         if (!isset($_SERVER['KERNEL_CLASS']) && !isset($_ENV['KERNEL_CLASS'])) {
-            throw new \LogicException(sprintf('You must set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel in phpunit.xml / phpunit.xml.dist or override the "%1$s::createKernel()" or "%1$s::getKernelClass()" method.', static::class));
+            throw new \LogicException(\sprintf('You must set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel in phpunit.xml / phpunit.xml.dist or override the "%1$s::createKernel()" or "%1$s::getKernelClass()" method.', static::class));
         }
 
         if (!class_exists($class = $_ENV['KERNEL_CLASS'] ?? $_SERVER['KERNEL_CLASS'])) {
-            throw new \RuntimeException(sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the "%s::createKernel()" method.', $class, static::class));
+            throw new \RuntimeException(\sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the "%s::createKernel()" method.', $class, static::class));
         }
 
         return $class;
@@ -84,10 +78,8 @@ abstract class KernelTestCase extends TestCase
      * used by other services.
      *
      * Using this method is the best way to get a container from your test code.
-     *
-     * @return Container
      */
-    protected static function getContainer(): ContainerInterface
+    protected static function getContainer(): Container
     {
         if (!static::$booted) {
             static::bootKernel();
@@ -126,6 +118,12 @@ abstract class KernelTestCase extends TestCase
         if (null !== static::$kernel) {
             static::$kernel->boot();
             $container = static::$kernel->getContainer();
+
+            if ($container->has('services_resetter')) {
+                // Instantiate the service because Container::reset() only resets services that have been used
+                $container->get('services_resetter');
+            }
+
             static::$kernel->shutdown();
             static::$booted = false;
 

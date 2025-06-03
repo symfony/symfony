@@ -24,7 +24,7 @@ class RememberMeCookieTest extends AbstractWebTestCase
             '_username' => 'test',
             '_password' => 'test',
         ], [], [
-             'HTTPS' => (int) $https,
+            'HTTPS' => (int) $https,
         ]);
 
         $cookies = $client->getResponse()->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);

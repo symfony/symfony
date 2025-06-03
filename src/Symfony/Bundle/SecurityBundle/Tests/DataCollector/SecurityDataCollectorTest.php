@@ -28,6 +28,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -53,7 +54,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertFalse($collector->supportsRoleHierarchy());
         $this->assertCount(0, $collector->getRoles());
         $this->assertCount(0, $collector->getInheritedRoles());
-        $this->assertEmpty($collector->getUser());
+        $this->assertSame('', $collector->getUser());
         $this->assertNull($collector->getFirewall());
     }
 
@@ -72,7 +73,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertTrue($collector->supportsRoleHierarchy());
         $this->assertCount(0, $collector->getRoles());
         $this->assertCount(0, $collector->getInheritedRoles());
-        $this->assertEmpty($collector->getUser());
+        $this->assertSame('', $collector->getUser());
         $this->assertNull($collector->getFirewall());
     }
 
@@ -103,7 +104,7 @@ class SecurityDataCollectorTest extends TestCase
         $adminToken = new UsernamePasswordToken(new InMemoryUser('yceruto', 'P4$$w0rD', ['ROLE_ADMIN']), 'provider', ['ROLE_ADMIN']);
 
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), 'provider', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $adminToken));
+        $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER']), 'provider', ['ROLE_USER'], $adminToken));
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
         $collector->collect(new Request(), new Response());
@@ -115,7 +116,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('yceruto', $collector->getImpersonatorUser());
         $this->assertSame(SwitchUserToken::class, $collector->getTokenClass()->getValue());
         $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertSame(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $collector->getRoles()->getValue(true));
+        $this->assertSame(['ROLE_USER'], $collector->getRoles()->getValue(true));
         $this->assertSame([], $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
     }
@@ -226,8 +227,8 @@ class SecurityDataCollectorTest extends TestCase
         $voter1 = new DummyVoter();
         $voter2 = new DummyVoter();
 
-        $decoratedVoter1 = new TraceableVoter($voter1, new class() implements EventDispatcherInterface {
-            public function dispatch(object $event, string $eventName = null): object
+        $decoratedVoter1 = new TraceableVoter($voter1, new class implements EventDispatcherInterface {
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 return new \stdClass();
             }
@@ -271,8 +272,8 @@ class SecurityDataCollectorTest extends TestCase
             'object' => new \stdClass(),
             'result' => true,
             'voter_details' => [
-                ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
-                ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN, 'reasons' => []],
+                ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN, 'reasons' => []],
             ],
         ]];
 
@@ -301,8 +302,8 @@ class SecurityDataCollectorTest extends TestCase
         $voter1 = new DummyVoter();
         $voter2 = new DummyVoter();
 
-        $decoratedVoter1 = new TraceableVoter($voter1, new class() implements EventDispatcherInterface {
-            public function dispatch(object $event, string $eventName = null): object
+        $decoratedVoter1 = new TraceableVoter($voter1, new class implements EventDispatcherInterface {
+            public function dispatch(object $event, ?string $eventName = null): object
             {
                 return new \stdClass();
             }
@@ -360,10 +361,10 @@ class SecurityDataCollectorTest extends TestCase
                 'object' => new \stdClass(),
                 'result' => false,
                 'voter_details' => [
-                    ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED],
-                    ['class' => $voter1::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
-                    ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                    ['class' => $voter2::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED, 'reasons' => []],
+                    ['class' => $voter1::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED, 'reasons' => []],
+                    ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
+                    ['class' => $voter2::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
                 ],
             ],
             [
@@ -371,8 +372,8 @@ class SecurityDataCollectorTest extends TestCase
                 'object' => new \stdClass(),
                 'result' => true,
                 'voter_details' => [
-                    ['class' => $voter1::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                    ['class' => $voter2::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ['class' => $voter1::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
+                    ['class' => $voter2::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
                 ],
             ],
         ];
@@ -397,7 +398,37 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
     }
 
-    public static function provideRoles()
+    public function testGetVotersIfAccessDecisionManagerHasNoVoters()
+    {
+        $strategy = MainConfiguration::STRATEGY_AFFIRMATIVE;
+
+        $accessDecisionManager = $this->createMock(TraceableAccessDecisionManager::class);
+
+        $accessDecisionManager
+            ->method('getStrategy')
+            ->willReturn($strategy);
+
+        $accessDecisionManager
+            ->method('getVoters')
+            ->willReturn([]);
+
+        $accessDecisionManager
+            ->method('getDecisionLog')
+            ->willReturn([[
+                'attributes' => ['view'],
+                'object' => new \stdClass(),
+                'result' => true,
+                'voterDetails' => [],
+            ]]);
+
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
+
+        $dataCollector->collect(new Request(), new Response());
+
+        $this->assertSame([], $dataCollector->getVoters());
+    }
+
+    public static function provideRoles(): array
     {
         return [
             // Basic roles
@@ -431,7 +462,7 @@ class SecurityDataCollectorTest extends TestCase
 
 final class DummyVoter implements VoterInterface
 {
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {
     }
 }

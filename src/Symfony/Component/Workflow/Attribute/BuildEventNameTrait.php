@@ -20,20 +20,20 @@ use Symfony\Component\Workflow\Exception\LogicException;
  */
 trait BuildEventNameTrait
 {
-    private static function buildEventName(string $keyword, string $argument, string $workflow = null, string $node = null): string
+    private static function buildEventName(string $keyword, string $argument, ?string $workflow = null, ?string $node = null): string
     {
         if (null === $workflow) {
             if (null !== $node) {
-                throw new LogicException(sprintf('The "%s" argument of "%s" cannot be used without a "workflow" argument.', $argument, self::class));
+                throw new LogicException(\sprintf('The "%s" argument of "%s" cannot be used without a "workflow" argument.', $argument, self::class));
             }
 
-            return sprintf('workflow.%s', $keyword);
+            return \sprintf('workflow.%s', $keyword);
         }
 
         if (null === $node) {
-            return sprintf('workflow.%s.%s', $workflow, $keyword);
+            return \sprintf('workflow.%s.%s', $workflow, $keyword);
         }
 
-        return sprintf('workflow.%s.%s.%s', $workflow, $keyword, $node);
+        return \sprintf('workflow.%s.%s.%s', $workflow, $keyword, $node);
     }
 }

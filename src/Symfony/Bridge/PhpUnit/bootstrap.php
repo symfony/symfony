@@ -21,16 +21,13 @@ if (in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && $file = getenv('SYMFONY_DEPR
 }
 
 // Detect if we're loaded by an actual run of phpunit
-if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists(\PHPUnit\TextUI\Command::class, false)) {
+if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists(PHPUnit\TextUI\Command::class, false)) {
     return;
 }
 
 if (isset($fileIdentifier)) {
     unset($GLOBALS['__composer_autoload_files'][$fileIdentifier]);
 }
-
-// Enforce a consistent locale
-setlocale(\LC_ALL, 'C');
 
 if (class_exists(Deprecation::class)) {
     Deprecation::withoutDeduplication();

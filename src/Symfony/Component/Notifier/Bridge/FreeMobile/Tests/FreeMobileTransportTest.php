@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FreeMobileTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): FreeMobileTransport
+    public static function createTransport(?HttpClientInterface $client = null): FreeMobileTransport
     {
         return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? new MockHttpClient());
     }

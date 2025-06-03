@@ -26,8 +26,6 @@ final class NativeTransportFactoryTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        parent::setUpBeforeClass();
-
         $namespace = str_replace('\\Tests\\', '\\', __NAMESPACE__);
 
         $current = static::class;

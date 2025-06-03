@@ -46,7 +46,7 @@ class Envelope
     {
         // to ensure deliverability of bounce emails independent of UTF-8 capabilities of SMTP servers
         if (!preg_match('/^[^@\x80-\xFF]++@/', $sender->getAddress())) {
-            throw new InvalidArgumentException(sprintf('Invalid sender "%s": non-ASCII characters not supported in local-part of email.', $sender->getAddress()));
+            throw new InvalidArgumentException(\sprintf('Invalid sender "%s": non-ASCII characters not supported in local-part of email.', $sender->getAddress()));
         }
         $this->sender = $sender;
     }
@@ -72,7 +72,7 @@ class Envelope
         $this->recipients = [];
         foreach ($recipients as $recipient) {
             if (!$recipient instanceof Address) {
-                throw new InvalidArgumentException(sprintf('A recipient must be an instance of "%s" (got "%s").', Address::class, get_debug_type($recipient)));
+                throw new InvalidArgumentException(\sprintf('A recipient must be an instance of "%s" (got "%s").', Address::class, get_debug_type($recipient)));
             }
             $this->recipients[] = new Address($recipient->getAddress());
         }
@@ -84,5 +84,34 @@ class Envelope
     public function getRecipients(): array
     {
         return $this->recipients;
+    }
+
+    /**
+     * Returns true if any address' localpart contains at least one
+     * non-ASCII character, and false if all addresses have all-ASCII
+     * localparts.
+     *
+     * This helps to decide whether to the SMTPUTF8 extensions (RFC
+     * 6530 and following) for any given message.
+     *
+     * The SMTPUTF8 extension is strictly required if any address
+     * contains a non-ASCII character in its localpart. If non-ASCII
+     * is only used in domains (e.g. horst@freiherr-von-mühlhausen.de)
+     * then it is possible to send the message using IDN encoding
+     * instead of SMTPUTF8. The most common software will display the
+     * message as intended.
+     */
+    public function anyAddressHasUnicodeLocalpart(): bool
+    {
+        if ($this->getSender()->hasUnicodeLocalpart()) {
+            return true;
+        }
+        foreach ($this->getRecipients() as $r) {
+            if ($r->hasUnicodeLocalpart()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

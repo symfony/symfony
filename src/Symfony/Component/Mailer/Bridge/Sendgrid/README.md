@@ -7,15 +7,15 @@ Configuration example:
 
 ```env
 # SMTP
-MAILER_DSN=sendgrid+smtp://KEY@default
+MAILER_DSN=sendgrid+smtp://KEY@default?region=REGION
 
 # API
-MAILER_DSN=sendgrid+api://KEY@default
+MAILER_DSN=sendgrid+api://KEY@default?region=REGION
 ```
 
 where:
  - `KEY` is your Sendgrid API Key
-
+ - `REGION` is Sendgrid selected region (default to global)
 
 Webhook
 -------

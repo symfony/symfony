@@ -25,16 +25,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'cache:pool:list', description: 'List available cache pools')]
 final class CachePoolListCommand extends Command
 {
-    private array $poolNames;
-
     /**
      * @param string[] $poolNames
      */
-    public function __construct(array $poolNames)
-    {
+    public function __construct(
+        private array $poolNames,
+    ) {
         parent::__construct();
-
-        $this->poolNames = $poolNames;
     }
 
     protected function configure(): void

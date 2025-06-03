@@ -117,7 +117,7 @@ final class TwitterOptions implements MessageOptionsInterface
      *
      * @return $this
      */
-    public function attachVideo(File $file, string $alt = '', File $subtitles = null, bool $amplify = false, array $extraOwners = []): static
+    public function attachVideo(File $file, string $alt = '', ?File $subtitles = null, bool $amplify = false, array $extraOwners = []): static
     {
         $this->options['attach'][] = [
             'file' => $file,

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\DataProviderTestSuite;
 use PHPUnit\Framework\RiskyTestError;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
@@ -50,6 +51,8 @@ class SymfonyTestsListenerTrait
      */
     public function __construct(array $mockedNamespaces = [])
     {
+        setlocale(\LC_ALL, $_ENV['SYMFONY_PHPUNIT_LOCALE'] ?? 'C');
+
         if (class_exists(ExcludeList::class)) {
             (new ExcludeList())->getExcludedDirectories();
             ExcludeList::addDirectory(\dirname((new \ReflectionClass(__CLASS__))->getFileName(), 2));
@@ -191,7 +194,13 @@ class SymfonyTestsListenerTrait
     public function addSkippedTest($test, \Exception $e, $time): void
     {
         if (0 < $this->state) {
-            $this->isSkipped[\get_class($test)][$test->getName()] = 1;
+            if ($test instanceof DataProviderTestSuite) {
+                foreach ($test->tests() as $testWithDataProvider) {
+                    $this->isSkipped[\get_class($testWithDataProvider)][$testWithDataProvider->getName()] = 1;
+                }
+            } else {
+                $this->isSkipped[\get_class($test)][$test->getName()] = 1;
+            }
         }
     }
 
@@ -327,7 +336,7 @@ class SymfonyTestsListenerTrait
 
             return $h ? $h($type, $msg, $file, $line, $context) : false;
         }
-        // If the message is serialized we need to extract the message. This occurs when the error is triggered by
+        // If the message is serialized we need to extract the message. This occurs when the error is triggered
         // by the isolated test path in \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest().
         $parsedMsg = @unserialize($msg);
         if (\is_array($parsedMsg)) {

@@ -40,6 +40,6 @@ final class NullMessage implements MessageInterface
 
     public function getTransport(): ?string
     {
-        return $this->decoratedMessage->getTransport() ?? 'null';
+        return $this->decoratedMessage->getTransport() ?? null;
     }
 }

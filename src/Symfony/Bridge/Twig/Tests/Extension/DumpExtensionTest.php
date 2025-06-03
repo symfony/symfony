@@ -142,6 +142,6 @@ class DumpExtensionTest extends TestCase
             'Custom dumper should be used to dump data.'
         );
 
-        $this->assertEmpty($output, 'Dumper output should be ignored.');
+        $this->assertSame('', $output, 'Dumper output should be ignored.');
     }
 }

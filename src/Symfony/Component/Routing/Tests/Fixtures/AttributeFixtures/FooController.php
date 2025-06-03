@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures;
 
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class FooController
 {
@@ -53,6 +53,11 @@ class FooController
 
     #[Route(condition: 'context.getMethod() == \'GET\'')]
     public function condition()
+    {
+    }
+
+    #[Route(alias: ['alias', 'completely_different_name'])]
+    public function alias()
     {
     }
 }

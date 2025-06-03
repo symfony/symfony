@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
+use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
+use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -199,20 +201,20 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $client->reset();
 
-        $expected = [
-            'Request: "GET https://127.0.0.1:3000/json"',
-            'Queueing pushed response: "https://127.0.0.1:3000/json/1"',
-            'Queueing pushed response: "https://127.0.0.1:3000/json/2"',
-            'Queueing pushed response: "https://127.0.0.1:3000/json/3"',
-            'Response: "200 https://127.0.0.1:3000/json"',
-            'Accepting pushed response: "GET https://127.0.0.1:3000/json/1"',
-            'Response: "200 https://127.0.0.1:3000/json/1"',
-            'Accepting pushed response: "GET https://127.0.0.1:3000/json/2"',
-            'Response: "200 https://127.0.0.1:3000/json/2"',
-            'Accepting pushed response: "GET https://127.0.0.1:3000/json/3"',
-            'Response: "200 https://127.0.0.1:3000/json/3"',
-        ];
-        $this->assertSame($expected, $logger->logs);
+        $expected = <<<EOTXT
+            Request: "GET https://127.0.0.1:3000/json"
+            Queueing pushed response: "https://127.0.0.1:3000/json/1"
+            Queueing pushed response: "https://127.0.0.1:3000/json/2"
+            Queueing pushed response: "https://127.0.0.1:3000/json/3"
+            Response: "200 https://127.0.0.1:3000/json" %f seconds
+            Accepting pushed response: "GET https://127.0.0.1:3000/json/1"
+            Response: "200 https://127.0.0.1:3000/json/1" %f seconds
+            Accepting pushed response: "GET https://127.0.0.1:3000/json/2"
+            Response: "200 https://127.0.0.1:3000/json/2" %f seconds
+            Accepting pushed response: "GET https://127.0.0.1:3000/json/3"
+            Response: "200 https://127.0.0.1:3000/json/3" %f seconds
+            EOTXT;
+        $this->assertStringMatchesFormat($expected, implode("\n", $logger->logs));
     }
 
     public function testPause()
@@ -287,19 +289,19 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $client->reset();
 
-        $expected = [
-            'Request: "GET https://127.0.0.1:3000/json"',
-            'Queueing pushed response: "https://127.0.0.1:3000/json/1"',
-            'Queueing pushed response: "https://127.0.0.1:3000/json/2"',
-            'Queueing pushed response: "https://127.0.0.1:3000/json/3"',
-            'Response: "200 https://127.0.0.1:3000/json"',
-            'Accepting pushed response: "GET https://127.0.0.1:3000/json/1"',
-            'Response: "200 https://127.0.0.1:3000/json/1"',
-            'Accepting pushed response: "GET https://127.0.0.1:3000/json/2"',
-            'Response: "200 https://127.0.0.1:3000/json/2"',
-            'Unused pushed response: "https://127.0.0.1:3000/json/3"',
-        ];
-        $this->assertSame($expected, $logger->logs);
+        $expected = <<<EOTXT
+            Request: "GET https://127.0.0.1:3000/json"
+            Queueing pushed response: "https://127.0.0.1:3000/json/1"
+            Queueing pushed response: "https://127.0.0.1:3000/json/2"
+            Queueing pushed response: "https://127.0.0.1:3000/json/3"
+            Response: "200 https://127.0.0.1:3000/json" %f seconds
+            Accepting pushed response: "GET https://127.0.0.1:3000/json/1"
+            Response: "200 https://127.0.0.1:3000/json/1" %f seconds
+            Accepting pushed response: "GET https://127.0.0.1:3000/json/2"
+            Response: "200 https://127.0.0.1:3000/json/2" %f seconds
+            Unused pushed response: "https://127.0.0.1:3000/json/3"
+            EOTXT;
+        $this->assertStringMatchesFormat($expected, implode("\n", $logger->logs));
     }
 
     public function testDnsFailure()
@@ -318,7 +320,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            throw new SkippedTestSuiteError('Testing with the "vulcain" is not supported on Windows.');
+            self::markTestSkipped('Testing with the "vulcain" is not supported on Windows.');
         }
 
         $process = new Process(['vulcain'], null, [
@@ -328,21 +330,26 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'KEY_FILE' => __DIR__.'/Fixtures/tls/server.key',
             'CERT_FILE' => __DIR__.'/Fixtures/tls/server.crt',
         ]);
-        $process->start();
+
+        try {
+            $process->start();
+        } catch (ProcessFailedException $e) {
+            self::markTestSkipped('vulcain failed: '.$e->getMessage());
+        }
 
         register_shutdown_function($process->stop(...));
         sleep('\\' === \DIRECTORY_SEPARATOR ? 10 : 1);
 
         if (!$process->isRunning()) {
             if ('\\' !== \DIRECTORY_SEPARATOR && 127 === $process->getExitCode()) {
-                throw new SkippedTestSuiteError('vulcain binary is missing');
+                self::markTestSkipped('vulcain binary is missing');
             }
 
             if ('\\' !== \DIRECTORY_SEPARATOR && 126 === $process->getExitCode()) {
-                throw new SkippedTestSuiteError('vulcain binary is not executable');
+                self::markTestSkipped('vulcain binary is not executable');
             }
 
-            throw new SkippedTestSuiteError((new ProcessFailedException($process))->getMessage());
+            self::markTestSkipped((new ProcessFailedException($process))->getMessage());
         }
 
         self::$vulcainStarted = true;
@@ -438,7 +445,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString("\r\nContent-Length: ", $response->getInfo('debug'));
+        $this->assertStringContainsStringIgnoringCase("\r\nContent-Length: ", $response->getInfo('debug'));
     }
 
     public function testNullBody()
@@ -450,6 +457,150 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->expectNotToPerformAssertions();
+    }
+
+    public function testMisspelledScheme()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid URL: host is missing in "http:/localhost:8057/".');
+
+        $httpClient->request('GET', 'http:/localhost:8057/');
+    }
+
+    public function testNoPrivateNetwork()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client = new NoPrivateNetworkHttpClient($client);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Host "localhost" is blocked');
+
+        $client->request('GET', 'http://localhost:8888');
+    }
+
+    public function testNoPrivateNetworkWithResolve()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client = new NoPrivateNetworkHttpClient($client);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Host "symfony.com" is blocked');
+
+        $client->request('GET', 'http://symfony.com', ['resolve' => ['symfony.com' => '127.0.0.1']]);
+    }
+
+    public function testNoPrivateNetworkWithResolveAndRedirect()
+    {
+        DnsMock::withMockedHosts([
+            'localhost' => [
+                [
+                    'host' => 'localhost',
+                    'class' => 'IN',
+                    'ttl' => 15,
+                    'type' => 'A',
+                    'ip' => '127.0.0.1',
+                ],
+            ],
+            'symfony.com' => [
+                [
+                    'host' => 'symfony.com',
+                    'class' => 'IN',
+                    'ttl' => 15,
+                    'type' => 'A',
+                    'ip' => '10.0.0.1',
+                ],
+            ],
+        ]);
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client = new NoPrivateNetworkHttpClient($client, '10.0.0.1/32');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Host "symfony.com" is blocked');
+
+        $client->request('GET', 'http://localhost:8057/302?location=https://symfony.com/');
+    }
+
+    public function testNoPrivateNetwork304()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client = new NoPrivateNetworkHttpClient($client, '104.26.14.6/32');
+        $response = $client->request('GET', 'http://localhost:8057/304', [
+            'headers' => ['If-Match' => '"abc"'],
+            'buffer' => false,
+        ]);
+
+        $this->assertSame(304, $response->getStatusCode());
+        $this->assertSame('', $response->getContent(false));
+    }
+
+    public function testNoPrivateNetwork302()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client = new NoPrivateNetworkHttpClient($client, '104.26.14.6/32');
+        $response = $client->request('GET', 'http://localhost:8057/302/relative');
+
+        $body = $response->toArray();
+
+        $this->assertSame('/', $body['REQUEST_URI']);
+        $this->assertNull($response->getInfo('redirect_url'));
+
+        $response = $client->request('GET', 'http://localhost:8057/302/relative', [
+            'max_redirects' => 0,
+        ]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://localhost:8057/', $response->getInfo('redirect_url'));
+    }
+
+    public function testNoPrivateNetworkStream()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:8057');
+        $client = new NoPrivateNetworkHttpClient($client, '104.26.14.6/32');
+
+        $response = $client->request('GET', 'http://localhost:8057');
+        $chunks = $client->stream($response);
+        $result = [];
+
+        foreach ($chunks as $r => $chunk) {
+            if ($chunk->isTimeout()) {
+                $result[] = 't';
+            } elseif ($chunk->isLast()) {
+                $result[] = 'l';
+            } elseif ($chunk->isFirst()) {
+                $result[] = 'f';
+            }
+        }
+
+        $this->assertSame($response, $r);
+        $this->assertSame(['f', 'l'], $result);
+
+        $chunk = null;
+        $i = 0;
+
+        foreach ($client->stream($response) as $chunk) {
+            ++$i;
+        }
+
+        $this->assertSame(1, $i);
+        $this->assertTrue($chunk->isLast());
+    }
+
+    public function testNoRedirectWithInvalidLocation()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:8057/302?location=localhost:8067');
+
+        $this->assertSame(302, $response->getStatusCode());
+
+        $response = $client->request('GET', 'http://localhost:8057/302?location=http:localhost');
+
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     /**
@@ -504,5 +655,82 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->assertSame(['abc' => 'def', 'content-type' => 'application/json', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+    }
+
+    public function testHeadRequestWithClosureBody()
+    {
+        $p = TestHttpServer::start(8067);
+
+        try {
+            $client = $this->getHttpClient(__FUNCTION__);
+
+            $response = $client->request('HEAD', 'http://localhost:8057/head', [
+                'body' => fn () => '',
+            ]);
+            $headers = $response->getHeaders();
+        } finally {
+            $p->stop();
+        }
+
+        $this->assertArrayHasKey('x-request-vars', $headers);
+
+        $vars = json_decode($headers['x-request-vars'][0], true);
+        $this->assertIsArray($vars);
+        $this->assertSame('HEAD', $vars['REQUEST_METHOD']);
+    }
+
+    /**
+     * @testWith [301]
+     *           [302]
+     *           [303]
+     */
+    public function testPostToGetRedirect(int $status)
+    {
+        $p = TestHttpServer::start(8067);
+
+        try {
+            $client = $this->getHttpClient(__FUNCTION__);
+
+            $response = $client->request('POST', 'http://localhost:8057/custom?status='.$status.'&headers[]=Location%3A%20%2F');
+            $body = $response->toArray();
+        } finally {
+            $p->stop();
+        }
+
+        $this->assertSame('GET', $body['REQUEST_METHOD']);
+        $this->assertSame('/', $body['REQUEST_URI']);
+    }
+
+    public function testResponseCanBeProcessedAfterClientReset()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://127.0.0.1:8057/timeout-body');
+        $stream = $client->stream($response);
+
+        $response->getStatusCode();
+        $client->reset();
+        $stream->current();
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testUnixSocket()
+    {
+        if (!file_exists('/var/run/docker.sock')) {
+            $this->markTestSkipped('Docker socket not found.');
+        }
+
+        $client = $this->getHttpClient(__FUNCTION__)
+            ->withOptions([
+                'base_uri' => 'http://docker',
+                'bindto' => '/run/docker.sock',
+            ]);
+
+        $response = $client->request('GET', '/info');
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $info = $response->getInfo();
+        $this->assertSame('/run/docker.sock', $info['primary_ip']);
     }
 }

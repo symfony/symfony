@@ -88,7 +88,7 @@ class StateMachineTest extends TestCase
         $net = new StateMachine($definition, null, $dispatcher);
 
         $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
-            $event->addTransitionBlocker(new TransitionBlocker(sprintf('Transition blocker of place %s', $event->getTransition()->getFroms()[0]), 'blocker'));
+            $event->addTransitionBlocker(new TransitionBlocker(\sprintf('Transition blocker of place %s', $event->getTransition()->getFroms()[0]), 'blocker'));
         });
 
         $subject = new Subject();
@@ -124,7 +124,7 @@ class StateMachineTest extends TestCase
         $net = new StateMachine($definition, null, $dispatcher);
 
         $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
-            $event->addTransitionBlocker(new TransitionBlocker(sprintf('Transition blocker of place %s', $event->getTransition()->getFroms()[0]), 'blocker'));
+            $event->addTransitionBlocker(new TransitionBlocker(\sprintf('Transition blocker of place %s', $event->getTransition()->getFroms()[0]), 'blocker'));
         });
 
         $subject = new Subject();

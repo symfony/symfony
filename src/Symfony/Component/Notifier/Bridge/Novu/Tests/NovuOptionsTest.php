@@ -16,9 +16,6 @@ use Symfony\Component\Notifier\Bridge\Novu\NovuOptions;
 
 class NovuOptionsTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
     public function testToArray()
     {
         $options = new NovuOptions(
@@ -29,6 +26,12 @@ class NovuOptionsTest extends TestCase
             null,
             null,
             null,
+            [
+                'email' => [
+                    'from' => 'no-reply@example.com',
+                    'senderName' => 'No-Reply',
+                ],
+            ],
             [],
         );
 
@@ -40,6 +43,12 @@ class NovuOptionsTest extends TestCase
                 'phone' => null,
                 'avatar' => null,
                 'locale' => null,
+                'overrides' => [
+                    'email' => [
+                        'from' => 'no-reply@example.com',
+                        'senderName' => 'No-Reply',
+                    ],
+                ],
             ],
             $options->toArray()
         );

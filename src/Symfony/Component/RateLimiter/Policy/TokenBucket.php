@@ -20,8 +20,6 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
-    private string $id;
-    private Rate $rate;
     private int $tokens;
     private int $burstSize;
     private float $timer;
@@ -32,10 +30,14 @@ final class TokenBucket implements LimiterStateInterface
      * @param Rate       $rate          the fill rate and time of this bucket
      * @param float|null $timer         the current timer of the bucket, defaulting to microtime(true)
      */
-    public function __construct(string $id, int $initialTokens, Rate $rate, float $timer = null)
-    {
+    public function __construct(
+        private string $id,
+        int $initialTokens,
+        private Rate $rate,
+        ?float $timer = null,
+    ) {
         if ($initialTokens < 1) {
-            throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
+            throw new \InvalidArgumentException(\sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
         }
 
         $this->id = $id;
@@ -67,8 +69,13 @@ final class TokenBucket implements LimiterStateInterface
     public function getAvailableTokens(float $now): int
     {
         $elapsed = max(0, $now - $this->timer);
+        $newTokens = $this->rate->calculateNewTokensDuringInterval($elapsed);
 
-        return min($this->burstSize, $this->tokens + $this->rate->calculateNewTokensDuringInterval($elapsed));
+        if ($newTokens > 0) {
+            $this->timer += $this->rate->calculateRefillInterval($elapsed);
+        }
+
+        return min($this->burstSize, $this->tokens + $newTokens);
     }
 
     public function getExpirationTime(): int

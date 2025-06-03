@@ -74,12 +74,14 @@ class AliasTest extends TestCase
      */
     public function testCannotDeprecateWithAnInvalidTemplate($message)
     {
-        $this->expectException(InvalidArgumentException::class);
         $def = new Alias('foo');
+
+        $this->expectException(InvalidArgumentException::class);
+
         $def->setDeprecated('package', '1.1', $message);
     }
 
-    public static function invalidDeprecationMessageProvider()
+    public static function invalidDeprecationMessageProvider(): array
     {
         return [
             "With \rs" => ["invalid \r message %alias_id%"],

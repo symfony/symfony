@@ -16,7 +16,6 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormRegistry;
-use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
@@ -174,10 +173,10 @@ class FormFactoryTest extends TestCase
 
 class ConfigurableFormTypeGuesser implements FormTypeGuesserInterface
 {
-    private ?\Symfony\Component\Form\Guess\TypeGuess $typeGuess = null;
-    private ?\Symfony\Component\Form\Guess\ValueGuess $requiredGuess = null;
-    private ?\Symfony\Component\Form\Guess\ValueGuess $maxLengthGuess = null;
-    private ?\Symfony\Component\Form\Guess\ValueGuess $patternGuess = null;
+    private ?TypeGuess $typeGuess = null;
+    private ?ValueGuess $requiredGuess = null;
+    private ?ValueGuess $maxLengthGuess = null;
+    private ?ValueGuess $patternGuess = null;
 
     public function guessType($class, $property): ?TypeGuess
     {

@@ -542,9 +542,13 @@ return [
             'SHP',
             'Bowndka St Helen',
         ],
+        'SLE' => [
+            'SLE',
+            'Leonka Sira Leon',
+        ],
         'SLL' => [
             'SLL',
-            'Leonka Sira Leon',
+            'Leonka Sira Leon (1964—2022)',
         ],
         'SOS' => [
             'S',

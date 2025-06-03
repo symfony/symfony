@@ -13,9 +13,9 @@ namespace Symfony\Component\Mailer\Bridge\Brevo\Webhook;
 
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher\IpsRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
-use Symfony\Component\HttpFoundation\RequestMatcher\IpsRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Mailer\Bridge\Brevo\RemoteEvent\BrevoPayloadConverter;
 use Symfony\Component\RemoteEvent\Event\Mailer\AbstractMailerEvent;
@@ -41,7 +41,7 @@ final class BrevoRequestParser extends AbstractRequestParser
         ]);
     }
 
-    protected function doParse(Request $request, string $secret): ?AbstractMailerEvent
+    protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
         $content = $request->toArray();
         if (
@@ -49,7 +49,6 @@ final class BrevoRequestParser extends AbstractRequestParser
             || !isset($content['email'])
             || !isset($content['message-id'])
             || !isset($content['ts_event'])
-            || !isset($content['tags'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }

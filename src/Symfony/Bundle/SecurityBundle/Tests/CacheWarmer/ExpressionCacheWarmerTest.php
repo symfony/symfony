@@ -31,9 +31,11 @@ class ExpressionCacheWarmerTest extends TestCase
         $expressionLang = $this->createMock(ExpressionLanguage::class);
         $expressionLang->expects($this->exactly(2))
             ->method('parse')
-            ->willReturnCallback(function (...$args) use (&$series) {
-                $expectedArgs = array_shift($series);
-                $this->assertSame($expectedArgs, $args);
+            ->willReturnCallback(function (Expression|string $expression, array $names) use (&$series) {
+                [$expectedExpression, $expectedNames] = array_shift($series);
+
+                $this->assertSame($expectedExpression, $expression);
+                $this->assertSame($expectedNames, $names);
 
                 return $this->createMock(ParsedExpression::class);
             })

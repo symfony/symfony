@@ -50,6 +50,21 @@ abstract class AbstractDescriptorTestCase extends TestCase
         return static::getDescriptionTestData(ObjectsProvider::getRouteCollections());
     }
 
+    /** @dataProvider getDescribeRouteCollectionWithHttpMethodFilterTestData */
+    public function testDescribeRouteCollectionWithHttpMethodFilter(string $httpMethod, RouteCollection $routes, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $routes, ['method' => $httpMethod]);
+    }
+
+    public static function getDescribeRouteCollectionWithHttpMethodFilterTestData(): iterable
+    {
+        foreach (ObjectsProvider::getRouteCollectionsByHttpMethod() as $httpMethod => $routeCollection) {
+            foreach (static::getDescriptionTestData($routeCollection) as $testData) {
+                yield [$httpMethod, ...$testData];
+            }
+        }
+    }
+
     /** @dataProvider getDescribeRouteTestData */
     public function testDescribeRoute(Route $route, $expectedDescription)
     {
@@ -110,7 +125,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     /** @dataProvider getDescribeContainerDefinitionWithArgumentsShownTestData */
     public function testDescribeContainerDefinitionWithArgumentsShown(Definition $definition, $expectedDescription)
     {
-        $this->assertDescription($expectedDescription, $definition, ['show_arguments' => true]);
+        $this->assertDescription($expectedDescription, $definition, []);
     }
 
     public static function getDescribeContainerDefinitionWithArgumentsShownTestData(): array
@@ -169,7 +184,13 @@ abstract class AbstractDescriptorTestCase extends TestCase
         return $data;
     }
 
-    /** @dataProvider getDescribeContainerParameterTestData */
+    /**
+     * The legacy group must be kept as deprecations will always be raised.
+     *
+     * @group legacy
+     *
+     * @dataProvider getDescribeContainerParameterTestData
+     */
     public function testDescribeContainerParameter($parameter, $expectedDescription, array $options)
     {
         $this->assertDescription($expectedDescription, $parameter, $options);
@@ -185,6 +206,9 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $file = array_pop($data[1]);
         $data[1][] = ['parameter' => 'twig.form.resources'];
         $data[1][] = $file;
+        $file = array_pop($data[2]);
+        $data[2][] = ['parameter' => 'deprecated_foo'];
+        $data[2][] = $file;
 
         return $data;
     }
@@ -264,6 +288,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $options['is_debug'] = false;
         $options['raw_output'] = true;
         $options['raw_text'] = true;
+        $options['method'] ??= null;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
 
         if ('txt' === $this->getFormat()) {
@@ -283,7 +308,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     {
         $data = [];
         foreach ($objects as $name => $object) {
-            $file = sprintf('%s.%s', trim($name, '.'), static::getFormat());
+            $file = \sprintf('%s.%s', trim($name, '.'), static::getFormat());
             $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
             $data[] = [$object, $description, $file];
         }
@@ -298,13 +323,13 @@ abstract class AbstractDescriptorTestCase extends TestCase
             'public' => ['show_hidden' => false],
             'tag1' => ['show_hidden' => true, 'tag' => 'tag1'],
             'tags' => ['group_by' => 'tags', 'show_hidden' => true],
-            'arguments' => ['show_hidden' => false, 'show_arguments' => true],
+            'arguments' => ['show_hidden' => false],
         ];
 
         $data = [];
         foreach ($objects as $name => $object) {
             foreach ($variations as $suffix => $options) {
-                $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
+                $file = \sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
                 $data[] = [$object, $description, $options, $file];
             }
@@ -323,7 +348,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $data = [];
         foreach ($objects as $name => $object) {
             foreach ($variations as $suffix => $options) {
-                $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
+                $file = \sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
                 $data[] = [$object, $description, $options, $file];
             }
@@ -344,7 +369,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $data = [];
         foreach (ObjectsProvider::getContainerBuildersWithPriorityTags() as $name => $object) {
             foreach ($variations as $suffix => $options) {
-                $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
+                $file = \sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
                 $data[] = [$object, $description, $options];
             }

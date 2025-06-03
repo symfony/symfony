@@ -23,10 +23,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class CallbackValidator extends ConstraintValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $object, Constraint $constraint)
+    public function validate(mixed $object, Constraint $constraint): void
     {
         if (!$constraint instanceof Callback) {
             throw new UnexpectedTypeException($constraint, Callback::class);
@@ -46,7 +43,7 @@ class CallbackValidator extends ConstraintValidator
             $method($object, $this->context, $constraint->payload);
         } elseif (null !== $object) {
             if (!method_exists($object, $method)) {
-                throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist in class "%s".', $method, get_debug_type($object)));
+                throw new ConstraintDefinitionException(\sprintf('Method "%s" targeted by Callback constraint does not exist in class "%s".', $method, get_debug_type($object)));
             }
 
             $reflMethod = new \ReflectionMethod($object, $method);

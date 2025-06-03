@@ -22,7 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
-#[AsCommand(name: 'importmap:remove', description: 'Removes JavaScript packages')]
+#[AsCommand(name: 'importmap:remove', description: 'Remove JavaScript packages')]
 final class ImportMapRemoveCommand extends Command
 {
     public function __construct(
@@ -55,9 +55,9 @@ EOT
         $this->importMapManager->remove($packageList);
 
         if (1 === \count($packageList)) {
-            $io->success(sprintf('Removed "%s" from importmap.php.', $packageList[0]));
+            $io->success(\sprintf('Removed "%s" from importmap.php.', $packageList[0]));
         } else {
-            $io->success(sprintf('Removed %d items from importmap.php.', \count($packageList)));
+            $io->success(\sprintf('Removed %d items from importmap.php.', \count($packageList)));
         }
 
         return Command::SUCCESS;

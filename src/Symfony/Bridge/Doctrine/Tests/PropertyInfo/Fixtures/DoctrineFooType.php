@@ -32,7 +32,7 @@ class DoctrineFooType extends Type
         return $platform->getClobTypeDeclarationSQL([]);
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if (null === $value) {
             return null;
@@ -41,10 +41,10 @@ class DoctrineFooType extends Type
             throw new ConversionException(sprintf('Expected "%s", got "%s"', 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\Foo', get_debug_type($value)));
         }
 
-        return $foo->bar;
+        return $value->bar;
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): mixed
+    public function convertToPHPValue($value, AbstractPlatform $platform): ?Foo
     {
         if (null === $value) {
             return null;

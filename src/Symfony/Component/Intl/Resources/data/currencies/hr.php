@@ -194,10 +194,6 @@ return [
             'BRR',
             'brazilski cruzeiro',
         ],
-        'BRZ' => [
-            'BRZ',
-            'BRZ',
-        ],
         'BSD' => [
             'BSD',
             'bahamski dolar',
@@ -638,10 +634,6 @@ return [
             'MAF',
             'marokanski franak',
         ],
-        'MCF' => [
-            'MCF',
-            'MCF',
-        ],
         'MDC' => [
             'MDC',
             'moldavski kupon',
@@ -688,7 +680,7 @@ return [
         ],
         'MRU' => [
             'MRU',
-            'mauritanijska ouguja',
+            'mauretanska ouguja',
         ],
         'MTL' => [
             'MTL',
@@ -898,9 +890,13 @@ return [
             'SKK',
             'slovačka kruna',
         ],
+        'SLE' => [
+            'SLE',
+            'sijeraleonski leone',
+        ],
         'SLL' => [
             'SLL',
-            'sijeraleonski leone',
+            'sijeraleonski leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

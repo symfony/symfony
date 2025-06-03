@@ -20,7 +20,7 @@ use Symfony\Component\Scheduler\Trigger\StatefulTriggerInterface;
 
 final class MessageGenerator implements MessageGeneratorInterface
 {
-    private Schedule $schedule;
+    private ?Schedule $schedule = null;
     private TriggerHeap $triggerHeap;
     private ?\DateTimeImmutable $waitUntil;
 
@@ -33,9 +33,18 @@ final class MessageGenerator implements MessageGeneratorInterface
         $this->waitUntil = new \DateTimeImmutable('@0');
     }
 
+    /**
+     * @return \Generator<MessageContext, object>
+     */
     public function getMessages(): \Generator
     {
         $checkpoint = $this->checkpoint();
+
+        if ($this->schedule?->shouldRestart()) {
+            unset($this->triggerHeap);
+            $this->waitUntil = new \DateTimeImmutable('@0');
+            $this->schedule->setRestart(false);
+        }
 
         if (!$this->waitUntil
             || $this->waitUntil > ($now = $this->clock->now())
@@ -55,7 +64,6 @@ final class MessageGenerator implements MessageGeneratorInterface
             /** @var RecurringMessage $recurringMessage */
             [$time, $index, $recurringMessage] = $heap->extract();
             $id = $recurringMessage->getId();
-            $message = $recurringMessage->getMessage();
             $trigger = $recurringMessage->getTrigger();
             $yield = true;
 
@@ -66,19 +74,38 @@ final class MessageGenerator implements MessageGeneratorInterface
                 $yield = false;
             }
 
-            if ($nextTime = $trigger->getNextRunDate($time)) {
+            $nextTime = $trigger->getNextRunDate($time);
+
+            if ($this->schedule->shouldProcessOnlyLastMissedRun()) {
+                while ($nextTime < $this->clock->now()) {
+                    $nextTime = $trigger->getNextRunDate($nextTime);
+                }
+            }
+
+            if ($nextTime) {
                 $heap->insert([$nextTime, $index, $recurringMessage]);
             }
 
             if ($yield) {
-                yield (new MessageContext($this->name, $id, $trigger, $time, $nextTime)) => $message;
-                $checkpoint->save($time, $index);
+                $context = new MessageContext($this->name, $id, $trigger, $time, $nextTime);
+                try {
+                    foreach ($recurringMessage->getMessages($context) as $message) {
+                        yield $context => $message;
+                    }
+                } finally {
+                    $checkpoint->save($time, $index);
+                }
             }
         }
 
         $this->waitUntil = $heap->isEmpty() ? null : $heap->top()[0];
 
         $checkpoint->release($now, $this->waitUntil);
+    }
+
+    public function getSchedule(): Schedule
+    {
+        return $this->schedule ??= $this->scheduleProvider->getSchedule();
     }
 
     private function heap(\DateTimeImmutable $time, \DateTimeImmutable $startTime): TriggerHeap
@@ -89,8 +116,8 @@ final class MessageGenerator implements MessageGeneratorInterface
 
         $heap = new TriggerHeap($time);
 
-        foreach ($this->schedule()->getRecurringMessages() as $index => $recurringMessage) {
-            $trigger  = $recurringMessage->getTrigger();
+        foreach ($this->getSchedule()->getRecurringMessages() as $index => $recurringMessage) {
+            $trigger = $recurringMessage->getTrigger();
 
             if ($trigger instanceof StatefulTriggerInterface) {
                 $trigger->continue($startTime);
@@ -106,13 +133,8 @@ final class MessageGenerator implements MessageGeneratorInterface
         return $this->triggerHeap = $heap;
     }
 
-    private function schedule(): Schedule
-    {
-        return $this->schedule ??= $this->scheduleProvider->getSchedule();
-    }
-
     private function checkpoint(): Checkpoint
     {
-        return $this->checkpoint ??= new Checkpoint('scheduler_checkpoint_'.$this->name, $this->schedule()->getLock(), $this->schedule()->getState());
+        return $this->checkpoint ??= new Checkpoint('scheduler_checkpoint_'.$this->name, $this->getSchedule()->getLock(), $this->getSchedule()->getState());
     }
 }

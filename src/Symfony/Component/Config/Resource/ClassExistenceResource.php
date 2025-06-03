@@ -23,7 +23,6 @@ namespace Symfony\Component\Config\Resource;
  */
 class ClassExistenceResource implements SelfCheckingResourceInterface
 {
-    private string $resource;
     private ?array $exists = null;
 
     private static int $autoloadLevel = 0;
@@ -34,9 +33,10 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      * @param string    $resource The fully-qualified class name
      * @param bool|null $exists   Boolean when the existence check has already been done
      */
-    public function __construct(string $resource, bool $exists = null)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        private string $resource,
+        ?bool $exists = null,
+    ) {
         if (null !== $exists) {
             $this->exists = [$exists, null];
         }
@@ -139,7 +139,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      *
      * @internal
      */
-    public static function throwOnRequiredClass(string $class, \Exception $previous = null): void
+    public static function throwOnRequiredClass(string $class, ?\Exception $previous = null): void
     {
         // If the passed class is the resource being checked, we shouldn't throw.
         if (null === $previous && self::$autoloadedClass === $class) {
@@ -158,10 +158,10 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             throw $previous;
         }
 
-        $message = sprintf('Class "%s" not found.', $class);
+        $message = \sprintf('Class "%s" not found.', $class);
 
         if ($class !== (self::$autoloadedClass ?? $class)) {
-            $message = substr_replace($message, sprintf(' while loading "%s"', self::$autoloadedClass), -1, 0);
+            $message = substr_replace($message, \sprintf(' while loading "%s"', self::$autoloadedClass), -1, 0);
         }
 
         if (null !== $previous) {

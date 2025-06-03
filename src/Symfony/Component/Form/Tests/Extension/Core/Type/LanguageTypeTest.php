@@ -13,11 +13,12 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Extension\Core\Type\LanguageType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LanguageTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LanguageType';
+    public const TESTED_TYPE = LanguageType::class;
 
     protected function setUp(): void
     {

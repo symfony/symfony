@@ -24,10 +24,10 @@ class TrimmedBufferOutput extends Output
     private int $maxLength;
     private string $buffer = '';
 
-    public function __construct(int $maxLength, ?int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = false, OutputFormatterInterface $formatter = null)
+    public function __construct(int $maxLength, ?int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = false, ?OutputFormatterInterface $formatter = null)
     {
         if ($maxLength <= 0) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects a strictly positive maxLength. Got %d.', __METHOD__, $maxLength));
+            throw new InvalidArgumentException(\sprintf('"%s()" expects a strictly positive maxLength. Got %d.', __METHOD__, $maxLength));
         }
 
         parent::__construct($verbosity, $decorated, $formatter);
@@ -45,10 +45,7 @@ class TrimmedBufferOutput extends Output
         return $content;
     }
 
-    /**
-     * @return void
-     */
-    protected function doWrite(string $message, bool $newline)
+    protected function doWrite(string $message, bool $newline): void
     {
         $this->buffer .= $message;
 
@@ -56,6 +53,6 @@ class TrimmedBufferOutput extends Output
             $this->buffer .= \PHP_EOL;
         }
 
-        $this->buffer = substr($this->buffer, 0 - $this->maxLength);
+        $this->buffer = substr($this->buffer, -$this->maxLength);
     }
 }

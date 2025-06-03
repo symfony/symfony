@@ -130,9 +130,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
 
     private function assertViolationRaised($isin, $code)
     {
-        $constraint = new Isin([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Isin(message: 'myMessage');
 
         $this->validator->validate($isin, $constraint);
 

@@ -18,6 +18,8 @@ use Symfony\Component\Mime\Header\IdentificationHeader;
 use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class DataPartTest extends TestCase
 {
@@ -134,28 +136,37 @@ class DataPartTest extends TestCase
         DataPart::fromPath(__DIR__.'/../Fixtures/mimetypes/');
     }
 
-    /**
-     * @group network
-     */
     public function testFromPathWithUrl()
     {
-        if (!\in_array('https', stream_get_wrappers())) {
-            $this->markTestSkipped('"https" stream wrapper is not enabled.');
+        if (!\in_array('http', stream_get_wrappers(), true)) {
+            $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
 
-        $p = DataPart::fromPath($file = 'https://symfony.com/images/common/logo/logo_symfony_header.png');
-        $content = file_get_contents($file);
-        $this->assertEquals($content, $p->getBody());
-        $maxLineLength = 76;
-        $this->assertEquals(substr(base64_encode($content), 0, $maxLineLength), substr($p->bodyToString(), 0, $maxLineLength));
-        $this->assertEquals(substr(base64_encode($content), 0, $maxLineLength), substr(implode('', iterator_to_array($p->bodyToIterable())), 0, $maxLineLength));
-        $this->assertEquals('image', $p->getMediaType());
-        $this->assertEquals('png', $p->getMediaSubType());
-        $this->assertEquals(new Headers(
-            new ParameterizedHeader('Content-Type', 'image/png', ['name' => 'logo_symfony_header.png']),
-            new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
-            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'logo_symfony_header.png', 'filename' => 'logo_symfony_header.png'])
-        ), $p->getPreparedHeaders());
+        $finder = new PhpExecutableFinder();
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', 'localhost:8856']));
+        $process->setWorkingDirectory(__DIR__.'/../Fixtures/web');
+        $process->start();
+
+        try {
+            do {
+                usleep(50000);
+            } while (!@fopen('http://localhost:8856', 'r'));
+            $p = DataPart::fromPath($file = 'http://localhost:8856/logo_symfony_header.png');
+            $content = file_get_contents($file);
+            $this->assertEquals($content, $p->getBody());
+            $maxLineLength = 76;
+            $this->assertEquals(substr(base64_encode($content), 0, $maxLineLength), substr($p->bodyToString(), 0, $maxLineLength));
+            $this->assertEquals(substr(base64_encode($content), 0, $maxLineLength), substr(implode('', iterator_to_array($p->bodyToIterable())), 0, $maxLineLength));
+            $this->assertEquals('image', $p->getMediaType());
+            $this->assertEquals('png', $p->getMediaSubType());
+            $this->assertEquals(new Headers(
+                new ParameterizedHeader('Content-Type', 'image/png', ['name' => 'logo_symfony_header.png']),
+                new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
+                new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'logo_symfony_header.png', 'filename' => 'logo_symfony_header.png'])
+            ), $p->getPreparedHeaders());
+        } finally {
+            $process->stop();
+        }
     }
 
     public function testHasContentId()

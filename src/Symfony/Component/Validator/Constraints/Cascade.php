@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @Annotation
- * @Target({"CLASS"})
+ * Validates a whole class, including nested objects in properties.
  *
  * @author Jules Pietri <jules@heahprod.com>
  */
@@ -25,16 +25,27 @@ class Cascade extends Constraint
 {
     public array $exclude = [];
 
-    public function __construct(array|string|null $exclude = null, array $options = null)
+    /**
+     * @param non-empty-string[]|non-empty-string|array<string,mixed>|null $exclude Properties excluded from validation
+     * @param array<string,mixed>|null                                     $options
+     */
+    #[HasNamedArguments]
+    public function __construct(array|string|null $exclude = null, ?array $options = null)
     {
         if (\is_array($exclude) && !array_is_list($exclude)) {
-            $options = array_merge($exclude, $options);
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($exclude, $options ?? []);
         } else {
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            }
+
             $this->exclude = array_flip((array) $exclude);
         }
 
         if (\is_array($options) && \array_key_exists('groups', $options)) {
-            throw new ConstraintDefinitionException(sprintf('The option "groups" is not supported by the constraint "%s".', __CLASS__));
+            throw new ConstraintDefinitionException(\sprintf('The option "groups" is not supported by the constraint "%s".', __CLASS__));
         }
 
         parent::__construct($options);

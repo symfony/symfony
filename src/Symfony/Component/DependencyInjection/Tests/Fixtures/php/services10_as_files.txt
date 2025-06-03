@@ -13,6 +13,7 @@ return [
 namespace Container%s;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -120,7 +121,7 @@ class ProjectServiceContainer extends Container
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
     return;
 }
 
@@ -154,6 +155,7 @@ return new \Container%s\ProjectServiceContainer([
     'container.build_hash' => '%s',
     'container.build_id' => '%s',
     'container.build_time' => %d,
+    'container.runtime_mode' => \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\DIRECTORY_SEPARATOR.'Container%s');
 
 )

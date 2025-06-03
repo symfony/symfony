@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle\AcmeBundle;
@@ -27,10 +28,13 @@ use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Twig\Environment;
 
 class TwigExtensionTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public function testLoadEmptyConfiguration()
     {
         $container = $this->createContainer();
@@ -49,16 +53,22 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
 
         if (class_exists(Mailer::class)) {
-            $this->assertCount(1, $container->getDefinition('twig.mime_body_renderer')->getArguments());
+            $this->assertCount(2, $container->getDefinition('twig.mime_body_renderer')->getArguments());
+        }
+
+        if (interface_exists(ValidatorInterface::class)) {
+            $this->assertTrue($container->hasDefinition('twig.validator'));
+        } else {
+            $this->assertFalse($container->hasDefinition('twig.validator'));
         }
     }
 
     /**
-     * @dataProvider getFormats
+     * @dataProvider getFormatsAndBuildDir
      */
-    public function testLoadFullConfiguration($format)
+    public function testLoadFullConfiguration(string $format, ?string $buildDir)
     {
-        $container = $this->createContainer();
+        $container = $this->createContainer($buildDir);
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'full', $format);
         $this->compileContainer($container);
@@ -89,19 +99,89 @@ class TwigExtensionTest extends TestCase
 
         // Twig options
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertTrue($options['auto_reload'], '->load() sets the auto_reload option');
+        $this->assertFalse($options['auto_reload'], '->load() sets the auto_reload option');
         $this->assertSame('name', $options['autoescape'], '->load() sets the autoescape option');
-        $this->assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
-        $this->assertEquals('/tmp', $options['cache'], '->load() sets the cache option');
+        $this->assertArrayNotHasKey('base_template_class', $options, '->load() does not set the base_template_class if none is provided');
         $this->assertEquals('ISO-8859-1', $options['charset'], '->load() sets the charset option');
         $this->assertTrue($options['debug'], '->load() sets the debug option');
         $this->assertTrue($options['strict_variables'], '->load() sets the strict_variables option');
+        $this->assertEquals($buildDir !== null ? new Reference('twig.template_cache.chain') : '%kernel.cache_dir%/twig', $options['cache'], '->load() sets the cache option');
+    }
+
+    /**
+     * @dataProvider getFormatsAndBuildDir
+     */
+    public function testLoadNoCacheConfiguration(string $format, ?string $buildDir)
+    {
+        $container = $this->createContainer($buildDir);
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'no-cache', $format);
+        $this->compileContainer($container);
+
+        $this->assertEquals(Environment::class, $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
+
+        // Twig options
+        $options = $container->getDefinition('twig')->getArgument(1);
+        $this->assertFalse($options['cache'], '->load() sets cache option to false');
+    }
+
+    /**
+     * @dataProvider getFormatsAndBuildDir
+     */
+    public function testLoadPathCacheConfiguration(string $format, ?string $buildDir)
+    {
+        $container = $this->createContainer($buildDir);
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'path-cache', $format);
+        $this->compileContainer($container);
+
+        $this->assertEquals(Environment::class, $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
+
+        // Twig options
+        $options = $container->getDefinition('twig')->getArgument(1);
+        $this->assertSame('random-path', $options['cache'], '->load() sets cache option to string path');
+    }
+
+    /**
+     * @dataProvider getFormatsAndBuildDir
+     */
+    public function testLoadProdCacheConfiguration(string $format, ?string $buildDir)
+    {
+        $container = $this->createContainer($buildDir);
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'prod-cache', $format);
+        $this->compileContainer($container);
+
+        $this->assertEquals(Environment::class, $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
+
+        // Twig options
+        $options = $container->getDefinition('twig')->getArgument(1);
+        $this->assertEquals($buildDir !== null ? new Reference('twig.template_cache.chain') : '%kernel.cache_dir%/twig', $options['cache'], '->load() sets cache option to CacheChain reference');
+    }
+
+    /**
+     * @group legacy
+     *
+     * @dataProvider getFormats
+     */
+    public function testLoadCustomBaseTemplateClassConfiguration(string $format)
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+
+        $this->expectUserDeprecationMessage('Since symfony/twig-bundle 7.1: The child node "base_template_class" at path "twig" is deprecated.');
+
+        $this->loadFromFile($container, 'templateClass', $format);
+        $this->compileContainer($container);
+
+        $options = $container->getDefinition('twig')->getArgument(1);
+        $this->assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
     }
 
     /**
      * @dataProvider getFormats
      */
-    public function testLoadCustomTemplateEscapingGuesserConfiguration($format)
+    public function testLoadCustomTemplateEscapingGuesserConfiguration(string $format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -115,7 +195,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadDefaultTemplateEscapingGuesserConfiguration($format)
+    public function testLoadDefaultTemplateEscapingGuesserConfiguration(string $format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -129,7 +209,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadCustomDateFormats($fileFormat)
+    public function testLoadCustomDateFormats(string $fileFormat)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -178,7 +258,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testTwigLoaderPaths($format)
+    public function testTwigLoaderPaths(string $format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -207,7 +287,7 @@ class TwigExtensionTest extends TestCase
         ], $paths);
     }
 
-    public static function getFormats()
+    public static function getFormats(): array
     {
         return [
             ['php'],
@@ -216,10 +296,23 @@ class TwigExtensionTest extends TestCase
         ];
     }
 
+    public static function getFormatsAndBuildDir(): array
+    {
+        return [
+            ['php', null],
+            ['php', __DIR__.'/build'],
+            ['yml', null],
+            ['yml', __DIR__.'/build'],
+            ['xml', null],
+            ['xml', __DIR__.'/build'],
+        ];
+    }
+
+
     /**
      * @dataProvider stopwatchExtensionAvailabilityProvider
      */
-    public function testStopwatchExtensionAvailability($debug, $stopwatchEnabled, $expected)
+    public function testStopwatchExtensionAvailability(bool $debug, bool $stopwatchEnabled, bool $expected)
     {
         $container = $this->createContainer();
         $container->setParameter('kernel.debug', $debug);
@@ -237,7 +330,7 @@ class TwigExtensionTest extends TestCase
         $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
     }
 
-    public static function stopwatchExtensionAvailabilityProvider()
+    public static function stopwatchExtensionAvailabilityProvider(): array
     {
         return [
             'debug-and-stopwatch-enabled' => [true, true, true],
@@ -286,14 +379,15 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $bodyRenderer = $container->getDefinition('twig.mime_body_renderer');
-        $this->assertCount(2, $bodyRenderer->getArguments());
+        $this->assertCount(3, $bodyRenderer->getArguments());
         $this->assertEquals(new Reference('my_converter'), $bodyRenderer->getArgument('$converter'));
     }
 
-    private function createContainer()
+    private function createContainer(?string $buildDir = null): ContainerBuilder
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
+            'kernel.build_dir' => $buildDir ?? __DIR__,
             'kernel.project_dir' => __DIR__,
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => false,
@@ -311,7 +405,7 @@ class TwigExtensionTest extends TestCase
         return $container;
     }
 
-    private function compileContainer(ContainerBuilder $container)
+    private function compileContainer(ContainerBuilder $container): void
     {
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
@@ -319,7 +413,7 @@ class TwigExtensionTest extends TestCase
         $container->compile();
     }
 
-    private function loadFromFile(ContainerBuilder $container, $file, $format)
+    private function loadFromFile(ContainerBuilder $container, string $file, string $format): void
     {
         $locator = new FileLocator(__DIR__.'/Fixtures/'.$format);
 

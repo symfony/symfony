@@ -12,7 +12,9 @@
     class SymfonyProfiler {
         constructor() {
             this.#createTabs();
+            this.#createTableSearchFields();
             this.#createToggles();
+            this.#createCopyToClipboard();
             this.#convertDateTimesToUserTimezone();
         }
 
@@ -74,7 +76,7 @@
                     }
 
                     tab.addEventListener('click', function(e) {
-                        const activeTab = e.target || e.srcElement;
+                        let activeTab = e.target || e.srcElement;
 
                         /* needed because when the tab contains HTML contents, user can click */
                         /* on any of those elements instead of their parent '<button>' element */
@@ -104,6 +106,56 @@
             });
         }
 
+        #createTableSearchFields() {
+            document.querySelectorAll('div.table-with-search-field').forEach((tableWrapper, i) => {
+                const searchField = document.createElement('input');
+                searchField.type = 'search';
+                searchField.placeholder = 'search...';
+                searchField.id = `table-search-field-${i}`;
+                searchField.classList.add(`table-search-field-input`);
+                searchField.autocapitalize = 'off';
+                searchField.autocomplete = 'off';
+                searchField.autocorrect = 'off';
+                tableWrapper.insertBefore(searchField, tableWrapper.firstChild);
+
+                const labelField = document.createElement('label');
+                labelField.htmlFor = `table-search-field-${i}`;
+                labelField.classList.add(`table-search-field-label`);
+                labelField.textContent = 'Search inside the contents of the table';
+                tableWrapper.insertBefore(labelField, tableWrapper.firstChild);
+
+                searchField.addEventListener('input', () => {
+                    const query = searchField.value.toLowerCase();
+                    let allRowsAreHidden = true;
+                    tableWrapper.querySelectorAll('tbody tr').forEach((row) => {
+                        const rowMatchesQuery = row.textContent.toLowerCase().includes(query);
+                        row.style.display = rowMatchesQuery ? '' : 'none';
+
+                        if (rowMatchesQuery) {
+                            allRowsAreHidden = false;
+                        }
+                    });
+
+                    /* if there are no results and all rows are hidden, show a message to avoid confusion */
+                    const noResultsElement = tableWrapper.querySelector('.no-results-message');
+                    if (allRowsAreHidden) {
+                        if (null === noResultsElement) {
+                            const noResultsElement = document.createElement('p');
+                            noResultsElement.textContent = 'No results found.';
+                            noResultsElement.classList.add('no-results-message');
+                            tableWrapper.appendChild(noResultsElement);
+                        } else {
+                            noResultsElement.style.display = '';
+                        }
+                    } else {
+                        if (null !== noResultsElement) {
+                            noResultsElement.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        }
+
         #createToggles() {
             const toggles = document.querySelectorAll('.sf-toggle:not([data-processed=true])');
             toggles.forEach((toggle) => {
@@ -121,6 +173,12 @@
                 }
 
                 toggle.addEventListener('click', (e) => {
+                    const toggle = e.currentTarget;
+
+                    if (e.target.closest('a, .sf-toggle') !== toggle) {
+                        return;
+                    }
+
                     e.preventDefault();
 
                     if ('' !== window.getSelection().toString()) {
@@ -128,9 +186,6 @@
                         return;
                     }
 
-                    /* needed because when the toggle contains HTML contents, user can click */
-                    /* on any of those elements instead of their parent '.sf-toggle' element */
-                    const toggle = e.target.closest('.sf-toggle');
                     const element = document.querySelector(toggle.getAttribute('data-toggle-selector'));
 
                     toggle.classList.toggle('sf-toggle-on');
@@ -153,23 +208,36 @@
                     toggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
                 });
 
-                /* Prevents from disallowing clicks on links inside toggles */
-                const toggleLinks = toggle.querySelectorAll('a');
-                toggleLinks.forEach((toggleLink) => {
-                    toggleLink.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                    });
-                });
-
-                /* Prevents from disallowing clicks on "copy to clipboard" elements inside toggles */
-                const copyToClipboardElements = toggle.querySelectorAll('span[data-clipboard-text]');
-                copyToClipboardElements.forEach((copyToClipboardElement) => {
-                    copyToClipboardElement.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                    });
-                });
-
                 toggle.setAttribute('data-processed', 'true');
+            });
+        }
+
+        #createCopyToClipboard() {
+            if (!navigator.clipboard) {
+                return;
+            }
+
+            const copyToClipboardElements = document.querySelectorAll('[data-clipboard-text]');
+
+            copyToClipboardElements.forEach((copyToClipboardElement) => {
+                copyToClipboardElement.classList.remove('hidden');
+
+                copyToClipboardElement.addEventListener('click', (e) => {
+                    /* Prevents from disallowing clicks on "copy to clipboard" elements inside toggles */
+                    e.stopPropagation();
+
+                    navigator.clipboard.writeText(copyToClipboardElement.getAttribute('data-clipboard-text'));
+
+                    let oldContent = copyToClipboardElement.textContent;
+
+                    copyToClipboardElement.textContent = `✅ Copied!`;
+                    copyToClipboardElement.disabled = true;
+
+                    setTimeout(() => {
+                        copyToClipboardElement.textContent = oldContent;
+                        copyToClipboardElement.disabled = false;
+                    }, 7000);
+                });
             });
         }
 

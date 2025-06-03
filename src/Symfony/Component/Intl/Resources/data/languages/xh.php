@@ -2,7 +2,8 @@
 
 return [
     'Names' => [
-        'af' => 'isiBhulu',
+        'af' => 'IsiBhulu',
+        'am' => 'IsiAmharic',
         'ar' => 'Isi-Arabhu',
         'bn' => 'IsiBangla',
         'de' => 'IsiJamani',
@@ -18,6 +19,7 @@ return [
         'pl' => 'Isi-Polish',
         'pt' => 'IsiPhuthukezi',
         'ru' => 'Isi-Russian',
+        'sq' => 'IsiAlbania',
         'th' => 'Isi-Thai',
         'tr' => 'Isi-Turkish',
         'xh' => 'IsiXhosa',

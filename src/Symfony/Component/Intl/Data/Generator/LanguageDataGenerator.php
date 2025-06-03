@@ -130,12 +130,11 @@ class LanguageDataGenerator extends AbstractDataGenerator
                     $localizedNames[$language] = $name;
                 }
             }
-            $data = [
+
+            return [
                 'Names' => $names,
                 'LocalizedNames' => $localizedNames,
             ];
-
-            return $data;
         }
 
         return null;

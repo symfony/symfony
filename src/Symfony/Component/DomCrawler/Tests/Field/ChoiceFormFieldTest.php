@@ -272,6 +272,17 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue());
     }
 
+    public function testCheckboxIsDisabled()
+    {
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'disabled' => '']);
+        $field = new ChoiceFormField($node);
+
+        $this->assertTrue($field->isDisabled(), '->isDisabled() returns true when the checkbox is disabled, even if it is not checked');
+
+        $field->tick();
+        $this->assertTrue($field->isDisabled(), '->isDisabled() returns true when the checkbox is disabled, even if it is checked');
+    }
+
     public function testTick()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => false]);

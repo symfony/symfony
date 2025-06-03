@@ -70,9 +70,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testValidateConstraints()
     {
         $object = new \stdClass();
-        $constraint1 = new NotNull(['groups' => ['group1', 'group2']]);
-        $constraint2 = new NotBlank(['groups' => 'group2']);
-        $constraint3 = new Length(['groups' => 'group2', 'min' => 3]);
+        $constraint1 = new NotNull(groups: ['group1', 'group2']);
+        $constraint2 = new NotBlank(groups: ['group2']);
+        $constraint3 = new Length(groups: ['group2'], min: 3);
 
         $options = [
             'validation_groups' => ['group1', 'group2'],
@@ -156,8 +156,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testValidateConstraintsOptionEvenIfNoValidConstraint()
     {
         $object = new \stdClass();
-        $constraint1 = new NotNull(['groups' => ['group1', 'group2']]);
-        $constraint2 = new NotBlank(['groups' => 'group2']);
+        $constraint1 = new NotNull(groups: ['group1', 'group2']);
+        $constraint2 = new NotBlank(groups: ['group2']);
 
         $parent = $this->getBuilder('parent', null)
             ->setCompound(true)
@@ -184,8 +184,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $form = $this->getBuilder('name', '\stdClass', [
-                'validation_groups' => [],
-            ])
+            'validation_groups' => [],
+        ])
             ->setData($object)
             ->setCompound(true)
             ->setDataMapper(new DataMapper())
@@ -256,12 +256,12 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $form = $this->getBuilder('name', '\stdClass', [
-                'invalid_message' => 'invalid_message_key',
-                // Invalid message parameters must be supported, because the
-                // invalid message can be a translation key
-                // see https://github.com/symfony/symfony/issues/5144
-                'invalid_message_parameters' => ['{{ foo }}' => 'bar'],
-            ])
+            'invalid_message' => 'invalid_message_key',
+            // Invalid message parameters must be supported, because the
+            // invalid message can be a translation key
+            // see https://github.com/symfony/symfony/issues/5144
+            'invalid_message_parameters' => ['{{ foo }}' => 'bar'],
+        ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 static fn ($data) => $data,
@@ -292,13 +292,13 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $form = $this->getBuilder('name', '\stdClass', [
-                'invalid_message' => 'invalid_message_key',
-                // Invalid message parameters must be supported, because the
-                // invalid message can be a translation key
-                // see https://github.com/symfony/symfony/issues/5144
-                'invalid_message_parameters' => ['{{ foo }}' => 'bar'],
-                'validation_groups' => [],
-            ])
+            'invalid_message' => 'invalid_message_key',
+            // Invalid message parameters must be supported, because the
+            // invalid message can be a translation key
+            // see https://github.com/symfony/symfony/issues/5144
+            'invalid_message_parameters' => ['{{ foo }}' => 'bar'],
+            'validation_groups' => [],
+        ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 static fn ($data) => $data,
@@ -684,7 +684,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testCauseForNotAllowedExtraFieldsIsTheFormConstraint()
     {
         $form = $this
-            ->getBuilder('form', null, ['constraints' => [new NotBlank(['groups' => ['foo']])]])
+            ->getBuilder('form', null, ['constraints' => [new NotBlank(groups: ['foo'])]])
             ->setCompound(true)
             ->setDataMapper(new DataMapper())
             ->getForm();
@@ -707,7 +707,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         return new FormValidator();
     }
 
-    private function getBuilder(string $name = 'name', string $dataClass = null, array $options = []): FormBuilder
+    private function getBuilder(string $name = 'name', ?string $dataClass = null, array $options = []): FormBuilder
     {
         $options = array_replace([
             'constraints' => [],

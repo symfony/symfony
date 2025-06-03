@@ -18,11 +18,9 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class RingCentralOptions implements MessageOptionsInterface
 {
-    private array $options;
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public function getRecipientId(): ?string
@@ -33,7 +31,7 @@ final class RingCentralOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function country(string $id, string $isoCode = null, string $name = null, string $uri = null, string $callingCode = null): static
+    public function country(string $id, ?string $isoCode = null, ?string $name = null, ?string $uri = null, ?string $callingCode = null): static
     {
         $this->options['country'] = [
             'id' => $id,

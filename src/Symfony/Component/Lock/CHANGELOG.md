@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add support for `valkey:` / `valkeys:` schemes
+
+7.2
+---
+
+ * RedisStore uses `EVALSHA` over `EVAL` when evaluating LUA scripts
+ * Add `NullStore`
+
+7.0
+---
+
+ * Add parameter `$isSameDatabase` to `DoctrineDbalStore::configureSchema()`
+ * Remove the `gcProbablity` (notice the typo) option, use `gcProbability` instead
+
+6.4
+---
+
+ * Make `MongoDbStore` instantiable with the mongodb extension directly
+
 6.3
 ---
 

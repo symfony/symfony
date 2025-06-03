@@ -17,7 +17,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IgnorePropertyDummy;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -28,7 +28,7 @@ class SerializerExtractorTest extends TestCase
 
     protected function setUp(): void
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader());
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->extractor = new SerializerExtractor($classMetadataFactory);
     }
 
@@ -48,5 +48,10 @@ class SerializerExtractorTest extends TestCase
     public function testGetPropertiesWithAnyGroup()
     {
         $this->assertSame(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class, ['serializer_groups' => null]));
+    }
+
+    public function testGetPropertiesWithNonExistentClassReturnsNull()
+    {
+        $this->assertNull($this->extractor->getProperties('NonExistent'));
     }
 }

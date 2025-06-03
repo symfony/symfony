@@ -14,24 +14,26 @@ namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Node\BodyNode;
+use Twig\Node\EmptyNode;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
 use Twig\Node\ModuleNode;
-use Twig\Node\Node;
+use Twig\Node\Nodes;
 use Twig\Source;
+use Twig\TwigFilter;
 
 class TwigNodeProvider
 {
     public static function getModule($content)
     {
         return new ModuleNode(
-            new ConstantExpression($content, 0),
+            new BodyNode([new ConstantExpression($content, 0)]),
             null,
-            new ArrayExpression([], 0),
-            new ArrayExpression([], 0),
-            new ArrayExpression([], 0),
-            null,
+            new EmptyNode(),
+            new EmptyNode(),
+            new EmptyNode(),
+            new EmptyNode(),
             new Source('', '')
         );
     }
@@ -47,8 +49,8 @@ class TwigNodeProvider
 
         return new FilterExpression(
             new ConstantExpression($message, 0),
-            new ConstantExpression('trans', 0),
-            new Node($arguments),
+            new TwigFilter('trans'),
+            new Nodes($arguments),
             0
         );
     }

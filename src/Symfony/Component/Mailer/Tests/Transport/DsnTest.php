@@ -105,4 +105,29 @@ class DsnTest extends TestCase
             'The mailer DSN must contain a host (use "default" by default).',
         ];
     }
+
+    /**
+     * @dataProvider getBooleanOptionProvider
+     */
+    public function testGetBooleanOption(bool $expected, string $dsnString, string $option, bool $default)
+    {
+        $dsn = Dsn::fromString($dsnString);
+
+        $this->assertSame($expected, $dsn->getBooleanOption($option, $default));
+    }
+
+    public static function getBooleanOptionProvider(): iterable
+    {
+        yield [true, 'scheme://localhost?enabled=1', 'enabled', false];
+        yield [true, 'scheme://localhost?enabled=true', 'enabled', false];
+        yield [true, 'scheme://localhost?enabled=on', 'enabled', false];
+        yield [true, 'scheme://localhost?enabled=yes', 'enabled', false];
+        yield [false, 'scheme://localhost?enabled=0', 'enabled', false];
+        yield [false, 'scheme://localhost?enabled=false', 'enabled', false];
+        yield [false, 'scheme://localhost?enabled=off', 'enabled', false];
+        yield [false, 'scheme://localhost?enabled=no', 'enabled', false];
+
+        yield [false, 'scheme://localhost', 'not_existant', false];
+        yield [true, 'scheme://localhost', 'not_existant', true];
+    }
 }

@@ -19,9 +19,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -88,7 +90,7 @@ class TraceableFirewallListenerTest extends TestCase
         $supportingAuthenticator
             ->expects($this->once())
             ->method('createToken')
-            ->willReturn($this->createMock(TokenInterface::class));
+            ->willReturn(new class extends AbstractToken {});
 
         $notSupportingAuthenticator = $this->createMock(DummyAuthenticator::class);
         $notSupportingAuthenticator
@@ -99,7 +101,7 @@ class TraceableFirewallListenerTest extends TestCase
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $dispatcher = new EventDispatcher();
         $authenticatorManager = new AuthenticatorManager(
-            [$notSupportingAuthenticator, $supportingAuthenticator],
+            [new TraceableAuthenticator($notSupportingAuthenticator), new TraceableAuthenticator($supportingAuthenticator)],
             $tokenStorage,
             $dispatcher,
             'main'

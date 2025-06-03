@@ -29,11 +29,11 @@ abstract class TranslationProviderTestCase extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
         $this->fs = new Filesystem();
-        $this->translationAppDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationAppDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationAppDir);
         $this->fs->mkdir($this->translationAppDir.'/translations');
     }
 
@@ -41,7 +41,6 @@ abstract class TranslationProviderTestCase extends TestCase
     {
         \Locale::setDefault($this->defaultLocale);
         $this->fs->remove($this->translationAppDir);
-        parent::tearDown();
     }
 
     protected function getProviderCollection(ProviderInterface $provider, array $providerNames = ['loco'], array $locales = ['en'], array $domains = ['messages']): TranslationProviderCollection
@@ -63,7 +62,7 @@ abstract class TranslationProviderTestCase extends TestCase
         }
         $yamlContent .= "\n";
 
-        $filename = sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
+        $filename = \sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
         file_put_contents($filename, $yamlContent);
 
         $this->files[] = $filename;
@@ -115,7 +114,7 @@ XLIFF;
 XLIFF;
         }
 
-        $filename = sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
+        $filename = \sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));
         file_put_contents($filename, $xliffContent);
 
         $this->files[] = $filename;

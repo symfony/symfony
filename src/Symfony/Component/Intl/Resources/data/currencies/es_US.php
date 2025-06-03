@@ -2,10 +2,6 @@
 
 return [
     'Names' => [
-        'BDT' => [
-            'BDT',
-            'taka bangladesí',
-        ],
         'BTN' => [
             'BTN',
             'ngultrum butanés',
@@ -16,11 +12,7 @@ return [
         ],
         'JPY' => [
             '¥',
-            'yen',
-        ],
-        'LAK' => [
-            'LAK',
-            'kip laosiano',
+            'yen japonés',
         ],
         'THB' => [
             'THB',
@@ -33,10 +25,6 @@ return [
         'UZS' => [
             'UZS',
             'sum',
-        ],
-        'VND' => [
-            'VND',
-            'dong vietnamita',
         ],
         'XAF' => [
             'XAF',

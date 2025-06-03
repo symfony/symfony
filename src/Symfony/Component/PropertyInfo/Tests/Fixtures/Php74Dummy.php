@@ -23,11 +23,18 @@ class Php74Dummy
     private ?int $nullableWithDefault = 1;
     public array $collection = [];
 
+    /** @var Dummy[]|null  */
+    public ?array $nullableTypedCollection = null;
+
     public function addStringCollection(string $string): void
     {
     }
 
     public function removeStringCollection(string $string): void
+    {
+    }
+
+    public function addNullableTypedCollection(Dummy $dummy): void
     {
     }
 }

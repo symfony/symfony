@@ -22,17 +22,12 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterReverseContainerPass implements CompilerPassInterface
 {
-    private bool $beforeRemoving;
-
-    public function __construct(bool $beforeRemoving)
-    {
-        $this->beforeRemoving = $beforeRemoving;
+    public function __construct(
+        private bool $beforeRemoving,
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('reverse_container')) {
             return;

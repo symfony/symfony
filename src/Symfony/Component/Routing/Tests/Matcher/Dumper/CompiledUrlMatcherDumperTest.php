@@ -28,15 +28,11 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.uniqid('CompiledUrlMatcher').'.php';
+        $this->dumpPath = tempnam(sys_get_temp_dir(), 'sf_matcher_');
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         @unlink($this->dumpPath);
     }
 
@@ -493,18 +489,20 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
     public function testGenerateDumperMatcherWithObject()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
         $routeCollection = new RouteCollection();
         $routeCollection->add('_', new Route('/', [new \stdClass()]));
         $dumper = new CompiledUrlMatcherDumper($routeCollection);
+
+        $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
+        $this->expectException(\InvalidArgumentException::class);
+
         $dumper->dump();
     }
 }
 
 class TestCompiledUrlMatcher extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface
 {
-    public function redirect(string $path, string $route, string $scheme = null): array
+    public function redirect(string $path, string $route, ?string $scheme = null): array
     {
         return [];
     }

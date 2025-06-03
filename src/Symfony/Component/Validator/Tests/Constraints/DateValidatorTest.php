@@ -53,6 +53,19 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidDates
+     */
+    public function testValidDatesWithNewLine(string $date)
+    {
+        $this->validator->validate($date."\n", new Date(message: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$date."\n\"")
+            ->setCode(Date::INVALID_FORMAT_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidDates()
     {
         return [
@@ -67,9 +80,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidDates($date, $code)
     {
-        $constraint = new Date([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Date(message: 'myMessage');
 
         $this->validator->validate($date, $constraint);
 

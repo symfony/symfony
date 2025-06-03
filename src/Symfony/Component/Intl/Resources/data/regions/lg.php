@@ -92,7 +92,6 @@ return [
         'IE' => 'Ayalandi',
         'IL' => 'Yisirayeri',
         'IN' => 'Buyindi',
-        'IO' => 'Bizinga by’eCago',
         'IQ' => 'Yiraaka',
         'IR' => 'Yiraani',
         'IS' => 'Ayisirandi',

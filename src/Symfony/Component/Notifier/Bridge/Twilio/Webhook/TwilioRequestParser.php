@@ -25,7 +25,7 @@ final class TwilioRequestParser extends AbstractRequestParser
         return new MethodRequestMatcher('POST');
     }
 
-    protected function doParse(Request $request, string $secret): ?SmsEvent
+    protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?SmsEvent
     {
         // Statuses: https://www.twilio.com/docs/sms/api/message-resource#message-status-values
         // Payload examples: https://www.twilio.com/docs/sms/outbound-message-logging
@@ -50,7 +50,7 @@ final class TwilioRequestParser extends AbstractRequestParser
             'receiving' => null,
             'received' => null,
             'scheduled' => null,
-            default => throw new RejectWebhookException(406, sprintf('Unsupported event "%s".', $payload['event'])),
+            default => throw new RejectWebhookException(406, \sprintf('Unsupported event "%s".', $payload['event'])),
         };
         if (!$name) {
             return null;

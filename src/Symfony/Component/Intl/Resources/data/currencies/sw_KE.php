@@ -202,9 +202,13 @@ return [
             'SGD',
             'Dola ya Singapoo',
         ],
+        'SLE' => [
+            'SLE',
+            'Leoni ya Siera Leoni',
+        ],
         'SLL' => [
             'SLL',
-            'Leoni ya Siera Leoni',
+            'Leoni ya Siera Leoni (1964—2022)',
         ],
         'SSP' => [
             'SSP',

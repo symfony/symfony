@@ -47,6 +47,36 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
+    public function testItKeysTheHandlerFailedNestedExceptionsByHandlerDescription()
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+        $handler = new class {
+            public function __invoke()
+            {
+                throw new \Exception('failed');
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        try {
+            $middleware->handle($envelope, $this->getStackMock(false));
+        } catch (HandlerFailedException $e) {
+            $key = (new HandlerDescriptor($handler))->getName();
+
+            $this->assertCount(1, $e->getWrappedExceptions());
+            $this->assertArrayHasKey($key, $e->getWrappedExceptions());
+            $this->assertSame('failed', $e->getWrappedExceptions()[$key]->getMessage());
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
     /**
      * @dataProvider itAddsHandledStampsProvider
      */
@@ -70,7 +100,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public static function itAddsHandledStampsProvider(): iterable
     {
-        $first = new class() extends HandleMessageMiddlewareTestCallable {
+        $first = new class extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
             {
                 return 'first result';
@@ -78,7 +108,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         };
         $firstClass = $first::class;
 
-        $second = new class() extends HandleMessageMiddlewareTestCallable {
+        $second = new class extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
             {
                 return null;
@@ -86,7 +116,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         };
         $secondClass = $second::class;
 
-        $failing = new class() extends HandleMessageMiddlewareTestCallable {
+        $failing = new class extends HandleMessageMiddlewareTestCallable {
             public function __invoke()
             {
                 throw new \Exception('handler failed.');
@@ -169,12 +199,12 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testBatchHandler()
     {
-        $handler = new class() implements BatchHandlerInterface {
+        $handler = new class implements BatchHandlerInterface {
             public array $processedMessages;
 
             use BatchHandlerTrait;
 
-            public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
             {
                 return $this->handle($message, $ack);
             }
@@ -199,7 +229,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ]));
 
         $ackedMessages = [];
-        $ack = static function (Envelope $envelope, \Throwable $e = null) use (&$ackedMessages) {
+        $ack = static function (Envelope $envelope, ?\Throwable $e = null) use (&$ackedMessages) {
             if (null !== $e) {
                 throw $e;
             }
@@ -225,10 +255,10 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testBatchHandlerNoAck()
     {
-        $handler = new class() implements BatchHandlerInterface {
+        $handler = new class implements BatchHandlerInterface {
             use BatchHandlerTrait;
 
-            public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
             {
                 return $this->handle($message, $ack);
             }
@@ -248,7 +278,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ]));
 
         $error = null;
-        $ack = static function (Envelope $envelope, \Throwable $e = null) use (&$error) {
+        $ack = static function (Envelope $envelope, ?\Throwable $e = null) use (&$error) {
             $error = $e;
         };
 
@@ -260,12 +290,12 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testBatchHandlerNoBatch()
     {
-        $handler = new class() implements BatchHandlerInterface {
+        $handler = new class implements BatchHandlerInterface {
             public array $processedMessages;
 
             use BatchHandlerTrait;
 
-            public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
             {
                 return $this->handle($message, $ack);
             }

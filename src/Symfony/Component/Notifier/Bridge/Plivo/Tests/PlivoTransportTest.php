@@ -24,12 +24,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class PlivoTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $from = 'from'): PlivoTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $from = 'from'): PlivoTransport
     {
         return new PlivoTransport('authId', 'authToken', $from, $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'too short' => ['a'];
         yield 'too long' => ['abcdefghijkl'];
@@ -51,7 +51,7 @@ final class PlivoTransportTest extends TransportTestCase
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }

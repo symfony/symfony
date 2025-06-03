@@ -174,9 +174,13 @@ return [
             'SHP',
             'Pawundi ey’eSenti Herena',
         ],
+        'SLE' => [
+            'SLE',
+            'Lewone',
+        ],
         'SLL' => [
             'SLL',
-            'Lewone',
+            'Lewone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

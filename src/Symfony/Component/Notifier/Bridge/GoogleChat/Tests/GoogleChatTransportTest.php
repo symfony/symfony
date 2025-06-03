@@ -14,8 +14,8 @@ namespace Symfony\Component\Notifier\Bridge\GoogleChat\Tests;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatOptions;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedOptionsException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class GoogleChatTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null, string $threadKey = null): GoogleChatTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $threadKey = null): GoogleChatTransport
     {
         return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $threadKey, $client ?? new MockHttpClient());
     }
@@ -108,11 +108,11 @@ final class GoogleChatTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('{"name":"spaces/My-Space/messages/abcdefg.hijklmno"}');
 
-        $expectedBody = json_encode(['text' => $message]);
+        $expectedBody = json_encode(['text' => $message, 'thread' => ['threadKey' => 'My-Thread']]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://chat.googleapis.com/v1/spaces/My-Space/messages?key=theAccessKey&token=theAccessToken%3D&threadKey=My-Thread', $url);
+            $this->assertSame('https://chat.googleapis.com/v1/spaces/My-Space/messages?key=theAccessKey&token=theAccessToken%3D&messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD', $url);
             $this->assertSame($expectedBody, $options['body']);
 
             return $response;
@@ -159,14 +159,15 @@ final class GoogleChatTransportTest extends TransportTestCase
 
     public function testSendWithInvalidOptions()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The "'.GoogleChatTransport::class.'" transport only supports instances of "'.GoogleChatOptions::class.'" for options.');
+        $options = $this->createMock(MessageOptionsInterface::class);
+        $this->expectException(UnsupportedOptionsException::class);
+        $this->expectExceptionMessage(\sprintf('The "%s" transport only supports instances of "%s" for options (instance of "%s" given).', GoogleChatTransport::class, GoogleChatOptions::class, get_debug_type($options)));
 
         $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => $this->createMock(ResponseInterface::class));
 
         $transport = self::createTransport($client);
 
-        $transport->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
+        $transport->send(new ChatMessage('testMessage', $options));
     }
 
     public function testSendWith200ResponseButNotOk()

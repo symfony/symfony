@@ -107,7 +107,6 @@ return [
         'IL' => 'Israel',
         'IM' => 'Enez Vanav',
         'IN' => 'India',
-        'IO' => 'Tiriad breizhveurat Meurvor Indez',
         'IQ' => 'Iraq',
         'IR' => 'Iran',
         'IS' => 'Island',

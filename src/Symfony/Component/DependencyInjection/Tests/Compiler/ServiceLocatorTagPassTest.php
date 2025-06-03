@@ -83,7 +83,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(CustomDefinition::class, $locator('bar')::class);
         $this->assertSame(CustomDefinition::class, $locator('baz')::class);
         $this->assertSame(CustomDefinition::class, $locator('some.service')::class);
-        $this->assertSame(CustomDefinition::class, \get_class($locator('inlines.service')));
+        $this->assertSame(CustomDefinition::class, $locator('inlines.service')::class);
     }
 
     public function testServiceWithKeyOverwritesPreviousInheritedKey()
@@ -208,8 +208,8 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('service-2');
 
         $locator = ServiceLocatorTagPass::register($container, [
-            'service-2' => new Reference('service-2'),
-            'service-1' => new Reference('service-1'),
+            new Reference('service-2'),
+            new Reference('service-1'),
         ]);
         $locator = $container->getDefinition($locator);
         $factories = $locator->getArguments()[0];

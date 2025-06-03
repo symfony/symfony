@@ -314,7 +314,15 @@ class BinaryFileResponseTest extends ResponseTestCase
         $property->setValue($response, $file);
 
         $response->prepare($request);
-        $this->assertEquals($virtual, $response->headers->get('X-Accel-Redirect'));
+        $header = $response->headers->get('X-Accel-Redirect');
+
+        if ($virtual) {
+            // Making sure the path doesn't contain characters unsupported by nginx
+            $this->assertMatchesRegularExpression('/^([^?%]|%[0-9A-F]{2})*$/', $header);
+            $header = rawurldecode($header);
+        }
+
+        $this->assertEquals($virtual, $header);
     }
 
     public function testDeleteFileAfterSend()
@@ -344,7 +352,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals('none', $response->headers->get('Accept-Ranges'));
     }
 
-    public function testAcceptRangeNotOverriden()
+    public function testAcceptRangeNotOverridden()
     {
         $request = Request::create('/', 'POST');
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
@@ -361,6 +369,7 @@ class BinaryFileResponseTest extends ResponseTestCase
             ['/home/Foo/bar.txt', '/var/www/=/files/,/home/Foo/=/baz/', '/baz/bar.txt'],
             ['/home/Foo/bar.txt', '"/var/www/"="/files/", "/home/Foo/"="/baz/"', '/baz/bar.txt'],
             ['/tmp/bar.txt', '"/var/www/"="/files/", "/home/Foo/"="/baz/"', null],
+            ['/var/www/var/www/files/foo%.txt', '/var/www/=/files/', '/files/var/www/files/foo%.txt'],
         ];
     }
 
@@ -433,5 +442,50 @@ class BinaryFileResponseTest extends ResponseTestCase
         if (file_exists($path)) {
             @unlink($path);
         }
+    }
+
+    public function testCreateFromTemporaryFile()
+    {
+        $file = new \SplTempFileObject();
+        $file->fwrite('foo,bar');
+
+        $response = new BinaryFileResponse($file, 201, [
+            'Content-Type' => 'text/csv',
+        ]);
+
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT);
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('text/csv', $response->headers->get('Content-Type'));
+        $this->assertEquals('attachment; filename=temp', $response->headers->get('Content-Disposition'));
+
+        ob_start();
+        $response->setAutoLastModified();
+        $response->prepare(new Request());
+        $this->assertSame('7', $response->headers->get('Content-Length'));
+        $response->sendContent();
+        $string = ob_get_clean();
+        $this->assertSame('foo,bar', $string);
+    }
+
+    public function testSetChunkSizeTooSmall()
+    {
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The chunk size of a BinaryFileResponse cannot be less than 1.');
+
+        $response->setChunkSize(0);
+    }
+
+    public function testCreateFromTemporaryFileWithoutMimeType()
+    {
+        $file = new \SplTempFileObject();
+        $file->fwrite('foo,bar');
+
+        $response = new BinaryFileResponse($file);
+        $response->prepare(new Request());
+
+        $this->assertSame('application/octet-stream', $response->headers->get('Content-Type'));
     }
 }

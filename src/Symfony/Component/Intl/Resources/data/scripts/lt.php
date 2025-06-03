@@ -95,7 +95,6 @@ return [
         'Merc' => 'Merojitų rankraštinis',
         'Mero' => 'meroitik',
         'Mlym' => 'malajalių',
-        'Modi' => 'Modi',
         'Mong' => 'mongolų',
         'Moon' => 'mūn',
         'Mroo' => 'Mro',

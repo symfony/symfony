@@ -248,7 +248,11 @@ class InfobipApiTransportTest extends TestCase
             ->addTextHeader('X-Infobip-IntermediateReport', 'true')
             ->addTextHeader('X-Infobip-NotifyUrl', 'https://foo.bar')
             ->addTextHeader('X-Infobip-NotifyContentType', 'application/json')
-            ->addTextHeader('X-Infobip-MessageId', 'RANDOM-CUSTOM-ID');
+            ->addTextHeader('X-Infobip-MessageId', 'RANDOM-CUSTOM-ID')
+            ->addTextHeader('X-Infobip-Track', 'false')
+            ->addTextHeader('X-Infobip-TrackingUrl', 'https://bar.foo')
+            ->addTextHeader('X-Infobip-TrackClicks', 'true')
+            ->addTextHeader('X-Infobip-TrackOpens', 'true');
 
         $this->transport->send($email);
 
@@ -280,6 +284,30 @@ class InfobipApiTransportTest extends TestCase
             Content-Disposition: form-data; name="messageId"
 
             RANDOM-CUSTOM-ID
+            --%s
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: 8bit
+            Content-Disposition: form-data; name="track"
+
+            false
+            --%s
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: 8bit
+            Content-Disposition: form-data; name="trackingUrl"
+
+            https://bar.foo
+            --%s
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: 8bit
+            Content-Disposition: form-data; name="trackClicks"
+
+            true
+            --%s
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: 8bit
+            Content-Disposition: form-data; name="trackOpens"
+
+            true
             --%s--
             TXT,
             $options['body']
@@ -410,7 +438,10 @@ class InfobipApiTransportTest extends TestCase
             ->addTextHeader('X-Infobip-NotifyUrl', 'https://foo.bar')
             ->addTextHeader('X-Infobip-NotifyContentType', 'application/json')
             ->addTextHeader('X-Infobip-MessageId', 'RANDOM-CUSTOM-ID')
-            ->addTextHeader('X-Infobip-Track', 'false');
+            ->addTextHeader('X-Infobip-Track', 'false')
+            ->addTextHeader('X-Infobip-TrackingUrl', 'https://bar.foo')
+            ->addTextHeader('X-Infobip-TrackClicks', 'true')
+            ->addTextHeader('X-Infobip-TrackOpens', 'true');
 
         $sentMessage = $this->transport->send($email);
 
@@ -423,6 +454,9 @@ class InfobipApiTransportTest extends TestCase
             X-Infobip-NotifyContentType: application/json
             X-Infobip-MessageId: RANDOM-CUSTOM-ID
             X-Infobip-Track: false
+            X-Infobip-TrackingUrl: https://bar.foo
+            X-Infobip-TrackClicks: true
+            X-Infobip-TrackOpens: true
             %a
             TXT,
             $sentMessage->toString()

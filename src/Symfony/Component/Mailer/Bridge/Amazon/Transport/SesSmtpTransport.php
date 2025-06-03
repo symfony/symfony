@@ -28,10 +28,10 @@ class SesSmtpTransport extends EsmtpTransport
     /**
      * @param string|null $region Amazon SES region
      */
-    public function __construct(string $username, #[\SensitiveParameter] string $password, string $region = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null, string $host = 'default')
+    public function __construct(string $username, #[\SensitiveParameter] string $password, ?string $region = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null, string $host = 'default')
     {
         if ('default' === $host) {
-            $host = sprintf('email-smtp.%s.amazonaws.com', $region ?: 'eu-west-1');
+            $host = \sprintf('email-smtp.%s.amazonaws.com', $region ?: 'eu-west-1');
         }
 
         parent::__construct($host, 465, true, $dispatcher, $logger);
@@ -40,7 +40,7 @@ class SesSmtpTransport extends EsmtpTransport
         $this->setPassword($password);
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Message) {
             $this->addSesHeaders($message);

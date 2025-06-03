@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures;
 
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route(path: '/defaults', methods: ['GET'], schemes: ['https'], locale: 'g_locale', format: 'g_format')]
 class GlobalDefaultsClass

@@ -306,7 +306,6 @@ class HttpUtilsTest extends TestCase
 
     public function testCheckRequestPathWithUrlMatcherLoadingException()
     {
-        $this->expectException(\RuntimeException::class);
         $urlMatcher = $this->createMock(UrlMatcherInterface::class);
         $urlMatcher
             ->expects($this->any())
@@ -315,7 +314,26 @@ class HttpUtilsTest extends TestCase
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
+
+        $this->expectException(\RuntimeException::class);
+
         $utils->checkRequestPath($this->getRequest(), 'foobar');
+    }
+
+    public function testCheckRequestPathWithRequestAlreadyMatchedBefore()
+    {
+        $urlMatcher = $this->createMock(RequestMatcherInterface::class);
+        $urlMatcher
+            ->expects($this->never())
+            ->method('matchRequest')
+        ;
+
+        $request = $this->getRequest();
+        $request->attributes->set('_route', 'route_name');
+
+        $utils = new HttpUtils(null, $urlMatcher);
+        $this->assertTrue($utils->checkRequestPath($request, 'route_name'));
+        $this->assertFalse($utils->checkRequestPath($request, 'foobar'));
     }
 
     public function testCheckPathWithoutRouteParam()
@@ -353,8 +371,7 @@ class HttpUtilsTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You must provide a UrlGeneratorInterface instance to be able to use routes.');
-        $utils = new HttpUtils();
-        $utils->generateUri(new Request(), 'route_name');
+        (new HttpUtils())->generateUri(new Request(), 'route_name');
     }
 
     private function getUrlGenerator($generatedUrl = '/foo/bar')

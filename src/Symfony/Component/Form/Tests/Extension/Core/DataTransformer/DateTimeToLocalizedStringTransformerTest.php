@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTestCase
@@ -25,14 +27,15 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
     protected \DateTime $dateTimeWithoutSeconds;
     private string $defaultLocale;
 
+    private $initialTestCaseUseException;
+    private $initialTestCaseErrorLevel;
+
     protected function setUp(): void
     {
-        parent::setUp();
-
         // Normalize intl. configuration settings.
         if (\extension_loaded('intl')) {
-            $this->iniSet('intl.use_exceptions', 0);
-            $this->iniSet('intl.error_level', 0);
+            $this->initialTestCaseUseException = ini_set('intl.use_exceptions', 0);
+            $this->initialTestCaseErrorLevel = ini_set('intl.error_level', 0);
         }
 
         // Since we test against "de_AT", we need the full implementation
@@ -48,6 +51,11 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
     protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
+
+        if (\extension_loaded('intl')) {
+            ini_set('intl.use_exceptions', $this->initialTestCaseUseException);
+            ini_set('intl.error_level', $this->initialTestCaseErrorLevel);
+        }
     }
 
     public static function dataProvider()
@@ -228,6 +236,10 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
     public function testReverseTransformFromDifferentLocale()
     {
+        if (version_compare(Intl::getIcuVersion(), '71.1', '>')) {
+            $this->markTestSkipped('ICU version 71.1 or lower is required.');
+        }
+
         \Locale::setDefault('en_US');
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
@@ -331,47 +343,119 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $transformer->reverseTransform('20107-03-21 12:34:56');
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
     {
-        if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('intl extension is not loaded');
+        $errorLevel = ini_set('intl.error_level', \E_WARNING);
+
+        try {
+            $this->expectException(TransformationFailedException::class);
+            $transformer = new DateTimeToLocalizedStringTransformer();
+            $transformer->reverseTransform('12345');
+        } finally {
+            ini_set('intl.error_level', $errorLevel);
         }
-
-        $this->iniSet('intl.error_level', \E_WARNING);
-
-        $this->expectException(TransformationFailedException::class);
-        $transformer = new DateTimeToLocalizedStringTransformer();
-        $transformer->reverseTransform('12345');
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testReverseTransformWrapsIntlErrorsWithExceptions()
     {
-        if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('intl extension is not loaded');
+        $initialUseExceptions = ini_set('intl.use_exceptions', 1);
+
+        try {
+            $this->expectException(TransformationFailedException::class);
+            $transformer = new DateTimeToLocalizedStringTransformer();
+            $transformer->reverseTransform('12345');
+        } finally {
+            ini_set('intl.use_exceptions', $initialUseExceptions);
         }
-
-        $this->iniSet('intl.use_exceptions', 1);
-
-        $this->expectException(TransformationFailedException::class);
-        $transformer = new DateTimeToLocalizedStringTransformer();
-        $transformer->reverseTransform('12345');
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
     {
-        if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('intl extension is not loaded');
+        $initialUseExceptions = ini_set('intl.use_exceptions', 1);
+        $initialErrorLevel = ini_set('intl.error_level', \E_WARNING);
+
+        try {
+            $this->expectException(TransformationFailedException::class);
+            $transformer = new DateTimeToLocalizedStringTransformer();
+            $transformer->reverseTransform('12345');
+        } finally {
+            ini_set('intl.use_exceptions', $initialUseExceptions);
+            ini_set('intl.error_level', $initialErrorLevel);
         }
-
-        $this->iniSet('intl.use_exceptions', 1);
-        $this->iniSet('intl.error_level', \E_WARNING);
-
-        $this->expectException(TransformationFailedException::class);
-        $transformer = new DateTimeToLocalizedStringTransformer();
-        $transformer->reverseTransform('12345');
     }
 
-    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    public function testTransformDateTimeWithCustomCalendar()
+    {
+        $dateTime = new \DateTimeImmutable('2024-03-31');
+
+        $weekBeginsOnSunday = \IntlCalendar::createInstance();
+        $weekBeginsOnSunday->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
+
+        $this->assertSame(
+            '2024-03-31 2024w14',
+            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnSunday, pattern: "y-MM-dd y'w'w"))->transform($dateTime),
+        );
+
+        $weekBeginsOnMonday = \IntlCalendar::createInstance();
+        $weekBeginsOnMonday->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+
+        $this->assertSame(
+            '2024-03-31 2024w13',
+            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnMonday, pattern: "y-MM-dd y'w'w"))->transform($dateTime),
+        );
+    }
+
+    public function testReverseTransformDateTimeWithCustomCalendar()
+    {
+        $weekBeginsOnSunday = \IntlCalendar::createInstance();
+        $weekBeginsOnSunday->setFirstDayOfWeek(\IntlCalendar::DOW_SUNDAY);
+
+        $this->assertSame(
+            '2024-03-31',
+            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnSunday, pattern: "y-MM-dd y'w'w"))
+                ->reverseTransform('2024-03-31 2024w14')
+                ->format('Y-m-d'),
+        );
+
+        $weekBeginsOnMonday = \IntlCalendar::createInstance();
+        $weekBeginsOnMonday->setFirstDayOfWeek(\IntlCalendar::DOW_MONDAY);
+
+        $this->assertSame(
+            '2024-03-31',
+            (new DateTimeToLocalizedStringTransformer(calendar: $weekBeginsOnMonday, pattern: "y-MM-dd y'w'w"))
+                ->reverseTransform('2024-03-31 2024w13')
+                ->format('Y-m-d'),
+        );
+    }
+
+    public function testDefaultCalendarIsGregorian()
+    {
+        $now = new \DateTimeImmutable();
+
+        $this->assertSame(
+            (new DateTimeToLocalizedStringTransformer(calendar: \IntlDateFormatter::GREGORIAN, pattern: "y-MM-dd y'w'w"))->transform($now),
+            (new DateTimeToLocalizedStringTransformer(pattern: "y-MM-dd y'w'w"))->transform($now),
+        );
+    }
+
+    public function testInvalidCalendar()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "calendar" option should be either an \IntlDateFormatter constant or an \IntlCalendar instance.');
+
+        new DateTimeToLocalizedStringTransformer(calendar: 123456);
+    }
+
+    protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer
     {
         return new DateTimeToLocalizedStringTransformer($inputTimezone, $outputTimezone);
     }

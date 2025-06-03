@@ -21,11 +21,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ValueToDuplicatesTransformer implements DataTransformerInterface
 {
-    private array $keys;
-
-    public function __construct(array $keys)
-    {
-        $this->keys = $keys;
+    public function __construct(
+        private array $keys,
+    ) {
     }
 
     /**
@@ -58,7 +56,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
         $emptyKeys = [];
 
         foreach ($this->keys as $key) {
-            if (isset($array[$key]) && '' !== $array[$key] && false !== $array[$key] && [] !== $array[$key]) {
+            if (isset($array[$key]) && false !== $array[$key] && [] !== $array[$key]) {
                 if ($array[$key] !== $result) {
                     throw new TransformationFailedException('All values in the array should be the same.');
                 }
@@ -73,7 +71,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
                 return null;
             }
 
-            throw new TransformationFailedException(sprintf('The keys "%s" should not be empty.', implode('", "', $emptyKeys)));
+            throw new TransformationFailedException(\sprintf('The keys "%s" should not be empty.', implode('", "', $emptyKeys)));
         }
 
         return $result;

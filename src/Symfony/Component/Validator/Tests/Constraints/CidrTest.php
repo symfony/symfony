@@ -31,7 +31,7 @@ class CidrTest extends TestCase
 
     public function testForV4()
     {
-        $cidrConstraint = new Cidr(['version' => Ip::V4]);
+        $cidrConstraint = new Cidr(version: Ip::V4);
 
         self::assertEquals(Ip::V4, $cidrConstraint->version);
         self::assertEquals(0, $cidrConstraint->netmaskMin);
@@ -40,7 +40,7 @@ class CidrTest extends TestCase
 
     public function testForV6()
     {
-        $cidrConstraint = new Cidr(['version' => Ip::V6]);
+        $cidrConstraint = new Cidr(version: Ip::V6);
 
         self::assertEquals(Ip::V6, $cidrConstraint->version);
         self::assertEquals(0, $cidrConstraint->netmaskMin);
@@ -49,12 +49,20 @@ class CidrTest extends TestCase
 
     public function testWithInvalidVersion()
     {
-        $availableVersions = [Ip::ALL, Ip::V4, Ip::V6];
+        $availableVersions = [
+            Ip::V4, Ip::V6, Ip::ALL,
+            Ip::V4_NO_PUBLIC, Ip::V6_NO_PUBLIC, Ip::ALL_NO_PUBLIC,
+            Ip::V4_NO_PRIVATE, Ip::V6_NO_PRIVATE, Ip::ALL_NO_PRIVATE,
+            Ip::V4_NO_RESERVED, Ip::V6_NO_RESERVED, Ip::ALL_NO_RESERVED,
+            Ip::V4_ONLY_PUBLIC, Ip::V6_ONLY_PUBLIC, Ip::ALL_ONLY_PUBLIC,
+            Ip::V4_ONLY_PRIVATE, Ip::V6_ONLY_PRIVATE, Ip::ALL_ONLY_PRIVATE,
+            Ip::V4_ONLY_RESERVED, Ip::V6_ONLY_RESERVED, Ip::ALL_ONLY_RESERVED,
+        ];
 
         self::expectException(ConstraintDefinitionException::class);
-        self::expectExceptionMessage(sprintf('The option "version" must be one of "%s".', implode('", "', $availableVersions)));
+        self::expectExceptionMessage(\sprintf('The option "version" must be one of "%s".', implode('", "', $availableVersions)));
 
-        new Cidr(['version' => '8']);
+        new Cidr(version: '8');
     }
 
     /**
@@ -62,11 +70,11 @@ class CidrTest extends TestCase
      */
     public function testWithValidMinMaxValues(string $ipVersion, int $netmaskMin, int $netmaskMax)
     {
-        $cidrConstraint = new Cidr([
-            'version' => $ipVersion,
-            'netmaskMin' => $netmaskMin,
-            'netmaskMax' => $netmaskMax,
-        ]);
+        $cidrConstraint = new Cidr(
+            version: $ipVersion,
+            netmaskMin: $netmaskMin,
+            netmaskMax: $netmaskMax,
+        );
 
         self::assertEquals($ipVersion, $cidrConstraint->version);
         self::assertEquals($netmaskMin, $cidrConstraint->netmaskMin);
@@ -81,13 +89,13 @@ class CidrTest extends TestCase
         $expectedMax = Ip::V4 == $ipVersion ? 32 : 128;
 
         self::expectException(ConstraintDefinitionException::class);
-        self::expectExceptionMessage(sprintf('The netmask range must be between 0 and %d.', $expectedMax));
+        self::expectExceptionMessage(\sprintf('The netmask range must be between 0 and %d.', $expectedMax));
 
-        new Cidr([
-            'version' => $ipVersion,
-            'netmaskMin' => $netmaskMin,
-            'netmaskMax' => $netmaskMax,
-        ]);
+        new Cidr(
+            version: $ipVersion,
+            netmaskMin: $netmaskMin,
+            netmaskMax: $netmaskMax,
+        );
     }
 
     public static function getInvalidMinMaxValues(): array

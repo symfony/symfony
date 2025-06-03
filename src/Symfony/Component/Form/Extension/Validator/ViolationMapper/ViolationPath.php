@@ -132,7 +132,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function getElement(int $index): string
     {
         if (!isset($this->elements[$index])) {
-            throw new OutOfBoundsException(sprintf('The index "%s" is not within the violation path.', $index));
+            throw new OutOfBoundsException(\sprintf('The index "%s" is not within the violation path.', $index));
         }
 
         return $this->elements[$index];
@@ -141,7 +141,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function isProperty(int $index): bool
     {
         if (!isset($this->isIndex[$index])) {
-            throw new OutOfBoundsException(sprintf('The index "%s" is not within the violation path.', $index));
+            throw new OutOfBoundsException(\sprintf('The index "%s" is not within the violation path.', $index));
         }
 
         return !$this->isIndex[$index];
@@ -150,7 +150,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function isIndex(int $index): bool
     {
         if (!isset($this->isIndex[$index])) {
-            throw new OutOfBoundsException(sprintf('The index "%s" is not within the violation path.', $index));
+            throw new OutOfBoundsException(\sprintf('The index "%s" is not within the violation path.', $index));
         }
 
         return $this->isIndex[$index];
@@ -176,7 +176,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function mapsForm(int $index): bool
     {
         if (!isset($this->mapsForm[$index])) {
-            throw new OutOfBoundsException(sprintf('The index "%s" is not within the violation path.', $index));
+            throw new OutOfBoundsException(\sprintf('The index "%s" is not within the violation path.', $index));
         }
 
         return $this->mapsForm[$index];

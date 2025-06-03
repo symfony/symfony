@@ -1,5 +1,9 @@
 <?php
 
+require __DIR__.'/vendor/autoload.php';
+
+use Composer\MetadataMinifier\MetadataMinifier;
+
 if (3 > $_SERVER['argc']) {
     echo "Usage: branch version dir1 dir2 ... dirN\n";
     exit(1);
@@ -52,11 +56,23 @@ foreach ($dirs as $k => $dir) {
 
     $packages[$package->name][$package->version] = $package;
 
-    $versions = @file_get_contents('https://repo.packagist.org/p/'.$package->name.'.json') ?: sprintf('{"packages":{"%s":{"%s":%s}}}', $package->name, $package->version, file_get_contents($dir.'/composer.json'));
-    $versions = json_decode($versions)->packages->{$package->name};
+    if (false !== $taggedReleases = @file_get_contents('https://repo.packagist.org/p2/'.$package->name.'.json')) {
+        $versions = MetadataMinifier::expand(json_decode($taggedReleases, true)['packages'][$package->name]);
 
-    foreach ($versions as $v => $package) {
-        $packages[$package->name] += [$v => $package];
+        foreach ($versions as $v => $p) {
+            $packages[$package->name] += [$v => $p];
+        }
+    }
+
+    if (false !== $devReleases = @file_get_contents('https://repo.packagist.org/p2/'.$package->name.'~dev.json')) {
+        $versions = MetadataMinifier::expand(json_decode($taggedReleases, true)['packages'][$package->name]);
+    } else {
+        $versions = sprintf('{"packages":{"%s":{"%s":%s}}}', $package->name, $package->version, file_get_contents($dir.'/composer.json'));
+        $versions = json_decode($versions, true)['packages'][$package->name];
+    }
+
+    foreach ($versions as $v => $p) {
+        $packages[$package->name] += [$v => $p];
     }
 }
 

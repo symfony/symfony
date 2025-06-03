@@ -23,8 +23,6 @@ class Section
      */
     private array $events = [];
 
-    private ?float $origin;
-    private bool $morePrecision;
     private ?string $id = null;
 
     /**
@@ -36,10 +34,10 @@ class Section
      * @param float|null $origin        Set the origin of the events in this section, use null to set their origin to their start time
      * @param bool       $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
-    public function __construct(float $origin = null, bool $morePrecision = false)
-    {
-        $this->origin = $origin;
-        $this->morePrecision = $morePrecision;
+    public function __construct(
+        private ?float $origin = null,
+        private bool $morePrecision = false,
+    ) {
     }
 
     /**
@@ -115,7 +113,7 @@ class Section
     public function stopEvent(string $name): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
-            throw new \LogicException(sprintf('Event "%s" is not started.', $name));
+            throw new \LogicException(\sprintf('Event "%s" is not started.', $name));
         }
 
         return $this->events[$name]->stop();
@@ -139,7 +137,7 @@ class Section
     public function getEvent(string $name): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
-            throw new \LogicException(sprintf('Event "%s" is not known.', $name));
+            throw new \LogicException(\sprintf('Event "%s" is not known.', $name));
         }
 
         return $this->events[$name];

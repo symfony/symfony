@@ -24,15 +24,9 @@ namespace Symfony\Component\Form\Util;
  */
 class OrderedHashMapIterator implements \Iterator
 {
-    /** @var TValue[] */
-    private array $elements;
-    /** @var list<string> */
-    private array $orderedKeys;
     private int $cursor = 0;
     private int $cursorId;
-    /** @var array<int, int> */
-    private array $managedCursors;
-    private string|null $key = null;
+    private ?string $key = null;
     /** @var TValue|null */
     private mixed $current = null;
 
@@ -47,11 +41,11 @@ class OrderedHashMapIterator implements \Iterator
      *                                        {@link OrderedHashMap} instance to support
      *                                        recognizing the deletion of elements.
      */
-    public function __construct(array &$elements, array &$orderedKeys, array &$managedCursors)
-    {
-        $this->elements = &$elements;
-        $this->orderedKeys = &$orderedKeys;
-        $this->managedCursors = &$managedCursors;
+    public function __construct(
+        private array &$elements,
+        private array &$orderedKeys,
+        private array &$managedCursors,
+    ) {
         $this->cursorId = \count($managedCursors);
 
         $this->managedCursors[$this->cursorId] = &$this->cursor;
@@ -62,10 +56,7 @@ class OrderedHashMapIterator implements \Iterator
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -101,10 +92,6 @@ class OrderedHashMapIterator implements \Iterator
 
     public function key(): mixed
     {
-        if (null === $this->key) {
-            return null;
-        }
-
         return $this->key;
     }
 

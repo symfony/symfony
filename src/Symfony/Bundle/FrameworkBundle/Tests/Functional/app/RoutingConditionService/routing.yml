@@ -1,4 +1,4 @@
 _routingconditionservice_bundle:
     prefix:   /
     resource: "@RoutingConditionServiceBundle/Controller"
-    type:     annotation
+    type:     attribute

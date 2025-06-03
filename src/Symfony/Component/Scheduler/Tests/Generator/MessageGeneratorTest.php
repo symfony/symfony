@@ -13,7 +13,8 @@ namespace Symfony\Component\Scheduler\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Scheduler\Generator\Checkpoint;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\RecurringMessage;
@@ -28,11 +29,7 @@ class MessageGeneratorTest extends TestCase
      */
     public function testGetMessagesFromSchedule(string $startTime, array $runs, array $schedule)
     {
-        // for referencing
-        $now = self::makeDateTime($startTime);
-
-        $clock = $this->createMock(ClockInterface::class);
-        $clock->method('now')->willReturnReference($now);
+        $clock = new MockClock(self::makeDateTime($startTime));
 
         foreach ($schedule as $i => $s) {
             if (\is_array($s)) {
@@ -48,7 +45,7 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
 
         foreach ($runs as $time => $expected) {
-            $now = self::makeDateTime($time);
+            $clock->modify($time);
             $this->assertSame($expected, iterator_to_array($scheduler->getMessages(), false));
         }
     }
@@ -58,11 +55,7 @@ class MessageGeneratorTest extends TestCase
      */
     public function testGetMessagesFromScheduleProvider(string $startTime, array $runs, array $schedule)
     {
-        // for referencing
-        $now = self::makeDateTime($startTime);
-
-        $clock = $this->createMock(ClockInterface::class);
-        $clock->method('now')->willReturnReference($now);
+        $clock = new MockClock(self::makeDateTime($startTime));
 
         foreach ($schedule as $i => $s) {
             if (\is_array($s)) {
@@ -90,18 +83,76 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
 
         foreach ($runs as $time => $expected) {
-            $now = self::makeDateTime($time);
+            $clock->modify($time);
             $this->assertSame($expected, iterator_to_array($scheduler->getMessages(), false));
         }
     }
 
+    public function testGetMessagesFromScheduleProviderWithRestart()
+    {
+        $first = (object) ['id' => 'first'];
+        $startTime = '22:12:00';
+        $runs = [
+            '22:12:00' => [],
+            '22:12:01' => [],
+            '22:13:00' => [$first],
+            '22:13:01' => [],
+        ];
+        $schedule = [[$first, '22:13:00', '22:14:00']];
+
+        $clock = new MockClock(self::makeDateTime($startTime));
+
+        foreach ($schedule as $i => $s) {
+            if (\is_array($s)) {
+                $schedule[$i] = $this->createMessage(...$s);
+            }
+        }
+
+        $scheduleProvider = new class($schedule) implements ScheduleProviderInterface {
+            private Schedule $schedule;
+
+            public function __construct(array $schedule)
+            {
+                $this->schedule = (new Schedule())->with(...$schedule);
+                $this->schedule->stateful(new ArrayAdapter());
+            }
+
+            public function getSchedule(): Schedule
+            {
+                return $this->schedule;
+            }
+
+            public function add(RecurringMessage $message): self
+            {
+                $this->schedule->add($message);
+
+                return $this;
+            }
+        };
+
+        $scheduler = new MessageGenerator($scheduleProvider, 'dummy', $clock);
+
+        // Warmup. The first run always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+
+        $toAdd = (object) ['id' => 'added-after-start'];
+
+        foreach ($runs as $time => $expected) {
+            $clock->modify($time);
+            $this->assertSame($expected, iterator_to_array($scheduler->getMessages(), false));
+        }
+
+        $scheduleProvider->add($this->createMessage($toAdd, '22:13:10', '22:13:11'));
+
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(9);
+        $this->assertSame([$toAdd], iterator_to_array($scheduler->getMessages(), false));
+    }
+
     public function testYieldedContext()
     {
-        // for referencing
-        $now = self::makeDateTime('22:12:00');
-
-        $clock = $this->createMock(ClockInterface::class);
-        $clock->method('now')->willReturnReference($now);
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
 
         $message = $this->createMessage((object) ['id' => 'message'], '22:13:00', '22:14:00', '22:16:00');
         $schedule = (new Schedule())->add($message);
@@ -112,8 +163,7 @@ class MessageGeneratorTest extends TestCase
         // Warmup. The first run is alw ays returns nothing.
         $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
 
-        $now = self::makeDateTime('22:14:10');
-
+        $clock->sleep(2 * 60 + 10);
         $iterator = $scheduler->getMessages();
 
         $this->assertInstanceOf(MessageContext::class, $context = $iterator->key());
@@ -126,6 +176,93 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame($message->getTrigger(), $context->trigger);
         $this->assertEquals(self::makeDateTime('22:14:00'), $context->triggeredAt);
         $this->assertEquals(self::makeDateTime('22:16:00'), $context->nextTriggerAt);
+    }
+
+    public function testCheckpointSavedInBrokenLoop()
+    {
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
+
+        $message = $this->createMessage((object) ['id' => 'message'], '22:13:00', '22:14:00', '22:16:00');
+        $schedule = (new Schedule())->add($message);
+
+        $cache = new ArrayAdapter();
+        $schedule->stateful($cache);
+        $checkpoint = new Checkpoint('dummy', cache: $cache);
+
+        $scheduler = new MessageGenerator($schedule, 'dummy', clock: $clock, checkpoint: $checkpoint);
+
+        // Warmup. The first run is always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(60 + 10); // 22:13:10
+
+        foreach ($scheduler->getMessages() as $message) {
+            // Message is handled but loop is broken just after
+            break;
+        }
+
+        $this->assertEquals(self::makeDateTime('22:13:00'), $checkpoint->time());
+    }
+
+    public function testCheckpointSavedInBigBrokenLoop()
+    {
+        $clock = new MockClock(self::makeDateTime('22:15:00'));
+
+        $message = RecurringMessage::every('1 minute', (object) ['id' => 'message']);
+        $schedule = (new Schedule())->add($message);
+
+        $cache = new ArrayAdapter();
+        $schedule->stateful($cache);
+        $checkpoint = new Checkpoint('dummy', cache: $cache);
+
+        $scheduler = new MessageGenerator($schedule, 'dummy', clock: $clock, checkpoint: $checkpoint);
+
+        // Warmup. The first run is always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+        $this->assertEquals(self::makeDateTime('22:15:00'), $checkpoint->time());
+
+        $clock->sleep(60 + 10); // 22:16:10
+
+        $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(2 * 60); // 22:18:10
+
+        $this->assertCount(2, iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(5 * 60); // 22:23:10
+
+        $this->assertCount(5, iterator_to_array($scheduler->getMessages(), false));
+
+        $this->assertEquals(self::makeDateTime('22:23:00'), $checkpoint->time());
+    }
+
+    public function testCheckpointSavedInBigBrokenLoopWithOnlyLastMissed()
+    {
+        $clock = new MockClock(self::makeDateTime('22:15:00'));
+
+        $message = RecurringMessage::every('1 minute', (object) ['id' => 'message']);
+        $schedule = (new Schedule())->add($message);
+
+        $cache = new ArrayAdapter();
+        $schedule->stateful($cache)->processOnlyLastMissedRun(true);
+        $checkpoint = new Checkpoint('dummy', cache: $cache);
+
+        $scheduler = new MessageGenerator($schedule, 'dummy', clock: $clock, checkpoint: $checkpoint);
+
+        // Warmup. The first run is always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+        $this->assertEquals(self::makeDateTime('22:15:00'), $clock->now());
+
+        $clock->sleep(60 + 10); // 22:16:10
+        $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(2 * 60); // 22:18:10
+        $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->sleep(5 * 60); // 22:23:10
+        $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
+
+        $this->assertEquals(self::makeDateTime('22:23:10'), $clock->now());
     }
 
     public static function messagesProvider(): \Generator
@@ -211,7 +348,7 @@ class MessageGeneratorTest extends TestCase
                 '22:12:01' => [],
             ],
             'schedule' => [
-                RecurringMessage::trigger(new class() implements TriggerInterface {
+                RecurringMessage::trigger(new class implements TriggerInterface {
                     public function __toString(): string
                     {
                         return 'foo';
@@ -242,7 +379,7 @@ class MessageGeneratorTest extends TestCase
                 } elseif ($lastTick == $tick && $count < 2) {
                     $ticks = [$lastTick, ++$count];
                 } else {
-                    $this->fail(sprintf('Invalid tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
+                    $this->fail(\sprintf('Invalid tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
                 }
 
                 foreach ($runs as $run) {
@@ -251,7 +388,7 @@ class MessageGeneratorTest extends TestCase
                     }
                 }
 
-                $this->fail(sprintf('There is no next run for tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
+                $this->fail(\sprintf('There is no next run for tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
             });
 
         return RecurringMessage::trigger($trigger, $message);

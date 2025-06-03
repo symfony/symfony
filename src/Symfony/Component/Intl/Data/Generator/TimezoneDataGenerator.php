@@ -17,7 +17,6 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Data\Util\ArrayAccessibleResourceBundle;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 use Symfony\Component\Intl\Exception\MissingResourceException;
-use Symfony\Component\Intl\Locale;
 
 /**
  * The rule for compiling the zone bundle.
@@ -121,20 +120,16 @@ class TimezoneDataGenerator extends AbstractDataGenerator
 
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
-        $rootBundle = $reader->read($tempDir, 'root');
-
         $this->zoneIds = array_unique($this->zoneIds);
 
         sort($this->zoneIds);
         ksort($this->zoneToCountryMapping);
 
-        $data = [
+        return [
             'Zones' => $this->zoneIds,
             'ZoneToCountry' => $this->zoneToCountryMapping,
             'CountryToZone' => self::generateCountryToZoneMapping($this->zoneToCountryMapping),
         ];
-
-        return $data;
     }
 
     private function generateZones(BundleEntryReaderInterface $reader, string $tempDir, string $locale): array
@@ -159,7 +154,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
 
         $regionFormat = $reader->readEntry($tempDir, $locale, ['zoneStrings', 'regionFormat']);
         $fallbackFormat = $reader->readEntry($tempDir, $locale, ['zoneStrings', 'fallbackFormat']);
-        $resolveName = function (string $id, string $city = null) use ($reader, $tempDir, $locale, $regionFormat, $fallbackFormat): ?string {
+        $resolveName = function (string $id, ?string $city = null) use ($reader, $tempDir, $locale, $regionFormat, $fallbackFormat): ?string {
             // Resolve default name as described per http://cldr.unicode.org/translation/timezones
             if (isset($this->zoneToCountryMapping[$id])) {
                 try {

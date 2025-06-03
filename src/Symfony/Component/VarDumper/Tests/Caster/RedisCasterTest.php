@@ -46,7 +46,7 @@ EODUMP;
     public function testConnected(string $class)
     {
         if (!class_exists($class)) {
-            self::markTestSkipped(sprintf('"%s" class required', $class));
+            self::markTestSkipped(\sprintf('"%s" class required', $class));
         }
 
         $redisHost = explode(':', getenv('REDIS_HOST')) + [1 => 6379];

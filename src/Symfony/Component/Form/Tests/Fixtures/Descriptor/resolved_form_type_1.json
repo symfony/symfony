@@ -6,18 +6,22 @@
             "choice_attr",
             "choice_filter",
             "choice_label",
+            "choice_lazy",
             "choice_loader",
             "choice_name",
             "choice_translation_domain",
             "choice_translation_parameters",
             "choice_value",
             "choices",
+            "duplicate_preferred_choices",
             "expanded",
             "group_by",
             "multiple",
             "placeholder",
             "placeholder_attr",
-            "preferred_choices"
+            "preferred_choices",
+            "separator",
+            "separator_html"
         ],
         "overridden": {
             "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [

@@ -23,9 +23,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
 final class Middleware implements MiddlewareInterface
 {
     public function __construct(
-        private DebugDataHolder $debugDataHolder,
-        private ?Stopwatch $stopwatch,
-        private string $connectionName = 'default',
+        private readonly DebugDataHolder $debugDataHolder,
+        private readonly ?Stopwatch $stopwatch,
+        private readonly string $connectionName = 'default',
     ) {
     }
 

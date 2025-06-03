@@ -18,6 +18,9 @@ use Symfony\Component\Serializer\CacheWarmer\CompiledClassMetadataCacheWarmer;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryCompiler;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
+/**
+ * @group legacy
+ */
 final class CompiledClassMetadataCacheWarmerTest extends TestCase
 {
     public function testItImplementsCacheWarmerInterface()

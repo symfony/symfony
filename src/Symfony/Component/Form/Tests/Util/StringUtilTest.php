@@ -16,7 +16,7 @@ use Symfony\Component\Form\Util\StringUtil;
 
 class StringUtilTest extends TestCase
 {
-    public static function trimProvider()
+    public static function trimProvider(): array
     {
         return [
             [' Foo! ', 'Foo!'],
@@ -49,14 +49,14 @@ class StringUtilTest extends TestCase
         $this->assertSame("ab\ncd", StringUtil::trim($symbol));
     }
 
-    public static function spaceProvider()
+    public static function spaceProvider(): array
     {
         return [
             // separators
             ['0020'],
             ['00A0'],
             ['1680'],
-//            ['180E'],
+            // ['180E'],
             ['2000'],
             ['2001'],
             ['2002'],
@@ -97,7 +97,7 @@ class StringUtilTest extends TestCase
         $this->assertSame($expectedBlockPrefix, $blockPrefix);
     }
 
-    public static function fqcnToBlockPrefixProvider()
+    public static function fqcnToBlockPrefixProvider(): array
     {
         return [
             ['TYPE', 'type'],

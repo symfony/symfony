@@ -42,7 +42,7 @@ class NotificationEmail extends TemplatedEmail
     ];
     private bool $rendered = false;
 
-    public function __construct(Headers $headers = null, AbstractPart $body = null)
+    public function __construct(?Headers $headers = null, ?AbstractPart $body = null)
     {
         $missingPackages = [];
         if (!class_exists(CssInlinerExtension::class)) {
@@ -54,7 +54,7 @@ class NotificationEmail extends TemplatedEmail
         }
 
         if ($missingPackages) {
-            throw new \LogicException(sprintf('You cannot use "%s" if the "%s" Twig extension%s not available. Try running "%s".', static::class, implode('" and "', $missingPackages), \count($missingPackages) > 1 ? 's are' : ' is', 'composer require '.implode(' ', array_keys($missingPackages))));
+            throw new \LogicException(\sprintf('You cannot use "%s" if the "%s" Twig extension%s not available. Try running "%s".', static::class, implode('" and "', $missingPackages), \count($missingPackages) > 1 ? 's are' : ' is', 'composer require '.implode(' ', array_keys($missingPackages))));
         }
 
         parent::__construct($headers, $body);
@@ -63,7 +63,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * Creates a NotificationEmail instance that is appropriate to send to normal (non-admin) users.
      */
-    public static function asPublicEmail(Headers $headers = null, AbstractPart $body = null): self
+    public static function asPublicEmail(?Headers $headers = null, ?AbstractPart $body = null): self
     {
         $email = new static($headers, $body);
         $email->markAsPublic();
@@ -88,7 +88,7 @@ class NotificationEmail extends TemplatedEmail
     public function markdown(string $content): static
     {
         if (!class_exists(MarkdownExtension::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s" if the Markdown Twig extension is not available. Try running "composer require twig/markdown-extra".', __METHOD__));
+            throw new \LogicException(\sprintf('You cannot use "%s" if the Markdown Twig extension is not available. Try running "composer require twig/markdown-extra".', __METHOD__));
         }
 
         $this->context['markdown'] = true;
@@ -174,6 +174,26 @@ class NotificationEmail extends TemplatedEmail
         return '@email/'.$this->theme.'/notification/body.html.twig';
     }
 
+    /**
+     * @return $this
+     */
+    public function context(array $context): static
+    {
+        $parentContext = [];
+
+        foreach ($context as $key => $value) {
+            if (\array_key_exists($key, $this->context)) {
+                $this->context[$key] = $value;
+            } else {
+                $parentContext[$key] = $value;
+            }
+        }
+
+        parent::context($parentContext);
+
+        return $this;
+    }
+
     public function getContext(): array
     {
         return array_merge($this->context, parent::getContext());
@@ -198,7 +218,7 @@ class NotificationEmail extends TemplatedEmail
         $importance = $this->context['importance'] ?? self::IMPORTANCE_LOW;
         $this->priority($this->determinePriority($importance));
         if ($this->context['importance']) {
-            $headers->setHeaderBody('Text', 'Subject', sprintf('[%s] %s', strtoupper($importance), $this->getSubject()));
+            $headers->setHeaderBody('Text', 'Subject', \sprintf('[%s] %s', strtoupper($importance), $this->getSubject()));
         }
 
         return $headers;

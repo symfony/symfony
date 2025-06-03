@@ -518,9 +518,13 @@ return [
             'SHP',
             'Pọ́n-un Elena',
         ],
+        'SLE' => [
+            'SLE',
+            'Líónì Sira Líonì',
+        ],
         'SLL' => [
             'SLL',
-            'Líónì Sira Líonì',
+            'Líónì Sira Líonì (1964—2022)',
         ],
         'SOS' => [
             'SOS',

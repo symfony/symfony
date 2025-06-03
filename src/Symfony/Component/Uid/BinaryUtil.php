@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Uid;
 
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
+
 /**
  * @internal
  *
@@ -36,7 +38,7 @@ class BinaryUtil
         'u' => 52, 'v' => 53, 'w' => 54, 'x' => 55, 'y' => 56, 'z' => 57,
     ];
 
-    // https://tools.ietf.org/html/rfc4122#section-4.1.4
+    // https://datatracker.ietf.org/doc/html/rfc9562#section-5.1
     // 0x01b21dd213814000 is the number of 100-ns intervals between the
     // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
     private const TIME_OFFSET_INT = 0x01B21DD213814000;
@@ -118,8 +120,10 @@ class BinaryUtil
 
     /**
      * @param string $time Count of 100-nanosecond intervals since the UUID epoch 1582-10-15 00:00:00 in hexadecimal
+     *
+     * @return string Count of 100-nanosecond intervals since the UUID epoch 1582-10-15 00:00:00 as a numeric string
      */
-    public static function hexToDateTime(string $time): \DateTimeImmutable
+    public static function hexToNumericString(string $time): string
     {
         if (\PHP_INT_SIZE >= 8) {
             $time = (string) (hexdec($time) - self::TIME_OFFSET_INT);
@@ -140,7 +144,17 @@ class BinaryUtil
             $time = '-' === $time[0] ? '-'.str_pad(substr($time, 1), 8, '0', \STR_PAD_LEFT) : str_pad($time, 8, '0', \STR_PAD_LEFT);
         }
 
-        return \DateTimeImmutable::createFromFormat('U.u?', substr_replace($time, '.', -7, 0));
+        return $time;
+    }
+
+    /**
+     * Sub-microseconds are lost since they are not handled by \DateTimeImmutable.
+     *
+     * @param string $time Count of 100-nanosecond intervals since the UUID epoch 1582-10-15 00:00:00 in hexadecimal
+     */
+    public static function hexToDateTime(string $time): \DateTimeImmutable
+    {
+        return \DateTimeImmutable::createFromFormat('U.u?', substr_replace(self::hexToNumericString($time), '.', -7, 0));
     }
 
     /**
@@ -150,7 +164,7 @@ class BinaryUtil
     {
         if (\PHP_INT_SIZE >= 8) {
             if (-self::TIME_OFFSET_INT > $time = (int) $time->format('Uu0')) {
-                throw new \InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
+                throw new InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
             }
 
             return str_pad(dechex(self::TIME_OFFSET_INT + $time), 16, '0', \STR_PAD_LEFT);
@@ -159,7 +173,7 @@ class BinaryUtil
         $time = $time->format('Uu0');
         $negative = '-' === $time[0];
         if ($negative && self::TIME_OFFSET_INT < $time = substr($time, 1)) {
-            throw new \InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
+            throw new InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
         }
         $time = self::fromBase($time, self::BASE10);
         $time = str_pad($time, 8, "\0", \STR_PAD_LEFT);

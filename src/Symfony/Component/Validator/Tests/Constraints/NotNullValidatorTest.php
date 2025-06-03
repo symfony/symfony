@@ -42,12 +42,9 @@ class NotNullValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidConstraints
-     */
-    public function testNullIsInvalid(NotNull $constraint)
+    public function testNullIsInvalid()
     {
-        $this->validator->validate(null, $constraint);
+        $this->validator->validate(null, new NotNull(message: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'null')
@@ -55,11 +52,18 @@ class NotNullValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public static function provideInvalidConstraints(): iterable
+    /**
+     * @group legacy
+     */
+    public function testNullIsInvalidDoctrineStyle()
     {
-        yield 'Doctrine style' => [new NotNull([
+        $this->validator->validate(null, new NotNull([
             'message' => 'myMessage',
-        ])];
-        yield 'named parameters' => [new NotNull(message: 'myMessage')];
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'null')
+            ->setCode(NotNull::IS_NULL_ERROR)
+            ->assertRaised();
     }
 }

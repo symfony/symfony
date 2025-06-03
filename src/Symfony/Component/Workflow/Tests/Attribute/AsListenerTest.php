@@ -20,7 +20,7 @@ class AsListenerTest extends TestCase
     /**
      * @dataProvider provideOkTests
      */
-    public function testOk(string $class, string $expectedEvent, string $workflow = null, string $node = null)
+    public function testOk(string $class, string $expectedEvent, ?string $workflow = null, ?string $node = null)
     {
         $attribute = new $class($workflow, $node);
 
@@ -64,7 +64,7 @@ class AsListenerTest extends TestCase
     public function testTransitionThrowException(string $class)
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('The "transition" argument of "%s" cannot be used without a "workflow" argument.', $class));
+        $this->expectExceptionMessage(\sprintf('The "transition" argument of "%s" cannot be used without a "workflow" argument.', $class));
 
         new $class(transition: 'some');
     }
@@ -83,7 +83,7 @@ class AsListenerTest extends TestCase
     public function testPlaceThrowException(string $class)
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('The "place" argument of "%s" cannot be used without a "workflow" argument.', $class));
+        $this->expectExceptionMessage(\sprintf('The "place" argument of "%s" cannot be used without a "workflow" argument.', $class));
 
         new $class(place: 'some');
     }

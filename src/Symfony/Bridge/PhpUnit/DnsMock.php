@@ -30,24 +30,20 @@ class DnsMock
         'NAPTR' => \DNS_NAPTR,
         'TXT' => \DNS_TXT,
         'HINFO' => \DNS_HINFO,
+        'CAA' => '\\' !== \DIRECTORY_SEPARATOR ? \DNS_CAA : 0,
     ];
 
     /**
      * Configures the mock values for DNS queries.
      *
      * @param array $hosts Mocked hosts as keys, arrays of DNS records as returned by dns_get_record() as values
-     *
-     * @return void
      */
-    public static function withMockedHosts(array $hosts)
+    public static function withMockedHosts(array $hosts): void
     {
         self::$hosts = $hosts;
     }
 
-    /**
-     * @return bool
-     */
-    public static function checkdnsrr($hostname, $type = 'MX')
+    public static function checkdnsrr($hostname, $type = 'MX'): bool
     {
         if (!self::$hosts) {
             return \checkdnsrr($hostname, $type);
@@ -68,10 +64,7 @@ class DnsMock
         return false;
     }
 
-    /**
-     * @return bool
-     */
-    public static function getmxrr($hostname, &$mxhosts, &$weight = null)
+    public static function getmxrr($hostname, &$mxhosts, &$weight = null): bool
     {
         if (!self::$hosts) {
             return \getmxrr($hostname, $mxhosts, $weight);
@@ -169,10 +162,7 @@ class DnsMock
         return $records;
     }
 
-    /**
-     * @return void
-     */
-    public static function register($class)
+    public static function register($class): void
     {
         $self = static::class;
 

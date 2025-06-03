@@ -99,16 +99,19 @@ $passthruOrFail = function ($command) {
 
 if (\PHP_VERSION_ID >= 80000) {
     $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.6') ?: '9.6';
-} elseif (\PHP_VERSION_ID >= 70200) {
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5') ?: '8.5';
 } else {
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5') ?: '7.5';
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5') ?: '8.5';
 }
 
 $MAX_PHPUNIT_VERSION = $getEnvVar('SYMFONY_MAX_PHPUNIT_VERSION', false);
 
 if ($MAX_PHPUNIT_VERSION && version_compare($MAX_PHPUNIT_VERSION, $PHPUNIT_VERSION, '<')) {
     $PHPUNIT_VERSION = $MAX_PHPUNIT_VERSION;
+}
+
+if (version_compare($PHPUNIT_VERSION, '10.0', '>=') && version_compare($PHPUNIT_VERSION, '11.0', '<')) {
+    fwrite(\STDERR, 'This script does not work with PHPUnit 10.'.\PHP_EOL);
+    exit(1);
 }
 
 $PHPUNIT_REMOVE_RETURN_TYPEHINT = filter_var($getEnvVar('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT', '0'), \FILTER_VALIDATE_BOOLEAN);
@@ -145,7 +148,7 @@ foreach ($defaultEnvs as $envName => $envValue) {
     }
 }
 
-if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER')) {
+if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER') || version_compare($PHPUNIT_VERSION, '11.0', '>=')) {
     putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 
@@ -237,7 +240,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         $passthruOrFail("$COMPOSER require --no-update --no-interaction ".$SYMFONY_PHPUNIT_REQUIRE);
     }
     if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
-        $passthruOrFail("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
+        $passthruOrFail("$COMPOSER require --no-update --no-interaction phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
 
     if (preg_match('{\^((\d++\.)\d++)[\d\.]*$}', $info['requires']['php'], $phpVersion) && version_compare($phpVersion[2].'99', \PHP_VERSION, '<')) {
@@ -253,19 +256,19 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         if (realpath($p) === realpath($path)) {
             $path = $p;
         }
-        $passthruOrFail("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");
+        $passthruOrFail("$COMPOSER require --no-update --no-interaction symfony/phpunit-bridge \"*@dev\"");
         $passthruOrFail("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', \DIRECTORY_SEPARATOR, $path)));
         if ('\\' === \DIRECTORY_SEPARATOR) {
             file_put_contents('composer.json', preg_replace('/^( {8})"phpunit-bridge": \{$/m', "$0\n$1    ".'"options": {"symlink": false},', file_get_contents('composer.json')));
         }
     } else {
-        $passthruOrFail("$COMPOSER require --no-update symfony/phpunit-bridge \"*\"");
+        $passthruOrFail("$COMPOSER require --no-update --no-interaction symfony/phpunit-bridge \"*\"");
     }
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
     $q = '\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 80000 ? '"' : '';
     // --no-suggest is not in the list to keep compat with composer 1.0, which is shipped with Ubuntu 16.04LTS
-    $exit = proc_close(proc_open("$q$COMPOSER install --no-dev --prefer-dist --no-progress $q", [], $p, getcwd()));
+    $exit = proc_close(proc_open("$q$COMPOSER update --no-dev --prefer-dist --no-progress $q", [], $p, getcwd()));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
     if ($prevCacheDir) {
         putenv("COMPOSER_CACHE_DIR=$prevCacheDir");
@@ -275,19 +278,20 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     }
 
     // Mutate TestCase code
-    $alteredCode = file_get_contents($alteredFile = './src/Framework/TestCase.php');
-    if ($PHPUNIT_REMOVE_RETURN_TYPEHINT) {
-        $alteredCode = preg_replace('/^    ((?:protected|public)(?: static)? function \w+\(\)): void/m', '    $1', $alteredCode);
-    }
-    $alteredCode = preg_replace('/abstract class TestCase[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillTestCaseTrait;", $alteredCode, 1);
-    file_put_contents($alteredFile, $alteredCode);
+    if (version_compare($PHPUNIT_VERSION, '11.0', '<')) {
+        $alteredCode = file_get_contents($alteredFile = './src/Framework/TestCase.php');
+        if ($PHPUNIT_REMOVE_RETURN_TYPEHINT) {
+            $alteredCode = preg_replace('/^    ((?:protected|public)(?: static)? function \w+\(\)): void/m', '    $1', $alteredCode);
+        }
+        $alteredCode = preg_replace('/abstract class TestCase[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillTestCaseTrait;", $alteredCode, 1);
+        file_put_contents($alteredFile, $alteredCode);
 
-    // Mutate Assert code
-    $alteredCode = file_get_contents($alteredFile = './src/Framework/Assert.php');
-    $alteredCode = preg_replace('/abstract class Assert[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillAssertTrait;", $alteredCode, 1);
-    file_put_contents($alteredFile, $alteredCode);
+        // Mutate Assert code
+        $alteredCode = file_get_contents($alteredFile = './src/Framework/Assert.php');
+        $alteredCode = preg_replace('/abstract class Assert[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillAssertTrait;", $alteredCode, 1);
+        file_put_contents($alteredFile, $alteredCode);
 
-    file_put_contents('phpunit', <<<'EOPHP'
+        file_put_contents('phpunit', <<<'EOPHP'
 <?php
 
 define('PHPUNIT_COMPOSER_INSTALL', __DIR__.'/vendor/autoload.php');
@@ -312,7 +316,9 @@ if (method_exists(\PHPUnit\Util\ExcludeList::class, 'addDirectory')) {
 Symfony\Bridge\PhpUnit\TextUI\Command::main();
 
 EOPHP
-    );
+        );
+    }
+
     chdir('..');
     file_put_contents(".$PHPUNIT_VERSION_DIR.md5", $configurationHash);
     chdir($oldPwd);
@@ -371,13 +377,17 @@ if (isset($argv[1]) && is_dir($argv[1]) && !file_exists($argv[1].'/phpunit.xml.d
     }
 }
 
-$cmd[0] = sprintf('%s %s --colors=%s', $PHP, escapeshellarg("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit"), false === $getEnvVar('NO_COLOR') ? 'always' : 'never');
+$cmd[0] = sprintf('%s %s --colors=%s', $PHP, escapeshellarg("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit"), '' === $getEnvVar('NO_COLOR', '') ? 'always' : 'never');
 $cmd = str_replace('%', '%%', implode(' ', $cmd)).' %1$s';
 
 if ('\\' === \DIRECTORY_SEPARATOR) {
     $cmd = 'cmd /v:on /d /c "('.$cmd.')%2$s"';
 } else {
     $cmd .= '%2$s';
+}
+
+if (version_compare($PHPUNIT_VERSION, '11.0', '>=')) {
+    $GLOBALS['_composer_autoload_path'] = "$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/vendor/autoload.php";
 }
 
 if ($components) {
@@ -456,12 +466,12 @@ if ($components) {
         }
     }
 } elseif (!isset($argv[1]) || 'install' !== $argv[1] || file_exists('install')) {
-    if (!class_exists(\SymfonyExcludeListSimplePhpunit::class, false)) {
+    if (!class_exists(SymfonyExcludeListSimplePhpunit::class, false)) {
         class SymfonyExcludeListSimplePhpunit
         {
         }
     }
-    array_splice($argv, 1, 0, ['--colors='.(false === $getEnvVar('NO_COLOR') ? 'always' : 'never')]);
+    array_splice($argv, 1, 0, ['--colors='.('' === $getEnvVar('NO_COLOR', '') ? 'always' : 'never')]);
     $_SERVER['argv'] = $argv;
     $_SERVER['argc'] = ++$argc;
     include "$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit";

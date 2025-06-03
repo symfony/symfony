@@ -37,14 +37,14 @@ use Symfony\Component\HttpKernel\RebootableInterface;
 #[AsCommand(name: 'cache:clear', description: 'Clear the cache')]
 class CacheClearCommand extends Command
 {
-    private CacheClearerInterface $cacheClearer;
     private Filesystem $filesystem;
 
-    public function __construct(CacheClearerInterface $cacheClearer, Filesystem $filesystem = null)
-    {
+    public function __construct(
+        private CacheClearerInterface $cacheClearer,
+        ?Filesystem $filesystem = null,
+    ) {
         parent::__construct();
 
-        $this->cacheClearer = $cacheClearer;
         $this->filesystem = $filesystem ?? new Filesystem();
     }
 
@@ -80,7 +80,7 @@ EOF
         $fs->remove($oldCacheDir);
 
         if (!is_writable($realCacheDir)) {
-            throw new RuntimeException(sprintf('Unable to write in the "%s" directory.', $realCacheDir));
+            throw new RuntimeException(\sprintf('Unable to write in the "%s" directory.', $realCacheDir));
         }
 
         $useBuildDir = $realBuildDir !== $realCacheDir;
@@ -89,7 +89,7 @@ EOF
             $fs->remove($oldBuildDir);
 
             if (!is_writable($realBuildDir)) {
-                throw new RuntimeException(sprintf('Unable to write in the "%s" directory.', $realBuildDir));
+                throw new RuntimeException(\sprintf('Unable to write in the "%s" directory.', $realBuildDir));
             }
 
             if ($this->isNfs($realCacheDir)) {
@@ -100,7 +100,7 @@ EOF
             $fs->mkdir($realCacheDir);
         }
 
-        $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $io->comment(\sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
         if ($useBuildDir) {
             $this->cacheClearer->clear($realBuildDir);
         }
@@ -146,6 +146,16 @@ EOF
                     }
                     $this->warmupOptionals($useBuildDir ? $realCacheDir : $warmupDir, $warmupDir, $io);
                 }
+
+                // fix references to cached files with the real cache directory name
+                $search = [$warmupDir, str_replace('/', '\\/', $warmupDir), str_replace('\\', '\\\\', $warmupDir)];
+                $replace = str_replace('\\', '/', $realBuildDir);
+                foreach (Finder::create()->files()->in($warmupDir) as $file) {
+                    $content = str_replace($search, $replace, $this->filesystem->readFile($file), $count);
+                    if ($count) {
+                        file_put_contents($file, $content);
+                    }
+                }
             }
 
             if (!$fs->exists($warmupDir.'/'.$containerDir)) {
@@ -154,7 +164,7 @@ EOF
             }
 
             if ($this->isNfs($realBuildDir)) {
-                $io->note('For better performances, you should move the cache and log directories to a non-shared folder of the VM.');
+                $io->note('For better performance, you should move the cache and log directories to a non-shared folder of the VM.');
                 $fs->remove($realBuildDir);
             } else {
                 $fs->rename($realBuildDir, $oldBuildDir);
@@ -189,7 +199,7 @@ EOF
             $io->comment('Finished');
         }
 
-        $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $io->success(\sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
         return 0;
     }
@@ -200,7 +210,7 @@ EOF
 
         if (null === $mounts) {
             $mounts = [];
-            if ('/' === \DIRECTORY_SEPARATOR && $files = @file('/proc/mounts')) {
+            if ('/' === \DIRECTORY_SEPARATOR && @is_readable('/proc/mounts') && $files = @file('/proc/mounts')) {
                 foreach ($files as $mount) {
                     $mount = \array_slice(explode(' ', $mount), 1, -3);
                     if (!\in_array(array_pop($mount), ['vboxsf', 'nfs'])) {
@@ -227,16 +237,6 @@ EOF
             throw new \LogicException('Calling "cache:clear" with a kernel that does not implement "Symfony\Component\HttpKernel\RebootableInterface" is not supported.');
         }
         $kernel->reboot($warmupDir);
-
-        // fix references to cached files with the real cache directory name
-        $search = [$warmupDir, str_replace('\\', '\\\\', $warmupDir)];
-        $replace = str_replace('\\', '/', $realBuildDir);
-        foreach (Finder::create()->files()->in($warmupDir) as $file) {
-            $content = str_replace($search, $replace, file_get_contents($file), $count);
-            if ($count) {
-                file_put_contents($file, $content);
-            }
-        }
     }
 
     private function warmupOptionals(string $cacheDir, string $warmupDir, SymfonyStyle $io): void
@@ -245,7 +245,7 @@ EOF
         $warmer = $kernel->getContainer()->get('cache_warmer');
         // non optional warmers already ran during container compilation
         $warmer->enableOnlyOptionalWarmers();
-        $preload = (array) $warmer->warmUp($cacheDir, $io);
+        $preload = (array) $warmer->warmUp($cacheDir, $warmupDir, $io);
 
         if ($preload && file_exists($preloadFile = $warmupDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
             Preloader::append($preloadFile, $preload);

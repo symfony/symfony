@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="mn" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="mn" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
@@ -35,7 +35,7 @@
                 <target>Нэвтрэх токенг дэмжих нэвтрэх эрхийн хангагч олдсонгүй.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>No  available, it either timed out or cookies are not enabled.</source>
+                <source>No session available, it either timed out or cookies are not enabled.</source>
                 <target>Хэрэглэгчийн session олдсонгүй, хугацаа нь дууссан эсвэл күүки идэвхижүүлээгүй байна.</target>
             </trans-unit>
             <trans-unit id="11">
@@ -69,6 +69,14 @@
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
                 <target>Буруу эсвэл хугацаа нь дууссан нэвтрэх зам.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target state="needs-review-translation">Нэвтрэх оролдлого ихээр амжилтгүй болсон, %minutes% минутын дараа дахин оролдоно уу.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">Хэт олон бүтэлгүй нэвтрэх оролдлого, %minutes% минутын дараа дахин оролдоно уу.</target>
             </trans-unit>
         </body>
     </file>

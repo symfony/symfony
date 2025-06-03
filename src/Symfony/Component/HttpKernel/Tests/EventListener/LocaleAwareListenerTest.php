@@ -47,12 +47,13 @@ class LocaleAwareListenerTest extends TestCase
 
     public function testDefaultLocaleIsUsedOnExceptionsInOnKernelRequest()
     {
-        $matcher = $this->exactly(2);
         $this->localeAwareService
-            ->expects($matcher)
+            ->expects($this->exactly(2))
             ->method('setLocale')
-            ->willReturnCallback(function (string $locale) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+            ->willReturnCallback(function (string $locale): void {
+                static $counter = 0;
+
+                if (1 === ++$counter) {
                     throw new \InvalidArgumentException();
                 }
 
@@ -93,12 +94,13 @@ class LocaleAwareListenerTest extends TestCase
 
     public function testDefaultLocaleIsUsedOnExceptionsInOnKernelFinishRequest()
     {
-        $matcher = $this->exactly(2);
         $this->localeAwareService
-            ->expects($matcher)
+            ->expects($this->exactly(2))
             ->method('setLocale')
-            ->willReturnCallback(function (string $locale) use ($matcher) {
-                if (1 === $matcher->getInvocationCount()) {
+            ->willReturnCallback(function (string $locale): void {
+                static $counter = 0;
+
+                if (1 === ++$counter) {
                     throw new \InvalidArgumentException();
                 }
 
@@ -113,7 +115,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->listener->onKernelFinishRequest($event);
     }
 
-    private function createRequest($locale)
+    private function createRequest(string $locale): Request
     {
         $request = new Request();
         $request->setLocale($locale);

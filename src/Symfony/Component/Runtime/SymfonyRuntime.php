@@ -41,6 +41,7 @@ class_exists(MissingDotenv::class, false) || class_exists(Dotenv::class) || clas
  *  - "test_envs" to define the names of the test envs - defaults to ["test"];
  *  - "use_putenv" to tell Dotenv to set env vars using putenv() (NOT RECOMMENDED.)
  *  - "dotenv_overload" to tell Dotenv to override existing vars
+ *  - "dotenv_extra_paths" to define a list of additional dot-env files
  *
  * When the "debug" / "env" options are not defined, they will fallback to the
  * "APP_DEBUG" / "APP_ENV" environment variables, and to the "--env|-e" / "--no-debug"
@@ -86,6 +87,7 @@ class SymfonyRuntime extends GenericRuntime
      *   env_var_name?: string,
      *   debug_var_name?: string,
      *   dotenv_overload?: ?bool,
+     *   dotenv_extra_paths?: ?string[],
      * } $options
      */
     public function __construct(array $options = [])
@@ -93,22 +95,38 @@ class SymfonyRuntime extends GenericRuntime
         $envKey = $options['env_var_name'] ??= 'APP_ENV';
         $debugKey = $options['debug_var_name'] ??= 'APP_DEBUG';
 
+        if (isset($_SERVER['argv']) && !empty($_GET)) {
+            // register_argc_argv=On is too risky in web servers
+            $_SERVER['argv'] = [];
+            $_SERVER['argc'] = 0;
+        }
+
         if (isset($options['env'])) {
             $_SERVER[$envKey] = $options['env'];
-        } elseif (isset($_SERVER['argv']) && class_exists(ArgvInput::class)) {
+        } elseif (empty($_GET) && isset($_SERVER['argv']) && class_exists(ArgvInput::class)) {
             $this->options = $options;
             $this->getInput();
         }
 
         if (!($options['disable_dotenv'] ?? false) && isset($options['project_dir']) && !class_exists(MissingDotenv::class, false)) {
-            (new Dotenv($envKey, $debugKey))
+            $overrideExistingVars = $options['dotenv_overload'] ?? false;
+            $dotenv = (new Dotenv($envKey, $debugKey))
                 ->setProdEnvs((array) ($options['prod_envs'] ?? ['prod']))
-                ->usePutenv($options['use_putenv'] ?? false)
-                ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $options['dotenv_overload'] ?? false);
+                ->usePutenv($options['use_putenv'] ?? false);
 
-            if (isset($this->input) && ($options['dotenv_overload'] ?? false)) {
+            $dotenv->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $overrideExistingVars);
+
+            if (\is_array($options['dotenv_extra_paths'] ?? null) && $options['dotenv_extra_paths']) {
+                $options['dotenv_extra_paths'] = array_map(fn (string $path) => $options['project_dir'].'/'.$path, $options['dotenv_extra_paths']);
+
+                $overrideExistingVars
+                    ? $dotenv->overload(...$options['dotenv_extra_paths'])
+                    : $dotenv->load(...$options['dotenv_extra_paths']);
+            }
+
+            if (isset($this->input) && $overrideExistingVars) {
                 if ($this->input->getParameterOption(['--env', '-e'], $_SERVER[$envKey], true) !== $_SERVER[$envKey]) {
-                    throw new \LogicException(sprintf('Cannot use "--env" or "-e" when the "%s" file defines "%s" and the "dotenv_overload" runtime option is true.', $options['dotenv_path'] ?? '.env', $envKey));
+                    throw new \LogicException(\sprintf('Cannot use "--env" or "-e" when the "%s" file defines "%s" and the "dotenv_overload" runtime option is true.', $options['dotenv_path'] ?? '.env', $envKey));
                 }
 
                 if ($_SERVER[$debugKey] && $this->input->hasParameterOption('--no-debug', true)) {
@@ -131,7 +149,7 @@ class SymfonyRuntime extends GenericRuntime
     public function getRunner(?object $application): RunnerInterface
     {
         if ($application instanceof HttpKernelInterface) {
-            return new HttpKernelRunner($application, Request::createFromGlobals());
+            return new HttpKernelRunner($application, Request::createFromGlobals(), $this->options['debug'] ?? false);
         }
 
         if ($application instanceof Response) {
@@ -154,10 +172,6 @@ class SymfonyRuntime extends GenericRuntime
         }
 
         if ($application instanceof Application) {
-            if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
-                echo 'Warning: The console should be invoked via the CLI version of PHP, not the '.\PHP_SAPI.' SAPI'.\PHP_EOL;
-            }
-
             set_time_limit(0);
             $defaultEnv = !isset($this->options['env']) ? ($_SERVER[$this->options['env_var_name']] ?? 'dev') : null;
             $output = $this->output ??= new ConsoleOutput();

@@ -23,14 +23,14 @@ final class NativeClock implements ClockInterface
     /**
      * @throws \DateInvalidTimeZoneException When $timezone is invalid
      */
-    public function __construct(\DateTimeZone|string $timezone = null)
+    public function __construct(\DateTimeZone|string|null $timezone = null)
     {
         $this->timezone = \is_string($timezone ??= date_default_timezone_get()) ? $this->withTimeZone($timezone)->timezone : $timezone;
     }
 
-    public function now(): \DateTimeImmutable
+    public function now(): DatePoint
     {
-        return new \DateTimeImmutable('now', $this->timezone);
+        return DatePoint::createFromInterface(new \DateTimeImmutable('now', $this->timezone));
     }
 
     public function sleep(float|int $seconds): void

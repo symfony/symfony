@@ -17,9 +17,6 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\Embeddable\Identifier;
 #[ORM\Entity]
 class EmbeddedIdentifierEntity
 {
-    /**
-     * @var Embeddable\Identifier
-     */
-    #[ORM\Embedded(class: Identifier::class)]
-    protected $id;
+    #[ORM\Embedded]
+    protected Identifier $id;
 }

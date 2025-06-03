@@ -56,7 +56,7 @@ return [
         ],
         'BGN' => [
             'BGN',
-            'Bulgarskur Lev',
+            'Bulgarskur lev',
         ],
         'BHD' => [
             'BHD',
@@ -96,7 +96,7 @@ return [
         ],
         'BYN' => [
             'BYN',
-            'Hvítarussiskur Ruble',
+            'Hvítarussiskur ruble',
         ],
         'BYR' => [
             'BYR',
@@ -152,7 +152,7 @@ return [
         ],
         'CZK' => [
             'CZK',
-            'Kekkiskt Koruna',
+            'Kekkiskt koruna',
         ],
         'DJF' => [
             'DJF',
@@ -244,7 +244,7 @@ return [
         ],
         'HUF' => [
             'HUF',
-            'Ungarskur Forintur',
+            'Ungarskur forintur',
         ],
         'IDR' => [
             'IDR',
@@ -334,6 +334,10 @@ return [
             'LRD',
             'Liberia dollari',
         ],
+        'LSL' => [
+            'LSL',
+            'Lesoto loti',
+        ],
         'LYD' => [
             'LYD',
             'Libya dinar',
@@ -344,7 +348,7 @@ return [
         ],
         'MDL' => [
             'MDL',
-            'Moldovanskur Leu',
+            'Moldovanskur leu',
         ],
         'MGA' => [
             'MGA',
@@ -448,7 +452,7 @@ return [
         ],
         'PLN' => [
             'PLN',
-            'Pólskur Zloty',
+            'Pólskur zloty',
         ],
         'PYG' => [
             'PYG',
@@ -502,9 +506,13 @@ return [
             'SHP',
             'St. Helena pund',
         ],
+        'SLE' => [
+            'SLE',
+            'Sierra Leona leone',
+        ],
         'SLL' => [
             'SLL',
-            'Sierra Leona leone',
+            'Sierra Leona leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

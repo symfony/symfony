@@ -52,4 +52,16 @@ class ConfigurationTest extends TestCase
 
         $this->assertSame(['global' => ['value' => ['some-key' => 'some-value']]], $config['globals']);
     }
+
+    public function testNullPathsAreConvertedToIterable()
+    {
+        $input = [
+            'paths' => null,
+        ];
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(), [$input]);
+
+        $this->assertSame([], $config['paths']);
+    }
 }

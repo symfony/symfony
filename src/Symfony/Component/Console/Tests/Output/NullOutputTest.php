@@ -35,10 +35,10 @@ class NullOutputTest extends TestCase
     public function testVerbosity()
     {
         $output = new NullOutput();
-        $this->assertSame(OutputInterface::VERBOSITY_QUIET, $output->getVerbosity(), '->getVerbosity() returns VERBOSITY_QUIET for NullOutput by default');
+        $this->assertSame(OutputInterface::VERBOSITY_SILENT, $output->getVerbosity(), '->getVerbosity() returns VERBOSITY_SILENT for NullOutput by default');
 
         $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
-        $this->assertSame(OutputInterface::VERBOSITY_QUIET, $output->getVerbosity(), '->getVerbosity() always returns VERBOSITY_QUIET for NullOutput');
+        $this->assertSame(OutputInterface::VERBOSITY_SILENT, $output->getVerbosity(), '->getVerbosity() always returns VERBOSITY_QUIET for NullOutput');
     }
 
     public function testGetFormatter()
@@ -60,7 +60,7 @@ class NullOutputTest extends TestCase
     {
         $output = new NullOutput();
         $output->setVerbosity(Output::VERBOSITY_NORMAL);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity());
+        $this->assertEquals(Output::VERBOSITY_SILENT, $output->getVerbosity());
     }
 
     public function testSetDecorated()
@@ -70,10 +70,16 @@ class NullOutputTest extends TestCase
         $this->assertFalse($output->isDecorated());
     }
 
+    public function testIsSilent()
+    {
+        $output = new NullOutput();
+        $this->assertTrue($output->isSilent());
+    }
+
     public function testIsQuiet()
     {
         $output = new NullOutput();
-        $this->assertTrue($output->isQuiet());
+        $this->assertFalse($output->isQuiet());
     }
 
     public function testIsVerbose()

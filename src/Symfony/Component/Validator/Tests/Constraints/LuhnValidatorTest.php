@@ -76,9 +76,7 @@ class LuhnValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidNumbers($number, $code)
     {
-        $constraint = new Luhn([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Luhn(message: 'myMessage');
 
         $this->validator->validate($number, $constraint);
 

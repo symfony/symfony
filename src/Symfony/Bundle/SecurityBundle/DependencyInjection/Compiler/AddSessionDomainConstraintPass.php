@@ -21,20 +21,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AddSessionDomainConstraintPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('session.storage.options') || !$container->has('security.http_utils')) {
             return;
         }
 
         $sessionOptions = $container->getParameter('session.storage.options');
-        $domainRegexp = empty($sessionOptions['cookie_domain']) ? '%%s' : sprintf('(?:%%%%s|(?:.+\.)?%s)', preg_quote(trim($sessionOptions['cookie_domain'], '.')));
+        $domainRegexp = empty($sessionOptions['cookie_domain']) ? '%%s' : \sprintf('(?:%%%%s|(?:.+\.)?%s)', preg_quote(trim($sessionOptions['cookie_domain'], '.')));
 
         if ('auto' === ($sessionOptions['cookie_secure'] ?? null)) {
-            $secureDomainRegexp = sprintf('{^https://%s$}i', $domainRegexp);
+            $secureDomainRegexp = \sprintf('{^https://%s$}i', $domainRegexp);
             $domainRegexp = 'https?://'.$domainRegexp;
         } else {
             $secureDomainRegexp = null;
@@ -42,7 +39,7 @@ class AddSessionDomainConstraintPass implements CompilerPassInterface
         }
 
         $container->findDefinition('security.http_utils')
-            ->addArgument(sprintf('{^%s$}i', $domainRegexp))
+            ->addArgument(\sprintf('{^%s$}i', $domainRegexp))
             ->addArgument($secureDomainRegexp);
     }
 }

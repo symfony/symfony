@@ -25,7 +25,7 @@ final class MonotonicClock implements ClockInterface
     /**
      * @throws \DateInvalidTimeZoneException When $timezone is invalid
      */
-    public function __construct(\DateTimeZone|string $timezone = null)
+    public function __construct(\DateTimeZone|string|null $timezone = null)
     {
         if (false === $offset = hrtime()) {
             throw new \RuntimeException('hrtime() returned false: the runtime environment does not provide access to a monotonic timer.');
@@ -38,7 +38,7 @@ final class MonotonicClock implements ClockInterface
         $this->timezone = \is_string($timezone ??= date_default_timezone_get()) ? $this->withTimeZone($timezone)->timezone : $timezone;
     }
 
-    public function now(): \DateTimeImmutable
+    public function now(): DatePoint
     {
         [$s, $us] = hrtime();
 
@@ -56,7 +56,7 @@ final class MonotonicClock implements ClockInterface
 
         $now = '@'.($s + $this->sOffset).'.'.$now;
 
-        return (new \DateTimeImmutable($now, $this->timezone))->setTimezone($this->timezone);
+        return DatePoint::createFromInterface(new \DateTimeImmutable($now, $this->timezone))->setTimezone($this->timezone);
     }
 
     public function sleep(float|int $seconds): void

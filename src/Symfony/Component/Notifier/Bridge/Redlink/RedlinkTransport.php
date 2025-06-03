@@ -29,14 +29,12 @@ final class RedlinkTransport extends AbstractTransport
     protected const HOST = 'api.redlink.pl';
 
     public function __construct(
-        #[\SensitiveParameter]
-        private readonly string $apiToken,
-        #[\SensitiveParameter]
-        private readonly string $appToken,
+        #[\SensitiveParameter] private readonly string $apiToken,
+        #[\SensitiveParameter] private readonly string $appToken,
         private readonly ?string $from,
         private readonly ?string $version,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
     }
@@ -48,7 +46,7 @@ final class RedlinkTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf(
+        return \sprintf(
             'redlink://%s?from=%s&version=%s',
             $this->getEndpoint(),
             $this->from,
@@ -66,7 +64,7 @@ final class RedlinkTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
-        $endpoint = sprintf('https://%s/%s/sms', $this->getEndpoint(), $this->version);
+        $endpoint = \sprintf('https://%s/%s/sms', $this->getEndpoint(), $this->version);
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
@@ -95,7 +93,7 @@ final class RedlinkTransport extends AbstractTransport
 
             $errorMessage = $content['errors'][0]['message'] ?? '';
 
-            throw new TransportException(sprintf('Unable to send the SMS: '.$errorMessage.'. UniqId: (%s).', $requestUniqueIdentifier), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: '.$errorMessage.'. UniqId: (%s).', $requestUniqueIdentifier), $response);
         }
 
         $messageId = $content['data'][0]['externalId'] ?? '';

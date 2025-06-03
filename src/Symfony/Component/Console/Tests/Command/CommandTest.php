@@ -12,12 +12,13 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +30,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use ExpectUserDeprecationMessageTrait;
 
     protected static string $fixturesPath;
 
@@ -142,13 +143,12 @@ class CommandTest extends TestCase
     public function testInvalidCommandNames($name)
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Command name "%s" is invalid.', $name));
+        $this->expectExceptionMessage(\sprintf('Command name "%s" is invalid.', $name));
 
-        $command = new \TestCommand();
-        $command->setName($name);
+        (new \TestCommand())->setName($name);
     }
 
-    public static function provideInvalidCommandNames()
+    public static function provideInvalidCommandNames(): array
     {
         return [
             [''],
@@ -236,8 +236,7 @@ class CommandTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot retrieve helper "formatter" because there is no HelperSet defined.');
-        $command = new \TestCommand();
-        $command->getHelper('formatter');
+        (new \TestCommand())->getHelper('formatter');
     }
 
     public function testMergeApplicationDefinition()
@@ -305,16 +304,17 @@ class CommandTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You must override the execute() method in the concrete command class.');
-        $command = new Command('foo');
-        $command->run(new StringInput(''), new NullOutput());
+        (new Command('foo'))->run(new StringInput(''), new NullOutput());
     }
 
     public function testRunWithInvalidOption()
     {
-        $this->expectException(InvalidOptionException::class);
-        $this->expectExceptionMessage('The "--bar" option does not exist.');
         $command = new \TestCommand();
         $tester = new CommandTester($command);
+
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage('The "--bar" option does not exist.');
+
         $tester->execute(['--bar' => true]);
     }
 
@@ -351,8 +351,10 @@ class CommandTest extends TestCase
     public function testSetCode()
     {
         $command = new \TestCommand();
-        $ret = $command->setCode(function (InputInterface $input, OutputInterface $output) {
+        $ret = $command->setCode(function (InputInterface $input, OutputInterface $output): int {
             $output->writeln('from the code...');
+
+            return 0;
         });
         $this->assertEquals($command, $ret, '->setCode() implements a fluent interface');
         $tester = new CommandTester($command);
@@ -397,8 +399,10 @@ class CommandTest extends TestCase
 
     private static function createClosure()
     {
-        return function (InputInterface $input, OutputInterface $output) {
+        return function (InputInterface $input, OutputInterface $output): int {
             $output->writeln(isset($this) ? 'bound' : 'not bound');
+
+            return 0;
         };
     }
 
@@ -412,16 +416,20 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'from the code...'.\PHP_EOL, $tester->getDisplay());
     }
 
-    public function callableMethodCommand(InputInterface $input, OutputInterface $output)
+    public function callableMethodCommand(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('from the code...');
+
+        return 0;
     }
 
     public function testSetCodeWithStaticAnonymousFunction()
     {
         $command = new \TestCommand();
-        $command->setCode(static function (InputInterface $input, OutputInterface $output) {
+        $command->setCode(static function (InputInterface $input, OutputInterface $output): int {
             $output->writeln(isset($this) ? 'bound' : 'not bound');
+
+            return 0;
         });
         $tester = new CommandTester($command);
         $tester->execute([]);
@@ -431,13 +439,11 @@ class CommandTest extends TestCase
 
     public function testCommandAttribute()
     {
-        $this->assertSame('|foo|f', Php8Command::getDefaultName());
-        $this->assertSame('desc', Php8Command::getDefaultDescription());
-
         $command = new Php8Command();
 
         $this->assertSame('foo', $command->getName());
         $this->assertSame('desc', $command->getDescription());
+        $this->assertSame('help', $command->getHelp());
         $this->assertTrue($command->isHidden());
         $this->assertSame(['f'], $command->getAliases());
     }
@@ -445,57 +451,70 @@ class CommandTest extends TestCase
     /**
      * @group legacy
      */
-    public function testDefaultNameProperty()
+    public function testCommandAttributeWithDeprecatedMethods()
     {
-        $this->expectDeprecation('Since symfony/console 6.1: Relying on the static property "$defaultName" for setting a command name is deprecated. Add the "Symfony\Component\Console\Attribute\AsCommand" attribute to the "Symfony\Component\Console\Tests\Command\MyCommand" class instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultName()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultDescription()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
 
-        $this->assertSame('my:command', MyCommand::getDefaultName());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDefaultDescriptionProperty()
-    {
-        $this->expectDeprecation('Since symfony/console 6.1: Relying on the static property "$defaultDescription" for setting a command description is deprecated. Add the "Symfony\Component\Console\Attribute\AsCommand" attribute to the "Symfony\Component\Console\Tests\Command\MyCommand" class instead.');
-
-        $this->assertSame('This is a command I wrote all by myself', MyCommand::getDefaultDescription());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticDefaultProperties()
-    {
-        $command = new MyCommand();
-
-        $this->assertSame('my:command', $command->getName());
-        $this->assertSame('This is a command I wrote all by myself', $command->getDescription());
+        $this->assertSame('|foo|f', Php8Command::getDefaultName());
+        $this->assertSame('desc', Php8Command::getDefaultDescription());
     }
 
     public function testAttributeOverridesProperty()
     {
-        $this->assertSame('my:command', MyAnnotatedCommand::getDefaultName());
-        $this->assertSame('This is a command I wrote all by myself', MyAnnotatedCommand::getDefaultDescription());
-
         $command = new MyAnnotatedCommand();
 
         $this->assertSame('my:command', $command->getName());
         $this->assertSame('This is a command I wrote all by myself', $command->getDescription());
     }
 
+    /**
+     * @group legacy
+     */
+    public function testAttributeOverridesPropertyWithDeprecatedMethods()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultName()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Method "Symfony\Component\Console\Command\Command::getDefaultDescription()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+
+        $this->assertSame('my:command', MyAnnotatedCommand::getDefaultName());
+        $this->assertSame('This is a command I wrote all by myself', MyAnnotatedCommand::getDefaultDescription());
+    }
+
     public function testDefaultCommand()
     {
         $apl = new Application();
-        $apl->setDefaultCommand(Php8Command::getDefaultName());
+        $apl->setDefaultCommand('foo');
         $property = new \ReflectionProperty($apl, 'defaultCommand');
 
         $this->assertEquals('foo', $property->getValue($apl));
 
-        $apl->setDefaultCommand(Php8Command2::getDefaultName());
+        $apl->setDefaultCommand('foo2');
         $property = new \ReflectionProperty($apl, 'defaultCommand');
 
         $this->assertEquals('foo2', $property->getValue($apl));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedMethods()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Overriding "Command::getDefaultName()" in "Symfony\Component\Console\Tests\Command\FooCommand" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Overriding "Command::getDefaultDescription()" in "Symfony\Component\Console\Tests\Command\FooCommand" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.');
+
+        new FooCommand();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedNonIntegerReturnTypeFromClosureCode()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/console 7.3: Returning a non-integer value from the command "foo" is deprecated and will throw an exception in Symfony 8.0.');
+
+        $command = new Command('foo');
+        $command->setCode(function () {});
+        $command->run(new ArrayInput([]), new NullOutput());
     }
 }
 
@@ -503,12 +522,14 @@ class CommandTest extends TestCase
 // scope.
 function createClosure()
 {
-    return function (InputInterface $input, OutputInterface $output) {
+    return function (InputInterface $input, OutputInterface $output): int {
         $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
+
+        return 0;
     };
 }
 
-#[AsCommand(name: 'foo', description: 'desc', hidden: true, aliases: ['f'])]
+#[AsCommand(name: 'foo', description: 'desc', hidden: true, aliases: ['f'], help: 'help')]
 class Php8Command extends Command
 {
 }
@@ -518,29 +539,23 @@ class Php8Command2 extends Command
 {
 }
 
-class MyCommand extends Command
-{
-    /**
-     * @deprecated since Symfony 6.1
-     */
-    protected static $defaultName = 'my:command';
-
-    /**
-     * @deprecated since Symfony 6.1
-     */
-    protected static $defaultDescription = 'This is a command I wrote all by myself';
-}
-
 #[AsCommand(name: 'my:command', description: 'This is a command I wrote all by myself')]
 class MyAnnotatedCommand extends Command
 {
-    /**
-     * @deprecated since Symfony 6.1
-     */
     protected static $defaultName = 'i-shall-be-ignored';
 
-    /**
-     * @deprecated since Symfony 6.1
-     */
     protected static $defaultDescription = 'This description should be ignored.';
+}
+
+class FooCommand extends Command
+{
+    public static function getDefaultName(): ?string
+    {
+        return 'foo';
+    }
+
+    public static function getDefaultDescription(): ?string
+    {
+        return 'foo description';
+    }
 }

@@ -172,33 +172,33 @@ class HttpFoundationFactoryTest extends TestCase
         $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
         $size = $symfonyUploadedFile->getSize();
 
-        $uniqid = uniqid();
-        $symfonyUploadedFile->move($this->tmpDir, $uniqid);
+        $filename = 'upload';
+        $symfonyUploadedFile->move($this->tmpDir, $filename);
 
         $this->assertEquals($uploadedFile->getSize(), $size);
         $this->assertEquals(\UPLOAD_ERR_OK, $symfonyUploadedFile->getError());
         $this->assertEquals('myfile.txt', $symfonyUploadedFile->getClientOriginalName());
         $this->assertEquals('txt', $symfonyUploadedFile->getClientOriginalExtension());
         $this->assertEquals('text/plain', $symfonyUploadedFile->getClientMimeType());
-        $this->assertEquals('An uploaded file.', file_get_contents($this->tmpDir.'/'.$uniqid));
+        $this->assertEquals('An uploaded file.', file_get_contents($this->tmpDir.'/'.$filename));
     }
 
     public function testCreateUploadedFileWithError()
     {
-        $this->expectException(FileException::class);
-        $this->expectExceptionMessage('The file "e" could not be written on disk.');
-
         $uploadedFile = $this->createUploadedFile('Error.', \UPLOAD_ERR_CANT_WRITE, 'e', 'text/plain');
         $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
 
         $this->assertEquals(\UPLOAD_ERR_CANT_WRITE, $symfonyUploadedFile->getError());
+
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('The file "e" could not be written on disk.');
 
         $symfonyUploadedFile->move($this->tmpDir, 'shouldFail.txt');
     }
 
     private function createUploadedFile(string $content, int $error, string $clientFileName, string $clientMediaType): UploadedFile
     {
-        $filePath = tempnam($this->tmpDir, uniqid());
+        $filePath = tempnam($this->tmpDir, 'sftest');
         file_put_contents($filePath, $content);
 
         return new UploadedFile($filePath, filesize($filePath), $error, $clientFileName, $clientMediaType);
@@ -208,7 +208,6 @@ class HttpFoundationFactoryTest extends TestCase
     {
         $reflection = new \ReflectionClass($this->factory);
         $createUploadedFile = $reflection->getMethod('createUploadedFile');
-        $createUploadedFile->setAccessible(true);
 
         return $createUploadedFile->invokeArgs($this->factory, [$uploadedFile]);
     }

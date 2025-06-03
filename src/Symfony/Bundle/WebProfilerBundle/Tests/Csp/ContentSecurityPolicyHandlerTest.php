@@ -46,7 +46,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
         }
     }
 
-    public static function provideRequestAndResponses()
+    public static function provideRequestAndResponses(): array
     {
         $nonce = bin2hex(random_bytes(16));
 
@@ -73,7 +73,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
         ];
     }
 
-    public static function provideRequestAndResponsesForOnKernelResponse()
+    public static function provideRequestAndResponsesForOnKernelResponse(): array
     {
         $nonce = bin2hex(random_bytes(16));
 

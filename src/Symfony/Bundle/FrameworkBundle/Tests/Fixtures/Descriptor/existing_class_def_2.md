@@ -7,4 +7,5 @@
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - Usages: none

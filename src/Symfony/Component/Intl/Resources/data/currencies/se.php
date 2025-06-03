@@ -14,22 +14,6 @@ return [
             'FIM',
             'suoma márkki',
         ],
-        'HKD' => [
-            'HK$',
-            'HKD',
-        ],
-        'INR' => [
-            '₹',
-            'INR',
-        ],
-        'JPY' => [
-            'JP¥',
-            'JPY',
-        ],
-        'MXN' => [
-            'MX$',
-            'MXN',
-        ],
         'NOK' => [
             'kr',
             'norgga kruvdno',

@@ -23,17 +23,18 @@ use Symfony\Component\VarDumper\Server\Connection;
 class ServerDumper implements DataDumperInterface
 {
     private Connection $connection;
-    private ?DataDumperInterface $wrappedDumper;
 
     /**
      * @param string                     $host             The server host
      * @param DataDumperInterface|null   $wrappedDumper    A wrapped instance used whenever we failed contacting the server
      * @param ContextProviderInterface[] $contextProviders Context providers indexed by context name
      */
-    public function __construct(string $host, DataDumperInterface $wrappedDumper = null, array $contextProviders = [])
-    {
+    public function __construct(
+        string $host,
+        private ?DataDumperInterface $wrappedDumper = null,
+        array $contextProviders = [],
+    ) {
         $this->connection = new Connection($host, $contextProviders);
-        $this->wrappedDumper = $wrappedDumper;
     }
 
     public function getContextProviders(): array
@@ -41,10 +42,7 @@ class ServerDumper implements DataDumperInterface
         return $this->connection->getContextProviders();
     }
 
-    /**
-     * @return string|null
-     */
-    public function dump(Data $data)
+    public function dump(Data $data): ?string
     {
         if (!$this->connection->write($data) && $this->wrappedDumper) {
             return $this->wrappedDumper->dump($data);

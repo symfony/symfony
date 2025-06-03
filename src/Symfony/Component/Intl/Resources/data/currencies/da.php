@@ -806,9 +806,13 @@ return [
             'SKK',
             'Slovakisk koruna',
         ],
+        'SLE' => [
+            'SLE',
+            'sierraleonsk leone',
+        ],
         'SLL' => [
             'SLL',
-            'sierraleonsk leone',
+            'sierraleonsk leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

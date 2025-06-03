@@ -28,10 +28,9 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
 {
     private \PDO $conn;
     private string $dsn;
-    private string $username = '';
-    private string $password = '';
+    private ?string $username = null;
+    private ?string $password = null;
     private array $connectionOptions = [];
-    private static array $storeRegistry = [];
 
     /**
      * You can either pass an existing database connection as PDO instance or
@@ -53,7 +52,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
     {
         if ($connOrDsn instanceof \PDO) {
             if (\PDO::ERRMODE_EXCEPTION !== $connOrDsn->getAttribute(\PDO::ATTR_ERRMODE)) {
-                throw new InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION)).', __METHOD__));
+                throw new InvalidArgumentException(\sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION)).', __METHOD__));
             }
 
             $this->conn = $connOrDsn;
@@ -67,10 +66,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         // prevent concurrency within the same connection
         $this->getInternalStore()->save($key);
@@ -102,10 +98,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         throw new LockConflictedException();
     }
 
-    /**
-     * @return void
-     */
-    public function saveRead(Key $key)
+    public function saveRead(Key $key): void
     {
         // prevent concurrency within the same connection
         $this->getInternalStore()->saveRead($key);
@@ -138,10 +131,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         throw new LockConflictedException();
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         // postgresql locks forever.
         // check if lock still exists
@@ -150,10 +140,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         }
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         // Prevent deleting locks own by an other key in the same connection
         if (!$this->exists($key)) {
@@ -181,7 +168,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         $stmt = $this->getConnection()->prepare($sql);
 
         $stmt->bindValue(':key', $this->getHashedKey($key));
-        $result = $stmt->execute();
+        $stmt->execute();
 
         if ($stmt->fetchColumn() > 0) {
             // connection is locked, check for lock in internal store
@@ -191,10 +178,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         return false;
     }
 
-    /**
-     * @return void
-     */
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         // prevent concurrency within the same connection
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
@@ -217,10 +201,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         $this->unlockShared($key);
     }
 
-    /**
-     * @return void
-     */
-    public function waitAndSaveRead(Key $key)
+    public function waitAndSaveRead(Key $key): void
     {
         // prevent concurrency within the same connection
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
@@ -295,14 +276,14 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
     private function checkDriver(): void
     {
         if ('pgsql' !== $driver = $this->conn->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
-            throw new InvalidArgumentException(sprintf('The adapter "%s" does not support the "%s" driver.', __CLASS__, $driver));
+            throw new InvalidArgumentException(\sprintf('The adapter "%s" does not support the "%s" driver.', __CLASS__, $driver));
         }
     }
 
     private function getInternalStore(): SharedLockStoreInterface
     {
-        $namespace = spl_object_hash($this->getConnection());
+        static $storeRegistry = new \WeakMap();
 
-        return self::$storeRegistry[$namespace] ??= new InMemoryStore();
+        return $storeRegistry[$this->getConnection()] ??= new InMemoryStore();
     }
 }

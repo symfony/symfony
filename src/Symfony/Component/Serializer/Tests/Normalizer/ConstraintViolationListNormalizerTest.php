@@ -50,23 +50,23 @@ class ConstraintViolationListNormalizerTest extends TestCase
             'detail' => 'd: a
 4: 1',
             'violations' => [
-                    [
-                        'propertyPath' => 'd',
-                        'title' => 'a',
-                        'template' => 'b',
-                        'type' => 'urn:uuid:f',
-                        'parameters' => [
-                            'value' => 'foo',
-                        ],
-                    ],
-                    [
-                        'propertyPath' => '4',
-                        'title' => '1',
-                        'template' => '2',
-                        'type' => 'urn:uuid:6',
-                        'parameters' => [],
+                [
+                    'propertyPath' => 'd',
+                    'title' => 'a',
+                    'template' => 'b',
+                    'type' => 'urn:uuid:f',
+                    'parameters' => [
+                        'value' => 'foo',
                     ],
                 ],
+                [
+                    'propertyPath' => '4',
+                    'title' => '1',
+                    'template' => '2',
+                    'type' => 'urn:uuid:6',
+                    'parameters' => [],
+                ],
+            ],
         ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($list));
@@ -116,7 +116,7 @@ error',
     /**
      * @dataProvider payloadFieldsProvider
      */
-    public function testNormalizePayloadFields($fields, array $expected = null)
+    public function testNormalizePayloadFields($fields, ?array $expected = null)
     {
         $constraint = new NotNull();
         $constraint->payload = ['severity' => 'warning', 'anotherField2' => 'aValue'];

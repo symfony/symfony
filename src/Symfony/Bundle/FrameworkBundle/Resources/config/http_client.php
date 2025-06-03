@@ -39,6 +39,7 @@ return static function (ContainerConfigurator $container) {
             ->factory('current')
             ->args([[service('http_client.transport')]])
             ->tag('http_client.client')
+            ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
 
         ->alias(HttpClientInterface::class, 'http_client')
 
@@ -59,8 +60,6 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->alias(HttpAsyncClient::class, 'httplug.http_client')
-        ->alias(\Http\Client\HttpClient::class, 'httplug.http_client')
-            ->deprecate('symfony/framework-bundle', '6.3', 'The "%alias_id%" service is deprecated, use "'.ClientInterface::class.'" instead.')
 
         ->set('http_client.abstract_retry_strategy', GenericRetryStrategy::class)
             ->abstract()

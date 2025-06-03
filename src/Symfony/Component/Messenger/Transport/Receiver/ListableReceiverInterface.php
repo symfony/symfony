@@ -29,7 +29,7 @@ interface ListableReceiverInterface extends ReceiverInterface
      *
      * @return Envelope[]|iterable
      */
-    public function all(int $limit = null): iterable;
+    public function all(?int $limit = null): iterable;
 
     /**
      * Returns the Envelope by id or none.

@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection as DbalConnection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -24,17 +25,15 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  */
-class DoctrineTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface
+class DoctrineTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface, KeepaliveReceiverInterface
 {
-    private Connection $connection;
-    private SerializerInterface $serializer;
     private DoctrineReceiver $receiver;
     private DoctrineSender $sender;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer)
-    {
-        $this->connection = $connection;
-        $this->serializer = $serializer;
+    public function __construct(
+        private Connection $connection,
+        private SerializerInterface $serializer,
+    ) {
     }
 
     public function get(): iterable
@@ -52,12 +51,17 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
         $this->getReceiver()->reject($envelope);
     }
 
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        $this->getReceiver()->keepalive($envelope, $seconds);
+    }
+
     public function getMessageCount(): int
     {
         return $this->getReceiver()->getMessageCount();
     }
 
-    public function all(int $limit = null): iterable
+    public function all(?int $limit = null): iterable
     {
         return $this->getReceiver()->all($limit);
     }
@@ -79,13 +83,9 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
 
     /**
      * Adds the Table to the Schema if this transport uses this connection.
-     *
-     * @param \Closure $isSameDatabase
      */
-    public function configureSchema(Schema $schema, DbalConnection $forConnection/* , \Closure $isSameDatabase */): void
+    public function configureSchema(Schema $schema, DbalConnection $forConnection, \Closure $isSameDatabase): void
     {
-        $isSameDatabase = 2 < \func_num_args() ? func_get_arg(2) : static fn () => false;
-
         $this->connection->configureSchema($schema, $forConnection, $isSameDatabase);
     }
 

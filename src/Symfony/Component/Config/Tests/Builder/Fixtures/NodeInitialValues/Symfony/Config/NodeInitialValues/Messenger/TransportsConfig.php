@@ -16,6 +16,9 @@ class TransportsConfig
     private $_usedProperties = [];
 
     /**
+     * The DSN to use. This is a required option.
+     * The info is used to describe the DSN,
+     * it can be multi-line.
      * @default null
      * @param ParamConfigurator|mixed $value
      * @return $this

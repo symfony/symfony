@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class StoreTest extends TestCase
@@ -41,7 +40,7 @@ class StoreTest extends TestCase
 
     public function testReadsAnEmptyArrayWithReadWhenNothingCachedAtKey()
     {
-        $this->assertEmpty($this->getStoreMetadata('/nothing'));
+        $this->assertSame([], $this->getStoreMetadata('/nothing'));
     }
 
     public function testUnlockFileThatDoesExist()
@@ -66,7 +65,7 @@ class StoreTest extends TestCase
         $this->assertNotEmpty($metadata);
 
         $this->assertTrue($this->store->purge('/foo'));
-        $this->assertEmpty($this->getStoreMetadata($request));
+        $this->assertSame([], $this->getStoreMetadata($request));
 
         // cached content should be kept after purging
         $path = $this->store->getPath($metadata[0][1]['x-content-digest'][0]);
@@ -292,7 +291,7 @@ class StoreTest extends TestCase
         $this->assertNotEmpty($this->getStoreMetadata($request));
 
         $this->assertTrue($this->store->purge('https://example.com/foo'));
-        $this->assertEmpty($this->getStoreMetadata($request));
+        $this->assertSame([], $this->getStoreMetadata($request));
     }
 
     public function testPurgeHttpAndHttps()
@@ -307,8 +306,8 @@ class StoreTest extends TestCase
         $this->assertNotEmpty($this->getStoreMetadata($requestHttps));
 
         $this->assertTrue($this->store->purge('http://example.com/foo'));
-        $this->assertEmpty($this->getStoreMetadata($requestHttp));
-        $this->assertEmpty($this->getStoreMetadata($requestHttps));
+        $this->assertSame([], $this->getStoreMetadata($requestHttp));
+        $this->assertSame([], $this->getStoreMetadata($requestHttps));
     }
 
     public function testDoesNotStorePrivateHeaders()

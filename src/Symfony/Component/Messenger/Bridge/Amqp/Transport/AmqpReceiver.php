@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -28,11 +29,11 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
-    private Connection $connection;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
@@ -52,6 +53,16 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
     {
         try {
             $amqpEnvelope = $this->connection->get($queueName);
+        } catch (\AMQPConnectionException) {
+            // Try to reconnect once to accommodate need for one of the nodes in cluster needing to stop serving the
+            // traffic. This may happen for example when one of the nodes in cluster is going into maintenance node.
+            // see https://github.com/php-amqplib/php-amqplib/issues/1161
+            try {
+                $this->connection->queue($queueName)->getConnection()->reconnect();
+                $amqpEnvelope = $this->connection->get($queueName);
+            } catch (\AMQPException $exception) {
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            }
         } catch (\AMQPException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -74,6 +85,12 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
             throw $exception;
         }
 
+        if (null !== $amqpEnvelope->getMessageId()) {
+            $envelope = $envelope
+                ->withoutAll(TransportMessageIdStamp::class)
+                ->with(new TransportMessageIdStamp($amqpEnvelope->getMessageId()));
+        }
+
         yield $envelope->with(new AmqpReceivedStamp($amqpEnvelope, $queueName));
     }
 
@@ -82,10 +99,16 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
         try {
             $stamp = $this->findAmqpStamp($envelope);
 
-            $this->connection->ack(
-                $stamp->getAmqpEnvelope(),
-                $stamp->getQueueName()
-            );
+            $this->connection->ack($stamp->getAmqpEnvelope(), $stamp->getQueueName());
+        } catch (\AMQPConnectionException) {
+            try {
+                $stamp = $this->findAmqpStamp($envelope);
+
+                $this->connection->queue($stamp->getQueueName())->getConnection()->reconnect();
+                $this->connection->ack($stamp->getAmqpEnvelope(), $stamp->getQueueName());
+            } catch (\AMQPException $exception) {
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            }
         } catch (\AMQPException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -114,6 +137,13 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
     {
         try {
             $this->connection->nack($amqpEnvelope, $queueName, \AMQP_NOPARAM);
+        } catch (\AMQPConnectionException) {
+            try {
+                $this->connection->queue($queueName)->getConnection()->reconnect();
+                $this->connection->nack($amqpEnvelope, $queueName, \AMQP_NOPARAM);
+            } catch (\AMQPException $exception) {
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            }
         } catch (\AMQPException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

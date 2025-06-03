@@ -14,22 +14,24 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\SentForRetryStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  */
-class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterface
+class BeanstalkdReceiver implements KeepaliveReceiverInterface, MessageCountAwareInterface
 {
-    private Connection $connection;
     private SerializerInterface $serializer;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
@@ -47,12 +49,20 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
                 'headers' => $beanstalkdEnvelope['headers'],
             ]);
         } catch (MessageDecodingFailedException $exception) {
-            $this->connection->reject($beanstalkdEnvelope['id']);
+            $this->connection->reject(
+                $beanstalkdEnvelope['id'],
+                $this->connection->getMessagePriority($beanstalkdEnvelope['id']),
+            );
 
             throw $exception;
         }
 
-        return [$envelope->with(new BeanstalkdReceivedStamp($beanstalkdEnvelope['id'], $this->connection->getTube()))];
+        return [$envelope
+            ->withoutAll(TransportMessageIdStamp::class)
+            ->with(
+                new BeanstalkdReceivedStamp($beanstalkdEnvelope['id'], $this->connection->getTube()),
+                new TransportMessageIdStamp($beanstalkdEnvelope['id']),
+            )];
     }
 
     public function ack(Envelope $envelope): void
@@ -62,7 +72,16 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
 
     public function reject(Envelope $envelope): void
     {
-        $this->connection->reject($this->findBeanstalkdReceivedStamp($envelope)->getId());
+        $this->connection->reject(
+            $this->findBeanstalkdReceivedStamp($envelope)->getId(),
+            $envelope->last(BeanstalkdPriorityStamp::class)?->priority,
+            $envelope->last(SentForRetryStamp::class)?->isSent ?? false,
+        );
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        $this->connection->keepalive($this->findBeanstalkdReceivedStamp($envelope)->getId());
     }
 
     public function getMessageCount(): int

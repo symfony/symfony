@@ -79,7 +79,7 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    public function getApplicationDocument(Application $application, string $namespace = null, bool $short = false): \DOMDocument
+    public function getApplicationDocument(Application $application, ?string $namespace = null, bool $short = false): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($rootXml = $dom->createElement('symfony'));
@@ -208,11 +208,9 @@ class XmlDescriptor extends Descriptor
             $defaults = \is_array($option->getDefault()) ? $option->getDefault() : (\is_bool($option->getDefault()) ? [var_export($option->getDefault(), true)] : ($option->getDefault() ? [$option->getDefault()] : []));
             $objectXML->appendChild($defaultsXML = $dom->createElement('defaults'));
 
-            if (!empty($defaults)) {
-                foreach ($defaults as $default) {
-                    $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
-                    $defaultXML->appendChild($dom->createTextNode($default));
-                }
+            foreach ($defaults as $default) {
+                $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
+                $defaultXML->appendChild($dom->createTextNode($default));
             }
         }
 

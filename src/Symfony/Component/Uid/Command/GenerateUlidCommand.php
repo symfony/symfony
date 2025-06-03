@@ -25,12 +25,9 @@ use Symfony\Component\Uid\Factory\UlidFactory;
 #[AsCommand(name: 'ulid:generate', description: 'Generate a ULID')]
 class GenerateUlidCommand extends Command
 {
-    private UlidFactory $factory;
-
-    public function __construct(UlidFactory $factory = null)
-    {
-        $this->factory = $factory ?? new UlidFactory();
-
+    public function __construct(
+        private UlidFactory $factory = new UlidFactory(),
+    ) {
         parent::__construct();
     }
 
@@ -40,7 +37,7 @@ class GenerateUlidCommand extends Command
             ->setDefinition([
                 new InputOption('time', null, InputOption::VALUE_REQUIRED, 'The ULID timestamp: a parsable date/time string'),
                 new InputOption('count', 'c', InputOption::VALUE_REQUIRED, 'The number of ULID to generate', 1),
-                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, sprintf('The ULID output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'base32'),
+                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, \sprintf('The ULID output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'base32'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command generates a ULID.
@@ -71,7 +68,7 @@ EOF
             try {
                 $time = new \DateTimeImmutable($time);
             } catch (\Exception $e) {
-                $io->error(sprintf('Invalid timestamp "%s": %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
+                $io->error(\sprintf('Invalid timestamp "%s": %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
 
                 return 1;
             }
@@ -79,10 +76,10 @@ EOF
 
         $formatOption = $input->getOption('format');
 
-        if (\in_array($formatOption, $this->getAvailableFormatOptions())) {
+        if (\in_array($formatOption, $this->getAvailableFormatOptions(), true)) {
             $format = 'to'.ucfirst($formatOption);
         } else {
-            $io->error(sprintf('Invalid format "%s", supported formats are "%s".', $formatOption, implode('", "', $this->getAvailableFormatOptions())));
+            $io->error(\sprintf('Invalid format "%s", supported formats are "%s".', $formatOption, implode('", "', $this->getAvailableFormatOptions())));
 
             return 1;
         }
@@ -108,6 +105,7 @@ EOF
         }
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return [

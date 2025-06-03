@@ -13,10 +13,10 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\UriSigner;
 
 /**
  * Handles content fragments represented by special URIs.
@@ -33,16 +33,13 @@ use Symfony\Component\HttpKernel\UriSigner;
  */
 class FragmentListener implements EventSubscriberInterface
 {
-    private UriSigner $signer;
-    private string $fragmentPath;
-
     /**
      * @param string $fragmentPath The path that triggers this listener
      */
-    public function __construct(UriSigner $signer, string $fragmentPath = '/_fragment')
-    {
-        $this->signer = $signer;
-        $this->fragmentPath = $fragmentPath;
+    public function __construct(
+        private UriSigner $signer,
+        private string $fragmentPath = '/_fragment',
+    ) {
     }
 
     /**
@@ -70,6 +67,7 @@ class FragmentListener implements EventSubscriberInterface
         }
 
         parse_str($request->query->get('_path', ''), $attributes);
+        $attributes['_check_controller_is_allowed'] = true;
         $request->attributes->add($attributes);
         $request->attributes->set('_route_params', array_replace($request->attributes->get('_route_params', []), $attributes));
         $request->query->remove('_path');

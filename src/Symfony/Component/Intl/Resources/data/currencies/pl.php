@@ -528,7 +528,7 @@ return [
         ],
         'LSL' => [
             'LSL',
-            'loti lesotyjskie',
+            'loti sotyjskie',
         ],
         'LTL' => [
             'LTL',
@@ -802,9 +802,13 @@ return [
             'SKK',
             'korona słowacka',
         ],
+        'SLE' => [
+            'SLE',
+            'leone sierraleoński',
+        ],
         'SLL' => [
             'SLL',
-            'leone sierraleoński',
+            'leone sierraleoński (1964—2022)',
         ],
         'SOS' => [
             'SOS',

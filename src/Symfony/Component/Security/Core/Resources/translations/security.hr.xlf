@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="hr" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target>Previše neuspjelih pokušaja prijave, molim pokušajte ponovo za %minutes% minutu.|Previše neuspjelih pokušaja prijave, molim pokušajte ponovo za %minutes% minute.|Previše neuspjelih pokušaja prijave, molim pokušajte ponovo za %minutes% minuta.</target>
+                <target>Previše neuspjelih pokušaja prijave, pokušajte ponovo za %minutes% minutu.|Previše neuspjelih pokušaja prijave, pokušajte ponovo za %minutes% minute.|Previše neuspjelih pokušaja prijave, pokušajte ponovo za %minutes% minuta.</target>
             </trans-unit>
         </body>
     </file>

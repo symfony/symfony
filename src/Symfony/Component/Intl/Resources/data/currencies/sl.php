@@ -116,7 +116,7 @@ return [
         ],
         'BHD' => [
             'BHD',
-            'bahranski dinar',
+            'bahrajnski dinar',
         ],
         'BIF' => [
             'BIF',
@@ -432,7 +432,7 @@ return [
         ],
         'HTG' => [
             'HTG',
-            'haitski gurd',
+            'haitijski gurd',
         ],
         'HUF' => [
             'HUF',
@@ -584,11 +584,11 @@ return [
         ],
         'MDL' => [
             'MDL',
-            'moldavijski leu',
+            'moldavski lev',
         ],
         'MGA' => [
             'MGA',
-            'malgaški ariarij',
+            'madagaskarski ariari',
         ],
         'MGF' => [
             'MGF',
@@ -612,7 +612,7 @@ return [
         ],
         'MOP' => [
             'MOP',
-            'makavska pataka',
+            'macajska pataka',
         ],
         'MRO' => [
             'MRO',
@@ -684,7 +684,7 @@ return [
         ],
         'NIO' => [
             'NIO',
-            'nikaraška zlata kordova',
+            'nikaragovska kordova',
         ],
         'NLG' => [
             'NLG',
@@ -736,7 +736,7 @@ return [
         ],
         'PLN' => [
             'PLN',
-            'poljski novi zlot',
+            'poljski zlot',
         ],
         'PLZ' => [
             'PLZ',
@@ -764,7 +764,7 @@ return [
         ],
         'RON' => [
             'RON',
-            'romunski leu',
+            'romunski lev',
         ],
         'RSD' => [
             'RSD',
@@ -826,9 +826,13 @@ return [
             'SKK',
             'slovaška krona',
         ],
+        'SLE' => [
+            'SLE',
+            'sierraleonski leone',
+        ],
         'SLL' => [
             'SLL',
-            'sieraleonski leone',
+            'sierraleonski leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',
@@ -852,7 +856,7 @@ return [
         ],
         'STN' => [
             'STN',
-            'saotomejska dobra',
+            'dobra Svetega Tomaža in Princa',
         ],
         'SUR' => [
             'SUR',
@@ -868,7 +872,7 @@ return [
         ],
         'SZL' => [
             'SZL',
-            'svazijski lilangeni',
+            'esvatinski lilangeni',
         ],
         'THB' => [
             'THB',
@@ -888,7 +892,7 @@ return [
         ],
         'TMT' => [
             'TMT',
-            'turkmenistanski novi manat',
+            'turkmenistanski manat',
         ],
         'TND' => [
             'TND',
@@ -908,7 +912,7 @@ return [
         ],
         'TRY' => [
             'TRY',
-            'nova turška lira',
+            'turška lira',
         ],
         'TTD' => [
             'TTD',
@@ -988,7 +992,7 @@ return [
         ],
         'XAF' => [
             'FCFA',
-            'CFA frank BEAC',
+            'srednjeafriški frank CFA',
         ],
         'XCD' => [
             'XCD',
@@ -1012,7 +1016,7 @@ return [
         ],
         'XPF' => [
             'CFPF',
-            'CFP frank',
+            'frank CFP',
         ],
         'YDD' => [
             'YDD',

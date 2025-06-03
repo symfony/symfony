@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
@@ -27,8 +27,6 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class HttpCacheTest extends HttpCacheTestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
     {
         $storeMock = $this->getMockBuilder(StoreInterface::class)
@@ -37,7 +35,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         // does not implement TerminableInterface
         $kernel = new TestKernel();
-        $httpCache = new HttpCache($kernel, $storeMock, null, ['terminate_on_cache_hit' => false]);
+        $httpCache = new HttpCache($kernel, $storeMock);
         $httpCache->terminate(Request::create('/'), new Response());
 
         $this->assertFalse($kernel->terminateCalled, 'terminate() is never called if the kernel class does not implement TerminableInterface');
@@ -51,7 +49,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $kernelMock->expects($this->once())
             ->method('terminate');
 
-        $kernel = new HttpCache($kernelMock, $storeMock, null, ['terminate_on_cache_hit' => false]);
+        $kernel = new HttpCache($kernelMock, $storeMock);
         $kernel->terminate(Request::create('/'), new Response());
     }
 
@@ -101,58 +99,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertCount(1, $terminateEvents);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDoesCallTerminateOnFreshResponseIfConfigured()
-    {
-        $this->expectDeprecation('Since symfony/http-kernel 6.2: Setting "terminate_on_cache_hit" to "true" is deprecated and will be changed to "false" in Symfony 7.0.');
-
-        $terminateEvents = [];
-
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher
-            ->expects($this->any())
-            ->method('dispatch')
-            ->with($this->callback(function ($event) use (&$terminateEvents) {
-                if ($event instanceof TerminateEvent) {
-                    $terminateEvents[] = $event;
-                }
-
-                return true;
-            }));
-
-        $this->setNextResponse(
-            200,
-            [
-                'ETag' => '1234',
-                'Cache-Control' => 'public, s-maxage=60',
-            ],
-            'Hello World',
-            null,
-            $eventDispatcher
-        );
-        $this->cacheConfig['terminate_on_cache_hit'] = true;
-
-        $this->request('GET', '/');
-        $this->assertHttpKernelIsCalled();
-        $this->assertEquals(200, $this->response->getStatusCode());
-        $this->assertTraceContains('miss');
-        $this->assertTraceContains('store');
-        $this->cache->terminate($this->request, $this->response);
-
-        sleep(2);
-
-        $this->request('GET', '/');
-        $this->assertHttpKernelIsNotCalled();
-        $this->assertEquals(200, $this->response->getStatusCode());
-        $this->assertTraceContains('fresh');
-        $this->assertEquals(2, $this->response->headers->get('Age'));
-        $this->cache->terminate($this->request, $this->response);
-
-        $this->assertCount(2, $terminateEvents);
-    }
-
     public function testPassesOnNonGetHeadRequests()
     {
         $this->setNextResponse(200);
@@ -160,6 +106,17 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertHttpKernelIsCalled();
         $this->assertResponseOk();
         $this->assertTraceContains('pass');
+        $this->assertFalse($this->response->headers->has('Age'));
+    }
+
+    public function testPassesSuspiciousMethodRequests()
+    {
+        $this->setNextResponse(200);
+        $this->request('POST', '/', ['HTTP_X-HTTP-Method-Override' => '__CONSTRUCT']);
+        $this->assertHttpKernelIsCalled();
+        $this->assertResponseOk();
+        $this->assertTraceNotContains('stale');
+        $this->assertTraceNotContains('invalid');
         $this->assertFalse($this->response->headers->has('Age'));
     }
 
@@ -239,7 +196,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
         $this->assertEquals('', $this->response->headers->get('Content-Type'));
-        $this->assertEmpty($this->response->getContent());
+        $this->assertSame('', $this->response->getContent());
         $this->assertTraceContains('miss');
         $this->assertTraceContains('store');
     }
@@ -253,7 +210,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals(304, $this->response->getStatusCode());
         $this->assertEquals('', $this->response->headers->get('Content-Type'));
         $this->assertTrue($this->response->headers->has('ETag'));
-        $this->assertEmpty($this->response->getContent());
+        $this->assertSame('', $this->response->getContent());
         $this->assertTraceContains('miss');
         $this->assertTraceContains('store');
     }
@@ -319,7 +276,7 @@ class HttpCacheTest extends HttpCacheTestCase
             if ($request->cookies->has('authenticated')) {
                 $response->headers->set('Cache-Control', 'private, no-store');
                 $response->setETag('"private tag"');
-                if (\in_array('"private tag"', $etags)) {
+                if (\in_array('"private tag"', $etags, true)) {
                     $response->setStatusCode(304);
                 } else {
                     $response->setStatusCode(200);
@@ -329,7 +286,7 @@ class HttpCacheTest extends HttpCacheTestCase
             } else {
                 $response->headers->set('Cache-Control', 'public');
                 $response->setETag('"public tag"');
-                if (\in_array('"public tag"', $etags)) {
+                if (\in_array('"public tag"', $etags, true)) {
                     $response->setStatusCode(304);
                 } else {
                     $response->setStatusCode(200);
@@ -706,6 +663,7 @@ class HttpCacheTest extends HttpCacheTestCase
          */
         sleep(10);
 
+        $this->store = $this->createStore(); // create another store instance that does not hold the current lock
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
         $this->assertEquals(200, $this->response->getStatusCode());
@@ -722,6 +680,32 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertHttpKernelIsNotCalled();
         $this->assertEquals(503, $this->response->getStatusCode());
         $this->assertEquals('Old response', $this->response->getContent());
+    }
+
+    public function testTraceAddedWhenCacheLocked()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        // Disable stale-while-revalidate, which circumvents blocking access
+        $this->cacheConfig['stale_while_revalidate'] = 0;
+
+        // The presence of Last-Modified makes this cacheable
+        $this->setNextResponse(200, ['Cache-Control' => 'public, no-cache', 'Last-Modified' => 'some while ago'], 'Old response');
+        $this->request('GET', '/'); // warm the cache
+
+        $primedStore = $this->store;
+
+        $this->store = $this->createMock(Store::class);
+        $this->store->method('lookup')->willReturnCallback(fn (Request $request) => $primedStore->lookup($request));
+        // Assume the cache is locked at the first attempt, but immediately treat the lock as released afterwards
+        $this->store->method('lock')->willReturnOnConsecutiveCalls(false, true);
+        $this->store->method('isLocked')->willReturn(false);
+
+        $this->request('GET', '/');
+
+        $this->assertTraceContains('waiting');
     }
 
     public function testHitsCachedResponseWithSMaxAgeDirective()
@@ -1325,8 +1309,177 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->request('HEAD', '/', [], [], true);
 
-        $this->assertEmpty($this->response->getContent());
+        $this->assertSame('', $this->response->getContent());
         $this->assertEquals(100, $this->response->getTtl());
+    }
+
+    public function testEsiCacheIncludesEmbeddedResponseContentWhenMainResponseFailsRevalidationAndEmbeddedResponseIsFresh()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0', // goes stale immediately
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:00:00 +0000',
+                ],
+            ],
+            [
+                'status' => 200,
+                'body' => 'embedded',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=10', // stays fresh
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:05:00 +0000',
+                ],
+            ],
+        ]);
+
+        // prime the cache
+        $this->request('GET', '/', [], [], true);
+        $this->assertSame(200, $this->response->getStatusCode());
+        $this->assertSame('main embedded', $this->response->getContent());
+        $this->assertSame('Mon, 12 Aug 2024 10:05:00 +0000', $this->response->getLastModified()->format(\DATE_RFC2822)); // max of both values
+
+        $this->setNextResponses([
+            [
+                // On the next request, the main response has an updated Last-Modified (main page was modified)...
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:10:00 +0000',
+                ],
+            ],
+            // no revalidation request happens for the embedded response, since it is still fresh
+        ]);
+
+        // Re-request with Last-Modified time that we received when the cache was primed
+        $this->request('GET', '/', ['HTTP_IF_MODIFIED_SINCE' => 'Mon, 12 Aug 2024 10:05:00 +0000'], [], true);
+
+        $this->assertSame(200, $this->response->getStatusCode());
+
+        // The cache should use the content ("embedded") from the cached entry
+        $this->assertSame('main embedded', $this->response->getContent());
+
+        $traces = $this->cache->getTraces();
+        $this->assertSame(['stale', 'invalid', 'store'], $traces['GET /']);
+
+        // The embedded resource was still fresh
+        $this->assertSame(['fresh'], $traces['GET /foo']);
+    }
+
+    public function testEsiCacheIncludesEmbeddedResponseContentWhenMainResponseFailsRevalidationAndEmbeddedResponseIsValid()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0', // goes stale immediately
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:00:00 +0000',
+                ],
+            ],
+            [
+                'status' => 200,
+                'body' => 'embedded',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0', // goes stale immediately
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:05:00 +0000',
+                ],
+            ],
+        ]);
+
+        // prime the cache
+        $this->request('GET', '/', [], [], true);
+        $this->assertSame(200, $this->response->getStatusCode());
+        $this->assertSame('main embedded', $this->response->getContent());
+        $this->assertSame('Mon, 12 Aug 2024 10:05:00 +0000', $this->response->getLastModified()->format(\DATE_RFC2822)); // max of both values
+
+        $this->setNextResponses([
+            [
+                // On the next request, the main response has an updated Last-Modified (main page was modified)...
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:10:00 +0000',
+                ],
+            ],
+            [
+                // We have a stale cache entry for the embedded response which will be revalidated.
+                // Let's assume the resource did not change, so the controller sends a 304 without content body.
+                'status' => 304,
+                'body' => '',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=0',
+                ],
+            ],
+        ]);
+
+        // Re-request with Last-Modified time that we received when the cache was primed
+        $this->request('GET', '/', ['HTTP_IF_MODIFIED_SINCE' => 'Mon, 12 Aug 2024 10:05:00 +0000'], [], true);
+
+        $this->assertSame(200, $this->response->getStatusCode());
+
+        // The cache should use the content ("embedded") from the cached entry
+        $this->assertSame('main embedded', $this->response->getContent());
+
+        $traces = $this->cache->getTraces();
+        $this->assertSame(['stale', 'invalid', 'store'], $traces['GET /']);
+
+        // Check that the embedded resource was successfully revalidated
+        $this->assertSame(['stale', 'valid', 'store'], $traces['GET /foo']);
+    }
+
+    public function testEsiCacheIncludesEmbeddedResponseContentWhenMainAndEmbeddedResponseAreFresh()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'main <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=10',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:05:00 +0000',
+                ],
+            ],
+            [
+                'status' => 200,
+                'body' => 'embedded',
+                'headers' => [
+                    'Cache-Control' => 's-maxage=10',
+                    'Last-Modified' => 'Mon, 12 Aug 2024 10:00:00 +0000',
+                ],
+            ],
+        ]);
+
+        // prime the cache
+        $this->request('GET', '/', [], [], true);
+        $this->assertSame(200, $this->response->getStatusCode());
+        $this->assertSame('main embedded', $this->response->getContent());
+        $this->assertSame('Mon, 12 Aug 2024 10:05:00 +0000', $this->response->getLastModified()->format(\DATE_RFC2822));
+
+        // Assume that a client received 'Mon, 12 Aug 2024 10:00:00 +0000' as last-modified information in the past. This may, for example,
+        // be the case when the "main" response at that point had an older Last-Modified time, so the embedded response's Last-Modified time
+        // governed the result for the combined response. In other words, the client received a Last-Modified time that still validates the
+        // embedded response as of now, but no longer matches the Last-Modified time of the "main" resource.
+        // Now this client does a revalidation request.
+        $this->request('GET', '/', ['HTTP_IF_MODIFIED_SINCE' => 'Mon, 12 Aug 2024 10:00:00 +0000'], [], true);
+
+        $this->assertSame(200, $this->response->getStatusCode());
+
+        // The cache should use the content ("embedded") from the cached entry
+        $this->assertSame('main embedded', $this->response->getContent());
+
+        $traces = $this->cache->getTraces();
+        $this->assertSame(['fresh'], $traces['GET /']);
+
+        // Check that the embedded resource was successfully revalidated
+        $this->assertSame(['fresh'], $traces['GET /foo']);
     }
 
     public function testEsiCacheForceValidation()
@@ -1385,7 +1538,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         // The response has been assembled from expiration and validation based resources
         // This can neither be cached nor revalidated, so it should be private/no cache
-        $this->assertEmpty($this->response->getContent());
+        $this->assertSame('', $this->response->getContent());
         $this->assertNull($this->response->getTtl());
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
@@ -1443,7 +1596,7 @@ class HttpCacheTest extends HttpCacheTestCase
         // in decimal number of OCTETs, sent to the recipient or, in the case of the HEAD
         // method, the size of the entity-body that would have been sent had the request
         // been a GET."
-        $this->assertEmpty($this->response->getContent());
+        $this->assertSame('', $this->response->getContent());
         $this->assertEquals(12, $this->response->headers->get('Content-Length'));
     }
 
@@ -1567,7 +1720,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->setNextResponses($responses);
 
         $this->request('HEAD', '/', [], [], true);
-        $this->assertEmpty($this->response->getContent());
+        $this->assertSame('', $this->response->getContent());
         $this->assertNull($this->response->getETag());
         $this->assertNull($this->response->getLastModified());
     }

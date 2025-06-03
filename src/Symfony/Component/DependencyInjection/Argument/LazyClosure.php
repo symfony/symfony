@@ -36,7 +36,7 @@ class LazyClosure
     public function __get(mixed $name): mixed
     {
         if ('service' !== $name) {
-            throw new InvalidArgumentException(sprintf('Cannot read property "%s" from a lazy closure.', $name));
+            throw new InvalidArgumentException(\sprintf('Cannot read property "%s" from a lazy closure.', $name));
         }
 
         if (isset($this->initializer)) {
@@ -61,17 +61,17 @@ class LazyClosure
         $r = $container->getReflectionClass($class);
 
         if (null !== $id) {
-            $id = sprintf(' for service "%s"', $id);
+            $id = \sprintf(' for service "%s"', $id);
         }
 
         if (!$asClosure) {
             $id = str_replace('%', '%%', (string) $id);
 
             if (!$r || !$r->isInterface()) {
-                throw new RuntimeException(sprintf("Cannot create adapter{$id} because \"%s\" is not an interface.", $class));
+                throw new RuntimeException(\sprintf("Cannot create adapter{$id} because \"%s\" is not an interface.", $class));
             }
             if (1 !== \count($method = $r->getMethods())) {
-                throw new RuntimeException(sprintf("Cannot create adapter{$id} because interface \"%s\" doesn't have exactly one method.", $class));
+                throw new RuntimeException(\sprintf("Cannot create adapter{$id} because interface \"%s\" doesn't have exactly one method.", $class));
             }
             $method = $method[0]->name;
         } elseif (!$r || !$r->hasMethod($method)) {

@@ -15,6 +15,7 @@ use Symfony\Bridge\Monolog\Handler\NotifierHandler;
 use Symfony\Component\Notifier\Channel\BrowserChannel;
 use Symfony\Component\Notifier\Channel\ChannelPolicy;
 use Symfony\Component\Notifier\Channel\ChatChannel;
+use Symfony\Component\Notifier\Channel\DesktopChannel;
 use Symfony\Component\Notifier\Channel\EmailChannel;
 use Symfony\Component\Notifier\Channel\PushChannel;
 use Symfony\Component\Notifier\Channel\SmsChannel;
@@ -24,6 +25,7 @@ use Symfony\Component\Notifier\EventListener\NotificationLoggerListener;
 use Symfony\Component\Notifier\EventListener\SendFailedMessageToNotifierListener;
 use Symfony\Component\Notifier\FlashMessage\DefaultFlashMessageImportanceMapper;
 use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\Notifier\Message\DesktopMessage;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Messenger\MessageHandler;
@@ -73,8 +75,18 @@ return static function (ContainerConfigurator $container) {
             ->tag('notifier.channel', ['channel' => 'email'])
 
         ->set('notifier.channel.push', PushChannel::class)
-            ->args([service('texter.transports'), service('messenger.default_bus')->ignoreOnInvalid()])
+            ->args([
+                service('texter.transports'),
+                abstract_arg('message bus'),
+            ])
             ->tag('notifier.channel', ['channel' => 'push'])
+
+        ->set('notifier.channel.desktop', DesktopChannel::class)
+            ->args([
+                service('texter.transports'),
+                abstract_arg('message bus'),
+            ])
+            ->tag('notifier.channel', ['channel' => 'desktop'])
 
         ->set('notifier.monolog_handler', NotifierHandler::class)
             ->args([service('notifier')])
@@ -128,9 +140,12 @@ return static function (ContainerConfigurator $container) {
 
         ->set('notifier.notification_logger_listener', NotificationLoggerListener::class)
             ->tag('kernel.event_subscriber')
-
-        ->alias('notifier.logger_notification_listener', 'notifier.notification_logger_listener')
-            ->deprecate('symfony/framework-bundle', '6.3', 'The "%alias_id%" service is deprecated, use "notifier.notification_logger_listener" instead.')
-
     ;
+
+    if (class_exists(DesktopMessage::class)) {
+        $container->services()
+            ->set('texter.messenger.desktop_handler', MessageHandler::class)
+                ->args([service('texter.transports')])
+                ->tag('messenger.message_handler', ['handles' => DesktopMessage::class]);
+    }
 };

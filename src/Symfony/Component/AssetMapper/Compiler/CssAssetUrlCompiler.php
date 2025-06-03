@@ -12,10 +12,10 @@
 namespace Symfony\Component\AssetMapper\Compiler;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\AssetMapper\AssetDependency;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\MappedAsset;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Resolves url() paths in CSS files.
@@ -24,8 +24,6 @@ use Symfony\Component\AssetMapper\MappedAsset;
  */
 final class CssAssetUrlCompiler implements AssetCompilerInterface
 {
-    use AssetCompilerPathResolverTrait;
-
     // https://regex101.com/r/BOJ3vG/1
     public const ASSET_URL_PATTERN = '/url\(\s*["\']?(?!(?:\/|\#|%23|data|http|\/\/))([^"\'\s?#)]+)([#?][^"\')]+)?\s*["\']?\)/';
 
@@ -37,25 +35,56 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
-        return preg_replace_callback(self::ASSET_URL_PATTERN, function ($matches) use ($asset, $assetMapper) {
+        preg_match_all('/\/\*|\*\//', $content, $commentMatches, \PREG_OFFSET_CAPTURE);
+
+        $start = null;
+        $commentBlocks = [];
+        foreach ($commentMatches[0] as $match) {
+            if ('/*' === $match[0]) {
+                $start = $match[1];
+            } elseif ($start) {
+                $commentBlocks[] = [$start, $match[1]];
+                $start = null;
+            }
+        }
+
+        return preg_replace_callback(self::ASSET_URL_PATTERN, function ($matches) use ($asset, $assetMapper, $commentBlocks) {
+            $matchPos = $matches[0][1];
+
+            // Ignore matchs inside comments
+            foreach ($commentBlocks as $block) {
+                if ($matchPos > $block[0]) {
+                    if ($matchPos < $block[1]) {
+                        return $matches[0][0];
+                    }
+                    break;
+                }
+            }
+
             try {
-                $resolvedPath = $this->resolvePath(\dirname($asset->logicalPath), $matches[1]);
+                $resolvedSourcePath = Path::join(\dirname($asset->sourcePath), $matches[1]);
             } catch (RuntimeException $e) {
-                $this->handleMissingImport(sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
+                $this->handleMissingImport(\sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
 
                 return $matches[0];
             }
-            $dependentAsset = $assetMapper->getAsset($resolvedPath);
+            $dependentAsset = $assetMapper->getAssetFromSourcePath($resolvedSourcePath);
 
             if (null === $dependentAsset) {
-                $this->handleMissingImport(sprintf('Unable to find asset "%s" referenced in "%s".', $matches[1], $asset->sourcePath));
+                $message = \sprintf('Unable to find asset "%s" referenced in "%s". The file "%s" ', $matches[1], $asset->sourcePath, $resolvedSourcePath);
+                if (is_file($resolvedSourcePath)) {
+                    $message .= 'exists, but it is not in a mapped asset path. Add it to the "paths" config.';
+                } else {
+                    $message .= 'does not exist.';
+                }
+                $this->handleMissingImport($message);
 
                 // return original, unchanged path
                 return $matches[0];
             }
 
-            $asset->addDependency(new AssetDependency($dependentAsset));
-            $relativePath = $this->createRelativePath($asset->publicPathWithoutDigest, $dependentAsset->publicPath);
+            $asset->addDependency($dependentAsset);
+            $relativePath = Path::makeRelative($dependentAsset->publicPath, \dirname($asset->publicPathWithoutDigest));
 
             return 'url("'.$relativePath.'")';
         }, $content);
@@ -66,7 +95,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
         return 'css' === $asset->publicExtension;
     }
 
-    private function handleMissingImport(string $message, \Throwable $e = null): void
+    private function handleMissingImport(string $message, ?\Throwable $e = null): void
     {
         match ($this->missingImportMode) {
             AssetCompilerInterface::MISSING_IMPORT_IGNORE => null,

@@ -16,6 +16,8 @@ use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @group legacy
  */
 class TypeTest extends TestCase
 {
@@ -75,7 +77,7 @@ class TypeTest extends TestCase
         $this->assertTrue($firstValueType->isCollection());
         $this->assertEquals(Type::BUILTIN_TYPE_ARRAY, $secondValueType->getBuiltinType());
         $this->assertFalse($secondValueType->isNullable());
-        $this->assertTrue($firstValueType->isCollection());
+        $this->assertTrue($secondValueType->isCollection());
     }
 
     public function testInvalidCollectionValueArgument()

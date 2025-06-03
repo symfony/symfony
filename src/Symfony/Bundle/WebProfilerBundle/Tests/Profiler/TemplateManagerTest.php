@@ -30,8 +30,6 @@ class TemplateManagerTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->profiler = $this->createMock(Profiler::class);
         $twigEnvironment = $this->mockTwigEnvironment();
         $templates = [

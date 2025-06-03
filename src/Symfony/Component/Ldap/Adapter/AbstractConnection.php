@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractConnection implements ConnectionInterface
 {
-    protected $config;
+    protected array $config;
 
     public function __construct(array $config = [])
     {
@@ -30,10 +30,7 @@ abstract class AbstractConnection implements ConnectionInterface
         $this->config = $resolver->resolve($config);
     }
 
-    /**
-     * @return void
-     */
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'host' => 'localhost',
@@ -45,7 +42,7 @@ abstract class AbstractConnection implements ConnectionInterface
 
         $resolver->setDefault('port', fn (Options $options) => 'ssl' === $options['encryption'] ? 636 : 389);
 
-        $resolver->setDefault('connection_string', fn (Options $options) => sprintf('ldap%s://%s:%s', 'ssl' === $options['encryption'] ? 's' : '', $options['host'], $options['port']));
+        $resolver->setDefault('connection_string', fn (Options $options) => \sprintf('ldap%s://%s:%s', 'ssl' === $options['encryption'] ? 's' : '', $options['host'], $options['port']));
 
         $resolver->setAllowedTypes('host', 'string');
         $resolver->setAllowedTypes('port', 'numeric');

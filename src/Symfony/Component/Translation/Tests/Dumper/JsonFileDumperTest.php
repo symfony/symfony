@@ -24,7 +24,7 @@ class JsonFileDumperTest extends TestCase
 
         $dumper = new JsonFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/resources.json', $dumper->formatCatalogue($catalogue, 'messages'));
+        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/resources.json', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 
     public function testDumpWithCustomEncoding()
@@ -34,6 +34,6 @@ class JsonFileDumperTest extends TestCase
 
         $dumper = new JsonFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/resources.dump.json', $dumper->formatCatalogue($catalogue, 'messages', ['json_encoding' => \JSON_HEX_QUOT]));
+        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/resources.dump.json', $dumper->formatCatalogue($catalogue, 'messages', ['json_encoding' => \JSON_HEX_QUOT]));
     }
 }

@@ -24,7 +24,7 @@ class PrototypedArrayNodeTest extends TestCase
         $node = new PrototypedArrayNode('root');
         $prototype = new ArrayNode(null, $node);
         $node->setPrototype($prototype);
-        $this->assertEmpty($node->getDefaultValue());
+        $this->assertSame([], $node->getDefaultValue());
     }
 
     public function testGetDefaultValueReturnsDefaultValueForPrototypes()
@@ -291,51 +291,51 @@ class PrototypedArrayNodeTest extends TestCase
         $variableValue = new VariableNode('value');
 
         return [
-           [
-               $scalarValue,
-               [
-                   ['id' => 'option1', 'value' => 'value1'],
-               ],
-               ['option1' => 'value1'],
-           ],
+            [
+                $scalarValue,
+                [
+                    ['id' => 'option1', 'value' => 'value1'],
+                ],
+                ['option1' => 'value1'],
+            ],
 
-           [
-               $scalarValue,
-               [
-                   ['id' => 'option1', 'value' => 'value1'],
-                   ['id' => 'option2', 'value' => 'value2', 'foo' => 'foo2'],
-               ],
-               [
-                   'option1' => 'value1',
-                   'option2' => ['value' => 'value2', 'foo' => 'foo2'],
-               ],
-           ],
+            [
+                $scalarValue,
+                [
+                    ['id' => 'option1', 'value' => 'value1'],
+                    ['id' => 'option2', 'value' => 'value2', 'foo' => 'foo2'],
+                ],
+                [
+                    'option1' => 'value1',
+                    'option2' => ['value' => 'value2', 'foo' => 'foo2'],
+                ],
+            ],
 
-           [
-               $arrayValue,
-               [
-                   [
-                       'id' => 'option1',
-                       'value' => ['foo' => 'foo1', 'bar' => 'bar1'],
-                   ],
-               ],
-               [
-                   'option1' => ['foo' => 'foo1', 'bar' => 'bar1'],
-               ],
-           ],
+            [
+                $arrayValue,
+                [
+                    [
+                        'id' => 'option1',
+                        'value' => ['foo' => 'foo1', 'bar' => 'bar1'],
+                    ],
+                ],
+                [
+                    'option1' => ['foo' => 'foo1', 'bar' => 'bar1'],
+                ],
+            ],
 
-           [$variableValue,
-               [
-                   [
-                       'id' => 'option1', 'value' => ['foo' => 'foo1', 'bar' => 'bar1'],
-                   ],
-                   ['id' => 'option2', 'value' => 'value2'],
-               ],
-               [
-                   'option1' => ['foo' => 'foo1', 'bar' => 'bar1'],
-                   'option2' => 'value2',
-               ],
-           ],
+            [$variableValue,
+                [
+                    [
+                        'id' => 'option1', 'value' => ['foo' => 'foo1', 'bar' => 'bar1'],
+                    ],
+                    ['id' => 'option2', 'value' => 'value2'],
+                ],
+                [
+                    'option1' => ['foo' => 'foo1', 'bar' => 'bar1'],
+                    'option2' => 'value2',
+                ],
+            ],
         ];
     }
 

@@ -257,7 +257,7 @@ class MailjetApiTransportTest extends TestCase
             ->text('foobar');
 
         $this->expectExceptionObject(
-            new HttpTransportException(sprintf('Unable to send an email: "%s" malformed api response.', $json), $response)
+            new HttpTransportException(\sprintf('Unable to send an email: "%s" malformed api response.', $json), $response)
         );
 
         $transport->send($email);
@@ -369,8 +369,8 @@ class MailjetApiTransportTest extends TestCase
                         'CustomCampaign' => 'SendAPI_campaign',
                         'DeduplicateCampaign' => true,
                         'Priority' => 2,
-                        'TrackClick' => 'account_default',
-                        'TrackOpen' => 'account_default',
+                        'TrackClicks' => 'account_default',
+                        'TrackOpens' => 'account_default',
                     ],
                 ],
                 'SandBoxMode' => false,
@@ -421,8 +421,8 @@ class MailjetApiTransportTest extends TestCase
                         'CustomCampaign' => 'SendAPI_campaign',
                         'DeduplicateCampaign' => true,
                         'Priority' => 2,
-                        'TrackClick' => 'account_default',
-                        'TrackOpen' => 'account_default',
+                        'TrackClicks' => 'account_default',
+                        'TrackOpens' => 'account_default',
                     ],
                 ],
                 'SandBoxMode' => true,

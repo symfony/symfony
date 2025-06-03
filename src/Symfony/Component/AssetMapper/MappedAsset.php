@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\AssetMapper;
 
+use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
+
 /**
  * Represents a single asset in the asset mapper system.
  *
@@ -22,34 +24,34 @@ final class MappedAsset
     public readonly string $publicPath;
     public readonly string $publicPathWithoutDigest;
     public readonly string $publicExtension;
-    public readonly string $content;
+
+    /**
+     * The final content of this asset if different from the sourcePath.
+     *
+     * If null, the content should be read from the sourcePath.
+     */
+    public readonly ?string $content;
+
     public readonly string $digest;
     public readonly bool $isPredigested;
 
     /**
-     * @var AssetDependency[]
-     */
-    private array $dependencies = [];
-
-    /**
-     * @var string[]
-     */
-    private array $fileDependencies = [];
-
-    /**
-     * @param AssetDependency[] $dependencies
-     * @param string[]          $fileDependencies
+     * @param MappedAsset[]      $dependencies      assets that the content of this asset depends on
+     * @param string[]           $fileDependencies  files that the content of this asset depends on
+     * @param JavaScriptImport[] $javaScriptImports
      */
     public function __construct(
         public readonly string $logicalPath,
-        string $sourcePath = null,
-        string $publicPathWithoutDigest = null,
-        string $publicPath = null,
-        string $content = null,
-        string $digest = null,
-        bool $isPredigested = null,
-        array $dependencies = [],
-        array $fileDependencies = [],
+        ?string $sourcePath = null,
+        ?string $publicPathWithoutDigest = null,
+        ?string $publicPath = null,
+        ?string $content = null,
+        ?string $digest = null,
+        ?bool $isPredigested = null,
+        public readonly bool $isVendor = false,
+        private array $dependencies = [],
+        private array $fileDependencies = [],
+        private array $javaScriptImports = [],
     ) {
         if (null !== $sourcePath) {
             $this->sourcePath = $sourcePath;
@@ -61,34 +63,28 @@ final class MappedAsset
             $this->publicPathWithoutDigest = $publicPathWithoutDigest;
             $this->publicExtension = pathinfo($publicPathWithoutDigest, \PATHINFO_EXTENSION);
         }
-        if (null !== $content) {
-            $this->content = $content;
-        }
+        $this->content = $content;
         if (null !== $digest) {
             $this->digest = $digest;
         }
         if (null !== $isPredigested) {
             $this->isPredigested = $isPredigested;
         }
-        foreach ($dependencies as $dependency) {
-            $this->addDependency($dependency);
-        }
-        foreach ($fileDependencies as $fileDependency) {
-            $this->addFileDependency($fileDependency);
-        }
     }
 
     /**
-     * @return AssetDependency[]
+     * Assets that the content of this asset depends on - for internal caching.
+     *
+     * @return MappedAsset[]
      */
     public function getDependencies(): array
     {
         return $this->dependencies;
     }
 
-    public function addDependency(AssetDependency $assetDependency): void
+    public function addDependency(self $asset): void
     {
-        $this->dependencies[] = $assetDependency;
+        $this->dependencies[] = $asset;
     }
 
     /**
@@ -102,5 +98,18 @@ final class MappedAsset
     public function addFileDependency(string $sourcePath): void
     {
         $this->fileDependencies[] = $sourcePath;
+    }
+
+    /**
+     * @return JavaScriptImport[]
+     */
+    public function getJavaScriptImports(): array
+    {
+        return $this->javaScriptImports;
+    }
+
+    public function addJavaScriptImport(JavaScriptImport $import): void
+    {
+        $this->javaScriptImports[] = $import;
     }
 }

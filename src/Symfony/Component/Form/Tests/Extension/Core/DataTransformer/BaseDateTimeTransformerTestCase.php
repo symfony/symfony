@@ -31,5 +31,5 @@ abstract class BaseDateTimeTransformerTestCase extends TestCase
         $this->createDateTimeTransformer(null, 'that_timezone_does_not_exist');
     }
 
-    abstract protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer;
+    abstract protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer;
 }

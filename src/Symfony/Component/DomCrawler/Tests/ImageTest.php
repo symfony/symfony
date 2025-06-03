@@ -50,7 +50,7 @@ class ImageTest extends TestCase
     public function testGetUri($url, $currentUri, $expected)
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML(sprintf('<html><img alt="foo" src="%s" /></html>', $url));
+        $dom->loadHTML(\sprintf('<html><img alt="foo" src="%s" /></html>', $url));
         $image = new Image($dom->getElementsByTagName('img')->item(0), $currentUri);
 
         $this->assertEquals($expected, $image->getUri());

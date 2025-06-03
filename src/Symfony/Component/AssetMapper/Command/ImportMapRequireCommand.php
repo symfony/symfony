@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\AssetMapper\Command;
 
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -23,18 +23,25 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
-#[AsCommand(name: 'importmap:require', description: 'Requires JavaScript packages')]
+#[AsCommand(name: 'importmap:require', description: 'Require JavaScript packages')]
 final class ImportMapRequireCommand extends Command
 {
+    use VersionProblemCommandTrait;
+
     public function __construct(
         private readonly ImportMapManager $importMapManager,
-        private readonly AssetMapperInterface $assetMapper,
-        private readonly string $projectDir,
+        private readonly ImportMapVersionChecker $importMapVersionChecker,
+        private readonly ?string $projectDir = null,
     ) {
+        if (null === $projectDir) {
+            trigger_deprecation('symfony/asset-mapper', '7.3', 'The "%s()" method will have a new `string $projectDir` argument in version 8.0, not defining it is deprecated.', __METHOD__);
+        }
+
         parent::__construct();
     }
 
@@ -42,33 +49,25 @@ final class ImportMapRequireCommand extends Command
     {
         $this
             ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to add')
-            ->addOption('download', 'd', InputOption::VALUE_NONE, 'Download packages locally')
-            ->addOption('preload', 'p', InputOption::VALUE_NONE, 'Preload packages')
+            ->addOption('entrypoint', null, InputOption::VALUE_NONE, 'Make the packages an entrypoint?')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The local path where the package lives relative to the project root')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simulate the installation of the packages')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command adds packages to <comment>importmap.php</comment> usually
 by finding a CDN URL for the given package and version.
 
 For example:
 
-    <info>php %command.full_name% lodash --preload</info>
+    <info>php %command.full_name% lodash</info>
     <info>php %command.full_name% "lodash@^4.15"</info>
 
 You can also require specific paths of a package:
 
     <info>php %command.full_name% "chart.js/auto"</info>
 
-Or download one package/file, but alias its name in your import map:
+Or require one package/file, but alias its name in your import map:
 
     <info>php %command.full_name% "vue/dist/vue.esm-bundler.js=vue"</info>
-
-The <info>preload</info> option will set the <info>preload</info> option in the importmap,
-which will tell the browser to preload the package. This should be used for all
-critical packages that are needed on page load.
-
-The <info>download</info> option will download the package locally and point the
-importmap to it. Use this if you want to avoid using a CDN or if you want to
-ensure that the package is available even if the CDN is down.
 
 Sometimes, a package may require other packages and multiple new items may be added
 to the import map.
@@ -77,6 +76,15 @@ You can also require multiple packages at once:
 
     <info>php %command.full_name% "lodash@^4.15" "@hotwired/stimulus"</info>
 
+To add an importmap entry pointing to a local file, use the <info>path</info> option:
+
+    <info>php %command.full_name% "any_module_name" --path=./assets/some_file.js</info>
+
+To simulate the installation, use the <info>--dry-run</info> option:
+
+    <info>php %command.full_name% "any_module_name" --dry-run -v</info>
+
+When this option is enabled, this command does not perform any write operations to the filesystem.
 EOT
             );
     }
@@ -95,22 +103,17 @@ EOT
             }
 
             $path = $input->getOption('path');
-            if (!is_file($path)) {
-                $path = $this->projectDir.'/'.$path;
+        }
 
-                if (!is_file($path)) {
-                    $io->error(sprintf('The path "%s" does not exist.', $input->getOption('path')));
-
-                    return Command::FAILURE;
-                }
-            }
+        if ($input->getOption('dry-run')) {
+            $io->writeln(['', '<comment>[DRY-RUN]</comment> No changes will apply to the importmap configuration.', '']);
         }
 
         $packages = [];
         foreach ($packageList as $packageName) {
             $parts = ImportMapManager::parsePackageName($packageName);
             if (null === $parts) {
-                $io->error(sprintf('Package "%s" is not a valid package name format. Use the format PACKAGE@VERSION - e.g. "lodash" or "lodash@^4"', $packageName));
+                $io->error(\sprintf('Package "%s" is not a valid package name format. Use the format PACKAGE@VERSION - e.g. "lodash" or "lodash@^4"', $packageName));
 
                 return Command::FAILURE;
             }
@@ -118,49 +121,50 @@ EOT
             $packages[] = new PackageRequireOptions(
                 $parts['package'],
                 $parts['version'] ?? null,
-                $input->getOption('download'),
-                $input->getOption('preload'),
-                $parts['alias'] ?? $parts['package'],
-                isset($parts['registry']) && $parts['registry'] ? $parts['registry'] : null,
+                $parts['alias'] ?? null,
                 $path,
+                $input->getOption('entrypoint'),
             );
         }
 
-        if ($input->getOption('download')) {
-            $io->warning(sprintf('The --download option is experimental. It should work well with the default %s provider but check your browser console for 404 errors.', ImportMapManager::PROVIDER_JSDELIVR_ESM));
-        }
-
-        $newPackages = $this->importMapManager->require($packages);
-        if (1 === \count($newPackages)) {
-            $newPackage = $newPackages[0];
-            $message = sprintf('Package "%s" added to importmap.php', $newPackage->importName);
-
-            if ($newPackage->isDownloaded && null !== $downloadedAsset = $this->assetMapper->getAsset($newPackage->path)) {
-                $application = $this->getApplication();
-                if ($application instanceof Application) {
-                    $projectDir = $application->getKernel()->getProjectDir();
-                    $downloadedPath = $downloadedAsset->sourcePath;
-                    if (str_starts_with($downloadedPath, $projectDir)) {
-                        $downloadedPath = substr($downloadedPath, \strlen($projectDir) + 1);
-                    }
-
-                    $message .= sprintf(' and downloaded locally to "%s"', $downloadedPath);
-                }
-            }
-
-            $message .= '.';
+        if ($input->getOption('dry-run')) {
+            $newPackages = $this->importMapManager->requirePackages($packages, new ImportMapEntries());
         } else {
-            $names = array_map(fn (ImportMapEntry $package) => $package->importName, $newPackages);
-            $message = sprintf('%d new packages (%s) added to the importmap.php!', \count($newPackages), implode(', ', $names));
+            $newPackages = $this->importMapManager->require($packages);
         }
 
-        $messages = [$message];
+        $this->renderVersionProblems($this->importMapVersionChecker, $output);
+
+        $newPackageNames = array_map(fn (ImportMapEntry $package): string => $package->importName, $newPackages);
 
         if (1 === \count($newPackages)) {
-            $messages[] = sprintf('Use the new package normally by importing "%s".', $newPackages[0]->importName);
+            $messages = [\sprintf('Package "%s" added to importmap.php.', $newPackageNames[0])];
+        } else {
+            $messages = [\sprintf('%d new items (%s) added to the importmap.php!', \count($newPackages), implode(', ', $newPackageNames))];
+        }
+
+        if ($io->isVerbose()) {
+            $io->table(
+                ['Package', 'Version', 'Path'],
+                array_map(fn (ImportMapEntry $package): array => [
+                    $package->importName,
+                    $package->version ?? '-',
+                    // BC layer for AssetMapper < 7.3
+                    // When `projectDir` is not null, we use the absolute path of the package
+                    null !== $this->projectDir ? Path::makeRelative($package->path, $this->projectDir) : $package->path,
+                ], $newPackages),
+            );
+        }
+
+        if (1 === \count($newPackages)) {
+            $messages[] = \sprintf('Use the new package normally by importing "%s".', $newPackages[0]->importName);
         }
 
         $io->success($messages);
+
+        if ($input->getOption('dry-run')) {
+            $io->writeln(['<comment>[DRY-RUN]</comment> No changes applied to the importmap configuration.', '']);
+        }
 
         return Command::SUCCESS;
     }

@@ -2,25 +2,9 @@
 
 return [
     'Names' => [
-        'BDT' => [
-            'BDT',
-            'taka bangladesí',
-        ],
         'BTN' => [
             'BTN',
             'ngultrum butanés',
-        ],
-        'KGS' => [
-            'KGS',
-            'som kirguís',
-        ],
-        'KHR' => [
-            'KHR',
-            'riel camboyano',
-        ],
-        'LAK' => [
-            'LAK',
-            'kip laosiano',
         ],
         'MRO' => [
             'MRU',
@@ -28,7 +12,7 @@ return [
         ],
         'MRU' => [
             'UM',
-            'uguiya',
+            'uguiya mauritano',
         ],
         'MVR' => [
             'MVR',
@@ -38,17 +22,9 @@ return [
             '$',
             'peso mexicano',
         ],
-        'STN' => [
-            'STN',
-            'dobra santotomense',
-        ],
         'THB' => [
             'THB',
             'baht tailandés',
-        ],
-        'VND' => [
-            'VND',
-            'dong vietnamita',
         ],
         'ZMW' => [
             'ZMW',

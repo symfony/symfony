@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Test\HttpClientAssertionsTrait;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -70,7 +71,7 @@ class NoTemplatingEntryKernel extends Kernel
                 'form' => ['enabled' => false],
             ];
 
-            if (Kernel::VERSION_ID >= 60400) {
+            if (trait_exists(HttpClientAssertionsTrait::class)) {
                 $config['handle_all_throwables'] = true;
             }
 

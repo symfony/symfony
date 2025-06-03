@@ -36,16 +36,21 @@ final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorIn
         private string $prefix = '',
     ) {
         if (!class_exists(ParserFactory::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s" as the "nikic/php-parser" package is not installed. Try running "composer require nikic/php-parser".', static::class));
+            throw new \LogicException(\sprintf('You cannot use "%s" as the "nikic/php-parser" package is not installed. Try running "composer require nikic/php-parser".', static::class));
         }
 
-        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $this->parser = (new ParserFactory())->createForHostVersion();
     }
 
     public function extract(iterable|string $resource, MessageCatalogue $catalogue): void
     {
         foreach ($this->extractFiles($resource) as $file) {
             $traverser = new NodeTraverser();
+
+            // This is needed to resolve namespaces in class methods/constants.
+            $nameResolver = new NodeVisitor\NameResolver();
+            $traverser->addVisitor($nameResolver);
+
             /** @var AbstractVisitor&NodeVisitor $visitor */
             foreach ($this->visitors as $visitor) {
                 $visitor->initialize($catalogue, $file, $this->prefix);
@@ -72,7 +77,7 @@ final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorIn
     protected function extractFromDirectory(array|string $resource): iterable|Finder
     {
         if (!class_exists(Finder::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s" as the "symfony/finder" package is not installed. Try running "composer require symfony/finder".', static::class));
+            throw new \LogicException(\sprintf('You cannot use "%s" as the "symfony/finder" package is not installed. Try running "composer require symfony/finder".', static::class));
         }
 
         return (new Finder())->files()->name('*.php')->in($resource);

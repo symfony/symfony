@@ -1,0 +1,11 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    http_method_override: false
+    type_info: true
+
+services:
+    type_info.resolver.alias:
+        alias: type_info.resolver
+        public: true

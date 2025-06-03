@@ -115,9 +115,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         $symbolNamePairs = array_map(fn ($pair) => \array_slice(iterator_to_array($pair), 0, 2), iterator_to_array($rootBundle['Currencies']));
 
         // Remove unwanted currencies
-        $symbolNamePairs = array_diff_key($symbolNamePairs, self::DENYLIST);
-
-        return $symbolNamePairs;
+        return array_diff_key($symbolNamePairs, self::DENYLIST);
     }
 
     private function generateCurrencyMeta(ArrayAccessibleResourceBundle $supplementalDataBundle): array
@@ -134,9 +132,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         asort($alpha3ToNumericMapping);
 
         // Filter unknown currencies (e.g. "AYM")
-        $alpha3ToNumericMapping = array_intersect_key($alpha3ToNumericMapping, array_flip($currencyCodes));
-
-        return $alpha3ToNumericMapping;
+        return array_intersect_key($alpha3ToNumericMapping, array_flip($currencyCodes));
     }
 
     private function generateNumericToAlpha3Mapping(array $alpha3ToNumericMapping): array

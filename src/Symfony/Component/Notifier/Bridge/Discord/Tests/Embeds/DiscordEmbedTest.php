@@ -45,7 +45,7 @@ final class DiscordEmbedTest extends TestCase
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the title is 256 characters.');
 
-        (new DiscordEmbed())->title(str_repeat('h', 257));
+        (new DiscordEmbed())->title(str_repeat('š', 257));
     }
 
     public function testThrowsWhenDescriptionExceedsCharacterLimit()
@@ -53,7 +53,7 @@ final class DiscordEmbedTest extends TestCase
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the description is 4096 characters.');
 
-        (new DiscordEmbed())->description(str_repeat('h', 4097));
+        (new DiscordEmbed())->description(str_repeat('š', 4097));
     }
 
     public function testThrowsWhenFieldsLimitReached()

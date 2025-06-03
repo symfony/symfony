@@ -171,7 +171,7 @@ class JsonResponseTest extends TestCase
 
     public function testConstructorWithObjectWithToStringMethod()
     {
-        $class = new class() {
+        $class = new class {
             public function __toString(): string
             {
                 return '{}';
@@ -189,6 +189,14 @@ class JsonResponseTest extends TestCase
         $this->expectExceptionMessage('If $json is set to true, argument $data must be a string or object implementing __toString(), "stdClass" given.');
 
         new JsonResponse(new \stdClass(), 200, [], true);
+    }
+
+    public function testSetDataWithNull()
+    {
+        $response = new JsonResponse();
+        $response->setData(null);
+
+        $this->assertSame('null', $response->getContent());
     }
 }
 

@@ -137,8 +137,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTestCase
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Aborted.');
-        $dialog = new SymfonyQuestionHelper();
-        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
+        (new SymfonyQuestionHelper())->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
     }
 
     public function testChoiceQuestionPadding()

@@ -21,18 +21,20 @@ class CheckDefinitionValidityPassTest extends TestCase
 {
     public function testProcessDetectsSyntheticNonPublicDefinitions()
     {
-        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(true)->setPublic(false);
+
+        $this->expectException(RuntimeException::class);
 
         $this->process($container);
     }
 
     public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
     {
-        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(false)->setAbstract(false);
+
+        $this->expectException(RuntimeException::class);
 
         $this->process($container);
     }
@@ -92,10 +94,12 @@ class CheckDefinitionValidityPassTest extends TestCase
      */
     public function testInvalidTags(string $name, array $attributes, string $message)
     {
-        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage($message);
         $container = new ContainerBuilder();
         $container->register('a', 'class')->addTag($name, $attributes);
+
+        $this->expectException(RuntimeException::class);
+
         $this->process($container);
     }
 
@@ -104,37 +108,39 @@ class CheckDefinitionValidityPassTest extends TestCase
         $message = 'A "tags" attribute must be of a scalar-type for service "a", tag "%s", attribute "%s".';
         yield 'object attribute value' => [
             'foo',
-            ['bar' => new class() {}],
-            sprintf($message, 'foo', 'bar'),
+            ['bar' => new class {}],
+            \sprintf($message, 'foo', 'bar'),
         ];
         yield 'nested object attribute value' => [
             'foo',
-            ['bar' => ['baz' => new class() {}]],
-            sprintf($message, 'foo', 'bar.baz'),
+            ['bar' => ['baz' => new class {}]],
+            \sprintf($message, 'foo', 'bar.baz'),
         ];
         yield 'deeply nested object attribute value' => [
             'foo',
-            ['bar' => ['baz' => ['qux' => new class() {}]]],
-            sprintf($message, 'foo', 'bar.baz.qux'),
+            ['bar' => ['baz' => ['qux' => new class {}]]],
+            \sprintf($message, 'foo', 'bar.baz.qux'),
         ];
     }
 
     public function testDynamicPublicServiceName()
     {
-        $this->expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->register("foo.$env", 'class')->setPublic(true);
+
+        $this->expectException(EnvParameterException::class);
 
         $this->process($container);
     }
 
     public function testDynamicPublicAliasName()
     {
-        $this->expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->setAlias("foo.$env", 'class')->setPublic(true);
+
+        $this->expectException(EnvParameterException::class);
 
         $this->process($container);
     }

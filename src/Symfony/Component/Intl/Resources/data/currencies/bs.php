@@ -680,7 +680,7 @@ return [
         ],
         'MRU' => [
             'MRU',
-            'Mauritanijska ugvija',
+            'mauritanijska ugvija',
         ],
         'MTL' => [
             'MTL',
@@ -886,9 +886,13 @@ return [
             'SKK',
             'Slovačka kruna',
         ],
+        'SLE' => [
+            'SLE',
+            'Sijeraleonski leone',
+        ],
         'SLL' => [
             'SLL',
-            'Sijeraleonski leone',
+            'Sijeraleonski leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

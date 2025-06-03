@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class IntegerTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\IntegerType';
+    public const TESTED_TYPE = IntegerType::class;
 
     private string $previousLocale;
 

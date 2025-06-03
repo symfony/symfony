@@ -19,11 +19,32 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class CompoundTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testItCannotRedefineConstraintsOption()
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('You can\'t redefine the "constraints" option. Use the "Symfony\Component\Validator\Constraints\Compound::getConstraints()" method instead.');
         new EmptyCompound(['constraints' => [new NotBlank()]]);
+    }
+
+    public function testGroupsAndPayload()
+    {
+        $payload = new \stdClass();
+        $compound = new EmptyCompound(groups: ['my-group', 'my-other-group'], payload: $payload);
+
+        $this->assertSame(['my-group', 'my-other-group'], $compound->groups);
+        $this->assertSame($payload, $compound->payload);
+    }
+
+    public function testGroupsAndPayloadInOptionsArray()
+    {
+        $payload = new \stdClass();
+        $compound = new EmptyCompound(['groups' => ['my-group', 'my-other-group'], 'payload' => $payload]);
+
+        $this->assertSame(['my-group', 'my-other-group'], $compound->groups);
+        $this->assertSame($payload, $compound->payload);
     }
 
     public function testCanDependOnNormalizedOptions()
@@ -54,7 +75,7 @@ class ForwardingOptionCompound extends Compound
     protected function getConstraints(array $options): array
     {
         return [
-            new Length(['min' => $options['min'] ?? null]),
+            new Length(min: $options['min'] ?? null),
         ];
     }
 }

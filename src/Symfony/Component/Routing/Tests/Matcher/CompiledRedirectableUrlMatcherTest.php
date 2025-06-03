@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class CompiledRedirectableUrlMatcherTest extends RedirectableUrlMatcherTest
 {
-    protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
+    protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)
     {
         $dumper = new CompiledUrlMatcherDumper($routes);
         $compiledRoutes = $dumper->getCompiledRoutes();
@@ -33,7 +33,7 @@ class CompiledRedirectableUrlMatcherTest extends RedirectableUrlMatcherTest
 
 class TestCompiledRedirectableUrlMatcher extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface
 {
-    public function redirect(string $path, string $route, string $scheme = null): array
+    public function redirect(string $path, string $route, ?string $scheme = null): array
     {
         return [];
     }

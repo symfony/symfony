@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 
 #[DiscriminatorMap(typeProperty: 'type', mapping: [
     'first' => AbstractDummyFirstChild::class,
     'second' => AbstractDummySecondChild::class,
     'third' => AbstractDummyThirdChild::class,
-])]
+], defaultType: 'third')]
 abstract class AbstractDummy
 {
     public $foo;

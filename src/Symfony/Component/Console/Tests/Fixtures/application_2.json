@@ -33,13 +33,22 @@
                         "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
+                    "silent": {
+                        "name": "--silent",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
                     "quiet": {
                         "name": "--quiet",
                         "shortcut": "-q",
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Do not output any message",
+                        "description": "Only errors are displayed. All other output is suppressed",
                         "default": false
                     },
                     "verbose": {
@@ -154,13 +163,22 @@
                         "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
+                    "silent": {
+                        "name": "--silent",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
                     "quiet": {
                         "name": "--quiet",
                         "shortcut": "-q",
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Do not output any message",
+                        "description": "Only errors are displayed. All other output is suppressed",
                         "default": false
                     },
                     "verbose": {
@@ -266,13 +284,22 @@
                         "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
+                    "silent": {
+                        "name": "--silent",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
                     "quiet": {
                         "name": "--quiet",
                         "shortcut": "-q",
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Do not output any message",
+                        "description": "Only errors are displayed. All other output is suppressed",
                         "default": false
                     },
                     "verbose": {
@@ -369,13 +396,22 @@
                         "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
+                    "silent": {
+                        "name": "--silent",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
                     "quiet": {
                         "name": "--quiet",
                         "shortcut": "-q",
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Do not output any message",
+                        "description": "Only errors are displayed. All other output is suppressed",
                         "default": false
                     },
                     "verbose": {
@@ -457,13 +493,22 @@
                         "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
+                    "silent": {
+                        "name": "--silent",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
                     "quiet": {
                         "name": "--quiet",
                         "shortcut": "-q",
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Do not output any message",
+                        "description": "Only errors are displayed. All other output is suppressed",
                         "default": false
                     },
                     "verbose": {
@@ -553,13 +598,22 @@
                         "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
+                    "silent": {
+                        "name": "--silent",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
                     "quiet": {
                         "name": "--quiet",
                         "shortcut": "-q",
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Do not output any message",
+                        "description": "Only errors are displayed. All other output is suppressed",
                         "default": false
                     },
                     "verbose": {
@@ -630,13 +684,22 @@
                         "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
+                    "silent": {
+                        "name": "--silent",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
                     "quiet": {
                         "name": "--quiet",
                         "shortcut": "-q",
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Do not output any message",
+                        "description": "Only errors are displayed. All other output is suppressed",
                         "default": false
                     },
                     "verbose": {
@@ -709,13 +772,22 @@
                         "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
                         "default": false
                     },
+                    "silent": {
+                        "name": "--silent",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
                     "quiet": {
                         "name": "--quiet",
                         "shortcut": "-q",
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Do not output any message",
+                        "description": "Only errors are displayed. All other output is suppressed",
                         "default": false
                     },
                     "verbose": {

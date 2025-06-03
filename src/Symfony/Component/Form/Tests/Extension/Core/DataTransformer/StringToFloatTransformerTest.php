@@ -71,7 +71,7 @@ class StringToFloatTransformerTest extends TestCase
     /**
      * @dataProvider provideReverseTransformations
      */
-    public function testReverseTransform($from, $to, int $scale = null)
+    public function testReverseTransform($from, $to, ?int $scale = null)
     {
         $transformer = new StringToFloatTransformer($scale);
 

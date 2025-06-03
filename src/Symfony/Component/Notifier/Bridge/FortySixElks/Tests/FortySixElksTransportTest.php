@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class FortySixElksTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): FortySixElksTransport
+    public static function createTransport(?HttpClientInterface $client = null): FortySixElksTransport
     {
         return new FortySixElksTransport('api_username', 'api_password', 'Symfony', $client ?? new MockHttpClient());
     }

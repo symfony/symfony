@@ -25,7 +25,7 @@ class CacheAttributeListenerTest extends AbstractWebTestCase
     {
         $client = self::createClient(['test_case' => 'CacheAttributeListener']);
 
-        $client->request('GET', '/', server: ['HTTP_IF_NONE_MATCH' => sprintf('"%s"', hash('sha256', '12345'))]);
+        $client->request('GET', '/', server: ['HTTP_IF_NONE_MATCH' => \sprintf('"%s"', hash('sha256', '12345'))]);
 
         self::assertTrue($client->getResponse()->isRedirect('http://localhost/login'));
     }
@@ -44,7 +44,7 @@ class CacheAttributeListenerTest extends AbstractWebTestCase
         $client = self::createClient(['test_case' => 'CacheAttributeListener']);
 
         $client->loginUser(new InMemoryUser('the-username', 'the-password', ['ROLE_USER']));
-        $client->request('GET', '/', server: ['HTTP_IF_NONE_MATCH' => sprintf('"%s"', hash('sha256', '12345'))]);
+        $client->request('GET', '/', server: ['HTTP_IF_NONE_MATCH' => \sprintf('"%s"', hash('sha256', '12345'))]);
 
         $response = $client->getResponse();
 

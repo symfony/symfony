@@ -530,9 +530,13 @@ return [
             'SHP',
             'Paun Saint Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone Sierra Leone',
+        ],
         'SLL' => [
             'SLL',
-            'Leone Sierra Leone',
+            'Leone Sierra Leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

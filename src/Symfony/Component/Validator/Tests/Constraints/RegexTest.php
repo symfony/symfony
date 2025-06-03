@@ -69,10 +69,10 @@ class RegexTest extends TestCase
      */
     public function testGetHtmlPattern($pattern, $htmlPattern, $match = true)
     {
-        $constraint = new Regex([
-            'pattern' => $pattern,
-            'match' => $match,
-        ]);
+        $constraint = new Regex(
+            pattern: $pattern,
+            match: $match,
+        );
 
         $this->assertSame($pattern, $constraint->pattern);
         $this->assertSame($htmlPattern, $constraint->getHtmlPattern());
@@ -80,10 +80,10 @@ class RegexTest extends TestCase
 
     public function testGetCustomHtmlPattern()
     {
-        $constraint = new Regex([
-            'pattern' => '((?![0-9]$|[a-z]+).)*',
-            'htmlPattern' => 'foobar',
-        ]);
+        $constraint = new Regex(
+            pattern: '((?![0-9]$|[a-z]+).)*',
+            htmlPattern: 'foobar',
+        );
 
         $this->assertSame('((?![0-9]$|[a-z]+).)*', $constraint->pattern);
         $this->assertSame('foobar', $constraint->getHtmlPattern());
@@ -91,11 +91,14 @@ class RegexTest extends TestCase
 
     public function testNormalizerCanBeSet()
     {
-        $regex = new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'trim']);
+        $regex = new Regex(pattern: '/^[0-9]+$/', normalizer: 'trim');
 
         $this->assertEquals('trim', $regex->normalizer);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -103,6 +106,9 @@ class RegexTest extends TestCase
         new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'Unknown Callable']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

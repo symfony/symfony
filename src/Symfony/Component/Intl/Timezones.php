@@ -49,7 +49,7 @@ final class Timezones extends ResourceBundle
     /**
      * @throws MissingResourceException if the timezone identifier does not exist or is an alias
      */
-    public static function getName(string $timezone, string $displayLocale = null): string
+    public static function getName(string $timezone, ?string $displayLocale = null): string
     {
         return self::readEntry(['Names', $timezone], $displayLocale);
     }
@@ -57,7 +57,7 @@ final class Timezones extends ResourceBundle
     /**
      * @return string[]
      */
-    public static function getNames(string $displayLocale = null): array
+    public static function getNames(?string $displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
     }
@@ -66,19 +66,19 @@ final class Timezones extends ResourceBundle
      * @throws \Exception       if the timezone identifier does not exist
      * @throws RuntimeException if there's no timezone DST transition information available
      */
-    public static function getRawOffset(string $timezone, int $timestamp = null): int
+    public static function getRawOffset(string $timezone, ?int $timestamp = null): int
     {
         $dateTimeImmutable = new \DateTimeImmutable(date('Y-m-d H:i:s', $timestamp ?? time()), new \DateTimeZone($timezone));
 
         return $dateTimeImmutable->getOffset();
     }
 
-    public static function getGmtOffset(string $timezone, int $timestamp = null, string $displayLocale = null): string
+    public static function getGmtOffset(string $timezone, ?int $timestamp = null, ?string $displayLocale = null): string
     {
         $offset = self::getRawOffset($timezone, $timestamp);
         $abs = abs($offset);
 
-        return sprintf(self::readEntry(['Meta', 'GmtFormat'], $displayLocale), sprintf(self::readEntry(['Meta', 'HourFormat'.(0 <= $offset ? 'Pos' : 'Neg')], $displayLocale), $abs / 3600, $abs / 60 % 60));
+        return \sprintf(self::readEntry(['Meta', 'GmtFormat'], $displayLocale), \sprintf(self::readEntry(['Meta', 'HourFormat'.(0 <= $offset ? 'Pos' : 'Neg')], $displayLocale), $abs / 3600, $abs / 60 % 60));
     }
 
     /**
@@ -102,7 +102,7 @@ final class Timezones extends ResourceBundle
             }
 
             if (Countries::exists(strtoupper($country))) {
-                throw new MissingResourceException(sprintf('Country codes must be in uppercase, but "%s" was passed. Try with "%s" country code instead.', $country, strtoupper($country)));
+                throw new MissingResourceException(\sprintf('Country codes must be in uppercase, but "%s" was passed. Try with "%s" country code instead.', $country, strtoupper($country)));
             }
 
             throw $e;

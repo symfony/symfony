@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Fixtures\OtherAnnotatedClasses;
 
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class VariadicClass
 {

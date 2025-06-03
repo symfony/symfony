@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Implement the `CloseableTransportInterface` to allow closing the transport
+ * Add new `queue_attributes` and `queue_tags` options for SQS queue creation
+
+7.2
+---
+
+ * Implement the `KeepaliveReceiverInterface` to enable asynchronously notifying SQS that the job is still being processed, in order to avoid timeouts
+
+6.4
+---
+
+ * Add `AddFifoStampMiddleware` to help adding `AmazonSqsFifoStamp`
+
 6.1
 ---
 

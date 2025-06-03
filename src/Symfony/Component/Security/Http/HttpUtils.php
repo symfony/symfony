@@ -26,23 +26,18 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
  */
 class HttpUtils
 {
-    private ?UrlGeneratorInterface $urlGenerator;
-    private UrlMatcherInterface|RequestMatcherInterface|null $urlMatcher;
-    private ?string $domainRegexp;
-    private ?string $secureDomainRegexp;
-
     /**
      * @param $domainRegexp       A regexp the target of HTTP redirections must match, scheme included
      * @param $secureDomainRegexp A regexp the target of HTTP redirections must match when the scheme is "https"
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator = null, UrlMatcherInterface|RequestMatcherInterface $urlMatcher = null, string $domainRegexp = null, string $secureDomainRegexp = null)
-    {
-        $this->urlGenerator = $urlGenerator;
-        $this->urlMatcher = $urlMatcher;
-        $this->domainRegexp = $domainRegexp;
-        $this->secureDomainRegexp = $secureDomainRegexp;
+    public function __construct(
+        private ?UrlGeneratorInterface $urlGenerator = null,
+        private UrlMatcherInterface|RequestMatcherInterface|null $urlMatcher = null,
+        private ?string $domainRegexp = null,
+        private ?string $secureDomainRegexp = null,
+    ) {
     }
 
     /**
@@ -53,10 +48,10 @@ class HttpUtils
      */
     public function createRedirectResponse(Request $request, string $path, int $status = 302): RedirectResponse
     {
-        if (null !== $this->secureDomainRegexp && 'https' === $this->urlMatcher->getContext()->getScheme() && preg_match('#^https?:[/\\\\]{2,}+[^/]++#i', $path, $host) && !preg_match(sprintf($this->secureDomainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
+        if (null !== $this->secureDomainRegexp && 'https' === $this->urlMatcher->getContext()->getScheme() && preg_match('#^https?:[/\\\\]{2,}+[^/]++#i', $path, $host) && !preg_match(\sprintf($this->secureDomainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
             $path = '/';
         }
-        if (null !== $this->domainRegexp && preg_match('#^https?:[/\\\\]{2,}+[^/]++#i', $path, $host) && !preg_match(sprintf($this->domainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
+        if (null !== $this->domainRegexp && preg_match('#^https?:[/\\\\]{2,}+[^/]++#i', $path, $host) && !preg_match(\sprintf($this->domainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
             $path = '/';
         }
 
@@ -107,6 +102,11 @@ class HttpUtils
     public function checkRequestPath(Request $request, string $path): bool
     {
         if ('/' !== $path[0]) {
+            // Shortcut if request has already been matched before
+            if ($request->attributes->has('_route')) {
+                return $path === $request->attributes->get('_route');
+            }
+
             try {
                 // matching a request is more powerful than matching a URL path + context, so try that first
                 if ($this->urlMatcher instanceof RequestMatcherInterface) {
@@ -116,9 +116,7 @@ class HttpUtils
                 }
 
                 return isset($parameters['_route']) && $path === $parameters['_route'];
-            } catch (MethodNotAllowedException) {
-                return false;
-            } catch (ResourceNotFoundException) {
+            } catch (MethodNotAllowedException|ResourceNotFoundException) {
                 return false;
             }
         }

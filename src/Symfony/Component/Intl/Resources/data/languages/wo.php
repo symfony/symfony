@@ -4,7 +4,7 @@ return [
     'Names' => [
         'af' => 'Afrikaans',
         'am' => 'Amharik',
-        'ar' => 'Araab',
+        'ar' => 'Arabic',
         'as' => 'Asame',
         'az' => 'Aserbayjane',
         'ba' => 'Baskir',
@@ -150,6 +150,7 @@ return [
         'zh' => 'Sinuwaa',
     ],
     'LocalizedNames' => [
+        'ar_001' => 'Araab',
         'de_AT' => 'Almaa bu Ótiriis',
         'de_CH' => 'Almaa bu Kawe bu Swis',
         'en_AU' => 'Àngale bu Óstraali',
@@ -161,6 +162,8 @@ return [
         'es_MX' => 'Español bu Meksik',
         'fr_CA' => 'Frañse bu Kanadaa',
         'fr_CH' => 'Frañse bu Swis',
+        'hi_Latn' => 'Hindī',
+        'nl_BE' => 'Belsig',
         'pt_BR' => 'Purtugees bu Bresil',
         'pt_PT' => 'Portugees bu Tugël',
         'zh_Hans' => 'Sinuwaa buñ woyofal',

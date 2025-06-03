@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="file.ext">
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="sr-Cyrl" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
@@ -134,9 +134,9 @@
                 <source>This file is not a valid image.</source>
                 <target>Ова датотека није валидна слика.</target>
             </trans-unit>
-            <trans-unit id="37">
-                <source>This is not a valid IP address.</source>
-                <target>Ово није валидна ИП адреса.</target>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>Ова вредност није валидна IP адреса.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -144,11 +144,11 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>Вредност није валидан локал.</target>
+                <target>Вредност није валидна међународна ознака језика.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>Вредност није валидна земља.</target>
+                <target>Вредност није валидна држава.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -160,19 +160,19 @@
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>Ширина слике је превелика ({{ width }}px). Најећа дозвољена ширина је {{ max_width }}px.</target>
+                <target>Ширина слике је превелика ({{ width }} пиксела). Најећа дозвољена ширина је {{ max_width }} пиксела.</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>Ширина слике је премала ({{ width }}px). Најмања дозвољена ширина је {{ min_width }}px.</target>
+                <target>Ширина слике је премала ({{ width }} пиксела). Најмања дозвољена ширина је {{ min_width }} пиксела.</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>Висина слике је превелика ({{ height }}px). Најећа дозвољена висина је {{ max_height }}px.</target>
+                <target>Висина слике је превелика ({{ height }} пиксела). Најећа дозвољена висина је {{ max_height }} пиксела.</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>Висина слике је премала ({{ height }}px). Најмања дозвољена висина је {{ min_height }}px.</target>
+                <target>Висина слике је премала ({{ height }} пиксела). Најмања дозвољена висина је {{ min_height }} пиксела.</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
@@ -184,15 +184,15 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>Датотека је само парцијално отпремљена.</target>
+                <target>Датотека је само делимично отпремљена.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
                 <target>Датотека није отпремљена.</target>
             </trans-unit>
-            <trans-unit id="51">
-                <source>No temporary folder was configured in php.ini.</source>
-                <target>Привремени директоријум није конфигурисан у php.ini.</target>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>Привремени директоријум није конфигурисан у php.ini, или конфигурисани директоријум не постоји.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -222,29 +222,29 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Невалидан број картице или тип картице није подржан.</target>
             </trans-unit>
-            <trans-unit id="59">
-                <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Ово није валидан међународни број банковног рачуна (IBAN).</target>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>Ова вредност није валидан Међународни број банковног рачуна (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
-                <target>Ово није валидан ISBN-10.</target>
+                <target>Ова вредност није валидан ISBN-10.</target>
             </trans-unit>
             <trans-unit id="61">
                 <source>This value is not a valid ISBN-13.</source>
-                <target>Ово није валидан ISBN-13.</target>
+                <target>Ова вредност није валидан ISBN-13.</target>
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>Ово није валидан ISBN-10 или ISBN-13.</target>
+                <target>Овa вредност није ни валидан ISBN-10 ни валидан ISBN-13.</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
-                <target>Ово није валидан ISSN.</target>
+                <target>Ова вредност није валидан ISSN.</target>
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>Ово није валидна валута.</target>
+                <target>Ово вредност није валидна валута.</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
@@ -288,15 +288,15 @@
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
-                <target>Слика је квадратна ({{ width }}x{{ height }}px). Квадратне слике нису дозвољене.</target>
+                <target>Слика је квадратна ({{ width }}x{{ height }} пиксела). Квадратне слике нису дозвољене.</target>
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
-                <target>Слика је оријентације пејзажа ({{ width }}x{{ height }}px). Пејзажна оријентација слика није дозвољена.</target>
+                <target>Слика је оријентације пејзажа ({{ width }}x{{ height }} пиксела). Пејзажна оријентација слика није дозвољена.</target>
             </trans-unit>
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
-                <target>Слика је оријантације портрета ({{ width }}x{{ height }}px). Портретна оријентација слика није дозвољена.</target>
+                <target>Слика је оријантације портрета ({{ width }}x{{ height }} пиксела). Портретна оријентација слика није дозвољена.</target>
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
@@ -310,21 +310,21 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Вредност се не поклапа са очекиваним {{ charset }} сетом карактера.</target>
             </trans-unit>
-            <trans-unit id="81">
-                <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Ово није валидан међународни идентификацијски код банке (BIC).</target>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>Ова вредност није валидан Код за идентификацију бизниса (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Грешка</target>
             </trans-unit>
-            <trans-unit id="83">
-                <source>This is not a valid UUID.</source>
-                <target>Ово није валидан универзални уникатни идентификатор (UUID).</target>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Ова вредност није валидан UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Ова вредност би требало да буде дељива са {{ compared_value }}.</target>
+                <target>Ова вредност треба да буде дељива са {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
@@ -332,27 +332,27 @@
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>Ова вредност би требало да буде валидан JSON.</target>
+                <target>Ова вредност треба да буде валидан JSON.</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>Ова колекција би требала да садржи само јединствене елементе.</target>
+                <target>Ова колекција треба да садржи само јединствене елементе.</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>Ова вредност би требала бити позитивна.</target>
+                <target>Ова вредност треба да буде позитивна.</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>Ова вредност би требала бити позитивна или нула.</target>
+                <target>Ова вредност треба да буде или позитивна или нула.</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
-                <target>Ова вредност би требала бити негативна.</target>
+                <target>Ова вредност треба да буде негативна.</target>
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>Ова вредност би требала бити позитивна или нула.</target>
+                <target>Ова вредност треба да буде или негативна или нула.</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
@@ -372,19 +372,19 @@
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-                <target>Број елемената у овој колекцији би требало да буде дељив са {{ compared_value }}.</target>
+                <target>Број елемената у овој колекцији треба да буде дељив са {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Ова вредност би требало да задовољава најмање једно од наредних ограничења:</target>
+                <target>Ова вредност треба да задовољава најмање једно од наредних ограничења:</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
-                <target>Сваки елемент ове колекције би требало да задовољи сопствени скуп ограничења.</target>
+                <target>Сваки елемент ове колекције треба да задовољи сопствени скуп ограничења.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>Ова вредност није исправна међународна идентификациона ознака хартија од вредности (ISIN).</target>
+                <target>Ова вредност није валидна међународна идентификациона ознака хартија од вредности (ISIN).</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
@@ -392,15 +392,83 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
-                <target>Ова вредност није исправна CSS боја.</target>
+                <target>Ова вредност није валидна CSS боја.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target>Ова вредност није исправна CIDR нотација.</target>
+                <target>Ова вредност није валидна CIDR нотација.</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
-                <target>Вредност мрежне маске треба бити између {{ min }} и {{ max }}.</target>
+                <target>Вредност мрежне маске треба да буде између {{ min }} и {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Назив датотеке је сувише дугачак. Треба да има {{ filename_max_length }} карактер или мање.|Назив датотеке је сувише дугачак. Треба да има {{ filename_max_length }} карактера или мање.|Назив датотеке је сувише дугачак. Треба да има {{ filename_max_length }} карактера или мање.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Лозинка није довољно јака. Молимо користите јачу лозинку.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Ова вредност садржи карактере који нису дозвољени од стране важећег нивоа рестрикције.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Коришћење невидљивих карактера није дозвољено.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Мешање бројева из различитих скрипти није дозвољено.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Коришћење скривених преклопних карактера није дозвољено.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Екстензија фајла није валидна ({{ extension }}). Дозвољене екстензије су {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Детектовано кодирање знакова није валидно ({{ detected }}). Дозвољена кодирања су {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>Ова вредност није валидна MAC адреса.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Овом URL-у недостаје домен највишег нивоа.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
+                <target>Ова вредност је прекратка. Треба да садржи макар једну реч.|Ова вредност је прекратка. Треба да садржи макар {{ min }} речи.|Ова вредност је прекратка. Треба да садржи макар {{ min }} речи.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
+                <target>Ова вредност је предугачка. Треба да садржи само једну реч.|Ова вредност је предугачка. Треба да садржи највише {{ max }} речи.|Ова вредност је предугачка. Треба да садржи највише {{ max }} речи.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value does not represent a valid week in the ISO 8601 format.</source>
+                <target>Ова вредност не представља валидну недељу у ISO 8601 формату.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value is not a valid week.</source>
+                <target>Ова вредност није валидна недеља.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value should not be before week "{{ min }}".</source>
+                <target>Ова вредност не треба да буде пре недеље "{{ min }}".</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>This value should not be after week "{{ max }}".</source>
+                <target>Ова вредност не треба да буде после недеље "{{ max }}".</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target state="needs-review-translation">Ова вредност није важећи Twig шаблон.</target>
             </trans-unit>
         </body>
     </file>

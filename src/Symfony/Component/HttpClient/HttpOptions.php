@@ -66,6 +66,16 @@ class HttpOptions
     /**
      * @return $this
      */
+    public function setHeader(string $key, string $value): static
+    {
+        $this->options['headers'][$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function setHeaders(iterable $headers): static
     {
         $this->options['headers'] = $headers;
@@ -156,6 +166,8 @@ class HttpOptions
     }
 
     /**
+     * @param callable(int, int, array, \Closure|null=):void $callback
+     *
      * @return $this
      */
     public function setOnProgress(callable $callback): static

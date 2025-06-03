@@ -12,7 +12,6 @@ return [
         'moh' => 'mohok',
         'nqo' => 'n’ko',
         'shi' => 'južni šilha',
-        'tzm' => 'centralnoatlaski tamašek',
         'xh' => 'isikosa',
         'zgh' => 'standardni marokanski tamašek',
         'zu' => 'isizulu',

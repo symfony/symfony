@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -31,6 +31,14 @@ class Dummy extends ParentDummy
     protected $baz;
 
     /**
+     * #@+
+     * A short description ignoring template.
+     *
+     *
+     * A long description...
+     *
+     * ...over several lines.
+     *
      * @var \DateTimeImmutable
      */
     public $bal;
@@ -45,6 +53,11 @@ class Dummy extends ParentDummy
      */
     #[Groups(['a', 'b'])]
     public $collection;
+
+    /**
+     * @var DummyCollection<int, string>
+     */
+    public $collectionAsObject;
 
     /**
      * @var string[][]
@@ -155,6 +168,8 @@ class Dummy extends ParentDummy
      */
     public $arrayOfMixed;
 
+    public $noDocBlock;
+
     /**
      * @var list<string>
      */
@@ -164,6 +179,14 @@ class Dummy extends ParentDummy
      * @var parent
      */
     public $parentAnnotation;
+
+    /**
+     * @var \BackedEnum<string>
+     */
+    public $genericInterface;
+
+    /** @var Dummy[]|null  */
+    public $nullableTypedCollection = null;
 
     public static function getStatic()
     {
@@ -194,7 +217,7 @@ class Dummy extends ParentDummy
      *
      * @param ParentDummy|null $parent
      */
-    public function setB(ParentDummy $parent = null)
+    public function setB(?ParentDummy $parent = null)
     {
     }
 
@@ -255,6 +278,10 @@ class Dummy extends ParentDummy
     }
 
     public function hasElement(string $element): bool
+    {
+    }
+
+    public function addNullableTypedCollection(Dummy $dummy): void
     {
     }
 }

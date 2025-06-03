@@ -69,7 +69,7 @@ class CompiledUrlGeneratorDumper extends GeneratorDumper
             }
 
             if (null === $target = $routes->get($currentId)) {
-                throw new RouteNotFoundException(sprintf('Target route "%s" for alias "%s" does not exist.', $currentId, $name));
+                throw new RouteNotFoundException(\sprintf('Target route "%s" for alias "%s" does not exist.', $currentId, $name));
             }
 
             $compiledTarget = $target->compile();
@@ -109,11 +109,11 @@ EOF;
     {
         $routes = '';
         foreach ($this->getCompiledRoutes() as $name => $properties) {
-            $routes .= sprintf("\n    '%s' => %s,", $name, CompiledUrlMatcherDumper::export($properties));
+            $routes .= \sprintf("\n    '%s' => %s,", $name, CompiledUrlMatcherDumper::export($properties));
         }
 
         foreach ($this->getCompiledAliases() as $alias => $properties) {
-            $routes .= sprintf("\n    '%s' => %s,", $alias, CompiledUrlMatcherDumper::export($properties));
+            $routes .= \sprintf("\n    '%s' => %s,", $alias, CompiledUrlMatcherDumper::export($properties));
         }
 
         return $routes;

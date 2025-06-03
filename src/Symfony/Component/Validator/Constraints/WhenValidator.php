@@ -33,17 +33,27 @@ final class WhenValidator extends ConstraintValidator
         $variables = $constraint->values;
         $variables['value'] = $value;
         $variables['this'] = $context->getObject();
+        $variables['context'] = $context;
 
-        if ($this->getExpressionLanguage()->evaluate($constraint->expression, $variables)) {
+        if ($constraint->expression instanceof \Closure) {
+            $result = ($constraint->expression)($context->getObject());
+        } else {
+            $result = $this->getExpressionLanguage()->evaluate($constraint->expression, $variables);
+        }
+
+        if ($result) {
             $context->getValidator()->inContext($context)
                 ->validate($value, $constraint->constraints);
+        } elseif ($constraint->otherwise) {
+            $context->getValidator()->inContext($context)
+                ->validate($value, $constraint->otherwise);
         }
     }
 
     private function getExpressionLanguage(): ExpressionLanguage
     {
         if (!class_exists(ExpressionLanguage::class)) {
-            throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" validator. Try running "composer require symfony/expression-language".', __CLASS__));
+            throw new LogicException(\sprintf('The "symfony/expression-language" component is required to use the "%s" validator. Try running "composer require symfony/expression-language".', __CLASS__));
         }
 
         return $this->expressionLanguage ??= new ExpressionLanguage();

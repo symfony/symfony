@@ -120,6 +120,10 @@ class Email extends Message
      */
     public function from(Address|string ...$addresses): static
     {
+        if (!$addresses) {
+            throw new LogicException('"from()" must be called with at least one address.');
+        }
+
         return $this->setListAddressHeaderBody('From', $addresses);
     }
 
@@ -242,7 +246,7 @@ class Email extends Message
             $priority = 1;
         }
 
-        return $this->setHeaderBody('Text', 'X-Priority', sprintf('%d (%s)', $priority, self::PRIORITY_MAP[$priority]));
+        return $this->setHeaderBody('Text', 'X-Priority', \sprintf('%d (%s)', $priority, self::PRIORITY_MAP[$priority]));
     }
 
     /**
@@ -266,7 +270,7 @@ class Email extends Message
     public function text($body, string $charset = 'utf-8'): static
     {
         if (null !== $body && !\is_string($body) && !\is_resource($body)) {
-            throw new \TypeError(sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
+            throw new \TypeError(\sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
         }
 
         $this->cachedBody = null;
@@ -297,7 +301,7 @@ class Email extends Message
     public function html($body, string $charset = 'utf-8'): static
     {
         if (null !== $body && !\is_string($body) && !\is_resource($body)) {
-            throw new \TypeError(sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
+            throw new \TypeError(\sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
         }
 
         $this->cachedBody = null;
@@ -325,7 +329,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function attach($body, string $name = null, string $contentType = null): static
+    public function attach($body, ?string $name = null, ?string $contentType = null): static
     {
         return $this->addPart(new DataPart($body, $name, $contentType));
     }
@@ -333,7 +337,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function attachFromPath(string $path, string $name = null, string $contentType = null): static
+    public function attachFromPath(string $path, ?string $name = null, ?string $contentType = null): static
     {
         return $this->addPart(new DataPart(new File($path), $name, $contentType));
     }
@@ -343,7 +347,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function embed($body, string $name = null, string $contentType = null): static
+    public function embed($body, ?string $name = null, ?string $contentType = null): static
     {
         return $this->addPart((new DataPart($body, $name, $contentType))->asInline());
     }
@@ -351,21 +355,9 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function embedFromPath(string $path, string $name = null, string $contentType = null): static
+    public function embedFromPath(string $path, ?string $name = null, ?string $contentType = null): static
     {
         return $this->addPart((new DataPart(new File($path), $name, $contentType))->asInline());
-    }
-
-    /**
-     * @return $this
-     *
-     * @deprecated since Symfony 6.2, use addPart() instead
-     */
-    public function attachPart(DataPart $part): static
-    {
-        @trigger_deprecation('symfony/mime', '6.2', 'The "%s()" method is deprecated, use "addPart()" instead.', __METHOD__);
-
-        return $this->addPart($part);
     }
 
     /**
@@ -396,10 +388,7 @@ class Email extends Message
         return $this->generateBody();
     }
 
-    /**
-     * @return void
-     */
-    public function ensureValidity()
+    public function ensureValidity(): void
     {
         $this->ensureBodyValid();
 
@@ -412,7 +401,7 @@ class Email extends Message
 
     private function ensureBodyValid(): void
     {
-        if (null === $this->text && null === $this->html && !$this->attachments) {
+        if (null === $this->text && null === $this->html && !$this->attachments && null === parent::getBody()) {
             throw new LogicException('A message must have a text or an HTML part or attachments.');
         }
     }

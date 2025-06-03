@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\Tests\Fixtures\BackedProperty;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooReadonly;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooSerializable;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooUnitEnum;
@@ -65,7 +66,7 @@ class VarExporterTest extends TestCase
         yield [$h = fopen(__FILE__, 'r')];
         yield [[$h]];
 
-        $a = new class() {
+        $a = new class {
         };
 
         yield [$a];
@@ -94,10 +95,6 @@ class VarExporterTest extends TestCase
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
 
         $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
-
-        if (\PHP_VERSION_ID < 80200 && 'datetime' === $testName) {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
-        }
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
         if ('incomplete-class' === $testName || 'external-references' === $testName) {
@@ -239,6 +236,12 @@ class VarExporterTest extends TestCase
 
         yield ['unit-enum', [FooUnitEnum::Bar], true];
         yield ['readonly', new FooReadonly('k', 'v')];
+
+        if (\PHP_VERSION_ID < 80400) {
+            return;
+        }
+
+        yield ['backed-property', new BackedProperty('name')];
     }
 
     public function testUnicodeDirectionality()
@@ -259,7 +262,7 @@ class MyWakeup
         return ['sub', 'baz'];
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (123 === $this->sub) {
             $this->bis = 123;
@@ -333,17 +336,21 @@ class MyArrayObject extends \ArrayObject
 class GoodNight
 {
     public $good;
+    protected $foo;
+    private $bar;
 
     public function __construct()
     {
         unset($this->good);
+        $this->foo = 'afternoon';
+        $this->bar = 'morning';
     }
 
     public function __sleep(): array
     {
         $this->good = 'night';
 
-        return ['good'];
+        return ['good', 'foo', "\0*\0foo", "\0".__CLASS__."\0bar"];
     }
 }
 
@@ -411,7 +418,7 @@ class Php74Serializable implements \Serializable
         return [$this->foo = new \stdClass()];
     }
 
-    public function __unserialize(array $data)
+    public function __unserialize(array $data): void
     {
         [$this->foo] = $data;
     }
@@ -421,7 +428,7 @@ class Php74Serializable implements \Serializable
         throw new \BadMethodCallException();
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException();
     }

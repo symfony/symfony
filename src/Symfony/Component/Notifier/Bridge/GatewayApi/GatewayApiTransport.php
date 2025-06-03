@@ -28,20 +28,18 @@ final class GatewayApiTransport extends AbstractTransport
 {
     protected const HOST = 'gatewayapi.com';
 
-    private string $authToken;
-    private string $from;
-
-    public function __construct(#[\SensitiveParameter] string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('gatewayapi://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('gatewayapi://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -60,7 +58,7 @@ final class GatewayApiTransport extends AbstractTransport
         $options['recipients'] = [['msisdn' => $message->getPhone()]];
         $options['message'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/rest/mtsms', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/rest/mtsms', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->authToken, ''],
@@ -74,7 +72,7 @@ final class GatewayApiTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to send the SMS: error %d.', $statusCode), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: error %d.', $statusCode), $response);
         }
 
         $content = $response->toArray(false);

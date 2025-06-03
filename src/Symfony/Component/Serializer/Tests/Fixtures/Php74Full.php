@@ -45,7 +45,7 @@ final class Php74FullWithConstructor
 
 final class Php74FullWithTypedConstructor
 {
-    public function __construct(float $something)
+    public function __construct(float $something, bool $somethingElse)
     {
     }
 }

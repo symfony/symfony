@@ -15,20 +15,22 @@ use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
 use Twig\Node\BlockNode;
+use Twig\Node\EmptyNode;
 use Twig\Node\Expression\ArrayExpression;
-use Twig\Node\Expression\AssignNameExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
-use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\AssignContextVariable;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\ModuleNode;
 use Twig\Node\Node;
+use Twig\Node\Nodes;
 use Twig\Node\SetNode;
-use Twig\NodeVisitor\AbstractNodeVisitor;
+use Twig\NodeVisitor\NodeVisitorInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
+final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 {
     private Scope $scope;
 
@@ -37,7 +39,7 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         $this->scope = new Scope();
     }
 
-    protected function doEnterNode(Node $node, Environment $env): Node
+    public function enterNode(Node $node, Environment $env): Node
     {
         if ($node instanceof BlockNode || $node instanceof ModuleNode) {
             $this->scope = $this->scope->enter();
@@ -48,21 +50,32 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
                 $this->scope->set('domain', $node->getNode('expr'));
 
                 return $node;
-            } else {
-                $var = $this->getVarName();
-                $name = new AssignNameExpression($var, $node->getTemplateLine());
-                $this->scope->set('domain', new NameExpression($var, $node->getTemplateLine()));
-
-                return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
             }
+
+            if (null === $templateName = $node->getTemplateName()) {
+                throw new \LogicException('Cannot traverse a node without a template name.');
+            }
+
+            $var = '__internal_trans_default_domain'.hash('xxh128', $templateName);
+
+            $name = new AssignContextVariable($var, $node->getTemplateLine());
+            $this->scope->set('domain', new ContextVariable($var, $node->getTemplateLine()));
+
+            return new SetNode(false, new Nodes([$name]), new Nodes([$node->getNode('expr')]), $node->getTemplateLine());
         }
 
         if (!$this->scope->has('domain')) {
             return $node;
         }
 
-        if ($node instanceof FilterExpression && 'trans' === $node->getNode('filter')->getAttribute('value')) {
+        if ($node instanceof FilterExpression && 'trans' === ($node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'))) {
             $arguments = $node->getNode('arguments');
+
+            if ($arguments instanceof EmptyNode) {
+                $arguments = new Nodes();
+                $node->setNode('arguments', $arguments);
+            }
+
             if ($this->isNamedArguments($arguments)) {
                 if (!$arguments->hasNode('domain') && !$arguments->hasNode(1)) {
                     $arguments->setNode('domain', $this->scope->get('domain'));
@@ -83,7 +96,7 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    protected function doLeaveNode(Node $node, Environment $env): ?Node
+    public function leaveNode(Node $node, Environment $env): ?Node
     {
         if ($node instanceof TransDefaultDomainNode) {
             return null;
@@ -110,10 +123,5 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         }
 
         return false;
-    }
-
-    private function getVarName(): string
-    {
-        return sprintf('__internal_%s', hash('sha256', uniqid(mt_rand(), true), false));
     }
 }

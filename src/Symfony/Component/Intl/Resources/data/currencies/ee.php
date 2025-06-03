@@ -370,10 +370,6 @@ return [
             'ETB',
             'ethiopiaga birr',
         ],
-        'EUR' => [
-            '€',
-            'EUR',
-        ],
         'FIM' => [
             'FIM',
             'finlandga markka',
@@ -862,9 +858,13 @@ return [
             'SKK',
             'slovakga koruna',
         ],
+        'SLE' => [
+            'SLE',
+            'sierra leonega leone',
+        ],
         'SLL' => [
             'SLL',
-            'sierra leonega leone',
+            'sierra leonega leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

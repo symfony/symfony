@@ -33,7 +33,7 @@ final class DoctrineTestHelper
     /**
      * Returns an entity manager for testing.
      */
-    public static function createTestEntityManager(Configuration $config = null): EntityManager
+    public static function createTestEntityManager(?Configuration $config = null): EntityManager
     {
         if (!\extension_loaded('pdo_sqlite')) {
             TestCase::markTestSkipped('Extension pdo_sqlite is required.');
@@ -47,6 +47,10 @@ final class DoctrineTestHelper
         $config ??= self::createTestConfiguration();
         $eventManager = new EventManager();
 
+        if (\PHP_VERSION_ID >= 80400 && method_exists($config, 'enableNativeLazyObjects')) {
+            $config->enableNativeLazyObjects(true);
+        }
+
         return new EntityManager(DriverManager::getConnection($params, $config, $eventManager), $config, $eventManager);
     }
 
@@ -58,9 +62,7 @@ final class DoctrineTestHelper
         $config->setProxyDir(sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Tests/Fixtures' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'], true));
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         $config->setLazyGhostObjectEnabled(true);
 
         return $config;

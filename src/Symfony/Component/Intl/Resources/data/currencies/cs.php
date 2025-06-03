@@ -898,9 +898,13 @@ return [
             'SKK',
             'slovenská koruna',
         ],
+        'SLE' => [
+            'SLE',
+            'sierraleonský leone',
+        ],
         'SLL' => [
             'SLL',
-            'sierro-leonský leone',
+            'sierraleonský leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

@@ -61,14 +61,12 @@ class PackagesTest extends TestCase
     public function testNoDefaultPackage()
     {
         $this->expectException(LogicException::class);
-        $packages = new Packages();
-        $packages->getPackage();
+        (new Packages())->getPackage();
     }
 
     public function testUndefinedPackage()
     {
         $this->expectException(InvalidArgumentException::class);
-        $packages = new Packages();
-        $packages->getPackage('a');
+        (new Packages())->getPackage('a');
     }
 }

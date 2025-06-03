@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -187,7 +187,7 @@ class MapDenormalizationTest extends TestCase
 
     private function getSerializer()
     {
-        $loaderMock = new class() implements ClassMetadataFactoryInterface {
+        $loaderMock = new class implements ClassMetadataFactoryInterface {
             public function getMetadataFor($value): ClassMetadataInterface
             {
                 if (AbstractDummyValue::class === $value) {
@@ -209,7 +209,7 @@ class MapDenormalizationTest extends TestCase
             }
         };
 
-        $factory = new ClassMetadataFactory(new AnnotationLoader());
+        $factory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($factory, null, null, new PhpDocExtractor(), new ClassDiscriminatorFromClassMetadata($loaderMock));
         $serializer = new Serializer([$normalizer, new ArrayDenormalizer()]);
         $normalizer->setSerializer($serializer);

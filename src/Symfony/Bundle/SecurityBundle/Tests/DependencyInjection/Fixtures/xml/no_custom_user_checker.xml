@@ -22,7 +22,6 @@
             <switch-user />
             <x509 />
             <remote-user />
-            <user-checker />
             <logout />
             <remember-me secret="TheSecret"/>
         </firewall>

@@ -13,19 +13,16 @@ namespace Symfony\Component\Clock\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\ClockAwareTrait;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Clock\MockClock;
 
 class ClockAwareTraitTest extends TestCase
 {
     public function testTrait()
     {
-        $sut = new class() {
-            use ClockAwareTrait {
-                now as public;
-            }
-        };
+        $sut = new ClockAwareTestImplem();
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $sut->now());
+        $this->assertInstanceOf(DatePoint::class, $sut->now());
 
         $clock = new MockClock();
         $sut = new $sut();
@@ -36,5 +33,12 @@ class ClockAwareTraitTest extends TestCase
         $clock->sleep(1);
         $this->assertEquals($clock->now(), $sut->now());
         $this->assertSame(1.0, round($sut->now()->getTimestamp() - $ts, 1));
+    }
+}
+
+class ClockAwareTestImplem
+{
+    use ClockAwareTrait {
+        now as public;
     }
 }

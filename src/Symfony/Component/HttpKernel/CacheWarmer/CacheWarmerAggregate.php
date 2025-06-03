@@ -22,20 +22,17 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class CacheWarmerAggregate implements CacheWarmerInterface
 {
-    private iterable $warmers;
-    private bool $debug;
-    private ?string $deprecationLogsFilepath;
     private bool $optionalsEnabled = false;
     private bool $onlyOptionalsEnabled = false;
 
     /**
      * @param iterable<mixed, CacheWarmerInterface> $warmers
      */
-    public function __construct(iterable $warmers = [], bool $debug = false, string $deprecationLogsFilepath = null)
-    {
-        $this->warmers = $warmers;
-        $this->debug = $debug;
-        $this->deprecationLogsFilepath = $deprecationLogsFilepath;
+    public function __construct(
+        private iterable $warmers = [],
+        private bool $debug = false,
+        private ?string $deprecationLogsFilepath = null,
+    ) {
     }
 
     public function enableOptionalWarmers(): void
@@ -48,7 +45,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         $this->onlyOptionalsEnabled = $this->optionalsEnabled = true;
     }
 
-    public function warmUp(string $cacheDir, SymfonyStyle $io = null): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null, ?SymfonyStyle $io = null): array
     {
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
             $collectedLogs = [];
@@ -96,15 +93,15 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                 }
 
                 $start = microtime(true);
-                foreach ((array) $warmer->warmUp($cacheDir) as $item) {
-                    if (is_dir($item) || (str_starts_with($item, \dirname($cacheDir)) && !is_file($item))) {
-                        throw new \LogicException(sprintf('"%s::warmUp()" should return a list of files or classes but "%s" is none of them.', $warmer::class, $item));
+                foreach ($warmer->warmUp($cacheDir, $buildDir) as $item) {
+                    if (is_dir($item) || (str_starts_with($item, \dirname($cacheDir)) && !is_file($item)) || ($buildDir && str_starts_with($item, \dirname($buildDir)) && !is_file($item))) {
+                        throw new \LogicException(\sprintf('"%s::warmUp()" should return a list of files or classes but "%s" is none of them.', $warmer::class, $item));
                     }
                     $preload[] = $item;
                 }
 
                 if ($io?->isDebug()) {
-                    $io->info(sprintf('"%s" completed in %0.2fms.', $warmer::class, 1000 * (microtime(true) - $start)));
+                    $io->info(\sprintf('"%s" completed in %0.2fms.', $warmer::class, 1000 * (microtime(true) - $start)));
                 }
             }
         } finally {

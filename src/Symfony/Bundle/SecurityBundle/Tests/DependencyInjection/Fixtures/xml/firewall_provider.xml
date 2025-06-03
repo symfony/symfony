@@ -15,7 +15,7 @@
 
         <sec:firewalls>
             <sec:firewall name="main" provider="with-dash">
-                <sec:form_login />
+                <sec:form-login />
             </sec:firewall>
         </sec:firewalls>
     </sec:config>

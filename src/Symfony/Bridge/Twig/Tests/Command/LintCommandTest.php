@@ -18,6 +18,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Twig\DeprecatedCallableInfo;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
@@ -93,7 +94,20 @@ class LintCommandTest extends TestCase
         $ret = $tester->execute(['filename' => [$filename], '--show-deprecations' => true], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertMatchesRegularExpression('/ERROR  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/DEPRECATION  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
+    }
+
+    public function testLintFileWithMultipleReportedDeprecation()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile("{{ foo|deprecated_filter }}\n{{ bar|deprecated_filter }}");
+
+        $ret = $tester->execute(['filename' => [$filename], '--show-deprecations' => true], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+
+        $this->assertEquals(1, $ret, 'Returns 1 in case of error');
+        $this->assertMatchesRegularExpression('/DEPRECATION  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/DEPRECATION  in \S+ \(line 2\)/', trim($tester->getDisplay()));
         $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
     }
 
@@ -146,7 +160,7 @@ class LintCommandTest extends TestCase
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
-    public static function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
     }
@@ -159,7 +173,8 @@ class LintCommandTest extends TestCase
     private function createCommand(): Command
     {
         $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));
-        $environment->addFilter(new TwigFilter('deprecated_filter', fn ($v) => $v, ['deprecated' => true]));
+        $options = ['deprecation_info' => new DeprecatedCallableInfo('foo/bar', '1.1')];
+        $environment->addFilter(new TwigFilter('deprecated_filter', fn ($v) => $v, $options));
 
         $command = new LintCommand($environment);
 

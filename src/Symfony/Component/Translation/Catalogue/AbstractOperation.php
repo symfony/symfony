@@ -30,9 +30,7 @@ abstract class AbstractOperation implements OperationInterface
     public const NEW_BATCH = 'new';
     public const ALL_BATCH = 'all';
 
-    protected $source;
-    protected $target;
-    protected $result;
+    protected MessageCatalogue $result;
 
     /**
      * This array stores 'all', 'new' and 'obsolete' messages for all valid domains.
@@ -55,21 +53,21 @@ abstract class AbstractOperation implements OperationInterface
      *
      * @var array The array that stores 'all', 'new' and 'obsolete' messages
      */
-    protected $messages;
+    protected array $messages;
 
     private array $domains;
 
     /**
      * @throws LogicException
      */
-    public function __construct(MessageCatalogueInterface $source, MessageCatalogueInterface $target)
-    {
+    public function __construct(
+        protected MessageCatalogueInterface $source,
+        protected MessageCatalogueInterface $target,
+    ) {
         if ($source->getLocale() !== $target->getLocale()) {
             throw new LogicException('Operated catalogues must belong to the same locale.');
         }
 
-        $this->source = $source;
-        $this->target = $target;
         $this->result = new MessageCatalogue($source->getLocale());
         $this->messages = [];
     }
@@ -96,8 +94,8 @@ abstract class AbstractOperation implements OperationInterface
 
     public function getMessages(string $domain): array
     {
-        if (!\in_array($domain, $this->getDomains())) {
-            throw new InvalidArgumentException(sprintf('Invalid domain: "%s".', $domain));
+        if (!\in_array($domain, $this->getDomains(), true)) {
+            throw new InvalidArgumentException(\sprintf('Invalid domain: "%s".', $domain));
         }
 
         if (!isset($this->messages[$domain][self::ALL_BATCH])) {
@@ -109,8 +107,8 @@ abstract class AbstractOperation implements OperationInterface
 
     public function getNewMessages(string $domain): array
     {
-        if (!\in_array($domain, $this->getDomains())) {
-            throw new InvalidArgumentException(sprintf('Invalid domain: "%s".', $domain));
+        if (!\in_array($domain, $this->getDomains(), true)) {
+            throw new InvalidArgumentException(\sprintf('Invalid domain: "%s".', $domain));
         }
 
         if (!isset($this->messages[$domain][self::NEW_BATCH])) {
@@ -122,8 +120,8 @@ abstract class AbstractOperation implements OperationInterface
 
     public function getObsoleteMessages(string $domain): array
     {
-        if (!\in_array($domain, $this->getDomains())) {
-            throw new InvalidArgumentException(sprintf('Invalid domain: "%s".', $domain));
+        if (!\in_array($domain, $this->getDomains(), true)) {
+            throw new InvalidArgumentException(\sprintf('Invalid domain: "%s".', $domain));
         }
 
         if (!isset($this->messages[$domain][self::OBSOLETE_BATCH])) {
@@ -160,7 +158,7 @@ abstract class AbstractOperation implements OperationInterface
                 self::OBSOLETE_BATCH => $this->getObsoleteMessages($domain),
                 self::NEW_BATCH => $this->getNewMessages($domain),
                 self::ALL_BATCH => $this->getMessages($domain),
-                default => throw new \InvalidArgumentException(sprintf('$batch argument must be one of ["%s", "%s", "%s"].', self::ALL_BATCH, self::NEW_BATCH, self::OBSOLETE_BATCH)),
+                default => throw new \InvalidArgumentException(\sprintf('$batch argument must be one of ["%s", "%s", "%s"].', self::ALL_BATCH, self::NEW_BATCH, self::OBSOLETE_BATCH)),
             };
 
             if (!$messages || (!$this->source->all($intlDomain) && $this->source->all($domain))) {
@@ -180,8 +178,6 @@ abstract class AbstractOperation implements OperationInterface
      * stores the results.
      *
      * @param string $domain The domain which the operation will be performed for
-     *
-     * @return void
      */
-    abstract protected function processDomain(string $domain);
+    abstract protected function processDomain(string $domain): void;
 }

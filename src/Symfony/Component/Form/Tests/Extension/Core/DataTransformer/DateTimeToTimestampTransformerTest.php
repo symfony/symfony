@@ -115,7 +115,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $reverseTransformer->reverseTransform('2010-2010-2010');
     }
 
-    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    protected function createDateTimeTransformer(?string $inputTimezone = null, ?string $outputTimezone = null): BaseDateTimeTransformer
     {
         return new DateTimeToTimestampTransformer($inputTimezone, $outputTimezone);
     }

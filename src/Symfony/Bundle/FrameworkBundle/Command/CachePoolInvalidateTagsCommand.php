@@ -30,14 +30,13 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 #[AsCommand(name: 'cache:pool:invalidate-tags', description: 'Invalidate cache tags for all or a specific pool')]
 final class CachePoolInvalidateTagsCommand extends Command
 {
-    private ServiceProviderInterface $pools;
     private array $poolNames;
 
-    public function __construct(ServiceProviderInterface $pools)
-    {
+    public function __construct(
+        private ServiceProviderInterface $pools,
+    ) {
         parent::__construct();
 
-        $this->pools = $pools;
         $this->poolNames = array_keys($pools->getProvidedServices());
     }
 
@@ -65,26 +64,26 @@ final class CachePoolInvalidateTagsCommand extends Command
         $errors = false;
 
         foreach ($pools as $name) {
-            $io->comment(sprintf('Invalidating tag(s): <info>%s</info> from pool <comment>%s</comment>.', $tagList, $name));
+            $io->comment(\sprintf('Invalidating tag(s): <info>%s</info> from pool <comment>%s</comment>.', $tagList, $name));
 
             try {
                 $pool = $this->pools->get($name);
             } catch (ServiceNotFoundException) {
-                $io->error(sprintf('Pool "%s" not found.', $name));
+                $io->error(\sprintf('Pool "%s" not found.', $name));
                 $errors = true;
 
                 continue;
             }
 
             if (!$pool instanceof TagAwareCacheInterface) {
-                $io->error(sprintf('Pool "%s" is not taggable.', $name));
+                $io->error(\sprintf('Pool "%s" is not taggable.', $name));
                 $errors = true;
 
                 continue;
             }
 
             if (!$pool->invalidateTags($tags)) {
-                $io->error(sprintf('Cache tag(s) "%s" could not be invalidated for pool "%s".', $tagList, $name));
+                $io->error(\sprintf('Cache tag(s) "%s" could not be invalidated for pool "%s".', $tagList, $name));
                 $errors = true;
             }
         }

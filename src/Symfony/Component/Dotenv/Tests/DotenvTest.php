@@ -53,6 +53,7 @@ class DotenvTest extends TestCase
             ["FOO=\nBAR=\${FOO:-\'a{a}a}", "Unsupported character \"'\" found in the default value of variable \"\$FOO\". in \".env\" at line 2.\n...\\nBAR=\${FOO:-\'a{a}a}...\n                       ^ line 2 offset 24"],
             ["FOO=\nBAR=\${FOO:-a\$a}", "Unsupported character \"\$\" found in the default value of variable \"\$FOO\". in \".env\" at line 2.\n...FOO=\\nBAR=\${FOO:-a\$a}...\n                       ^ line 2 offset 20"],
             ["FOO=\nBAR=\${FOO:-a\"a}", "Unclosed braces on variable expansion in \".env\" at line 2.\n...FOO=\\nBAR=\${FOO:-a\"a}...\n                    ^ line 2 offset 17"],
+            ['_=FOO', "Invalid character in variable name in \".env\" at line 1.\n..._=FOO...\n  ^ line 1 offset 0"],
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {
@@ -174,7 +175,19 @@ class DotenvTest extends TestCase
             ["FOO=BAR\nBAR=\${NOTDEFINED:=TEST}", ['FOO' => 'BAR', 'NOTDEFINED' => 'TEST', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\${FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\$FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST}']],
+            ["FOO=BAR\nBAR=\${FOO:-}", ['FOO' => 'BAR', 'BAR' => 'BAR']],
+            ["FOO=BAR\nBAR=\${NOTDEFINED:-}", ['FOO' => 'BAR', 'BAR' => '']],
+            ["FOO=\nBAR=\${FOO:-}", ['FOO' => '', 'BAR' => '']],
+            ["FOO=\nBAR=\$FOO:-}", ['FOO' => '', 'BAR' => '}']],
+            ["FOO=BAR\nBAR=\${FOO:=}", ['FOO' => 'BAR', 'BAR' => 'BAR']],
+            ["FOO=BAR\nBAR=\${NOTDEFINED:=}", ['FOO' => 'BAR', 'NOTDEFINED' => '', 'BAR' => '']],
+            ["FOO=\nBAR=\${FOO:=}", ['FOO' => '', 'BAR' => '']],
+            ["FOO=\nBAR=\$FOO:=}", ['FOO' => '', 'BAR' => '}']],
             ["FOO=foo\nFOOBAR=\${FOO}\${BAR}", ['FOO' => 'foo', 'FOOBAR' => 'foo']],
+
+            // underscores
+            ['_FOO=BAR', ['_FOO' => 'BAR']],
+            ['_FOO_BAR=FOOBAR', ['_FOO_BAR' => 'FOOBAR']],
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {
@@ -425,16 +438,16 @@ class DotenvTest extends TestCase
         $this->assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
     }
 
-    public function testEnvVarIsOverriden()
+    public function testEnvVarIsOverridden()
     {
-        putenv('TEST_ENV_VAR_OVERRIDEN=original_value');
+        putenv('TEST_ENV_VAR_OVERRIDDEN=original_value');
 
         $dotenv = (new Dotenv())->usePutenv();
-        $dotenv->populate(['TEST_ENV_VAR_OVERRIDEN' => 'new_value'], true);
+        $dotenv->populate(['TEST_ENV_VAR_OVERRIDDEN' => 'new_value'], true);
 
-        $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));
-        $this->assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDEN']);
-        $this->assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDEN']);
+        $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDDEN'));
+        $this->assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDDEN']);
+        $this->assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDDEN']);
     }
 
     public function testMemorizingLoadedVarsNamesInSpecialVar()
@@ -598,5 +611,15 @@ class DotenvTest extends TestCase
 
         $resetContext();
         rmdir($tmpdir);
+    }
+
+    public function testExceptionWithBom()
+    {
+        $dotenv = new Dotenv();
+
+        $this->expectException(FormatException::class);
+        $this->expectExceptionMessage('Loading files starting with a byte-order-mark (BOM) is not supported.');
+
+        $dotenv->load(__DIR__.'/fixtures/file_with_bom');
     }
 }

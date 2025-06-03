@@ -4,8 +4,5 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/routing https://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="_webhook_controller" path="/{type}">
-        <default key="_controller">webhook.controller::handle</default>
-        <requirement key="type">.+</requirement>
-    </route>
+    <import resource="webhook.php" type="php" />
 </routes>

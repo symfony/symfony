@@ -28,16 +28,13 @@ final class SmsFactorTransport extends AbstractTransport
 {
     protected const HOST = 'api.smsfactor.com';
 
-    private string $tokenApi;
-    private ?string $sender;
-    private ?SmsFactorPushType $pushType;
-
-    public function __construct(#[\SensitiveParameter] string $tokenApi, ?string $sender, ?SmsFactorPushType $pushType, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->tokenApi = $tokenApi;
-        $this->sender = $sender;
-        $this->pushType = $pushType;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $tokenApi,
+        private ?string $sender,
+        private ?SmsFactorPushType $pushType,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -48,7 +45,7 @@ final class SmsFactorTransport extends AbstractTransport
             'push_type' => $this->pushType?->value,
         ]);
 
-        return sprintf('sms-factor://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
+        return \sprintf('sms-factor://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query, '', '&') : '');
     }
 
     public function supports(MessageInterface $message): bool

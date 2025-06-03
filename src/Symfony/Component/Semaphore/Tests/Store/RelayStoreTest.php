@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use Relay\Relay;
 
 /**
@@ -26,10 +25,14 @@ class RelayStoreTest extends AbstractRedisStoreTestCase
 
     public static function setUpBeforeClass(): void
     {
+        if (\PHP_VERSION_ID <= 80500 && isset($_SERVER['GITHUB_ACTIONS'])) {
+            self::markTestSkipped('Test segfaults on PHP 8.5');
+        }
+
         try {
             new Relay(...explode(':', getenv('REDIS_HOST')));
         } catch (\Relay\Exception $e) {
-            throw new SkippedTestSuiteError($e->getMessage());
+            self::markTestSkipped($e->getMessage());
         }
     }
 

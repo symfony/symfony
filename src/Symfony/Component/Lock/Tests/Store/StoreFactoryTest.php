@@ -20,6 +20,7 @@ use Symfony\Component\Lock\Store\DoctrineDbalStore;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\Lock\Store\MemcachedStore;
+use Symfony\Component\Lock\Store\NullStore;
 use Symfony\Component\Lock\Store\PdoStore;
 use Symfony\Component\Lock\Store\PostgreSqlStore;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -92,5 +93,7 @@ class StoreFactoryTest extends TestCase
 
         yield ['flock', FlockStore::class];
         yield ['flock://'.sys_get_temp_dir(), FlockStore::class];
+
+        yield ['null', NullStore::class];
     }
 }

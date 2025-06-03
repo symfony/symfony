@@ -15,8 +15,6 @@ namespace Symfony\Component\PropertyInfo;
  * The property read info tells how a property can be read.
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
- *
- * @internal
  */
 final class PropertyReadInfo
 {

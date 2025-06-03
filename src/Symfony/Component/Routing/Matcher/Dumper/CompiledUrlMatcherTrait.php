@@ -42,7 +42,7 @@ trait CompiledUrlMatcherTrait
             throw new MethodNotAllowedException(array_keys($allow));
         }
         if (!$this instanceof RedirectableUrlMatcherInterface) {
-            throw new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
+            throw new ResourceNotFoundException(\sprintf('No routes found for "%s".', $pathinfo));
         }
         if (!\in_array($this->context->getMethod(), ['HEAD', 'GET'], true)) {
             // no-op
@@ -67,7 +67,7 @@ trait CompiledUrlMatcherTrait
             }
         }
 
-        throw new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
+        throw new ResourceNotFoundException(\sprintf('No routes found for "%s".', $pathinfo));
     }
 
     private function doMatch(string $pathinfo, array &$allow = [], array &$allowSchemes = []): array

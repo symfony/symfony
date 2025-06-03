@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mime\Encoder;
+namespace Symfony\Component\Mime\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
 class IdnAddressEncoderTest extends TestCase
 {

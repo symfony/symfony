@@ -178,11 +178,39 @@ EOTXT
 
     public function testTypeErrorInDebugInfo()
     {
-        $this->assertDumpMatchesFormat('class@anonymous {}', new class() {
+        $this->assertDumpMatchesFormat('class@anonymous {}', new class {
             public function __debugInfo(): array
             {
                 return ['class' => \get_class(null)];
             }
         });
     }
+
+    public function testClassHierarchy()
+    {
+        $this->assertDumpMatchesFormat(<<<'DUMP'
+            Symfony\Component\VarDumper\Tests\Caster\B {
+              +a: "a"
+              #b: "b"
+              -c: "c"
+              +d: "d"
+              #e: "e"
+              -f: "f"
+            }
+            DUMP, new B());
+    }
+}
+
+class A
+{
+    public $a = 'a';
+    protected $b = 'b';
+    private $c = 'c';
+}
+
+class B extends A
+{
+    public $d = 'd';
+    protected $e = 'e';
+    private $f = 'f';
 }

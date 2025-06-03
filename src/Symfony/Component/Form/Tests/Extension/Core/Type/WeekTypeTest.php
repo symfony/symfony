@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\WeekType;
 use Symfony\Component\Form\FormError;
 
 class WeekTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\WeekType';
+    public const TESTED_TYPE = WeekType::class;
 
     public function testSubmitArray()
     {
@@ -313,7 +314,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
-    public static function provideEmptyData()
+    public static function provideEmptyData(): array
     {
         return [
             'Compound text field' => ['text', ['year' => '2019', 'week' => '1'], ['year' => 2019, 'week' => 1]],

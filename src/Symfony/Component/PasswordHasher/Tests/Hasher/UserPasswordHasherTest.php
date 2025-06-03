@@ -121,7 +121,7 @@ class UserPasswordHasherTest extends TestCase
         $mockPasswordHasherFactory->expects($this->any())
             ->method('getPasswordHasher')
             ->with($user)
-            ->will($this->onConsecutiveCalls($hasher, $hasher, new NativePasswordHasher(5, 20000, 5), $hasher));
+            ->willReturn($hasher, $hasher, new NativePasswordHasher(5, 20000, 5), $hasher);
 
         $passwordHasher = new UserPasswordHasher($mockPasswordHasherFactory);
 

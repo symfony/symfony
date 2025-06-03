@@ -27,7 +27,7 @@ class RedisTagAwareArrayAdapterTest extends RedisArrayAdapterTest
         $this->skippedTests['testTagItemExpiry'] = 'Testing expiration slows down the test suite';
     }
 
-    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface
     {
         if ('testClearWithPrefix' === $testMethod && \defined('Redis::SCAN_PREFIX')) {
             self::$redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);

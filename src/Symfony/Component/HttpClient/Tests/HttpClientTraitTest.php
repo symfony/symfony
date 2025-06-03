@@ -72,10 +72,8 @@ class HttpClientTraitTest extends TestCase
     public function testNormalizeBodyMultipart()
     {
         $file = fopen('php://memory', 'r+');
-        stream_context_set_option($file, ['http' => [
-            'filename' => 'test.txt',
-            'content_type' => 'text/plain',
-        ]]);
+        stream_context_set_option($file, 'http', 'filename', 'test.txt');
+        stream_context_set_option($file, 'http', 'content_type', 'text/plain');
         fwrite($file, 'foobarbaz');
         rewind($file);
 
@@ -124,7 +122,7 @@ class HttpClientTraitTest extends TestCase
     public function testNormalizeBodyMultipartForwardStream($stream)
     {
         $body = [
-            'logo' => $stream,
+            'logo' => $stream(),
         ];
 
         $headers = [];
@@ -155,12 +153,8 @@ class HttpClientTraitTest extends TestCase
 
     public static function provideNormalizeBodyMultipartForwardStream()
     {
-        if (!\extension_loaded('openssl')) {
-            throw self::markTestSkipped('Extension openssl required.');
-        }
-
-        yield 'native' => [fopen('https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png', 'r')];
-        yield 'symfony' => [HttpClient::create()->request('GET', 'https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png')->toStream()];
+        yield 'native' => [static fn () => fopen('https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png', 'r')];
+        yield 'symfony' => [static fn () => HttpClient::create()->request('GET', 'https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png')->toStream()];
     }
 
     /**
@@ -177,7 +171,6 @@ class HttpClientTraitTest extends TestCase
     public static function provideResolveUrl(): array
     {
         return [
-            [self::RFC3986_BASE, 'http:h',        'http:h'],
             [self::RFC3986_BASE, 'g',             'http://a/b/c/g'],
             [self::RFC3986_BASE, './g',           'http://a/b/c/g'],
             [self::RFC3986_BASE, 'g/',            'http://a/b/c/g/'],
@@ -217,6 +210,7 @@ class HttpClientTraitTest extends TestCase
             [self::RFC3986_BASE, 'g/../h',        'http://a/b/c/h'],
             [self::RFC3986_BASE, 'g;x=1/./y',     'http://a/b/c/g;x=1/y'],
             [self::RFC3986_BASE, 'g;x=1/../y',    'http://a/b/c/y'],
+            [self::RFC3986_BASE, 'g/h:123/i',     'http://a/b/c/g/h:123/i'],
             // dot-segments in the query or fragment
             [self::RFC3986_BASE, 'g?y/./x',       'http://a/b/c/g?y/./x'],
             [self::RFC3986_BASE, 'g?y/../x',      'http://a/b/c/g?y/../x'],
@@ -231,7 +225,6 @@ class HttpClientTraitTest extends TestCase
             ['http://u:p@a/b/c/d;p?q', '.',       'http://u:p@a/b/c/'],
             // path ending with slash or no slash at all
             ['http://a/b/c/d/',  'e',             'http://a/b/c/d/e'],
-            ['http:no-slash',     'e',            'http:e'],
             // falsey relative parts
             [self::RFC3986_BASE, '//0',           'http://0/'],
             [self::RFC3986_BASE, '0',             'http://a/b/c/0'],
@@ -243,15 +236,34 @@ class HttpClientTraitTest extends TestCase
     public function testResolveUrlWithoutScheme()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8080". Did you forget to add "http(s)://"?');
+        $this->expectExceptionMessage('Unsupported scheme in "localhost:8080": "http" or "https" expected.');
         self::resolveUrl(self::parseUrl('localhost:8080'), null);
     }
 
-    public function testResolveBaseUrlWitoutScheme()
+    public function testResolveBaseUrlWithoutScheme()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8081". Did you forget to add "http(s)://"?');
+        $this->expectExceptionMessage('Unsupported scheme in "localhost:8081": "http" or "https" expected.');
         self::resolveUrl(self::parseUrl('/foo'), self::parseUrl('localhost:8081'));
+    }
+
+    /**
+     * @testWith ["http://foo.com\\bar"]
+     *           ["\\\\foo.com/bar"]
+     *           ["a\rb"]
+     *           ["a\nb"]
+     *           ["a\tb"]
+     *           ["\u0000foo"]
+     *           ["foo\u0000"]
+     *           [" foo"]
+     *           ["foo "]
+     *           ["//"]
+     */
+    public function testParseMalformedUrl(string $url)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Malformed URL');
+        self::parseUrl($url);
     }
 
     /**

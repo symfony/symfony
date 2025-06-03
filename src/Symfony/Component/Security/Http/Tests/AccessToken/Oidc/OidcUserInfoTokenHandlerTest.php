@@ -33,7 +33,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
             'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
             'email' => 'foo@example.com',
         ];
-        $expectedUser = new OidcUser(...$claims);
+        $expectedUser = new OidcUser(...$claims, userIdentifier: $claims[$claim]);
 
         $responseMock = $this->createMock(ResponseInterface::class);
         $responseMock->expects($this->once())
@@ -52,7 +52,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
         $this->assertInstanceOf(OidcUser::class, $actualUser);
         $this->assertEquals($expectedUser, $actualUser);
         $this->assertEquals($claims, $userBadge->getAttributes());
-        $this->assertEquals($claims['sub'], $actualUser->getUserIdentifier());
+        $this->assertEquals($claims[$claim], $actualUser->getUserIdentifier());
     }
 
     public static function getClaims(): iterable
@@ -63,15 +63,10 @@ class OidcUserInfoTokenHandlerTest extends TestCase
 
     public function testThrowsAnExceptionIfUserPropertyIsMissing()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
-        $response = ['foo' => 'bar'];
-
         $responseMock = $this->createMock(ResponseInterface::class);
         $responseMock->expects($this->once())
             ->method('toArray')
-            ->willReturn($response);
+            ->willReturn(['foo' => 'bar']);
 
         $clientMock = $this->createMock(HttpClientInterface::class);
         $clientMock->expects($this->once())
@@ -83,6 +78,10 @@ class OidcUserInfoTokenHandlerTest extends TestCase
             ->method('error');
 
         $handler = new OidcUserInfoTokenHandler($clientMock, $loggerMock);
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+
         $handler->getUserBadgeFrom('a-secret-token');
     }
 }

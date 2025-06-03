@@ -130,6 +130,11 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $options['option'] = 'bar';
         $options['show_deprecated'] = true;
         yield [$resolvedType->getOptionsResolver(), $options, 'deprecated_option'];
+
+        $resolvedType = new ResolvedFormType(new FooType(), [], $parent);
+        $options['type'] = $resolvedType->getInnerType();
+        $options['option'] = 'baz';
+        yield [$resolvedType->getOptionsResolver(), $options, 'nested_option'];
     }
 
     abstract protected function getDescriptor();
@@ -153,7 +158,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     private function getFixtureFilename($name)
     {
-        return sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat());
+        return \sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat());
     }
 }
 
@@ -172,5 +177,9 @@ class FooType extends AbstractType
         $resolver->setAllowedTypes('foo', 'string');
         $resolver->setAllowedValues('foo', ['bar', 'baz']);
         $resolver->setNormalizer('foo', fn (Options $options, $value) => (string) $value);
+        $resolver->setOptions('baz', function (OptionsResolver $baz) {
+            $baz->setRequired('foo');
+            $baz->setDefaults(['foo' => true, 'bar' => true]);
+        });
     }
 }

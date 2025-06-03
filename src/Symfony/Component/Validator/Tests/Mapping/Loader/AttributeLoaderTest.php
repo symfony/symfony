@@ -29,7 +29,6 @@ use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
@@ -37,7 +36,7 @@ class AttributeLoaderTest extends TestCase
 {
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $metadata = new ClassMetadata($this->getFixtureNamespace().'\Entity');
 
         $this->assertTrue($loader->loadClassMetadata($metadata));
@@ -45,7 +44,7 @@ class AttributeLoaderTest extends TestCase
 
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $metadata = new ClassMetadata('\stdClass');
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
@@ -53,7 +52,7 @@ class AttributeLoaderTest extends TestCase
 
     public function testLoadClassMetadata()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $namespace = $this->getFixtureNamespace();
 
         $metadata = new ClassMetadata($namespace.'\Entity');
@@ -67,29 +66,29 @@ class AttributeLoaderTest extends TestCase
         $expected->addConstraint(new Sequentially([
             new Expression('this.getFirstName() != null'),
         ]));
-        $expected->addConstraint(new Callback(['callback' => 'validateMe', 'payload' => 'foo']));
+        $expected->addConstraint(new Callback(callback: 'validateMe', payload: 'foo'));
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addPropertyConstraint('firstName', new NotNull());
-        $expected->addPropertyConstraint('firstName', new Range(['min' => 3]));
-        $expected->addPropertyConstraint('firstName', new All([new NotNull(), new Range(['min' => 3])]));
-        $expected->addPropertyConstraint('firstName', new All(['constraints' => [new NotNull(), new Range(['min' => 3])]]));
-        $expected->addPropertyConstraint('firstName', new Collection([
-            'foo' => [new NotNull(), new Range(['min' => 3])],
-            'bar' => new Range(['min' => 5]),
+        $expected->addPropertyConstraint('firstName', new Range(min: 3));
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new Collection(fields: [
+            'foo' => [new NotNull(), new Range(min: 3)],
+            'bar' => new Range(min: 5),
             'baz' => new Required([new Email()]),
             'qux' => new Optional([new NotBlank()]),
-        ], null, null, true));
-        $expected->addPropertyConstraint('firstName', new Choice([
-            'message' => 'Must be one of %choices%',
-            'choices' => ['A', 'B'],
-        ]));
+        ], allowExtraFields: true));
+        $expected->addPropertyConstraint('firstName', new Choice(
+            message: 'Must be one of %choices%',
+            choices: ['A', 'B'],
+        ));
         $expected->addPropertyConstraint('firstName', new AtLeastOneOf([
             new NotNull(),
-            new Range(['min' => 3]),
+            new Range(min: 3),
         ], null, null, 'foo', null, false));
         $expected->addPropertyConstraint('firstName', new Sequentially([
             new NotBlank(),
-            new Range(['min' => 5]),
+            new Range(min: 5),
         ]));
         $expected->addPropertyConstraint('childA', new Valid());
         $expected->addPropertyConstraint('childB', new Valid());
@@ -105,11 +104,11 @@ class AttributeLoaderTest extends TestCase
     }
 
     /**
-     * Test MetaData merge with parent annotation.
+     * Test MetaData merge with parent attribute.
      */
     public function testLoadParentClassMetadata()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $namespace = $this->getFixtureNamespace();
 
         // Load Parent MetaData
@@ -124,11 +123,11 @@ class AttributeLoaderTest extends TestCase
     }
 
     /**
-     * Test MetaData merge with parent annotation.
+     * Test MetaData merge with parent attribute.
      */
     public function testLoadClassMetadataAndMerge()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $namespace = $this->getFixtureNamespace();
 
         // Load Parent MetaData
@@ -153,29 +152,29 @@ class AttributeLoaderTest extends TestCase
         $expected->addConstraint(new Sequentially([
             new Expression('this.getFirstName() != null'),
         ]));
-        $expected->addConstraint(new Callback(['callback' => 'validateMe', 'payload' => 'foo']));
+        $expected->addConstraint(new Callback(callback: 'validateMe', payload: 'foo'));
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addPropertyConstraint('firstName', new NotNull());
-        $expected->addPropertyConstraint('firstName', new Range(['min' => 3]));
-        $expected->addPropertyConstraint('firstName', new All([new NotNull(), new Range(['min' => 3])]));
-        $expected->addPropertyConstraint('firstName', new All(['constraints' => [new NotNull(), new Range(['min' => 3])]]));
-        $expected->addPropertyConstraint('firstName', new Collection([
-            'foo' => [new NotNull(), new Range(['min' => 3])],
-            'bar' => new Range(['min' => 5]),
+        $expected->addPropertyConstraint('firstName', new Range(min: 3));
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new Collection(fields: [
+            'foo' => [new NotNull(), new Range(min: 3)],
+            'bar' => new Range(min: 5),
             'baz' => new Required([new Email()]),
             'qux' => new Optional([new NotBlank()]),
-        ], null, null, true));
-        $expected->addPropertyConstraint('firstName', new Choice([
-            'message' => 'Must be one of %choices%',
-            'choices' => ['A', 'B'],
-        ]));
+        ], allowExtraFields: true));
+        $expected->addPropertyConstraint('firstName', new Choice(
+            message: 'Must be one of %choices%',
+            choices: ['A', 'B'],
+        ));
         $expected->addPropertyConstraint('firstName', new AtLeastOneOf([
             new NotNull(),
-            new Range(['min' => 3]),
+            new Range(min: 3),
         ], null, null, 'foo', null, false));
         $expected->addPropertyConstraint('firstName', new Sequentially([
             new NotBlank(),
-            new Range(['min' => 5]),
+            new Range(min: 5),
         ]));
         $expected->addPropertyConstraint('childA', new Valid());
         $expected->addPropertyConstraint('childB', new Valid());
@@ -196,9 +195,9 @@ class AttributeLoaderTest extends TestCase
         $this->assertInstanceOf(NotNull::class, $otherMetadata[1]->getConstraints()[0]);
     }
 
-    public function testLoadGroupSequenceProviderAnnotation()
+    public function testLoadGroupSequenceProviderAttribute()
     {
-        $loader = $this->createAnnotationLoader();
+        $loader = $this->createAttributeLoader();
         $namespace = $this->getFixtureNamespace();
 
         $metadata = new ClassMetadata($namespace.'\GroupSequenceProviderEntity');
@@ -211,7 +210,23 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    protected function createAnnotationLoader(): AnnotationLoader
+    public function testLoadExternalGroupSequenceProvider()
+    {
+        $loader = $this->createAttributeLoader();
+        $namespace = $this->getFixtureAttributeNamespace();
+
+        $metadata = new ClassMetadata($namespace.'\GroupProviderDto');
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata($namespace.'\GroupProviderDto');
+        $expected->setGroupProvider('Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider');
+        $expected->setGroupSequenceProvider(true);
+        $expected->getReflectionClass();
+
+        $this->assertEquals($expected, $metadata);
+    }
+
+    protected function createAttributeLoader(): AttributeLoader
     {
         return new AttributeLoader();
     }
@@ -219,5 +234,10 @@ class AttributeLoaderTest extends TestCase
     protected function getFixtureNamespace(): string
     {
         return 'Symfony\Component\Validator\Tests\Fixtures\NestedAttribute';
+    }
+
+    protected function getFixtureAttributeNamespace(): string
+    {
+        return 'Symfony\Component\Validator\Tests\Fixtures\Attribute';
     }
 }

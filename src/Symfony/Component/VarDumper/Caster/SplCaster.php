@@ -19,6 +19,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @final
+ *
+ * @internal since Symfony 7.3
  */
 class SplCaster
 {
@@ -29,26 +31,17 @@ class SplCaster
         \SplFileObject::READ_CSV => 'READ_CSV',
     ];
 
-    /**
-     * @return array
-     */
-    public static function castArrayObject(\ArrayObject $c, array $a, Stub $stub, bool $isNested)
+    public static function castArrayObject(\ArrayObject $c, array $a, Stub $stub, bool $isNested): array
     {
         return self::castSplArray($c, $a, $stub, $isNested);
     }
 
-    /**
-     * @return array
-     */
-    public static function castArrayIterator(\ArrayIterator $c, array $a, Stub $stub, bool $isNested)
+    public static function castArrayIterator(\ArrayIterator $c, array $a, Stub $stub, bool $isNested): array
     {
         return self::castSplArray($c, $a, $stub, $isNested);
     }
 
-    /**
-     * @return array
-     */
-    public static function castHeap(\Iterator $c, array $a, Stub $stub, bool $isNested)
+    public static function castHeap(\Iterator $c, array $a, Stub $stub, bool $isNested): array
     {
         $a += [
             Caster::PREFIX_VIRTUAL.'heap' => iterator_to_array(clone $c),
@@ -57,10 +50,7 @@ class SplCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castDoublyLinkedList(\SplDoublyLinkedList $c, array $a, Stub $stub, bool $isNested)
+    public static function castDoublyLinkedList(\SplDoublyLinkedList $c, array $a, Stub $stub, bool $isNested): array
     {
         $prefix = Caster::PREFIX_VIRTUAL;
         $mode = $c->getIteratorMode();
@@ -75,10 +65,7 @@ class SplCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castFileInfo(\SplFileInfo $c, array $a, Stub $stub, bool $isNested)
+    public static function castFileInfo(\SplFileInfo $c, array $a, Stub $stub, bool $isNested): array
     {
         static $map = [
             'path' => 'getPath',
@@ -141,7 +128,7 @@ class SplCaster
         }
 
         if (isset($a[$prefix.'perms'])) {
-            $a[$prefix.'perms'] = new ConstStub(sprintf('0%o', $a[$prefix.'perms']), $a[$prefix.'perms']);
+            $a[$prefix.'perms'] = new ConstStub(\sprintf('0%o', $a[$prefix.'perms']), $a[$prefix.'perms']);
         }
 
         static $mapDate = ['aTime', 'mTime', 'cTime'];
@@ -154,10 +141,7 @@ class SplCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castFileObject(\SplFileObject $c, array $a, Stub $stub, bool $isNested)
+    public static function castFileObject(\SplFileObject $c, array $a, Stub $stub, bool $isNested): array
     {
         static $map = [
             'csvControl' => 'getCsvControl',
@@ -194,10 +178,7 @@ class SplCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castObjectStorage(\SplObjectStorage $c, array $a, Stub $stub, bool $isNested)
+    public static function castObjectStorage(\SplObjectStorage $c, array $a, Stub $stub, bool $isNested): array
     {
         $storage = [];
         unset($a[Caster::PREFIX_DYNAMIC."\0gcdata"]); // Don't hit https://bugs.php.net/65967
@@ -208,7 +189,7 @@ class SplCaster
             $storage[] = new EnumStub([
                 'object' => $obj,
                 'info' => $clone->getInfo(),
-             ]);
+            ]);
         }
 
         $a += [
@@ -218,30 +199,21 @@ class SplCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castOuterIterator(\OuterIterator $c, array $a, Stub $stub, bool $isNested)
+    public static function castOuterIterator(\OuterIterator $c, array $a, Stub $stub, bool $isNested): array
     {
         $a[Caster::PREFIX_VIRTUAL.'innerIterator'] = $c->getInnerIterator();
 
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castWeakReference(\WeakReference $c, array $a, Stub $stub, bool $isNested)
+    public static function castWeakReference(\WeakReference $c, array $a, Stub $stub, bool $isNested): array
     {
         $a[Caster::PREFIX_VIRTUAL.'object'] = $c->get();
 
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castWeakMap(\WeakMap $c, array $a, Stub $stub, bool $isNested)
+    public static function castWeakMap(\WeakMap $c, array $a, Stub $stub, bool $isNested): array
     {
         $map = [];
 
@@ -249,7 +221,7 @@ class SplCaster
             $map[] = new EnumStub([
                 'object' => $obj,
                 'data' => $data,
-             ]);
+            ]);
         }
 
         $a += [

@@ -18,13 +18,12 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!\array_key_exists('testPrune', $this->skippedTests) && !$this->createCachePool() instanceof PruneableInterface) {
             $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
         }
@@ -234,7 +233,7 @@ abstract class AdapterTestCase extends CachePoolTest
         /** @var PruneableInterface|CacheItemPoolInterface $cache */
         $cache = $this->createCachePool();
 
-        $doSet = function ($name, $value, \DateInterval $expiresAfter = null) use ($cache) {
+        $doSet = function ($name, $value, ?\DateInterval $expiresAfter = null) use ($cache) {
             $item = $cache->getItem($name);
             $item->set($value);
 
@@ -352,11 +351,55 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $this->assertEquals('value-50', $cache->getItem((string) 50)->get());
     }
+
+    public function testErrorsDontInvalidate()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $item = $cache->getItem('foo');
+        $this->assertTrue($cache->save($item->set('bar')));
+        $this->assertTrue($cache->hasItem('foo'));
+
+        $item->set(static fn () => null);
+        $this->assertFalse($cache->save($item));
+        $this->assertSame('bar', $cache->getItem('foo')->get());
+    }
+
+    public function testNamespaces()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $this->assertInstanceOf(NamespacedPoolInterface::class, $cache);
+
+        $derived = $cache->withSubNamespace('derived');
+
+        $item = $derived->getItem('foo');
+        $derived->save($item->set('Foo'));
+
+        $this->assertFalse($cache->getItem('foo')->isHit());
+
+        $item = $cache->getItem('bar');
+        $cache->save($item->set('Bar'));
+
+        $this->assertFalse($derived->getItem('bar')->isHit());
+        $this->assertTrue($cache->getItem('bar')->isHit());
+
+        $derived = $cache->withSubNamespace('derived');
+        $this->assertTrue($derived->getItem('foo')->isHit());
+    }
 }
 
 class NotUnserializable
 {
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \Exception(__CLASS__);
     }

@@ -23,7 +23,7 @@ class InputArgumentTest extends TestCase
     public function testConstructor()
     {
         $argument = new InputArgument('foo');
-        $this->assertEquals('foo', $argument->getName(), '__construct() takes a name as its first argument');
+        $this->assertSame('foo', $argument->getName(), '__construct() takes a name as its first argument');
     }
 
     public function testModes()
@@ -62,13 +62,13 @@ class InputArgumentTest extends TestCase
     public function testGetDescription()
     {
         $argument = new InputArgument('foo', null, 'Some description');
-        $this->assertEquals('Some description', $argument->getDescription(), '->getDescription() return the message description');
+        $this->assertSame('Some description', $argument->getDescription(), '->getDescription() return the message description');
     }
 
     public function testGetDefault()
     {
         $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', 'default');
-        $this->assertEquals('default', $argument->getDefault(), '->getDefault() return the default value');
+        $this->assertSame('default', $argument->getDefault(), '->getDefault() return the default value');
     }
 
     public function testSetDefault()
@@ -77,34 +77,40 @@ class InputArgumentTest extends TestCase
         $argument->setDefault(null);
         $this->assertNull($argument->getDefault(), '->setDefault() can reset the default value by passing null');
         $argument->setDefault('another');
-        $this->assertEquals('another', $argument->getDefault(), '->setDefault() changes the default value');
+        $this->assertSame('another', $argument->getDefault(), '->setDefault() changes the default value');
 
         $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
         $argument->setDefault([1, 2]);
-        $this->assertEquals([1, 2], $argument->getDefault(), '->setDefault() changes the default value');
+        $this->assertSame([1, 2], $argument->getDefault(), '->setDefault() changes the default value');
     }
 
     public function testSetDefaultWithRequiredArgument()
     {
+        $argument = new InputArgument('foo', InputArgument::REQUIRED);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
-        $argument = new InputArgument('foo', InputArgument::REQUIRED);
+
         $argument->setDefault('default');
     }
 
     public function testSetDefaultWithRequiredArrayArgument()
     {
+        $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
-        $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
+
         $argument->setDefault([]);
     }
 
     public function testSetDefaultWithArrayArgument()
     {
+        $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
+
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A default value for an array argument must be an array.');
-        $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
+
         $argument->setDefault('default');
     }
 
@@ -130,10 +136,11 @@ class InputArgumentTest extends TestCase
 
     public function testCompleteClosureReturnIncorrectType()
     {
+        $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
+
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Closure for argument "foo" must return an array. Got "string".');
 
-        $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
         $argument->complete(new CompletionInput(), new CompletionSuggestions());
     }
 }

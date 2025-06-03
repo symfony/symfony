@@ -530,9 +530,13 @@ return [
             'SHP',
             'Pauni ya St. Helena',
         ],
+        'SLE' => [
+            'SLE',
+            'Leone ya Siera Leoni',
+        ],
         'SLL' => [
             'SLL',
-            'Leone ya Siera Leoni',
+            'Leone ya Siera Leoni (1964—2022)',
         ],
         'SOS' => [
             'SOS',

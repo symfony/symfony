@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add compact nested mapping support by using the `Yaml::DUMP_COMPACT_NESTED_MAPPING` flag
+ * Add the `Yaml::DUMP_FORCE_DOUBLE_QUOTES_ON_VALUES` flag to enforce double quotes around string values
+
+7.2
+---
+
+ * Deprecate parsing duplicate mapping keys whose value is `null`
+ * Add support for dumping `null` as an empty value by using the `Yaml::DUMP_NULL_AS_EMPTY` flag
+
+7.1
+---
+
+ * Add support for getting all the enum cases with `!php/enum Foo`
+
+7.0
+---
+
+ * Remove the `!php/const:` tag, use `!php/const` instead (without the colon)
+
 6.3
 ---
 

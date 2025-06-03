@@ -85,6 +85,28 @@ class RequestContextTest extends TestCase
         $this->assertSame('/', $requestContext->getPathInfo());
     }
 
+    /**
+     * @testWith ["http://foo.com\\bar"]
+     *           ["\\\\foo.com/bar"]
+     *           ["a\rb"]
+     *           ["a\nb"]
+     *           ["a\tb"]
+     *           ["\u0000foo"]
+     *           ["foo\u0000"]
+     *           [" foo"]
+     *           ["foo "]
+     *           [":"]
+     */
+    public function testFromBadUri(string $uri)
+    {
+        $context = RequestContext::fromUri($uri);
+
+        $this->assertSame('http', $context->getScheme());
+        $this->assertSame('localhost', $context->getHost());
+        $this->assertSame('', $context->getBaseUrl());
+        $this->assertSame('/', $context->getPathInfo());
+    }
+
     public function testFromRequest()
     {
         $request = Request::create('https://test.com:444/foo?bar=baz');

@@ -60,19 +60,22 @@ class PeriodicalTriggerTest extends TestCase
     /**
      * @dataProvider getInvalidIntervals
      */
-    public function testInvalidInterval($interval)
+    public function testInvalidInterval($interval, $expectedExceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         new PeriodicalTrigger($interval, $now = new \DateTimeImmutable(), $now->modify('1 day'));
     }
 
     public static function getInvalidIntervals(): iterable
     {
-        yield ['wrong'];
-        yield ['3600.5'];
-        yield ['-3600'];
-        yield [-3600];
+        yield ['wrong', 'Unknown or bad format (wrong) at position 0 (w): The timezone could not be found in the database'];
+        yield ['3600.5', 'Unknown or bad format (3600.5) at position 5 (5): Unexpected character'];
+        yield ['-3600', 'Unknown or bad format (-3600) at position 3 (0): Unexpected character'];
+        yield [-3600, 'The "$interval" argument must be greater than zero.'];
+        yield ['0', 'The "$interval" argument must be greater than zero.'];
+        yield [0, 'The "$interval" argument must be greater than zero.'];
     }
 
     /**
@@ -96,18 +99,15 @@ class PeriodicalTriggerTest extends TestCase
         yield ['every 2 hours', new PeriodicalTrigger('2 hours', $from, $until)];
         yield ['every 2 seconds', new PeriodicalTrigger(new \DateInterval('PT2S'), $from, $until)];
         yield ['DateInterval', new PeriodicalTrigger(new \DateInterval('P1D'), $from, $until)];
-
-        if (\PHP_VERSION_ID >= 80200) {
-            yield ['last day of next month', new PeriodicalTrigger(\DateInterval::createFromDateString('last day of next month'), $from, $until)];
-        }
+        yield ['last day of next month', new PeriodicalTrigger(\DateInterval::createFromDateString('last day of next month'), $from, $until)];
     }
 
     /**
      * @dataProvider providerGetNextRunDates
      */
-    public function testGetNextRunDates(\DateTimeImmutable $from, TriggerInterface $trigger, array $expected, int $count = 0)
+    public function testGetNextRunDates(\DateTimeImmutable $from, TriggerInterface $trigger, array $expected, int $count)
     {
-        $this->assertEquals($expected, $this->getNextRunDates($from, $trigger, $count ?? \count($expected)));
+        $this->assertEquals($expected, $this->getNextRunDates($from, $trigger, $count));
     }
 
     public static function providerGetNextRunDates(): iterable

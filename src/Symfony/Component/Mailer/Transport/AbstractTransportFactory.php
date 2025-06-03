@@ -21,20 +21,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class AbstractTransportFactory implements TransportFactoryInterface
 {
-    protected $dispatcher;
-    protected $client;
-    protected $logger;
-
-    public function __construct(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null)
-    {
-        $this->dispatcher = $dispatcher;
-        $this->client = $client;
-        $this->logger = $logger;
+    public function __construct(
+        protected ?EventDispatcherInterface $dispatcher = null,
+        protected ?HttpClientInterface $client = null,
+        protected ?LoggerInterface $logger = null,
+    ) {
     }
 
     public function supports(Dsn $dsn): bool
     {
-        return \in_array($dsn->getScheme(), $this->getSupportedSchemes());
+        return \in_array($dsn->getScheme(), $this->getSupportedSchemes(), true);
     }
 
     abstract protected function getSupportedSchemes(): array;

@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class PushoverTransportTest extends TransportTestCase
 {
-    public static function createTransport(HttpClientInterface $client = null): PushoverTransport
+    public static function createTransport(?HttpClientInterface $client = null): PushoverTransport
     {
         return new PushoverTransport('userKey', 'appToken', $client ?? new MockHttpClient());
     }

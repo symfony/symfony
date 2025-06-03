@@ -35,7 +35,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
      */
     private const TAG_FOLDER = 'tags';
 
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null, MarshallerInterface $marshaller = null)
+    public function __construct(string $namespace = '', int $defaultLifetime = 0, ?string $directory = null, ?MarshallerInterface $marshaller = null)
     {
         $this->marshaller = new TagAwareMarshaller($marshaller);
         parent::__construct('', $defaultLifetime);

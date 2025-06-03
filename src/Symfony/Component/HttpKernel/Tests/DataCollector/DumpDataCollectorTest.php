@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Server\Connection;
@@ -79,7 +79,7 @@ class DumpDataCollectorTest extends TestCase
         // Collect doesn't re-trigger dump
         ob_start();
         $collector->collect(new Request(), new Response());
-        $this->assertEmpty(ob_get_clean());
+        $this->assertSame('', ob_get_clean());
         $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:6:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
     }
 
@@ -157,7 +157,7 @@ EOTXT;
 
         ob_start();
         $collector->__destruct();
-        $this->assertEmpty(ob_get_clean());
+        $this->assertSame('', ob_get_clean());
     }
 
     public function testNullContentTypeWithNoDebugEnv()
@@ -175,6 +175,6 @@ EOTXT;
 
         ob_start();
         $collector->__destruct();
-        $this->assertEmpty(ob_get_clean());
+        $this->assertSame('', ob_get_clean());
     }
 }

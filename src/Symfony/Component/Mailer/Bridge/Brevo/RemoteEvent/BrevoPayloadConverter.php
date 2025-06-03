@@ -41,14 +41,15 @@ final class BrevoPayloadConverter implements PayloadConverterInterface
                 'unique_opened' => MailerEngagementEvent::OPEN,
                 'opened' => MailerEngagementEvent::OPEN,
                 'proxy_open' => MailerEngagementEvent::OPEN,
+                'unique_proxy_open' => MailerEngagementEvent::OPEN,
                 'complaint' => MailerEngagementEvent::SPAM,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['event'])),
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['event'])),
             };
             $event = new MailerEngagementEvent($name, $payload['message-id'], $payload);
         }
 
         if (!$date = \DateTimeImmutable::createFromFormat('U', $payload['ts_event'])) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payload['ts_event']));
+            throw new ParseException(\sprintf('Invalid date "%s".', $payload['ts_event']));
         }
 
         if (
@@ -60,7 +61,10 @@ final class BrevoPayloadConverter implements PayloadConverterInterface
 
         $event->setDate($date);
         $event->setRecipientEmail($payload['email']);
-        $event->setTags($payload['tags']);
+
+        if (isset($payload['tags'])) {
+            $event->setTags($payload['tags']);
+        }
 
         return $event;
     }

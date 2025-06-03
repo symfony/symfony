@@ -92,7 +92,6 @@ return [
         'IE' => 'Irlânde',
         'IL' => 'Israëli',
         'IN' => 'Ênnde',
-        'IO' => 'Sêse tî Anglëe na Ngûyämä tî Ênnde',
         'IQ' => 'Irâki',
         'IR' => 'Iräan',
         'IS' => 'Islânde',

@@ -29,24 +29,20 @@ final class SendberryTransport extends AbstractTransport
 {
     protected const HOST = 'api.sendberry.com';
 
-    private string $username;
-    private string $password;
-    private string $authKey;
-    private string $from;
-
-    public function __construct(string $username, #[\SensitiveParameter] string $password, string $authKey, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
-    {
-        $this->username = $username;
-        $this->password = $password;
-        $this->authKey = $authKey;
-        $this->from = $from;
-
+    public function __construct(
+        private string $username,
+        #[\SensitiveParameter] private string $password,
+        private string $authKey,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('sendberry://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('sendberry://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -72,7 +68,7 @@ final class SendberryTransport extends AbstractTransport
             }
         }
 
-        $endpoint = sprintf('https://%s/SMS/SEND', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/SMS/SEND', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'json' => [
                 'from' => $from,
@@ -96,7 +92,7 @@ final class SendberryTransport extends AbstractTransport
 
         $responseArr = $response->toArray();
         if (isset($responseArr['status']) && 'ok' !== $responseArr['status']) {
-            throw new TransportException(sprintf("Unable to send the SMS. \n%s\n.", implode("\n", $responseArr['message'])), $response);
+            throw new TransportException(\sprintf("Unable to send the SMS. \n%s\n.", implode("\n", $responseArr['message'])), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

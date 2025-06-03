@@ -79,7 +79,7 @@ class Exporter
 
             if ($reflector->hasMethod('__serialize')) {
                 if (!$reflector->getMethod('__serialize')->isPublic()) {
-                    throw new \Error(sprintf('Call to %s method "%s::__serialize()".', $reflector->getMethod('__serialize')->isProtected() ? 'protected' : 'private', $class));
+                    throw new \Error(\sprintf('Call to %s method "%s::__serialize()".', $reflector->getMethod('__serialize')->isProtected() ? 'protected' : 'private', $class));
                 }
 
                 if (!\is_array($serializeProperties = $value->__serialize())) {
@@ -90,7 +90,8 @@ class Exporter
                     $properties = $serializeProperties;
                 } else {
                     foreach ($serializeProperties as $n => $v) {
-                        $c = $reflector->hasProperty($n) && ($p = $reflector->getProperty($n))->isReadOnly() ? $p->class : 'stdClass';
+                        $p = $reflector->hasProperty($n) ? $reflector->getProperty($n) : null;
+                        $c = $p && (\PHP_VERSION_ID >= 80400 ? $p->isProtectedSet() || $p->isPrivateSet() : $p->isReadOnly()) ? $p->class : 'stdClass';
                         $properties[$c][$n] = $v;
                     }
                 }
@@ -119,7 +120,6 @@ class Exporter
                 $arrayValue = (array) $value;
             } elseif ($value instanceof \Serializable
                 || $value instanceof \__PHP_Incomplete_Class
-                || \PHP_VERSION_ID < 80200 && $value instanceof \DatePeriod
             ) {
                 ++$objectsCount;
                 $objectsPool[$value] = [$id = \count($objectsPool), serialize($value), [], 0];
@@ -144,7 +144,8 @@ class Exporter
                 $i = 0;
                 $n = (string) $name;
                 if ('' === $n || "\0" !== $n[0]) {
-                    $c = $reflector->hasProperty($n) && ($p = $reflector->getProperty($n))->isReadOnly() ? $p->class : 'stdClass';
+                    $p = $reflector->hasProperty($n) ? $reflector->getProperty($n) : null;
+                    $c = $p && (\PHP_VERSION_ID >= 80400 ? $p->isProtectedSet() || $p->isPrivateSet() : $p->isReadOnly()) ? $p->class : 'stdClass';
                 } elseif ('*' === $n[1]) {
                     $n = substr($n, 3);
                     $c = $reflector->getProperty($n)->class;
@@ -159,11 +160,11 @@ class Exporter
                     $n = substr($n, 1 + $i);
                 }
                 if (null !== $sleep) {
-                    if (!isset($sleep[$n]) || ($i && $c !== $class)) {
+                    if (!isset($sleep[$name]) && (!isset($sleep[$n]) || ($i && $c !== $class))) {
                         unset($arrayValue[$name]);
                         continue;
                     }
-                    $sleep[$n] = false;
+                    unset($sleep[$name], $sleep[$n]);
                 }
                 if (!\array_key_exists($name, $proto) || $proto[$name] !== $v || "\x00Error\x00trace" === $name || "\x00Exception\x00trace" === $name) {
                     $properties[$c][$n] = $v;
@@ -171,9 +172,7 @@ class Exporter
             }
             if ($sleep) {
                 foreach ($sleep as $n => $v) {
-                    if (false !== $v) {
-                        trigger_error(sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $n), \E_USER_NOTICE);
-                    }
+                    trigger_error(\sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $n), \E_USER_NOTICE);
                 }
             }
             if (method_exists($class, '__unserialize')) {
@@ -226,10 +225,10 @@ class Exporter
         $subIndent = $indent.'    ';
 
         if (\is_string($value)) {
-            $code = sprintf("'%s'", addcslashes($value, "'\\"));
+            $code = \sprintf("'%s'", addcslashes($value, "'\\"));
 
             $code = preg_replace_callback("/((?:[\\0\\r\\n]|\u{202A}|\u{202B}|\u{202D}|\u{202E}|\u{2066}|\u{2067}|\u{2068}|\u{202C}|\u{2069})++)(.)/", function ($m) use ($subIndent) {
-                $m[1] = sprintf('\'."%s".\'', str_replace(
+                $m[1] = \sprintf('\'."%s".\'', str_replace(
                     ["\0", "\r", "\n", "\u{202A}", "\u{202B}", "\u{202D}", "\u{202E}", "\u{2066}", "\u{2067}", "\u{2068}", "\u{202C}", "\u{2069}", '\n\\'],
                     ['\0', '\r', '\n', '\u{202A}', '\u{202B}', '\u{202D}', '\u{202E}', '\u{2066}', '\u{2067}', '\u{2068}', '\u{202C}', '\u{2069}', '\n"'."\n".$subIndent.'."\\'],
                     $m[1]
@@ -287,7 +286,7 @@ class Exporter
             return self::exportHydrator($value, $indent, $subIndent);
         }
 
-        throw new \UnexpectedValueException(sprintf('Cannot export value of type "%s".', get_debug_type($value)));
+        throw new \UnexpectedValueException(\sprintf('Cannot export value of type "%s".', get_debug_type($value)));
     }
 
     private static function exportRegistry(Registry $value, string $indent, string $subIndent): string

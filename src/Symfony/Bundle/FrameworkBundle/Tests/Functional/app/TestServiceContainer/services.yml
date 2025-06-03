@@ -23,3 +23,8 @@ services:
         decorates: decorated
         properties:
             inner: '@.inner'
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\ResettableService:
+        public: true
+        tags:
+            - kernel.reset: { method: 'myCustomName' }

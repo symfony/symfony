@@ -31,11 +31,9 @@ class NodeExtension extends AbstractExtension
     public const ATTRIBUTE_NAME_IN_LOWER_CASE = 2;
     public const ATTRIBUTE_VALUE_IN_LOWER_CASE = 4;
 
-    private int $flags;
-
-    public function __construct(int $flags = 0)
-    {
-        $this->flags = $flags;
+    public function __construct(
+        private int $flags = 0,
+    ) {
     }
 
     /**
@@ -65,6 +63,8 @@ class NodeExtension extends AbstractExtension
             'Selector' => $this->translateSelector(...),
             'CombinedSelector' => $this->translateCombinedSelector(...),
             'Negation' => $this->translateNegation(...),
+            'Matching' => $this->translateMatching(...),
+            'SpecificityAdjustment' => $this->translateSpecificityAdjustment(...),
             'Function' => $this->translateFunction(...),
             'Pseudo' => $this->translatePseudo(...),
             'Attribute' => $this->translateAttribute(...),
@@ -91,10 +91,40 @@ class NodeExtension extends AbstractExtension
         $subXpath->addNameTest();
 
         if ($subXpath->getCondition()) {
-            return $xpath->addCondition(sprintf('not(%s)', $subXpath->getCondition()));
+            return $xpath->addCondition(\sprintf('not(%s)', $subXpath->getCondition()));
         }
 
         return $xpath->addCondition('0');
+    }
+
+    public function translateMatching(Node\MatchingNode $node, Translator $translator): XPathExpr
+    {
+        $xpath = $translator->nodeToXPath($node->selector);
+
+        foreach ($node->arguments as $argument) {
+            $expr = $translator->nodeToXPath($argument);
+            $expr->addNameTest();
+            if ($condition = $expr->getCondition()) {
+                $xpath->addCondition($condition, 'or');
+            }
+        }
+
+        return $xpath;
+    }
+
+    public function translateSpecificityAdjustment(Node\SpecificityAdjustmentNode $node, Translator $translator): XPathExpr
+    {
+        $xpath = $translator->nodeToXPath($node->selector);
+
+        foreach ($node->arguments as $argument) {
+            $expr = $translator->nodeToXPath($argument);
+            $expr->addNameTest();
+            if ($condition = $expr->getCondition()) {
+                $xpath->addCondition($condition, 'or');
+            }
+        }
+
+        return $xpath;
     }
 
     public function translateFunction(Node\FunctionNode $node, Translator $translator): XPathExpr
@@ -121,11 +151,11 @@ class NodeExtension extends AbstractExtension
         }
 
         if ($node->getNamespace()) {
-            $name = sprintf('%s:%s', $node->getNamespace(), $name);
+            $name = \sprintf('%s:%s', $node->getNamespace(), $name);
             $safe = $safe && $this->isSafeName($node->getNamespace());
         }
 
-        $attribute = $safe ? '@'.$name : sprintf('attribute::*[name() = %s]', Translator::getXpathLiteral($name));
+        $attribute = $safe ? '@'.$name : \sprintf('attribute::*[name() = %s]', Translator::getXpathLiteral($name));
         $value = $node->getValue();
         $xpath = $translator->nodeToXPath($node->getSelector());
 
@@ -166,7 +196,7 @@ class NodeExtension extends AbstractExtension
         }
 
         if ($node->getNamespace()) {
-            $element = sprintf('%s:%s', $node->getNamespace(), $element);
+            $element = \sprintf('%s:%s', $node->getNamespace(), $element);
             $safe = $safe && $this->isSafeName($node->getNamespace());
         }
 

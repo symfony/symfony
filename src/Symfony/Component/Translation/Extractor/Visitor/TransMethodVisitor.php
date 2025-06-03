@@ -26,6 +26,11 @@ final class TransMethodVisitor extends AbstractVisitor implements NodeVisitor
 
     public function enterNode(Node $node): ?Node
     {
+        return null;
+    }
+
+    public function leaveNode(Node $node): ?Node
+    {
         if (!$node instanceof Node\Expr\MethodCall && !$node instanceof Node\Expr\FuncCall) {
             return null;
         }
@@ -34,12 +39,12 @@ final class TransMethodVisitor extends AbstractVisitor implements NodeVisitor
             return null;
         }
 
-        $name = (string) $node->name;
+        $name = $node->name instanceof Node\Name ? $node->name->getLast() : (string) $node->name;
 
         if ('trans' === $name || 't' === $name) {
             $firstNamedArgumentIndex = $this->nodeFirstNamedArgumentIndex($node);
 
-            if (!$messages = $this->getStringArguments($node, 0 < $firstNamedArgumentIndex ? 0 : 'message')) {
+            if (!$messages = $this->getStringArguments($node, 0 < $firstNamedArgumentIndex ? 0 : 'id')) {
                 return null;
             }
 
@@ -50,11 +55,6 @@ final class TransMethodVisitor extends AbstractVisitor implements NodeVisitor
             }
         }
 
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
         return null;
     }
 

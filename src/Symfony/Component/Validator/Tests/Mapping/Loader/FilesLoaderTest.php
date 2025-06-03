@@ -36,11 +36,13 @@ class FilesLoaderTest extends TestCase
 
     public function getFilesLoader(LoaderInterface $loader)
     {
-        return $this->getMockForAbstractClass(FilesLoader::class, [[
+        $files = [
             __DIR__.'/constraint-mapping.xml',
             __DIR__.'/constraint-mapping.yaml',
             __DIR__.'/constraint-mapping.test',
             __DIR__.'/constraint-mapping.txt',
-        ], $loader]);
+        ];
+
+        return new class($files, $loader) extends FilesLoader {};
     }
 }

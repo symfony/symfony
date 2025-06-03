@@ -36,17 +36,22 @@ final class WebhookController
     public function handle(string $type, Request $request): Response
     {
         if (!isset($this->parsers[$type])) {
-            return new Response(sprintf('No parser found for webhook of type "%s".', $type), 404);
+            return new Response('No webhook parser found for the type given in the URL.', 404, ['Content-Type' => 'text/plain']);
         }
         /** @var RequestParserInterface $parser */
         $parser = $this->parsers[$type]['parser'];
+        $events = $parser->parse($request, $this->parsers[$type]['secret']);
 
-        if (!$event = $parser->parse($request, $this->parsers[$type]['secret'])) {
-            return $parser->createRejectedResponse('Unable to parse the webhook payload.');
+        if (!$events) {
+            return $parser->createRejectedResponse('Unable to parse the webhook payload.', $request);
         }
 
-        $this->bus->dispatch(new ConsumeRemoteEventMessage($type, $event));
+        $events = \is_array($events) ? $events : [$events];
 
-        return $parser->createSuccessfulResponse();
+        foreach ($events as $event) {
+            $this->bus->dispatch(new ConsumeRemoteEventMessage($type, $event));
+        }
+
+        return $parser->createSuccessfulResponse($request);
     }
 }

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Translation\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
 use Symfony\Component\Translation\DataCollectorTranslator;
 
@@ -128,6 +130,27 @@ class TranslationDataCollectorTest extends TestCase
         $this->assertEquals(1, $dataCollector->getCountDefines());
 
         $this->assertEquals($expectedMessages, array_values($dataCollector->getMessages()->getValue(true)));
+    }
+
+    public function testCollectAndReset()
+    {
+        $translator = $this->getTranslator();
+        $translator->method('getLocale')->willReturn('fr');
+        $translator->method('getFallbackLocales')->willReturn(['en']);
+        $translator->method('getGlobalParameters')->willReturn(['welcome' => 'Welcome {name}!']);
+
+        $dataCollector = new TranslationDataCollector($translator);
+        $dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
+
+        $this->assertSame('fr', $dataCollector->getLocale());
+        $this->assertSame(['en'], $dataCollector->getFallbackLocales());
+        $this->assertSame(['welcome' => 'Welcome {name}!'], $dataCollector->getGlobalParameters());
+
+        $dataCollector->reset();
+
+        $this->assertNull($dataCollector->getLocale());
+        $this->assertSame([], $dataCollector->getFallbackLocales());
+        $this->assertSame([], $dataCollector->getGlobalParameters());
     }
 
     private function getTranslator()

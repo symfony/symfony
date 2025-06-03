@@ -17,7 +17,6 @@
             importmap-path="%kernel.project_dir%/importmap.php"
             importmap-polyfill="https://cdn.example.com/polyfill.js"
             vendor-dir="%kernel.project_dir%/assets/vendor"
-            provider="jspm"
         >
             <framework:path>assets/</framework:path>
             <framework:path namespace="my_namespace">assets2/</framework:path>

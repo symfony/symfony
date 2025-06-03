@@ -568,6 +568,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #52234  add return type hints to EntityFactory (xabbuh)
  * bug #52229 [FrameworkBundle] Fix CommandDataCollector is always registered (smnandre)
  * bug #52218 [FrameworkBundle] Add conflict with `WebProfilerBundle` < 6.4 (HeahDude)
+ * bug [#60459] [Translations] Reviewd and fixed cs translation
 
 * 6.4.0-BETA1 (2023-10-21)
 

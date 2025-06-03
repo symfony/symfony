@@ -3788,3 +3788,4 @@ The Symfony Connect username in parenthesis allows to get more information
  - RENAUDIN Xavier (xorrox)
  - Yannick Vanhaeren (yvh)
  - Zan Baldwin (zanderbaldwin)
+ - Jiří Kořenek

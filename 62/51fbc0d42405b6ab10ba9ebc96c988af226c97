@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Neirda24 at 2025-06-03T09:03:37Z
+
+Awesome ! Would it be worth waiting for 8.5 for this kind of feature ? https://wiki.php.net/rfc/closures_in_const_expr It could be wild for some features. Otherwise it would have to wait 2 years for symfony 9 before including such functionnalities in core. I know that the timing is short because 8.5 is planned for November I think...
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-03T09:13:58Z
+
+@Neirda24 We already *support* using static closures in some attributes in Symfony 7.3. We don't need to make PHP 8.5 the minimum supported version to benefit from those, as long as the usage of a closure is not required when using the attribute. For instance, `IsGranted` added support for using a static closure, but kept support for using an Expression (same for the `When` constraint).
+
+And PHP 8.5.0 will be will be approximately at the same time than Symfony 8.0.0. This does not qualify it as a candidate for the min version, as it would make it too hard to upgrade to it (many companies don't upgrade their prod to the `.0` release of PHP, to give it more time to stabilize with a few patch versions before they upgrade prod environments)

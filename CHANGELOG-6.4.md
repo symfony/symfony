@@ -162,7 +162,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 * 6.4.16 (2024-11-27)
 
  * bug #59013 [HttpClient] Fix checking for private IPs before connecting (nicolas-grekas)
- * bug #58562 [HttpClient] Close gracefull when the server closes the connection abruptly (discordier)
+ * bug #58562 [HttpClient] Close graceful when the server closes the connection abruptly (discordier)
  * bug #59007 [Dotenv] read runtime config from composer.json in debug dotenv command (xabbuh)
  * bug #58963 [PropertyInfo] Fix write visibility for Asymmetric Visibility and Virtual Properties (xabbuh, pan93412)
  * bug #58983 [Translation] [Bridge][Lokalise] Fix empty keys array in PUT, DELETE requests causing Lokalise API error (DominicLuidold)

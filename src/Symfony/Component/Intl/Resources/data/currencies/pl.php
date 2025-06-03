@@ -528,7 +528,7 @@ return [
         ],
         'LSL' => [
             'LSL',
-            'loti sotyjskie',
+            'loti lesotyjskie',
         ],
         'LTL' => [
             'LTL',

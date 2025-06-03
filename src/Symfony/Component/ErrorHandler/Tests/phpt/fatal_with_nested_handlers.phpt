@@ -24,7 +24,7 @@ var_dump([
 $eHandler[0]->setExceptionHandler('print_r');
 
 if (true) {
-    class Broken implements \Iterator
+    class Broken implements \JsonSerializable
     {
     }
 }
@@ -37,17 +37,17 @@ array(1) {
 }
 object(Symfony\Component\ErrorHandler\Error\FatalError)#%d (%d) {
   ["message":protected]=>
-  string(209) "Error: Class Symfony\Component\ErrorHandler\Broken contains 5 abstract methods and must therefore be declared abstract or implement the remaining methods (Iterator::current, Iterator::next, Iterator::key, ...)"
+  string(186) "Error: Class Symfony\Component\ErrorHandler\Broken contains 1 abstract method and must therefore be declared abstract or implement the remaining methods (JsonSerializable::jsonSerialize)"
 %a
   ["error":"Symfony\Component\ErrorHandler\Error\FatalError":private]=>
-  array(%d) {
+  array(4) {
     ["type"]=>
     int(1)
     ["message"]=>
-    string(202) "Class Symfony\Component\ErrorHandler\Broken contains 5 abstract methods and must therefore be declared abstract or implement the remaining methods (Iterator::current, Iterator::next, Iterator::key, ...)"
+    string(179) "Class Symfony\Component\ErrorHandler\Broken contains 1 abstract method and must therefore be declared abstract or implement the remaining methods (JsonSerializable::jsonSerialize)"
     ["file"]=>
     string(%d) "%s"
     ["line"]=>
-    int(%d)%A
+    int(%d)
   }
 }

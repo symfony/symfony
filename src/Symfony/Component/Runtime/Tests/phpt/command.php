@@ -19,9 +19,7 @@ require __DIR__.'/autoload.php';
 return function (Command $command, InputInterface $input, OutputInterface $output, array $context) {
     $command->addOption('hello', 'e', InputOption::VALUE_REQUIRED, 'How should I greet?', 'OK');
 
-    return $command->setCode(function () use ($input, $output, $context): int {
+    return $command->setCode(function () use ($input, $output, $context) {
         $output->write($input->getOption('hello').' Command '.$context['SOME_VAR']);
-
-        return 0;
     });
 };

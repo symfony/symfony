@@ -45,7 +45,7 @@ final class BodyRenderer implements BodyRendererInterface
             return;
         }
 
-        if ($message->isRendered()) {
+        if (null === $message->getTextTemplate() && null === $message->getHtmlTemplate()) {
             // email has already been rendered
             return;
         }

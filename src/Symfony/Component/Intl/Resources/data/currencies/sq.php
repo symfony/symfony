@@ -516,11 +516,11 @@ return [
         ],
         'SLE' => [
             'SLE',
-            'Leoni i Siera-Leones',
+            'Leoni i Sierra-Leones',
         ],
         'SLL' => [
             'SLL',
-            'Leoni i Siera-Leones (1964–2022)',
+            'Leoni i Sierra-Leones (1964—2022)',
         ],
         'SOS' => [
             'SOS',

@@ -42,6 +42,7 @@ class WeekType extends AbstractType
         } else {
             $yearOptions = $weekOptions = [
                 'error_bubbling' => true,
+                'empty_data' => '',
             ];
             // when the form is compound the entries of the array are ignored in favor of children data
             // so we need to handle the cascade setting here

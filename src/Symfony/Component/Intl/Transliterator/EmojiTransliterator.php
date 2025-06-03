@@ -70,22 +70,14 @@ if (!class_exists(\Transliterator::class)) {
             return self::create($this->id, self::REVERSE);
         }
 
-        /**
-         * @return int
-         */
-        #[\ReturnTypeWillChange]
         public function getErrorCode(): int|false
         {
-            return isset($this->transliterator) ? $this->transliterator->getErrorCode() : 0;
+            return $this->transliterator?->getErrorCode() ?? 0;
         }
 
-        /**
-         * @return string
-         */
-        #[\ReturnTypeWillChange]
         public function getErrorMessage(): string|false
         {
-            return isset($this->transliterator) ? $this->transliterator->getErrorMessage() : '';
+            return $this->transliterator?->getErrorMessage() ?? false;
         }
 
         public static function listIDs(): array

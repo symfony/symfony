@@ -153,7 +153,7 @@ class EntityValueResolverTest extends TestCase
         $request = new Request();
         $request->attributes->set('nullValue', null);
 
-        $argument = $this->createArgument(entity: new MapEntity(id: ['nullValue']), isNullable: true);
+        $argument = $this->createArgument(entity: new MapEntity(id: ['nullValue']), isNullable: true,);
 
         $this->assertSame([null], $resolver->resolve($request, $argument));
     }
@@ -415,12 +415,9 @@ class EntityValueResolverTest extends TestCase
             ->method('getManagerForClass')
             ->willReturn($manager);
 
-        if (null === $manager) {
-            $registry->method('getManager')
-                ->willThrowException(new \InvalidArgumentException());
-        } else {
-            $registry->method('getManager')->willReturn($manager);
-        }
+        $registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($manager);
 
         return $registry;
     }

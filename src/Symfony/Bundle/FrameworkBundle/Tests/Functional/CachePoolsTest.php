@@ -88,6 +88,10 @@ class CachePoolsTest extends AbstractWebTestCase
         $pool2 = $container->get('cache.pool2');
         $pool2->save($item);
 
+        $container->get('cache_clearer.alias')->clear($container->getParameter('kernel.cache_dir'));
+        $item = $pool1->getItem($key);
+        $this->assertFalse($item->isHit());
+
         $item = $pool2->getItem($key);
         $this->assertTrue($item->isHit());
 

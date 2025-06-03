@@ -75,19 +75,19 @@ final class ClickSendTransport extends AbstractTransport
         $options['from'] = $message->getFrom() ?: $this->from;
         $options['source'] ??= $this->source;
         $options['list_id'] ??= $this->listId;
-        $options['from_email'] ??= $this->fromEmail;
+        $options['from_email'] ?? $this->fromEmail;
 
         if (isset($options['from']) && !preg_match('/^[a-zA-Z0-9\s]{3,11}$/', $options['from']) && !preg_match('/^\+[1-9]\d{1,14}$/', $options['from'])) {
             throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $options['from']));
         }
 
-        if (!$options['list_id']) {
+        if ($options['list_id'] ?? false) {
             $options['to'] = $message->getPhone();
         }
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->apiUsername, $this->apiKey],
-            'json' => ['messages' => [array_filter($options)]],
+            'json' => array_filter($options),
         ]);
 
         try {

@@ -124,7 +124,7 @@ class Connection
                         }
 
                         try {
-                            if (\extension_loaded('redis') && version_compare(phpversion('redis'), '6.0.0-dev', '>=')) {
+                            if (\extension_loaded('redis') && version_compare(phpversion('redis'), '6.0.0', '>=')) {
                                 $params = [
                                     'host' => $host,
                                     'port' => $port,
@@ -134,7 +134,7 @@ class Connection
                                     'readTimeout' => $options['read_timeout'],
                                 ];
 
-                                $sentinel = @new \RedisSentinel($params);
+                                $sentinel = new \RedisSentinel($params);
                             } else {
                                 $sentinel = @new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
                             }
@@ -187,21 +187,7 @@ class Connection
         }
 
         $connect = isset($params['persistent_id']) ? 'pconnect' : 'connect';
-
-        @$redis->{$connect}($host, $port, $params['timeout'], $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...(\defined('Redis::SCAN_PREFIX') || \extension_loaded('relay')) ? [['stream' => $params['ssl'] ?? null]] : []);
-
-        $error = null;
-        set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
-
-        try {
-            $isConnected = $redis->isConnected();
-        } finally {
-            restore_error_handler();
-        }
-
-        if (!$isConnected) {
-            throw new InvalidArgumentException('Redis connection failed: '.(preg_match('/^Redis::p?connect\(\): (.*)/', $error ?? $redis->getLastError() ?? '', $matches) ? \sprintf(' (%s)', $matches[1]) : ''));
-        }
+        $redis->{$connect}($host, $port, $params['timeout'], $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...(\defined('Redis::SCAN_PREFIX') || \extension_loaded('relay')) ? [['stream' => $params['ssl'] ?? null]] : []);
 
         $redis->setOption($redis instanceof \Redis ? \Redis::OPT_SERIALIZER : Relay::OPT_SERIALIZER, $params['serializer']);
 

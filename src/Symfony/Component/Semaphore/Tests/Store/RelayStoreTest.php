@@ -25,10 +25,6 @@ class RelayStoreTest extends AbstractRedisStoreTestCase
 
     public static function setUpBeforeClass(): void
     {
-        if (\PHP_VERSION_ID <= 80500 && isset($_SERVER['GITHUB_ACTIONS'])) {
-            self::markTestSkipped('Test segfaults on PHP 8.5');
-        }
-
         try {
             new Relay(...explode(':', getenv('REDIS_HOST')));
         } catch (\Relay\Exception $e) {

@@ -32,6 +32,11 @@ class HttplugClientTest extends TestCase
         TestHttpServer::start();
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        TestHttpServer::stop();
+    }
+
     /**
      * @requires function ob_gzhandler
      */

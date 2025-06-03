@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Twig\TokenParser;
 
 use Symfony\Bridge\Twig\Node\StopwatchNode;
 use Twig\Node\Expression\AssignNameExpression;
-use Twig\Node\Expression\Variable\LocalVariable;
 use Twig\Node\Node;
 use Twig\Token;
 use Twig\TokenParser\AbstractTokenParser;
@@ -38,9 +37,7 @@ final class StopwatchTokenParser extends AbstractTokenParser
         $stream = $this->parser->getStream();
 
         // {% stopwatch 'bar' %}
-        $name = method_exists($this->parser, 'parseExpression') ?
-            $this->parser->parseExpression() :
-            $this->parser->getExpressionParser()->parseExpression();
+        $name = $this->parser->getExpressionParser()->parseExpression();
 
         $stream->expect(Token::BLOCK_END_TYPE);
 
@@ -49,7 +46,7 @@ final class StopwatchTokenParser extends AbstractTokenParser
         $stream->expect(Token::BLOCK_END_TYPE);
 
         if ($this->stopwatchIsAvailable) {
-            return new StopwatchNode($name, $body, class_exists(LocalVariable::class) ? new LocalVariable(null, $token->getLine()) : new AssignNameExpression($this->parser->getVarName(), $token->getLine()), $lineno, $this->getTag());
+            return new StopwatchNode($name, $body, new AssignNameExpression($this->parser->getVarName(), $token->getLine()), $lineno, $this->getTag());
         }
 
         return $body;

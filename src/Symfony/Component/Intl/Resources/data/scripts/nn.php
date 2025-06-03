@@ -20,6 +20,7 @@ return [
         'Perm' => 'gammalpermisk',
         'Phlp' => 'salmepahlavi',
         'Sgnw' => 'teiknskrift',
+        'Syrc' => 'syriakisk',
         'Syre' => 'syriakisk (estrangelo-variant)',
         'Syrj' => 'syriakisk (vestleg variant)',
         'Syrn' => 'syriakisk (austleg variant)',

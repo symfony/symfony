@@ -4,6 +4,7 @@ return [
     'Names' => [
         'Adlm' => 'Adlam',
         'Aghb' => 'Kaukázusi albaniai',
+        'Arab' => 'Arab',
         'Aran' => 'Nasztalik',
         'Armi' => 'Birodalmi arámi',
         'Armn' => 'Örmény',
@@ -54,6 +55,7 @@ return [
         'Hung' => 'Ómagyar',
         'Inds' => 'Indus',
         'Ital' => 'Régi olasz',
+        'Jamo' => 'Jamo',
         'Java' => 'Jávai',
         'Jpan' => 'Japán',
         'Kali' => 'Kajah li',
@@ -128,6 +130,7 @@ return [
         'Tfng' => 'Berber',
         'Tglg' => 'Tagalog',
         'Thaa' => 'Thaana',
+        'Thai' => 'Thai',
         'Tibt' => 'Tibeti',
         'Ugar' => 'Ugari',
         'Vaii' => 'Vai',

@@ -141,12 +141,10 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
             throw $exception;
         }
 
-        return $envelope
-            ->withoutAll(TransportMessageIdStamp::class)
-            ->with(
-                new DoctrineReceivedStamp($data['id']),
-                new TransportMessageIdStamp($data['id'])
-            );
+        return $envelope->with(
+            new DoctrineReceivedStamp($data['id']),
+            new TransportMessageIdStamp($data['id'])
+        );
     }
 
     private function withRetryableExceptionRetry(callable $callable): void

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\Groups as GroupsAnnotation;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
@@ -43,7 +42,6 @@ class Dummy extends ParentDummy
 
     /**
      * @var \DateTimeImmutable[]
-     * @GroupsAnnotation({"a", "b"})
      */
     #[Groups(['a', 'b'])]
     public $collection;

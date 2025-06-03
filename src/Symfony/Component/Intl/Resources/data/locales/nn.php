@@ -8,7 +8,5 @@ return [
         'mg' => 'madagassisk',
         'ne' => 'nepalsk',
         'sc' => 'sardinsk',
-        'st' => 'sørsotho',
-        'tn' => 'tswana',
     ],
 ];

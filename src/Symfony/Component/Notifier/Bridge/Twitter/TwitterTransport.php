@@ -160,32 +160,32 @@ final class TwitterTransport extends AbstractTransport
             'category' => $category,
             'owners' => $extraOwners,
         ]) {
-            $body = [
+            $query = [
                 'command' => 'INIT',
                 'total_bytes' => $file->getSize(),
                 'media_type' => $file->getContentType(),
             ];
 
             if ($category) {
-                $body['media_category'] = $category;
+                $query['media_category'] = $category;
             }
 
             if ($extraOwners) {
-                $body['additional_owners'] = implode(',', $extraOwners);
+                $query['additional_owners'] = implode(',', $extraOwners);
             }
 
             $pool[++$i] = $this->request('POST', '/1.1/media/upload.json', [
-                'body' => $body,
+                'query' => $query,
                 'user_data' => [$i, null, 0, fopen($file->getPath(), 'r'), $alt, $subtitles],
             ]);
 
             if ($subtitles) {
-                $body['total_bytes'] = $subtitles->getSize();
-                $body['media_type'] = $subtitles->getContentType();
-                $body['media_category'] = 'subtitles';
+                $query['total_bytes'] = $subtitles->getSize();
+                $query['media_type'] = $subtitles->getContentType();
+                $query['media_category'] = 'subtitles';
 
                 $pool[++$i] = $this->request('POST', '/1.1/media/upload.json', [
-                    'body' => $body,
+                    'query' => $query,
                     'user_data' => [$i, null, 0, fopen($subtitles->getPath(), 'r'), null, $subtitles],
                 ]);
             }

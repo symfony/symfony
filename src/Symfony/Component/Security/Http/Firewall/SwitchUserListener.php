@@ -111,7 +111,7 @@ class SwitchUserListener extends AbstractListener
         }
 
         if (self::EXIT_VALUE === $username) {
-            $this->attemptExitUser($request);
+            $this->tokenStorage->setToken($this->attemptExitUser($request));
         } else {
             try {
                 $this->tokenStorage->setToken($this->attemptSwitchUser($request, $username));
@@ -212,8 +212,6 @@ class SwitchUserListener extends AbstractListener
             $this->dispatcher->dispatch($switchEvent, SecurityEvents::SWITCH_USER);
             $original = $switchEvent->getToken();
         }
-
-        $this->tokenStorage->setToken($original);
 
         return $original;
     }

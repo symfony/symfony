@@ -12,37 +12,30 @@ if (!$_POST) {
     $_POST['content-type'] = $_SERVER['HTTP_CONTENT_TYPE'] ?? '?';
 }
 
-$headers = [
-    'SERVER_PROTOCOL',
-    'SERVER_NAME',
-    'REQUEST_URI',
-    'REQUEST_METHOD',
-    'PHP_AUTH_USER',
-    'PHP_AUTH_PW',
-    'REMOTE_ADDR',
-    'REMOTE_PORT',
-];
-
-foreach ($headers as $k) {
-    if (isset($_SERVER[$k])) {
-        $vars[$k] = $_SERVER[$k];
-    }
-}
-
 foreach ($_SERVER as $k => $v) {
-    if (str_starts_with($k, 'HTTP_')) {
-        $vars[$k] = $v;
+    switch ($k) {
+        default:
+            if (!str_starts_with($k, 'HTTP_')) {
+                continue 2;
+            }
+            // no break
+        case 'SERVER_NAME':
+        case 'SERVER_PROTOCOL':
+        case 'REQUEST_URI':
+        case 'REQUEST_METHOD':
+        case 'PHP_AUTH_USER':
+        case 'PHP_AUTH_PW':
+            $vars[$k] = $v;
     }
 }
 
 $json = json_encode($vars, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
 
-switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
+switch ($vars['REQUEST_URI']) {
     default:
         exit;
 
     case '/head':
-        header('X-Request-Vars: '.json_encode($vars, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE));
         header('Content-Length: '.strlen($json), true);
         break;
 
@@ -101,8 +94,7 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
 
     case '/302':
         if (!isset($vars['HTTP_AUTHORIZATION'])) {
-            $location = $_GET['location'] ?? 'http://localhost:8057/';
-            header('Location: '.$location, true, 302);
+            header('Location: http://localhost:8057/', true, 302);
         }
         break;
 
@@ -199,16 +191,6 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
         ]);
 
         exit;
-
-    case '/custom':
-        if (isset($_GET['status'])) {
-            http_response_code((int) $_GET['status']);
-        }
-        if (isset($_GET['headers']) && is_array($_GET['headers'])) {
-            foreach ($_GET['headers'] as $header) {
-                header($header);
-            }
-        }
 }
 
 header('Content-Type: application/json', true);

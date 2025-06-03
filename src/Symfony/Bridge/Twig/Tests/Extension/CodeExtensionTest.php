@@ -116,6 +116,7 @@ HTML;
         $this->assertEquals($expected, $this->render($template, $data));
     }
 
+
     public function testFormatFileIntegration()
     {
         $template = <<<'TWIG'

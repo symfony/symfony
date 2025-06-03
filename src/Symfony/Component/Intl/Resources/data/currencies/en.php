@@ -1166,13 +1166,9 @@ return [
             'ZWD',
             'Zimbabwean Dollar (1980–2008)',
         ],
-        'ZWG' => [
-            'ZWG',
-            'Zimbabwean Gold',
-        ],
         'ZWL' => [
             'ZWL',
-            'Zimbabwean Dollar (2009–2024)',
+            'Zimbabwean Dollar (2009)',
         ],
         'ZWR' => [
             'ZWR',

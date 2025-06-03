@@ -45,7 +45,6 @@ use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Uid\Factory\UuidFactory;
-use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
@@ -1067,7 +1066,7 @@ class Configuration implements ConfigurationInterface
                             ->validate()->castToArray()->end()
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
-                        ->enumNode('email_validation_mode')->values((class_exists(Email::class) ? Email::VALIDATION_MODES : ['html5-allow-no-tld', 'html5', 'strict']) + ['loose'])->end()
+                        ->enumNode('email_validation_mode')->values(['html5', 'loose', 'strict'])->end()
                         ->arrayNode('mapping')
                             ->addDefaultsIfNotSet()
                             ->fixXmlConfig('path')
@@ -1197,6 +1196,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('default_context')
                             ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
                             ->validate()
                                 ->ifTrue(fn () => $this->debug && class_exists(JsonParser::class))
                                 ->then(fn (array $v) => $v + [JsonDecode::DETAILED_ERROR_MESSAGES => true])

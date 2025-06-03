@@ -57,6 +57,6 @@ final class PathHeader extends AbstractHeader
 
     public function getBodyAsString(): string
     {
-        return '<'.$this->address->getEncodedAddress().'>';
+        return '<'.$this->address->toString().'>';
     }
 }

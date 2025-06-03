@@ -26,8 +26,6 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
 class MappedAssetFactoryTest extends TestCase
 {
-    private const DEFAULT_FIXTURES = __DIR__.'/../Fixtures/assets/vendor';
-
     private AssetMapperInterface&MockObject $assetMapper;
 
     public function testCreateMappedAsset()
@@ -139,15 +137,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertTrue($asset->isVendor);
     }
 
-    public function testCreateMappedAssetInMissingVendor()
-    {
-        $assetMapper = $this->createFactory(null, '/this-path-does-not-exist/');
-        $asset = $assetMapper->createMappedAsset('lodash.js', __DIR__.'/../Fixtures/assets/vendor/lodash/lodash.index.js');
-        $this->assertSame('lodash.js', $asset->logicalPath);
-        $this->assertFalse($asset->isVendor);
-    }
-
-    private function createFactory(?AssetCompilerInterface $extraCompiler = null, ?string $vendorDir = self::DEFAULT_FIXTURES): MappedAssetFactory
+    private function createFactory(?AssetCompilerInterface $extraCompiler = null): MappedAssetFactory
     {
         $compilers = [
             new JavaScriptImportPathCompiler($this->createMock(ImportMapConfigReader::class)),
@@ -172,7 +162,7 @@ class MappedAssetFactoryTest extends TestCase
         $factory = new MappedAssetFactory(
             $pathResolver,
             $compiler,
-            $vendorDir,
+            __DIR__.'/../Fixtures/assets/vendor',
         );
 
         // mock the AssetMapper to behave like normal: by calling back to the factory

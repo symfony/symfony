@@ -50,7 +50,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             )
             \s*[\'"`](\.\/[^\'"`\n]++|(\.\.\/)*+[^\'"`\n]++)[\'"`]\s*[;\)]
         ?
-    /mxu';
+    /mx';
 
     public function __construct(
         private readonly ImportMapConfigReader $importMapConfigReader,
@@ -89,11 +89,6 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             }
 
             if (!$dependentAsset) {
-                return $fullImportString;
-            }
-
-            // Ignore self-referencing import
-            if ($dependentAsset->logicalPath === $asset->logicalPath) {
                 return $fullImportString;
             }
 

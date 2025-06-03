@@ -50,7 +50,7 @@ return [
         'Tfng' => 'Tifinak',
         'Thaa' => 'Thaana',
         'Thai' => 'Thailand',
-        'Tibt' => 'Tibet',
+        'Tibt' => 'Tibetan',
         'Vaii' => 'Vai',
         'Yiii' => 'Yi',
         'Zmth' => 'Notasi Matematika',

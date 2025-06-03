@@ -680,7 +680,7 @@ return [
         ],
         'MRU' => [
             'MRU',
-            'mauretanska ouguja',
+            'mauritanijska ouguja',
         ],
         'MTL' => [
             'MTL',

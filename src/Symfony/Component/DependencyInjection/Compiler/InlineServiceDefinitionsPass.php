@@ -224,8 +224,6 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
             return false;
         }
 
-        $srcDefinition = $this->container->getDefinition($srcId);
-
-        return $srcDefinition->isShared() && !$srcDefinition->isLazy();
+        return $this->container->getDefinition($srcId)->isShared();
     }
 }

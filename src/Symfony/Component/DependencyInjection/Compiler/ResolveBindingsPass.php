@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -183,10 +182,10 @@ class ResolveBindingsPass extends AbstractRecursivePass
             foreach ($reflectionMethod->getParameters() as $key => $parameter) {
                 $names[$key] = $parameter->name;
 
-                if (\array_key_exists($key, $arguments) && '' !== $arguments[$key] && !$arguments[$key] instanceof AbstractArgument) {
+                if (\array_key_exists($key, $arguments) && '' !== $arguments[$key]) {
                     continue;
                 }
-                if (\array_key_exists($parameter->name, $arguments) && '' !== $arguments[$parameter->name] && !$arguments[$parameter->name] instanceof AbstractArgument) {
+                if (\array_key_exists($parameter->name, $arguments) && '' !== $arguments[$parameter->name]) {
                     continue;
                 }
                 if (
@@ -231,9 +230,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
 
             foreach ($names as $key => $name) {
                 if (\array_key_exists($name, $arguments) && (0 === $key || \array_key_exists($key - 1, $arguments))) {
-                    if (!array_key_exists($key, $arguments)) {
-                        $arguments[$key] = $arguments[$name];
-                    }
+                    $arguments[$key] = $arguments[$name];
                     unset($arguments[$name]);
                 }
             }

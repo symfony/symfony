@@ -146,6 +146,16 @@ EOF
                     }
                     $this->warmupOptionals($useBuildDir ? $realCacheDir : $warmupDir, $warmupDir, $io);
                 }
+
+                // fix references to cached files with the real cache directory name
+                $search = [$warmupDir, str_replace('/', '\\/', $warmupDir), str_replace('\\', '\\\\', $warmupDir)];
+                $replace = str_replace('\\', '/', $realBuildDir);
+                foreach (Finder::create()->files()->in($warmupDir) as $file) {
+                    $content = str_replace($search, $replace, file_get_contents($file), $count);
+                    if ($count) {
+                        file_put_contents($file, $content);
+                    }
+                }
             }
 
             if (!$fs->exists($warmupDir.'/'.$containerDir)) {
@@ -227,16 +237,6 @@ EOF
             throw new \LogicException('Calling "cache:clear" with a kernel that does not implement "Symfony\Component\HttpKernel\RebootableInterface" is not supported.');
         }
         $kernel->reboot($warmupDir);
-
-        // fix references to cached files with the real cache directory name
-        $search = [$warmupDir, str_replace('\\', '\\\\', $warmupDir)];
-        $replace = str_replace('\\', '/', $realBuildDir);
-        foreach (Finder::create()->files()->in($warmupDir) as $file) {
-            $content = str_replace($search, $replace, file_get_contents($file), $count);
-            if ($count) {
-                file_put_contents($file, $content);
-            }
-        }
     }
 
     private function warmupOptionals(string $cacheDir, string $warmupDir, SymfonyStyle $io): void

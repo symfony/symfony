@@ -197,13 +197,12 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[\CURLOPT_RESOLVE] = $resolve;
         }
 
+        $curlopts[\CURLOPT_CUSTOMREQUEST] = $method;
         if ('POST' === $method) {
             // Use CURLOPT_POST to have browser-like POST-to-GET redirects for 301, 302 and 303
             $curlopts[\CURLOPT_POST] = true;
         } elseif ('HEAD' === $method) {
             $curlopts[\CURLOPT_NOBODY] = true;
-        } else {
-            $curlopts[\CURLOPT_CUSTOMREQUEST] = $method;
         }
 
         if ('\\' !== \DIRECTORY_SEPARATOR && $options['timeout'] < 1) {
@@ -238,7 +237,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
         if (!\is_string($body)) {
             if (\is_resource($body)) {
-                $curlopts[\CURLOPT_INFILE] = $body;
+                $curlopts[\CURLOPT_READDATA] = $body;
             } else {
                 $curlopts[\CURLOPT_READFUNCTION] = static function ($ch, $fd, $length) use ($body) {
                     static $eof = false;
@@ -278,7 +277,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             if (file_exists($options['bindto'])) {
                 $curlopts[\CURLOPT_UNIX_SOCKET_PATH] = $options['bindto'];
             } elseif (!str_starts_with($options['bindto'], 'if!') && preg_match('/^(.*):(\d+)$/', $options['bindto'], $matches)) {
-                $curlopts[\CURLOPT_INTERFACE] = $matches[1];
+                $curlopts[\CURLOPT_INTERFACE] = trim($matches[1], '[]');
                 $curlopts[\CURLOPT_LOCALPORT] = $matches[2];
             } else {
                 $curlopts[\CURLOPT_INTERFACE] = $options['bindto'];
@@ -317,13 +316,16 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         foreach ($curlopts as $opt => $value) {
+            if (\PHP_INT_SIZE === 8 && \defined('CURLOPT_INFILESIZE_LARGE') && \CURLOPT_INFILESIZE === $opt && $value >= 1 << 31) {
+                $opt = \CURLOPT_INFILESIZE_LARGE;
+            }
             if (null !== $value && !curl_setopt($ch, $opt, $value) && \CURLOPT_CERTINFO !== $opt && (!\defined('CURLOPT_HEADEROPT') || \CURLOPT_HEADEROPT !== $opt)) {
                 $constantName = $this->findConstantName($opt);
                 throw new TransportException(sprintf('Curl option "%s" is not supported.', $constantName ?? $opt));
             }
         }
 
-        return $pushedResponse ?? new CurlResponse($multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host, $port), CurlClientState::$curlVersion['version_number'], $url);
+        return $pushedResponse ?? new CurlResponse($multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $authority), CurlClientState::$curlVersion['version_number'], $url);
     }
 
     public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
@@ -404,12 +406,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      *
      * Work around CVE-2018-1000007: Authorization and Cookie headers should not follow redirects - fixed in Curl 7.64
      */
-    private static function createRedirectResolver(array $options, string $host, int $port): \Closure
+    private static function createRedirectResolver(array $options, string $authority): \Closure
     {
         $redirectHeaders = [];
         if (0 < $options['max_redirects']) {
-            $redirectHeaders['host'] = $host;
-            $redirectHeaders['port'] = $port;
+            $redirectHeaders['authority'] = $authority;
             $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static fn ($h) => 0 !== stripos($h, 'Host:'));
 
             if (isset($options['normalized_headers']['authorization'][0]) || isset($options['normalized_headers']['cookie'][0])) {
@@ -420,6 +421,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         return static function ($ch, string $location, bool $noContent) use (&$redirectHeaders, $options) {
             try {
                 $location = self::parseUrl($location);
+                $url = self::parseUrl(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL));
+                $url = self::resolveUrl($location, $url);
             } catch (InvalidArgumentException) {
                 return null;
             }
@@ -430,16 +433,12 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 $redirectHeaders['with_auth'] = array_filter($redirectHeaders['with_auth'], $filterContentHeaders);
             }
 
-            if ($redirectHeaders && $host = parse_url('http:'.$location['authority'], \PHP_URL_HOST)) {
-                $port = parse_url('http:'.$location['authority'], \PHP_URL_PORT) ?: ('http:' === $location['scheme'] ? 80 : 443);
-                $requestHeaders = $redirectHeaders['host'] === $host && $redirectHeaders['port'] === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+            if ($redirectHeaders && isset($location['authority'])) {
+                $requestHeaders = $location['authority'] === $redirectHeaders['authority'] ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 curl_setopt($ch, \CURLOPT_HTTPHEADER, $requestHeaders);
             } elseif ($noContent && $redirectHeaders) {
                 curl_setopt($ch, \CURLOPT_HTTPHEADER, $redirectHeaders['with_auth']);
             }
-
-            $url = self::parseUrl(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL));
-            $url = self::resolveUrl($location, $url);
 
             curl_setopt($ch, \CURLOPT_PROXY, self::getProxyUrl($options['proxy'], $url));
 
@@ -476,7 +475,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_RESOLVE => 'resolve',
             \CURLOPT_NOSIGNAL => 'timeout',
             \CURLOPT_HTTPHEADER => 'headers',
-            \CURLOPT_INFILE => 'body',
+            \CURLOPT_READDATA => 'body',
             \CURLOPT_READFUNCTION => 'body',
             \CURLOPT_INFILESIZE => 'body',
             \CURLOPT_POSTFIELDS => 'body',

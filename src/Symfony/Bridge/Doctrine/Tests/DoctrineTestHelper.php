@@ -47,6 +47,10 @@ final class DoctrineTestHelper
         $config ??= self::createTestConfiguration();
         $eventManager = new EventManager();
 
+        if (\PHP_VERSION_ID >= 80400 && method_exists($config, 'enableNativeLazyObjects')) {
+            $config->enableNativeLazyObjects(true);
+        }
+
         return new EntityManager(DriverManager::getConnection($params, $config, $eventManager), $config, $eventManager);
     }
 
@@ -61,7 +65,10 @@ final class DoctrineTestHelper
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
-        $config->setLazyGhostObjectEnabled(true);
+
+        if (!class_exists(\Doctrine\Persistence\Mapping\Driver\AnnotationDriver::class)) { // doctrine/persistence >= 3.0
+            $config->setLazyGhostObjectEnabled(true);
+        }
 
         return $config;
     }

@@ -231,6 +231,10 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             $text .= ' at line '.$line;
         }
 
+        if (!file_exists($file)) {
+            return $text;
+        }
+
         $link = $this->fileLinkFormat->format($file, $line);
 
         return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $this->escape($link), $text);

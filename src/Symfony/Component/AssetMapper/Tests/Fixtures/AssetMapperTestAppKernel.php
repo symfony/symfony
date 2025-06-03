@@ -44,6 +44,7 @@ class AssetMapperTestAppKernel extends Kernel
                 'assets' => null,
                 'asset_mapper' => [
                     'paths' => ['dir1', 'dir2', 'non_ascii', 'assets'],
+                    'public_prefix' => 'assets'
                 ],
                 'test' => true,
             ]);

@@ -25,6 +25,9 @@ use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\LazyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\MagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ReadOnlyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\TestClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\AsymmetricVisibility;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\Hooked;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\HookedWithDefaultValue;
 use Symfony\Component\VarExporter\Tests\Fixtures\SimpleObject;
 
 class LazyGhostTraitTest extends TestCase
@@ -476,6 +479,79 @@ class LazyGhostTraitTest extends TestCase
         $output = $serializer->normalize($object);
 
         $this->assertSame(['property' => 'property', 'method' => 'method'], $output);
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testPropertyHooks()
+    {
+        $initialized = false;
+        $object = $this->createLazyGhost(Hooked::class, function ($instance) use (&$initialized) {
+            $initialized = true;
+        });
+
+        $this->assertSame(123, $object->notBacked);
+        $this->assertFalse($initialized);
+        $this->assertSame(234, $object->backed);
+        $this->assertTrue($initialized);
+
+        $initialized = false;
+        $object = $this->createLazyGhost(Hooked::class, function ($instance) use (&$initialized) {
+            $initialized = true;
+        });
+
+        $object->backed = 345;
+        $this->assertTrue($initialized);
+        $this->assertSame(345, $object->backed);
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testPropertyHooksWithDefaultValue()
+    {
+        $initialized = false;
+        $object = $this->createLazyGhost(HookedWithDefaultValue::class, function ($instance) use (&$initialized) {
+            $initialized = true;
+        });
+
+        $this->assertSame(321, $object->backedIntWithDefault);
+        $this->assertSame('321', $object->backedStringWithDefault);
+        $this->assertSame(false, $object->backedBoolWithDefault);
+        $this->assertTrue($initialized);
+
+        $initialized = false;
+        $object = $this->createLazyGhost(HookedWithDefaultValue::class, function ($instance) use (&$initialized) {
+            $initialized = true;
+        });
+        $object->backedIntWithDefault = 654;
+        $object->backedStringWithDefault = '654';
+        $object->backedBoolWithDefault = true;
+        $this->assertTrue($initialized);
+        $this->assertSame(654, $object->backedIntWithDefault);
+        $this->assertSame('654', $object->backedStringWithDefault);
+        $this->assertSame(true, $object->backedBoolWithDefault);
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testAsymmetricVisibility()
+    {
+        $object = $this->createLazyGhost(AsymmetricVisibility::class, function ($instance) {
+            $instance->__construct(123, 234);
+        });
+
+        $this->assertSame(123, $object->foo);
+        $this->assertSame(234, $object->getBar());
+
+        $object = $this->createLazyGhost(AsymmetricVisibility::class, function ($instance) {
+            $instance->__construct(123, 234);
+        });
+
+        $this->assertSame(234, $object->getBar());
+        $this->assertSame(123, $object->foo);
     }
 
     /**

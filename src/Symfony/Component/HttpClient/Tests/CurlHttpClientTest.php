@@ -17,6 +17,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @requires extension curl
+ * @group dns-sensitive
  */
 class CurlHttpClientTest extends HttpClientTestCase
 {
@@ -31,20 +32,6 @@ class CurlHttpClientTest extends HttpClientTestCase
         }
 
         return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false], 6, 50);
-    }
-
-    public function testBindToPort()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://localhost:8057', ['bindto' => '127.0.0.1:9876']);
-        $response->getStatusCode();
-
-        $r = new \ReflectionProperty($response, 'handle');
-
-        $curlInfo = curl_getinfo($r->getValue($response));
-
-        self::assertSame('127.0.0.1', $curlInfo['local_ip']);
-        self::assertSame(9876, $curlInfo['local_port']);
     }
 
     public function testTimeoutIsNotAFatalError()

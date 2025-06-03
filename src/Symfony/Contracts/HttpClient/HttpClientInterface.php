@@ -46,9 +46,9 @@ interface HttpClientInterface
         'buffer' => true,       // bool|resource|\Closure - whether the content of the response should be buffered or not,
                                 //   or a stream resource where the response body should be written,
                                 //   or a closure telling if/where the response should be buffered based on its headers
-        'on_progress' => null,  // callable(int $dlNow, int $dlSize, array $info) - throwing any exceptions MUST abort
-                                //   the request; it MUST be called on DNS resolution, on arrival of headers and on
-                                //   completion; it SHOULD be called on upload/download of data and at least 1/s
+        'on_progress' => null,  // callable(int $dlNow, int $dlSize, array $info) - throwing any exceptions MUST abort the
+                                //   request; it MUST be called on connection, on headers and on completion; it SHOULD be
+                                //   called on upload/download of data and at least 1/s
         'resolve' => [],        // string[] - a map of host to IP address that SHOULD replace DNS resolution
         'proxy' => null,        // string - by default, the proxy-related env vars handled by curl SHOULD be honored
         'no_proxy' => null,     // string - a comma separated list of hosts that do not require a proxy to be reached

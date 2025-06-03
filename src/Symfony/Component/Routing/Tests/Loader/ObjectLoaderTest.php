@@ -104,7 +104,7 @@ class TestObjectLoader extends ObjectLoader
 
     protected function getObject(string $id): object
     {
-        return $this->loaderMap[$id] ?? null;
+        return $this->loaderMap[$id];
     }
 }
 

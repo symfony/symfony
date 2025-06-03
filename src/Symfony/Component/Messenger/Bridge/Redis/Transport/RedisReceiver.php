@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -76,7 +77,12 @@ class RedisReceiver implements ReceiverInterface, MessageCountAwareInterface
             throw $exception;
         }
 
-        return [$envelope->with(new RedisReceivedStamp($message['id']))];
+        return [$envelope
+            ->withoutAll(TransportMessageIdStamp::class)
+            ->with(
+                new RedisReceivedStamp($message['id']),
+                new TransportMessageIdStamp($message['id'])
+            )];
     }
 
     public function ack(Envelope $envelope): void

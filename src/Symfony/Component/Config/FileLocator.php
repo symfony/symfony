@@ -86,7 +86,8 @@ class FileLocator implements FileLocatorInterface
                 && ':' === $file[1]
                 && ('\\' === $file[2] || '/' === $file[2])
             )
-            || null !== parse_url($file, \PHP_URL_SCHEME)
+            || parse_url($file, \PHP_URL_SCHEME)
+            || str_starts_with($file, 'phar:///') // "parse_url()" doesn't handle absolute phar path, despite being valid
         ) {
             return true;
         }

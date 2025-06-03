@@ -416,6 +416,7 @@ return [
         'zza' => 'Zaza Simi',
     ],
     'LocalizedNames' => [
+        'ar_001' => 'Musuq Estandar Arabe Simi',
         'es_419' => 'Español Simi (Latino América)',
         'fa_AF' => 'Dari Simi',
         'nl_BE' => 'Flamenco Simi',

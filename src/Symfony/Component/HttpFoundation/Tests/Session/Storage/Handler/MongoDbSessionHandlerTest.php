@@ -166,6 +166,8 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->storage->write('foo', 'bar');
         $this->storage->write('baz', 'qux');
 
+        $this->storage->open('test', 'test');
+
         $this->assertTrue($this->storage->destroy('foo'));
 
         $sessions = $this->getSessions();

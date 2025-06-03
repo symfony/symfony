@@ -47,7 +47,11 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
             }
 
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate
-            return new UserBadge($claims[$this->claim], new FallbackUserLoader(fn () => $this->createUser($claims)), $claims);
+            return new UserBadge($claims[$this->claim], new FallbackUserLoader(function () use ($claims) {
+                $claims['user_identifier'] = $claims[$this->claim];
+
+                return $this->createUser($claims);
+            }), $claims);
         } catch (\Exception $e) {
             $this->logger?->error('An error occurred on OIDC server.', [
                 'error' => $e->getMessage(),

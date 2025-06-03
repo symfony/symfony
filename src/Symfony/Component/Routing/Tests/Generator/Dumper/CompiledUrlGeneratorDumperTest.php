@@ -37,8 +37,8 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
         $this->routeCollection = new RouteCollection();
         $this->generatorDumper = new CompiledUrlGeneratorDumper($this->routeCollection);
-        $this->testTmpFilepath = sys_get_temp_dir().'/php_generator.'.$this->getName().'.php';
-        $this->largeTestTmpFilepath = sys_get_temp_dir().'/php_generator.'.$this->getName().'.large.php';
+        $this->testTmpFilepath = sys_get_temp_dir().'/php_generator.php';
+        $this->largeTestTmpFilepath = sys_get_temp_dir().'/php_generator.large.php';
         @unlink($this->testTmpFilepath);
         @unlink($this->largeTestTmpFilepath);
     }

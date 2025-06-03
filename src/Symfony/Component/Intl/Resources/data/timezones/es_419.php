@@ -52,7 +52,6 @@ return [
         'Europe/Vilnius' => 'hora de Europa del Este (Vilna)',
         'Indian/Cocos' => 'hora de Islas Cocos',
         'Indian/Kerguelen' => 'hora de las Tierras Australes y Antárticas Francesas (Kerguelen)',
-        'MST7MDT' => 'hora de la montaña',
         'Pacific/Easter' => 'hora de la Isla de Pascua',
         'Pacific/Guadalcanal' => 'hora de Islas Salomón (Guadalcanal)',
         'Pacific/Kwajalein' => 'hora de Islas Marshall (Kwajalein)',

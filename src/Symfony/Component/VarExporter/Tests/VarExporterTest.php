@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\Tests\Fixtures\BackedProperty;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooReadonly;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooSerializable;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooUnitEnum;
@@ -239,6 +240,12 @@ class VarExporterTest extends TestCase
 
         yield ['unit-enum', [FooUnitEnum::Bar], true];
         yield ['readonly', new FooReadonly('k', 'v')];
+
+        if (\PHP_VERSION_ID < 80400) {
+            return;
+        }
+
+        yield ['backed-property', new BackedProperty('name')];
     }
 
     public function testUnicodeDirectionality()

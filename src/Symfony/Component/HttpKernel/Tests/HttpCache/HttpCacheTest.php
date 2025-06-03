@@ -163,6 +163,17 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertFalse($this->response->headers->has('Age'));
     }
 
+    public function testPassesSuspiciousMethodRequests()
+    {
+        $this->setNextResponse(200);
+        $this->request('POST', '/', ['HTTP_X-HTTP-Method-Override' => '__CONSTRUCT']);
+        $this->assertHttpKernelIsCalled();
+        $this->assertResponseOk();
+        $this->assertTraceNotContains('stale');
+        $this->assertTraceNotContains('invalid');
+        $this->assertFalse($this->response->headers->has('Age'));
+    }
+
     public function testInvalidatesOnPostPutDeleteRequests()
     {
         foreach (['post', 'put', 'delete'] as $method) {

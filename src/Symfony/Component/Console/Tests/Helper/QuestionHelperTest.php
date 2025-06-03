@@ -908,6 +908,10 @@ EOD;
 
     public function testAutocompleteMoveCursorBackwards()
     {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
         // F<TAB><BACKSPACE><BACKSPACE><BACKSPACE>
         $inputStream = $this->getInputStream("F\t\177\177\177");
 

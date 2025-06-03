@@ -14,6 +14,9 @@ namespace Symfony\Component\HttpClient\Tests;
 use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * @group dns-sensitive
+ */
 class AmpHttpClientTest extends HttpClientTestCase
 {
     protected function getHttpClient(string $testCase): HttpClientInterface

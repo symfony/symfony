@@ -431,7 +431,7 @@ class Crawler implements \Countable, \IteratorAggregate
 
         $domNode = $this->getNode(0);
 
-        while (\XML_ELEMENT_NODE === $domNode->nodeType) {
+        while (null !== $domNode && \XML_ELEMENT_NODE === $domNode->nodeType) {
             $node = $this->createSubCrawler($domNode);
             if ($node->matches($selector)) {
                 return $node;

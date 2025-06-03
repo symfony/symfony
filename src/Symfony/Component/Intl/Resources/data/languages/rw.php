@@ -75,7 +75,7 @@ return [
         'pt' => 'Igiporutugali',
         'ro' => 'Ikinyarumaniya',
         'ru' => 'Ikirusiya',
-        'rw' => 'Kinyarwanda',
+        'rw' => 'Ikinyarwanda',
         'sa' => 'Igisansikiri',
         'sd' => 'Igisindi',
         'sh' => 'Inyeseribiya na Korowasiya',

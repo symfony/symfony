@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
@@ -305,9 +306,34 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isSecure());
 
         // Fragment should not be included in the URI
-        $request = Request::create('http://test.com/foo#bar');
-        $request->server->set('REQUEST_URI', 'http://test.com/foo#bar');
+        $request = Request::create('http://test.com/foo#bar\\baz');
+        $request->server->set('REQUEST_URI', 'http://test.com/foo#bar\\baz');
         $this->assertEquals('http://test.com/foo', $request->getUri());
+
+        $request = Request::create('http://test.com/foo?bar=f\\o');
+        $this->assertEquals('http://test.com/foo?bar=f%5Co', $request->getUri());
+        $this->assertEquals('/foo', $request->getPathInfo());
+        $this->assertEquals('bar=f%5Co', $request->getQueryString());
+    }
+
+    /**
+     * @testWith ["http://foo.com\\bar"]
+     *           ["\\\\foo.com/bar"]
+     *           ["a\rb"]
+     *           ["a\nb"]
+     *           ["a\tb"]
+     *           ["\u0000foo"]
+     *           ["foo\u0000"]
+     *           [" foo"]
+     *           ["foo "]
+     *           ["//"]
+     */
+    public function testCreateWithBadRequestUri(string $uri)
+    {
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('Invalid URI');
+
+        Request::create($uri);
     }
 
     /**
@@ -578,7 +604,6 @@ class RequestTest extends TestCase
 
         $server['REDIRECT_QUERY_STRING'] = 'query=string';
         $server['REDIRECT_URL'] = '/path/info';
-        $server['SCRIPT_NAME'] = '/index.php';
         $server['QUERY_STRING'] = 'query=string';
         $server['REQUEST_URI'] = '/path/info?toto=test&1=1';
         $server['SCRIPT_NAME'] = '/index.php';
@@ -705,7 +730,6 @@ class RequestTest extends TestCase
 
         $server['REDIRECT_QUERY_STRING'] = 'query=string';
         $server['REDIRECT_URL'] = '/path/info';
-        $server['SCRIPT_NAME'] = '/index.php';
         $server['QUERY_STRING'] = 'query=string';
         $server['REQUEST_URI'] = '/path/info?toto=test&1=1';
         $server['SCRIPT_NAME'] = '/index.php';
@@ -2378,6 +2402,8 @@ class RequestTest extends TestCase
             'trusted with via and protocol name' => ['HTTP/2.0', true, 'HTTP/1.0 fred, HTTP/1.1 nowhere.com (Apache/1.1)', 'HTTP/1.0'],
             'trusted with broken via' => ['HTTP/2.0', true, 'HTTP/1^0 foo', 'HTTP/2.0'],
             'trusted with partially-broken via' => ['HTTP/2.0', true, '1.0 fred, foo', 'HTTP/1.0'],
+            'trusted with simple via' => ['HTTP/2.0', true, 'HTTP/1.0', 'HTTP/1.0'],
+            'trusted with only version via' => ['HTTP/2.0', true, '1.0', 'HTTP/1.0'],
         ];
     }
 
@@ -2640,16 +2666,6 @@ class RequestTest extends TestCase
         foreach ((new \ReflectionClass(Request::class))->getConstants() as $constant => $value) {
             $this->assertNotSame(0b10000000, $value, sprintf('The constant "%s" should not use the reserved value "0b10000000".', $constant));
         }
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testInvalidUriCreationDeprecated()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 6.3: Calling "Symfony\Component\HttpFoundation\Request::create()" with an invalid URI is deprecated.');
-        $request = Request::create('/invalid-path:123');
-        $this->assertEquals('http://localhost/invalid-path:123', $request->getUri());
     }
 }
 

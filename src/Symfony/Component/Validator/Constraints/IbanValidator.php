@@ -69,7 +69,7 @@ class IbanValidator extends ConstraintValidator
         'DK' => 'DK\d{2}\d{4}\d{9}\d{1}', // Denmark
         'DO' => 'DO\d{2}[\dA-Z]{4}\d{20}', // Dominican Republic
         'DZ' => 'DZ\d{2}\d{22}', // Algeria
-        'EE' => 'EE\d{2}\d{2}\d{2}\d{11}\d{1}', // Estonia
+        'EE' => 'EE\d{2}\d{2}\d{14}', // Estonia
         'EG' => 'EG\d{2}\d{4}\d{4}\d{17}', // Egypt
         'ES' => 'ES\d{2}\d{4}\d{4}\d{1}\d{1}\d{10}', // Spain
         'FI' => 'FI\d{2}\d{3}\d{11}', // Finland
@@ -126,7 +126,7 @@ class IbanValidator extends ConstraintValidator
         'MZ' => 'MZ\d{2}\d{21}', // Mozambique
         'NC' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
         'NE' => 'NE\d{2}[A-Z]{2}\d{22}', // Niger
-        'NI' => 'NI\d{2}[A-Z]{4}\d{24}', // Nicaragua
+        'NI' => 'NI\d{2}[A-Z]{4}\d{20}', // Nicaragua
         'NL' => 'NL\d{2}[A-Z]{4}\d{10}', // Netherlands (The)
         'NO' => 'NO\d{2}\d{4}\d{6}\d{1}', // Norway
         'OM' => 'OM\d{2}\d{3}[\dA-Z]{16}', // Oman
@@ -150,7 +150,7 @@ class IbanValidator extends ConstraintValidator
         'SM' => 'SM\d{2}[A-Z]{1}\d{5}\d{5}[\dA-Z]{12}', // San Marino
         'SN' => 'SN\d{2}[A-Z]{2}\d{22}', // Senegal
         'SO' => 'SO\d{2}\d{4}\d{3}\d{12}', // Somalia
-        'ST' => 'ST\d{2}\d{4}\d{4}\d{11}\d{2}', // Sao Tome and Principe
+        'ST' => 'ST\d{2}\d{8}\d{11}\d{2}', // Sao Tome and Principe
         'SV' => 'SV\d{2}[A-Z]{4}\d{20}', // El Salvador
         'TD' => 'TD\d{2}\d{23}', // Chad
         'TF' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France

@@ -100,6 +100,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(HttpKernelInterface::class, 'http_kernel')
 
         ->set('request_stack', RequestStack::class)
+            ->tag('kernel.reset', ['method' => 'resetRequestFormats', 'on_invalid' => 'ignore'])
             ->public()
         ->alias(RequestStack::class, 'request_stack')
 

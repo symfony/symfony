@@ -100,8 +100,15 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
             throw new AuthenticationException('The cookie is incorrectly formatted.');
         }
 
-        [$series, $tokenValue] = explode(':', $rememberMeDetails->getValue());
+        [$series, $tokenValue] = explode(':', $rememberMeDetails->getValue(), 2);
         $persistentToken = $this->tokenProvider->loadTokenBySeries($series);
+
+        if ($persistentToken->getUserIdentifier() !== $rememberMeDetails->getUserIdentifier() || $persistentToken->getClass() !== $rememberMeDetails->getUserFqcn()) {
+            throw new AuthenticationException('The cookie\'s hash is invalid.');
+        }
+
+        // content of $rememberMeDetails is not trustable. this prevents use of this class
+        unset($rememberMeDetails);
 
         if ($this->tokenVerifier) {
             $isTokenValid = $this->tokenVerifier->verifyToken($persistentToken, $tokenValue);
@@ -112,11 +119,17 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
             throw new CookieTheftException('This token was already used. The account is possibly compromised.');
         }
 
-        if ($persistentToken->getLastUsed()->getTimestamp() + $this->options['lifetime'] < time()) {
+        $expires = $persistentToken->getLastUsed()->getTimestamp() + $this->options['lifetime'];
+        if ($expires < time()) {
             throw new AuthenticationException('The cookie has expired.');
         }
 
-        return parent::consumeRememberMeCookie($rememberMeDetails->withValue($persistentToken->getLastUsed()->getTimestamp().':'.$rememberMeDetails->getValue().':'.$persistentToken->getClass()));
+        return parent::consumeRememberMeCookie(new RememberMeDetails(
+            $persistentToken->getClass(),
+            $persistentToken->getUserIdentifier(),
+            $expires,
+            $persistentToken->getLastUsed()->getTimestamp().':'.$series.':'.$tokenValue.':'.$persistentToken->getClass()
+        ));
     }
 
     public function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void
@@ -147,7 +160,12 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
             return;
         }
 
-        $rememberMeDetails = RememberMeDetails::fromRawCookie($cookie);
+        try {
+            $rememberMeDetails = RememberMeDetails::fromRawCookie($cookie);
+        } catch (AuthenticationException) {
+            // malformed cookie should not fail the response and can be simply ignored
+            return;
+        }
         [$series] = explode(':', $rememberMeDetails->getValue());
         $this->tokenProvider->deleteTokenBySeries($series);
     }

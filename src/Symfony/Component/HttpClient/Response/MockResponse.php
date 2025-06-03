@@ -167,7 +167,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $runningResponses[0][1][$response->id] = $response;
     }
 
-    protected static function perform(ClientState $multi, array &$responses): void
+    protected static function perform(ClientState $multi, array $responses): void
     {
         foreach ($responses as $response) {
             $id = $response->id;

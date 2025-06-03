@@ -9,7 +9,6 @@ return [
         'America/St_Lucia' => 'Atlantic Time (Saint Lucia)',
         'America/St_Thomas' => 'Atlantic Time (Saint Thomas)',
         'America/St_Vincent' => 'Atlantic Time (Saint Vincent)',
-        'Asia/Aqtau' => 'West Kazakhstan Time (Aktau)',
         'Asia/Rangoon' => 'Myanmar Time (Rangoon)',
         'Atlantic/St_Helena' => 'Greenwich Mean Time (Saint Helena)',
         'Indian/Kerguelen' => 'French Southern and Antarctic Time (Kerguelen)',

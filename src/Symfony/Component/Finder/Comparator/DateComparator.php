@@ -36,7 +36,7 @@ class DateComparator extends Comparator
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid date.', $matches[2]));
         }
 
-        $operator = $matches[1] ?? '==';
+        $operator = $matches[1] ?: '==';
         if ('since' === $operator || 'after' === $operator) {
             $operator = '>';
         }

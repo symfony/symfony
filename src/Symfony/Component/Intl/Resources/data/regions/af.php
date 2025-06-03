@@ -43,7 +43,7 @@ return [
         'CC' => 'Kokoseilande',
         'CD' => 'Demokratiese Republiek van die Kongo',
         'CF' => 'Sentraal-Afrikaanse Republiek',
-        'CG' => 'Kongo - Brazzaville',
+        'CG' => 'Kongo-Brazzaville',
         'CH' => 'Switserland',
         'CI' => 'Ivoorkus',
         'CK' => 'Cookeilande',

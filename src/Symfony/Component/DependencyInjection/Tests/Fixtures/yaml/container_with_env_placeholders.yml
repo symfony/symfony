@@ -1,0 +1,19 @@
+parameters:
+    '%env(PARAMETER_NAME)%': '%env(PARAMETER_VALUE)%'
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    service:
+        class: '%env(SERVICE_CLASS)%'
+        public: true
+        file: '%env(SERVICE_FILE)%'
+        arguments: ['%env(SERVICE_ARGUMENT)%']
+        properties: { '%env(SERVICE_PROPERTY_NAME)%': '%env(SERVICE_PROPERTY_VALUE)%' }
+        calls:
+            - ['%env(SERVICE_METHOD_NAME)%', ['%env(SERVICE_METHOD_ARGUMENT)%']]
+
+        factory: '%env(SERVICE_FACTORY)%'
+        configurator: '%env(SERVICE_CONFIGURATOR)%'

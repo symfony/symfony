@@ -11,6 +11,6 @@ require __DIR__.'/kernel-loop.php';
 
 ?>
 --EXPECTF--
-OK Kernel foo_bar
-OK Kernel foo_bar
+OK Kernel (env=dev) foo_bar
+OK Kernel (env=dev) foo_bar
 0

@@ -48,7 +48,7 @@ final class SendgridRequestParser extends AbstractRequestParser
             !isset($content[0]['email'])
             || !isset($content[0]['timestamp'])
             || !isset($content[0]['event'])
-            || !isset($content[0]['sg_message_id'])
+            || !isset($content[0]['sg_event_id'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }

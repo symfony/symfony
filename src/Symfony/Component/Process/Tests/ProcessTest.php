@@ -540,6 +540,20 @@ class ProcessTest extends TestCase
         $this->assertNull($process->getExitCodeText());
     }
 
+    public function testStderrNotMixedWithStdout()
+    {
+        if (!Process::isPtySupported()) {
+            $this->markTestSkipped('PTY is not supported on this operating system.');
+        }
+
+        $process = $this->getProcess('echo "foo" && echo "bar" >&2');
+        $process->setPty(true);
+        $process->run();
+
+        $this->assertSame("foo\r\n", $process->getOutput());
+        $this->assertSame("bar\n", $process->getErrorOutput());
+    }
+
     public function testPTYCommand()
     {
         if (!Process::isPtySupported()) {
@@ -710,6 +724,9 @@ class ProcessTest extends TestCase
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Windows does not support POSIX signals');
+        }
+        if (\PHP_VERSION_ID < 80300 && isset($_SERVER['GITHUB_ACTIONS'])) {
+            $this->markTestSkipped('Transient on GHA with PHP < 8.3');
         }
 
         $process = $this->getProcessForCode('sleep(32);');
@@ -1436,7 +1453,12 @@ class ProcessTest extends TestCase
     {
         $p = new Process(['/usr/bin/php']);
 
-        $expected = '\\' === \DIRECTORY_SEPARATOR ? '"/usr/bin/php"' : "'/usr/bin/php'";
+        $expected = '\\' === \DIRECTORY_SEPARATOR ? '/usr/bin/php' : "'/usr/bin/php'";
+        $this->assertSame($expected, $p->getCommandLine());
+
+        $p = new Process(['cd', '/d']);
+
+        $expected = '\\' === \DIRECTORY_SEPARATOR ? 'cd /d' : "'cd' '/d'";
         $this->assertSame($expected, $p->getCommandLine());
     }
 

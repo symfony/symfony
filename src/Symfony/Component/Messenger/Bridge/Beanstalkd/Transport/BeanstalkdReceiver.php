@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -52,7 +53,12 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
             throw $exception;
         }
 
-        return [$envelope->with(new BeanstalkdReceivedStamp($beanstalkdEnvelope['id'], $this->connection->getTube()))];
+        return [$envelope
+            ->withoutAll(TransportMessageIdStamp::class)
+            ->with(
+                new BeanstalkdReceivedStamp($beanstalkdEnvelope['id'], $this->connection->getTube()),
+                new TransportMessageIdStamp($beanstalkdEnvelope['id']),
+            )];
     }
 
     public function ack(Envelope $envelope): void

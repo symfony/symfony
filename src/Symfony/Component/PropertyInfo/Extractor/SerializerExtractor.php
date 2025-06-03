@@ -34,7 +34,7 @@ class SerializerExtractor implements PropertyListExtractorInterface
             return null;
         }
 
-        if (!$this->classMetadataFactory->getMetadataFor($class)) {
+        if (!$this->classMetadataFactory->hasMetadataFor($class)) {
             return null;
         }
 

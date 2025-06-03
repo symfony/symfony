@@ -252,8 +252,8 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
     {
         static $useProcess;
 
-        if ($useProcess ??= class_exists(Process::class)) {
-            return (new Process([$payload]))->getCommandLine();
+        if ($useProcess ??= function_exists('proc_open') && class_exists(Process::class)) {
+            return substr((new Process(['', $payload]))->getCommandLine(), 3);
         }
 
         if ('\\' === \DIRECTORY_SEPARATOR) {

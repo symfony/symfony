@@ -2,7 +2,9 @@
     "name": "symfony/phpunit-bridge",
     "type": "symfony-bridge",
     "description": "Provides utilities for PHPUnit, especially user deprecation notices management",
-    "keywords": [],
+    "keywords": [
+        "testing"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

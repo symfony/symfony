@@ -10,6 +10,7 @@
     findUnusedBaselineEntry="false"
     findUnusedCode="false"
     findUnusedIssueHandlerSuppression="false"
+    ensureOverrideAttribute="false"
 >
     <projectFiles>
         <directory name="src" />

@@ -24,8 +24,7 @@ abstract class AbstractSchemaListener
     protected function getIsSameDatabaseChecker(Connection $connection): \Closure
     {
         return static function (\Closure $exec) use ($connection): bool {
-            $schemaManager = $connection->createSchemaManager();
-
+            $schemaManager = method_exists($connection, 'createSchemaManager') ? $connection->createSchemaManager() : $connection->getSchemaManager();
             $checkTable = 'schema_subscriber_check_'.bin2hex(random_bytes(7));
             $table = new Table($checkTable);
             $table->addColumn('id', Types::INTEGER)

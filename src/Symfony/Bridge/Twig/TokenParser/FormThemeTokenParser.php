@@ -29,12 +29,16 @@ final class FormThemeTokenParser extends AbstractTokenParser
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $form = $this->parser->getExpressionParser()->parseExpression();
+        $parseExpression = method_exists($this->parser, 'parseExpression')
+            ? $this->parser->parseExpression(...)
+            : $this->parser->getExpressionParser()->parseExpression(...);
+
+        $form = $parseExpression();
         $only = false;
 
         if ($this->parser->getStream()->test(Token::NAME_TYPE, 'with')) {
             $this->parser->getStream()->next();
-            $resources = $this->parser->getExpressionParser()->parseExpression();
+            $resources = $parseExpression();
 
             if ($this->parser->getStream()->nextIf(Token::NAME_TYPE, 'only')) {
                 $only = true;
@@ -42,7 +46,7 @@ final class FormThemeTokenParser extends AbstractTokenParser
         } else {
             $resources = new ArrayExpression([], $stream->getCurrent()->getLine());
             do {
-                $resources->addElement($this->parser->getExpressionParser()->parseExpression());
+                $resources->addElement($parseExpression());
             } while (!$stream->test(Token::BLOCK_END_TYPE));
         }
 

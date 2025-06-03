@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target state="needs-review-translation">Příliš mnoho neúspěšných pokusů o přihlášení, zkuste to prosím znovu za %minutes% minutu.|Příliš mnoho neúspěšných pokusů o přihlášení, zkuste to prosím znovu za %minutes% minuty.|Příliš mnoho neúspěšných pokusů o přihlášení, zkuste to prosím znovu za %minutes% minut.</target>
+                <target>Příliš mnoho neúspěšných pokusů o přihlášení, zkuste to prosím znovu za %minutes% minutu.|Příliš mnoho neúspěšných pokusů o přihlášení, zkuste to prosím znovu za %minutes% minuty.|Příliš mnoho neúspěšných pokusů o přihlášení, zkuste to prosím znovu za %minutes% minut.</target>
             </trans-unit>
         </body>
     </file>

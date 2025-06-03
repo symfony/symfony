@@ -1,0 +1,5 @@
+imports:
+    - { resource: config.yml }
+
+parameters:
+    debug.container.dump: false

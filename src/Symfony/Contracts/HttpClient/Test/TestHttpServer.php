@@ -25,6 +25,13 @@ class TestHttpServer
     {
         $workingDirectory = \func_get_args()[1] ?? __DIR__.'/Fixtures/web';
 
+        if (0 > $port) {
+            $port = -$port;
+            $ip = '[::1]';
+        } else {
+            $ip = '127.0.0.1';
+        }
+
         if (isset(self::$process[$port])) {
             self::$process[$port]->stop();
         } else {
@@ -34,14 +41,14 @@ class TestHttpServer
         }
 
         $finder = new PhpExecutableFinder();
-        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', '127.0.0.1:'.$port]));
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', $ip.':'.$port]));
         $process->setWorkingDirectory($workingDirectory);
         $process->start();
         self::$process[$port] = $process;
 
         do {
             usleep(50000);
-        } while (!@fopen('http://127.0.0.1:'.$port, 'r'));
+        } while (!@fopen('http://'.$ip.':'.$port, 'r'));
 
         return $process;
     }

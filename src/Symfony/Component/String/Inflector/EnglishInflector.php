@@ -333,6 +333,9 @@ final class EnglishInflector implements InflectorInterface
         // conspectuses (conspectus), prospectuses (prospectus)
         ['sutcep', 6, true, true, 'pectuses'],
 
+        // nexuses (nexus)
+        ['suxen', 5, false, false, 'nexuses'],
+
         // fungi (fungus), alumni (alumnus), syllabi (syllabus), radii (radius)
         ['su', 2, true, true, 'i'],
 
@@ -354,14 +357,14 @@ final class EnglishInflector implements InflectorInterface
         // indices (index)
         ['xedni', 5, false, true, ['indicies', 'indexes']],
 
+        // fax (faxes, faxxes)
+        ['xaf', 3, true, true, ['faxes', 'faxxes']],
+
         // boxes (box)
         ['xo', 2, false, true, 'oxes'],
 
-        // indexes (index), matrixes (matrix)
-        ['x', 1, true, false, ['cies', 'xes']],
-
-        // appendices (appendix)
-        ['xi', 2, false, true, 'ices'],
+        // indexes (index), matrixes (matrix), appendices (appendix)
+        ['x', 1, true, false, ['ces', 'xes']],
 
         // babies (baby)
         ['y', 1, false, true, 'ies'],

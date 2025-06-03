@@ -98,6 +98,12 @@ class Link implements EvolvableLinkInterface
     public const REL_PREDECESSOR_VERSION = 'predecessor-version';
     public const REL_PREFETCH = 'prefetch';
     public const REL_PRELOAD = 'preload';
+
+    /**
+     * This feature is deprecated and superseded by the Speculation Rules API.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/prerender
+     */
     public const REL_PRERENDER = 'prerender';
     public const REL_PREV = 'prev';
     public const REL_PREVIEW = 'preview';

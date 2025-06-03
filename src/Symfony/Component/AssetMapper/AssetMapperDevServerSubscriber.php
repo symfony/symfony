@@ -109,7 +109,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         private readonly ?CacheItemPoolInterface $cacheMapCache = null,
         private readonly ?Profiler $profiler = null,
     ) {
-        $this->publicPrefix = rtrim($publicPrefix, '/').'/';
+        $this->publicPrefix = '/'.trim($publicPrefix, '/').'/';
         $this->extensionsMap = array_merge(self::EXTENSIONS_MAP, $extensionsMap);
     }
 

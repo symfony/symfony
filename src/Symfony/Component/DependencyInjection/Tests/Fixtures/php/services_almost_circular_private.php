@@ -373,15 +373,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected static function getManager3Service($container, $lazyLoad = true)
     {
-        $a = ($container->services['listener3'] ?? self::getListener3Service($container));
+        $a = ($container->privates['connection3'] ?? self::getConnection3Service($container));
 
         if (isset($container->services['manager3'])) {
             return $container->services['manager3'];
         }
-        $b = new \stdClass();
-        $b->listener = [$a];
 
-        return $container->services['manager3'] = new \stdClass($b);
+        return $container->services['manager3'] = new \stdClass($a);
     }
 
     /**
@@ -482,6 +480,34 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
     }
 
     /**
+     * Gets the private 'connection3' shared service.
+     *
+     * @return \stdClass
+     */
+    protected static function getConnection3Service($container)
+    {
+        $container->privates['connection3'] = $instance = new \stdClass();
+
+        $instance->listener = [($container->services['listener3'] ?? self::getListener3Service($container))];
+
+        return $instance;
+    }
+
+    /**
+     * Gets the private 'connection4' shared service.
+     *
+     * @return \stdClass
+     */
+    protected static function getConnection4Service($container)
+    {
+        $container->privates['connection4'] = $instance = new \stdClass();
+
+        $instance->listener = [($container->services['listener4'] ?? self::getListener4Service($container))];
+
+        return $instance;
+    }
+
+    /**
      * Gets the private 'doctrine.listener' shared service.
      *
      * @return \stdClass
@@ -572,13 +598,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected static function getManager4Service($container, $lazyLoad = true)
     {
-        $a = new \stdClass();
+        $a = ($container->privates['connection4'] ?? self::getConnection4Service($container));
 
-        $container->privates['manager4'] = $instance = new \stdClass($a);
+        if (isset($container->privates['manager4'])) {
+            return $container->privates['manager4'];
+        }
 
-        $a->listener = [($container->services['listener4'] ?? self::getListener4Service($container))];
-
-        return $instance;
+        return $container->privates['manager4'] = new \stdClass($a);
     }
 
     /**

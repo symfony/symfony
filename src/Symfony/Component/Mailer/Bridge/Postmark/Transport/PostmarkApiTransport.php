@@ -91,7 +91,7 @@ class PostmarkApiTransport extends AbstractApiTransport
             'Attachments' => $this->getAttachments($email),
         ];
 
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to'];
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to', 'date'];
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
                 continue;
@@ -147,7 +147,7 @@ class PostmarkApiTransport extends AbstractApiTransport
             ];
 
             if ('inline' === $disposition) {
-                $att['ContentID'] = 'cid:'.$filename;
+                $att['ContentID'] = 'cid:'.($attachment->hasContentId() ? $attachment->getContentId() : $filename);
             }
 
             $attachments[] = $att;

@@ -27,7 +27,6 @@ return [
         'Hebr' => 'Hebreig',
         'Hira' => 'Hiragana',
         'Hrkt' => 'Syllwyddor Japaneaidd',
-        'Jamo' => 'Jamo',
         'Jpan' => 'Japaneaidd',
         'Kana' => 'Catacana',
         'Khmr' => 'Chmeraidd',

@@ -498,13 +498,14 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->get($locatorId)->get('foo::fooAction');
 
-        $this->assertCount(9, $locator->getProvidedServices());
+        $this->assertCount(10, $locator->getProvidedServices());
         $this->assertInstanceOf(\stdClass::class, $locator->get('service1'));
         $this->assertSame('foo/bar', $locator->get('value'));
         $this->assertSame('foo', $locator->get('expression'));
         $this->assertInstanceOf(\stdClass::class, $locator->get('serviceAsValue'));
         $this->assertInstanceOf(\stdClass::class, $locator->get('expressionAsValue'));
         $this->assertSame('bar', $locator->get('rawValue'));
+        $this->stringContains('Symfony_Component_HttpKernel_Tests_Fixtures_Suit_APP_SUIT', $locator->get('suit'));
         $this->assertSame('@bar', $locator->get('escapedRawValue'));
         $this->assertSame('foo', $locator->get('customAutowire'));
         $this->assertInstanceOf(FooInterface::class, $autowireCallable = $locator->get('autowireCallable'));
@@ -719,6 +720,8 @@ class WithAutowireAttribute
         \stdClass $expressionAsValue,
         #[Autowire('bar')]
         string $rawValue,
+        #[Autowire(env: 'enum:\Symfony\Component\HttpKernel\Tests\Fixtures\Suit:APP_SUIT')]
+        Suit $suit,
         #[Autowire('@@bar')]
         string $escapedRawValue,
         #[CustomAutowire('some.parameter')]

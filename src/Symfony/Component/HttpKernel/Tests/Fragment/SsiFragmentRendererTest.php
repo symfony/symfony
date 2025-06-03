@@ -51,8 +51,8 @@ class SsiFragmentRendererTest extends TestCase
         $reference = new ControllerReference('main_controller', [], []);
         $altReference = new ControllerReference('alt_controller', [], []);
 
-        $this->assertEquals(
-            '<!--#include virtual="/_fragment?_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->',
+        $this->assertMatchesRegularExpression(
+            '{^<!--#include virtual="/_fragment\?_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->$}',
             $strategy->render($reference, $request, ['alt' => $altReference])->getContent()
         );
     }
@@ -69,8 +69,8 @@ class SsiFragmentRendererTest extends TestCase
         $reference = new ControllerReference('main_controller', [], []);
         $altReference = new ControllerReference('alt_controller', [], []);
 
-        $this->assertSame(
-            '<!--#include virtual="http://localhost/_fragment?_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->',
+        $this->assertMatchesRegularExpression(
+            '{^<!--#include virtual="http://localhost/_fragment\?_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->$}',
             $strategy->render($reference, $request, ['alt' => $altReference, 'absolute_uri' => true])->getContent()
         );
     }

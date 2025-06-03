@@ -214,6 +214,7 @@ class HttpClientTraitTest extends TestCase
             [self::RFC3986_BASE, 'g/../h',        'http://a/b/c/h'],
             [self::RFC3986_BASE, 'g;x=1/./y',     'http://a/b/c/g;x=1/y'],
             [self::RFC3986_BASE, 'g;x=1/../y',    'http://a/b/c/y'],
+            [self::RFC3986_BASE, 'g/h:123/i',     'http://a/b/c/g/h:123/i'],
             // dot-segments in the query or fragment
             [self::RFC3986_BASE, 'g?y/./x',       'http://a/b/c/g?y/./x'],
             [self::RFC3986_BASE, 'g?y/../x',      'http://a/b/c/g?y/../x'],
@@ -239,14 +240,14 @@ class HttpClientTraitTest extends TestCase
     public function testResolveUrlWithoutScheme()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8080". Did you forget to add "http(s)://"?');
+        $this->expectExceptionMessage('Unsupported scheme in "localhost:8080": "http" or "https" expected.');
         self::resolveUrl(self::parseUrl('localhost:8080'), null);
     }
 
-    public function testResolveBaseUrlWitoutScheme()
+    public function testResolveBaseUrlWithoutScheme()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8081". Did you forget to add "http(s)://"?');
+        $this->expectExceptionMessage('Unsupported scheme in "localhost:8081": "http" or "https" expected.');
         self::resolveUrl(self::parseUrl('/foo'), self::parseUrl('localhost:8081'));
     }
 

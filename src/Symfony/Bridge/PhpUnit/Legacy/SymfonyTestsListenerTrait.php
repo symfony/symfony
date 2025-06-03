@@ -13,6 +13,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\DataProviderTestSuite;
 use PHPUnit\Framework\RiskyTestError;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
@@ -193,7 +194,13 @@ class SymfonyTestsListenerTrait
     public function addSkippedTest($test, \Exception $e, $time): void
     {
         if (0 < $this->state) {
-            $this->isSkipped[\get_class($test)][$test->getName()] = 1;
+            if ($test instanceof DataProviderTestSuite) {
+                foreach ($test->tests() as $testWithDataProvider) {
+                    $this->isSkipped[\get_class($testWithDataProvider)][$testWithDataProvider->getName()] = 1;
+                }
+            } else {
+                $this->isSkipped[\get_class($test)][$test->getName()] = 1;
+            }
         }
     }
 

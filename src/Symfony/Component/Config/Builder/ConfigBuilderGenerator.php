@@ -413,39 +413,39 @@ public function NAME($value): static
     {
         $comment = '';
         if ('' !== $info = (string) $node->getInfo()) {
-            $comment .= ' * '.$info."\n";
+            $comment .= $info."\n";
         }
 
         if (!$node instanceof ArrayNode) {
             foreach ((array) ($node->getExample() ?? []) as $example) {
-                $comment .= ' * @example '.$example."\n";
+                $comment .= '@example '.$example."\n";
             }
 
             if ('' !== $default = $node->getDefaultValue()) {
-                $comment .= ' * @default '.(null === $default ? 'null' : var_export($default, true))."\n";
+                $comment .= '@default '.(null === $default ? 'null' : var_export($default, true))."\n";
             }
 
             if ($node instanceof EnumNode) {
-                $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_unique(array_map(fn ($a) => !$a instanceof \UnitEnum ? var_export($a, true) : '\\'.ltrim(var_export($a, true), '\\'), $node->getValues()))))."\n";
+                $comment .= sprintf('@param ParamConfigurator|%s $value', implode('|', array_unique(array_map(fn ($a) => !$a instanceof \UnitEnum ? var_export($a, true) : '\\'.ltrim(var_export($a, true), '\\'), $node->getValues()))))."\n";
             } else {
                 $parameterTypes = $this->getParameterTypes($node);
-                $comment .= ' * @param ParamConfigurator|'.implode('|', $parameterTypes).' $value'."\n";
+                $comment .= '@param ParamConfigurator|'.implode('|', $parameterTypes).' $value'."\n";
             }
         } else {
             foreach ((array) ($node->getExample() ?? []) as $example) {
-                $comment .= ' * @example '.json_encode($example)."\n";
+                $comment .= '@example '.json_encode($example)."\n";
             }
 
             if ($node->hasDefaultValue() && [] != $default = $node->getDefaultValue()) {
-                $comment .= ' * @default '.json_encode($default)."\n";
+                $comment .= '@default '.json_encode($default)."\n";
             }
         }
 
         if ($node->isDeprecated()) {
-            $comment .= ' * @deprecated '.$node->getDeprecation($node->getName(), $node->getParent()->getName())['message']."\n";
+            $comment .= '@deprecated '.$node->getDeprecation($node->getName(), $node->getParent()->getName())['message']."\n";
         }
 
-        return $comment;
+        return $comment ? ' * '.str_replace("\n", "\n * ", rtrim($comment, "\n"))."\n" : '';
     }
 
     /**

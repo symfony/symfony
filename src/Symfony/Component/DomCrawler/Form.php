@@ -180,9 +180,8 @@ class Form extends Link implements \ArrayAccess
         $uri = parent::getUri();
 
         if (!\in_array($this->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
-            $query = parse_url($uri, \PHP_URL_QUERY);
             $currentParameters = [];
-            if ($query) {
+            if ($query = parse_url($uri, \PHP_URL_QUERY)) {
                 parse_str($query, $currentParameters);
             }
 

@@ -55,6 +55,8 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainer;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainerInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
@@ -1675,6 +1677,59 @@ PHP
 
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
+    }
+
+    public function testCloningLazyGhostWithDependency()
+    {
+        $container = new ContainerBuilder();
+        $container->register('dependency', \stdClass::class);
+        $container->register(DependencyContainer::class)
+            ->addArgument(new Reference('dependency'))
+            ->setLazy(true)
+            ->setPublic(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_CloningLazyGhostWithDependency']);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_CloningLazyGhostWithDependency();
+
+        $bar = $container->get(DependencyContainer::class);
+        $this->assertInstanceOf(DependencyContainer::class, $bar);
+
+        $first_clone = clone $bar;
+        $second_clone = clone $bar;
+
+        $this->assertSame($first_clone->dependency, $second_clone->dependency);
+    }
+
+    public function testCloningProxyWithDependency()
+    {
+        $container = new ContainerBuilder();
+        $container->register('dependency', \stdClass::class);
+        $container->register(DependencyContainer::class)
+            ->addArgument(new Reference('dependency'))
+            ->setLazy(true)
+            ->addTag('proxy', [
+                'interface' => DependencyContainerInterface::class,
+            ])
+            ->setPublic(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_CloningProxyWithDependency']);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_CloningProxyWithDependency();
+
+        $bar = $container->get(DependencyContainer::class);
+        $this->assertInstanceOf(DependencyContainerInterface::class, $bar);
+
+        $first_clone = clone $bar;
+        $second_clone = clone $bar;
+
+        $this->assertSame($first_clone->getDependency(), $second_clone->getDependency());
     }
 
     public function testCurrentFactoryInlining()

@@ -900,11 +900,11 @@ return [
         ],
         'SLE' => [
             'SLE',
-            'sierro-leonský leone',
+            'sierraleonský leone',
         ],
         'SLL' => [
             'SLL',
-            'sierro-leonský leone (1964—2022)',
+            'sierraleonský leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',

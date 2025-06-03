@@ -668,7 +668,7 @@ return [
         ],
         'SLL' => [
             'SLL',
-            'leone de Serra Leoa (1964—2022)',
+            'leone de Serra Leoa (1964–2022)',
         ],
         'SOS' => [
             'SOS',

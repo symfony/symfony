@@ -17,6 +17,7 @@ use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Connection\Aggregate\ReplicationInterface;
 use Predis\Connection\Cluster\ClusterInterface as Predis2ClusterInterface;
 use Predis\Connection\Cluster\RedisCluster as Predis2RedisCluster;
+use Predis\Connection\Replication\ReplicationInterface as Predis2ReplicationInterface;
 use Predis\Response\ErrorInterface;
 use Predis\Response\Status;
 use Relay\Relay;
@@ -473,9 +474,16 @@ trait RedisTrait
         $cleared = true;
         $hosts = $this->getHosts();
         $host = reset($hosts);
-        if ($host instanceof \Predis\Client && $host->getConnection() instanceof ReplicationInterface) {
-            // Predis supports info command only on the master in replication environments
-            $hosts = [$host->getClientFor('master')];
+        if ($host instanceof \Predis\Client) {
+            $connection = $host->getConnection();
+
+            if ($connection instanceof ReplicationInterface) {
+                $hosts = [$host->getClientFor('master')];
+            } elseif ($connection instanceof Predis2ReplicationInterface) {
+                $connection->switchToMaster();
+
+                $hosts = [$host];
+            }
         }
 
         foreach ($hosts as $host) {
@@ -508,7 +516,7 @@ trait RedisTrait
 
             $cursor = null;
             do {
-                $keys = $host instanceof \Predis\ClientInterface ? $host->scan($cursor, 'MATCH', $pattern, 'COUNT', 1000) : $host->scan($cursor, $pattern, 1000);
+                $keys = $host instanceof \Predis\ClientInterface ? $host->scan($cursor ?? 0, 'MATCH', $pattern, 'COUNT', 1000) : $host->scan($cursor, $pattern, 1000);
                 if (isset($keys[1]) && \is_array($keys[1])) {
                     $cursor = $keys[0];
                     $keys = $keys[1];

@@ -105,10 +105,14 @@ HTML;
         ;
         $email->textTemplate('text');
 
+        $this->assertFalse($email->isRendered());
         $renderer->render($email);
+        $this->assertTrue($email->isRendered());
+
         $this->assertEquals('Text', $email->getTextBody());
 
         $email->text('reset');
+        $this->assertTrue($email->isRendered());
 
         $renderer->render($email);
         $this->assertEquals('reset', $email->getTextBody());

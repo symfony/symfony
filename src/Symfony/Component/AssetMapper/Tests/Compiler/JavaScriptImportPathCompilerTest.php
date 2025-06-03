@@ -172,6 +172,22 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
+        yield 'static_named_import_with_unicode_character' => [
+            'input' => 'import { ɵmyFunction } from "./other.js";',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'static_multiple_named_imports' => [
+            'input' => <<<EOF
+                import {
+                    myFunction,
+                    helperFunction
+                } from "./other.js";
+                EOF
+            ,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
         yield 'static_import_everything' => [
             'input' => 'import * as myModule from "./other.js";',
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
@@ -556,6 +572,34 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $compiler->compile($input, $bootstrapAsset, $assetMapper);
         $this->assertCount(1, $bootstrapAsset->getJavaScriptImports());
         $this->assertSame($popperAsset->logicalPath, $bootstrapAsset->getJavaScriptImports()[0]->assetLogicalPath);
+    }
+
+    public function testCompileIgnoresSelfReferencingBareImportAssets()
+    {
+        $bootstrapAsset = new MappedAsset('foo.js', 'foo.js', 'foo.js');
+
+        $importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
+        $importMapConfigReader->expects($this->once())
+            ->method('findRootImportMapEntry')
+            ->with('foobar')
+            ->willReturn(ImportMapEntry::createRemote('foobar', ImportMapType::JS, 'foo.js', '1.2.3', 'foobar', false));
+        $importMapConfigReader->expects($this->any())
+            ->method('convertPathToFilesystemPath')
+            ->with('foo.js')
+            ->willReturn('foo.js');
+
+        $assetMapper = $this->createMock(AssetMapperInterface::class);
+        $assetMapper->expects($this->once())
+            ->method('getAssetFromSourcePath')
+            ->with('foo.js')
+            ->willReturn($bootstrapAsset);
+
+        $compiler = new JavaScriptImportPathCompiler($importMapConfigReader);
+        $input = 'import { foo } from "foobar";';
+        $compiler->compile($input, $bootstrapAsset, $assetMapper);
+        $this->assertCount(0, $bootstrapAsset->getDependencies());
+        $this->assertCount(0, $bootstrapAsset->getFileDependencies());
+        $this->assertCount(0, $bootstrapAsset->getJavaScriptImports());
     }
 
     /**

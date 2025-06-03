@@ -159,6 +159,28 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['foo' => $closure], $this->resolver->resolve());
     }
 
+    public function testClosureWithUnionTypesNotInvoked()
+    {
+        $closure = function (int|string|null $value) {
+            Assert::fail('Should not be called');
+        };
+
+        $this->resolver->setDefault('foo', $closure);
+
+        $this->assertSame(['foo' => $closure], $this->resolver->resolve());
+    }
+
+    public function testClosureWithIntersectionTypesNotInvoked()
+    {
+        $closure = function (\Stringable&\JsonSerializable $value) {
+            Assert::fail('Should not be called');
+        };
+
+        $this->resolver->setDefault('foo', $closure);
+
+        $this->assertSame(['foo' => $closure], $this->resolver->resolve());
+    }
+
     public function testAccessPreviousDefaultValue()
     {
         // defined by superclass

@@ -14,10 +14,13 @@ namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Clazz;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyGeneric;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
@@ -482,7 +485,88 @@ class PhpStanExtractorTest extends TestCase
 
     public function testGenericInterface()
     {
-        $this->assertNull($this->extractor->getTypes(Dummy::class, 'genericInterface'));
+        $this->assertEquals(
+            [
+                new Type(
+                    builtinType: Type::BUILTIN_TYPE_OBJECT,
+                    class: \BackedEnum::class,
+                    collectionValueType: new Type(
+                        builtinType: Type::BUILTIN_TYPE_STRING,
+                    )
+                ),
+            ],
+            $this->extractor->getTypes(Dummy::class, 'genericInterface')
+        );
+    }
+
+    /**
+     * @param list<Type> $expectedTypes
+     * @dataProvider genericsProvider
+     */
+    public function testGenericsLegacy(string $property, array $expectedTypes)
+    {
+        $this->assertEquals($expectedTypes, $this->extractor->getTypes(DummyGeneric::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: list<Type>}>
+     */
+    public static function genericsProvider(): iterable
+    {
+        yield [
+            'basicClass',
+            [
+                new Type(
+                    builtinType: Type::BUILTIN_TYPE_OBJECT,
+                    class: Clazz::class,
+                    collectionValueType: new Type(
+                        builtinType: Type::BUILTIN_TYPE_OBJECT,
+                        class: Dummy::class,
+                    )
+                ),
+            ],
+        ];
+        yield [
+            'nullableClass',
+            [
+                new Type(
+                    builtinType: Type::BUILTIN_TYPE_OBJECT,
+                    class: Clazz::class,
+                    nullable: true,
+                    collectionValueType: new Type(
+                        builtinType: Type::BUILTIN_TYPE_OBJECT,
+                        class: Dummy::class,
+                    )
+                ),
+            ],
+        ];
+        yield [
+            'basicInterface',
+            [
+                new Type(
+                    builtinType: Type::BUILTIN_TYPE_OBJECT,
+                    class: IFace::class,
+                    collectionValueType: new Type(
+                        builtinType: Type::BUILTIN_TYPE_OBJECT,
+                        class: Dummy::class,
+                    )
+                ),
+            ],
+        ];
+        yield [
+            'nullableInterface',
+            [
+                new Type(
+                    builtinType: Type::BUILTIN_TYPE_OBJECT,
+                    class: IFace::class,
+                    nullable: true,
+                    collectionValueType: new Type(
+                        builtinType: Type::BUILTIN_TYPE_OBJECT,
+                        class: Dummy::class,
+                    )
+                ),
+            ],
+        ];
     }
 }
 

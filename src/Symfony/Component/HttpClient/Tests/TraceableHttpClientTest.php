@@ -29,11 +29,6 @@ class TraceableHttpClientTest extends TestCase
         TestHttpServer::start();
     }
 
-    public static function tearDownAfterClass(): void
-    {
-        TestHttpServer::stop();
-    }
-
     public function testItTracesRequest()
     {
         $httpClient = $this->createMock(HttpClientInterface::class);

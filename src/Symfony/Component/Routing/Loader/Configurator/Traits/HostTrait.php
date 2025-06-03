@@ -28,6 +28,7 @@ trait HostTrait
 
         foreach ($routes->all() as $name => $route) {
             if (null === $locale = $route->getDefault('_locale')) {
+                $priority = $routes->getPriority($name) ?? 0;
                 $routes->remove($name);
                 foreach ($hosts as $locale => $host) {
                     $localizedRoute = clone $route;
@@ -35,14 +36,14 @@ trait HostTrait
                     $localizedRoute->setRequirement('_locale', preg_quote($locale));
                     $localizedRoute->setDefault('_canonical_route', $name);
                     $localizedRoute->setHost($host);
-                    $routes->add($name.'.'.$locale, $localizedRoute);
+                    $routes->add($name.'.'.$locale, $localizedRoute, $priority);
                 }
             } elseif (!isset($hosts[$locale])) {
                 throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding host in its parent collection.', $name, $locale));
             } else {
                 $route->setHost($hosts[$locale]);
                 $route->setRequirement('_locale', preg_quote($locale));
-                $routes->add($name, $route);
+                $routes->add($name, $route, $routes->getPriority($name) ?? 0);
             }
         }
     }

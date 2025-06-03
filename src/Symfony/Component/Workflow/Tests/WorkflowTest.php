@@ -14,6 +14,7 @@ namespace Symfony\Component\Workflow\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\Event\EnteredEvent;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Event\TransitionEvent;
@@ -683,6 +684,44 @@ class WorkflowTest extends TestCase
         }
 
         $workflow->apply($subject, 't1');
+    }
+
+    public function testEventWhenAlreadyInThisPlace()
+    {
+        // ┌──────┐     ┌──────────────────────┐     ┌───┐     ┌─────────────┐     ┌───┐
+        // │ init │ ──▶ │ from_init_to_a_and_b │ ──▶ │ B │ ──▶ │ from_b_to_c │ ──▶ │ C │
+        // └──────┘     └──────────────────────┘     └───┘     └─────────────┘     └───┘
+        //                         │
+        //                         │
+        //                         ▼
+        //                     ┌───────────────────────────────┐
+        //                     │               A               │
+        //                     └───────────────────────────────┘
+        $definition = new Definition(
+            ['init', 'A', 'B', 'C'],
+            [
+                new Transition('from_init_to_a_and_b', 'init', ['A', 'B']),
+                new Transition('from_b_to_c', 'B', 'C'),
+            ],
+        );
+
+        $subject = new Subject();
+        $dispatcher = new EventDispatcher();
+        $name = 'workflow_name';
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, $name);
+
+        $calls = [];
+        $listener = function (Event $event) use (&$calls) {
+            $calls[] = $event;
+        };
+        $dispatcher->addListener("workflow.$name.entered.A", $listener);
+
+        $workflow->apply($subject, 'from_init_to_a_and_b');
+        $workflow->apply($subject, 'from_b_to_c');
+
+        $this->assertCount(1, $calls);
+        $this->assertInstanceOf(EnteredEvent::class, $calls[0]);
+        $this->assertSame('from_init_to_a_and_b', $calls[0]->getTransition()->getName());
     }
 
     public function testMarkingStateOnApplyWithEventDispatcher()

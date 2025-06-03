@@ -443,6 +443,16 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
 
+    public function testAddingRouteWithHosts()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('route-with-hosts.yml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/route-with-hosts-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
     public function testWhenEnv()
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
@@ -476,6 +486,29 @@ class YamlFileLoaderTest extends TestCase
         ]);
 
         $routes = $loader->load('localized-prefix.yml');
+
+        $this->assertSame(2, $routes->getPriority('important.cs'));
+        $this->assertSame(2, $routes->getPriority('important.en'));
+        $this->assertSame(1, $routes->getPriority('also_important'));
+    }
+
+    public function testPriorityWithHost()
+    {
+        new LoaderResolver([
+            $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/locale_and_host')),
+            new class() extends AttributeClassLoader {
+                protected function configureRoute(
+                    Route $route,
+                    \ReflectionClass $class,
+                    \ReflectionMethod $method,
+                    object $annot
+                ): void {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $routes = $loader->load('priorized-host.yml');
 
         $this->assertSame(2, $routes->getPriority('important.cs'));
         $this->assertSame(2, $routes->getPriority('important.en'));

@@ -56,6 +56,9 @@ class ChoiceValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException('The Choice constraint expects a valid callback.');
             }
             $choices = $choices();
+            if (!is_array($choices)) {
+                throw new ConstraintDefinitionException(sprintf('The Choice constraint callback "%s" is expected to return an array, but returned "%s".', trim($this->formatValue($constraint->callback), '"'), get_debug_type($choices)));
+            }
         } else {
             $choices = $constraint->choices;
         }

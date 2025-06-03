@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
-#[Entity]
+#[Entity(repositoryClass: SingleIntIdEntityRepository::class)]
 class SingleIntIdEntity
 {
     #[Column(type: Types::JSON, nullable: true)]

@@ -147,7 +147,7 @@ class Cookie
         ];
 
         if (null !== $url) {
-            if ((false === $urlParts = parse_url($url)) || !isset($urlParts['host'])) {
+            if (false === ($urlParts = parse_url($url)) || !isset($urlParts['host'])) {
                 throw new InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
             }
 
@@ -160,7 +160,7 @@ class Cookie
 
             if ('secure' === strtolower($part)) {
                 // Ignore the secure flag if the original URI is not given or is not HTTPS
-                if (!$url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
+                if (null === $url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
                     continue;
                 }
 

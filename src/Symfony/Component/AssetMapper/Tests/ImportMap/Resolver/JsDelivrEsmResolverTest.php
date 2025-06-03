@@ -693,6 +693,13 @@ EOF,
                 ['jquery', '3.7.0'],
             ],
         ];
+
+        yield 'dynamic import with path' => [
+            'return(await import("/npm/@datadog/browser-rum@6.3.0/esm/boot/startRecording.js/+esm")).startRecording',
+            [
+                ['@datadog/browser-rum/esm/boot/startRecording.js', '6.3.0'],
+            ],
+        ];
     }
 
     private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry

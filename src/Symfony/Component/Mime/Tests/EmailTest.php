@@ -695,4 +695,60 @@ EOF;
         $this->assertCount(1, $attachments);
         $this->assertStringContainsString('foo_bar_xyz_123', $attachments[0]->getBody());
     }
+
+    public function testInvalidBodyWithEmptyEmail()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('A message must have a text or an HTML part or attachments.');
+
+        (new Email())->ensureValidity();
+    }
+
+    public function testBodyWithTextIsValid()
+    {
+        $email = new Email();
+        $email->to('test@example.com')
+            ->from('test@example.com')
+            ->text('foo');
+
+        $email->ensureValidity();
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testBodyWithHtmlIsValid()
+    {
+        $email = new Email();
+        $email->to('test@example.com')
+            ->from('test@example.com')
+            ->html('foo');
+
+        $email->ensureValidity();
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testEmptyBodyWithAttachmentsIsValid()
+    {
+        $email = new Email();
+        $email->to('test@example.com')
+            ->from('test@example.com')
+            ->addPart(new DataPart('foo'));
+
+        $email->ensureValidity();
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testSetBodyIsValid()
+    {
+        $email = new Email();
+        $email->to('test@example.com')
+            ->from('test@example.com')
+            ->setBody(new TextPart('foo'));
+
+        $email->ensureValidity();
+
+        $this->expectNotToPerformAssertions();
+    }
 }

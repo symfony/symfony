@@ -16,7 +16,9 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceiver;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -39,14 +41,21 @@ final class BeanstalkdReceiverTest extends TestCase
         $receiver = new BeanstalkdReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->get();
         $this->assertCount(1, $actualEnvelopes);
-        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
+        /** @var Envelope $actualEnvelope */
+        $actualEnvelope = $actualEnvelopes[0];
+        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelope->getMessage());
 
         /** @var BeanstalkdReceivedStamp $receivedStamp */
-        $receivedStamp = $actualEnvelopes[0]->last(BeanstalkdReceivedStamp::class);
+        $receivedStamp = $actualEnvelope->last(BeanstalkdReceivedStamp::class);
 
         $this->assertInstanceOf(BeanstalkdReceivedStamp::class, $receivedStamp);
         $this->assertSame('1', $receivedStamp->getId());
         $this->assertSame($tube, $receivedStamp->getTube());
+
+        /** @var TransportMessageIdStamp $transportMessageIdStamp */
+        $transportMessageIdStamp = $actualEnvelope->last(TransportMessageIdStamp::class);
+        $this->assertNotNull($transportMessageIdStamp);
+        $this->assertSame('1', $transportMessageIdStamp->getId());
     }
 
     public function testItReturnsEmptyArrayIfThereAreNoMessages()

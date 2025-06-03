@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -277,11 +278,23 @@ class ResolveBindingsPassTest extends TestCase
         $definition->setArguments(['c' => 'C', 'hostName' => 'H']);
         $definition->setBindings($bindings);
 
-        $container->register('foo', CaseSensitiveClass::class);
-
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
         $this->assertEquals(['C', 'K', 'H'], $definition->getArguments());
+    }
+
+    public function testAbstractArg()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setArguments([new AbstractArgument(), 'apiKey' => new AbstractArgument()]);
+        $definition->setBindings(['$c' => new BoundArgument('C'), '$apiKey' => new BoundArgument('K')]);
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+
+        $this->assertEquals(['C', 'K'], $definition->getArguments());
     }
 }

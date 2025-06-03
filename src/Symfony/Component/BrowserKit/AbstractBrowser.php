@@ -170,7 +170,7 @@ abstract class AbstractBrowser
      */
     public function jsonRequest(string $method, string $uri, array $parameters = [], array $server = [], bool $changeHistory = true): Crawler
     {
-        $content = json_encode($parameters);
+        $content = json_encode($parameters, \JSON_PRESERVE_ZERO_FRACTION);
 
         $this->setServerParameter('CONTENT_TYPE', 'application/json');
         $this->setServerParameter('HTTP_ACCEPT', 'application/json');
@@ -353,11 +353,11 @@ abstract class AbstractBrowser
 
         $server = array_merge($this->server, $server);
 
-        if (!empty($server['HTTP_HOST']) && null === parse_url($originalUri, \PHP_URL_HOST)) {
+        if (!empty($server['HTTP_HOST']) && !parse_url($originalUri, \PHP_URL_HOST)) {
             $uri = preg_replace('{^(https?\://)'.preg_quote($this->extractHost($uri)).'}', '${1}'.$server['HTTP_HOST'], $uri);
         }
 
-        if (isset($server['HTTPS']) && null === parse_url($originalUri, \PHP_URL_SCHEME)) {
+        if (isset($server['HTTPS']) && !parse_url($originalUri, \PHP_URL_SCHEME)) {
             $uri = preg_replace('{^'.parse_url($uri, \PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
         }
 

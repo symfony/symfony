@@ -13,9 +13,12 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -124,6 +127,21 @@ class CheckCircularReferencesPassTest extends TestCase
 
         // just make sure that a lazily loaded service does not trigger a CircularReferenceException
         $this->addToAssertionCount(1);
+    }
+
+    public function testProcessDefersLazyServices()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a')->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('tag', needsIndexes: true)));
+        $container->register('b')->addArgument(new Reference('c'))->addTag('tag');
+        $container->register('c')->addArgument(new Reference('b'));
+
+        (new ServiceLocatorTagPass())->process($container);
+
+        $this->expectException(ServiceCircularReferenceException::class);
+
+        $this->process($container);
     }
 
     public function testProcessIgnoresIteratorArguments()

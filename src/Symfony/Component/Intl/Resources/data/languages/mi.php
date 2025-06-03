@@ -410,7 +410,7 @@ return [
         'zza' => 'Tātā',
     ],
     'LocalizedNames' => [
-        'ar_001' => 'Ārapi Moroko',
+        'ar_001' => 'Ārapi Moroki',
         'de_AT' => 'Tiamana Ateriana',
         'de_CH' => 'Tiamana Ōkawa Huiterangi',
         'en_AU' => 'Ingarihi Ahitereiriana',

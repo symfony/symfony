@@ -224,6 +224,7 @@ class PdoSessionHandlerTest extends TestCase
     {
         // wrong method sequence that should no happen, but still works
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage->open('', 'sid');
         $storage->write('id', 'data');
         $storage->write('other_id', 'other_data');
         $storage->destroy('inexistent');

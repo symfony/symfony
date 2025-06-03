@@ -226,7 +226,7 @@ class ParameterBagTest extends TestCase
         $this->assertSame('foo', $bag->getString('unknown', 'foo'), '->getString() returns the default if a parameter is not defined');
         $this->assertSame('1', $bag->getString('bool_true'), '->getString() returns "1" if a parameter is true');
         $this->assertSame('', $bag->getString('bool_false', 'foo'), '->getString() returns an empty empty string if a parameter is false');
-        $this->assertSame('strval', $bag->getString('stringable'), '->getString() gets a value of a stringable paramater as string');
+        $this->assertSame('strval', $bag->getString('stringable'), '->getString() gets a value of a stringable parameter as string');
     }
 
     public function testGetStringExceptionWithArray()

@@ -2,7 +2,8 @@
 
 return [
     'Names' => [
-        'Asia/Rangoon' => 'Myanmar Time (Rangoon)',
+        'Asia/Hovd' => 'Khovd Time',
+        'Asia/Qyzylorda' => 'Kazakhstan Time (Kyzylorda)',
     ],
     'Meta' => [],
 ];

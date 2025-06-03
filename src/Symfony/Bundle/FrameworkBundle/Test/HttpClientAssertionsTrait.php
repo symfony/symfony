@@ -14,10 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector;
 
-/*
+/**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
-
 trait HttpClientAssertionsTrait
 {
     public static function assertHttpClientRequest(string $expectedUrl, string $expectedMethod = 'GET', string|array|null $expectedBody = null, array $expectedHeaders = [], string $httpClientId = 'http_client'): void

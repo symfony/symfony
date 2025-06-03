@@ -251,6 +251,56 @@ class LokaliseProviderTest extends ProviderTestCase
         $this->assertTrue($updateProcessed, 'Translations update was not called.');
     }
 
+    public function testUpdateProcessWhenLocalTranslationsMatchLokaliseTranslations()
+    {
+        $getLanguagesResponse = function (string $method, string $url): ResponseInterface {
+            $this->assertSame('GET', $method);
+            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+
+            return new MockResponse(json_encode([
+                'languages' => [
+                    ['lang_iso' => 'en'],
+                    ['lang_iso' => 'fr'],
+                ],
+            ]));
+        };
+
+        $failOnPutRequest = function (string $method, string $url, array $options = []): void {
+            $this->assertSame('PUT', $method);
+            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys', $url);
+            $this->assertSame(json_encode(['keys' => []]), $options['body']);
+
+            $this->fail('PUT request is invalid: an empty `keys` array was provided, resulting in a Lokalise API error');
+        };
+
+        $mockHttpClient = (new MockHttpClient([
+            $getLanguagesResponse,
+            $failOnPutRequest,
+        ]))->withOptions([
+            'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
+            'headers' => ['X-Api-Token' => 'API_KEY'],
+        ]);
+
+        $provider = self::createProvider(
+            $mockHttpClient,
+            $this->getLoader(),
+            $this->getLogger(),
+            $this->getDefaultLocale(),
+            'api.lokalise.com'
+        );
+
+        // TranslatorBag with catalogues that do not store any message to mimic the behaviour of
+        // Symfony\Component\Translation\Command\TranslationPushCommand when local translations and Lokalise
+        // translations match without any changes in both translation sets
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue(new MessageCatalogue('en', []));
+        $translatorBag->addCatalogue(new MessageCatalogue('fr', []));
+
+        $provider->write($translatorBag);
+
+        $this->assertSame(1, $mockHttpClient->getRequestsCount());
+    }
+
     public function testWriteGetLanguageServerError()
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
@@ -721,6 +771,38 @@ class LokaliseProviderTest extends ProviderTestCase
         );
 
         $provider->delete($translatorBag);
+    }
+
+    public function testDeleteProcessWhenLocalTranslationsMatchLokaliseTranslations()
+    {
+        $failOnDeleteRequest = function (string $method, string $url, array $options = []): void {
+            $this->assertSame('DELETE', $method);
+            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys', $url);
+            $this->assertSame(json_encode(['keys' => []]), $options['body']);
+
+            $this->fail('DELETE request is invalid: an empty `keys` array was provided, resulting in a Lokalise API error');
+        };
+
+        // TranslatorBag with catalogues that do not store any message to mimic the behaviour of
+        // Symfony\Component\Translation\Command\TranslationPushCommand when local translations and Lokalise
+        // translations match without any changes in both translation sets
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue(new MessageCatalogue('en', []));
+        $translatorBag->addCatalogue(new MessageCatalogue('fr', []));
+
+        $mockHttpClient = new MockHttpClient([$failOnDeleteRequest], 'https://api.lokalise.com/api2/projects/PROJECT_ID/');
+
+        $provider = self::createProvider(
+            $mockHttpClient,
+            $this->getLoader(),
+            $this->getLogger(),
+            $this->getDefaultLocale(),
+            'api.lokalise.com'
+        );
+
+        $provider->delete($translatorBag);
+
+        $this->assertSame(0, $mockHttpClient->getRequestsCount());
     }
 
     public static function getResponsesForOneLocaleAndOneDomain(): \Generator

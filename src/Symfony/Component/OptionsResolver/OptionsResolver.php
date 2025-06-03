@@ -232,7 +232,7 @@ class OptionsResolver implements Options
                 return $this;
             }
 
-            if (isset($params[0]) && null !== ($type = $params[0]->getType()) && self::class === $type->getName() && (!isset($params[1]) || (($type = $params[1]->getType()) instanceof \ReflectionNamedType && Options::class === $type->getName()))) {
+            if (isset($params[0]) && ($type = $params[0]->getType()) instanceof \ReflectionNamedType && self::class === $type->getName() && (!isset($params[1]) || (($type = $params[1]->getType()) instanceof \ReflectionNamedType && Options::class === $type->getName()))) {
                 // Store closure for later evaluation
                 $this->nested[$option][] = $value;
                 $this->defaults[$option] = [];

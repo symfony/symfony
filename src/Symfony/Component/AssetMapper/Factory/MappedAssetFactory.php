@@ -128,6 +128,6 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         $sourcePath = realpath($sourcePath);
         $vendorDir = realpath($this->vendorDir);
 
-        return $sourcePath && str_starts_with($sourcePath, $vendorDir);
+        return $sourcePath && $vendorDir && str_starts_with($sourcePath, $vendorDir);
     }
 }

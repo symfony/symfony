@@ -69,10 +69,6 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['America/Argentina/Buenos_Aires'];
 
         // not deprecated in ICU
-        yield ['CST6CDT'];
-        yield ['EST5EDT'];
-        yield ['MST7MDT'];
-        yield ['PST8PDT'];
         yield ['America/Toronto'];
 
         // previously expired in ICU

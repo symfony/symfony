@@ -36,6 +36,6 @@ final class DiscordFooterEmbedObjectTest extends TestCase
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the text is 2048 characters.');
 
-        (new DiscordFooterEmbedObject())->text(str_repeat('h', 2049));
+        (new DiscordFooterEmbedObject())->text(str_repeat('š', 2049));
     }
 }

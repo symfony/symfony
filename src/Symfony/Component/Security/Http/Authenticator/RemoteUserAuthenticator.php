@@ -45,6 +45,6 @@ class RemoteUserAuthenticator extends AbstractPreAuthenticatedAuthenticator
             throw new BadCredentialsException(sprintf('User key was not found: "%s".', $this->userKey));
         }
 
-        return $request->server->get($this->userKey);
+        return $request->server->get($this->userKey) ?: null;
     }
 }

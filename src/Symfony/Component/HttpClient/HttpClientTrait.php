@@ -207,7 +207,13 @@ trait HttpClientTrait
         if ($resolve = $options['resolve'] ?? false) {
             $options['resolve'] = [];
             foreach ($resolve as $k => $v) {
-                $options['resolve'][substr(self::parseUrl('http://'.$k)['authority'], 2)] = (string) $v;
+                if ('' === $v = (string) $v) {
+                    $v = null;
+                } elseif ('[' === $v[0] && ']' === substr($v, -1) && str_contains($v, ':')) {
+                    $v = substr($v, 1, -1);
+                }
+
+                $options['resolve'][substr(self::parseUrl('http://'.$k)['authority'], 2)] = $v;
             }
         }
 
@@ -230,7 +236,13 @@ trait HttpClientTrait
 
         if ($resolve = $defaultOptions['resolve'] ?? false) {
             foreach ($resolve as $k => $v) {
-                $options['resolve'] += [substr(self::parseUrl('http://'.$k)['authority'], 2) => (string) $v];
+                if ('' === $v = (string) $v) {
+                    $v = null;
+                } elseif ('[' === $v[0] && ']' === substr($v, -1) && str_contains($v, ':')) {
+                    $v = substr($v, 1, -1);
+                }
+
+                $options['resolve'] += [substr(self::parseUrl('http://'.$k)['authority'], 2) => $v];
             }
         }
 
@@ -344,9 +356,11 @@ trait HttpClientTrait
                 }
             });
 
-            $body = http_build_query($body, '', '&');
+            if ('' === $body = http_build_query($body, '', '&')) {
+                return '';
+            }
 
-            if ('' === $body || !$streams && !str_contains($normalizedHeaders['content-type'][0] ?? '', 'multipart/form-data')) {
+            if (!$streams && !str_contains($normalizedHeaders['content-type'][0] ?? '', 'multipart/form-data')) {
                 if (!str_contains($normalizedHeaders['content-type'][0] ?? '', 'application/x-www-form-urlencoded')) {
                     $normalizedHeaders['content-type'] = ['Content-Type: application/x-www-form-urlencoded'];
                 }
@@ -626,29 +640,37 @@ trait HttpClientTrait
      */
     private static function parseUrl(string $url, array $query = [], array $allowedSchemes = ['http' => 80, 'https' => 443]): array
     {
-        if (false === $parts = parse_url($url)) {
-            if ('/' !== ($url[0] ?? '') || false === $parts = parse_url($url.'#')) {
-                throw new InvalidArgumentException(sprintf('Malformed URL "%s".', $url));
-            }
-            unset($parts['fragment']);
+        $tail = '';
+
+        if (false === $parts = parse_url(\strlen($url) !== strcspn($url, '?#') ? $url : $url.$tail = '#')) {
+            throw new InvalidArgumentException(sprintf('Malformed URL "%s".', $url));
         }
 
         if ($query) {
             $parts['query'] = self::mergeQueryString($parts['query'] ?? null, $query, true);
         }
 
+        $scheme = $parts['scheme'] ?? null;
+        $host = $parts['host'] ?? null;
+
+        if (!$scheme && $host && !str_starts_with($url, '//')) {
+            $parts = parse_url(':/'.$url.$tail);
+            $parts['path'] = substr($parts['path'], 2);
+            $scheme = $host = null;
+        }
+
         $port = $parts['port'] ?? 0;
 
-        if (null !== $scheme = $parts['scheme'] ?? null) {
+        if (null !== $scheme) {
             if (!isset($allowedSchemes[$scheme = strtolower($scheme)])) {
-                throw new InvalidArgumentException(sprintf('Unsupported scheme in "%s".', $url));
+                throw new InvalidArgumentException(sprintf('Unsupported scheme in "%s": "%s" expected.', $url, implode('" or "', array_keys($allowedSchemes))));
             }
 
             $port = $allowedSchemes[$scheme] === $port ? 0 : $port;
             $scheme .= ':';
         }
 
-        if (null !== $host = $parts['host'] ?? null) {
+        if (null !== $host) {
             if (!\defined('INTL_IDNA_VARIANT_UTS46') && preg_match('/[\x80-\xFF]/', $host)) {
                 throw new InvalidArgumentException(sprintf('Unsupported IDN "%s", try enabling the "intl" PHP extension or running "composer require symfony/polyfill-intl-idn".', $host));
             }
@@ -676,7 +698,7 @@ trait HttpClientTrait
             'authority' => null !== $host ? '//'.(isset($parts['user']) ? $parts['user'].(isset($parts['pass']) ? ':'.$parts['pass'] : '').'@' : '').$host : null,
             'path' => isset($parts['path'][0]) ? $parts['path'] : null,
             'query' => isset($parts['query']) ? '?'.$parts['query'] : null,
-            'fragment' => isset($parts['fragment']) ? '#'.$parts['fragment'] : null,
+            'fragment' => isset($parts['fragment']) && !$tail ? '#'.$parts['fragment'] : null,
         ];
     }
 

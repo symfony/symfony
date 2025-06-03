@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpFoundation\Tests\RateLimiter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\RateLimiter\LimiterInterface;
-use Symfony\Component\RateLimiter\Policy\NoLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 
 class AbstractRequestRateLimiterTest extends TestCase

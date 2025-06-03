@@ -44,7 +44,9 @@ class DoctrineExtractorTest extends TestCase
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
-        $config->setLazyGhostObjectEnabled(true);
+        if (!class_exists(\Doctrine\Persistence\Mapping\Driver\AnnotationDriver::class)) { // doctrine/persistence >= 3.0
+            $config->setLazyGhostObjectEnabled(true);
+        }
 
         $eventManager = new EventManager();
         $entityManager = new EntityManager(DriverManager::getConnection(['driver' => 'pdo_sqlite'], $config, $eventManager), $config, $eventManager);

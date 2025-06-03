@@ -698,4 +698,21 @@ class ConnectionTest extends TestCase
             ];
         }
     }
+
+    public function testConfigureSchemaOracleSequenceNameSuffixed()
+    {
+        $driverConnection = $this->createMock(DBALConnection::class);
+        $driverConnection->method('getDatabasePlatform')->willReturn(new OraclePlatform());
+        $schema = new Schema();
+
+        $connection = new Connection(['table_name' => 'messenger_messages'], $driverConnection);
+        $connection->configureSchema($schema, $driverConnection, fn () => true);
+
+        $expectedSuffix = '_seq';
+        $sequences = $schema->getSequences();
+        $this->assertCount(1, $sequences);
+        $sequence = array_pop($sequences);
+        $sequenceNameSuffix = substr($sequence->getName(), -strlen($expectedSuffix));
+        $this->assertSame($expectedSuffix, $sequenceNameSuffix);
+    }
 }

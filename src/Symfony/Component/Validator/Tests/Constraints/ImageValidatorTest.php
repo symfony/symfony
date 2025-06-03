@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\ImageValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -578,5 +580,76 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
                 'image/png',
             ]),
         ];
+    }
+
+    /**
+     * @dataProvider providerValidExtension
+     */
+    public function testExtensionValid(string $name)
+    {
+        if (!class_exists(MimeTypes::class)) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new Image(mimeTypes: [], extensions: ['gif'], extensionsMessage: 'myMessage');
+
+        $this->validator->validate(new File(__DIR__.'/Fixtures/'.$name), $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public static function providerValidExtension(): iterable
+    {
+        yield ['test.gif'];
+        yield ['test.png.gif'];
+    }
+
+    /**
+     * @dataProvider provideInvalidExtension
+     */
+    public function testExtensionInvalid(string $name, string $extension)
+    {
+        $path = __DIR__.'/Fixtures/'.$name;
+        $constraint = new Image(extensions: ['png', 'svg'], extensionsMessage: 'myMessage');
+
+        $this->validator->validate(new File($path), $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameters([
+                '{{ file }}' => '"'.$path.'"',
+                '{{ extension }}' => '"'.$extension.'"',
+                '{{ extensions }}' => '"png", "svg"',
+                '{{ name }}' => '"'.$name.'"',
+            ])
+            ->setCode(Image::INVALID_EXTENSION_ERROR)
+            ->assertRaised();
+    }
+
+    public static function provideInvalidExtension(): iterable
+    {
+        yield ['test.gif', 'gif'];
+        yield ['test.png.gif', 'gif'];
+    }
+
+    public function testExtensionAutodetectMimeTypesInvalid()
+    {
+        if (!class_exists(MimeTypes::class)) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $path = __DIR__.'/Fixtures/invalid-content.gif';
+        $constraint = new Image(mimeTypesMessage: 'myMessage', extensions: ['gif']);
+
+        $this->validator->validate(new File($path), $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameters([
+                '{{ file }}' => '"'.$path.'"',
+                '{{ name }}' => '"invalid-content.gif"',
+                '{{ type }}' => '"text/plain"',
+                '{{ types }}' => '"image/gif"',
+            ])
+            ->setCode(Image::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
     }
 }

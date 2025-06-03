@@ -138,7 +138,7 @@
                                                             {{- 'Content: ' ~ notification.getContent() }}<br/>
                                                             {{- 'Importance: ' ~ notification.getImportance() }}<br/>
                                                             {{- 'Emoji: ' ~ (notification.getEmoji() is empty ? '(empty)' : notification.getEmoji()) }}<br/>
-                                                            {{- 'Exception: ' ~ notification.getException() ?? '(empty)' }}<br/>
+                                                            {{- 'Exception: ' ~ (notification.getException() ?? '(empty)') }}<br/>
                                                             {{- 'ExceptionAsString: ' ~ (notification.getExceptionAsString() is empty ? '(empty)' : notification.getExceptionAsString()) }}
                                                         </pre>
                                                     </div>
@@ -151,7 +151,7 @@
                                                             {%- if message.getOptions() is null %}
                                                                 {{- '(empty)' }}
                                                             {%- else %}
-                                                                {{- message.getOptions()|json_encode(constant('JSON_PRETTY_PRINT')) }}
+                                                                {{- message.getOptions().toArray()|json_encode(constant('JSON_PRETTY_PRINT')) }}
                                                             {%- endif %}
                                                         </pre>
                                                     </div>

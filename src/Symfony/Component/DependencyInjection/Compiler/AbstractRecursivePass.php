@@ -219,6 +219,10 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
                 return new \ReflectionMethod(static function (...$arguments) {}, '__invoke');
             }
 
+            if ($r->hasMethod('__callStatic') && ($r = $r->getMethod('__callStatic')) && $r->isPublic()) {
+                return new \ReflectionMethod(static function (...$arguments) {}, '__invoke');
+            }
+
             throw new RuntimeException(sprintf('Invalid service "%s": method "%s()" does not exist.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
         }
 

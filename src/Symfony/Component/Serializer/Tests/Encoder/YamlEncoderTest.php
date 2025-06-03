@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -80,5 +81,13 @@ END;
         $this->assertEquals('  { foo: null }', $encoder->encode(['foo' => $obj], 'yaml', [YamlEncoder::YAML_INLINE => 0, YamlEncoder::YAML_INDENT => 2, YamlEncoder::YAML_FLAGS => 0]));
         $this->assertEquals(['foo' => $obj], $encoder->decode("foo: !php/object 'O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}'", 'yaml'));
         $this->assertEquals(['foo' => null], $encoder->decode("foo: !php/object 'O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}'", 'yaml', [YamlEncoder::YAML_FLAGS => 0]));
+    }
+
+    public function testInvalidYaml()
+    {
+        $encoder = new YamlEncoder();
+
+        $this->expectException(NotEncodableValueException::class);
+        $encoder->decode("\t", 'yaml');
     }
 }

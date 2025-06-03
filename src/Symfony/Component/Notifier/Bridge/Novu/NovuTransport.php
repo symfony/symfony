@@ -34,7 +34,6 @@ class NovuTransport extends AbstractTransport
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null
     ) {
-        $this->apiKey = $apiKey;
         parent::__construct($client, $dispatcher);
     }
 

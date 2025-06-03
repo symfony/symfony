@@ -274,6 +274,7 @@ class MessengerPass implements CompilerPassInterface
             }
         }
 
+        $consumableReceiverNames = [];
         foreach ($container->findTaggedServiceIds('messenger.receiver') as $id => $tags) {
             $receiverClass = $this->getServiceClass($container, $id);
             if (!is_subclass_of($receiverClass, ReceiverInterface::class)) {
@@ -288,6 +289,9 @@ class MessengerPass implements CompilerPassInterface
                     if ($tag['is_failure_transport'] ?? false) {
                         $failureTransportsMap[$tag['alias']] = $receiverMapping[$id];
                     }
+                }
+                if (!isset($tag['is_consumable']) || $tag['is_consumable'] !== false) {
+                    $consumableReceiverNames[] = $tag['alias'] ?? $id;
                 }
             }
         }
@@ -314,7 +318,7 @@ class MessengerPass implements CompilerPassInterface
                 $consumeCommandDefinition->replaceArgument(0, new Reference('messenger.routable_message_bus'));
             }
 
-            $consumeCommandDefinition->replaceArgument(4, array_values($receiverNames));
+            $consumeCommandDefinition->replaceArgument(4, $consumableReceiverNames);
             try {
                 $consumeCommandDefinition->replaceArgument(6, $busIds);
             } catch (OutOfBoundsException) {

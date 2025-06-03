@@ -36,7 +36,7 @@ class ChromePhpHandler extends BaseChromePhpHandler
             return;
         }
 
-        if (!preg_match(static::USER_AGENT_REGEX, $event->getRequest()->headers->get('User-Agent'))) {
+        if (!preg_match(static::USER_AGENT_REGEX, $event->getRequest()->headers->get('User-Agent', ''))) {
             self::$sendHeaders = false;
             $this->headers = [];
 

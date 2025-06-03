@@ -39,6 +39,11 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         return ['foo', 'bar'];
     }
 
+    public static function staticCallbackInvalid()
+    {
+        return null;
+    }
+
     public function testExpectArrayIfMultipleIsTrue()
     {
         $this->expectException(UnexpectedValueException::class);
@@ -124,6 +129,19 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('bar', $constraint);
 
         $this->assertNoViolation();
+    }
+
+    public function testInvalidChoiceCallbackContextMethod()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The Choice constraint callback "staticCallbackInvalid" is expected to return an array, but returned "null".');
+
+        // search $this for "staticCallbackInvalid"
+        $this->setObject($this);
+
+        $constraint = new Choice(['callback' => 'staticCallbackInvalid']);
+
+        $this->validator->validate('bar', $constraint);
     }
 
     public function testValidChoiceCallbackContextObjectMethod()

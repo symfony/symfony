@@ -466,6 +466,10 @@
                 <source>This value should not be after week "{{ max }}".</source>
                 <target>Aquest valor no ha de ser posterior a la setmana "{{ max }}".</target>
             </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target state="needs-review-translation">Aquest valor no és una plantilla Twig vàlida.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

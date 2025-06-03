@@ -281,6 +281,8 @@ class ChoiceType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
+        $view->vars['duplicate_preferred_choices'] = $options['duplicate_preferred_choices'];
+
         if ($options['expanded']) {
             // Radio buttons should have the same name as the parent
             $childName = $view->vars['full_name'];

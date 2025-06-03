@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -39,8 +40,8 @@ class BeanstalkdSender implements SenderInterface
         $delayStamp = $envelope->last(DelayStamp::class);
         $delayInMs = null !== $delayStamp ? $delayStamp->getDelay() : 0;
 
-        $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delayInMs);
+        $id = $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delayInMs);
 
-        return $envelope;
+        return $envelope->with(new TransportMessageIdStamp($id));
     }
 }

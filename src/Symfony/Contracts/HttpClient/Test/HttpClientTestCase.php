@@ -734,6 +734,18 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
+    public function testIPv6Resolve()
+    {
+        TestHttpServer::start(-8087);
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://symfony.com:8087/', [
+            'resolve' => ['symfony.com' => '::1'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testNotATimeout()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -1147,5 +1159,34 @@ abstract class HttpClientTestCase extends TestCase
 
         $response = $client2->request('GET', '/');
         $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testBindToPort()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057', ['bindto' => '127.0.0.1:9876']);
+        $response->getStatusCode();
+
+        $vars = $response->toArray();
+
+        self::assertSame('127.0.0.1', $vars['REMOTE_ADDR']);
+        self::assertSame('9876', $vars['REMOTE_PORT']);
+    }
+
+    public function testBindToPortV6()
+    {
+        TestHttpServer::start(-8087);
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://[::1]:8087', ['bindto' => '[::1]:9876']);
+        $response->getStatusCode();
+
+        $vars = $response->toArray();
+
+        self::assertSame('::1', $vars['REMOTE_ADDR']);
+
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            self::assertSame('9876', $vars['REMOTE_PORT']);
+        }
     }
 }

@@ -60,7 +60,7 @@ return static function (ContainerConfigurator $container) {
 
     $container->services()
         ->set('serializer', Serializer::class)
-            ->args([[], []])
+            ->args([[], [], []])
 
         ->alias(SerializerInterface::class, 'serializer')
         ->alias(NormalizerInterface::class, 'serializer')

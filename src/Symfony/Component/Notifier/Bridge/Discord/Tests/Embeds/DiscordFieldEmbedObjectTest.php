@@ -36,7 +36,7 @@ final class DiscordFieldEmbedObjectTest extends TestCase
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the name is 256 characters.');
 
-        (new DiscordFieldEmbedObject())->name(str_repeat('h', 257));
+        (new DiscordFieldEmbedObject())->name(str_repeat('š', 257));
     }
 
     public function testThrowsWhenValueExceedsCharacterLimit()
@@ -44,6 +44,6 @@ final class DiscordFieldEmbedObjectTest extends TestCase
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the value is 1024 characters.');
 
-        (new DiscordFieldEmbedObject())->value(str_repeat('h', 1025));
+        (new DiscordFieldEmbedObject())->value(str_repeat('š', 1025));
     }
 }

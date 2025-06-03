@@ -30,7 +30,7 @@ permissions:
 jobs:
   tests:
     name: Intl data
-    runs-on: Ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout

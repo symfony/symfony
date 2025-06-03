@@ -13,6 +13,7 @@ namespace Symfony\Component\Intl\Tests;
 
 use Symfony\Component\Intl\Currencies;
 use Symfony\Component\Intl\Exception\MissingResourceException;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * @group intl-data
@@ -313,6 +314,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         'ZRN',
         'ZRZ',
         'ZWD',
+        'ZWG',
         'ZWL',
         'ZWR',
     ];
@@ -530,6 +532,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         'CSD' => 891,
         'ZMK' => 894,
         'TWD' => 901,
+        'ZWG' => 924,
         'SLE' => 925,
         'VED' => 926,
         'UYW' => 927,
@@ -600,6 +603,10 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetNames($displayLocale)
     {
+        if ('en' !== $displayLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         $names = Currencies::getNames($displayLocale);
 
         $keys = array_keys($names);
@@ -618,6 +625,8 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public function testGetNamesDefaultLocale()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('de_AT');
 
         $this->assertSame(Currencies::getNames('de_AT'), Currencies::getNames());
@@ -628,6 +637,10 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
+        if ('en' !== $ofLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
@@ -639,6 +652,10 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetName($displayLocale)
     {
+        if ('en' !== $displayLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         $expected = Currencies::getNames($displayLocale);
         $actual = [];
 
@@ -651,6 +668,8 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public function testGetNameDefaultLocale()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('de_AT');
 
         $expected = Currencies::getNames('de_AT');

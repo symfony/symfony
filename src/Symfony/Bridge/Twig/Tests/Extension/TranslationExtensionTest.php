@@ -206,6 +206,68 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render([])));
     }
 
+    public function testDefaultTranslationDomainWithExpression()
+    {
+        $templates = [
+            'index' => '
+                {%- extends "base" %}
+
+                {%- trans_default_domain custom_domain %}
+
+                {%- block content %}
+                    {{- "foo"|trans }}
+                {%- endblock %}
+            ',
+
+            'base' => '
+                {%- block content "" %}
+            ',
+        ];
+
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => 'foo (messages)'], 'en');
+        $translator->addResource('array', ['foo' => 'foo (custom)'], 'en', 'custom');
+        $translator->addResource('array', ['foo' => 'foo (foo)'], 'en', 'foo');
+
+        $template = $this->getTemplate($templates, $translator);
+
+        $this->assertEquals('foo (foo)', trim($template->render(['custom_domain' => 'foo'])));
+    }
+
+    public function testDefaultTranslationDomainWithExpressionAndInheritance()
+    {
+        $templates = [
+            'index' => '
+                {%- extends "base" %}
+
+                {%- trans_default_domain foo_domain %}
+
+                {%- block content %}
+                    {{- "foo"|trans }}
+                {%- endblock %}
+            ',
+
+            'base' => '
+                {%- trans_default_domain custom_domain %}
+
+                {{- "foo"|trans }}
+                {%- block content "" %}
+                {{- "foo"|trans }}
+            ',
+        ];
+
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => 'foo (messages)'], 'en');
+        $translator->addResource('array', ['foo' => 'foo (custom)'], 'en', 'custom');
+        $translator->addResource('array', ['foo' => 'foo (foo)'], 'en', 'foo');
+
+        $template = $this->getTemplate($templates, $translator);
+
+        $this->assertEquals('foo (custom)foo (foo)foo (custom)', trim($template->render(['foo_domain' => 'foo', 'custom_domain' => 'custom'])));
+    }
+
     private function getTemplate($template, ?TranslatorInterface $translator = null): TemplateWrapper
     {
         $translator ??= new Translator('en');

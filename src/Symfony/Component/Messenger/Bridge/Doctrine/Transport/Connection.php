@@ -53,6 +53,8 @@ class Connection implements ResetInterface
         'auto_setup' => true,
     ];
 
+    private const ORACLE_SEQUENCES_SUFFIX = '_seq';
+
     /**
      * Configuration of the connection.
      *
@@ -470,6 +472,18 @@ class Connection implements ResetInterface
                 if (!$id) {
                     throw new TransportException('no id was returned by PostgreSQL from RETURNING clause.');
                 }
+            } elseif ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+                $sequenceName = $this->configuration['table_name'].self::ORACLE_SEQUENCES_SUFFIX;
+
+                $this->driverConnection->executeStatement($sql, $parameters, $types);
+
+                $result = $this->driverConnection->fetchOne('SELECT '.$sequenceName.'.CURRVAL FROM DUAL');
+
+                $id = (int) $result;
+
+                if (!$id) {
+                    throw new TransportException('no id was returned by Oracle from sequence: '.$sequenceName);
+                }
             } else {
                 $this->driverConnection->executeStatement($sql, $parameters, $types);
 
@@ -507,7 +521,7 @@ class Connection implements ResetInterface
         $table = $schema->createTable($this->configuration['table_name']);
         // add an internal option to mark that we created this & the non-namespaced table name
         $table->addOption(self::TABLE_OPTION_NAME, $this->configuration['table_name']);
-        $table->addColumn('id', Types::BIGINT)
+        $idColumn = $table->addColumn('id', Types::BIGINT)
             ->setAutoincrement(true)
             ->setNotnull(true);
         $table->addColumn('body', Types::TEXT)
@@ -527,6 +541,13 @@ class Connection implements ResetInterface
         $table->addIndex(['queue_name']);
         $table->addIndex(['available_at']);
         $table->addIndex(['delivered_at']);
+
+        // We need to create a sequence for Oracle and set the id column to get the correct nextval
+        if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+            $idColumn->setDefault($this->configuration['table_name'].self::ORACLE_SEQUENCES_SUFFIX.'.nextval');
+
+            $schema->createSequence($this->configuration['table_name'].self::ORACLE_SEQUENCES_SUFFIX);
+        }
     }
 
     private function decodeEnvelopeHeaders(array $doctrineEnvelope): array

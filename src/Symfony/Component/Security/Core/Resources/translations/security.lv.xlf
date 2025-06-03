@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target>Pārāk daudz neveiksmīgu autentifikācijas mēģinājumu, lūdzu, mēģiniet vēlreiz pēc %minutes% minūtes.|Pārāk daudz neveiksmīgu autentifikācijas mēģinājumu, lūdzu, mēģiniet vēlreiz pēc %minutes% minūtēm.</target>
+                <target>Pārāk daudz neveiksmīgu autentifikācijas mēģinājumu, lūdzu, mēģiniet vēlreiz pēc %minutes% minūtēm.</target>
             </trans-unit>
         </body>
     </file>

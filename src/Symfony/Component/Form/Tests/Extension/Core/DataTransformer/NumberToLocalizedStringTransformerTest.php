@@ -20,8 +20,17 @@ class NumberToLocalizedStringTransformerTest extends TestCase
 {
     private string $defaultLocale;
 
+    private $initialTestCaseUseException;
+    private $initialTestCaseErrorLevel;
+
     protected function setUp(): void
     {
+        // Normalize intl. configuration settings.
+        if (\extension_loaded('intl')) {
+            $this->initialTestCaseUseException = ini_set('intl.use_exceptions', 0);
+            $this->initialTestCaseErrorLevel = ini_set('intl.error_level', 0);
+        }
+
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
     }
@@ -29,6 +38,11 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
+
+        if (\extension_loaded('intl')) {
+            ini_set('intl.use_exceptions', $this->initialTestCaseUseException);
+            ini_set('intl.error_level', $this->initialTestCaseErrorLevel);
+        }
     }
 
     public static function provideTransformations()
@@ -645,6 +659,56 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $transformer = new NumberToLocalizedStringTransformer();
 
         $this->assertSame($output, $transformer->reverseTransform($input));
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
+    {
+        $errorLevel = ini_set('intl.error_level', \E_WARNING);
+
+        try {
+            $this->expectException(TransformationFailedException::class);
+            $transformer = new NumberToLocalizedStringTransformer();
+            $transformer->reverseTransform('invalid_number');
+        } finally {
+            ini_set('intl.error_level', $errorLevel);
+        }
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testReverseTransformWrapsIntlErrorsWithExceptions()
+    {
+        $initialUseExceptions = ini_set('intl.use_exceptions', 1);
+
+        try {
+            $this->expectException(TransformationFailedException::class);
+            $transformer = new NumberToLocalizedStringTransformer();
+            $transformer->reverseTransform('invalid_number');
+        } finally {
+            ini_set('intl.use_exceptions', $initialUseExceptions);
+        }
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
+    {
+        $initialUseExceptions = ini_set('intl.use_exceptions', 1);
+        $initialErrorLevel = ini_set('intl.error_level', \E_WARNING);
+
+        try {
+            $this->expectException(TransformationFailedException::class);
+            $transformer = new NumberToLocalizedStringTransformer();
+            $transformer->reverseTransform('invalid_number');
+        } finally {
+            ini_set('intl.use_exceptions', $initialUseExceptions);
+            ini_set('intl.error_level', $initialErrorLevel);
+        }
     }
 
     public static function eNotationProvider(): array

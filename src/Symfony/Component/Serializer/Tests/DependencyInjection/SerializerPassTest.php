@@ -77,9 +77,11 @@ class SerializerPassTest extends TestCase
 
     public function testBindSerializerDefaultContext()
     {
+        $context = ['enable_max_depth' => true];
+
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        $container->register('serializer')->setArguments([null, null]);
+        $container->register('serializer')->setArguments([null, null, []]);
         $container->setParameter('serializer.default_context', ['enable_max_depth' => true]);
         $definition = $container->register('n1')->addTag('serializer.normalizer')->addTag('serializer.encoder');
 
@@ -87,7 +89,8 @@ class SerializerPassTest extends TestCase
         $serializerPass->process($container);
 
         $bindings = $definition->getBindings();
-        $this->assertEquals($bindings['array $defaultContext'], new BoundArgument(['enable_max_depth' => true], false));
+        $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
+        $this->assertEquals($context, $container->getDefinition('serializer')->getArgument('$defaultContext'));
     }
 
     public function testNormalizersAndEncodersAreDecoredAndOrderedWhenCollectingData()

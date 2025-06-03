@@ -265,11 +265,11 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     /**
      * @param CurlClientState $multi
      */
-    private static function perform(ClientState $multi, ?array &$responses = null): void
+    private static function perform(ClientState $multi, ?array $responses = null): void
     {
         if ($multi->performing) {
             if ($responses) {
-                $response = current($responses);
+                $response = $responses[array_key_first($responses)];
                 $multi->handlesActivity[(int) $response->handle][] = null;
                 $multi->handlesActivity[(int) $response->handle][] = new TransportException(sprintf('Userland callback cannot use the client nor the response while processing "%s".', curl_getinfo($response->handle, \CURLINFO_EFFECTIVE_URL)));
             }
@@ -312,7 +312,16 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 }
 
                 $multi->handlesActivity[$id][] = null;
-                $multi->handlesActivity[$id][] = \in_array($result, [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) || '_0' === $waitFor || curl_getinfo($ch, \CURLINFO_SIZE_DOWNLOAD) === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD) ? null : new TransportException(ucfirst(curl_error($ch) ?: curl_strerror($result)).sprintf(' for "%s".', curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL)));
+                $multi->handlesActivity[$id][] = \in_array($result, [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true)
+                    || '_0' === $waitFor
+                    || curl_getinfo($ch, \CURLINFO_SIZE_DOWNLOAD) === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD)
+                    || ('C' === $waitFor[0]
+                        && 'OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0' === curl_error($ch)
+                        && -1.0 === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD)
+                        && \in_array('close', array_map('strtolower', $responses[$id]->headers['connection'] ?? []), true)
+                    )
+                    ? null
+                    : new TransportException(ucfirst(curl_error($ch) ?: curl_strerror($result)).\sprintf(' for "%s".', curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL)));
             }
         } finally {
             $multi->performing = false;
@@ -419,15 +428,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 $options['max_redirects'] = curl_getinfo($ch, \CURLINFO_REDIRECT_COUNT);
                 curl_setopt($ch, \CURLOPT_FOLLOWLOCATION, false);
                 curl_setopt($ch, \CURLOPT_MAXREDIRS, $options['max_redirects']);
-            } else {
-                $url = parse_url($location ?? ':');
-
-                if (isset($url['host']) && null !== $ip = $multi->dnsCache->hostnames[$url['host'] = strtolower($url['host'])] ?? null) {
-                    // Populate DNS cache for redirects if needed
-                    $port = $url['port'] ?? ('http' === ($url['scheme'] ?? parse_url(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL), \PHP_URL_SCHEME)) ? 80 : 443);
-                    curl_setopt($ch, \CURLOPT_RESOLVE, ["{$url['host']}:$port:$ip"]);
-                    $multi->dnsCache->removals["-{$url['host']}:$port"] = "-{$url['host']}:$port";
-                }
             }
         }
 

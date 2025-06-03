@@ -112,7 +112,7 @@ final class Envelope
      *
      * @return StampInterface[]|StampInterface[][] The stamps for the specified FQCN, or all stamps by their class name
      *
-     * @psalm-return ($stampFqcn is string : array<class-string<StampInterface>, list<StampInterface>> ? list<TStamp>)
+     * @psalm-return ($stampFqcn is null ? array<class-string<StampInterface>, list<StampInterface>> : list<TStamp>)
      */
     public function all(?string $stampFqcn = null): array
     {

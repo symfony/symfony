@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
@@ -47,8 +48,8 @@ use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\Reservation;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @group time-sensitive
@@ -73,7 +74,7 @@ class WorkerTest extends TestCase
                 return $envelopes[] = $envelope;
             });
 
-        $dispatcher = new class() implements EventDispatcherInterface {
+        $dispatcher = new class implements EventDispatcherInterface {
             private StopWorkerOnMessageLimitListener $listener;
 
             public function __construct()
@@ -403,7 +404,7 @@ class WorkerTest extends TestCase
 
         $worker = new Worker(['transport1' => $receiver1, 'transport2' => $receiver2], $bus, clock: new MockClock());
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(sprintf('Receiver for "transport2" does not implement "%s".', QueueReceiverInterface::class));
+        $this->expectExceptionMessage(\sprintf('Receiver for "transport2" does not implement "%s".', QueueReceiverInterface::class));
         $worker->run(['queues' => ['foo']]);
     }
 
@@ -418,7 +419,7 @@ class WorkerTest extends TestCase
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
-        $stamp = new class() implements StampInterface {
+        $stamp = new class implements StampInterface {
         };
         $listener = function (WorkerMessageReceivedEvent $event) use ($stamp) {
             $event->addStamps($stamp);
@@ -438,6 +439,8 @@ class WorkerTest extends TestCase
         $envelope = [
             new Envelope(new DummyMessage('message1')),
             new Envelope(new DummyMessage('message2')),
+            new Envelope(new DummyMessage('message3')),
+            new Envelope(new DummyMessage('message4')),
         ];
         $receiver = new DummyReceiver([$envelope]);
 
@@ -445,14 +448,12 @@ class WorkerTest extends TestCase
         $bus->method('dispatch')->willReturnArgument(0);
 
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+        $eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(4));
 
         $rateLimitCount = 0;
-        $listener = function (WorkerRateLimitedEvent $event) use (&$rateLimitCount) {
+        $eventDispatcher->addListener(WorkerRateLimitedEvent::class, static function () use (&$rateLimitCount) {
             ++$rateLimitCount;
-            $event->getLimiter()->reset(); // Reset limiter to continue test
-        };
-        $eventDispatcher->addListener(WorkerRateLimitedEvent::class, $listener);
+        });
 
         $rateLimitFactory = new RateLimiterFactory([
             'id' => 'bus',
@@ -461,11 +462,14 @@ class WorkerTest extends TestCase
             'interval' => '1 minute',
         ], new InMemoryStorage());
 
+        ClockMock::register(Reservation::class);
+        ClockMock::register(InMemoryStorage::class);
+
         $worker = new Worker(['bus' => $receiver], $bus, $eventDispatcher, null, ['bus' => $rateLimitFactory], new MockClock());
         $worker->run();
 
-        $this->assertCount(2, $receiver->getAcknowledgedEnvelopes());
-        $this->assertEquals(1, $rateLimitCount);
+        $this->assertSame(4, $receiver->getAcknowledgeCount());
+        $this->assertSame(3, $rateLimitCount);
     }
 
     public function testWorkerShouldLogOnStop()
@@ -579,25 +583,6 @@ class WorkerTest extends TestCase
         $worker->run();
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
-    }
-
-    public function testGcCollectCyclesIsCalledOnMessageHandle()
-    {
-        $apiMessage = new DummyMessage('API');
-
-        $receiver = new DummyReceiver([[new Envelope($apiMessage)]]);
-
-        $bus = $this->createMock(MessageBusInterface::class);
-
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
-
-        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
-        $worker->run();
-
-        $gcStatus = gc_status();
-
-        $this->assertGreaterThan(0, $gcStatus['runs']);
     }
 }
 

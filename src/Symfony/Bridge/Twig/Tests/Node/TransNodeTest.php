@@ -18,6 +18,7 @@ use Twig\Compiler;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\TextNode;
 
 /**
@@ -28,7 +29,7 @@ class TransNodeTest extends TestCase
     public function testCompileStrict()
     {
         $body = new TextNode('trans %var%', 0);
-        $vars = new NameExpression('foo', 0);
+        $vars = class_exists(ContextVariable::class) ? new ContextVariable('foo', 0) : new NameExpression('foo', 0);
         $node = new TransNode($body, null, null, $vars);
 
         $env = new Environment($this->createMock(LoaderInterface::class), ['strict_variables' => true]);

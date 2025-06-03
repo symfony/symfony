@@ -71,7 +71,7 @@ final class GoIpTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport does not support the "From" option.', __CLASS__));
         }
 
-        $response = $this->client->request('GET', $this->getEndpoint(), [
+        $response = $this->client->request('GET', 'https://'.$this->getEndpoint(), [
             'query' => [
                 'u' => $this->username,
                 'p' => $this->password,

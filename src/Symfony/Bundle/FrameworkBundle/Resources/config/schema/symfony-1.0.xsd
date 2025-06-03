@@ -266,6 +266,7 @@
             <xsd:element name="static-method" type="xsd:string" />
             <xsd:element name="mapping" type="file_mapping" />
             <xsd:element name="auto-mapping" type="auto_mapping" />
+            <xsd:element name="not-compromised-password" type="not-compromised-password" />
         </xsd:choice>
 
         <xsd:attribute name="enabled" type="xsd:boolean" />
@@ -298,6 +299,11 @@
             <xsd:enumeration value="strict" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="not-compromised-password">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="endpoint" type="xsd:string" />
+    </xsd:complexType>
 
     <xsd:complexType name="annotations">
         <xsd:attribute name="cache" type="xsd:string" />

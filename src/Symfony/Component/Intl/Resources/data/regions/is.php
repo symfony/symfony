@@ -214,7 +214,7 @@ return [
         'SV' => 'El Salvador',
         'SX' => 'Sint Maarten',
         'SY' => 'Sýrland',
-        'SZ' => 'Svasíland',
+        'SZ' => 'Esvatíní',
         'TC' => 'Turks- og Caicoseyjar',
         'TD' => 'Tsjad',
         'TF' => 'Frönsku suðlægu landsvæðin',

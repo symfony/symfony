@@ -352,6 +352,23 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $this->assertEquals('value-50', $cache->getItem((string) 50)->get());
     }
+
+    public function testErrorsDontInvalidate()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $item = $cache->getItem('foo');
+        $this->assertTrue($cache->save($item->set('bar')));
+        $this->assertTrue($cache->hasItem('foo'));
+
+        $item->set(static fn () => null);
+        $this->assertFalse($cache->save($item));
+        $this->assertSame('bar', $cache->getItem('foo')->get());
+    }
 }
 
 class NotUnserializable

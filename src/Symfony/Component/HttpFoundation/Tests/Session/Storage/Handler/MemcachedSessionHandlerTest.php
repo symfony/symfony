@@ -109,6 +109,7 @@ class MemcachedSessionHandlerTest extends TestCase
 
     public function testDestroySession()
     {
+        $this->storage->open('', 'sid');
         $this->memcached
             ->expects($this->once())
             ->method('delete')

@@ -22,7 +22,7 @@ final class MailerSendSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $username, #[\SensitiveParameter] string $password, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
-        parent::__construct('smtp.mailersend.net', 587, true, $dispatcher, $logger);
+        parent::__construct('smtp.mailersend.net', 587, false, $dispatcher, $logger);
 
         $this->setUsername($username);
         $this->setPassword($password);

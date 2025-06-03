@@ -38,6 +38,7 @@ class FileLocatorTest extends TestCase
             ['\\server\\foo.xml'],
             ['https://server/foo.xml'],
             ['phar://server/foo.xml'],
+            ['phar:///server/foo.xml'],
         ];
     }
 

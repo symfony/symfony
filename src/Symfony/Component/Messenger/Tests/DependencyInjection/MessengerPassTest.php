@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
@@ -504,6 +505,34 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $this->assertSame(['amqp', 'dummy'], $container->getDefinition('console.command.messenger_setup_transports')->getArgument(1));
+    }
+
+    public function testOnlyConsumableTransportsAreAddedToConsumeCommand()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('messenger.transport.async', DummyReceiver::class)
+            ->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register('messenger.transport.sync', DummyReceiver::class)
+            ->addTag('messenger.receiver', ['alias' => 'sync', 'is_consumable' => false]);
+        $container->register('messenger.receiver_locator', ServiceLocator::class)
+            ->setArguments([[]]);
+
+        $container->register('console.command.messenger_consume_messages', Command::class)
+            ->setArguments([
+                null,
+                null,
+                null,
+                null,
+                [],
+            ]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(
+            ['async'],
+            $container->getDefinition('console.command.messenger_consume_messages')->getArgument(4)
+        );
     }
 
     /**

@@ -27,11 +27,6 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class RetryableHttpClientTest extends TestCase
 {
-    public static function tearDownAfterClass(): void
-    {
-        TestHttpServer::stop();
-    }
-
     public function testRetryOnError()
     {
         $client = new RetryableHttpClient(

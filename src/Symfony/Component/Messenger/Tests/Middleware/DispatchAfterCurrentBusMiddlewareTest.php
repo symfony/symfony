@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Constraint\Callback;
-use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;

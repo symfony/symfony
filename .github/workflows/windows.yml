@@ -86,7 +86,10 @@ jobs:
           $env:SYMFONY_VERSION=(Select-String -CaseSensitive -Pattern " VERSION =" -SimpleMatch -Path src/Symfony/Component/HttpKernel/Kernel.php | Select Line | Select-String -Pattern "([0-9][0-9]*\.[0-9])").Matches.Value
           $env:COMPOSER_ROOT_VERSION=$env:SYMFONY_VERSION + ".x-dev"
 
-          php .github/build-packages.php HEAD^ $env:SYMFONY_VERSION src\Symfony\Bridge\PhpUnit
+          cd .github
+          php ../composer.phar install
+          php ./build-packages.php HEAD^ $env:SYMFONY_VERSION src\Symfony\Bridge\PhpUnit
+          cd ..
           php composer.phar update --no-progress --ansi
 
       - name: Install PHPUnit

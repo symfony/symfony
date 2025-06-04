@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-06-03T11:01:46Z
+
+Be careful, there is 2 different `value-of` supported cases in phpstan and psalm:
+
+- `value-of<T>` with `T` being a BackedEnum type returns the union of all backing values of that enum (which we can generalize to the backing type as done in this PR)
+- `value-of<T>` with `T` being an array type returns the type of values in that array (there is also `key-of<T>` for the equivalent for the key type)
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-06-03T11:10:21Z
+
+Oh, didn't know about that, I'll update the PR accordingly, thanks!
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-06-03T11:57:42Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-06-03T14:07:52Z
+
+Looks like a feature to me
+
+---------------------------------------------------------------------------
+
+by jack-worman at 2025-06-04T02:16:33Z
+
+> Looks like a feature to me
+
+I consider this a bug because when I upgraded to Symfony 7.3 the TypeInfo component started throwing an exception. This is because 7.3 introduced handling type aliases, and my code had a `value-of<T>` in it.
+
+So, until this is fixed I have to not use `value-of<T>` (and have worse static analysis) or not use TypeInfo (and do something 🤷 )

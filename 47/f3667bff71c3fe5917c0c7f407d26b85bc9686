@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-06-03T04:20:12Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-03T09:58:30Z
+
+The part about configuring doctrine deprecations might still be useful.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-06-03T12:07:35Z
+
+@stof I've applied the condition only to the parts related to `DeprecationErrorHandler`.

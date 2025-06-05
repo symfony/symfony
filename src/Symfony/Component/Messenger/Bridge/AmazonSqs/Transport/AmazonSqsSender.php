@@ -15,13 +15,14 @@ use AsyncAws\Core\Exception\Http\HttpException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class AmazonSqsSender implements SenderInterface
+class AmazonSqsSender implements SenderInterface, BatchSenderInterface
 {
     public function __construct(
         private Connection $connection,
@@ -30,6 +31,46 @@ class AmazonSqsSender implements SenderInterface
     }
 
     public function send(Envelope $envelope): Envelope
+    {
+        $preparedEnvelope = $this->prepareEnvelope($envelope);
+
+        try {
+            $this->connection->send(
+                $preparedEnvelope["body"],
+                $preparedEnvelope["headers"],
+                $preparedEnvelope["delay"],
+                $preparedEnvelope["messageGroupId"],
+                $preparedEnvelope["messageDeduplicationId"],
+                $preparedEnvelope["xrayTraceId"],
+            );
+        } catch (HttpException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        return $envelope;
+    }
+
+    /**
+     * @param Envelope[] $envelopes
+     * @return array
+     */
+    public function sendBatch(array $envelopes): array
+    {
+        $messages = [];
+        foreach ($envelopes as $envelope) {
+            $messages[] = $this->prepareEnvelope($envelope);
+        }
+
+        try {
+            $this->connection->sendBatch($messages);
+        } catch (HttpException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        return $envelopes;
+    }
+
+    private function prepareEnvelope(Envelope $envelope): array
     {
         $encodedMessage = $this->serializer->encode($envelope);
         $encodedMessage = $this->complyWithAmazonSqsRequirements($encodedMessage);
@@ -52,20 +93,14 @@ class AmazonSqsSender implements SenderInterface
         $amazonSqsXrayTraceHeaderStamp = $envelope->last(AmazonSqsXrayTraceHeaderStamp::class);
         $xrayTraceId = $amazonSqsXrayTraceHeaderStamp?->getTraceId();
 
-        try {
-            $this->connection->send(
-                $encodedMessage['body'],
-                $encodedMessage['headers'] ?? [],
-                $delay,
-                $messageGroupId,
-                $messageDeduplicationId,
-                $xrayTraceId
-            );
-        } catch (HttpException $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
-        }
-
-        return $envelope;
+        return [
+            "body" => $encodedMessage['body'],
+            "headers" => $encodedMessage['headers'] ?? [],
+            "delay" => $delay,
+            "messageGroupId" => $messageGroupId,
+            "messageDeduplicationId" => $messageDeduplicationId,
+            "xrayTraceId" => $xrayTraceId,
+        ];
     }
 
     /**

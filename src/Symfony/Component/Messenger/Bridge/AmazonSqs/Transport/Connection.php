@@ -347,6 +347,82 @@ class Connection
             $this->setup();
         }
 
+        $parameters = $this->getParameters(
+            $body,
+            $headers,
+            $delay,
+            $messageGroupId,
+            $messageDeduplicationId,
+            $xrayTraceId,
+        );
+
+        $this->client->sendMessage($parameters);
+    }
+
+    public function sendBatch(array $messages): void
+    {
+        if ($this->configuration['auto_setup']) {
+            $this->setup();
+        }
+
+        $entries = [];
+        foreach ($messages as $message) {
+            $params = $this->getParameters(
+                $message['body'],
+                $message['headers'],
+                $message['delay'],
+                $message['messageGroupId'],
+                $message['messageDeduplicationId'],
+                $message['xrayTraceId'],
+            );
+            $params['Id'] = (string) rand(10000, 999999);
+            $entries[] = $params;
+        }
+
+        $this->client->sendMessageBatch([
+            "QueueUrl" => $this->getQueueUrl(),
+            "Entries" => $entries,
+        ]);
+    }
+
+    public function reset(): void
+    {
+        if (null !== $this->currentResponse) {
+            // fetch current response in order to requeue in transit messages
+            if (!$this->fetchMessage()) {
+                $this->currentResponse->cancel();
+                $this->currentResponse = null;
+            }
+        }
+
+        foreach ($this->getPendingMessages() as $message) {
+            $this->client->changeMessageVisibility([
+                'QueueUrl' => $this->getQueueUrl(),
+                'ReceiptHandle' => $message['id'],
+                'VisibilityTimeout' => 0,
+            ]);
+        }
+    }
+
+    private function getQueueUrl(): string
+    {
+        if (null !== $this->queueUrl) {
+            return $this->queueUrl;
+        }
+
+        return $this->queueUrl = $this->client->getQueueUrl([
+            'QueueName' => $this->configuration['queue_name'],
+            'QueueOwnerAWSAccountId' => $this->configuration['account'],
+        ])->getQueueUrl();
+    }
+
+    private static function isFifoQueue(string $queueName): bool
+    {
+        return str_ends_with($queueName, self::AWS_SQS_FIFO_SUFFIX);
+    }
+
+    private function getParameters(string $body, array $headers, int $delay = 0, ?string $messageGroupId = null, ?string $messageDeduplicationId = null, ?string $xrayTraceId = null): array
+    {
         $parameters = [
             'QueueUrl' => $this->getQueueUrl(),
             'MessageBody' => $body,
@@ -390,42 +466,6 @@ class Connection
             unset($parameters['DelaySeconds']);
         }
 
-        $this->client->sendMessage($parameters);
-    }
-
-    public function reset(): void
-    {
-        if (null !== $this->currentResponse) {
-            // fetch current response in order to requeue in transit messages
-            if (!$this->fetchMessage()) {
-                $this->currentResponse->cancel();
-                $this->currentResponse = null;
-            }
-        }
-
-        foreach ($this->getPendingMessages() as $message) {
-            $this->client->changeMessageVisibility([
-                'QueueUrl' => $this->getQueueUrl(),
-                'ReceiptHandle' => $message['id'],
-                'VisibilityTimeout' => 0,
-            ]);
-        }
-    }
-
-    private function getQueueUrl(): string
-    {
-        if (null !== $this->queueUrl) {
-            return $this->queueUrl;
-        }
-
-        return $this->queueUrl = $this->client->getQueueUrl([
-            'QueueName' => $this->configuration['queue_name'],
-            'QueueOwnerAWSAccountId' => $this->configuration['account'],
-        ])->getQueueUrl();
-    }
-
-    private static function isFifoQueue(string $queueName): bool
-    {
-        return str_ends_with($queueName, self::AWS_SQS_FIFO_SUFFIX);
+        return $parameters;
     }
 }

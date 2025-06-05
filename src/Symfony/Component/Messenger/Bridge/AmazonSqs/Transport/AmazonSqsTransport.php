@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -28,7 +29,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface, ResetInterface
+class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface, ResetInterface, BatchSenderInterface
 {
     private SerializerInterface $serializer;
 
@@ -72,6 +73,14 @@ class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterfa
     public function send(Envelope $envelope): Envelope
     {
         return $this->getSender()->send($envelope);
+    }
+
+    public function sendBatch(array $envelopes): array
+    {
+        if (!$this->getSender() instanceof BatchSenderInterface) {
+            throw new \RuntimeException('Batch publish is not supported');
+        }
+        return $this->getSender()->sendBatch($envelopes);
     }
 
     public function setup(): void

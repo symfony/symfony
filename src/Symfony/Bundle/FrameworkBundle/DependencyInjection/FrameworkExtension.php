@@ -1630,10 +1630,6 @@ class FrameworkExtension extends Extension
             throw new LogicException('Validation support cannot be enabled as the Validator component is not installed. Try running "composer require symfony/validator".');
         }
 
-        if (!isset($config['email_validation_mode'])) {
-            $config['email_validation_mode'] = 'loose';
-        }
-
         $loader->load('validator.php');
 
         $validatorBuilder = $container->getDefinition('validator.builder');

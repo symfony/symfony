@@ -160,7 +160,7 @@ class RegionDataGenerator extends AbstractDataGenerator
         $alpha3ToAlpha2 = array_flip($alpha2ToAlpha3);
         asort($alpha3ToAlpha2);
 
-        $alpha2ToNumeric = $this->generateAlpha2ToNumericMapping($metadataBundle);
+        $alpha2ToNumeric = $this->generateAlpha2ToNumericMapping(array_flip($this->regionCodes), $metadataBundle);
         $numericToAlpha2 = [];
         foreach ($alpha2ToNumeric as $alpha2 => $numeric) {
             // Add underscore prefix to force keys with leading zeros to remain as string keys.
@@ -231,7 +231,7 @@ class RegionDataGenerator extends AbstractDataGenerator
         return $alpha2ToAlpha3;
     }
 
-    private function generateAlpha2ToNumericMapping(ArrayAccessibleResourceBundle $metadataBundle): array
+    private function generateAlpha2ToNumericMapping(array $countries, ArrayAccessibleResourceBundle $metadataBundle): array
     {
         $aliases = iterator_to_array($metadataBundle['alias']['territory']);
 
@@ -247,6 +247,10 @@ class RegionDataGenerator extends AbstractDataGenerator
             }
 
             if (isset(self::DENYLIST[$data['replacement']])) {
+                continue;
+            }
+
+            if (!isset($countries[$data['replacement']])) {
                 continue;
             }
 

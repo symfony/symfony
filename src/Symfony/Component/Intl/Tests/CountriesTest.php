@@ -527,7 +527,6 @@ class CountriesTest extends ResourceBundleTestCase
     ];
 
     private const ALPHA2_TO_NUMERIC = [
-        'AA' => '958',
         'AD' => '020',
         'AE' => '784',
         'AF' => '004',
@@ -715,18 +714,6 @@ class CountriesTest extends ResourceBundleTestCase
         'PW' => '585',
         'PY' => '600',
         'QA' => '634',
-        'QM' => '959',
-        'QN' => '960',
-        'QP' => '962',
-        'QQ' => '963',
-        'QR' => '964',
-        'QS' => '965',
-        'QT' => '966',
-        'QV' => '968',
-        'QW' => '969',
-        'QX' => '970',
-        'QY' => '971',
-        'QZ' => '972',
         'RE' => '638',
         'RO' => '642',
         'RS' => '688',
@@ -784,35 +771,26 @@ class CountriesTest extends ResourceBundleTestCase
         'VU' => '548',
         'WF' => '876',
         'WS' => '882',
-        'XC' => '975',
-        'XD' => '976',
-        'XE' => '977',
-        'XF' => '978',
-        'XG' => '979',
-        'XH' => '980',
-        'XI' => '981',
-        'XJ' => '982',
-        'XL' => '984',
-        'XM' => '985',
-        'XN' => '986',
-        'XO' => '987',
-        'XP' => '988',
-        'XQ' => '989',
-        'XR' => '990',
-        'XS' => '991',
-        'XT' => '992',
-        'XU' => '993',
-        'XV' => '994',
-        'XW' => '995',
-        'XX' => '996',
-        'XY' => '997',
-        'XZ' => '998',
         'YE' => '887',
         'YT' => '175',
         'ZA' => '710',
         'ZM' => '894',
         'ZW' => '716',
     ];
+
+    public function testAllGettersGenerateTheSameDataSetCount()
+    {
+        $alpha2Count = count(Countries::getCountryCodes());
+        $alpha3Count = count(Countries::getAlpha3Codes());
+        $numericCodesCount = count(Countries::getNumericCodes());
+        $namesCount = count(Countries::getNames());
+
+        // we base all on Name count since it is the first to be generated
+        $this->assertTrue(
+            $alpha2Count == $namesCount && $alpha3Count == $namesCount && $numericCodesCount == $namesCount,
+            sprintf('These values are not the same. Names: [%d], Alpha 2: [%d], Alpha 3: [%d], Numeric codes: [%d]', $namesCount, $alpha2Count, $alpha3Count, $numericCodesCount)
+        );
+    }
 
     public function testGetCountryCodes()
     {
@@ -992,7 +970,7 @@ class CountriesTest extends ResourceBundleTestCase
     public function testNumericCodeExists()
     {
         $this->assertTrue(Countries::numericCodeExists('250'));
-        $this->assertTrue(Countries::numericCodeExists('982'));
+        $this->assertTrue(Countries::numericCodeExists('008'));
         $this->assertTrue(Countries::numericCodeExists('716'));
         $this->assertTrue(Countries::numericCodeExists('036'));
         $this->assertFalse(Countries::numericCodeExists('667'));

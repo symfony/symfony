@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-06-05T13:03:12Z
+
+`HttpClient::create` still mentions `amphp/http-client:^4.2.1` in its warning. This should be updated (maybe even in the 7.3 branch though as v5 is already supported there)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-05T14:16:33Z
+
+Updated thanks. I'm leaving 7.3 as is, it's EOL in 2 months so no need to care about this message.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-05T14:21:32Z
+
+7.3 was released 1 week ago. It is EOL in 8 months

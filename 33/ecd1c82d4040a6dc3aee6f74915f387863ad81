@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-22T15:49:41Z
+
+If someone is using `_query` already, it could be a BC break, which would need a deprecation first.
+
+---------------------------------------------------------------------------
+
+by BenMorel at 2025-05-22T16:05:15Z
+
+> If someone is using _query already, it could be a BC break, which would need a deprecation first.
+
+I agree, unless it is considered that names starting with an underscore are reserved for Symfony, and not covered by the BC promise; I don't know about this, but there's a precedent here with `_locale`.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-05-22T16:38:16Z
+
+The difference is that `_locale` exists since the beginning of Symfony.
+
+A better example might be to look at how we handled `_fragment`. I'm almost sure we added it later.
+
+---------------------------------------------------------------------------
+
+by BenMorel at 2025-05-22T20:11:30Z
+
+@stof Good point. `_fragment` was introduced in 2014, in 6d79a565e0e56b525134080687eba3961eab1a73, PR #12979, and was first released in `v3.2.0` — a minor release.
+
+The BC break concern [was raised](https://github.com/symfony/symfony/pull/12979#issuecomment-66962833) by @Koc back then, but [was dismissed](https://github.com/symfony/symfony/pull/12979#issuecomment-72749346) by @Tobion:
+
+> And the tiny BC break is negligible because it's unlikely.
+
+I'll leave it up to you to decide whether introducing another one in a minor release is still acceptable in 2025; maybe this is something that could be documented in [Our Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html)?

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by gnat42 at 2025-06-04T14:52:35Z
+
+As an aside this is basically doing the other half of #37505
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-05T15:50:49Z
+
+Don't we need the same check in MoneyToLocalizedStringTransformer?
+
+---------------------------------------------------------------------------
+
+by gnat42 at 2025-06-05T16:24:30Z
+
+I've pushed another version that includes changes to the docblock and identical changes to MoneyToLocalizedStringTransformer including a test (I didn't run them locally so will push an update if somehow I did it wrong).

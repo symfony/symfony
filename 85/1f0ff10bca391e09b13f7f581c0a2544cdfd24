@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-06-05T14:53:58Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-06-05T17:53:17Z
+
+eventually we should automate intl updates using GHA at the PR level (either user-submitted or periodically)
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-05T19:58:33Z
+
+@ro0NL The update itself is already scripted. The data generator being fixed in this PR is precisely the code used by the `update-data.php` script.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-06-05T20:07:55Z
+
+the changes done to `Resources/data` are done from a local machine

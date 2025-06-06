@@ -20,7 +20,6 @@ framework:
         log: true
     profiler:
         only_exceptions: false
-        collect_serializer_data: true
 
 services:
     logger: { class: Psr\Log\NullLogger }

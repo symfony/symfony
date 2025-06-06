@@ -1013,10 +1013,6 @@ class FrameworkExtension extends Extension
             $loader->load('notifier_debug.php');
         }
 
-        if (false === $config['collect_serializer_data']) {
-            trigger_deprecation('symfony/framework-bundle', '7.3', 'Setting the "framework.profiler.collect_serializer_data" config option to "false" is deprecated.');
-        }
-
         if ($this->isInitializedConfigEnabled('serializer') && $config['collect_serializer_data']) {
             $loader->load('serializer_debug.php');
         }

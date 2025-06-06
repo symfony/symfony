@@ -18,8 +18,6 @@ framework:
         cookie_samesite: lax
     php_errors:
         log: true
-    profiler:
-        collect_serializer_data: true
 
 services:
     logger: { class: Psr\Log\NullLogger }

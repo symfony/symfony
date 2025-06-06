@@ -766,7 +766,7 @@ class ConfigurationTest extends TestCase
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
                 'collect_parameter' => null,
-                'collect_serializer_data' => false,
+                'collect_serializer_data' => true,
             ],
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Enable the property info constructor extractor by default
+ * Deprecate setting the `framework.profiler.collect_serializer_data` config option
 
 7.3
 ---

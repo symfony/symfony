@@ -55,7 +55,7 @@ class WebProfilerBundleKernel extends Kernel
             'http_method_override' => false,
             'php_errors' => ['log' => true],
             'secret' => 'foo-secret',
-            'profiler' => ['only_exceptions' => false, 'collect_serializer_data' => true],
+            'profiler' => ['only_exceptions' => false],
             'session' => ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file', 'cookie-secure' => 'auto', 'cookie-samesite' => 'lax'],
             'router' => ['utf8' => true],
         ];

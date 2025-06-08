@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-06-07T15:12:54Z
+
+I think not supporting it was done on purpose at the time as that special syntax was specifically introduced for `#[AsCommand]`, and I believe it works as expected until 7.3. If I'm not mistaken this should only be fixed there
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-06-07T15:35:52Z
+
+@chalasr If that's the case, then it currently works as expected on all versions. The problem in #60394 is that I started using this for cases that don't include the `#[AsCommand]` attribute. I'll retarget 7.4 as a feature.
+
+Of course, this isn't the only possible approach, but I personally prefer this one since it doesn't require duplicating the alias handling logic in yet another place. That logic already exists in the `Command` and `AddConsoleCommandPass` classes.

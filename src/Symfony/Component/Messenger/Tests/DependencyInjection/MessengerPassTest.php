@@ -809,6 +809,17 @@ class MessengerPassTest extends TestCase
         ], $container->getDefinition('console.command.messenger_debug')->getArgument(0));
     }
 
+    public function testCanOverrideHandlersLocator()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+
+        $container->register($busId. '.messenger.handlers_locator', \stdClass::class);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(\stdClass::class, $container->getDefinition($busId. '.messenger.handlers_locator')->getClass());
+    }
+
     private function getContainerBuilder(string $busId = 'message_bus'): ContainerBuilder
     {
         $container = new ContainerBuilder();

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+* Allow handler locator to be set by applications
+
 7.3
 ---
 

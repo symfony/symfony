@@ -165,9 +165,13 @@ class MessengerPass implements CompilerPassInterface
         $container->addDefinitions($definitions);
 
         foreach ($busIds as $bus) {
-            $container->register($locatorId = $bus.'.messenger.handlers_locator', HandlersLocator::class)
-                ->setArgument(0, $handlersLocatorMappingByBus[$bus] ?? [])
-            ;
+            $locatorId = $bus.'.messenger.handlers_locator';
+            if (!$container->has($locatorId)) {
+                $container->register($locatorId, HandlersLocator::class)
+                    ->setArgument(0, $handlersLocatorMappingByBus[$bus] ?? [])
+                ;
+            }
+
             if ($container->has($handleMessageId = $bus.'.middleware.handle_message')) {
                 $container->getDefinition($handleMessageId)
                     ->replaceArgument(0, new Reference($locatorId))

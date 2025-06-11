@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-10T06:57:33Z
+
+So we really need the extra method addInvokable() or could we handle this automatically?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-10T07:05:54Z
+
+We cannot widen the argument type in `add()` as that would be a BC break for child classes overriding the method.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-10T16:07:18Z
+
+We could remove it and handle it internally, couldn't we?
+
+Do we need to adjust addCommands() method as well?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-05-11T13:54:11Z
+
+Cool, thanks for working on this.
+
+> We could remove it and handle it internally, couldn't we?
+
+@OskarStark If you mean removing the type declaration then it's a  BC break too unfortunately, see https://3v4l.org/5dhmc.
+
+I'd prefer the invokable concept not to leak into public API though. What about adding `Application::addCommand(callable|Command $command): Command` instead? It would be great if that new method could provide a way to make the command lazy also.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-05-13T23:29:02Z
+
+> I'd prefer the invokable concept not to leak into public API though. What about adding `Application::addCommand(callable|Command $command): Command` instead? It would be great if that new method could provide a way to make the command lazy also.
+
+@chalasr I've made the changes you requested, please let me know what you think.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-05T15:32:53Z
+
+Wondering now that a new method is being added with support for both types of commands, shouldn’t we deprecate the `Application::add()` in favor of `Application::addCommand()` method to improve the API in version 8.0?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-06-05T18:35:35Z
+
+@yceruto 👍 for deprecating `add()`, that's what I had in mind.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-06-07T23:32:39Z
+
+@yceruto @chalasr I've deprecated the `add()` method.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-08T14:02:29Z
+
+@HypeMC it seems high-deps failures are related https://github.com/symfony/symfony/actions/runs/15518654102/job/43689003684?pr=60394, right?

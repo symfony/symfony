@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-05-14T09:10:57Z
+
+@nicolas-grekas I addressed your comments, added tests, and updated CHANGELOG.md
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-04T09:53:31Z
+
+@lyrixx why closing this ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-06-04T09:57:04Z
+
+Oups, I did something wrong with Git I guess. I rebased, and push -f. I think I missed something. I'll fix it asap
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-06-04T10:05:58Z
+
+So weird, my commit is [in my branch](https://github.com/lyrixx/symfony/commits/security-password-hasher/) but not displayed here! Hope github will recover my commit, otherwise I'll open a new PR (and loose two PR approval 😬)
+
+**edit** It's fixed now

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2025-05-30T16:23:04Z
+
+You mean, proceed with the re-entrant `lookup` from inside/after waiting for the lock, but then indicate on the request that it performed validation etc. and so the "outer" method invocations return immediately?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-30T16:26:47Z
+
+I means something like this:
+```php
+$response = $this->lookup($request, $catch);
+if ($request->attribute->has('foo')) { // lookup again after removing the attribute
+```
+With an early return in the lock method indeed.
+Should this be in a loop BTW?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2025-05-30T16:28:01Z
+
+The return has to be through several methods up the call stack. That would need some kind of check at every level with early returns in each case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-30T16:34:51Z
+
+Hum indeed.
+Then let's make the added exception internal.
+Also : what about a loop instead of just one retry?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2025-05-30T16:50:09Z
+
+I am fine with both. Should we be afraid of infinite retries? We could also limit to a certain number of iterations.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2025-05-30T21:36:37Z
+
+Exception is now `@internal`, and also looping until a response can be obtained

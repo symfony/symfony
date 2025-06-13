@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by mttsch at 2025-06-04T15:34:41Z
+
+This is my first "proper" contribution to Symfony.
+
+1. While https://github.com/jsonpath-standard/jsonpath-compliance-test-suite/tree/main recommends embedding that repository as a submodule, I was unsure whether that approach works for the Symfony repository, thus copied the file as a Fixture.
+2. Many errors are reported due to invalid filter expressions.
+3. I did not find a proper way to validate the selector with current APIs but only to use `find()` because the filter expression validation happens inside of private methods called via `find()`. (Tokenizing is not enough.)
+
+---------------------------------------------------------------------------
+
+by mttsch at 2025-06-04T15:37:57Z
+
+@stof As this is only one JSON file that can be also be downloaded manually without any issue, I assumed that providing the exact hash based link, see https://github.com/symfony/symfony/pull/60695/files#diff-8312c65e1b644a04bd87f0dee0894ab6712b296af12a1e191d1faaf5a1f52784R37, was sufficient.
+
+PS: Are you talking about a similar approach to the one the Intl component uses?
+PPS: Though there, the data fetching appears more complex than just downloading a file.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-04T15:53:47Z
+
+I think we might need a constant in the test containing a list of test names we don't support yet, for which the test would get skipped in CI (maybe with an env variable to force running them when working on them locally).
+This would allow us to merge that PR, preventing regressions on tests that we already pass and moving little by little into running it all (removing tests from the skip-list when we fix the issues we have) instead of being able to merge this PR only once we are 100% compliant.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-04T16:08:42Z
+
+> I assumed that providing the exact hash based link, see https://github.com/symfony/symfony/pull/60695/files#diff-8312c65e1b644a04bd87f0dee0894ab6712b296af12a1e191d1faaf5a1f52784R37, was sufficient.
+
+this comment in a separate location is almost guaranteed to become outdated by being forgotten when updating the JSON file.
+
+> PS: Are you talking about a similar approach to the one the Intl component uses?
+> PPS: Though there, the data fetching appears more complex than just downloading a file.
+
+the fetching is indeed a lot simpler, as we just save the file as is without any processing.
+
+See for instance https://github.com/symfony/symfony/tree/7.4/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Script/Mermaid where we have a Makefile fetching a specific reference of Mermaid (it is not a simple download of the file there, as we do a custom build). Updating to a new version involves updating the version number in the Makefile and then running `make` again, which guarantees that the update of the version number is not forgotten.
+
+---------------------------------------------------------------------------
+
+by mttsch at 2025-06-04T16:35:42Z
+
+@stof I added a makefile and added a const to exclude unsupported files.
+
+> (maybe with an env variable to force running them when working on them locally)
+
+Not sure about this part (also not done) because it can basically also be done by temporarily commenting out/removing the array contents similar to
+
+> removing tests from the skip-list when we fix the issues we have
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-06-05T07:05:02Z
+
+It makes me think of something: if a feature is lacking to make the suite pass, should this be considered a bugfix and target 7.3 or should we target 7.4?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-05T16:28:36Z
+
+As we are currently merging them as bugfix in 7.3 (as the component is announced as implementing the RFC, not as implementing its own syntax inspired by JsonPath), I suggest merging this PR in 7.3, so that we can clean the skip-list alongside doing the fixes.
+
+---------------------------------------------------------------------------
+
+by mttsch at 2025-06-05T18:57:12Z
+
+@stof PR now targets 7.3.

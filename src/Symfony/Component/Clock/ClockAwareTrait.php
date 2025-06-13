@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 trait ClockAwareTrait
 {
-    private readonly ClockInterface $clock;
+    private ClockInterface $clock;
 
     #[Required]
     public function setClock(ClockInterface $clock): void

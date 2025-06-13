@@ -34,6 +34,29 @@ class ClockAwareTraitTest extends TestCase
         $this->assertEquals($clock->now(), $sut->now());
         $this->assertSame(1.0, round($sut->now()->getTimestamp() - $ts, 1));
     }
+
+    public function testCallSetClockMultipleTimes()
+    {
+        $sut = new ClockAwareTestImplem();
+
+        $this->assertInstanceOf(DatePoint::class, $sut->now());
+
+        $sut->setClock(new MockClock());
+
+        $this->assertInstanceOf(DatePoint::class, $sut->now());
+    }
+
+    public function testCallNowBeforeSetClock()
+    {
+        $sut = new ClockAwareTestImplem();
+        $sut->setClock(new MockClock());
+
+        $this->assertInstanceOf(DatePoint::class, $sut->now());
+
+        $sut->setClock(new MockClock());
+
+        $this->assertInstanceOf(DatePoint::class, $sut->now());
+    }
 }
 
 class ClockAwareTestImplem

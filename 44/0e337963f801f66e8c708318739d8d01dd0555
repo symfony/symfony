@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by jack-worman at 2025-06-11T13:31:14Z
+
+Thanks for the review.
+All comments should be addressed.
+
+---------------------------------------------------------------------------
+
+by jack-worman at 2025-06-15T13:28:32Z
+
+> LGTM except for the changes in FrameworkBundle's DependencyInjection namespace which look useless to me.
+
+I reverted those changes. But I would like to say: static analysis tools are only as useful as the typing you give them!

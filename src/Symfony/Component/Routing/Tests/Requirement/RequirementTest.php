@@ -168,6 +168,7 @@ class RequirementTest extends TestCase
      *              ["42"]
      *              ["42198"]
      *              ["999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"]
+     *              ["a3.14sgf"]
      */
     public function testPositiveIntOK(string $digits)
     {
@@ -189,6 +190,37 @@ class RequirementTest extends TestCase
     {
         $this->assertDoesNotMatchRegularExpression(
             (new Route('/{digits}', [], ['digits' => Requirement::POSITIVE_INT]))->compile()->getRegex(),
+            '/'.$digits,
+        );
+    }
+
+    /**
+     * @testWith    ["1"]
+     *              ["42"]
+     *              ["42198"]
+     *              ["999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"]
+     */
+    public function testExactPositiveIntOK(string $digits)
+    {
+        $this->assertMatchesRegularExpression(
+            (new Route('/{digits}', [], ['digits' => Requirement::EXACT_POSITIVE_INT]))->compile()->getRegex(),
+            '/'.$digits,
+        );
+    }
+
+    /**
+     * @testWith    [""]
+     *              ["0"]
+     *              ["045"]
+     *              ["foo"]
+     *              ["-1"]
+     *              ["3.14"]
+     *              ["a3.14sgf"]
+     */
+    public function testExactPositiveIntKO(string $digits)
+    {
+        $this->assertDoesNotMatchRegularExpression(
+            (new Route('/{digits}', [], ['digits' => Requirement::EXACT_POSITIVE_INT]))->compile()->getRegex(),
             '/'.$digits,
         );
     }

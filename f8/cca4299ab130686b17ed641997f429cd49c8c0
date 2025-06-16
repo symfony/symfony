@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-06-05T10:06:49Z
+
+Can you also add `loose` in the `emailValidationModeProvider` of the test added in #60365 to have a non-regression test ?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-05T10:09:29Z
+
+Actually, I think the array_merge should be dropped (putting `loose` in the fallback array when the class does not exist anymore):
+
+- `Email::VALIDATION_MODES` contains `loose` in 6.4
+- in 7.x where `loose` does not exist in `Email::VALIDATION_MODES`, using `loose` is not supported and should indeed be reported as invalid config (instead of failing when instantiating the service)
+
+---------------------------------------------------------------------------
+
+by rhel-eo at 2025-06-05T10:34:38Z
+
+Prior to the change in https://github.com/symfony/symfony/pull/60365, the validation of this config option explicitly included `loose`, so I understood the intention was to avoid a patch release breaking projects that were using this value in their config.
+
+With the suggested change, projects that were using the previously allowed `loose` value would still receive a configuration validation error after a patch update.
+
+If you prefer to make this explicitly invalid because it is not supported, I understand that decision but wouldn't be able to contribute that on this PR as I don't have the context around any other consequences.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-05T10:47:50Z
+
+ah, I missed that we forgot to change the FrameworkBundle config in 7.0, and that some projects not using the constraint might have an invalid config.
+
+So yes, keep `loose` in the list all the time. And then, submit another PR to the 7.4 branch to deprecate the `loose` value
+
+---------------------------------------------------------------------------
+
+by rhel-eo at 2025-06-05T11:01:23Z
+
+Thanks, I've opened https://github.com/symfony/symfony/pull/60706 for that follow up change.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-16T07:06:24Z
+
+Looks like some comments from @stof are still to be accounted for, isn't it?

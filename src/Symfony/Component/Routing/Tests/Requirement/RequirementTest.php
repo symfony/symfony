@@ -168,7 +168,7 @@ class RequirementTest extends TestCase
      *              ["42"]
      *              ["42198"]
      *              ["999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"]
-     *              ["a3.14sgf"]
+     *              ["a123sgf"]
      */
     public function testPositiveIntOK(string $digits)
     {
@@ -215,7 +215,7 @@ class RequirementTest extends TestCase
      *              ["foo"]
      *              ["-1"]
      *              ["3.14"]
-     *              ["a3.14sgf"]
+     *              ["a123sgf"]
      */
     public function testExactPositiveIntKO(string $digits)
     {

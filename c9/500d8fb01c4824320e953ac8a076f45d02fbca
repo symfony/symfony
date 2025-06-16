@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2025-06-10T07:33:13Z
+
+Hi @santysisi,
+
+Indeed this could be a nice addition.
+**❓ Question**: What about helper methods such as `assertToEmailAddressNotContains`/`assertReplyToEmailAddressNotContains`? I know `assertToEmailAddressContains`/`assertReplyToEmailAddressContains` do not exist. Could be added too. WDYT?
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-06-10T22:24:16Z
+
+Hi @Spomky 👋, thanks a lot for your comment! 😊
+
+I see where you're coming from. The main concern with that approach is that it could lead to a large number of helper methods, like `assertBccEmailAddressContains`, `assertCcEmailAddressContains`, `assertFromEmailAddressContains`, and so on. Personally, I prefer having a single method that accepts a `headerName` argument, it's more flexible (IMO) and avoids code duplication.
+
+That said, if you and others feel that having separate, explicit methods is more readable or convenient, I'm happy to add them! 😄
+
+Thanks again for your feedback ❤️
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-06-11T08:08:07Z
+
+OK so let consider the suggested change from @bkosun and I'll approve this PR.

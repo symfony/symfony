@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow query-specific parameters in `UrlGenerator` using `_query`
+ * Add EXACT_POSITIVE_INT as routing requirement
 
 7.3
 ---

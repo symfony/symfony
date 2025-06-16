@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-06-05T17:30:31Z
+
+Thank you @stof, I didn't know that denial of service was actually a thing with regex. I updated accordingly.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-05T18:18:51Z
+
+@alexandre-daubois this can be a thing when you allow user input for the string being matched by the regex (which could totally happen in this component). Backtracking engines (like PCRE) have an exponential complexity based on the length of the input when attempting to match an affected regex (and failing to match it, as this is the worse case of backtracking).
+
+This is commonly reported in the npm ecosystem (also because JS does not support possessive quantifiers in its Regexp syntax, and so cannot apply the easy fix to prevent them in many cases, making the issue more common)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-06-10T09:18:05Z
+
+Applied your suggestions, it makes the code a bit simpler. Thanks!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-06-13T14:45:59Z
+
+I reworked the whole PR to keep pushing forward the compliance test suite. This PR removes 265 skips, so that's pretty nice.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-06-15T13:57:49Z
+
+@alexandre-daubois FYI in #60793 I had to skip three more tests
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-06-15T14:23:55Z
+
+They are added back and fixed in this PR. Thanks!

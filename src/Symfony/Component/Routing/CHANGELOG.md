@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Allow query-specific parameters in `UrlGenerator` using `_query`
- * Add EXACT_POSITIVE_INT as routing requirement
+ * Add `Requirement::EXACT_POSITIVE_INT` to validate positive numbers not contained into strings
 
 7.3
 ---

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-06-18T15:59:46Z
+
+Nice! Would that fix #58087 as well?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-18T20:42:37Z
+
+That looks quite likely. Can you give the repro a try?

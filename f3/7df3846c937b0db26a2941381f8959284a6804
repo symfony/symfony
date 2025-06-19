@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-05-22T11:29:42Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-05-23T09:47:12Z
+
+@derrabus You're probably very busy, but I'm really curious to hear your feedback on this 😊
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-05-26T06:25:27Z
+
+@mtarld @nicolas-grekas Friendly ping to pick your brain on this topic, since you worked on the discriminator mapping in #52681. I'm curious to hear if my approach makes sense, or that I should investigate time in finding an alternative solution. Any advice is much appreciated, thanks 😊
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-06-19T12:53:16Z
+
+Thanks for the help @mtarld and @nicolas-grekas 🎉
+
+The failing test is unrelated to these changes.

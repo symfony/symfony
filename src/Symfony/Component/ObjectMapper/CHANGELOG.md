@@ -7,6 +7,7 @@ CHANGELOG
  * The component is not marked as `@experimental` anymore
  * Add `ObjectMapperAwareInterface` to set the owning object mapper instance
  * Add a `MapCollection` transform that calls the Mapper over iterable properties
+ * Map a collection of source objects via `CollectionMapper`
 
 7.3
 ---

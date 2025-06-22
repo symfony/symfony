@@ -26,7 +26,7 @@ interface MapMultipleInterface
      * @template T of object
      * 
      * @param array<T> $sourceCollection The array of objects to map from
-     * @return \Generator<T> yields a target object for each source object
+     * @return \Generator<int, object, mixed, void> yields a target object for each source object
      *
      * @throws MapMultipleAggregateException      When mapping at least one of the source objects has failed.
      */

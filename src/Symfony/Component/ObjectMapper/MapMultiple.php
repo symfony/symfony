@@ -38,7 +38,7 @@ final class MapMultiple implements MapMultipleInterface
             }
         }
 
-        if (!empty($exceptions)) {
+        if ($exceptions) {
             throw new MapMultipleAggregateException('Mapping source collection has failed.', $exceptions);
         }
     }

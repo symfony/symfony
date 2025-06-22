@@ -11,7 +11,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\D;
 
 final class MapMultipleTest extends TestCase
 {
-    public function testMappingSucceeds(): void
+    public function testMappingSucceeds()
     {
         $source = [
             new C(
@@ -30,23 +30,23 @@ final class MapMultipleTest extends TestCase
 
         self::assertIsArray($target);
         self::assertCount(2, $target);
-        
+
         self::assertInstanceOf(D::class, $target[0]);
+        /** @var D $firstTarget */
         $firstTarget = $target[0];
-        assert($firstTarget instanceof D);
-        self::assertEquals('foo1', $firstTarget->baz);
-        self::assertEquals('bar1', $firstTarget->bat);
+        self::assertSame('foo1', $firstTarget->baz);
+        self::assertSame('bar1', $firstTarget->bat);
 
         self::assertInstanceOf(D::class, $target[1]);
+        /** @var D $secondTarget */
         $secondTarget = $target[1];
-        assert($secondTarget instanceof D);
-        self::assertEquals('foo2', $secondTarget->baz);
-        self::assertEquals('bar2', $secondTarget->bat);
+        self::assertSame('foo2', $secondTarget->baz);
+        self::assertSame('bar2', $secondTarget->bat);
     }
 
-    public function testMappingSecondSourceObjectThrows(): void
+    public function testMappingSecondSourceObjectThrows()
     {
-        $source = [
+        $sourceCollection = [
             new class('value1', 'value2') {
                 public function __construct(
                     public string $baz,
@@ -59,25 +59,25 @@ final class MapMultipleTest extends TestCase
 
         $mapper = new MapMultiple(new ObjectMapper());
 
-        $target = [];
+        $targetCollection = [];
 
         try {
-            foreach ($mapper->yieldMappedObjects($source, D::class) as $targetObject) {
-                $target[] = $targetObject;
+            foreach ($mapper->yieldMappedObjects($sourceCollection, D::class) as $targetObject) {
+                $targetCollection[] = $targetObject;
             }
 
-            self::fail('Mapping of second source element should have thrown!');
+            self::fail('Mapping second object should have thrown!');
         } catch (MapMultipleAggregateException $ex) {
-            self::assertEquals('Mapping source collection has failed.', $ex->getMessage());
+            self::assertSame('Mapping source collection has failed.', $ex->getMessage());
             self::assertCount(1, $ex->innerExceptions);
-            self::assertEquals('Undefined property: class@anonymous::$baz', $ex->innerExceptions[0]->getMessage());
+            self::assertSame('Undefined property: class@anonymous::$baz', $ex->innerExceptions[0]->getMessage());
         }
 
-        self::assertCount(1, $target, 'Mapping first source collection object should have passed!');
-        self::assertInstanceOf(D::class, $target[0]);
-        $firstTarget = $target[0];
-        assert($firstTarget instanceof D);
-        self::assertEquals('value1', $firstTarget->baz);
-        self::assertEquals('value2', $firstTarget->bat);
+        self::assertCount(1, $targetCollection, 'Mapping first object should have passed!');
+        self::assertInstanceOf(D::class, $targetCollection[0]);
+        /** @var D $firstTarget */
+        $firstTarget = $targetCollection[0];
+        self::assertSame('value1', $firstTarget->baz);
+        self::assertSame('value2', $firstTarget->bat);
     }
 }

@@ -2,27 +2,16 @@
 
 namespace Symfony\Component\Translation\Tests\Extractor\Visitor;
 
-use PhpParser\NodeVisitor;
 use Symfony\Component\Translation\Extractor\Visitor\TranslatableMessageVisitor;
-use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
-use Symfony\Component\Translation\MessageCatalogue;
 
-class TranslatableMessageVisitorTest extends AbstractVisitorTest
+final class TranslatableMessageVisitorTest extends AbstractVisitorTestCase
 {
     private const FIXTURES_FOLDER = __DIR__ . '/../../Fixtures/extractor-php-ast/translatable-message-visitor/';
 
-    public function getVisitor(): NodeVisitor
+    public function testExtractMessages()
     {
-        return new TranslatableMessageVisitor();
-    }
+        $catalogue = $this->extract(new TranslatableMessageVisitor(), self::FIXTURES_FOLDER);
 
-    public function getResource(): iterable|string
-    {
-        return self::FIXTURES_FOLDER;
-    }
-
-    public function assertCatalogue(MessageCatalogue $catalogue): void
-    {
         $expectedHeredoc = <<<EOF
 heredoc key with whitespace and escaped \$\n sequences
 EOF;
@@ -72,8 +61,8 @@ EOF;
             $catalogue->all(),
         );
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable.html.php:2']], $catalogue->getMetadata('translatable single-quoted key'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable.html.php:37']], $catalogue->getMetadata('translatable other-domain-test-no-params-short-array', 'not_messages'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable.html.php:3']], $catalogue->getMetadata('translatable single-quoted key'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable.html.php:38']], $catalogue->getMetadata('translatable other-domain-test-no-params-short-array', 'not_messages'));
 
         $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable-fqn.html.php:2']], $catalogue->getMetadata('translatable-fqn single-quoted key'));
         $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable-fqn.html.php:37']], $catalogue->getMetadata('translatable-fqn other-domain-test-no-params-short-array', 'not_messages'));

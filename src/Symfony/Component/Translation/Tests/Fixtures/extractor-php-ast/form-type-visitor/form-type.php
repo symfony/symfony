@@ -1,4 +1,3 @@
-This template is used for translation message extraction tests
 <?php
 // @see https://github.com/php-translation/extractor/blob/master/tests/Resources/Php/Symfony/ExplicitLabelType.php
 

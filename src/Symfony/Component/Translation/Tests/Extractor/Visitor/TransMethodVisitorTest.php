@@ -2,27 +2,17 @@
 
 namespace Symfony\Component\Translation\Tests\Extractor\Visitor;
 
-use PhpParser\NodeVisitor;
 use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
-use Symfony\Component\Translation\MessageCatalogue;
 
-class TransMethodVisitorTest extends AbstractVisitorTest
+final class TransMethodVisitorTest extends AbstractVisitorTestCase
 {
     private const FIXTURES_FOLDER = __DIR__ . '/../../Fixtures/extractor-php-ast/trans-method-visitor/';
     public const OTHER_DOMAIN = 'not_messages';
 
-    public function getVisitor(): NodeVisitor
+    public function testExtractMessages()
     {
-        return new TransMethodVisitor();
-    }
+        $catalogue = $this->extract(new TransMethodVisitor(), self::FIXTURES_FOLDER);
 
-    public function getResource(): iterable|string
-    {
-        return self::FIXTURES_FOLDER;
-    }
-
-    public function assertCatalogue(MessageCatalogue $catalogue): void
-    {
         $expectedHeredoc = <<<EOF
 heredoc key with whitespace and escaped \$\n sequences
 EOF;

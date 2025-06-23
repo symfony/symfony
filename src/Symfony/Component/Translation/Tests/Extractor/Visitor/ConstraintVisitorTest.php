@@ -2,26 +2,16 @@
 
 namespace Symfony\Component\Translation\Tests\Extractor\Visitor;
 
-use PhpParser\NodeVisitor;
 use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
-use Symfony\Component\Translation\MessageCatalogue;
 
-class ConstraintVisitorTest extends AbstractVisitorTest
+final class ConstraintVisitorTest extends AbstractVisitorTestCase
 {
     private const FIXTURES_FOLDER = __DIR__ . '/../../Fixtures/extractor-php-ast/constraint-visitor/';
 
-    public function getVisitor(): NodeVisitor
+    public function testExtractMessages()
     {
-        return new ConstraintVisitor(['NotBlank', 'Isbn', 'Length']);
-    }
+        $catalogue = $this->extract(new ConstraintVisitor(['NotBlank', 'Isbn', 'Length']), self::FIXTURES_FOLDER);
 
-    public function getResource(): iterable|string
-    {
-        return self::FIXTURES_FOLDER;
-    }
-
-    public function assertCatalogue(MessageCatalogue $catalogue): void
-    {
         $this->assertEquals(
             [
                 'validators' => [
@@ -42,6 +32,6 @@ class ConstraintVisitorTest extends AbstractVisitorTest
             $catalogue->all(),
         );
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'validator-constraints.php:8']], $catalogue->getMetadata('message-in-constraint-attribute', 'validators'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'validator-constraints.php:7']], $catalogue->getMetadata('message-in-constraint-attribute', 'validators'));
     }
 }

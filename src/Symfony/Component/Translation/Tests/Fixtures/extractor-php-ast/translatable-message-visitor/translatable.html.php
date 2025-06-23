@@ -1,4 +1,5 @@
 This template is used for translation message extraction tests
+<?php use Symfony\Component\Translation\TranslatableMessage; ?>
 <?php new TranslatableMessage('translatable single-quoted key'); ?>
 <?php new TranslatableMessage('translatable double-quoted key'); ?>
 <?php new TranslatableMessage(<<<EOF

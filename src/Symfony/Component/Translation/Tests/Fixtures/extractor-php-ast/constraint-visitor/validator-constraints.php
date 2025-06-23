@@ -1,4 +1,3 @@
-This template is used for translation message extraction tests
 <?php
 
 use Symfony\Component\Validator\Constraints as Assert;

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2025-06-18T12:47:18Z
+
+Sure I could wrap them manually in `new Command()->setCode($theCommand)` but that feels nasty from a user perspective.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-06-18T13:33:30Z
+
+I updated the target branch to 7.4, this is a new feature that cannot be merged into 7.3
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-06-18T13:43:36Z
+
+Thanks, it seems that the Application was already fixed in 7.4 https://github.com/symfony/symfony/pull/60394
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-06-18T13:56:34Z
+
+@GromNaN Done, also updated the changelog!
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-06-19T12:05:30Z
+
+@GromNaN Done, I also added another commit with extra tests.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-06-19T12:10:32Z
+
+@GromNaN @yceruto Thanks for the thorough reviews and guidance on this 👏

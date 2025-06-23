@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-06-12T21:13:18Z
+
+Just noticed that the `LazyFirewallContext` can also run the firewall listeners so I added the deprecation in there. I also moved the changelog entry to the `security-http`’s instead of the `security-bundle`’s.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-06-15T13:29:31Z
+
+With this PR `AbstractListener::__invoke` shouldn’t be called anymore, should I deprecate it as well? That would only leave its `getPriority` method so maybe the `AbstractListener` can be deprecated entirely?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-06-23T10:00:58Z
+
+> Let's keep AbstractListener, it's not a big deal - but let's deprecate its __invoke method.
+
+Done; I also deprecated `LazyFirewallContext::__invoke()` for the same reason.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-06-23T16:13:34Z
+
+Just to be sure: `WrappedListener` doesn’t need to be deprecated because it’s `@internal`?

@@ -10,6 +10,7 @@ CHANGELOG
  * Add `BackedEnum` support with `#[Argument]` and `#[Option]` inputs in invokable commands
  * Allow Usages to be specified via `#[AsCommand]` attribute.
  * Allow passing invokable commands to `Symfony\Component\Console\Tester\CommandTester`
+ * Make `$input` argument for `Symfony\Component\Console\Tester\CommandTester` optional
 
 7.3
 ---

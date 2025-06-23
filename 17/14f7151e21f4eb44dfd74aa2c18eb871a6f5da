@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-19T14:35:26Z
+
+AtLeastOneOf has the same issue?
+
+---------------------------------------------------------------------------
+
+by jkgroupe at 2025-06-19T14:51:54Z
+
+> AtLeastOneOf has the same issue?
+
+Yes. I add it to this PR

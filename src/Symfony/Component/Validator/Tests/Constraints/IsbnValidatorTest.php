@@ -121,7 +121,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $constraint = new Isbn(true);
+        $constraint = new Isbn();
 
         $this->validator->validate(null, $constraint);
 
@@ -130,7 +130,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
 
     public function testEmptyStringIsValid()
     {
-        $constraint = new Isbn(true);
+        $constraint = new Isbn();
 
         $this->validator->validate('', $constraint);
 
@@ -140,7 +140,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $constraint = new Isbn(true);
+        $constraint = new Isbn();
 
         $this->validator->validate(new \stdClass(), $constraint);
     }

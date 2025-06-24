@@ -95,7 +95,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     public function testReverseTransform()
     {
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
 
         \Locale::setDefault('de_AT');
 
@@ -115,7 +115,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     public function testReverseTransformWithGrouping()
     {
         // Since we test against "de_DE", we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
 
         \Locale::setDefault('de_DE');
 
@@ -210,7 +210,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     public function testReverseTransformExpectsInteger($number, $locale)
     {
         $this->expectException(TransformationFailedException::class);
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
 
         \Locale::setDefault($locale);
 

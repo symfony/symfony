@@ -75,7 +75,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
      **/
     public function testValidCurrenciesWithCountrySpecificLocale($currency)
     {
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
 
         \Locale::setDefault('en_GB');
 

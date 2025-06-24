@@ -25,7 +25,7 @@ class PercentTypeTest extends TypeTestCase
     {
         // we test against different locales, so we need the full
         // implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
 
         parent::setUp();
 

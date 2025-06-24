@@ -36,7 +36,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     public function testTransform()
     {
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
 
         \Locale::setDefault('de_AT');
 
@@ -71,7 +71,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     public function testReverseTransform()
     {
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
 
         \Locale::setDefault('de_AT');
 
@@ -99,7 +99,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     public function testFloatToIntConversionMismatchOnReverseTransform()
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
         \Locale::setDefault('de_AT');
 
         $this->assertSame(3655, (int) $transformer->reverseTransform('36,55'));
@@ -108,7 +108,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     public function testFloatToIntConversionMismatchOnTransform()
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_DOWN, 100);
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
         \Locale::setDefault('de_AT');
 
         $this->assertSame('10,20', $transformer->transform(1020));
@@ -120,7 +120,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
         setlocale(\LC_ALL, 'de_AT.UTF-8');
 
         $transformer = new MoneyToLocalizedStringTransformer(4, null, null, 100);
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
         \Locale::setDefault('de_AT');
 
         $this->assertSame('0,0035', $transformer->transform(12 / 34));

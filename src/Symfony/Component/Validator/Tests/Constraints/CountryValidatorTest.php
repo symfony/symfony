@@ -165,7 +165,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     public function testValidateUsingCountrySpecificLocale()
     {
         // in order to test with "en_GB"
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, null);
 
         \Locale::setDefault('en_GB');
 

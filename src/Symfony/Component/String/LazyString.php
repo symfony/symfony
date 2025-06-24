@@ -76,7 +76,7 @@ class LazyString implements \Stringable, \JsonSerializable
      */
     final public static function resolve(\Stringable|string|int|float|bool $value): string
     {
-        return $value;
+        return (string)$value;
     }
 
     public function __toString(): string

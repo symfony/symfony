@@ -126,7 +126,6 @@ class HttpCacheTest extends HttpCacheTestCase
 
             $this->assertHttpKernelIsCalled();
             $this->assertResponseOk();
-
             $this->assertTraceContains('invalidate');
             $this->assertTraceContains('pass');
         }

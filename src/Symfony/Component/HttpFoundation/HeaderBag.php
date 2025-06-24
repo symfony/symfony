@@ -28,7 +28,6 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     protected array $headers = [];
     protected array $cacheControl = [];
-
     protected array $cacheStatus = [];
 
     public function __construct(array $headers = [])

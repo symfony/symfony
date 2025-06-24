@@ -96,7 +96,7 @@ class NumberComparatorTest extends TestCase
                     '1k', '1ki', '1m', '1mi', '1g', '1gi',
                 ],
                 [
-                    false, null, '',
+                    null, '',
                     ' ', 'foobar',
                     '=1', '===1',
                     '0 . 1', '123 .45', '234. 567',

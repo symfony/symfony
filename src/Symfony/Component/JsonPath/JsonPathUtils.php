@@ -179,7 +179,7 @@ final class JsonPathUtils
      */
     public static function isJsonNumber(string $value): bool
     {
-        return preg_match('/^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$/', $value);
+        return (bool)preg_match('/^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$/', $value);
     }
 
     public static function parseCommaSeparatedValues(string $expr): array

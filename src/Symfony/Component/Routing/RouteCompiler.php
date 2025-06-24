@@ -103,7 +103,7 @@ class RouteCompiler implements RouteCompilerInterface
         $matches = [];
         $pos = 0;
         $defaultSeparator = $isHost ? '.' : '/';
-        $useUtf8 = preg_match('//u', $pattern);
+        $useUtf8 = (bool)preg_match('//u', $pattern);
         $needsUtf8 = $route->getOption('utf8');
 
         if (!$needsUtf8 && $useUtf8 && preg_match('/[\x80-\xFF]/', $pattern)) {

@@ -93,7 +93,7 @@ class CodePointString extends AbstractUnicodeString
         }
 
         if ($this->ignoreCase) {
-            return preg_match('{'.preg_quote($suffix).'$}iuD', $this->string);
+            return (bool)preg_match('{'.preg_quote($suffix).'$}iuD', $this->string);
         }
 
         return \strlen($this->string) >= \strlen($suffix) && 0 === substr_compare($this->string, $suffix, -\strlen($suffix));

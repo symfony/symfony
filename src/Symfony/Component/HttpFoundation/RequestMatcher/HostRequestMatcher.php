@@ -27,6 +27,6 @@ class HostRequestMatcher implements RequestMatcherInterface
 
     public function matches(Request $request): bool
     {
-        return preg_match('{'.$this->regexp.'}i', $request->getHost());
+        return (bool) preg_match('{'.$this->regexp.'}i', $request->getHost());
     }
 }

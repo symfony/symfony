@@ -477,7 +477,7 @@ class EmailTest extends TestCase
     public function testAttachments()
     {
         // inline part
-        $contents = file_get_contents($name = __DIR__.'/Fixtures/mimetypes/test', 'r');
+        $contents = file_get_contents($name = __DIR__.'/Fixtures/mimetypes/test', true);
         $att = new DataPart($file = fopen($name, 'r'), 'test');
         $inline = (new DataPart($contents, 'test'))->asInline();
         $e = new Email();
@@ -618,7 +618,7 @@ EOF;
         $email->html(null);
         $this->assertNull($email->getHtmlBody());
 
-        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', 'r');
+        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', true);
         $email->html($contents);
         $this->assertSame($contents, $email->getHtmlBody());
     }
@@ -641,7 +641,7 @@ EOF;
         $email->text(null);
         $this->assertNull($email->getTextBody());
 
-        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', 'r');
+        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', true);
         $email->text($contents);
         $this->assertSame($contents, $email->getTextBody());
     }

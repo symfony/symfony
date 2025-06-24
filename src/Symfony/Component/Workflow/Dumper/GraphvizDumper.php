@@ -141,7 +141,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function addPlaces(array $places, float $withMetadata): string
+    protected function addPlaces(array $places, bool $withMetadata): string
     {
         $code = '';
 
@@ -303,7 +303,7 @@ class GraphvizDumper implements DumperInterface
      *
      * @internal
      */
-    protected function formatLabel(Definition $definition, string $withMetadata, array $options): string
+    protected function formatLabel(Definition $definition, bool $withMetadata, array $options): string
     {
         $currentLabel = $options['label'] ?? '';
 

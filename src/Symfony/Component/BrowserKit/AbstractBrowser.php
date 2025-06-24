@@ -686,7 +686,7 @@ abstract class AbstractBrowser
 
     private function extractHost(string $uri): ?string
     {
-        $host = parse_url($uri, \PHP_URL_HOST);
+        $host = parse_url($uri, \PHP_URL_HOST) ?: null;
 
         if ($port = parse_url($uri, \PHP_URL_PORT)) {
             return $host.':'.$port;

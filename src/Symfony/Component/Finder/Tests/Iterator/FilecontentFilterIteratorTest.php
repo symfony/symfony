@@ -72,7 +72,7 @@ class FilecontentFilterIteratorTest extends IteratorTestCase
 
         $inner[] = new MockSplFileInfo([
             'name' => 'unreadable-file.txt',
-            'contents' => false,
+            'contents' => '',
             'type' => 'file',
             'mode' => 'r+', ]
         );

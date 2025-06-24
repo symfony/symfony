@@ -72,10 +72,10 @@ abstract class AbstractPipes implements PipesInterface
         }
 
         foreach ($this->pipes as $pipe) {
-            stream_set_blocking($pipe, 0);
+            stream_set_blocking($pipe, false);
         }
         if (\is_resource($this->input)) {
-            stream_set_blocking($this->input, 0);
+            stream_set_blocking($this->input, false);
         }
 
         $this->blocked = false;
@@ -97,7 +97,7 @@ abstract class AbstractPipes implements PipesInterface
             if (!$input->valid()) {
                 $input = null;
             } elseif (\is_resource($input = $input->current())) {
-                stream_set_blocking($input, 0);
+                stream_set_blocking($input, false);
             } elseif (!isset($this->inputBuffer[0])) {
                 if (!\is_string($input)) {
                     if (!\is_scalar($input)) {

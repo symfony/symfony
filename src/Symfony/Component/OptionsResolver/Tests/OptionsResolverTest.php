@@ -2643,9 +2643,9 @@ class OptionsResolverTest extends TestCase
         ;
         $introspector = new OptionsResolverIntrospector($this->resolver);
 
-        $this->assertTrue(true, $this->resolver->isDefined('foo'));
-        $this->assertTrue(true, $this->resolver->isDeprecated('foo'));
-        $this->assertTrue(true, $this->resolver->hasDefault('foo'));
+        $this->assertTrue(true, $this->resolver->isDefined('foo') ? 'Yes' : 'No');
+        $this->assertTrue(true, $this->resolver->isDeprecated('foo') ? 'Yes' : 'No');
+        $this->assertTrue(true, $this->resolver->hasDefault('foo') ? 'Yes' : 'No');
         $this->assertSame('bar', $introspector->getDefault('foo'));
         $this->assertSame(['string', 'bool'], $introspector->getAllowedTypes('foo'));
         $this->assertSame(['bar', 'zab'], $introspector->getAllowedValues('foo'));

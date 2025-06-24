@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-06-23T14:12:12Z
+
+@nicolas-grekas most cases are adding a suffix mostly because they were implemented at a time where named autowiring was based on argument names, where we would expect the argument name (and so often the property name) to end with `normalizer` if it is a NormalizerInterface for instance.
+
+When using the `Target` attribute, using the original name directly is much better (personally, I would even vote for deprecating parameter-name based named autowiring in favor of the attribute which fails clearly for invalid targets thanks to explicit intent)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-23T14:25:12Z
+
+So let's start with adding all those aliases and call `registerAliasForArgument()->setDeprecated('symfony/the-bundle', '7.4', \sprintf('Using "%%alias_id%%" to get a named service is deprecated, use #[Target('%s')] on the arguments instead.', $name))` for them all?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-23T14:33:54Z
+
+@nicolas-grekas given the maintenance cost of the double aliases is low, maybe we should make it easier to support multiple versions of Symfony by delaying the deprecation (you cannot use `#[Target('foo')` when supporting 7.3 or 6.4 as the alias using the unsuffixed target is not there). and adding a conditional attribute depending on the version of FrameworkBundle is not possible.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-06-23T14:37:49Z
+
+I like the fact that one can choose not to use the attribute as it’s less boilerplate for aliases that are used a lot.
+
+---------------------------------------------------------------------------
+
+by Valmonzo at 2025-06-23T15:45:19Z
+
+Same preference as @chalasr , but whatever you choose, I'll be happy to work on it !
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-24T06:53:27Z
+
+Fine, then let's also add this line for the other components? See my list above.

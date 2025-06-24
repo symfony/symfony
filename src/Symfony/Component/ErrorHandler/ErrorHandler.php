@@ -396,13 +396,13 @@ class ErrorHandler
         $silenced = 0 === ($level & $type);
         // Strong errors are not authorized to be silenced.
         $level |= \E_RECOVERABLE_ERROR | \E_USER_ERROR | \E_DEPRECATED | \E_USER_DEPRECATED;
-        $log = $this->loggedErrors & $type;
-        $throw = $this->thrownErrors & $type & $level;
+        $log = (bool) ($this->loggedErrors & $type);
+        $throw = (bool) ($this->thrownErrors & $type & $level);
         $type &= $level | $this->screamedErrors;
 
         // Never throw on warnings triggered by assert()
         if (\E_WARNING === $type && 'a' === $message[0] && 0 === strncmp($message, 'assert(): ', 10)) {
-            $throw = 0;
+            $throw = false;
         }
 
         if (!$type || (!$log && !$throw)) {
@@ -472,7 +472,7 @@ class ErrorHandler
         }
 
         if ($this->isRecursive) {
-            $log = 0;
+            $log = false;
         } else {
             try {
                 $this->isRecursive = true;

@@ -51,7 +51,6 @@ class ButtonBuilderTest extends TestCase
     {
         return [
             [''],
-            [false],
             [null],
         ];
     }

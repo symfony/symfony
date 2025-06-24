@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-06-23T18:17:22Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mttsch at 2025-06-23T18:18:41Z
+
+As far as I could tell from the code, the order of the top level in the (default) casters array is irrelevant (it is just used as a dictionary), thus I removed the entry not "grouped" with `AdressInfo`.

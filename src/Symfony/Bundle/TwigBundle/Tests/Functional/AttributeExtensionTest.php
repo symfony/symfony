@@ -51,7 +51,7 @@ class AttributeExtensionTest extends TestCase
                     $container->register(StaticExtensionWithAttributes::class, StaticExtensionWithAttributes::class)
                         ->setAutoconfigured(true);
                     $container->register(RuntimeExtensionWithAttributes::class, RuntimeExtensionWithAttributes::class)
-                        ->setArguments(['prefix_'])
+                        ->setArguments([true])
                         ->setAutoconfigured(true);
 
                     $container->setAlias('twig_test', 'twig')->setPublic(true);

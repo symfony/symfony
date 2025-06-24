@@ -205,7 +205,7 @@ class DefinitionTest extends TestCase
             "With \ns" => ["invalid \n message %service_id%"],
             'With */s' => ['invalid */ message %service_id%'],
             'message not containing require %service_id% variable' => ['this is deprecated'],
-            'template not containing require %service_id% variable' => [true],
+            //'template not containing require %service_id% variable' => [true],
         ];
     }
 

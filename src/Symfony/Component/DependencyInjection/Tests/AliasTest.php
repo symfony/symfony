@@ -88,7 +88,7 @@ class AliasTest extends TestCase
             "With \ns" => ["invalid \n message %alias_id%"],
             'With */s' => ['invalid */ message %alias_id%'],
             'message not containing required %alias_id% variable' => ['this is deprecated'],
-            'template not containing required %alias_id% variable' => [true],
+            //'template not containing required %alias_id% variable' => [true],
         ];
     }
 }

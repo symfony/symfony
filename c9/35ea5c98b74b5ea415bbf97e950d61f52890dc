@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-06-23T17:45:49Z
+
+> There are some PHPDoc updates that were forgotten; should I open a PR against 6.4 for these?
+
+Please yes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-24T06:51:28Z
+
+Please also update the corresponding changelog files

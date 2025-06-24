@@ -136,7 +136,7 @@ class PropertyAccessorBuilder
      */
     public function isMagicGetEnabled(): bool
     {
-        return $this->magicMethods & PropertyAccessor::MAGIC_GET;
+        return (bool) ($this->magicMethods & PropertyAccessor::MAGIC_GET);
     }
 
     /**
@@ -144,7 +144,7 @@ class PropertyAccessorBuilder
      */
     public function isMagicSetEnabled(): bool
     {
-        return $this->magicMethods & PropertyAccessor::MAGIC_SET;
+        return (bool) ($this->magicMethods & PropertyAccessor::MAGIC_SET);
     }
 
     /**

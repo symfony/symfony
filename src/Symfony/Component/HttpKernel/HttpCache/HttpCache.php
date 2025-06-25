@@ -637,7 +637,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
                 [$uri, $alt, $ignoreErrors, $part] = explode("\n", substr($content, $i, $j - $i), 4);
                 $i = $j + 24;
 
-                echo $this->surrogate->handle($this, $uri, $alt, $ignoreErrors);
+                echo $this->surrogate->handle($this, $uri, $alt, (bool) $ignoreErrors);
                 echo $part;
             }
 

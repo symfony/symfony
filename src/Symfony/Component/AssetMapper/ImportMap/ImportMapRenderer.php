@@ -96,11 +96,12 @@ class ImportMapRenderer
         }
 
         $scriptAttributes = $attributes || $this->scriptAttributes ? ' '.$this->createAttributesString($attributes) : '';
-        $importMapJson = json_encode(['imports' => $importMap], \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
+        $pageImportMap = array_filter($importMap, static fn (string $path):bool => \in_array($path, $modulePreloads));
+        $pageImportMapJson = json_encode(['imports' => $pageImportMap], \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
         $output .= <<<HTML
 
             <script type="importmap"$scriptAttributes>
-            $importMapJson
+            $pageImportMapJson
             </script>
             HTML;
 

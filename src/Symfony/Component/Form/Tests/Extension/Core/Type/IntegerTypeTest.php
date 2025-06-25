@@ -22,7 +22,7 @@ class IntegerTypeTest extends BaseTypeTestCase
 
     protected function setUp(): void
     {
-        IntlTestHelper::requireIntl($this, false);
+        IntlTestHelper::requireIntl($this);
         $this->previousLocale = \Locale::getDefault();
         parent::setUp();
     }

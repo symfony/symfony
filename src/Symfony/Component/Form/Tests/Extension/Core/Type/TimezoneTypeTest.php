@@ -144,7 +144,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
 
     public function testTimezonesAreSelectableWithIntl()
     {
-        IntlTestHelper::requireIntl($this, false);
+        IntlTestHelper::requireIntl($this);
 
         $choices = $this->factory->create(static::TESTED_TYPE, null, ['intl' => true])
             ->createView()->vars['choices'];

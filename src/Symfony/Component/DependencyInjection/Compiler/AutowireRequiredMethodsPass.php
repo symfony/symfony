@@ -70,7 +70,7 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
             $setters = $value->getMethodCalls();
             $value->setMethodCalls($withers);
             foreach ($setters as $call) {
-                $value->addMethodCall($call[0], $call[1], $call[2] ?? false);
+                $value->addMethodCall($call[0], $call[1], $call[2] ? true : false);
             }
         }
 

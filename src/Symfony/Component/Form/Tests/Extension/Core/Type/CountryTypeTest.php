@@ -21,7 +21,7 @@ class CountryTypeTest extends BaseTypeTestCase
 
     protected function setUp(): void
     {
-        IntlTestHelper::requireIntl($this, false);
+        IntlTestHelper::requireIntl($this);
 
         parent::setUp();
     }

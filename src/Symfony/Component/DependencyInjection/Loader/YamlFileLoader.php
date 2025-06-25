@@ -568,7 +568,7 @@ class YamlFileLoader extends FileLoader
                 if (isset($call['method']) && \is_string($call['method'])) {
                     $method = $call['method'];
                     $args = $call['arguments'] ?? [];
-                    $returnsClone = $call['returns_clone'] ?? false;
+                    $returnsClone = $call['returns_clone'] ? true : false;
                 } else {
                     if (1 === \count($call) && \is_string(key($call))) {
                         $method = key($call);
@@ -589,7 +589,7 @@ class YamlFileLoader extends FileLoader
                     } else {
                         $method = $call[0];
                         $args = $call[1] ?? [];
-                        $returnsClone = $call[2] ?? false;
+                        $returnsClone = $call[2] ? true : false;
                     }
                 }
 

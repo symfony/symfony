@@ -307,7 +307,7 @@ class Definition
     {
         $this->calls = [];
         foreach ($calls as $call) {
-            $this->addMethodCall($call[0], $call[1], $call[2] ?? false);
+            $this->addMethodCall($call[0], $call[1], $call[2] ? true : false);
         }
 
         return $this;

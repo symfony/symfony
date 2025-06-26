@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-06-25T07:52:47Z
+
+Actually should we deprecate it? If it is internal, just like `@internal` classes, I'm not sure we should do it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-06-25T07:58:49Z
+
+not sure if we can bypass the deprecation here then in a good way: https://github.com/symfony/symfony/blob/ae30d7c04d249fd07758582d67fc5ea014363f9a/src/Symfony/Component/DependencyInjection/Compiler/ResolveReferencesToAliasesPass.php#L62-L65

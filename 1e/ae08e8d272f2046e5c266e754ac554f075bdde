@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-06-24T09:14:24Z
+
+this should even use ` Psr\EventDispatcher\EventDispatcherInterface` like in the AbstractTransport.
+
+---------------------------------------------------------------------------
+
+by paulferrett at 2025-06-24T09:17:45Z
+
+> this should even use ` Psr\EventDispatcher\EventDispatcherInterface` like in the AbstractTransport.
+
+@stof unless I'm mistaken the AbstractTransport uses `Symfony\Contracts\EventDispatcher\EventDispatcherInterface` hence the change. Sorry, am I looking in the wrong place?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-24T09:23:15Z
+
+Ah indeed. I looked at the AbstractTransport of Mailer instead of Notifier.
+
+We should probably add support for any PSR dispatcher though. The notifier AbstractTransport uses the event dispatcher in a way compatible with the PSR interface. But that's for a separate PR targeting 7.4.

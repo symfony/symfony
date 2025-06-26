@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by UtechtDustin at 2025-06-26T06:53:35Z
+
+I searched for a long time why that deprecation message was shown although i already used the RateLimiterFactoryInterface for autowiring.
+This PR seems fixing it, thanks @xabbuh.

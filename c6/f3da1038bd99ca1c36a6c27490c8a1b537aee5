@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-06-24T11:51:05Z
+
+Actually, could you add a test covering this to prevent regressions (i.e. a test validation a string for which the canonicalization returns null with modern ICU) ?
+
+---------------------------------------------------------------------------
+
+by rdavaillaud at 2025-06-24T11:55:27Z
+
+> Actually, could you add a test covering this to prevent regressions (i.e. a test validation a string for which the canonicalization returns null with modern ICU) ?
+
+This should be handled by the LocaleValidatorTest of Validator component.
+How to force a specific version of system library in the tests?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-24T12:07:41Z
+
+> How to force a specific version of system library in the tests?
+
+no need to try to force a system library (which won't be possible from PHP anyway). And no need to skip the test if ICU is older (the test will still pass if canonicalization returns an empty string).
+
+---------------------------------------------------------------------------
+
+by rdavaillaud at 2025-06-24T12:36:20Z
+
+> no need to try to force a system library (which won't be possible from PHP anyway). And no need to skip the test if ICU is older (the test will still pass if canonicalization returns an empty string).
+
+I don't understand what I have to do then.
+The test is already in `\Symfony\Component\Validator\Tests\Constraints\LocaleValidatorTest::testInvalidLocales()`
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-24T13:01:15Z
+
+Is the existing test failing when using ICU 76 (without your patch) ?
+
+---------------------------------------------------------------------------
+
+by rdavaillaud at 2025-06-24T15:02:09Z
+
+@stof In fact, the problem is a little different than expected.
+- canonicalize returns null when the length of the value exceeds [INTL_MAX_LOCALE_LEN](https://www.php.net/manual/en/intl.constants.php#constant.intl-max-locale-len). (as stated in [PHP Documentation](https://www.php.net/manual/en/locale.canonicalize.php))
+- With ICU 76, canonicalize returns null when the length exceeds 11, at least on my system (docker, debian trixie, php 8.3) but don't know where the limit is from
+
+And, the actual validator test don't cover those 2 cases.
+
+I will make another PR, with clearer definition and tests.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-24T15:47:24Z
+
+@rdavaillaud no need to make another PR. You could add a test in this PR using a long locale name.

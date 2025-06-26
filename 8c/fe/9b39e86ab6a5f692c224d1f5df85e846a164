@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-06-23T06:50:03Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mttsch at 2025-06-24T11:10:57Z
+
+As I have been removing some deprecated code for 8.0, I was also always wondering how to fill out the table: It is no bug fix, it is no (new) feature, and it is also no deprecation, because it resolves the deprecation. Not sure if you would really somehow include this case to help filling out the table. (Setting everything to "no" also looks "weird" …)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-26T07:16:36Z
+
+@mttsch that's usually a feature. Signs of feature include need for a changelog line and need for a doc update. Removing (deprecated) features need both.

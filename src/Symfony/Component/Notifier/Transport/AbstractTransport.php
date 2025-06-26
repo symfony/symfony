@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Notifier\Event\FailedMessageEvent;
 use Symfony\Component\Notifier\Event\MessageEvent;
@@ -18,7 +19,6 @@ use Symfony\Component\Notifier\Event\SentMessageEvent;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**

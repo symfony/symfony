@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-19T06:32:39Z
+
+> I believe my patch is good, but with it I cannot achieve anymore what I need to do 😬
+
+I don't understand what this means, can you expand a bit please?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-06-19T07:11:26Z
+
+It's about this [line](https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/Security/Http/HttpUtils.php#L58). The decoration does not work here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-19T12:45:47Z
+
+> It's about this line. The decoration does not work here.
+
+So this PR won't fix your issue, isn't it?
+
+> Instead, I could change the class with a compiler pass
+
+Indeed.
+
+So let's close here?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-06-19T12:52:22Z
+
+> So this PR won't fix your issue, isn't it?
+
+I confirm it won't fix. I did not chose decoration, but inheritance to fix it.
+
+---
+
+We could close it, but I think the current code is wrong because it you decorate the service, everything is badly wired. This patch fix it
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-19T13:15:38Z
+
+Why don't you decorate the url-generator BTW?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-06-19T14:49:32Z
+
+Of course I did. But I had to change the http utils [because of this](https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/Security/Http/HttpUtils.php#L152-L165), may be the error is there. I don't understand this comment TBH
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-27T15:25:11Z
+
+Let's do this on 7.4 then since that's not really a bugfix but more of an improved behavior.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-06-27T15:57:39Z
+
+I updated the base branch and rebased

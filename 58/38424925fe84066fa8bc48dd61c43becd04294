@@ -1,0 +1,589 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-06-20T16:05:41Z
+
+> One can define an interface within their application's domain to achieve better type-coverage without any new coupling.
+
+Since the use-case is well-known, this interfaces should be provided by the FrameworkBundle itself. Otherwise the DX is broken as you don't have the signature of the closure for auto-completion and static analysis.
+
+Continuing in this logic, having an invokable class for each helper would be more transparent: unique type for DI of each helper and method signature to call them. Less magic with the `AutowireMethodOf` attribute.
+
+```php
+namespace Symfony\Bundle\FrameworkBundle\Controller\Helper;
+
+class Render
+{
+    // Explicit dependency injection
+    public function __construct(private Environment $twig) {}
+
+    public function __invoke(string $view, array $parameters = [], ?Response $response = null): Response
+    {
+        // ...
+    }
+}
+```
+
+So there is no need to use the attribute.
+
+```php
+use Symfony\Bundle\FrameworkBundle\Controller\Helper\Render;
+use Symfony\Bundle\FrameworkBundle\Controller\Helper\RedirectToRoute;
+
+class MyController
+{
+    public function __construct(
+        private Render $render,
+        private RedirectToRoute $redirectToRoute,
+    ) {
+    }
+
+    // Same function showProduct
+}
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-06-20T16:22:01Z
+
+I agree with Jérôme. I wouldn't want to see code using `ControllerHelper` elsewhere than in a Controller, even though it's only about pointing `#[AutowireMethodOf]` it feels just wrong conceptually.
+So I'd either add as many high-level helpers as AbstractController methods in their respective components as suggested or keep things as they are today.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-20T16:25:01Z
+
+@GromNaN thanks for the comments. This proposal is about providing innovative ways to decouple from helper classes, with AbstractController and entity repositories as primary use cases.
+
+Personally, I don't think maintaining a myriad of helper classes will improve anything: from a maintainer's perspective, it's an explosion of class, and from a DX perspective, it's a discoverability nightmare. Having one compact class with helper methods has been the natural solution for these reasons. This PR doesn't try to disrupt this practice - that's its main point and benefit: providing a solution to granularity without forcing us to use patterns that'd lead to even more classes/files to jungle with.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-20T16:34:00Z
+
+(Ignoring the likely too high migration costs, I think AbstractController could be favorably deprecated in favor of ControllerHelper, regardless of considerations related to AutowireMethodOf.)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-06-20T16:42:23Z
+
+If all the helper classes are in the same namespace, there is no discoverability issue.
+
+The solution you propose is a less practical than the current `AbstractController`:
+- You don't know the method signature, and you don't have any easy access to the method (until IDE/tools add support for inspection of `AutowireMethodOf`). It feels like magic `__call`.
+- You have to repeat `#[AutowireMethodOf(ControllerHelper::class)] private \Closure $<method>` for every helper you want to use.
+- The PHP syntax for calling a closure from a property is unusual `($this->redirectToRoute)('product_list')`.
+
+The advantage of the closure is for mocking, but as soon as you add invokable interfaces you lose this advantage.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-20T17:11:18Z
+
+> If all the helper classes are in the same namespace, there is no discoverability issue.
+
+Typing `$foo->` and seeing the possibilities is way more DX-friendly than having to see sibling classes in a folder/namespace.
+
+>The solution you propose is a less practical than the current AbstractController: [...]
+
+I :100: agree with you, those drawbacks are real (except the use of the "magic" adjective to highlight that you don't like it - any attributes can be described as such by nature of declarativeness - until the behavior is accepted, so that's not really helpful...).
+
+Yet, all these drawbacks apply to AutowireMethodOf.
+And the proposal is about ControllerHelper ;)
+
+What I wrote in the PR description needs some visionary thinking: from an architectural PoV, the design that's allowed by AutowireMethodOf is far superior. The good thing about the drawbacks is that they all can be removed by improving either the tooling or the syntax. We're here to build the future - we're not bound by the current state of the art.
+
+(If you don't share the vision completely, then you can focus on the meat of the proposal: ControllerHelper is already an improvement over AbstractController, eg it can be used with invokable controllers.)
+
+> The advantage of the closure is for mocking, but as soon as you add invokable interfaces you lose this advantage.
+
+You don't, anonymous classes to the rescue.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-06-20T19:46:57Z
+
+> For even better type-safety and application-level contracts, `#[AutowireMethodOf]` can generate adapters for functional interfaces. One can define an interface within their application's domain to achieve better type-coverage without any new coupling:
+
+Why don't _we_ create interfaces for those helper methods then and make those autowirable?
+
+---------------------------------------------------------------------------
+
+by afilina at 2025-06-21T13:38:21Z
+
+This is how I would approach all these questions and concerns, and then you decide.
+
+> Typing `$foo->` and seeing the possibilities is way more DX-friendly than having to see sibling classes in a folder/namespace.
+
+We need to consider the audience of this feature. Are the same people who care about decoupling also comfortable discovering through namespaces? Likely.
+
+> ControllerHelper is already an improvement over AbstractController, eg it can be used with invokable controllers.
+
+Nothing prevents Symfony from offering this new option, see how people use it, learn, iterate. It's definitely an improvement, so it's worthwhile.
+
+> from a maintainer's perspective, it's an explosion of class
+
+That's a very important consideration and I agree that maintainers should not be asked to bite off more than they can chew.
+
+> Why don't _we_ create interfaces for those helper methods then and make those autowirable?
+
+That is best for long-term maintenance of an app, if you want to be able to keep up with upgrades and BC breaks. We shouldn't inject interfaces we don't own into our controllers. With that in mind, the proposed solution makes it easier for devs to create the individual adapters which implement those interfaces.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-22T12:55:43Z
+
+>> For even better type-safety and application-level contracts, #[AutowireMethodOf] can generate adapters for functional interfaces. One can define an interface within their application's domain to achieve better type-coverage without any new coupling:
+>
+> Why don't we create interfaces for those helper methods then and make those autowirable?
+
+A couple of thoughts I had on this topic:
+
+- First, these type guarantees are not needed for many projects, so that this concern might be seen as overhead for some.
+- From a design perspective, having the interfaces being owned by the app rather than the framework is the highest form of decoupling. This applies here because contrary to many other interfaces provided by the framework, the one we're talking about don't really serve as abstractions to me. They'd be just some type-coverage helpers.
+- This lead me to wonder if [local type aliases](https://phpstan.org/writing-php-code/phpdoc-types#local-type-aliases) wouldn't be the correct solution to this problem - we could declare `@phpstan-type` on ControllerHelper and users would then `@phpstan-import-type Render from ControllerHelper` e.g. Of course that wouldn't help for autowiring.
+- In any way - last but not least - this is a nice domain to explore after this PR ;)
+
+---------------------------------------------------------------------------
+
+by ludekbenedik at 2025-06-22T20:35:48Z
+
+Hi,
+is there a benefit to use this construction
+
+```php
+class MyController
+{
+    public function __construct(
+        #[AutowireMethodOf(ControllerHelper::class)]
+        private \Closure $render,
+        #[AutowireMethodOf(ControllerHelper::class)]
+        private \Closure $redirectToRoute,
+    ) {
+    }
+
+    public function showProduct(int $id): Response
+    {
+        if (!$id) {
+            return ($this->redirectToRoute)('product_list');
+        }
+
+        return ($this->render)('product/show.html.twig', ['product_id' => $id]);
+    }
+}
+```
+instead of this construction?
+```php
+class MyController
+{
+    public function __construct(
+        #[Lazy]
+        private UrlGeneratorInterface $urlGenerator,
+        #[Lazy]
+        private TwigHelper $twigHelper,
+    ) {
+    }
+
+    public function showProduct(int $id): Response
+    {
+        if (!$id) {
+            return new RedirectResponse($this->urlGenerator->generate('product_list'));
+        }
+
+        return $this->twigHelper->render('product/show.html.twig', ['product_id' => $id]);
+    }
+}
+```
+
+There are some methods which only forward theirs arguments to a service like `generateUrl`, `isGranted`, `createForm`, `createFormBuilder`, `getUser`, `isCsrfTokenValid` and those can be replaced by lazy services.
+
+Separate helpers (for better decoupling) can be created for other methods: `TwigHelper::render()`, `HttpHelper::forward()`, `SecurityHelper::denyAccessUnlessGranted()`, ...
+
+If necessary, `RoutingHelper::redirectToRoute()` can be created.
+
+This approach is more straightforward. In addition, it offers this use.
+
+```php
+class MyController
+{
+    public function showProduct(
+        #[MapEntity(id: 'id')] Product $product,
+        RouteHelper $routeHelper,
+        TwigHelper $twigHelper,
+    ): Response {
+        if (!$id) {
+            return $routeHelper->redirect('product_list');
+        }
+
+        return $twigHelper->render('product/show.html.twig', ['product_id' => $id]);
+    }
+
+    public function deleteProduct(
+        #[MapEntity(id: 'id')] Product $product,
+        SecurityHelper $securityHelper,
+        // ...
+    ): Response {
+        $securityHelper->denyAccessUnlessGranted('delete', $product);
+        // ...
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-23T08:46:07Z
+
+@ludekbenedik sure, that's another possible follow up of this PR. Yet, it's not the one I'd push for personally, here is why:
+- It still builds on coupling: those classes would be in the Symfony namespace and wouldn't be abstract.
+- It still builds on inheritance, just elsewhere: the new helpers would need to be inheritable to still provide extensibility (to make the coupling not a hard one).
+- From a DX PoV, it'd make things harder, because discovering a class somewhere deep in a namespace is way harder than discovering a method in a helper class. That's the very reason why this helper has been created: yes, some methods are proxies - and the only reason why they exist is that: improved DX by discoverability. Let's not dismiss this aspect of the current state.
+- From a maintainers PoV, splitting helpers in many classes will just increase the maintenance surface while all the previous items already make them meh.
+
+We can alleviate the first 2 items by introducing interfaces, but that'd weaken the last 2 items to me. Also I don't think it makes sense to introduce interfaces for that, the reason being that helpers are not abstractions per se.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-06-23T09:20:50Z
+
+> From a design perspective, having the interfaces being owned by the app rather than the framework is the highest form of decoupling.
+
+Right, but effectively Symfony owns the signatures of those helper methods. Telling app developers to provide their own interface which contains a copy of our signature, looks the same on every project and and has to be kept in sync after updating Symfony, does not change that.
+
+> This applies here because contrary to many other interfaces provided by the framework, the one we're talking about don't really serve as abstractions to me.
+
+Of course not. All those helpers simply hide some commonly used glue code which is why I wanted to solve it with traits back then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-23T09:51:49Z
+
+The ship has sailed for the traits option - it suffers from difficult DI + files/traits explosion ;)
+
+You're right about app-owned interfaces, but only to a certain degree: it would always be possible for an app to write their own adapters if the ones generated by the DIC don't fit. Yes, that might be some work, but that's what e.g the DDD folks would aim for: being the ones in full control of boundaries.
+
+Note that I'm not telling that every apps should do it this style - like I'm not telling anyone DDD is the only possible approach to software design. But it's still nice to draw a path forward that goes in the direction of more advanced SOLID software.
+
+Personally, I think I'd first stop at the AutowireMethodOf + Closure style and then I'd try to improve the tooling so that static analyzers understand how types should be interpreted. It should be possible to create an implicit type from such arguments that'd forward the signature of the target method to callers of the closure, and to callees of the constructor.
+And for IDEs, I'd like to see autocompletion when the `$` is typed for that argument.
+
+I might also seek for a syntax that removes the need for repeating AutowireMethodOf. JavaScript has "import foo, bar from Baz". Maybe something like that written using an attribute on the constructor or the class itself. For a future PR :)
+
+Let's settle on the PR as is?
+
+---------------------------------------------------------------------------
+
+by ludekbenedik at 2025-06-24T20:58:08Z
+
+@nicolas-grekas I agree that using one facade is more convenient than more facades. The question is how big the facade should be. Isn't it a God facade?
+There were times when `AbstractController` contained methods for getting `ManagerRegistry`, dispatching a message, even methods for getting a service from the DI container.
+
+I can't imagine to use this construction in every controller. Even if some plugin brought autocomplete to the IDE I use.
+
+```php
+public function __construct(
+        #[AutowireMethodOf(ControllerHelper::class)]
+        private \Closure $render,
+        #[AutowireMethodOf(ControllerHelper::class)]
+        private \Closure $redirectToRoute,
+    ) {
+    }
+```
+
+And when an application defines interfaces and their implementations it does not matter if `ControllerHelper` or different facades exist or not.
+
+Discovering facades and their methods is not necessarily difficult. It depends on how logical the facades are.
+
+I would imagine the facades like this.
+
+### Symfony\Bundle\SecurityBundle\Security
+
+This facade already exists.
+
+#### Methods
+    isGranted   - already exists, alternative exists #[IsGranted]
+    getUser     - already exists, alternative exists #[CurrentUser]
+    getAccessDecision
+    denyAccessUnlessGranted
+    createAccessDeniedException
+    isCsrfTokenValid
+
+#### Services
+    'security.authorization_checker' => '?'.AuthorizationCheckerInterface::class,
+    'security.token_storage' => '?'.TokenStorageInterface::class,
+    'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
+
+### Symfony\Bundle\FrameworkBundle\Controller\HttpHelper
+
+It would be better if `UrlGenerator` and `FormFactory` were not part of the facade, but it's an acceptable compromise to improve DX.
+
+Wouldn't it be better to use `JsonStreamer` instead of `Serializer` for the `json` method?
+
+#### Methods
+    forward
+    redirect
+    json
+    file
+    addFlash
+    createNotFoundException
+    addLink
+    sendEarlyHints
+
+    generateUrl         - or inject UrlGeneratorInterface
+    redirectToRoute     - or use    $httpHelper->redirect($urlGenerator->generate(...));
+    createForm          - or inject FormFactoryInterface
+    createFormBuilder   - or inject FormFactoryInterface
+
+#### New methods
+    createBadRequestException
+    createNamedForm
+
+#### Services
+    'request_stack' => '?'.RequestStack::class,
+    'http_kernel' => '?'.HttpKernelInterface::class,
+    'serializer' => '?'.SerializerInterface::class,
+    'web_link.http_header_serializer' => '?'.HttpHeaderSerializer::class,
+
+    'router' => '?'.RouterInterface::class,
+    'form.factory' => '?'.FormFactoryInterface::class,
+
+### Symfony\Bundle\TwigBundle\Controller\TwigHelper
+#### Methods
+    renderView
+    renderBlockView
+    render
+    renderBlock
+    stream
+
+#### Services
+    'twig' => '?'.Environment::class,
+
+### Remove
+#### Methods
+    getParameter    - use #[Autowire(param: 'parameter_name')]
+
+#### Services
+    'parameter_bag' => '?'.ContainerBagInterface::class,
+
+### Using
+
+Most cases.
+
+```php
+function __constructor(private HttpHelper $httpHelper, private TwigHelper $twigHelper) {
+}
+
+#[Route]
+function __invoke(Request $request, HttpHelper $httpHelper, TwigHelper $twigHelper) {
+}
+```
+
+When security is required.
+
+```php
+function __constructor(private HttpHelper $httpHelper, private TwigHelper $twigHelper, private Security $security) {
+}
+
+#[Route]
+#[IsGranted]
+function __invoke(Request $request, #[CurrentUser] User $user, HttpHelper $httpHelper, TwigHelper $twigHelper) {
+}
+```
+
+API
+
+```php
+function __constructor(private Security $security, private StreamWriterInterface $jsonStreamWriter) {
+}
+
+#[Route]
+#[IsGranted]
+function __invoke(Request $request, #[CurrentUser] User $user, Security $security, StreamWriterInterface $jsonStreamWriter) {
+}
+```
+
+---------------------------------------------------------------------------
+
+by kevinpapst at 2025-06-24T21:39:50Z
+
+Maybe I am just missing the "visionary thinking that the PR description needs" 🤷 but I am always curious when I read that a central point of the Framework (here the AbstractController) might be deprecated, due to the huge associated maintenance costs. As you mentioned the costs are likely too high, I concentrate on the code proposals: the call syntax itself and the magic injection of "something" - this would decrease the DX for me. Something is missing here.
+
+It is already possible to write controllers without inheritance, a few examples were already mentioned. Probably we need a few more small helpers (like Security) that we can inject, instead of this new god object?
+Having them in a new ControllerHelper namespace would make them discoverable easily, especially if that new way of creating controllers gets documented as new best practice.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-25T11:21:53Z
+
+> I agree that using one facade is more convenient than more facades. The question is how big the facade should be. Isn't it a God facade?
+
+I don't think that matters for the PR we have here: we made decisions in the past regarding what fits in AbstractController, and the same reasoning/discussions should drive us.
+
+About the "god class" aspect, a helper class is a god class only if you inject it as a whole, which is precisely what the attribute addresses by allowing cherry-picking the few functions you need, in insulation. With that capability, where you describe a "god class", I see a series of functional units grouped in a class that's used a namespace.
+
+Then, about splitting into more helper classes, I already answered part of it, and I also now realize that what's important in AbstractController is the side of the helper: *controller* helper helps writing controllers - the vocabulary is aimed at what might be useful for writing them. This is oriented towards DX: "if you don't know what is most likely useful in a controller, here are the main items". But if you split things by domain instead (SecurityHelper & co.), then DX is made harder because you then need to first know that you have this sort of problems. This requires more mental hops, thus DX is weaker.
+
+> It is already possible to write controllers without inheritance, a few examples were already mentioned. Probably we need a few more small helpers (like Security) that we can inject, instead of this new god object?
+
+We don't, that'd be just more "god classes", making the current state worse.
+Also while you can write controllers without inheritance, you then have to opt-out from using the helpers provided by AsbtractController. That's a shame and what I also want to improve - without replacing inheritance by hard-coupling to a god class.
+
+Last but not least, AutowireMethodOf is not what's proposed in this PR. The attribute already works well. What's in this PR is a helper that I might have been reluctant to add in the past. But now that we have the bases to not make helpers a foot gun (because god class as you wrote), then I know there is a bright path forward with it: thanks to the attribute, a helper class can now be seen as a namespace with service dependencies and a collection of functions.
+
+---------------------------------------------------------------------------
+
+by kevinpapst at 2025-06-25T13:47:19Z
+
+> With that capability, where you describe a "god class", I see a series of functional units grouped in a class
+> We don't, that'd be just more "god classes", making the current state worse.
+> thanks to the attribute, a helper class can now be seen as a namespace with service dependencies and a collection of functions.
+
+I don't buy that argument. The existence of this attribute doesn't change the internals of the class. You even announce it `as a standalone service`, which can handle Forms, CSRF tokens, Voters, Redirects and more at the same time. You can't prevent that people will inject the entire ControllerHelper (even in places it does not belong).
+
+When I have so many ways of achieving the same outcome, my DX doesn't get better, because I have no clue anymore what is best practice, which one is faster, less resource consuming and why.
+```php
+class MyController
+{
+    public function __construct(
+        #[AutowireMethodOf(ControllerHelper::class)]
+        private \Closure $isGranted,
+        #[AutowireMethodOf(ControllerHelper::class)]
+        private \Closure $getUser,
+    ) {
+    }
+
+    public function showProduct(int $id): Response
+    {
+        if (!($this->isGranted)('foo', ($this->getUser)())) {
+            throw ...
+        }
+         ...
+    }
+}
+```
+or
+```php
+class MyController
+{
+    public function __construct(ControllerHelper $helper) {
+    }
+
+    public function showProduct(int $id): Response
+    {
+        if (!$this->helper->isGranted('foo', $this->helper->getUser())) {
+            throw ...
+        }
+         ...
+    }
+}
+```
+or
+```php
+class MyController
+{
+    public function showProduct(int $id, ControllerHelper $helper): Response
+    {
+        if (!$helper->isGranted('foo', $helper->getUser())) {
+            throw ...
+        }
+         ...
+    }
+}
+```
+or
+```php
+class MyController
+{
+    public function __construct(Security $security) {
+    }
+
+    public function showProduct(int $id): Response
+    {
+        if (!$this->security->isGranted('foo', $this->security->getUser())) {
+            throw ...
+        }
+         ...
+    }
+}
+```
+or
+```php
+class MyController extends AbstractController
+{
+    public function showProduct(int $id): Response
+    {
+        if (!$this->isGranted('foo', $this->getUser())) {
+            throw ...
+        }
+         ...
+    }
+}
+```
+
+I probably simply can't see how and why it improves my life as SF user.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-06-26T12:22:22Z
+
+Injecting closures is inferior to injecting a real type or even calling a parent method, spreading the opposite would be defeating decades of software design culture, not revolutionizing. I don't think we want developing with Symfony to be injecting PHPDoc-typed closures everywhere. I'm against spreading that practice as a best one to our users as it'd be pushing for poorly designed and hard to apprehend code that misses leveraging language type capabilities.
+This also applies to queries: make them truly typed, eventually invokable, but not closures.
+
+Scoping by domain is 100x better than per caller (RenderHelper > ControllerHelper) to me, it brings clarity and does not make discovery any harder. That's what we always do, and even Laravel facades got this.
+
+Regarding the argument that `ControllerHelper` is free decoupling, I think we have a pretty good tradeoff today: if you care about not coupling your controllers to Symfony then don't make your controllers extend `AbstractController` and give them the dependencies you want being your own types or Symfony built-in ones. As someone who use the decoupled approach on projects for which it's relevant, I don't feel like it's a big deal.
+
+Also deprecating `AbstractController` would increase the upgrade cost for both final applications and 3rd party packages providing Controllers for little benefit, I see we aren't there yet and I don't mind maintaining both, so I'm +0 for this PR.
+
+Please consider my arguments and be careful with what we end up pushing for :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-26T13:18:32Z
+
+I think @chalasr raised a valid point. In most of my projects, I don’t worry about coupling controllers to the framework (whether through `AbstractController` or `ControllerHelper`, or similar helpers), because I consider controllers part of the infrastructure or presentation layer).
+
+These layers serve as primary or secondary adapters, and their role is precisely to interact with the framework and external interfaces. In that context, tight coupling to Symfony is not only acceptable but often pragmatic, since the controllers aren’t meant to be reused or tested in isolation outside the framework.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2025-06-26T15:24:00Z
+
+Personally I like the functionality of #6, but I struggle to see any advantage as a consumer in this:
+
+```diff
+class MyController
+{
+    public function __construct(
+--        private RedirectToRoute $render,
+++        /** @var Closure(string, array, int): RedirectResponse **/
+++        #[AutowireMethodOf(ControllerHelper::class)]
+++        private \Closure $redirectToRoute,
+    ) {
+    }
+}
+```
+
+That instead you can use an interface and Symfony knows how to generate a concrete class behind, or directly a concrete invokable class, no magic involve, I see the benefit though.
+
+>This proposal is about providing innovative ways to decouple from helper classes, with AbstractController and entity repositories as primary use cases.
+>Personally, I don't think maintaining a myriad of helper classes will improve anything: from a maintainer's perspective, it's an explosion of class, and from a DX perspective, it's a discoverability nightmare.
+
+Maybe I'm naive but I don't see how this improves discoverability. You still need to look for a helper in the codebase, In my experience it does not make much difference to have to look at a group of 10 files or a file with 10 different methods. I appreciate I may be too biased here though.
+
+I'm also not sure to understand why class explosion is particularly an issue. From a maintenance perspective there is little difference between maintaining 10 different files that serves different purposes, rather than one big file that does 10 different things.
+
+From a performance perspective if the only possible way to get back types is to introduce an interface for which the compiler creates another concrete implementation, surely this is not gonna be better.
+
+>entity repositories as primary use cases.
+
+IIUC the gain here is that you can have one big repository class but expose individual queries? I admit I struggle to see what is the problem with injecting the entire repository, but if you want to be able to inject individual queries surely from a maintenance perspective it also makes more sense to maintain different files rather than mashing everything together?
+
+Maybe I just don't really understand the use case. I admit I don't really see the need of `#[AutowireMethodOf]` but I don't have much of an opinion about it either. It's another tool at disposal for solving problems (although I don't see which one).
+
+Pushing this as the de-facto replacement of `AbstractController` though, feels, in its current state, like a degradation from a DX perspective.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-27T15:16:29Z
+
+Let's do this. We're not get there about replacing AbstractController, no worries about that.
+Thank you all for the discussion!

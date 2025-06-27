@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by santysisi at 2025-05-20T00:15:59Z
+
+It seems that the error reported by Psalm was resolved in version [7.3](https://github.com/symfony/symfony/commit/f328d6ab3ad10b76ca5e5ce3faaf9f28a0189656). What should I do in cases like this? 🤔
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-30T06:31:41Z
+
+You can ignore the psalm error for now
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-06-20T17:49:34Z
+
+Hi 👋 Just checking in, Are there any issues or changes needed for this PR? 🙂
+I'm happy to make any updates if required.
+
+Also, the pipeline errors seem unrelated to the changes in this PR.
+
+Thanks!

@@ -1852,6 +1852,56 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->readFile(__DIR__);
     }
 
+    /**
+     * @dataProvider provideValidChunkSizes
+     */
+    public function testReadFileInChunks(int $chunkSize)
+    {
+        $licenseFile = \dirname(__DIR__).'/LICENSE';
+        $expectedContent = file_get_contents($licenseFile);
+
+        $chunks = '';
+        foreach ($this->filesystem->readFileInChunks($licenseFile, $chunkSize) as $chunk) {
+            $this->assertLessThanOrEqual($chunkSize, \strlen($chunk));
+            $chunks .= $chunk;
+        }
+
+        $this->assertSame($expectedContent, $chunks);
+    }
+
+    public static function provideValidChunkSizes(): array
+    {
+        return [
+            '512 B chunk' => [512],
+            '1 KB chunk' => [1024],
+            '2 KB chunk' => [2048],
+            '4 KB chunk' => [4096],
+            '8 KB chunk' => [8192],
+        ];
+    }
+
+    public function testReadFileInChunksNonExistent()
+    {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches(\sprintf(
+            '#^Failed to open file ".+%1$sTests/invalid"\\: #',
+            preg_quote(\DIRECTORY_SEPARATOR)
+        ));
+
+        $this->filesystem->readFileInChunks(__DIR__.'/invalid');
+    }
+
+    public function testReadFileInChunksFromDirectory()
+    {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches(\sprintf(
+            '#^Failed to read file ".+%sTests"\\: It is a directory\\.$#',
+            preg_quote(\DIRECTORY_SEPARATOR)
+        ));
+
+        $this->filesystem->readFileInChunks(__DIR__);
+    }
+
     public function testReadUnreadableFile()
     {
         $this->markAsSkippedIfChmodIsMissing();

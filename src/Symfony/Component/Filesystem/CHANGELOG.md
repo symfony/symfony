@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add the `Filesystem::readFileInChunks()` method
+
 7.1
 ---
 

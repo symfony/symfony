@@ -728,6 +728,57 @@ class Filesystem
         return $content;
     }
 
+    /**
+     * Reads a file in fixed-size chunks and yields them one at a time.
+     *
+     * @param string $filename The full path to the file
+     *
+     * @return \Traversable<string> Yields file content as strings in chunks
+     *
+     * @throws IOException If the file cannot be opened or read, or if it's a directory
+     */
+    public function readFileInChunks(string $filename, int $size = 8192): \Traversable
+    {
+        if (is_dir($filename)) {
+            throw new IOException(\sprintf('Failed to read file "%s": It is a directory.', $filename));
+        }
+
+        $stream = self::box('fopen', $filename, 'rb');
+        if (false === $stream) {
+            throw new IOException(\sprintf('Failed to open file "%s": "%s"', $filename, self::$lastError ?? 'Unknown error'), 0, null, $filename);
+        }
+
+        return $this->yieldStreamChunks($stream, $size);
+    }
+
+    /**
+     * @param resource $stream A readable stream resource
+     */
+    private function yieldStreamChunks($stream, int $size): \Traversable
+    {
+        if (!\is_resource($stream)) {
+            throw new InvalidArgumentException('The stream is not a resource.');
+        }
+
+        try {
+            while (!feof($stream)) {
+                $chunk = self::box('fread', $stream, $size);
+
+                if (false === $chunk) {
+                    throw new IOException(\sprintf('Error reading from stream: "%s"', self::$lastError ?? 'Unknown error'));
+                }
+
+                if ('' === $chunk) {
+                    break;
+                }
+
+                yield $chunk;
+            }
+        } finally {
+            self::box('fclose', $stream);
+        }
+    }
+
     private function toIterable(string|iterable $files): iterable
     {
         return is_iterable($files) ? $files : [$files];

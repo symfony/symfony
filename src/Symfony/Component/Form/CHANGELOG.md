@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * [BC BREAK] Change default value of `default_protocol` option in `UrlType` from `'http'` to `null`
+
 7.4
 ---
 

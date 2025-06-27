@@ -4,6 +4,7 @@ CHANGELOG
 8.0
 ---
 
+ * Remove deprecated rate limiter factory autowiring aliases
  * Remove `LazyFirewallContext::__invoke()`
 
 7.4

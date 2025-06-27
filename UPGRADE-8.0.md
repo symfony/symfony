@@ -152,6 +152,33 @@ FrameworkBundle
    $application->addCommand(new CreateUserCommand());
    ```
 
+ * Remove deprecated rate limiter factory autowiring aliases
+
+   *Before*
+   ```php
+   use Symfony\Component\RateLimiter\RateLimiterFactory;
+
+   public function __construct(
+       private RateLimiterFactory $anonymousApiLimiter,
+       private RateLimiterFactory $authenticatedApiLimiter,
+   ) {
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\RateLimiter\RateLimiterFactory;
+   use Symfony\Component\DependencyInjection\Attribute\Target;
+
+   public function __construct(
+       #[Target('limiter.anonymous_api')]
+       private RateLimiterFactory $anonymousApiLimiter,
+       #[Target('limiter.authenticated_api')]
+       private RateLimiterFactory $authenticatedApiLimiter,
+   ) {
+   }
+   ```
+
 HttpClient
 ----------
 

@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-06-18T11:21:54Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-18T11:26:27Z
+
+Hmm, this is not the right fix :(
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-18T11:43:09Z
+
+Changed implementation from returning `Type::string()` to any union-scalar
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-18T11:46:21Z
+
+Constants are not even restricted to scalars in recent PHP versions.
+
+The right fix would involve looking at the fetched constants.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-19T09:55:17Z
+
+I've updated implementation
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-20T10:17:10Z
+
+I'm not sure how to fix the failing serializer test. For me it looks like that it's an invalid test, because it defines `self::*` on an anonymous class but does not define any constant. Then later of course it fails because it's an union type, but for now when no matched constants were found it returns `Type::null` and as property defines also null, it tries to pass `Type::null` to `Type::union` twice.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-26T04:32:16Z
+
+@stof @mtarld so I just fixed the wrong test from Serializer, please review when you can :)
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-26T04:37:47Z
+
+I'm not sure how to fix property info though, as test passes for me locally
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-06-27T11:01:56Z
+
+But I don't know if we need to consider this as a BC break (as it was not a valid type anyway) 🤔
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-27T11:10:37Z
+
+Thanks, updated
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-27T12:02:47Z
+
+For the lowest-deps job, I suggest instead bumping the min version of type-info in property-info to use `^7.2.8` (i.e. the next 7.2 release that will contain the fix). It makes maintenance easier than having conditional test assertions depending on the version, while type-into 7.1 is EOL anyway.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-06-27T12:04:39Z
+
+Agreed, this will make things much more easier.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-27T12:10:06Z
+
+Thank you, both

@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-05-31T11:47:03Z
+
+I guess I may be missing something but how does this fix anything if only test files are updated?
+
+---------------------------------------------------------------------------
+
+by IndraGunawan at 2025-05-31T12:03:31Z
+
+> I guess I may be missing something but how does this fix anything if only test files are updated?
+
+i want to replicate the issue in the test case before committing the patch, once i get the expected error in the test case i'll push the patch
+
+----
+
+edited: patch pushed
+
+---------------------------------------------------------------------------
+
+by IndraGunawan at 2025-06-02T16:37:13Z
+
+Status: ready for review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-23T14:40:03Z
+
+Ah sorry I missed the high/low-deps failures. The reason why this fails is because of the cross-packages deps.
+Do you think you can find a test case that'd fit in CachePoolPassTest instead of FrameworkBundle?
+
+---------------------------------------------------------------------------
+
+by IndraGunawan at 2025-06-27T09:25:47Z
+
+@nicolas-grekas i can't reproduce the error with Cache component alone without FrameworkBundle
+
+the issue occurs when
+
+```yaml
+services:
+    _defaults:
+        autoconfigure: true
+```
+
+if the `autoconfigure: false` even without this patch, no error occurs. so i'm not sure if the issue is in the CachePoolPass or another place
+
+I'd be grateful if you could assist me with this issue

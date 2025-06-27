@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-26T16:42:00Z
+
+Status: needs work
+
+This creates a convention that AutowirePass cannot handle at the moment.

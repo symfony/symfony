@@ -4,6 +4,7 @@ CHANGELOG
 6.4
 ---
 
+ * `Symfony\Component\HttpKernel\EventListener\ProfilerListener` is now resettable to prevent memory leaks
  * Support backed enums in #[MapQueryParameter]
  * `BundleInterface` no longer extends `ContainerAwareInterface`
  * Add optional `$className` parameter to `ControllerEvent::getAttributes()`

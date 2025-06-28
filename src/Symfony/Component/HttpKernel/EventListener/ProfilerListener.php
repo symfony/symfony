@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * ProfilerListener collects data for the current request by listening to the kernel events.
@@ -30,7 +31,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  *
  * @final
  */
-class ProfilerListener implements EventSubscriberInterface
+class ProfilerListener implements EventSubscriberInterface, ResetInterface
 {
     private Profiler $profiler;
     private ?RequestMatcherInterface $matcher;
@@ -135,8 +136,7 @@ class ProfilerListener implements EventSubscriberInterface
             $this->profiler->saveProfile($this->profiles[$request]);
         }
 
-        $this->profiles = new \SplObjectStorage();
-        $this->parents = new \SplObjectStorage();
+        $this->reset();
     }
 
     public static function getSubscribedEvents(): array
@@ -146,5 +146,12 @@ class ProfilerListener implements EventSubscriberInterface
             KernelEvents::EXCEPTION => ['onKernelException', 0],
             KernelEvents::TERMINATE => ['onKernelTerminate', -1024],
         ];
+    }
+
+    public function reset(): void
+    {
+        $this->profiles = new \SplObjectStorage();
+        $this->parents = new \SplObjectStorage();
+        $this->exception = null;
     }
 }

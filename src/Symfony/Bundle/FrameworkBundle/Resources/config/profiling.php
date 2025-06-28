@@ -37,6 +37,7 @@ return static function (ContainerConfigurator $container) {
                 param('profiler_listener.only_main_requests'),
             ])
             ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('console_profiler_listener', ConsoleProfilerListener::class)
             ->args([

@@ -546,7 +546,7 @@ class PercentToLocalizedStringTransformerWithoutGrouping extends PercentToLocali
     protected function getNumberFormatter(): \NumberFormatter
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
-        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, false);
+        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, 0);
 
         return $formatter;
     }

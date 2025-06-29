@@ -163,7 +163,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
         }
 
-        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $this->grouping);
+        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, (int)$this->grouping);
 
         return $formatter;
     }

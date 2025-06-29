@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2025-05-24T14:30:09Z
+
+Shouldn't we do the same for `RecoverableExceptionInterface` also?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-24T15:31:20Z
+
+> Shouldn't we do the same for RecoverableExceptionInterface also?
+
+Indeed, I forgot about that one.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-05-24T18:41:35Z
+
+I don't think we need to do the same for `RecoverableExceptionInterface`, because when an exception implements that interface, it signals that the operation [should be retried](https://github.com/symfony/symfony/blob/6.4/src/Symfony/Component/Messenger/EventListener/SendFailedMessageForRetryListener.php#L127). With this new behavior, we're explicitly avoiding retries for exceptions that implement `UnrecoverableExceptionInterface`, so the distinction remains meaningful.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2025-05-24T18:50:32Z
+
+@santysisi `RecoverableExceptionInterface` enforces the retry regardless of what retry strategy says – f.e. `max_retries` may be reached, but if recoverable exception was thrown, the message must still be retried.
+
+`RecoverableExceptionInterface` can also override the retry delay set by retry strategy – so ignoring it here would mean always using retry delay from the retry strategy, which would again be unintended/unexpected behavior.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-05-24T18:59:54Z
+
+Got it, thanks for the explanation! I'll make that change. 🙌

@@ -104,13 +104,13 @@ class SessionListenerTest extends TestCase
 
         yield 'set_cookiesecure_auto_by_symfony_false_by_php' => [
             'phpSessionOptions' => ['secure' => false],
-            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => 'auto', 'cookie_secure' => 'auto', 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => true, 'cookie_secure' => 'auto', 'cookie_samesite' => Cookie::SAMESITE_LAX],
             'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => false, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
         ];
 
         yield 'set_cookiesecure_auto_by_symfony_true_by_php' => [
             'phpSessionOptions' => ['secure' => true],
-            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => 'auto', 'cookie_secure' => 'auto', 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => true, 'cookie_secure' => 'auto', 'cookie_samesite' => Cookie::SAMESITE_LAX],
             'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
         ];
 

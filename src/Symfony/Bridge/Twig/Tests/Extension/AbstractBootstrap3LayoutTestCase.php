@@ -2141,7 +2141,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     public function testMoneyWithoutCurrency()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType', 1234.56, [
-            'currency' => false,
+            'currency' => null,
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],

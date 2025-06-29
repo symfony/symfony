@@ -76,7 +76,7 @@ class MoneyTypeTest extends BaseTypeTestCase
 
     public function testMoneyPatternWithoutCurrency()
     {
-        $view = $this->factory->create(static::TESTED_TYPE, null, ['currency' => false])
+        $view = $this->factory->create(static::TESTED_TYPE, null, ['currency' => null])
             ->createView();
 
         $this->assertSame('{{ widget }}', $view->vars['money_pattern']);

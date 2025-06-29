@@ -94,8 +94,8 @@ class SecurityExtensionTest extends TestCase
         return [
             [null, null, null],
             ['object', null, 'object'],
-            ['object', false, new FieldVote('object', false)],
-            ['object', 0, new FieldVote('object', 0)],
+            ['object', '', new FieldVote('object', false)],
+            ['object', '0', new FieldVote('object', 0)],
             ['object', '', new FieldVote('object', '')],
             ['object', 'field', new FieldVote('object', 'field')],
         ];

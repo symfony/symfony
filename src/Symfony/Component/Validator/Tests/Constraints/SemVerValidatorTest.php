@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\SemVer;
 use Symfony\Component\Validator\Constraints\SemVerValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class SemVerValidatorTest extends ConstraintValidatorTestCase
+final class SemVerValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): SemVerValidator
     {
@@ -112,18 +112,18 @@ class SemVerValidatorTest extends ConstraintValidatorTestCase
         yield ['1.0.0'];
         yield ['1.2.3'];
         yield ['10.20.30'];
-        
+
         // Partial versions
         yield ['1'];
         yield ['1.2'];
         yield ['10.20'];
-        
+
         // With prefix
         yield ['v1.0.0'];
         yield ['v1.2.3'];
         yield ['v1'];
         yield ['v1.2'];
-        
+
         // With pre-release
         yield ['1.0.0-alpha'];
         yield ['1.0.0-alpha.1'];
@@ -133,7 +133,7 @@ class SemVerValidatorTest extends ConstraintValidatorTestCase
         yield ['1.0.0+20130313144700'];
         yield ['1.0.0-beta+exp.sha.5114f85'];
         yield ['1.0.0+21AF26D3----117B344092BD'];
-        
+
         // Complex examples
         yield ['1.2.3-alpha.1.2+build.123'];
         yield ['v1.2.3-rc.1+build.123'];

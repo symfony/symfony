@@ -995,8 +995,7 @@ class UrlMatcherTest extends TestCase
         $collection->add('without_defaults', $routeWithoutDefaults);
         
         // Test 1: Host without subdomain - should match route with defaults
-        $context = new RequestContext('', 'GET', 'example.com');
-        $matcher = $this->getUrlMatcher($collection, $context);
+        $matcher = $this->getUrlMatcher($collection, new RequestContext('', 'GET', 'example.com'));
         
         $result = $matcher->match('/test');
         $this->assertSame('with_defaults', $result['_route']);

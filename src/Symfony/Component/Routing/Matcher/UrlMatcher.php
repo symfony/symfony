@@ -165,7 +165,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                     $hasAllDefaults = true;
                     
                     foreach ($hostVariables as $variable) {
-                        if (!isset($routeDefaults[$variable])) {
+                        if (!\array_key_exists($variable, $routeDefaults)) {
                             $hasAllDefaults = false;
                             break;
                         }

@@ -43,11 +43,15 @@ class SemVerValidator extends ConstraintValidator
     private const LOOSE_SEMVER_PATTERN = '/^'
         .'(?P<prefix>v)?'                                                // Optional "v" prefix
         .'(?P<major>0|[1-9]\d*)'                                         // Major version (required)
-        .'(?:\.(?P<minor>0|[1-9]\d*)'                                    // Minor version (optional)
-        .'(?:\.(?P<patch>0|[1-9]\d*))?)?'                                // Patch version (optional)
-        .'(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)'   // Pre-release version
-        .'(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?'            // Pre-release segments
-        .'(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?'   // Build metadata
+        .'(?:'
+        .'\.(?P<minor>0|[1-9]\d*)'                                       // Minor version
+        .'(?:'
+        .'\.(?P<patch>0|[1-9]\d*)'                                       // Patch version
+        .'(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)'  // Pre-release (only with full version)
+        .'(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?'           // Pre-release segments
+        .'(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?'  // Build metadata (only with full version)
+        .')?'
+        .')?'
         .'$/';
 
     public function validate(mixed $value, Constraint $constraint): void

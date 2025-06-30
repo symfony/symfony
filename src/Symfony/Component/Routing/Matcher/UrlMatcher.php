@@ -158,7 +158,30 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
             $hostMatches = [];
             if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
-                continue;
+                // Check if route has defaults for all host variables before skipping
+                $hostVariables = $compiledRoute->getHostVariables();
+                if ($hostVariables) {
+                    $routeDefaults = $route->getDefaults();
+                    $hasAllDefaults = true;
+                    
+                    foreach ($hostVariables as $variable) {
+                        if (!isset($routeDefaults[$variable])) {
+                            $hasAllDefaults = false;
+                            break;
+                        }
+                    }
+                    
+                    if ($hasAllDefaults) {
+                        // Use defaults for host variables
+                        foreach ($hostVariables as $variable) {
+                            $hostMatches[$variable] = $routeDefaults[$variable];
+                        }
+                    } else {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
             }
 
             $attributes = $this->getAttributes($route, $name, array_replace($matches, $hostMatches));

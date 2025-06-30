@@ -89,12 +89,45 @@ trait CompiledUrlMatcherTrait
 
         foreach ($this->staticRoutes[$trimmedPathinfo] ?? [] as [$ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition]) {
             if ($requiredHost) {
-                if ('{' !== $requiredHost[0] ? $requiredHost !== $host : !preg_match($requiredHost, $host, $hostMatches)) {
-                    continue;
-                }
-                if ('{' === $requiredHost[0] && $hostMatches) {
-                    $hostMatches['_route'] = $ret['_route'];
-                    $ret = $this->mergeDefaults($hostMatches, $ret);
+                $hostMatches = [];
+                
+                // Check if host requirement is an array [regex, hostVars] or a string
+                if (\is_array($requiredHost)) {
+                    [$hostRegex, $hostVars] = $requiredHost;
+                    
+                    if (!preg_match($hostRegex, $host, $hostMatches)) {
+                        // Check if all host variables have defaults
+                        $hasAllDefaults = true;
+                        foreach ($hostVars as $var) {
+                            if (!array_key_exists($var, $ret)) {
+                                $hasAllDefaults = false;
+                                break;
+                            }
+                        }
+                        
+                        if (!$hasAllDefaults) {
+                            continue;
+                        }
+                        
+                        // Use defaults for host variables
+                        foreach ($hostVars as $var) {
+                            $hostMatches[$var] = $ret[$var];
+                        }
+                    }
+                    
+                    if ($hostMatches) {
+                        $hostMatches['_route'] = $ret['_route'];
+                        $ret = $this->mergeDefaults($hostMatches, $ret);
+                    }
+                } else {
+                    // Simple string host match (backwards compatibility)
+                    if ('{' !== $requiredHost[0] ? $requiredHost !== $host : !preg_match($requiredHost, $host, $hostMatches)) {
+                        continue;
+                    }
+                    if ('{' === $requiredHost[0] && $hostMatches) {
+                        $hostMatches['_route'] = $ret['_route'];
+                        $ret = $this->mergeDefaults($hostMatches, $ret);
+                    }
                 }
             }
 

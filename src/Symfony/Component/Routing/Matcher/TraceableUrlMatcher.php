@@ -117,8 +117,33 @@ class TraceableUrlMatcher extends UrlMatcher
 
             $hostMatches = [];
             if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
-                $this->addTrace(\sprintf('Host "%s" does not match the requirement ("%s")', $this->context->getHost(), $route->getHost()), self::ROUTE_ALMOST_MATCHES, $name, $route);
-                continue;
+                // Check if route has defaults for all host variables before skipping
+                $hostVariables = $compiledRoute->getHostVariables();
+                if ($hostVariables) {
+                    $routeDefaults = $route->getDefaults();
+                    $hasAllDefaults = true;
+                    
+                    foreach ($hostVariables as $variable) {
+                        if (!\array_key_exists($variable, $routeDefaults)) {
+                            $hasAllDefaults = false;
+                            break;
+                        }
+                    }
+                    
+                    if ($hasAllDefaults) {
+                        // Use defaults for host variables
+                        foreach ($hostVariables as $variable) {
+                            $hostMatches[$variable] = $routeDefaults[$variable];
+                        }
+                        $this->addTrace('Host does not match, but using default values', self::ROUTE_ALMOST_MATCHES, $name, $route);
+                    } else {
+                        $this->addTrace(sprintf('Host "%s" does not match the requirement ("%s")', $this->context->getHost(), $route->getHost()), self::ROUTE_ALMOST_MATCHES, $name, $route);
+                        continue;
+                    }
+                } else {
+                    $this->addTrace(sprintf('Host "%s" does not match the requirement ("%s")', $this->context->getHost(), $route->getHost()), self::ROUTE_ALMOST_MATCHES, $name, $route);
+                    continue;
+                }
             }
 
             $attributes = $this->getAttributes($route, $name, array_replace($matches, $hostMatches));

@@ -999,8 +999,8 @@ class UrlMatcherTest extends TestCase
         $matcher = $this->getUrlMatcher($collection, $context);
         
         $result = $matcher->match('/test');
-        $this->assertEquals('with_defaults', $result['_route']);
-        $this->assertEquals('en', $result['subdomain']);
+        $this->assertSame('with_defaults', $result['_route']);
+        $this->assertSame('en', $result['subdomain']);
         
         // Test 2: Same host should NOT match route without defaults
         $this->expectException(ResourceNotFoundException::class);

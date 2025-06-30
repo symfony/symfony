@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\SemVer;
 use Symfony\Component\Validator\Constraints\SemVerValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -36,7 +37,7 @@ class SemVerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getValidSemVersions')]
+    #[DataProvider('getValidSemVersions')]
     public function testValidSemVersions(string $version)
     {
         $this->validator->validate($version, new SemVer());
@@ -44,7 +45,7 @@ class SemVerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getValidSemVersionsWithPrefix')]
+    #[DataProvider('getValidSemVersionsWithPrefix')]
     public function testValidSemVersionsWithPrefix(string $version)
     {
         $this->validator->validate($version, new SemVer(requirePrefix: true));
@@ -52,7 +53,7 @@ class SemVerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidSemVersions')]
+    #[DataProvider('getInvalidSemVersions')]
     public function testInvalidSemVersions(string $version)
     {
         $constraint = new SemVer(message: 'myMessage');
@@ -65,7 +66,7 @@ class SemVerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidSemVersionsWithoutPrefix')]
+    #[DataProvider('getInvalidSemVersionsWithoutPrefix')]
     public function testRequirePrefixRejectsVersionsWithoutPrefix(string $version)
     {
         $constraint = new SemVer(requirePrefix: true, message: 'myMessage');
@@ -78,7 +79,7 @@ class SemVerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getSemVersionsWithPreRelease')]
+    #[DataProvider('getSemVersionsWithPreRelease')]
     public function testDisallowPreReleaseRejectsPreReleaseVersions(string $version)
     {
         $constraint = new SemVer(allowPreRelease: false, message: 'myMessage');
@@ -91,7 +92,7 @@ class SemVerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getSemVersionsWithBuildMetadata')]
+    #[DataProvider('getSemVersionsWithBuildMetadata')]
     public function testDisallowBuildMetadataRejectsBuildMetadataVersions(string $version)
     {
         $constraint = new SemVer(allowBuildMetadata: false, message: 'myMessage');

@@ -11,20 +11,23 @@
 
 namespace Symfony\Component\Translation\Tests\DataCollector;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
 use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\Translator;
 
 class TranslationDataCollectorTest extends TestCase
 {
     public function testCollectEmptyMessages()
     {
-        $translator = $this->getTranslator();
-        $translator->expects($this->any())->method('getCollectedMessages')->willReturn([]);
+        /** @var Translator&MockObject $translator */
+        $translator = $this->createMock(Translator::class);
+        $dataCollectorTranslator = new DataCollectorTranslator($translator);
 
-        $dataCollector = new TranslationDataCollector($translator);
+        $dataCollector = new TranslationDataCollector($dataCollectorTranslator);
         $dataCollector->lateCollect();
 
         $this->assertEquals(0, $dataCollector->getCountMissings());
@@ -119,10 +122,15 @@ class TranslationDataCollectorTest extends TestCase
             ],
         ];
 
-        $translator = $this->getTranslator();
-        $translator->expects($this->any())->method('getCollectedMessages')->willReturn($collectedMessages);
+        /** @var Translator&MockObject $translator */
+        $translator = $this->createMock(Translator::class);
+        $dataCollectorTranslator = new DataCollectorTranslator($translator);
 
-        $dataCollector = new TranslationDataCollector($translator);
+        $reflection = new \ReflectionClass($dataCollectorTranslator);
+        $property = $reflection->getProperty('messages');
+        $property->setValue($dataCollectorTranslator, $collectedMessages);
+
+        $dataCollector = new TranslationDataCollector($dataCollectorTranslator);
         $dataCollector->lateCollect();
 
         $this->assertEquals(1, $dataCollector->getCountMissings());
@@ -134,12 +142,15 @@ class TranslationDataCollectorTest extends TestCase
 
     public function testCollectAndReset()
     {
-        $translator = $this->getTranslator();
+        /** @var Translator&MockObject $translator */
+        $translator = $this->createMock(Translator::class);
         $translator->method('getLocale')->willReturn('fr');
         $translator->method('getFallbackLocales')->willReturn(['en']);
         $translator->method('getGlobalParameters')->willReturn(['welcome' => 'Welcome {name}!']);
 
-        $dataCollector = new TranslationDataCollector($translator);
+        $dataCollectorTranslator = new DataCollectorTranslator($translator);
+
+        $dataCollector = new TranslationDataCollector($dataCollectorTranslator);
         $dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
 
         $this->assertSame('fr', $dataCollector->getLocale());
@@ -151,16 +162,5 @@ class TranslationDataCollectorTest extends TestCase
         $this->assertNull($dataCollector->getLocale());
         $this->assertSame([], $dataCollector->getFallbackLocales());
         $this->assertSame([], $dataCollector->getGlobalParameters());
-    }
-
-    private function getTranslator()
-    {
-        $translator = $this
-            ->getMockBuilder(DataCollectorTranslator::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
-        return $translator;
     }
 }

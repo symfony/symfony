@@ -131,10 +131,6 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Name
             return MemcachedAdapter::createConnection($dsn, $options);
         }
         if (str_starts_with($dsn, 'couchbase:')) {
-            if (class_exists(\CouchbaseBucket::class) && CouchbaseBucketAdapter::isSupported()) {
-                return CouchbaseBucketAdapter::createConnection($dsn, $options);
-            }
-
             return CouchbaseCollectionAdapter::createConnection($dsn, $options);
         }
         if (preg_match('/^(mysql|oci|pgsql|sqlsrv|sqlite):/', $dsn)) {

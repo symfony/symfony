@@ -46,7 +46,7 @@ class SemVerValidator extends ConstraintValidator
         .'\.(?P<minor>0|[1-9]\d*)'                                       // Minor version
         .'(?:'
         .'\.(?P<patch>0|[1-9]\d*)'                                       // Patch version
-        .'(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)'  // Pre-release (only with full version)
+        .'(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)'   // Pre-release (only with full version)
         .'(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?'           // Pre-release segments
         .'(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?'  // Build metadata (only with full version)
         .')?'

@@ -31,17 +31,15 @@ class SemVer extends Constraint
     public bool $strict = true;
 
     /**
-     * @param array<string, mixed>|null $options
      * @param string[]|null $groups
      */
     public function __construct(
-        ?array $options = null,
         ?string $message = null,
         ?bool $strict = null,
         ?array $groups = null,
         mixed $payload = null,
     ) {
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->strict = $strict ?? $this->strict;

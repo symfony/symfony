@@ -69,7 +69,6 @@ class SemVerValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        // Use strict pattern (official SemVer spec) or loose pattern (common variations)
         $pattern = $constraint->strict ? self::STRICT_SEMVER_PATTERN : self::LOOSE_SEMVER_PATTERN;
         
         if (!preg_match($pattern, $value)) {

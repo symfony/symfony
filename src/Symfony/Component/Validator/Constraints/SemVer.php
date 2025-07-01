@@ -28,7 +28,7 @@ class SemVer extends Constraint
     ];
 
     public string $message = 'This value is not a valid semantic version.';
-    public bool $strict = false;
+    public bool $strict = true;
 
     /**
      * @param array<string, mixed>|null $options

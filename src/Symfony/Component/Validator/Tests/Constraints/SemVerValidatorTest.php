@@ -41,7 +41,7 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidLooseSemVersions(string $version)
     {
-        $this->validator->validate($version, new SemVer());
+        $this->validator->validate($version, new SemVer(strict: false));
 
         $this->assertNoViolation();
     }
@@ -51,7 +51,7 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidStrictSemVersions(string $version)
     {
-        $this->validator->validate($version, new SemVer(strict: true));
+        $this->validator->validate($version, new SemVer());
 
         $this->assertNoViolation();
     }
@@ -76,7 +76,7 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidStrictSemVersions(string $version)
     {
-        $constraint = new SemVer(strict: true, message: 'myMessage');
+        $constraint = new SemVer(message: 'myMessage');
 
         $this->validator->validate($version, $constraint);
 

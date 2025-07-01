@@ -28,9 +28,6 @@ class ResizeFormListener implements EventSubscriberInterface
     protected array $prototypeOptions;
 
     private \Closure|bool $deleteEmpty;
-    // BC, to be removed in 8.0
-    private bool $overridden = true;
-    private bool $usePreSetData = false;
 
     public function __construct(
         private string $type,
@@ -48,7 +45,6 @@ class ResizeFormListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::PRE_SET_DATA => 'preSetData', // deprecated
             FormEvents::POST_SET_DATA => ['postSetData', 255], // as early as possible
             FormEvents::PRE_SUBMIT => 'preSubmit',
             // (MergeCollectionListener, MergeDoctrineCollectionListener)
@@ -56,47 +52,8 @@ class ResizeFormListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @deprecated Since Symfony 7.2, use {@see postSetData()} instead.
-     */
-    public function preSetData(FormEvent $event): void
+    final public function postSetData(PostSetDataEvent $event): void
     {
-        if (__CLASS__ === static::class
-            || __CLASS__ === (new \ReflectionClass($this))->getMethod('preSetData')->getDeclaringClass()->name
-        ) {
-            // not a child class, or child class does not overload PRE_SET_DATA
-            return;
-        }
-
-        trigger_deprecation('symfony/form', '7.2', 'Calling "%s()" is deprecated, use "%s::postSetData()" instead.', __METHOD__, __CLASS__);
-        // parent::preSetData() has been called
-        $this->overridden = false;
-        try {
-            $this->postSetData($event);
-        } finally {
-            $this->usePreSetData = true;
-        }
-    }
-
-    /**
-     * Remove FormEvent type hint in 8.0.
-     */
-    final public function postSetData(FormEvent|PostSetDataEvent $event): void
-    {
-        if (__CLASS__ !== static::class) {
-            if ($this->overridden) {
-                trigger_deprecation('symfony/form', '7.2', 'Calling "%s::preSetData()" is deprecated, use "%s::postSetData()" instead.', static::class, __CLASS__);
-                // parent::preSetData() has not been called, noop
-
-                return;
-            }
-
-            if ($this->usePreSetData) {
-                // nothing else to do
-                return;
-            }
-        }
-
         $form = $event->getForm();
         $data = $event->getData() ?? [];
 

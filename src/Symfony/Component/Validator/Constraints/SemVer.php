@@ -28,9 +28,7 @@ class SemVer extends Constraint
     ];
 
     public string $message = 'This value is not a valid semantic version.';
-    public bool $requirePrefix = false;
-    public bool $allowPreRelease = true;
-    public bool $allowBuildMetadata = true;
+    public bool $strict = false;
 
     /**
      * @param array<string, mixed>|null $options
@@ -39,17 +37,13 @@ class SemVer extends Constraint
     public function __construct(
         ?array $options = null,
         ?string $message = null,
-        ?bool $requirePrefix = null,
-        ?bool $allowPreRelease = null,
-        ?bool $allowBuildMetadata = null,
+        ?bool $strict = null,
         ?array $groups = null,
         mixed $payload = null,
     ) {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
-        $this->requirePrefix = $requirePrefix ?? $this->requirePrefix;
-        $this->allowPreRelease = $allowPreRelease ?? $this->allowPreRelease;
-        $this->allowBuildMetadata = $allowBuildMetadata ?? $this->allowBuildMetadata;
+        $this->strict = $strict ?? $this->strict;
     }
 }

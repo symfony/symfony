@@ -37,9 +37,9 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getValidSemVersions
+     * @dataProvider getValidLooseSemVersions
      */
-    public function testValidSemVersions(string $version)
+    public function testValidLooseSemVersions(string $version)
     {
         $this->validator->validate($version, new SemVer());
 
@@ -47,11 +47,11 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getValidSemVersionsWithPrefix
+     * @dataProvider getValidStrictSemVersions
      */
-    public function testValidSemVersionsWithPrefix(string $version)
+    public function testValidStrictSemVersions(string $version)
     {
-        $this->validator->validate($version, new SemVer(requirePrefix: true));
+        $this->validator->validate($version, new SemVer(strict: true));
 
         $this->assertNoViolation();
     }
@@ -72,11 +72,11 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getInvalidSemVersionsWithoutPrefix
+     * @dataProvider getInvalidStrictSemVersions
      */
-    public function testRequirePrefixRejectsVersionsWithoutPrefix(string $version)
+    public function testInvalidStrictSemVersions(string $version)
     {
-        $constraint = new SemVer(requirePrefix: true, message: 'myMessage');
+        $constraint = new SemVer(strict: true, message: 'myMessage');
 
         $this->validator->validate($version, $constraint);
 
@@ -86,37 +86,7 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getSemVersionsWithPreRelease
-     */
-    public function testDisallowPreReleaseRejectsPreReleaseVersions(string $version)
-    {
-        $constraint = new SemVer(allowPreRelease: false, message: 'myMessage');
-
-        $this->validator->validate($version, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$version.'"')
-            ->setCode(SemVer::INVALID_SEMVER_ERROR)
-            ->assertRaised();
-    }
-
-    /**
-     * @dataProvider getSemVersionsWithBuildMetadata
-     */
-    public function testDisallowBuildMetadataRejectsBuildMetadataVersions(string $version)
-    {
-        $constraint = new SemVer(allowBuildMetadata: false, message: 'myMessage');
-
-        $this->validator->validate($version, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$version.'"')
-            ->setCode(SemVer::INVALID_SEMVER_ERROR)
-            ->assertRaised();
-    }
-
-    public static function getValidSemVersions(): iterable
+    public static function getValidLooseSemVersions(): iterable
     {
         // Full versions
         yield ['0.0.0'];
@@ -150,16 +120,28 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
         yield ['v1.2.3-rc.1+build.123'];
     }
 
-    public static function getValidSemVersionsWithPrefix(): iterable
+    public static function getValidStrictSemVersions(): iterable
     {
-        yield ['v1.0.0'];
-        yield ['v1.2.3'];
-        yield ['v1'];
-        yield ['v1.2'];
-        yield ['v1.0.0-alpha'];
-        yield ['v1.0.0-alpha.1'];
-        yield ['v1.0.0+20130313144700'];
-        yield ['v1.0.0-beta+exp.sha.5114f85'];
+        // Only valid according to official SemVer spec (no v prefix)
+        yield ['0.0.0'];
+        yield ['1.0.0'];
+        yield ['1.2.3'];
+        yield ['10.20.30'];
+        
+        // With pre-release
+        yield ['1.0.0-alpha'];
+        yield ['1.0.0-alpha.1'];
+        yield ['1.0.0-0.3.7'];
+        yield ['1.0.0-x.7.z.92'];
+        
+        // With build metadata
+        yield ['1.0.0+20130313144700'];
+        yield ['1.0.0+21AF26D3----117B344092BD'];
+        
+        // With both
+        yield ['1.0.0-alpha+001'];
+        yield ['1.0.0-beta+exp.sha.5114f85'];
+        yield ['1.2.3-alpha.1.2+build.123'];
     }
 
     public static function getInvalidSemVersions(): iterable
@@ -187,35 +169,19 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
         yield ['1.0.0-'];
     }
 
-    public static function getInvalidSemVersionsWithoutPrefix(): iterable
+    public static function getInvalidStrictSemVersions(): iterable
     {
-        yield ['1.0.0'];
-        yield ['1.2.3'];
+        // Versions with v prefix (not allowed in strict mode)
+        yield ['v1.0.0'];
+        yield ['v1.2.3'];
+        yield ['v1.0.0-alpha'];
+        yield ['v1.0.0+20130313144700'];
+        
+        // Partial versions (not allowed in strict mode)
         yield ['1'];
         yield ['1.2'];
-        yield ['1.0.0-alpha'];
-        yield ['1.0.0+20130313144700'];
+        yield ['v1'];
+        yield ['v1.2'];
     }
 
-    public static function getSemVersionsWithPreRelease(): iterable
-    {
-        yield ['1.0.0-alpha'];
-        yield ['1.0.0-alpha.1'];
-        yield ['1.0.0-0.3.7'];
-        yield ['1.0.0-x.7.z.92'];
-        yield ['1.0.0-alpha+001'];
-        yield ['1.0.0-beta+exp.sha.5114f85'];
-        yield ['v1.0.0-rc.1'];
-        yield ['v1.2.3-alpha.1.2+build.123'];
-    }
-
-    public static function getSemVersionsWithBuildMetadata(): iterable
-    {
-        yield ['1.0.0+20130313144700'];
-        yield ['1.0.0-alpha+001'];
-        yield ['1.0.0-beta+exp.sha.5114f85'];
-        yield ['1.0.0+21AF26D3----117B344092BD'];
-        yield ['v1.2.3-alpha.1.2+build.123'];
-        yield ['v1.2.3+build.123'];
-    }
 }

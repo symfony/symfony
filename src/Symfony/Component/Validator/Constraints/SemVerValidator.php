@@ -22,12 +22,11 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class SemVerValidator extends ConstraintValidator
 {
     /**
-     * Semantic Versioning 2.0.0 regex pattern.
+     * Strict Semantic Versioning 2.0.0 regex pattern.
+     * According to https://semver.org, no "v" prefix allowed
      * Supports: 1.0.0, 1.2.3, 1.2.3-alpha, 1.2.3-alpha.1, 1.2.3+20130313144700, 1.2.3-beta+exp.sha.5114f85
-     * With optional "v" prefix: v1.0.0, v1.2.3-alpha
      */
-    private const SEMVER_PATTERN = '/^'
-        .'(?P<prefix>v)?'                                                // Optional "v" prefix
+    private const STRICT_SEMVER_PATTERN = '/^'
         .'(?P<major>0|[1-9]\d*)'                                         // Major version
         .'\.(?P<minor>0|[1-9]\d*)'                                       // Minor version
         .'\.(?P<patch>0|[1-9]\d*)'                                       // Patch version
@@ -70,38 +69,10 @@ class SemVerValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        // Use loose pattern by default to allow partial versions
-        if (!preg_match(self::LOOSE_SEMVER_PATTERN, $value, $matches)) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(SemVer::INVALID_SEMVER_ERROR)
-                ->addViolation();
-
-            return;
-        }
-
-        // Check prefix requirement
-        if ($constraint->requirePrefix && empty($matches['prefix'])) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(SemVer::INVALID_SEMVER_ERROR)
-                ->addViolation();
-
-            return;
-        }
-
-        // Check pre-release
-        if (!$constraint->allowPreRelease && !empty($matches['prerelease'])) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(SemVer::INVALID_SEMVER_ERROR)
-                ->addViolation();
-
-            return;
-        }
-
-        // Check build metadata
-        if (!$constraint->allowBuildMetadata && !empty($matches['buildmetadata'])) {
+        // Use strict pattern (official SemVer spec) or loose pattern (common variations)
+        $pattern = $constraint->strict ? self::STRICT_SEMVER_PATTERN : self::LOOSE_SEMVER_PATTERN;
+        
+        if (!preg_match($pattern, $value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(SemVer::INVALID_SEMVER_ERROR)

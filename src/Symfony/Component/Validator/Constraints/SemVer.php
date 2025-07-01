@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -27,21 +28,22 @@ class SemVer extends Constraint
         self::INVALID_SEMVER_ERROR => 'INVALID_SEMVER_ERROR',
     ];
 
-    public string $message = 'This value is not a valid semantic version.';
-    public bool $strict = true;
+    public string $message;
+    public bool $strict;
 
     /**
      * @param string[]|null $groups
      */
+    #[HasNamedArguments]
     public function __construct(
-        ?string $message = null,
-        ?bool $strict = null,
+        string $message = 'This value is not a valid semantic version.',
+        bool $strict = true,
         ?array $groups = null,
         mixed $payload = null,
     ) {
         parent::__construct(null, $groups, $payload);
 
-        $this->message = $message ?? $this->message;
-        $this->strict = $strict ?? $this->strict;
+        $this->message = $message;
+        $this->strict = $strict;
     }
 }

@@ -36,7 +36,7 @@ class SemVerValidator extends ConstraintValidator
             -
             (?P<prerelease>
                 (?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)                  # Pre-release identifier
-                (?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*          # Additional dot-separated identifiers
+                (?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*           # Additional dot-separated identifiers
             )
         )?
         (?:
@@ -62,7 +62,7 @@ class SemVerValidator extends ConstraintValidator
                     -
                     (?P<prerelease>
                         (?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)          # Pre-release identifier
-                        (?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*  # Additional identifiers
+                        (?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*   # Additional identifiers
                     )
                 )?
                 (?:

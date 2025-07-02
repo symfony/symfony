@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-01T15:55:56Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mttsch at 2025-07-01T18:08:28Z
+
+@OskarStark Fixed. Using the same text as for 7.1 which is the same text as on the release pages except for replacing we with they.

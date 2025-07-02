@@ -86,6 +86,50 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testCustomInvalidMessage()
+    {
+        $constraint = new SemVer(message: 'Custom invalid version message');
+
+        $this->validator->validate('invalid-version', $constraint);
+
+        $this->buildViolation('Custom invalid version message')
+            ->setParameter('{{ value }}', '"invalid-version"')
+            ->setCode(SemVer::INVALID_SEMVER_ERROR)
+            ->assertRaised();
+    }
+
+    public function testCustomMinMessage()
+    {
+        $constraint = new SemVer(
+            minMessage: 'Custom minimum version message',
+            min: '2.0.0'
+        );
+
+        $this->validator->validate('1.0.0', $constraint);
+
+        $this->buildViolation('Custom minimum version message')
+            ->setParameter('{{ value }}', '"1.0.0"')
+            ->setParameter('{{ min }}', '2.0.0')
+            ->setCode(SemVer::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    public function testCustomMaxMessage()
+    {
+        $constraint = new SemVer(
+            maxMessage: 'Custom maximum version message',
+            max: '1.0.0'
+        );
+
+        $this->validator->validate('2.0.0', $constraint);
+
+        $this->buildViolation('Custom maximum version message')
+            ->setParameter('{{ value }}', '"2.0.0"')
+            ->setParameter('{{ max }}', '1.0.0')
+            ->setCode(SemVer::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidLooseSemVersions(): iterable
     {
         // Full versions

@@ -316,5 +316,4 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
         $constraint = new SemVer(strict: true, min: 'v1.0.0');
         $this->validator->validate('2.0.0', $constraint);
     }
-
 }

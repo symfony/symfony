@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-06-30T07:02:41Z
+
+> The testPreSetDataResizesForm() test also needs to be removed (I wonder why the tests don't fail)
+
+Done
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-06-30T07:17:43Z
+
+The "Verify Packages" failure also looks related. :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-06-30T07:44:10Z
+
+> The "Verify Packages" failure also looks related. :)
+
+Indeed, done, thanks
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-01T09:12:17Z
+
+Rebased

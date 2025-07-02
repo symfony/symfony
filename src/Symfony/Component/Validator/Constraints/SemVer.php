@@ -35,8 +35,8 @@ class SemVer extends Constraint
     ];
 
     public string $message;
-    public string $tooLowMessage;
-    public string $tooHighMessage;
+    public string $minMessage;
+    public string $maxMessage;
     public bool $strict;
     public ?string $min;
     public ?string $max;
@@ -47,8 +47,8 @@ class SemVer extends Constraint
     #[HasNamedArguments]
     public function __construct(
         string $message = 'This value is not a valid semantic version.',
-        string $tooLowMessage = 'This value should be {{ min }} or more.',
-        string $tooHighMessage = 'This value should be {{ max }} or less.',
+        string $minMessage = 'This value should be {{ min }} or more.',
+        string $maxMessage = 'This value should be {{ max }} or less.',
         bool $strict = true,
         ?string $min = null,
         ?string $max = null,
@@ -58,8 +58,8 @@ class SemVer extends Constraint
         parent::__construct(null, $groups, $payload);
 
         $this->message = $message;
-        $this->tooLowMessage = $tooLowMessage;
-        $this->tooHighMessage = $tooHighMessage;
+        $this->minMessage = $minMessage;
+        $this->maxMessage = $maxMessage;
         $this->strict = $strict;
         $this->min = $min;
         $this->max = $max;

@@ -187,7 +187,7 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidVersionsWithMinMax
      */
-    public function testValidVersionsWithMinMax(string $version, ?string $min, ?string $max, bool $strict = true)
+    public function testValidVersionsWithMinMax(string $version, ?string $min, ?string $max, bool $strict)
     {
         $constraint = new SemVer(strict: $strict, min: $min, max: $max);
 
@@ -199,25 +199,25 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
     public static function getValidVersionsWithMinMax(): iterable
     {
         // Test min only
-        yield ['2.0.0', '1.0.0', null];
-        yield ['2.0.0', '2.0.0', null];
-        yield ['2.0.1', '2.0.0', null];
+        yield ['2.0.0', '1.0.0', null, true];
+        yield ['2.0.0', '2.0.0', null, true];
+        yield ['2.0.1', '2.0.0', null, true];
         
         // Test max only
-        yield ['1.0.0', null, '2.0.0'];
-        yield ['2.0.0', null, '2.0.0'];
-        yield ['1.9.9', null, '2.0.0'];
+        yield ['1.0.0', null, '2.0.0', true];
+        yield ['2.0.0', null, '2.0.0', true];
+        yield ['1.9.9', null, '2.0.0', true];
         
         // Test both min and max
-        yield ['1.5.0', '1.0.0', '2.0.0'];
-        yield ['1.0.0', '1.0.0', '2.0.0'];
-        yield ['2.0.0', '1.0.0', '2.0.0'];
+        yield ['1.5.0', '1.0.0', '2.0.0', true];
+        yield ['1.0.0', '1.0.0', '2.0.0', true];
+        yield ['2.0.0', '1.0.0', '2.0.0', true];
         
         // Test with pre-release versions
-        yield ['1.0.0-alpha', '1.0.0-alpha', null];
-        yield ['1.0.0', '1.0.0-alpha', null];
-        yield ['1.0.0-beta', '1.0.0-alpha', null];
-        yield ['1.0.0-alpha.2', '1.0.0-alpha.1', null];
+        yield ['1.0.0-alpha', '1.0.0-alpha', null, true];
+        yield ['1.0.0', '1.0.0-alpha', null, true];
+        yield ['1.0.0-beta', '1.0.0-alpha', null, true];
+        yield ['1.0.0-alpha.2', '1.0.0-alpha.1', null, true];
         
         // Test with loose versions
         yield ['v2.0', 'v1.0', null, false];
@@ -228,10 +228,10 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getTooLowVersions
      */
-    public function testTooLowVersions(string $version, string $min, bool $strict = true)
+    public function testTooLowVersions(string $version, string $min, bool $strict)
     {
         $constraint = new SemVer(
-            tooLowMessage: 'myMessage',
+            minMessage: 'myMessage',
             strict: $strict,
             min: $min
         );
@@ -247,10 +247,10 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
 
     public static function getTooLowVersions(): iterable
     {
-        yield ['0.9.9', '1.0.0'];
-        yield ['1.0.0', '1.0.1'];
-        yield ['1.0.0-alpha', '1.0.0'];
-        yield ['1.0.0-alpha.1', '1.0.0-alpha.2'];
+        yield ['0.9.9', '1.0.0', true];
+        yield ['1.0.0', '1.0.1', true];
+        yield ['1.0.0-alpha', '1.0.0', true];
+        yield ['1.0.0-alpha.1', '1.0.0-alpha.2', true];
         
         // Test with loose versions
         yield ['v0.9', 'v1.0', false];
@@ -260,10 +260,10 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getTooHighVersions
      */
-    public function testTooHighVersions(string $version, string $max, bool $strict = true)
+    public function testTooHighVersions(string $version, string $max, bool $strict)
     {
         $constraint = new SemVer(
-            tooHighMessage: 'myMessage',
+            maxMessage: 'myMessage',
             strict: $strict,
             max: $max
         );
@@ -279,10 +279,10 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
 
     public static function getTooHighVersions(): iterable
     {
-        yield ['2.0.1', '2.0.0'];
-        yield ['1.0.1', '1.0.0'];
-        yield ['1.0.0', '1.0.0-alpha'];
-        yield ['1.0.0-alpha.2', '1.0.0-alpha.1'];
+        yield ['2.0.1', '2.0.0', true];
+        yield ['1.0.1', '1.0.0', true];
+        yield ['1.0.0', '1.0.0-alpha', true];
+        yield ['1.0.0-alpha.2', '1.0.0-alpha.1', true];
         
         // Test with loose versions
         yield ['v2.1', 'v2.0', false];

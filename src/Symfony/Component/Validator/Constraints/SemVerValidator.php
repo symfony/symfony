@@ -112,7 +112,7 @@ class SemVerValidator extends ConstraintValidator
             }
             
             if (version_compare($normalizedValue, $normalizedMin, '<')) {
-                $this->context->buildViolation($constraint->tooLowMessage)
+                $this->context->buildViolation($constraint->minMessage)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setParameter('{{ min }}', $constraint->min)
                     ->setCode(SemVer::TOO_LOW_ERROR)
@@ -129,7 +129,7 @@ class SemVerValidator extends ConstraintValidator
             }
             
             if (version_compare($normalizedValue, $normalizedMax, '>')) {
-                $this->context->buildViolation($constraint->tooHighMessage)
+                $this->context->buildViolation($constraint->maxMessage)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setParameter('{{ max }}', $constraint->max)
                     ->setCode(SemVer::TOO_HIGH_ERROR)

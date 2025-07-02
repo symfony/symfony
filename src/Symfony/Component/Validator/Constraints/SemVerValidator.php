@@ -96,6 +96,71 @@ class SemVerValidator extends ConstraintValidator
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(SemVer::INVALID_SEMVER_ERROR)
                 ->addViolation();
+            
+            return;
         }
+
+        // Normalize the version for comparison (remove 'v' prefix if present)
+        $normalizedValue = $this->normalizeVersion($value);
+
+        // Check min constraint
+        if (null !== $constraint->min) {
+            $normalizedMin = $this->normalizeVersion($constraint->min);
+            
+            if (!preg_match($pattern, $constraint->min)) {
+                throw new \InvalidArgumentException(sprintf('The "min" option value "%s" is not a valid semantic version according to the "strict" option.', $constraint->min));
+            }
+            
+            if (version_compare($normalizedValue, $normalizedMin, '<')) {
+                $this->context->buildViolation($constraint->tooLowMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setParameter('{{ min }}', $constraint->min)
+                    ->setCode(SemVer::TOO_LOW_ERROR)
+                    ->addViolation();
+            }
+        }
+
+        // Check max constraint
+        if (null !== $constraint->max) {
+            $normalizedMax = $this->normalizeVersion($constraint->max);
+            
+            if (!preg_match($pattern, $constraint->max)) {
+                throw new \InvalidArgumentException(sprintf('The "max" option value "%s" is not a valid semantic version according to the "strict" option.', $constraint->max));
+            }
+            
+            if (version_compare($normalizedValue, $normalizedMax, '>')) {
+                $this->context->buildViolation($constraint->tooHighMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setParameter('{{ max }}', $constraint->max)
+                    ->setCode(SemVer::TOO_HIGH_ERROR)
+                    ->addViolation();
+            }
+        }
+    }
+
+    /**
+     * Normalizes a version string for comparison by removing the 'v' prefix and
+     * ensuring it has all three version components (major.minor.patch).
+     */
+    private function normalizeVersion(string $version): string
+    {
+        // Remove 'v' prefix if present
+        $version = ltrim($version, 'v');
+        
+        // Split into parts
+        $parts = explode('.', explode('-', explode('+', $version)[0])[0]);
+        
+        // Ensure we have at least 3 parts for version_compare
+        while (count($parts) < 3) {
+            $parts[] = '0';
+        }
+        
+        // Get pre-release and build metadata if any
+        $suffix = '';
+        if (preg_match('/^[^-+]+(.+)$/', $version, $matches)) {
+            $suffix = $matches[1];
+        }
+        
+        return implode('.', array_slice($parts, 0, 3)) . $suffix;
     }
 }

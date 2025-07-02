@@ -184,4 +184,137 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
         yield ['v1.2'];
     }
 
+    /**
+     * @dataProvider getValidVersionsWithMinMax
+     */
+    public function testValidVersionsWithMinMax(string $version, ?string $min, ?string $max, bool $strict = true)
+    {
+        $constraint = new SemVer(strict: $strict, min: $min, max: $max);
+
+        $this->validator->validate($version, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public static function getValidVersionsWithMinMax(): iterable
+    {
+        // Test min only
+        yield ['2.0.0', '1.0.0', null];
+        yield ['2.0.0', '2.0.0', null];
+        yield ['2.0.1', '2.0.0', null];
+        
+        // Test max only
+        yield ['1.0.0', null, '2.0.0'];
+        yield ['2.0.0', null, '2.0.0'];
+        yield ['1.9.9', null, '2.0.0'];
+        
+        // Test both min and max
+        yield ['1.5.0', '1.0.0', '2.0.0'];
+        yield ['1.0.0', '1.0.0', '2.0.0'];
+        yield ['2.0.0', '1.0.0', '2.0.0'];
+        
+        // Test with pre-release versions
+        yield ['1.0.0-alpha', '1.0.0-alpha', null];
+        yield ['1.0.0', '1.0.0-alpha', null];
+        yield ['1.0.0-beta', '1.0.0-alpha', null];
+        yield ['1.0.0-alpha.2', '1.0.0-alpha.1', null];
+        
+        // Test with loose versions
+        yield ['v2.0', 'v1.0', null, false];
+        yield ['2', '1', null, false];
+        yield ['v1.5', 'v1.0', 'v2.0', false];
+    }
+
+    /**
+     * @dataProvider getTooLowVersions
+     */
+    public function testTooLowVersions(string $version, string $min, bool $strict = true)
+    {
+        $constraint = new SemVer(
+            tooLowMessage: 'myMessage',
+            strict: $strict,
+            min: $min
+        );
+
+        $this->validator->validate($version, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$version.'"')
+            ->setParameter('{{ min }}', $min)
+            ->setCode(SemVer::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getTooLowVersions(): iterable
+    {
+        yield ['0.9.9', '1.0.0'];
+        yield ['1.0.0', '1.0.1'];
+        yield ['1.0.0-alpha', '1.0.0'];
+        yield ['1.0.0-alpha.1', '1.0.0-alpha.2'];
+        
+        // Test with loose versions
+        yield ['v0.9', 'v1.0', false];
+        yield ['1', '2', false];
+    }
+
+    /**
+     * @dataProvider getTooHighVersions
+     */
+    public function testTooHighVersions(string $version, string $max, bool $strict = true)
+    {
+        $constraint = new SemVer(
+            tooHighMessage: 'myMessage',
+            strict: $strict,
+            max: $max
+        );
+
+        $this->validator->validate($version, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$version.'"')
+            ->setParameter('{{ max }}', $max)
+            ->setCode(SemVer::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getTooHighVersions(): iterable
+    {
+        yield ['2.0.1', '2.0.0'];
+        yield ['1.0.1', '1.0.0'];
+        yield ['1.0.0', '1.0.0-alpha'];
+        yield ['1.0.0-alpha.2', '1.0.0-alpha.1'];
+        
+        // Test with loose versions
+        yield ['v2.1', 'v2.0', false];
+        yield ['3', '2', false];
+    }
+
+    public function testInvalidMinOption()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "min" option value "invalid" is not a valid semantic version according to the "strict" option.');
+
+        $constraint = new SemVer(min: 'invalid');
+        $this->validator->validate('1.0.0', $constraint);
+    }
+
+    public function testInvalidMaxOption()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "max" option value "invalid" is not a valid semantic version according to the "strict" option.');
+
+        $constraint = new SemVer(max: 'invalid');
+        $this->validator->validate('1.0.0', $constraint);
+    }
+
+    public function testMinMaxOptionsFollowStrictMode()
+    {
+        // In strict mode, min/max with 'v' prefix should be invalid
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "min" option value "v1.0.0" is not a valid semantic version according to the "strict" option.');
+
+        $constraint = new SemVer(strict: true, min: 'v1.0.0');
+        $this->validator->validate('2.0.0', $constraint);
+    }
+
 }

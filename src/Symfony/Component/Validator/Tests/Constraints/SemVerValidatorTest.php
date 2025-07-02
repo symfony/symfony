@@ -291,29 +291,29 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMinOption()
     {
+        $constraint = new SemVer(min: 'invalid');
+        
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "min" option value "invalid" is not a valid semantic version according to the "strict" option.');
-
-        $constraint = new SemVer(min: 'invalid');
         $this->validator->validate('1.0.0', $constraint);
     }
 
     public function testInvalidMaxOption()
     {
+        $constraint = new SemVer(max: 'invalid');
+        
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "max" option value "invalid" is not a valid semantic version according to the "strict" option.');
-
-        $constraint = new SemVer(max: 'invalid');
         $this->validator->validate('1.0.0', $constraint);
     }
 
     public function testMinMaxOptionsFollowStrictMode()
     {
         // In strict mode, min/max with 'v' prefix should be invalid
+        $constraint = new SemVer(strict: true, min: 'v1.0.0');
+        
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "min" option value "v1.0.0" is not a valid semantic version according to the "strict" option.');
-
-        $constraint = new SemVer(strict: true, min: 'v1.0.0');
         $this->validator->validate('2.0.0', $constraint);
     }
 }

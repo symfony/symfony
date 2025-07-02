@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Validates that a value is a valid semantic version.
  *
+ * @see https://semver.org
+ *
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]

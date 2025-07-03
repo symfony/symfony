@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `target="_blank"` attribute to AJAX request links to open them in a new tab
+
 7.3
 ---
 

@@ -100,10 +100,8 @@ class SemVerValidator extends ConstraintValidator
             return;
         }
 
-        // Normalize the version for comparison (remove 'v' prefix if present)
         $normalizedValue = $this->normalizeVersion($value);
 
-        // Check min constraint
         if (null !== $constraint->min) {
             $normalizedMin = $this->normalizeVersion($constraint->min);
             
@@ -120,7 +118,6 @@ class SemVerValidator extends ConstraintValidator
             }
         }
 
-        // Check max constraint
         if (null !== $constraint->max) {
             $normalizedMax = $this->normalizeVersion($constraint->max);
             
@@ -144,13 +141,10 @@ class SemVerValidator extends ConstraintValidator
      */
     private function normalizeVersion(string $version): string
     {
-        // Remove 'v' prefix if present
         $version = ltrim($version, 'v');
         
-        // Split into parts
         $parts = explode('.', explode('-', explode('+', $version)[0])[0]);
         
-        // Ensure we have at least 3 parts for version_compare
         while (count($parts) < 3) {
             $parts[] = '0';
         }

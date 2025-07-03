@@ -221,7 +221,7 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
         yield ['v1.0.0-alpha'];
         yield ['v1.0.0+20130313144700'];
         
-        // Partial versions (not allowed in strict mode)
+        // Partial versions
         yield ['1'];
         yield ['1.2'];
         yield ['v1'];

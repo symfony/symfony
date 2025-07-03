@@ -278,7 +278,7 @@ class Hydrator
             }
 
             if (\ReflectionProperty::IS_PRIVATE & $flags) {
-                $propertyScopes["\0$class\0$name"] = $propertyScopes[$name] = [$class, $name, null, $access, $property];
+                $propertyScopes[\PHP_VERSION_ID >= 80500 ? $property->getMangledName() : "\0$class\0$name"] = $propertyScopes[$name] = [$class, $name, null, $access, $property];
 
                 continue;
             }
@@ -290,7 +290,7 @@ class Hydrator
             }
 
             if (\ReflectionProperty::IS_PROTECTED & $flags) {
-                $propertyScopes["\0*\0$name"] = $propertyScopes[$name];
+                $propertyScopes[\PHP_VERSION_ID >= 80500 ? $property->getMangledName() : "\0*\0$name"] = $propertyScopes[$name];
             }
         }
 
@@ -310,8 +310,9 @@ class Hydrator
                     $access |= self::PROPERTY_HAS_HOOKS | (isset($h['get']) && !$h['get']->returnsReference() ? self::PROPERTY_NOT_BY_REF : 0);
                 }
 
-                $propertyScopes["\0$class\0$name"] = [$class, $name, null, $access, $property];
-                $propertyScopes[$name] ??= $propertyScopes["\0$class\0$name"];
+                $mangledName = \PHP_VERSION_ID >= 80500 ? $property->getMangledName() : "\0$class\0$name";
+                $propertyScopes[$mangledName] = [$class, $name, null, $access, $property];
+                $propertyScopes[$name] ??= $propertyScopes[$mangledName];
             }
         }
 

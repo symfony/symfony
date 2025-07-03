@@ -67,8 +67,12 @@ final class ProxyHelper
 
         $hooks = '';
         $propertyScopes = Hydrator::$propertyScopes[$class->name] ??= Hydrator::getPropertyScopes($class->name);
-        foreach ($propertyScopes as $key => [$scope, $name, , $access]) {
-            $propertyScopes[$k = "\0$scope\0$name"] ?? $propertyScopes[$k = "\0*\0$name"] ?? $k = $name;
+        foreach ($propertyScopes as $key => [$scope, $name, , $access, $property]) {
+            if (\PHP_VERSION_ID >= 80500) {
+                $k = $property->getMangledName();
+            } else {
+                $propertyScopes[$k = "\0$scope\0$name"] ?? $propertyScopes[$k = "\0*\0$name"] ?? $k = $name;
+            }
             $flags = $access >> 2;
 
             if ($k !== $key || !($access & Hydrator::PROPERTY_HAS_HOOKS) || $flags & \ReflectionProperty::IS_VIRTUAL) {

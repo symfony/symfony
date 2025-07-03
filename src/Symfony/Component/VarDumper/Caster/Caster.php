@@ -194,7 +194,7 @@ class Caster
             $classProperties[match (true) {
                 $p->isPublic() => $p->name,
                 $p->isProtected() => self::PREFIX_PROTECTED.$p->name,
-                default => "\0".$className."\0".$p->name,
+                default => \PHP_VERSION_ID >= 80500 ? $p->getMangledName() : "\0".$className."\0".$p->name,
             }] = \PHP_VERSION_ID >= 80400 && $p->isVirtual() ? new VirtualStub($p) : new UninitializedStub($p);
         }
 

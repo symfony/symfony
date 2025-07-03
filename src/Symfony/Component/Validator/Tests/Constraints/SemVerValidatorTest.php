@@ -215,7 +215,7 @@ final class SemVerValidatorTest extends ConstraintValidatorTestCase
 
     public static function getInvalidStrictSemVersions(): iterable
     {
-        // Versions with v prefix (not allowed in strict mode)
+        // Versions with v prefix
         yield ['v1.0.0'];
         yield ['v1.2.3'];
         yield ['v1.0.0-alpha'];

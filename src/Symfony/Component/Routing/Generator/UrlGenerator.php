@@ -154,8 +154,19 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             }
         }
 
+        $resolvedParameters = [];
+        foreach ($parameters as $key => $value) {
+            if (!$value instanceof RoutableInterface) {
+                $resolvedParameters[$key] = $value;
+
+                continue;
+            }
+
+            $resolvedParameters = array_replace($resolvedParameters, $value->getRouterParameters()->getParameters($name));
+        }
+
         $variables = array_flip($variables);
-        $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
+        $mergedParams = array_replace($defaults, $this->context->getParameters(), $resolvedParameters);
 
         // all params must be given
         if ($diff = array_diff_key($variables, $mergedParams)) {
@@ -271,7 +282,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         // add a query string if needed
-        $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, fn ($a, $b) => $a == $b ? 0 : 1);
+        $extra = array_udiff_assoc(array_diff_key($resolvedParameters, $variables), $defaults, fn ($a, $b) => $a == $b ? 0 : 1);
         $extra = array_merge($extra, $queryParameters);
 
         array_walk_recursive($extra, $caster = static function (&$v) use (&$caster) {

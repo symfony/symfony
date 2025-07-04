@@ -4,6 +4,7 @@ CHANGELOG
 7.4
 ---
 
+ * Allow objects to provide route parameters by implementing `RoutableInterface`
  * Allow query-specific parameters in `UrlGenerator` using `_query`
 
 7.3

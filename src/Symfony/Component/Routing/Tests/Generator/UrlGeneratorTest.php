@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\RoutableInterface;
+use Symfony\Component\Routing\Generator\RouterParameters;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -1109,6 +1111,39 @@ class UrlGeneratorTest extends TestCase
         ]);
     }
 
+    public function testRoutableClass()
+    {
+        $routes = new RouteCollection();
+        $routes->add('test', new Route('/testing/{param}'));
+        $routes->add('test2', new Route('/testing/{param}/{framework}'));
+        $routes->add('test3', new Route('/testing/{param}'));
+        $routes->add('test4', new Route('/testing/{base}/{param}'));
+
+        // Regular
+        $url = $this->getGenerator($routes)->generate('test', [new RoutableObject()]);
+        $this->assertEquals('/app.php/testing/first', $url);
+
+        // Override routable config with parameter
+        $url = $this->getGenerator($routes)->generate('test', [new RoutableObject(), 'param' => 'baz']);
+        $this->assertEquals('/app.php/testing/baz', $url);
+
+        // Override parameter with routable config
+        $url = $this->getGenerator($routes)->generate('test', ['param' => 'baz', new RoutableObject()]);
+        $this->assertEquals('/app.php/testing/first', $url);
+
+        // Routable config for a specific route
+        $url = $this->getGenerator($routes)->generate('test2', [new RoutableObject()]);
+        $this->assertEquals('/app.php/testing/first/symfony', $url);
+
+        // Recursive use of Routable config
+        $url = $this->getGenerator($routes)->generate('test3', [new RoutableObject()]);
+        $this->assertEquals('/app.php/testing/second', $url);
+
+        // Extending the config of a parent object
+        $url = $this->getGenerator($routes)->generate('test4', [new ThirdRoutableObject(new RoutableObject())]);
+        $this->assertEquals('/app.php/testing/third/first', $url);
+    }
+
     /**
      * @group legacy
      */
@@ -1173,4 +1208,43 @@ class NonStringableObject
 class NonStringableObjectWithPublicProperty
 {
     public $foo = 'property';
+}
+
+class RoutableObject implements RoutableInterface
+{
+    private string $param = 'first';
+
+    public function getRouterParameters(): RouterParameters
+    {
+        return (new RouterParameters(['param' => $this->param]))
+            ->add('test2', ['param' => $this->param, 'framework' => 'symfony'])
+            ->add('test3', [new SecondRoutableObject()]);
+    }
+}
+
+class SecondRoutableObject implements RoutableInterface
+{
+    private string $param = 'second';
+
+    public function getRouterParameters(): RouterParameters
+    {
+        return (new RouterParameters(['param' => $this->param]));
+    }
+}
+
+class ThirdRoutableObject implements RoutableInterface
+{
+    private RoutableObject $base;
+
+    private string $param = 'third';
+
+    public function __construct(RoutableObject $base)
+    {
+        $this->base = $base;
+    }
+
+    public function getRouterParameters(): RouterParameters
+    {
+        return (new RouterParameters([...$this->base->getRouterParameters()->getParameters('default'), 'base' => $this->param]));
+    }
 }

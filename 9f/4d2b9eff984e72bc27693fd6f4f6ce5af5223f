@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by mttsch at 2025-06-30T17:54:22Z
+
+Symfony docs do not need update, also see https://github.com/symfony/symfony-docs/issues/20883.
+
+UPGRADE before/after is based on deprecation version from version 7.3.
+
+---------------------------------------------------------------------------
+
+by mttsch at 2025-07-01T03:25:25Z
+
+@OskarStark I used a slightly different formatting to keep in sync with the existing ones in the file, also see https://github.com/symfony/symfony/commit/26bc5b3cf002aa82c131b5e327aff31593b22ac0.

@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-01T00:41:32Z
+
+Hi 👋 I hope you're all doing well!
+
+I think this kind of change is acceptable in a new major version (like now), but if I'm mistaken, I'm happy to update the PR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-07-01T06:51:38Z
+
+The change itself looks reasonable to me, but that's a new feature and we should merge it into the `7.4` branch (to fix the failing tests on the `8.0` branch I opened #61003.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-01T12:36:35Z
+
+Hi 👋 I hope you're all doing well!
+I've updated the PR with your suggestions, please let me know if there's anything else I should change. ❤️
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-01T22:31:20Z
+
+Hey! 👋
+
+The pipeline failure in the `8.2-low-deps` job is due to the fact that the current minor version is `6.4`, while the `ServicesResetterInterface` was  introduced in `7.3`.
+
+I see a few options we could take here:
+
+1. **Bump the minor version requirement** to `^7.3` (this would solve the issue directly, but increases the minimum supported version).
+2. **Use a conditional implementation** like this, checking if the interface exists:
+```php
+if (interface_exists(ServicesResetterInterface::class)) {
+    // version using ServicesResetterInterface
+} else {
+    // fallback using ServicesResetter
+}
+```
+This would keep compatibility with both versions and avoid raising the minimum requirement.
+3. **Close this PR** and revisit the implementation once `^7.3` becomes the minimum supported version.
+
+Let me know which path you'd prefer, or if there's another alternative I haven't considered. Happy to adjust the PR accordingly! 🙏❤️
+
+Edit: some resources
+https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/Messenger/composer.json#L29
+https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/HttpKernel/CHANGELOG.md#73
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-07-02T05:56:31Z
+
+bumping the require for the HttpKernel component makes sense to me
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-02T23:35:54Z
+
+Hi 👋
+The change is now complete.
+I believe the error showing up isn’t relevant to the context of this PR.

@@ -13,6 +13,8 @@ namespace Symfony\Contracts\Translation;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @method string __toString()
  */
 interface TranslatableInterface
 {

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.7
+---
+
+* Add `TranslatableInterface::__toString()`
+
 3.6
 ---
 

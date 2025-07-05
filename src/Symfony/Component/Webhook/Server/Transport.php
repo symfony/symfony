@@ -21,21 +21,35 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class Transport implements TransportInterface
 {
+    private array $configurators = [];
+
     public function __construct(
         private readonly HttpClientInterface $client,
-        private readonly RequestConfiguratorInterface $headers,
-        private readonly RequestConfiguratorInterface $body,
-        private readonly RequestConfiguratorInterface $signer,
+        ...$params
     ) {
+        if (1 === count($params) && $params[0] instanceof \Traversable) {
+            $this->configurators = iterator_to_array($params[0]);
+        } elseif (3 === count($params)) {
+            trigger_deprecation('symfony/webhook', '7.3', 'Individual configurators for webhook transport is deprecated, use an iterable instead.');
+
+            $this->configurators = [
+                $params[0],
+                $params[1],
+                $params[2],
+            ];
+        } else {
+            throw new \InvalidArgumentException(sprintf('Expected a single Traversable argument or three configurators, got %d arguments.', count($params)));
+        }
     }
 
     public function send(Subscriber $subscriber, RemoteEvent $event): void
     {
         $options = new HttpOptions();
+        $secret = $subscriber->getSecret();
 
-        $this->headers->configure($event, $subscriber->getSecret(), $options);
-        $this->body->configure($event, $subscriber->getSecret(), $options);
-        $this->signer->configure($event, $subscriber->getSecret(), $options);
+        foreach ($this->configurators as $configurator) {
+            $configurator->configure($event, $secret, $options);
+        }
 
         $this->client->request('POST', $subscriber->getUrl(), $options->toArray());
     }

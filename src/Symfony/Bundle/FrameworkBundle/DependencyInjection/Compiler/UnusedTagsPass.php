@@ -105,6 +105,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'validator.constraint_validator',
         'validator.group_provider',
         'validator.initializer',
+        'webhook.configurator',
         'workflow',
         'object_mapper.transform_callable',
         'object_mapper.condition_callable',

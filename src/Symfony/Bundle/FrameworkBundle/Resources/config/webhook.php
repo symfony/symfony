@@ -26,17 +26,17 @@ return static function (ContainerConfigurator $container) {
         ->set('webhook.transport', Transport::class)
             ->args([
                 service('http_client'),
-                service('webhook.headers_configurator'),
-                service('webhook.body_configurator.json'),
-                service('webhook.signer'),
+                tagged_iterator('webhook.configurator'),
             ])
 
         ->set('webhook.headers_configurator', HeadersConfigurator::class)
+            ->tag('webhook.configurator')
 
         ->set('webhook.body_configurator.json', JsonBodyConfigurator::class)
             ->args([
                 abstract_arg('payload serializer'),
             ])
+            ->tag('webhook.configurator')
 
         ->set('webhook.payload_serializer.json', NativeJsonPayloadSerializer::class)
 
@@ -46,6 +46,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('webhook.signer', HeaderSignatureConfigurator::class)
+            ->tag('webhook.configurator')
 
         ->set('webhook.messenger.send_handler', SendWebhookHandler::class)
             ->args([

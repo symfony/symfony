@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0
+---
+
+ * Remove `ServiceSubscriberTrait`, use `ServiceMethodsSubscriberTrait` instead
+
 3.6
 ---
 

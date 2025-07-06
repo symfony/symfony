@@ -98,6 +98,11 @@ Console
    $application->addCommand(new CreateUserCommand());
    ```
 
+Contracts
+---------
+
+ * Remove `ServiceSubscriberTrait`, use `ServiceMethodsSubscriberTrait` instead
+
 DependencyInjection
 -------------------
 

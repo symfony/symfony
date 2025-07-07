@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-07T10:42:44Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-07T11:22:14Z
+
+Hmm, seems that the 32bit number is now to low to not be rounded.
+
+```
+1) Symfony\Component\Form\Tests\Extension\Core\DataTransformer\NumberToLocalizedStringTransformerTest::testReverseTransformDoesNotCauseIntegerPrecisionLoss
+Failed asserting that 2147483646.0 is identical to 2147483646.
+```
+
+any idea? @xabbuh shall we just skip this test on 32bit?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-07T12:17:02Z
+
+ready to merge

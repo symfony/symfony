@@ -19,6 +19,11 @@ use Symfony\Component\Validator\Constraint;
  *
  * @see https://semver.org
  *
+ * Available options:
+ * - strict: Whether to validate strict semantic versioning (default: true)
+ * - min: Minimum version constraint (inclusive)
+ * - max: Maximum version constraint (inclusive)
+ *
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]

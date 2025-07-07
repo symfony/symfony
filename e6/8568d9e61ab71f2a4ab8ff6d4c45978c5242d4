@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-06-30T06:31:26Z
+
+For 6.4?
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-06-30T14:37:38Z
+
+Sorry for the unnecessary review request my mistake :pray:
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-01T22:38:10Z
+
+I believe the error reported here is not related to the changes introduced in this PR. It seems to be caused by a flaky test, possibly intermittent. For reference, there's an open issue tracking it [here](https://github.com/symfony/symfony/issues/60417)

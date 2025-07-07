@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by llupa at 2025-07-02T11:47:17Z
+
+Edit:
+
+In the past I attempted at one solution in this PR: https://github.com/symfony/symfony/pull/59693 where I got great feedback.
+
+In the meantime, I tried to make something that:
+
+- No need to regenerate the data set as this can take a very long time
+- Tried to keep the size of generated data set as small as possible
+  - looking at helper methods that even compress the already existing data set
+- This solution while not revolutionary, keeps happy both _aspects_ of the static functions: `listing` and `targeting`
+  - When trying to find a _smart_ approach to use `meta.php` to make the `get*` specific country data this would break the listing methods and vice versa. I am aware that I might have missed a very obvious solution, please let me know!
+- Added a separate test class that includes `XK` and re-tests the entire data set with this code in it. Adapted certain tests to check both for backward compatibility and specifically for `XK`
+
+**Left to do: Update Changelog!**
+I wanted to know if this approach is good to begin with, but a documentation of the new ENV var is to follow.
+_Sidenote:_ Is the env var name enough? Needs to be renamed?
+
+cc: @nicolas-grekas @ro0NL @connorhu my followup after trying very hard not re-writing the bundle readers.
+
+---------------------------------------------------------------------------
+
+by connorhu at 2025-07-03T08:02:01Z
+
+I still think that this direction is over-engineered. We just need a setter method where the developer can specify where their custom files are. That way the developer can set the data in boot time. If the developer wants to make a list that includes Kosovo, or if they want to display historical things (e.g. Czechoslovakia), that's up to them.
+
+---------------------------------------------------------------------------
+
+by llupa at 2025-07-03T09:04:30Z
+
+@connorhu For `formerly used` codes I would open an RFC and a proposal of how to implement it.
+
+They have an ALPHA-4 standard on top and this component does not support the format. Some of the formerly used codes collide with current ones too. For example today's Slovakia and former Sikkim share the same code.

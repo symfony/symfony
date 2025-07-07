@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-06-28T00:55:54Z
+
+CI failure is unrelated
+
+```
+There was 1 failure:
+
+1) Symfony\Bundle\FrameworkBundle\Tests\Functional\CachePoolsTest::testCachePools
+Failed asserting that true is false.
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-28T06:15:59Z
+
+Introducing an new method means this is a new feature, it should target 7.4
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-06-29T08:36:48Z
+
+> Works for me but did you actually experience this leak?
+
+I have a Swoole+Symfony application with memory leak and while investigating the reasons (the memory profiler didn't help with the root cause) I found a possible memory leak in 3rd party library that relies on "kernel.response" event for cleanup (instead of tagging with kernel.reset) and this event is not called in all situations.
+
+This prompted me to look for similar potential issues in Symfony so I created this PR to prevent similar issues in the future

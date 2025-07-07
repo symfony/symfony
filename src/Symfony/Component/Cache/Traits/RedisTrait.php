@@ -48,7 +48,7 @@ trait RedisTrait
         'redis_sentinel' => null,
         'dbindex' => 0,
         'failover' => 'none',
-        'ssl' => null, // see https://php.net/context.ssl
+        'ssl' => null, // see https://www.php.net/context.ssl
     ];
     private \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis;
     private MarshallerInterface $marshaller;

@@ -24,7 +24,7 @@ use MongoDB\Driver\Query;
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
  *
- * @see https://php.net/mongodb
+ * @see https://www.php.net/mongodb
  */
 class MongoDbSessionHandler extends AbstractSessionHandler
 {

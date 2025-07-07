@@ -195,7 +195,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * @param int                                     $filter  FILTER_* constant
      * @param int|array{flags?: int, options?: array} $options Flags from FILTER_* constants
      *
-     * @see https://php.net/filter-var
+     * @see https://www.php.net/filter-var
      */
     public function filter(string $key, mixed $default = null, int $filter = \FILTER_DEFAULT, mixed $options = []): mixed
     {

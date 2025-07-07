@@ -35,7 +35,7 @@ use Doctrine\DBAL\Types\Types;
  * Saving it in a character column could corrupt the data. You can use createTable()
  * to initialize a correctly defined table.
  *
- * @see https://php.net/sessionhandlerinterface
+ * @see https://www.php.net/sessionhandlerinterface
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michael Williams <michael.williams@funsational.com>

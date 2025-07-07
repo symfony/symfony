@@ -149,7 +149,7 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * Non-standard parameters are removed from the URI to improve libmongoc's re-use of connections.
      *
-     * @see https://php.net/mongodb.connection-handling
+     * @see https://www.php.net/mongodb.connection-handling
      */
     private function skimUri(string $uri): string
     {

@@ -56,7 +56,7 @@ interface HttpClientInterface
         'max_duration' => 0,    // float - the maximum execution time (in seconds) for the request+response as a whole;
                                 //   a value lower than or equal to 0 means it is unlimited
         'bindto' => '0',        // string - the interface or the local socket to bind to
-        'verify_peer' => true,  // see https://php.net/context.ssl for the following options
+        'verify_peer' => true,  // see https://www.php.net/context.ssl for the following options
         'verify_host' => true,
         'cafile' => null,
         'capath' => null,

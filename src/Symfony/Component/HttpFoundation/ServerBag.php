@@ -74,7 +74,7 @@ class ServerBag extends ParameterBag
                     /*
                      * XXX: Since there is no PHP_AUTH_BEARER in PHP predefined variables,
                      *      I'll just set $headers['AUTHORIZATION'] here.
-                     *      https://php.net/reserved.variables.server
+                     *      https://www.php.net/reserved.variables.server
                      */
                     $headers['AUTHORIZATION'] = $authorizationHeader;
                 }

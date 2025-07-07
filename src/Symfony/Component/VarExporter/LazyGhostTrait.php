@@ -25,7 +25,7 @@ trait LazyGhostTrait
      * Creates a lazy-loading ghost instance.
      *
      * Skipped properties should be indexed by their array-cast identifier, see
-     * https://php.net/manual/language.types.array#language.types.array.casting
+     * https://www.php.net/manual/language.types.array#language.types.array.casting
      *
      * @param (\Closure(static):void   $initializer       The closure should initialize the object it receives as argument
      * @param array<string, true>|null $skippedProperties An array indexed by the properties to skip, a.k.a. the ones

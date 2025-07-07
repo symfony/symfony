@@ -51,7 +51,7 @@ class Connection
         'read_timeout' => 0.0, //  Float, value in seconds (optional, default is 0 meaning unlimited)
         'retry_interval' => 0, //  Int, value in milliseconds (optional, default is 0)
         'persistent_id' => null, // String, persistent connection id (optional, default is NULL meaning not persistent)
-        'ssl' => null, // see https://php.net/context.ssl
+        'ssl' => null, // see https://www.php.net/context.ssl
     ];
 
     private \Redis|Relay|\RedisCluster|\Closure $redis;

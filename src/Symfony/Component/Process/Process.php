@@ -496,7 +496,7 @@ class Process implements \IteratorAggregate
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param int $signal A valid POSIX signal (see https://php.net/pcntl.constants)
+     * @param int $signal A valid POSIX signal (see https://www.php.net/pcntl.constants)
      *
      * @return $this
      *
@@ -1178,7 +1178,7 @@ class Process implements \IteratorAggregate
     /**
      * Defines options to pass to the underlying proc_open().
      *
-     * @see https://php.net/proc_open for the options supported by PHP.
+     * @see https://www.php.net/proc_open for the options supported by PHP.
      *
      * Enabling the "create_new_console" option allows a subprocess to continue
      * to run after the main process exited, on both Windows and *nix
@@ -1435,7 +1435,7 @@ class Process implements \IteratorAggregate
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param int  $signal         A valid POSIX signal (see https://php.net/pcntl.constants)
+     * @param int  $signal         A valid POSIX signal (see https://www.php.net/pcntl.constants)
      * @param bool $throwException Whether to throw exception in case signal failed
      *
      * @throws LogicException   In case the process is not running

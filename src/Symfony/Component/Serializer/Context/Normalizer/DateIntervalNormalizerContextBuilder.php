@@ -27,7 +27,7 @@ final class DateIntervalNormalizerContextBuilder implements ContextBuilderInterf
     /**
      * Configures the format of the interval.
      *
-     * @see https://php.net/manual/en/dateinterval.format.php
+     * @see https://www.php.net/manual/en/dateinterval.format.php
      */
     public function withFormat(?string $format): static
     {

@@ -235,7 +235,7 @@ class Filesystem
      *
      * This method always throws on Windows, as the underlying PHP function is not supported.
      *
-     * @see https://php.net/chown
+     * @see https://www.php.net/chown
      *
      * @param string|int $user      A user name or number
      * @param bool       $recursive Whether change the owner recursively or not
@@ -267,7 +267,7 @@ class Filesystem
      *
      * This method always throws on Windows, as the underlying PHP function is not supported.
      *
-     * @see https://php.net/chgrp
+     * @see https://www.php.net/chgrp
      *
      * @param string|int $group     A group name or number
      * @param bool       $recursive Whether change the group recursively or not
@@ -311,7 +311,7 @@ class Filesystem
 
         if (!self::box('rename', $origin, $target)) {
             if (is_dir($origin)) {
-                // See https://bugs.php.net/54097 & https://php.net/rename#113943
+                // See https://bugs.php.net/54097 & https://www.php.net/rename#113943
                 $this->mirror($origin, $target, null, ['override' => $overwrite, 'delete' => $overwrite]);
                 $this->remove($origin);
 

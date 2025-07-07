@@ -138,7 +138,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
                 $dateTime = new \DateTime(sprintf('@%s', $timestamp));
             }
             // set timezone separately, as it would be ignored if set via the constructor,
-            // see https://php.net/datetime.construct
+            // see https://www.php.net/datetime.construct
             $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);

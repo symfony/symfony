@@ -59,7 +59,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * List of options for $options array with their defaults.
      *
-     * @see https://php.net/session.configuration for options
+     * @see https://www.php.net/session.configuration for options
      * but we omit 'session.' from the beginning of the keys for convenience.
      *
      * ("auto_start", is not supported as it tells PHP to start a session before
@@ -139,7 +139,7 @@ class NativeSessionStorage implements SessionStorageInterface
          * ---------- Part 1
          *
          * The part `[a-zA-Z0-9,-]` is related to the PHP ini directive `session.sid_bits_per_character` defined as 6.
-         * See https://php.net/session.configuration#ini.session.sid-bits-per-character
+         * See https://www.php.net/session.configuration#ini.session.sid-bits-per-character
          * Allowed values are integers such as:
          * - 4 for range `a-f0-9`
          * - 5 for range `a-v0-9`
@@ -148,7 +148,7 @@ class NativeSessionStorage implements SessionStorageInterface
          * ---------- Part 2
          *
          * The part `{22,250}` is related to the PHP ini directive `session.sid_length`.
-         * See https://php.net/session.configuration#ini.session.sid-length
+         * See https://www.php.net/session.configuration#ini.session.sid-length
          * Allowed values are integers between 22 and 256, but we use 250 for the max.
          *
          * Where does the 250 come from?
@@ -346,7 +346,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @param array $options Session ini directives [key => value]
      *
-     * @see https://php.net/session.configuration
+     * @see https://www.php.net/session.configuration
      *
      * @return void
      */
@@ -388,9 +388,9 @@ class NativeSessionStorage implements SessionStorageInterface
      * or pass in a \SessionHandler instance which configures session.save_handler in the
      * constructor, for a template see NativeFileSessionHandler.
      *
-     * @see https://php.net/session-set-save-handler
-     * @see https://php.net/sessionhandlerinterface
-     * @see https://php.net/sessionhandler
+     * @see https://www.php.net/session-set-save-handler
+     * @see https://www.php.net/sessionhandlerinterface
+     * @see https://www.php.net/sessionhandler
      *
      * @return void
      *

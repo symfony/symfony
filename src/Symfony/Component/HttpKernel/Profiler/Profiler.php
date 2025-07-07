@@ -126,7 +126,7 @@ class Profiler implements ResetInterface
      * @param string|null   $end    The end date to search to
      * @param \Closure|null $filter A filter to apply on the list of tokens
      *
-     * @see https://php.net/datetime.formats for the supported date/time formats
+     * @see https://www.php.net/datetime.formats for the supported date/time formats
      */
     public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?string $start, ?string $end, ?string $statusCode = null/* , \Closure $filter = null */): array
     {

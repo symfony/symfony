@@ -66,7 +66,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
 
         // Convert strings to date-time objects if comparing to another date-time object
         // This allows to compare with any date/time value supported by date-time constructors:
-        // https://php.net/datetime.formats
+        // https://www.php.net/datetime.formats
         if (\is_string($comparedValue) && $value instanceof \DateTimeInterface) {
             try {
                 $comparedValue = new $value($comparedValue);

@@ -363,7 +363,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     {
         // Quoting after official filter documentation:
         // "FILTER_FLAG_NO_RES_RANGE = This flag does not apply to IPv6 addresses."
-        // Full description: https://php.net/filter.filters.flags
+        // Full description: https://www.php.net/filter.filters.flags
         return self::getInvalidIpsV6();
     }
 

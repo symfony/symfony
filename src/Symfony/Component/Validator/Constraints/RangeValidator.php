@@ -67,7 +67,7 @@ class RangeValidator extends ConstraintValidator
         // Convert strings to DateTimes if comparing another DateTime
         // This allows to compare with any date/time value supported by
         // the DateTime constructor:
-        // https://php.net/datetime.formats
+        // https://www.php.net/datetime.formats
         if ($value instanceof \DateTimeInterface) {
             if (\is_string($min)) {
                 try {

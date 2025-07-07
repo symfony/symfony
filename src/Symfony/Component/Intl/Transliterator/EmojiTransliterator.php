@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\Transliterator;
 use Symfony\Component\Intl\Util\GzipStreamWrapper;
 
 if (!class_exists(\Transliterator::class)) {
-    throw new \LogicException(sprintf('You cannot use the "%s\EmojiTransliterator" class as the "intl" extension is not installed. See https://php.net/intl.', __NAMESPACE__));
+    throw new \LogicException(sprintf('You cannot use the "%s\EmojiTransliterator" class as the "intl" extension is not installed. See https://www.php.net/intl.', __NAMESPACE__));
 } else {
     /**
      * @internal

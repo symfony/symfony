@@ -100,7 +100,7 @@ HTML;
 
     public function testRendersStackWithoutBinaryStrings()
     {
-        // make sure method arguments are available in stack traces (see https://php.net/ini.core)
+        // make sure method arguments are available in stack traces (see https://www.php.net/ini.core)
         ini_set('zend.exception_ignore_args', false);
 
         $binaryData = file_get_contents(__DIR__.'/../Fixtures/pixel.png');

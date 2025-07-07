@@ -145,15 +145,12 @@ class SemVerValidator extends ConstraintValidator
         
         $parts = explode('.', explode('-', explode('+', $version)[0])[0]);
         
-        while (count($parts) < 3) {
+        while (\count($parts) < 3) {
             $parts[] = '0';
         }
         
         // Get pre-release and build metadata if any
-        $suffix = '';
-        if (preg_match('/^[^-+]+(.+)$/', $version, $matches)) {
-            $suffix = $matches[1];
-        }
+        $suffix = preg_match('/^[^-+]+(.+)$/', $version, $matches) ? $matches[1] : '';
         
         return implode('.', array_slice($parts, 0, 3)) . $suffix;
     }

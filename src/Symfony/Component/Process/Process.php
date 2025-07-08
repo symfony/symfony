@@ -1666,6 +1666,8 @@ class Process implements \IteratorAggregate
         $env = getenv();
         $env = ('\\' === \DIRECTORY_SEPARATOR ? array_intersect_ukey($env, $_SERVER, 'strcasecmp') : array_intersect_key($env, $_SERVER)) ?: $env;
 
+        $env += ['SYMFONY_PROCESS_IDENTIFIER' => bin2hex(random_bytes(5)];
+
         return $_ENV + ('\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($env, $_ENV, 'strcasecmp') : $env);
     }
 }

@@ -39,10 +39,10 @@ class SemVer extends Constraint
         self::TOO_HIGH_ERROR => 'TOO_HIGH_ERROR',
     ];
 
-    public string $message = 'This value is not a valid semantic version.';
-    public string $minMessage = 'This value should be {{ min }} or more.';
-    public string $maxMessage = 'This value should be {{ max }} or less.';
-    public bool $strict = true;
+    public string $message;
+    public string $minMessage;
+    public string $maxMessage;
+    public bool $strict;
     public ?string $min = null;
     public ?string $max = null;
 
@@ -51,22 +51,22 @@ class SemVer extends Constraint
      */
     #[HasNamedArguments]
     public function __construct(
-        ?string $message = null,
-        ?string $minMessage = null,
-        ?string $maxMessage = null,
-        ?bool $strict = null,
+        bool $strict = true,
+        string $message = 'This value is not a valid semantic version.',
         ?string $min = null,
+        string $minMessage = 'This value should be {{ min }} or more.',
         ?string $max = null,
+        string $maxMessage = 'This value should be {{ max }} or less.',
         ?array $groups = null,
         mixed $payload = null,
     ) {
         parent::__construct(null, $groups, $payload);
 
-        $this->message = $message ?? $this->message;
-        $this->minMessage = $minMessage ?? $this->minMessage;
-        $this->maxMessage = $maxMessage ?? $this->maxMessage;
-        $this->strict = $strict ?? $this->strict;
+        $this->strict = $strict;
+        $this->message = $message;
         $this->min = $min;
+        $this->minMessage = $minMessage;
         $this->max = $max;
+        $this->maxMessage = $maxMessage;
     }
 }

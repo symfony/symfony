@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-04-01T12:35:31Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-01T13:02:59Z
+
+Injecting an exception handler callback looks uncommon to me. This looks like a use case for injecting a logger and performing some logging.
+
+---------------------------------------------------------------------------
+
+by jnoordsij at 2025-04-01T13:30:38Z
+
+Thanks for your suggestion! While I figured a callback would allow for more flexibility, I do agree that a logger is probably a more standard way of approaching this. I've adjusted to inject a `LoggerInterface` instead. Let me know what you think!
+
+---------------------------------------------------------------------------
+
+by jnoordsij at 2025-06-21T11:31:43Z
+
+Rebased to resolve merge conflicts. Let me know if there is anything I can do to help get this merged.
+
+---------------------------------------------------------------------------
+
+by jnoordsij at 2025-06-30T16:00:17Z
+
+Thanks for the review suggestions! Changes have been applied; this is ready for review once more.

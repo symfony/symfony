@@ -51,22 +51,22 @@ class SemVer extends Constraint
      */
     #[HasNamedArguments]
     public function __construct(
-        bool $strict = true,
         string $message = 'This value is not a valid semantic version.',
-        ?string $min = null,
         string $minMessage = 'This value should be {{ min }} or more.',
-        ?string $max = null,
         string $maxMessage = 'This value should be {{ max }} or less.',
+        bool $strict = true,
+        ?string $min = null,
+        ?string $max = null,
         ?array $groups = null,
         mixed $payload = null,
     ) {
         parent::__construct(null, $groups, $payload);
 
-        $this->strict = $strict;
         $this->message = $message;
-        $this->min = $min;
         $this->minMessage = $minMessage;
-        $this->max = $max;
         $this->maxMessage = $maxMessage;
+        $this->strict = $strict;
+        $this->min = $min;
+        $this->max = $max;
     }
 }

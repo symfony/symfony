@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by ktherage at 2025-07-07T08:32:19Z
+
+> I think the constructor of the `RememberMeAuthenticator` class also has to be updated
+
+In which way ? I've removed the deprecation notice there : https://github.com/symfony/symfony/pull/61011/files#diff-8cdcb3fe63f51aca31c4a5869e39ffdfcc793d9d855df4498528a56e1bbd32cdL35-L39.
+
+Is there something I missed updating this ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-07-07T08:56:48Z
+
+@ktherage That's the token, but there also is an authenticator class.
+
+---------------------------------------------------------------------------
+
+by ktherage at 2025-07-07T09:51:00Z
+
+@xabbuh I did it and rebased. Sorry for this forgetfulness.

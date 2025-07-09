@@ -13,6 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use MongoDB\Collection;
 use MongoDB\Driver\Manager;
+use MongoDB\Driver\ReadPreference;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Store\MongoDbStore;
 use Symfony\Component\Lock\Store\StoreFactory;
@@ -38,6 +39,9 @@ class MongoDbStoreFactoryTest extends TestCase
         $collection->expects($this->once())
             ->method('getDatabaseName')
             ->willReturn('test');
+        $collection->expects($this->once())
+            ->method('getReadPreference')
+            ->willReturn(new ReadPreference('primary'));
 
         $store = StoreFactory::createStore($collection);
 

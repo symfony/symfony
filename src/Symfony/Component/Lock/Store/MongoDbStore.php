@@ -20,6 +20,7 @@ use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\BulkWriteException;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Query;
+use MongoDB\Driver\ReadPreference;
 use MongoDB\Exception\DriverRuntimeException;
 use MongoDB\Exception\InvalidArgumentException as MongoInvalidArgumentException;
 use MongoDB\Exception\UnsupportedException;
@@ -108,21 +109,26 @@ class MongoDbStore implements PersistingStoreInterface
             'collection' => null,
             'uriOptions' => [],
             'driverOptions' => [],
+            'readPreference' => null,
         ], $options);
 
         $this->initialTtl = $initialTtl;
 
         if ($mongo instanceof Collection) {
+            $this->manager = $mongo->getManager();
             $this->options['database'] ??= $mongo->getDatabaseName();
             $this->options['collection'] ??= $mongo->getCollectionName();
-            $this->manager = $mongo->getManager();
+            $this->options['readPreference'] ??= $mongo->getReadPreference();
         } elseif ($mongo instanceof Database) {
-            $this->options['database'] ??= $mongo->getDatabaseName();
             $this->manager = $mongo->getManager();
+            $this->options['database'] ??= $mongo->getDatabaseName();
+            $this->options['readPreference'] ??= $this->manager->getReadPreference();
         } elseif ($mongo instanceof Client) {
             $this->manager = $mongo->getManager();
+            $this->options['readPreference'] ??= $this->manager->getReadPreference();
         } elseif ($mongo instanceof Manager) {
             $this->manager = $mongo;
+            $this->options['readPreference'] ??= $this->manager->getReadPreference();
         } else {
             $this->uri = $this->skimUri($mongo);
         }
@@ -141,6 +147,10 @@ class MongoDbStore implements PersistingStoreInterface
 
         if ($this->initialTtl <= 0) {
             throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
+        }
+
+        if (!empty($this->options['readPreference']) && !$this->options['readPreference'] instanceof ReadPreference) {
+            throw new InvalidArgumentException(sprintf('"%s()" expects a MongoDB\Driver\ReadPreference instance, got "%s".', __METHOD__, get_debug_type($this->options['readPreference'])));
         }
     }
 
@@ -303,7 +313,7 @@ class MongoDbStore implements PersistingStoreInterface
                 'limit' => 1,
                 'projection' => ['_id' => 1],
             ]
-        ));
+        ), array_filter(['readPreference' => $this->options['readPreference']]));
 
         return [] !== $cursor->toArray();
     }

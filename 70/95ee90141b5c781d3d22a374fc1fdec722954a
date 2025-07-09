@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by jan-pintr at 2025-06-09T17:24:48Z
+
+Test added. But branch was reverted to 7.3, because the problem was introduced in 7.3 (here https://github.com/symfony/symfony/pull/59711) Is it ok?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-06-09T18:01:18Z
+
+> because the problem was introduced in 7.3
+
+Oh, my bad - so the problem doesn't exist < 7.3?
+
+---------------------------------------------------------------------------
+
+by jan-pintr at 2025-06-09T18:04:11Z
+
+Yes, it did not exist in <7.3
+
+---------------------------------------------------------------------------
+
+by jan-pintr at 2025-06-10T13:23:59Z
+
+Not sure either. Before test fails there is log `Installing symfony/scheduler (7.4.x-dev ac9f564): Extracting archive`.
+
+I suppose that the reason is that the `high-deps` is runned against `7.4.x-dev` in which it is not fixed yet? Could that be the reason?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-06-10T13:36:38Z
+
+> Could that be the reason?
+
+Yeah, that's what I'm thinking ~but I would have expected this issue with "low-deps"~ (oh, I forgot this wasn't an issue in 6.4 so that makes sense).
+
+It should be fixed once merged though.
+
+---------------------------------------------------------------------------
+
+by jan-pintr at 2025-06-20T14:30:57Z
+
+Suggestion applied, thank you.

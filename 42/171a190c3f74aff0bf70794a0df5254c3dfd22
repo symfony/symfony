@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by tacman at 2025-06-20T15:29:49Z
+
+Hmm.  I'm not sure why this is a non-existing property error.
+
+The DTO has the property $extra, with a default of null (or something else).
+
+The source object is a simple StdClass that doesn't have the property.  It's not setting a non-existing property of the target object, but rather set a default on the target object when the source object is missing the field.
+
+I think it's a pretty common case -- the source and target have some common fields, create the target object and map with the property name is the same or the property has a #[Map()] attribute.
+
+---------------------------------------------------------------------------
+
+by tacman at 2025-06-20T15:30:30Z
+
+the "isset" was just something I tried because it seemed like logic that would work, but didn't.  Could be a different issue.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-06-21T08:07:49Z
+
+> The source object is a simple StdClass that doesn't have the property. It's not setting a non-existing property of the target object, but rather set a default on the target object when the source object is missing the field.
+
+In your example:
+
+```php
+$mapper = new ObjectMapper();
+$target = 'App\Dto\MyClass';
+$obj = (object) ['id'=>'abc'];
+$entity = $mapper->map($obj, $target);
+```
+
+The `stdClass` does not have any information about how it should be mapped, therefore we use the data from the `$target` (here `App\Dto\MyClass`. `App\Dto\MyClass` has a `default` but when we read that property on the `stdClass` it does not exists. So it's not "setting a non-existing property" but "reading a non-existing property" which leads to a `NoSuchPropertyException`. Looks fine to me.
+The default value works fine when using the PropertyAccessor with the proper option see my assertions in the tests:
+
+```php
+        $this->assertEquals('abc', $b->id);
+        $this->assertEquals(null, $b->optional);
+```
+
+> I think it's a pretty common case -- the source and target have some common fields, create the target object and map with the property name is the same or the property has a #[Map()] attribute.
+
+`stdClass` is quite specific, use DTOs on both ends of the mapping and you probably won't have any issues.
+
+> the "isset" was just something I tried because it seemed like logic that would work, but didn't. Could be a different issue.
+
+Isset would be a weird use case but NotNull would be quite useful.
+
+---------------------------------------------------------------------------
+
+by tacman at 2025-06-21T10:40:35Z
+
+Thanks.  My use case is that I'm getting data from csv and JSON, and I want to map the data to a DTO.  But the field names and often type are wrong.
+
+So
+```csv
+First Name,Last Name,Country,Language Spoken At Home
+Bob,Roberts,USA,English
+```
+
+And I want a DTO of a class with properties $firstName, $lastName,$countryCode,$langCode
+
+So I want to import from $row['First Name'] to $dto->firstName and transform the country and language names to codes them with a service.  ObjectMapper seems like the perfect tool for that.  So this step is to go from the stdClass to a DTO.  What approach do you suggest?  I've been using league/csv-reader for some parts, (which will map to a DTO), but the problem is that I don't have a DTO yet.

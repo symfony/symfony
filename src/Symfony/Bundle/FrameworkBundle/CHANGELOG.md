@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add JsonPath integration to register custom JsonPath functions
+
 8.0
 ---
 

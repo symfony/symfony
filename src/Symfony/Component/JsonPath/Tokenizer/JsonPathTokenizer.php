@@ -13,7 +13,6 @@ namespace Symfony\Component\JsonPath\Tokenizer;
 
 use Symfony\Component\JsonPath\Exception\InvalidJsonPathException;
 use Symfony\Component\JsonPath\JsonPath;
-use Symfony\Component\JsonPath\JsonPathUtils;
 
 /**
  * @author Alexandre Daubois <alex.daubois@gmail.com>
@@ -26,9 +25,11 @@ final class JsonPathTokenizer
     private const BARE_LITERAL_REGEX = '(true|false|null|\d+(\.\d+)?([eE][+-]?\d+)?|\'[^\']*\'|"[^"]*")';
 
     /**
+     * @param callable(string $functionName, list<string> $args): void|null $functionValidator
+     *
      * @return JsonPathToken[]
      */
-    public static function tokenize(JsonPath $query): array
+    public static function tokenize(JsonPath $query, ?callable $functionValidator = null): array
     {
         $tokens = [];
         $current = '';
@@ -166,7 +167,7 @@ final class JsonPathTokenizer
                             throw new InvalidJsonPathException('unclosed bracket.', $position);
                         }
 
-                        self::validateFilterExpression($current, $position);
+                        self::validateFilterExpression($current, $position, $functionValidator);
                     }
 
                     $tokens[] = new JsonPathToken(TokenType::Bracket, $current);
@@ -295,9 +296,12 @@ final class JsonPathTokenizer
         return $index;
     }
 
-    private static function validateFilterExpression(string $expr, int $position): void
+    /**
+     * @param callable(string $functionName, list<string> $args): void $functionValidator
+     */
+    private static function validateFilterExpression(string $expr, int $position, ?callable $functionValidator): void
     {
-        self::validateBareLiterals($expr, $position);
+        self::validateBareLiterals($expr, $position, $functionValidator);
 
         $filterExpr = ltrim($expr, '?');
         $filterExpr = trim($filterExpr);
@@ -350,7 +354,10 @@ final class JsonPathTokenizer
         }
     }
 
-    private static function validateBareLiterals(string $expr, int $position): void
+    /**
+     * @param callable(string $functionName, string $args): void|null $functionValidator
+     */
+    private static function validateBareLiterals(string $expr, int $position, ?callable $functionValidator): void
     {
         $filterExpr = ltrim($expr, '?');
         $filterExpr = trim($filterExpr);
@@ -359,42 +366,16 @@ final class JsonPathTokenizer
             throw new InvalidJsonPathException('Incorrectly capitalized literal in filter expression.', $position);
         }
 
-        if (preg_match('/^(length|count|value)\s*\([^)]*\)$/', $filterExpr)) {
-            throw new InvalidJsonPathException('Function result must be compared.', $position);
-        }
+        if ($functionValidator && preg_match_all('/(\w+)\s*\(([^)]*)\)/', $filterExpr, $matches, \PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $functionName = $match[1];
+                $args = trim($match[2]);
 
-        if (preg_match('/\b(length|count|value)\s*\(([^)]*)\)/', $filterExpr, $matches)) {
-            $functionName = $matches[1];
-            $args = trim($matches[2]);
-            if (!$args) {
-                throw new InvalidJsonPathException('Function requires exactly one argument.', $position);
-            }
-
-            $argParts = JsonPathUtils::parseCommaSeparatedValues($args);
-            if (1 !== \count($argParts)) {
-                throw new InvalidJsonPathException('Function requires exactly one argument.', $position);
-            }
-
-            $arg = trim($argParts[0]);
-
-            if ('count' === $functionName && preg_match('/^'.self::BARE_LITERAL_REGEX.'$/', $arg)) {
-                throw new InvalidJsonPathException('count() function requires a query argument, not a literal.', $position);
-            }
-
-            if ('length' === $functionName && preg_match('/@\.\*/', $arg)) {
-                throw new InvalidJsonPathException('Function argument must be a singular query.', $position);
-            }
-        }
-
-        if (preg_match('/\b(match|search)\s*\(([^)]*)\)/', $filterExpr, $matches)) {
-            $args = trim($matches[2]);
-            if (!$args) {
-                throw new InvalidJsonPathException('Function requires exactly two arguments.', $position);
-            }
-
-            $argParts = JsonPathUtils::parseCommaSeparatedValues($args);
-            if (2 !== \count($argParts)) {
-                throw new InvalidJsonPathException('Function requires exactly two arguments.', $position);
+                try {
+                    $functionValidator($functionName, $args);
+                } catch (\InvalidArgumentException $e) {
+                    throw new InvalidJsonPathException($e->getMessage(), $position, previous: $e);
+                }
             }
         }
 
@@ -406,8 +387,8 @@ final class JsonPathTokenizer
             throw new InvalidJsonPathException('Bare literals in logical expression - literals must be compared.', $position);
         }
 
-        if (preg_match('/\b(match|search|length|count|value)\s*\([^)]*\)\s*[=!]=\s*(true|false)\b/', $filterExpr)
-            || preg_match('/\b(true|false)\s*[=!]=\s*(match|search|length|count|value)\s*\([^)]*\)/', $filterExpr)) {
+        if (preg_match('/\b(\w+)\s*\([^)]*\)\s*[=!]=\s*(true|false)\b/', $filterExpr)
+            || preg_match('/\b(true|false)\s*[=!]=\s*(\w+)\s*\([^)]*\)/', $filterExpr)) {
             throw new InvalidJsonPathException('Function result cannot be compared to boolean literal.', $position);
         }
 

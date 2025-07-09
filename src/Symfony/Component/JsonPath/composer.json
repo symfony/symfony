@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=8.4",
+        "psr/container": "^1.1|^2.0",
         "symfony/polyfill-ctype": "^1.8",
         "symfony/polyfill-mbstring": "^1.0"
     },

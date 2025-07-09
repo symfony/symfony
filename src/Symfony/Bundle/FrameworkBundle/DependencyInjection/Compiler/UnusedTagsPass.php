@@ -53,6 +53,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'form.type_guesser',
         'html_sanitizer',
         'http_client.client',
+        'json_path.function',
         'json_streamer.value_transformer',
         'kernel.cache_clearer',
         'kernel.cache_warmer',

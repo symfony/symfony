@@ -14,10 +14,10 @@ namespace Symfony\Component\JsonPath\Exception;
 /**
  * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
-class InvalidJsonPathException extends \LogicException implements ExceptionInterface
+class UnknownJsonPathFunctionException extends \RuntimeException implements ExceptionInterface
 {
-    public function __construct(string $message, ?int $position = null, ?\Throwable $previous = null)
+    public function __construct(string $name, ?\Throwable $previous = null)
     {
-        parent::__construct(\sprintf('JSONPath syntax error%s: %s', $position ? ' at position '.$position : '', $message), previous: $previous);
+        parent::__construct(\sprintf('Unknown JSONPath function "%s".', $name), previous: $previous);
     }
 }

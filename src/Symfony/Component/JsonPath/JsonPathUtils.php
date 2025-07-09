@@ -263,4 +263,33 @@ final class JsonPathUtils
 
         return $negative ? $s < '-9007199254740991' : $s > '9007199254740991';
     }
+
+    /**
+     * Transforms JSONPath regex patterns to comply with RFC 9485.
+     *
+     * @see https://www.rfc-editor.org/rfc/rfc9485.html#name-pcre-re2-and-ruby-regexps
+     */
+    public static function normalizeRegex(string $pattern): string
+    {
+        $result = '';
+        $inCharClass = false;
+        $i = -1;
+
+        while (null !== $char = $pattern[++$i] ?? null) {
+            switch ($char) {
+                case '\\': $char .= $pattern[++$i] ?? '';
+                    break;
+                case '[': $inCharClass = true;
+                    break;
+                case ']': $inCharClass = false;
+                    break;
+                case '.': $inCharClass || $char = '[^\r\n]';
+                    break;
+            }
+
+            $result .= $char;
+        }
+
+        return $result;
+    }
 }

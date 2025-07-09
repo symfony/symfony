@@ -102,6 +102,8 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
+use Symfony\Component\JsonPath\Functions\AsJsonPathFunction;
+use Symfony\Component\JsonPath\JsonPath;
 use Symfony\Component\JsonStreamer\Attribute\JsonStreamable;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\StreamReaderInterface;
@@ -465,6 +467,10 @@ class FrameworkExtension extends Extension
             $this->registerJsonStreamerConfiguration($config['json_streamer'], $container, $loader);
         }
 
+        if ($this->readConfigEnabled('json_path', $container, $config['json_path'])) {
+            $this->registerJsonPathConfiguration($loader);
+        }
+
         if ($this->readConfigEnabled('lock', $container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
         }
@@ -791,6 +797,12 @@ class FrameworkExtension extends Extension
                 'object' => $attribute->asObject,
                 'list' => $attribute->asList,
             ])->addTag('container.excluded', ['source' => 'because it\'s a streamable JSON']);
+        });
+
+        $container->registerAttributeForAutoconfiguration(AsJsonPathFunction::class, static function (ChildDefinition $definition, AsJsonPathFunction $attribute) {
+            $definition->addTag('json_path.function', [
+                'name' => $attribute->name,
+            ]);
         });
 
         if (!$container->getParameter('kernel.debug')) {
@@ -2175,6 +2187,15 @@ class FrameworkExtension extends Extension
 
             $container->getDefinition('type_info.type_context_factory')->replaceArgument(1, $config['aliases']);
         }
+    }
+
+    private function registerJsonPathConfiguration(PhpFileLoader $loader): void
+    {
+        if (!class_exists(JsonPath::class)) {
+            throw new LogicException('JsonPath support cannot be enabled as the JsonPath component is not installed. Try running "composer require symfony/json-path".');
+        }
+
+        $loader->load('json_path.php');
     }
 
     private function registerLockConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `JsonPathFunctionsProviderInterface`, `JsonPathFunctionInterface` and `JsonPathFunctionArgumentTrait` to allow registering custom JsonPath functions
+ * Add the `#[AsJsonPathFunction]` attribute to declare custom JsonPath functions
+
 7.4
 ---
 

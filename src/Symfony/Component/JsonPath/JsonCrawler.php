@@ -15,6 +15,9 @@ use Symfony\Component\JsonPath\Exception\InvalidArgumentException;
 use Symfony\Component\JsonPath\Exception\InvalidJsonPathException;
 use Symfony\Component\JsonPath\Exception\InvalidJsonStringInputException;
 use Symfony\Component\JsonPath\Exception\JsonCrawlerException;
+use Symfony\Component\JsonPath\Functions\JsonPathComparableFunctionInterface;
+use Symfony\Component\JsonPath\Functions\JsonPathFunctionsProvider;
+use Symfony\Component\JsonPath\Functions\JsonPathFunctionsProviderInterface;
 use Symfony\Component\JsonPath\Tokenizer\JsonPathToken;
 use Symfony\Component\JsonPath\Tokenizer\JsonPathTokenizer;
 use Symfony\Component\JsonPath\Tokenizer\TokenType;
@@ -30,14 +33,6 @@ use Symfony\Component\JsonStreamer\Read\Splitter;
  */
 final class JsonCrawler implements JsonCrawlerInterface
 {
-    private const RFC9535_FUNCTIONS = [
-        'length' => true,
-        'count' => true,
-        'match' => true,
-        'search' => true,
-        'value' => true,
-    ];
-
     /**
      * Comparison operators and their corresponding lengths.
      */
@@ -50,15 +45,20 @@ final class JsonCrawler implements JsonCrawlerInterface
         '<' => 1,
     ];
 
+    private readonly JsonPathFunctionsProviderInterface $functionsProvider;
+
     /**
      * @param resource|string $raw
      */
     public function __construct(
         private readonly mixed $raw,
+        ?JsonPathFunctionsProviderInterface $functionsProvider = null,
     ) {
         if (!\is_string($raw) && !\is_resource($raw)) {
             throw new InvalidArgumentException(\sprintf('Expected string or resource, got "%s".', get_debug_type($raw)));
         }
+
+        $this->functionsProvider = $functionsProvider ?? new JsonPathFunctionsProvider();
     }
 
     public function find(string|JsonPath $query): array
@@ -69,6 +69,8 @@ final class JsonCrawler implements JsonCrawlerInterface
     private function evaluate(JsonPath $query): array
     {
         try {
+            $this->validateFilterExpressions($query);
+
             if ($this->isComplexBracketExpression($query)) {
                 preg_match('/^\$\[([^\[\]]+)]$/', $query, $matches);
 
@@ -91,7 +93,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 return $this->normalizeStorage($this->evaluateBracket($matches[1], $data));
             }
 
-            $tokens = JsonPathTokenizer::tokenize($query);
+            $tokens = JsonPathTokenizer::tokenize($query, $this->createFunctionValidator());
 
             if (\is_resource($json = $this->raw)) {
                 if (!class_exists(Splitter::class)) {
@@ -116,7 +118,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                         throw new \RuntimeException('Failed to read from resource stream.');
                     }
 
-                    $tokens = JsonPathTokenizer::tokenize($query);
+                    $tokens = JsonPathTokenizer::tokenize($query, $this->createFunctionValidator());
                 }
             }
 
@@ -600,7 +602,7 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         if (str_starts_with($expr, '@.')) {
-            return $this->isArrayOrObject($context) && $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize(new JsonPath('$'.substr($expr, 1))), $context);
+            return $this->isArrayOrObject($context) && $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize(new JsonPath('$'.substr($expr, 1)), $this->createFunctionValidator()), $context);
         }
 
         if (str_starts_with($expr, '@[') && str_ends_with($expr, ']')) {
@@ -610,7 +612,7 @@ final class JsonCrawler implements JsonCrawlerInterface
         // function calls
         if (preg_match('/^(\w++)\s*+\((.*)\)$/', $expr, $matches)) {
             $functionName = trim($matches[1]);
-            if (!isset(self::RFC9535_FUNCTIONS[$functionName])) {
+            if (!$this->functionsProvider->hasFunction($functionName)) {
                 throw new JsonCrawlerException($expr, \sprintf('invalid function "%s"', $functionName));
             }
 
@@ -721,14 +723,15 @@ final class JsonCrawler implements JsonCrawlerInterface
                 return $result ? $result[0] : Nothing::Nothing;
             }
 
-            $results = $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize(new JsonPath('$'.$path)), $context);
+            $results = $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize(new JsonPath('$'.$path), $this->createFunctionValidator()), $context);
 
             return $results ? $results[0] : Nothing::Nothing;
         }
 
         // function calls
         if (preg_match('/^(\w++)\((.*)\)$/', $expr, $matches)) {
-            if (!isset(self::RFC9535_FUNCTIONS[$functionName = trim($matches[1])])) {
+            $functionName = trim($matches[1]);
+            if (!$this->functionsProvider->hasFunction($functionName)) {
                 throw new JsonCrawlerException($expr, \sprintf('invalid function "%s"', $functionName));
             }
 
@@ -741,60 +744,62 @@ final class JsonCrawler implements JsonCrawlerInterface
     private function evaluateFunction(string $name, string $args, mixed $context): mixed
     {
         $argList = [];
-        $nodelistSizes = [];
         if ($args = trim($args)) {
             $args = JsonPathUtils::parseCommaSeparatedValues($args);
             foreach ($args as $arg) {
                 $arg = trim($arg);
                 if (str_starts_with($arg, '$')) { // special handling for absolute paths
-                    $results = $this->evaluate(new JsonPath($arg));
-                    $argList[] = $results[0] ?? null;
-                    $nodelistSizes[] = \count($results);
+                    $argList[] = $this->evaluate(new JsonPath($arg));
                 } elseif (!str_starts_with($arg, '@')) { // special handling for @ to track nodelist size
-                    $argList[] = $this->evaluateScalar($arg, $context);
-                    $nodelistSizes[] = 1;
+                    $argList[] = [$this->evaluateScalar($arg, $context)];
                 } elseif ('@' === $arg) {
-                    $argList[] = $context;
-                    $nodelistSizes[] = 1;
+                    $argList[] = [$context];
                 } elseif (!$this->isArrayOrObject($context)) {
-                    $argList[] = null;
-                    $nodelistSizes[] = 0;
+                    $argList[] = [];
                 } elseif (str_starts_with($pathPart = substr($arg, 1), '[')) {
                     // handle bracket expressions like @['a','d']
                     $results = $this->evaluateBracket(substr($pathPart, 1, -1), $context);
                     $argList[] = $results;
-                    $nodelistSizes[] = \count($results);
                 } else {
                     // handle dot notation like @.a
-                    $results = $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize(new JsonPath('$'.$pathPart)), $context);
-                    $argList[] = $results[0] ?? null;
-                    $nodelistSizes[] = \count($results);
+                    $results = $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize(new JsonPath('$'.$pathPart), $this->createFunctionValidator()), $context);
+                    $argList[] = $results;
                 }
             }
         }
 
-        $value = $argList[0] ?? null;
-        $nodelistSize = $nodelistSizes[0] ?? 0;
+        if ($this->functionsProvider->hasFunction($name)) {
+            return $this->functionsProvider->getFunction($name)($argList, $context);
+        }
 
-        return match ($name) {
-            'length' => match (true) {
-                \is_string($value) => mb_strlen($value),
-                \is_array($value) => \count($value),
-                $value instanceof \stdClass => \count(get_object_vars($value)),
-                default => Nothing::Nothing,
-            },
-            'count' => $nodelistSize,
-            'match' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => (bool) @preg_match(\sprintf('/^%s$/u', $this->transformJsonPathRegex($argList[1])), $value),
-                default => false,
-            },
-            'search' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => (bool) @preg_match("/{$this->transformJsonPathRegex($argList[1])}/u", $value),
-                default => false,
-            },
-            'value' => 1 < $nodelistSize ? Nothing::Nothing : (1 === $nodelistSize ? (\is_array($value) ? ($value[0] ?? null) : $value) : $value),
-            default => null,
-        };
+        return null;
+    }
+
+    private function validateFilterExpressions(JsonPath $query): void
+    {
+        $queryString = (string) $query;
+
+        if (preg_match_all('/\[\?([^]]+)]/', $queryString, $matches)) {
+            foreach ($matches[1] as $filterExpr) {
+                $this->validateFunctionUsageInFilter(trim($filterExpr));
+            }
+        }
+    }
+
+    private function validateFunctionUsageInFilter(string $filterExpr): void
+    {
+        if (preg_match_all('/(\w+)\s*\([^)]*\)/', $filterExpr, $matches, \PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $functionName = $match[1];
+
+                if (preg_match('/^'.preg_quote($match[0], '/').'$/', $filterExpr)) {
+                    if ($this->functionsProvider->hasFunction($functionName)
+                        && $this->functionsProvider->getFunction($functionName) instanceof JsonPathComparableFunctionInterface) {
+                        throw new JsonCrawlerException($filterExpr, 'Function result must be compared.');
+                    }
+                }
+            }
+        }
     }
 
     private function evaluateRecursive(mixed $value): array
@@ -913,9 +918,12 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function compareOrdering(mixed $left, mixed $right, string $operator): bool
     {
-        if (null === $left || null === $right) {
+        $leftIsNothing = Nothing::Nothing === $left;
+        $rightIsNothing = Nothing::Nothing === $right;
+
+        if (null === $left || null === $right || $leftIsNothing || $rightIsNothing) {
             return match ($operator) {
-                '>=', '<=' => $left === $right,
+                '>=', '<=' => $left === $right || $leftIsNothing && $rightIsNothing,
                 default => false,
             };
         }
@@ -940,7 +948,7 @@ final class JsonCrawler implements JsonCrawlerInterface
     private function isNonSingularQuery(string $expr): bool
     {
         try {
-            $tokens = JsonPathTokenizer::tokenize(new JsonPath($expr));
+            $tokens = JsonPathTokenizer::tokenize(new JsonPath($expr), $this->createFunctionValidator());
 
             foreach ($tokens as $token) {
                 if (TokenType::Bracket === $token->type) {
@@ -1034,35 +1042,6 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
     }
 
-    /**
-     * Transforms JSONPath regex patterns to comply with RFC 9485.
-     *
-     * @see https://www.rfc-editor.org/rfc/rfc9485.html#name-pcre-re2-and-ruby-regexps
-     */
-    private function transformJsonPathRegex(string $pattern): string
-    {
-        $result = '';
-        $inCharClass = false;
-        $i = -1;
-
-        while (null !== $char = $pattern[++$i] ?? null) {
-            switch ($char) {
-                case '\\': $char .= $pattern[++$i] ?? '';
-                    break;
-                case '[': $inCharClass = true;
-                    break;
-                case ']': $inCharClass = false;
-                    break;
-                case '.': $inCharClass || $char = '[^\r\n]';
-                    break;
-            }
-
-            $result .= $char;
-        }
-
-        return $result;
-    }
-
     private function isArrayOrObject(mixed $value): bool
     {
         return \is_array($value) || $value instanceof \stdClass;
@@ -1102,5 +1081,18 @@ final class JsonCrawler implements JsonCrawlerInterface
     private function getValueIfKeyExists(mixed $value, string $key): array
     {
         return $this->isArrayOrObject($value) && \array_key_exists($key, $arrayValue = (array) $value) ? [$arrayValue[$key]] : [];
+    }
+
+    private function createFunctionValidator(): callable
+    {
+        return function (string $functionName, string $args): void {
+            if (!$this->functionsProvider->hasFunction($functionName)) {
+                return; // the crawler will handle unknown functions
+            }
+
+            $this->functionsProvider
+                ->getFunction($functionName)
+                ->validate($functionName, ($args = trim($args)) ? JsonPathUtils::parseCommaSeparatedValues($args) : []);
+        };
     }
 }

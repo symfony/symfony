@@ -75,6 +75,7 @@
         "symfony/validator": "^7.4|^8.0",
         "symfony/workflow": "^7.4|^8.0",
         "symfony/web-link": "^7.4|^8.0",
+        "symfony/json-path": "^7.4|^8.0",
         "symfony/webhook": "^7.4|^8.0",
         "symfony/yaml": "^7.4|^8.0"
     },

@@ -97,7 +97,7 @@ class DeprecationErrorHandler
     {
         $deprecations = [];
         $previousErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$deprecations, &$previousErrorHandler) {
-            if (\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || false === strpos($msg, '" targeting switch is equivalent to "break'))) {
+            if (\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || !str_contains($msg, '" targeting switch is equivalent to "break'))) {
                 if ($previousErrorHandler) {
                     return $previousErrorHandler($type, $msg, $file, $line, $context);
                 }
@@ -129,7 +129,7 @@ class DeprecationErrorHandler
      */
     public function handleError($type, $msg, $file, $line, $context = [])
     {
-        if ((\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || false === strpos($msg, '" targeting switch is equivalent to "break'))) || !$this->getConfiguration()->isEnabled()) {
+        if ((\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || !str_contains($msg, '" targeting switch is equivalent to "break'))) || !$this->getConfiguration()->isEnabled()) {
             return \call_user_func(self::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
         }
 

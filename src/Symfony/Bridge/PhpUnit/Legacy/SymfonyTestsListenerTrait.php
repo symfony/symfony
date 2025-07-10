@@ -57,7 +57,7 @@ class SymfonyTestsListenerTrait
             (new ExcludeList())->getExcludedDirectories();
             ExcludeList::addDirectory(\dirname((new \ReflectionClass(__CLASS__))->getFileName(), 2));
         } elseif (method_exists(Blacklist::class, 'addDirectory')) {
-            (new BlackList())->getBlacklistedDirectories();
+            (new Blacklist())->getBlacklistedDirectories();
             Blacklist::addDirectory(\dirname((new \ReflectionClass(__CLASS__))->getFileName(), 2));
         } else {
             Blacklist::$blacklistedClassNames[__CLASS__] = 2;
@@ -124,7 +124,7 @@ class SymfonyTestsListenerTrait
             if (!$test instanceof TestCase) {
                 continue;
             }
-            if (null === Test::getPreserveGlobalStateSettings(\get_class($test), $test->getName(false))) {
+            if (null === Test::getPreserveGlobalStateSettings($test::class, $test->getName(false))) {
                 $test->setPreserveGlobalState(false);
             }
         }
@@ -181,7 +181,7 @@ class SymfonyTestsListenerTrait
                         continue;
                     }
                     if ($test instanceof TestCase
-                        && isset($this->wasSkipped[\get_class($test)][$test->getName()])
+                        && isset($this->wasSkipped[$test::class][$test->getName()])
                     ) {
                         $skipped[] = $test;
                     }
@@ -196,10 +196,10 @@ class SymfonyTestsListenerTrait
         if (0 < $this->state) {
             if ($test instanceof DataProviderTestSuite) {
                 foreach ($test->tests() as $testWithDataProvider) {
-                    $this->isSkipped[\get_class($testWithDataProvider)][$testWithDataProvider->getName()] = 1;
+                    $this->isSkipped[$testWithDataProvider::class][$testWithDataProvider->getName()] = 1;
                 }
             } else {
-                $this->isSkipped[\get_class($test)][$test->getName()] = 1;
+                $this->isSkipped[$test::class][$test->getName()] = 1;
             }
         }
     }
@@ -214,15 +214,15 @@ class SymfonyTestsListenerTrait
                 putenv('SYMFONY_EXPECTED_DEPRECATIONS_SERIALIZE='.tempnam(sys_get_temp_dir(), 'expectdeprec'));
             }
 
-            $groups = Test::getGroups(\get_class($test), $test->getName(false));
+            $groups = Test::getGroups($test::class, $test->getName(false));
 
             if (!$this->runsInSeparateProcess) {
                 if (\in_array('time-sensitive', $groups, true)) {
-                    ClockMock::register(\get_class($test));
+                    ClockMock::register($test::class);
                     ClockMock::withClockMock(true);
                 }
                 if (\in_array('dns-sensitive', $groups, true)) {
-                    DnsMock::register(\get_class($test));
+                    DnsMock::register($test::class);
                 }
             }
 
@@ -230,7 +230,7 @@ class SymfonyTestsListenerTrait
                 return;
             }
 
-            $annotations = Test::parseTestMethodAnnotations(\get_class($test), $test->getName(false));
+            $annotations = Test::parseTestMethodAnnotations($test::class, $test->getName(false));
 
             if (isset($annotations['class']['expectedDeprecation'])) {
                 $test->getTestResultObject()->addError($test, new AssertionFailedError('"@expectedDeprecation" annotations are not allowed at the class level.'), 0);
@@ -268,14 +268,14 @@ class SymfonyTestsListenerTrait
             DebugClassLoader::checkClasses();
         }
 
-        $className = \get_class($test);
+        $className = $test::class;
         $groups = Test::getGroups($className, $test->getName(false));
 
         if ($this->checkNumAssertions) {
             $assertions = \count(self::$expectedDeprecations) + $test->getNumAssertions();
             if ($test->doesNotPerformAssertions() && $assertions > 0) {
-                $test->getTestResultObject()->addFailure($test, new RiskyTestError(sprintf('This test is annotated with "@doesNotPerformAssertions", but performed %s assertions', $assertions)), $time);
-            } elseif ($assertions === 0 && !$test->doesNotPerformAssertions() && $test->getTestResultObject()->noneSkipped()) {
+                $test->getTestResultObject()->addFailure($test, new RiskyTestError(\sprintf('This test is annotated with "@doesNotPerformAssertions", but performed %s assertions', $assertions)), $time);
+            } elseif (0 === $assertions && !$test->doesNotPerformAssertions() && $test->getTestResultObject()->noneSkipped()) {
                 $test->getTestResultObject()->addFailure($test, new RiskyTestError('This test did not perform any assertions'), $time);
             }
 

@@ -28,7 +28,7 @@ class DeprecationTest extends TestCase
         }
 
         foreach (get_declared_classes() as $class) {
-            if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+            if ('C' === $class[0] && str_starts_with($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
                 $vendorDir = \dirname($r->getFileName(), 2);
                 if (file_exists($vendorDir.'/composer/installed.json') && @mkdir($vendorDir.'/myfakevendor/myfakepackage1', 0777, true)) {
@@ -268,7 +268,7 @@ class DeprecationTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         foreach (get_declared_classes() as $class) {
-            if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+            if ('C' === $class[0] && str_starts_with($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
                 $v = \dirname($r->getFileName(), 2);
                 if (file_exists($v.'/composer/installed.json')) {

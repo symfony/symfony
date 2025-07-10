@@ -99,7 +99,7 @@ class Deprecation
                     $this->getOriginalFilesStack();
                     array_splice($this->originalFilesStack, 0, $j, [$this->triggeringFile]);
 
-                    if (preg_match('/(?|"([^"]++)" that is deprecated|should implement method "(?:static )?([^:]++))/', $message, $m) || (false === strpos($message, '()" will return') && false === strpos($message, 'native return type declaration') && preg_match('/^(?:The|Method) "([^":]++)/', $message, $m))) {
+                    if (preg_match('/(?|"([^"]++)" that is deprecated|should implement method "(?:static )?([^:]++))/', $message, $m) || (!str_contains($message, '()" will return') && !str_contains($message, 'native return type declaration') && preg_match('/^(?:The|Method) "([^":]++)/', $message, $m))) {
                         $this->triggeringFile = (new \ReflectionClass($m[1]))->getFileName();
                         array_unshift($this->originalFilesStack, $this->triggeringFile);
                     }
@@ -137,7 +137,7 @@ class Deprecation
             return;
         }
 
-        if (!isset($line['class'], $trace[$i - 2]['function']) || 0 !== strpos($line['class'], SymfonyTestsListenerFor::class)) {
+        if (!isset($line['class'], $trace[$i - 2]['function']) || !str_starts_with($line['class'], SymfonyTestsListenerFor::class)) {
             $this->originClass = isset($line['object']) ? \get_class($line['object']) : $line['class'];
             $this->originMethod = $line['function'];
 
@@ -147,7 +147,7 @@ class Deprecation
         $test = $line['args'][0] ?? null;
 
         if (($test instanceof TestCase || $test instanceof TestSuite) && ('trigger_error' !== $trace[$i - 2]['function'] || isset($trace[$i - 2]['class']))) {
-            $this->originClass = \get_class($test);
+            $this->originClass = $test::class;
             $this->originMethod = $test->getName();
         }
     }
@@ -159,7 +159,7 @@ class Deprecation
         }
         $class = $line['class'];
 
-        return 'ReflectionMethod' === $class || 0 === strpos($class, 'PHPUnit\\');
+        return 'ReflectionMethod' === $class || str_starts_with($class, 'PHPUnit\\');
     }
 
     public function originatesFromDebugClassLoader(): bool
@@ -189,7 +189,7 @@ class Deprecation
 
         $class = $this->originClass;
 
-        return false !== strpos($class, "@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class').'@anonymous' : $class;
+        return str_contains($class, "@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class').'@anonymous' : $class;
     }
 
     public function originatingMethod(): string
@@ -215,9 +215,9 @@ class Deprecation
         $method = $this->originatingMethod();
         $groups = class_exists(Groups::class, false) ? [new Groups(), 'groups'] : [Test::class, 'getGroups'];
 
-        return 0 === strpos($method, 'testLegacy')
-            || 0 === strpos($method, 'provideLegacy')
-            || 0 === strpos($method, 'getLegacy')
+        return str_starts_with($method, 'testLegacy')
+            || str_starts_with($method, 'provideLegacy')
+            || str_starts_with($method, 'getLegacy')
             || strpos($this->originClass, '\Legacy')
             || \in_array('legacy', $groups($this->originClass, $method), true);
     }
@@ -228,10 +228,10 @@ class Deprecation
             return false;
         }
         if (isset($this->trace[1]['class'])) {
-            return 0 === strpos($this->trace[1]['class'], 'PHPUnit\\');
+            return str_starts_with($this->trace[1]['class'], 'PHPUnit\\');
         }
 
-        return false !== strpos($this->triggeringFile, \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'phpunit'.\DIRECTORY_SEPARATOR);
+        return str_contains($this->triggeringFile, \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'phpunit'.\DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -300,7 +300,7 @@ class Deprecation
     {
         $path = realpath($path) ?: $path;
         foreach (self::getVendors() as $vendorRoot) {
-            if (0 === strpos($path, $vendorRoot)) {
+            if (str_starts_with($path, $vendorRoot)) {
                 $relativePath = substr($path, \strlen($vendorRoot) + 1);
                 $vendor = strstr($relativePath, \DIRECTORY_SEPARATOR, true);
                 if (false === $vendor) {
@@ -326,7 +326,7 @@ class Deprecation
                 self::$vendors[] = \dirname((new \ReflectionClass(DebugClassLoader::class))->getFileName());
             }
             foreach (get_declared_classes() as $class) {
-                if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+                if ('C' === $class[0] && str_starts_with($class, 'ComposerAutoloaderInit')) {
                     $r = new \ReflectionClass($class);
                     $v = \dirname($r->getFileName(), 2);
                     if (file_exists($v.'/composer/installed.json')) {
@@ -341,7 +341,7 @@ class Deprecation
             }
             foreach ($paths as $path) {
                 foreach (self::$vendors as $vendor) {
-                    if (0 !== strpos($path, $vendor)) {
+                    if (!str_starts_with($path, $vendor)) {
                         self::$internalPaths[] = $path;
                     }
                 }
@@ -371,13 +371,13 @@ class Deprecation
             return self::PATH_TYPE_UNDETERMINED;
         }
         foreach (self::getVendors() as $vendor) {
-            if (0 === strpos($realPath, $vendor) && false !== strpbrk(substr($realPath, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
+            if (str_starts_with($realPath, $vendor) && false !== strpbrk(substr($realPath, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                 return self::PATH_TYPE_VENDOR;
             }
         }
 
         foreach (self::$internalPaths as $internalPath) {
-            if (0 === strpos($realPath, $internalPath)) {
+            if (str_starts_with($realPath, $internalPath)) {
                 return self::PATH_TYPE_SELF;
             }
         }

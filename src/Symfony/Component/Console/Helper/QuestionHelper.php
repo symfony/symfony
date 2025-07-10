@@ -329,7 +329,7 @@ class QuestionHelper extends Helper
 
                         $matches = array_filter(
                             $autocomplete($ret),
-                            fn ($match) => '' === $ret || str_starts_with($match, $ret)
+                            fn ($match) => '' === $ret || str_starts_with($match ?? '', $ret)
                         );
                         $numMatches = \count($matches);
                         $ofs = -1;
@@ -365,7 +365,7 @@ class QuestionHelper extends Helper
 
                 foreach ($autocomplete($ret) as $value) {
                     // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                    if (str_starts_with($value, $tempRet)) {
+                    if (str_starts_with($value ?? '', $tempRet)) {
                         $matches[$numMatches++] = $value;
                     }
                 }
@@ -377,7 +377,7 @@ class QuestionHelper extends Helper
                 $cursor->savePosition();
                 // Write highlighted text, complete the partially entered response
                 $charactersEntered = \strlen(trim($this->mostRecentlyEnteredValue($fullChoice)));
-                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($matches[$ofs], $charactersEntered)).'</hl>');
+                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($matches[$ofs] ?? '', $charactersEntered)).'</hl>');
                 $cursor->restorePosition();
             }
         }

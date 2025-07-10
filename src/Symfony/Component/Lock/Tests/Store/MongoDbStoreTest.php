@@ -46,9 +46,9 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         }
     }
 
-    private static function getMongoManager(array $uriOptions = []): Manager
+    private static function getMongoManager(): Manager
     {
-        return new Manager('mongodb://'.getenv('MONGODB_HOST'), $uriOptions);
+        return new Manager('mongodb://'.getenv('MONGODB_HOST'));
     }
 
     protected function getClockDelay(): int

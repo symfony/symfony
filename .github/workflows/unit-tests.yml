@@ -34,6 +34,7 @@ jobs:
           - php: '8.3'
           - php: '8.4'
           - php: '8.5'
+            extensions: apcu,igbinary,intl,mbstring,memcached,redis
             #mode: experimental
       fail-fast: false
 

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by norkunas at 2025-07-09T09:58:48Z
+
+> Is this a bugfix or?
+
+I'd say yes - in 7.2 it should be handled differently because there these helpers does not exist, but then fixing on 7.3 it does not make sense not to use them :man_shrugging:

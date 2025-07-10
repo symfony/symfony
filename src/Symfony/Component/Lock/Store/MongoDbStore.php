@@ -62,19 +62,20 @@ class MongoDbStore implements PersistingStoreInterface
     private float $initialTtl;
 
     /**
-     * @param Collection|Client|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
-     * @param array                            $options    See below
-     * @param float                            $initialTtl The expiration delay of locks in seconds
+     * @param Collection|Database|Client|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
+     * @param array                                     $options    See below
+     * @param float                                     $initialTtl The expiration delay of locks in seconds
      *
      * @throws InvalidArgumentException If required options are not provided
      * @throws InvalidTtlException      When the initial ttl is not valid
      *
      * Options:
-     *      gcProbability: Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
-     *      database:      The name of the database [required when $mongo is a Client]
-     *      collection:    The name of the collection [required when $mongo is a Client]
-     *      uriOptions:    Array of uri options. [used when $mongo is a URI]
-     *      driverOptions: Array of driver options. [used when $mongo is a URI]
+     *      gcProbability:  Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
+     *      database:       The name of the database [required when $mongo is a Client]
+     *      collection:     The name of the collection [required when $mongo is a Client]
+     *      uriOptions:     Array of uri options. [used when $mongo is a URI]
+     *      driverOptions:  Array of driver options. [used when $mongo is a URI]
+     *      readPreference: A MongoDB\Driver\ReadPreference instance. [optional for `exists` check queries]
      *
      * When using a URI string:
      *      The database is determined from the uri's path, otherwise the "database" option is used. To specify an alternate authentication database; "authSource" uriOption or querystring parameter must be used.
@@ -91,7 +92,11 @@ class MongoDbStore implements PersistingStoreInterface
      * self::createTtlIndex(int $expireAfterSeconds = 0).
      *
      * writeConcern and readConcern are not specified by MongoDbStore meaning the connection's settings will take effect.
-     * readPreference is primary for all queries.
+     * readPreference, if not explicitly provided as an option, it will be inherited from:
+     * - The provided Collection object
+     * - The Manager from the provided Database, Client, or Manager instance
+     * - If none of the above, the connection's default settings will be used
+     *
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
     public function __construct(Collection|Database|Client|Manager|string $mongo, array $options = [], float $initialTtl = 300.0)

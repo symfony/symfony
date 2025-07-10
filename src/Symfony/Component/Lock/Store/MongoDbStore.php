@@ -121,8 +121,8 @@ class MongoDbStore implements PersistingStoreInterface
             $this->options['collection'] ??= $mongo->getCollectionName();
             $this->manager = $mongo->getManager();
         } elseif ($mongo instanceof Database) {
-            $this->manager = $mongo->getManager();
             $this->options['database'] ??= $mongo->getDatabaseName();
+            $this->manager = $mongo->getManager();
         } elseif ($mongo instanceof Client) {
             $this->manager = $mongo->getManager();
         } elseif ($mongo instanceof Manager) {

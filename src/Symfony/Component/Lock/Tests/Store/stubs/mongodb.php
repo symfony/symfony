@@ -12,7 +12,6 @@
 namespace MongoDB;
 
 use MongoDB\Driver\Manager;
-use MongoDB\Driver\ReadPreference;
 
 /*
  * Stubs for the mongodb/mongodb library version ~1.16
@@ -41,7 +40,5 @@ if (!class_exists(Collection::class)) {
         abstract public function getCollectionName(): string;
 
         abstract public function getDatabaseName(): string;
-
-        abstract public function getReadPreference(): ReadPreference;
     }
 }

@@ -21,6 +21,7 @@ use MongoDB\Driver\Exception\BulkWriteException;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Query;
 use MongoDB\Driver\ReadPreference;
+use MongoDB\Driver\WriteConcern;
 use MongoDB\Exception\DriverRuntimeException;
 use MongoDB\Exception\InvalidArgumentException as MongoInvalidArgumentException;
 use MongoDB\Exception\UnsupportedException;
@@ -70,12 +71,11 @@ class MongoDbStore implements PersistingStoreInterface
      * @throws InvalidTtlException      When the initial ttl is not valid
      *
      * Options:
-     *      gcProbability:  Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
-     *      database:       The name of the database [required when $mongo is a Client]
-     *      collection:     The name of the collection [required when $mongo is a Client]
-     *      uriOptions:     Array of uri options. [used when $mongo is a URI]
-     *      driverOptions:  Array of driver options. [used when $mongo is a URI]
-     *      readPreference: A MongoDB\Driver\ReadPreference instance. [optional for `exists` check queries]
+     *      gcProbability: Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
+     *      database:      The name of the database [required when $mongo is a Client]
+     *      collection:    The name of the collection [required when $mongo is a Client]
+     *      uriOptions:    Array of uri options. [used when $mongo is a URI]
+     *      driverOptions: Array of driver options. [used when $mongo is a URI]
      *
      * When using a URI string:
      *      The database is determined from the uri's path, otherwise the "database" option is used. To specify an alternate authentication database; "authSource" uriOption or querystring parameter must be used.
@@ -91,11 +91,9 @@ class MongoDbStore implements PersistingStoreInterface
      * to 0.0 and optionally leverage
      * self::createTtlIndex(int $expireAfterSeconds = 0).
      *
-     * writeConcern and readConcern are not specified by MongoDbStore meaning the connection's settings will take effect.
-     * readPreference, if not explicitly provided as an option, it will be inherited from:
-     * - The provided Collection object
-     * - The Manager from the provided Database, Client, or Manager instance
-     * - If none of the above, the connection's default settings will be used
+     * readConcern is not specified by MongoDbStore meaning the connection's settings will take effect.
+     * writeConcern is majority for all update queries.
+     * readPreference is primary for all read queries.
      *
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
@@ -114,26 +112,21 @@ class MongoDbStore implements PersistingStoreInterface
             'collection' => null,
             'uriOptions' => [],
             'driverOptions' => [],
-            'readPreference' => null,
         ], $options);
 
         $this->initialTtl = $initialTtl;
 
         if ($mongo instanceof Collection) {
-            $this->manager = $mongo->getManager();
             $this->options['database'] ??= $mongo->getDatabaseName();
             $this->options['collection'] ??= $mongo->getCollectionName();
-            $this->options['readPreference'] ??= $mongo->getReadPreference();
+            $this->manager = $mongo->getManager();
         } elseif ($mongo instanceof Database) {
             $this->manager = $mongo->getManager();
             $this->options['database'] ??= $mongo->getDatabaseName();
-            $this->options['readPreference'] ??= $this->manager->getReadPreference();
         } elseif ($mongo instanceof Client) {
             $this->manager = $mongo->getManager();
-            $this->options['readPreference'] ??= $this->manager->getReadPreference();
         } elseif ($mongo instanceof Manager) {
             $this->manager = $mongo;
-            $this->options['readPreference'] ??= $this->manager->getReadPreference();
         } else {
             $this->uri = $this->skimUri($mongo);
         }
@@ -152,10 +145,6 @@ class MongoDbStore implements PersistingStoreInterface
 
         if ($this->initialTtl <= 0) {
             throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
-        }
-
-        if (!empty($this->options['readPreference']) && !$this->options['readPreference'] instanceof ReadPreference) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects a MongoDB\Driver\ReadPreference instance, got "%s".', __METHOD__, get_debug_type($this->options['readPreference'])));
         }
     }
 
@@ -301,7 +290,11 @@ class MongoDbStore implements PersistingStoreInterface
             ['limit' => 1]
         );
 
-        $this->getManager()->executeBulkWrite($this->namespace, $write);
+        $this->getManager()->executeBulkWrite(
+            $this->namespace,
+            $write,
+            ['writeConcern' => new WriteConcern(WriteConcern::MAJORITY)]
+        );
     }
 
     public function exists(Key $key): bool
@@ -318,7 +311,9 @@ class MongoDbStore implements PersistingStoreInterface
                 'limit' => 1,
                 'projection' => ['_id' => 1],
             ]
-        ), array_filter(['readPreference' => $this->options['readPreference']]));
+        ), [
+            'readPreference' => new ReadPreference(ReadPreference::PRIMARY)
+        ]);
 
         return [] !== $cursor->toArray();
     }
@@ -360,7 +355,11 @@ class MongoDbStore implements PersistingStoreInterface
             ]
         );
 
-        $this->getManager()->executeBulkWrite($this->namespace, $write);
+        $this->getManager()->executeBulkWrite(
+            $this->namespace,
+            $write,
+            ['writeConcern' => new WriteConcern(WriteConcern::MAJORITY)]
+        );
     }
 
     private function isDuplicateKeyException(BulkWriteException $e): bool

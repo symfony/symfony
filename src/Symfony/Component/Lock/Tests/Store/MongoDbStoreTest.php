@@ -17,7 +17,6 @@ use MongoDB\Database;
 use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\ConnectionTimeoutException;
 use MongoDB\Driver\Manager;
-use MongoDB\Driver\ReadPreference;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -104,53 +103,6 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock']];
     }
 
-    public function testReadPreferenceWithManagerOnSecondary()
-    {
-        $mongo = self::getMongoManager(['readPreference' => 'secondary']);
-
-        $store = new MongoDbStore(
-            $mongo,
-            ['database' => 'test', 'collection' => 'lock', 'readPreference' => new ReadPreference('primary')]
-        );
-
-        // Use reflection to access the private options property
-        $reflection = new \ReflectionObject($store);
-        $optionsProperty = $reflection->getProperty('options');
-        $options = $optionsProperty->getValue($store);
-
-        // Assert that the readPreference is set to primary
-        $this->assertInstanceOf(ReadPreference::class, $options['readPreference']);
-        $this->assertEquals('primary', $options['readPreference']->getModeString());
-    }
-
-    public function testReadPreferenceWithCollectionOnNearest()
-    {
-        $collection = $this->createMock(Collection::class);
-        $collection->expects($this->once())
-            ->method('getManager')
-            ->willReturn(self::getMongoManager(['readPreference' => 'primary']));
-        $collection->expects($this->once())
-            ->method('getDatabaseName')
-            ->willReturn('test');
-        $collection->expects($this->once())
-            ->method('getCollectionName')
-            ->willReturn('lock');
-        $collection->expects($this->once())
-            ->method('getReadPreference')
-            ->willReturn(new ReadPreference('nearest'));
-
-        $store = new MongoDbStore($collection, []);
-
-        // Use reflection to access the private options property
-        $reflection = new \ReflectionObject($store);
-        $optionsProperty = $reflection->getProperty('options');
-        $options = $optionsProperty->getValue($store);
-
-        // Assert that the readPreference is set to primary
-        $this->assertInstanceOf(ReadPreference::class, $options['readPreference']);
-        $this->assertEquals('nearest', $options['readPreference']->getModeString());
-    }
-
     public function testConstructWithClient()
     {
         $client = $this->createMock(Client::class);
@@ -186,9 +138,6 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $collection->expects($this->once())
             ->method('getCollectionName')
             ->willReturn('lock');
-        $collection->expects($this->once())
-            ->method('getReadPreference')
-            ->willReturn(new ReadPreference('primary'));
 
         $this->testConstructionMethods($collection, []);
     }

@@ -40,15 +40,15 @@ class Expression extends Constraint
     public bool $negate = true;
 
     /**
-     * @param string|ExpressionObject|array<string,mixed>|null $expression The expression to evaluate
-     * @param array<string,mixed>|null                         $values     The values of the custom variables used in the expression (defaults to an empty array)
-     * @param string[]|null                                    $groups
-     * @param array<string,mixed>|null                         $options
-     * @param bool|null                                        $negate     Whether to fail if the expression evaluates to true (defaults to false)
+     * @param string|ExpressionObject|null $expression The expression to evaluate
+     * @param array<string,mixed>|null     $values     The values of the custom variables used in the expression (defaults to an empty array)
+     * @param string[]|null                $groups
+     * @param array<string,mixed>|null     $options
+     * @param bool|null                    $negate     Whether to fail if the expression evaluates to true (defaults to false)
      */
     #[HasNamedArguments]
     public function __construct(
-        string|ExpressionObject|array|null $expression,
+        string|ExpressionObject|null $expression = null,
         ?string $message = null,
         ?array $values = null,
         ?array $groups = null,
@@ -60,41 +60,12 @@ class Expression extends Constraint
             throw new LogicException(\sprintf('The "symfony/expression-language" component is required to use the "%s" constraint. Try running "composer require symfony/expression-language".', __CLASS__));
         }
 
-        if (\is_array($expression)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-            $options = array_merge($expression, $options ?? []);
-            $expression = null;
-        } else {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-                $options['value'] = $expression;
-            }
-        }
-
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->expression = $expression ?? $this->expression;
         $this->values = $values ?? $this->values;
         $this->negate = $negate ?? $this->negate;
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getDefaultOption(): ?string
-    {
-        return 'expression';
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getRequiredOptions(): array
-    {
-        return ['expression'];
     }
 
     public function getTargets(): string|array

@@ -517,6 +517,8 @@ Validator
 ---------
 
  * Remove `Bic::INVALID_BANK_CODE_ERROR` constant. This error code was not used in the Bic constraint validator anymore.
+ * Remove `Expression::getDefaultOption()`, use named arguments instead.
+ * Remove `Expression::etRequiredOptions()`, use named arguments instead.
 
 VarExporter
 -----------

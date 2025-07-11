@@ -41,18 +41,6 @@ class ExpressionTest extends TestCase
         self::assertSame('some attached data', $cConstraint->payload);
         self::assertFalse($cConstraint->negate);
     }
-
-    /**
-     * @group legacy
-     */
-    public function testInitializeWithOptionsArray()
-    {
-        $constraint = new Expression([
-            'expression' => '!this.getParent().get("field2").getData()',
-        ]);
-
-        $this->assertSame('!this.getParent().get("field2").getData()', $constraint->expression);
-    }
 }
 
 class ExpressionDummy

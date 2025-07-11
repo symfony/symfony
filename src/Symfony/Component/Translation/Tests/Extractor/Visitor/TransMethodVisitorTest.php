@@ -1,12 +1,21 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Translation\Tests\Extractor\Visitor;
 
 use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
 
 final class TransMethodVisitorTest extends AbstractVisitorTestCase
 {
-    private const FIXTURES_FOLDER = __DIR__ . '/../../Fixtures/extractor-php-ast/trans-method-visitor/';
+    private const FIXTURES_FOLDER = __DIR__.'/../../Fixtures/extractor-php-ast/trans-method-visitor/';
     public const OTHER_DOMAIN = 'not_messages';
 
     public function testExtractMessages()
@@ -92,14 +101,14 @@ EOF;
             $catalogue->all(),
         );
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translation.html.php:2']], $catalogue->getMetadata('single-quoted key'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translation.html.php:37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translation-73.html.php:8']], $catalogue->getMetadata("nowdoc\nindented\n  further"));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translation.html.php:2']], $catalogue->getMetadata('single-quoted key'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translation.html.php:37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translation-73.html.php:8']], $catalogue->getMetadata("nowdoc\nindented\n  further"));
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable-short.html.php:2']], $catalogue->getMetadata('translatable-short single-quoted key'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable-short.html.php:37']], $catalogue->getMetadata('translatable-short other-domain-test-no-params-short-array', 'not_messages'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-short.html.php:2']], $catalogue->getMetadata('translatable-short single-quoted key'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-short.html.php:37']], $catalogue->getMetadata('translatable-short other-domain-test-no-params-short-array', 'not_messages'));
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable-short-fqn.html.php:2']], $catalogue->getMetadata('translatable-short-fqn single-quoted key'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'translatable-short-fqn.html.php:37']], $catalogue->getMetadata('translatable-short-fqn other-domain-test-no-params-short-array', 'not_messages'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-short-fqn.html.php:2']], $catalogue->getMetadata('translatable-short-fqn single-quoted key'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-short-fqn.html.php:37']], $catalogue->getMetadata('translatable-short-fqn other-domain-test-no-params-short-array', 'not_messages'));
     }
 }

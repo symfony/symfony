@@ -1,12 +1,21 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Translation\Tests\Extractor\Visitor;
 
 use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
 
 final class ConstraintVisitorTest extends AbstractVisitorTestCase
 {
-    private const FIXTURES_FOLDER = __DIR__ . '/../../Fixtures/extractor-php-ast/constraint-visitor/';
+    private const FIXTURES_FOLDER = __DIR__.'/../../Fixtures/extractor-php-ast/constraint-visitor/';
 
     public function testExtractMessages()
     {
@@ -32,6 +41,6 @@ final class ConstraintVisitorTest extends AbstractVisitorTestCase
             $catalogue->all(),
         );
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER . 'validator-constraints.php:7']], $catalogue->getMetadata('message-in-constraint-attribute', 'validators'));
+        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'validator-constraints.php:7']], $catalogue->getMetadata('message-in-constraint-attribute', 'validators'));
     }
 }

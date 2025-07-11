@@ -19,7 +19,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 final class PhpAstExtractorTest extends TestCase
 {
-    private const FIXTURES_FOLDER = __DIR__ . '/../Fixtures/extractor-php-ast/extract-files/';
+    private const FIXTURES_FOLDER = __DIR__.'/../Fixtures/extractor-php-ast/extract-files/';
 
     #[DataProvider('resourcesProvider')]
     public function testExtractFiles(iterable|string $resource)

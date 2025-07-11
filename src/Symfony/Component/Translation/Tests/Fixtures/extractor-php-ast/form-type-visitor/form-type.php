@@ -1,5 +1,4 @@
 <?php
-// @see https://github.com/php-translation/extractor/blob/master/tests/Resources/Php/Symfony/ExplicitLabelType.php
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;

@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Extractor\Visitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -39,7 +40,7 @@ final class TranslatableMessageVisitor extends AbstractVisitor implements NodeVi
             return null;
         }
 
-        if (!\in_array('TranslatableMessage', $className->getParts(), true)) {
+        if (TranslatableMessage::class !== $className->name) {
             return null;
         }
 

@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-10T09:12:47Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-10T11:35:01Z
+
+friendly ping @GromNaN
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2025-07-10T13:18:28Z
+
+> This pull request addresses an issue where the `MongoDbStore` ignores the `readPreference` set on a MongoDB Collection, instead defaulting to the `readPreference` of the main Doctrine connection. This can cause a race condition when releasing a lock, leading to a failure exception.
+
+I agree, this is not desirable. For something as critical as locking, this should always use a `primary` read preference. Alternatively, `primaryPreferred` would allow read operations even if no primary was available, but I'm not sure how relevant that use case is.
+
+> The changes in this PR ensure that the `readPreference` of the provided Collection is respected. Additionally, it introduces the ability to pass a `readPreference` option directly to the `MongoDbStore` constructor for more explicit control.
+
+As @GromNaN already said, we shouldn't rely on anything other than a primary read preference for reads. That guarantees that we're always reading the latest data.
+
+> ### The Problem
+> A scenario was identified, similar to issue #58397, where a lock cannot be successfully released. This occurs when the application:
+>
+> 1. Provides a MongoDB Collection to the `MongoDbStore` with `readPreference` set to `primary`.
+> 2. Has a default `readPreference` of `nearest` configured on the MongoDB manager.
+>
+> When `release()` is called on a lock, the component first issues a `DELETE` command to the primary MongoDB node. Immediately after, it sends a query to verify the deletion. However, this verification query incorrectly uses the `nearest` read preference from the Doctrine connection, often hitting a secondary node. If replication to the secondary has not yet completed, the verification fails, and an exception is thrown, incorrectly reporting that the lock release failed.
+
+There are a couple of problems I can see with this approach:
+* If the delete command succeeded, the only option for that particular document to still be there would be if either `w=0` was used (unacknowledged writes are always reported as succeeded) or a write concern less than the majority of nodes was used and the delete was lost during a failover (unlikely but possible).
+* If you really want to check that the delete command succeeded, using a `secondary` read preference could always lead to issues unless you specified a write concern equal to the number of nodes in the cluster, which comes with its own problems.
+
+With all that in mind, using a `primary` read preference is the best solution for the problem. If we really want to be on the safe side, we could also ensure a majority write concern for all writes concerning the lock. While the default write concern is already majority, the connection itself may be using a different write concern. Using a majority write concern makes the writes more durable in case of failovers.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-07-10T14:26:50Z
+
+The PR title and description (and the commit message) should be updated to reflect the new solution being implemented.
+
+---------------------------------------------------------------------------
+
+by notrix at 2025-07-10T14:28:14Z
+
+I agree that in order this not to be a new feature we should not introduce new options and only stick to the issue. I have updated fixed readPreference to be `primary` and and writeConcern to be `majority`.

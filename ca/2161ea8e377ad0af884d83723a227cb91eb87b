@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mttsch at 2025-06-30T17:44:49Z
+
+I could not find a reference to the removed code in Symfony docs, thus I do not think they need updates. Also see the docs issue for the deprecations: https://github.com/symfony/symfony-docs/issues/20602
+
+---------------------------------------------------------------------------
+
+by mttsch at 2025-07-12T16:13:03Z
+
+Can I get a final instruction if something has to be changed or not?

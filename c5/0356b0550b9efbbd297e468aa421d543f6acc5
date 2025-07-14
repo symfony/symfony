@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-12T09:36:22Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-07-13T16:55:45Z
+
+Looks like we need to adapt our PHP CS fixer config then.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-07-13T17:37:55Z
+
+> Looks like we need to adapt our PHP CS fixer config then.
+
+There is no such rules AFAICS.
+
+I've enabled a rule to fix the order (see second commit).

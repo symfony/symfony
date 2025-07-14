@@ -985,22 +985,22 @@ class UrlMatcherTest extends TestCase
     public function testHostVariablesWithDefaults()
     {
         $collection = new RouteCollection();
-        
+
         // Route with host defaults - should match when subdomain is missing
         $routeWithDefaults = new Route('/test', ['subdomain' => 'en'], ['subdomain' => '[a-zA-Z]+'], [], '{subdomain}.example.com');
         $collection->add('with_defaults', $routeWithDefaults);
-        
-        // Route without host defaults - should NOT match when subdomain is missing  
+
+        // Route without host defaults - should NOT match when subdomain is missing
         $routeWithoutDefaults = new Route('/test2', [], ['subdomain' => '[a-zA-Z]+'], [], '{subdomain}.example.com');
         $collection->add('without_defaults', $routeWithoutDefaults);
-        
+
         // Test 1: Host without subdomain - should match route with defaults
         $matcher = $this->getUrlMatcher($collection, new RequestContext('', 'GET', 'example.com'));
-        
+
         $result = $matcher->match('/test');
         $this->assertSame('with_defaults', $result['_route']);
         $this->assertSame('en', $result['subdomain']);
-        
+
         // Test 2: Same host should NOT match route without defaults
         $this->expectException(ResourceNotFoundException::class);
         $matcher->match('/test2');

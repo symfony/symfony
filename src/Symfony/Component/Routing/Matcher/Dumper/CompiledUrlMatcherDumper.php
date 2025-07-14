@@ -225,7 +225,7 @@ EOF;
                 $compiledRoute = $route->compile();
                 $hostVars = $compiledRoute->getHostVariables();
                 $hostArg = null;
-                
+
                 if ($hostVars) {
                     // Pass both host regex and host variables for routes with host variables
                     $hostArg = [$compiledRoute->getHostRegex(), $hostVars];
@@ -233,7 +233,7 @@ EOF;
                     // Pass just the host string for static hosts
                     $hostArg = $host;
                 }
-                
+
                 $compiledRoutes[$url][] = $this->compileRoute($route, $name, $hostArg, $hasTrailingSlash, false, $conditions);
             }
         }

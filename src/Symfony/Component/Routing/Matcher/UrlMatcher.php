@@ -163,14 +163,14 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 if ($hostVariables) {
                     $routeDefaults = $route->getDefaults();
                     $hasAllDefaults = true;
-                    
+
                     foreach ($hostVariables as $variable) {
                         if (!\array_key_exists($variable, $routeDefaults)) {
                             $hasAllDefaults = false;
                             break;
                         }
                     }
-                    
+
                     if ($hasAllDefaults) {
                         // Use defaults for host variables
                         foreach ($hostVariables as $variable) {

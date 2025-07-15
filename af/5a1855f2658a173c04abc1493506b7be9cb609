@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-07-15T09:19:36Z
+
+how does this work for abstract classes that don't have only abstract methods or that have mandatory constructor arguments ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-15T09:22:06Z
+
+> how does this work for abstract classes that don't have only abstract methods or that have mandatory constructor arguments ?
+
+Methods, whether abstract or not, are forwarded to the instance returned by the lazy-factory. Then, it's the job of the lazy-factory to do whatever is needed to create such instances.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-07-15T09:23:04Z
+
+@nicolas-grekas does it handle the case of a constructor with required arguments properly ? and what happens for final methods ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-15T09:27:38Z
+
+For constructors: not our job. The service definition has to be correct.
+Final methods on abstract classes will throw an exception saying this is not compatible.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-07-15T09:39:58Z
+
+@nicolas-grekas the service definition won't provide constructor arguments for the proxy instance, only for the actual instance.
+So we should probably detect the case where the abstract class has a constructor to throw as unsupported (maybe first trying to override it and throwing only if not possible)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-15T09:43:13Z
+
+Ah sorry I misunderstood your question. We don't call the constructor, see newInstanceWithoutConstructor here:
+https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/VarExporter/Internal/LazyDecoratorTrait.php

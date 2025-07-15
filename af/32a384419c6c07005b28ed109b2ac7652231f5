@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-15T12:13:59Z
+
+Ah: a line should be added to the CHANGELOG file of the component
+
+---------------------------------------------------------------------------
+
+by dmitryuk at 2025-07-15T12:17:41Z
+
+> Ah: a line should be added to the CHANGELOG file of the component
+
+done
+p.s. interesting thing that you are the first who asked me to do that for all my PRs to Symfony

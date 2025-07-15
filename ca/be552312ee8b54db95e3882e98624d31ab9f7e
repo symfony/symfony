@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-02T09:28:26Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.4 for features / 6.4, 7.2, or 7.3 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by themasch at 2025-07-07T07:25:13Z
+
+@nicolas-grekas  like this?
+
+---------------------------------------------------------------------------
+
+by themasch at 2025-07-07T09:55:55Z
+
+Would it make sense to backport this to 7.3, 7.2 and 6.4, or would that be to big of a BC break?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-07-07T10:21:42Z
+
+New features are never backported in patch versions.
+
+---------------------------------------------------------------------------
+
+by themasch at 2025-07-07T11:05:18Z
+
+Okay, so this counts as a new feature, not a bug fix? Good to know, so we'll need to wait for 7.4 to remove our work around! Thanks!

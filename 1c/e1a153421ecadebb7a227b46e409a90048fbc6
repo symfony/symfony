@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2025-07-09T15:32:36Z
+
+> I am curious about your use case for enums with configuration.
+
+I have a compiler that creates PHP code based on some classes and enums I declare in my application. I use the resources to quickly check if there are changes and if I should recompile.
+
+To be specific: it's creating Webonyx GraphQL type files, which are annoying to create by hand (arrays etc). Therefore we have our own abstraction with attributes.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-07-09T18:51:37Z
+
+@GromNaN that is a valid use case for these classes, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-15T08:24:52Z
+
+Works for me as a bugfix on 6.4
+
+> The cases were visible, because the enum cases are available as class constants.
+
+Doesn't this mean that the more generic fix is to fix support for attributes on class constants?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-07-15T14:16:28Z
+
+> Works for me as a bugfix on 6.4
+
+Thanks. I'll rebase this PR later.
+
+> Doesn't this mean that the more generic fix is to fix support for attributes on class constants?
+
+Sure, but that's a PHP 8.5 feature: https://wiki.php.net/rfc/attributes-on-constants
+
+Maybe we should also add support for that already?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-15T15:19:14Z
+
+That RFC is for constants. Here we need class-constants, which do support attributes in PHP 8.1:
+https://www.php.net/manual/fr/reflectionclassconstant.getattributes.php
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-07-16T12:40:58Z
+
+@nicolas-grekas Implemented it for class constants. I think this solution is much better :) Thanks!

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-16T11:59:01Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-16T12:44:53Z
+
+The test files are missing the license header.
+Did you check branch 6.4? Is it not affected?
+
+---------------------------------------------------------------------------
+
+by vinceAmstoutz at 2025-07-16T12:52:51Z
+
+> The test files are missing the license header. Did you check branch 6.4? Is it not affected?
+
+The missing license headers have been added and yes, version 6.4 is affected, so I changed the target from version 7.2 to version 6.4.

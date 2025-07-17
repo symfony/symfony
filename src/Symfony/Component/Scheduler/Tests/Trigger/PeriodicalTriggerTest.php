@@ -76,6 +76,7 @@ class PeriodicalTriggerTest extends TestCase
         yield [-3600, 'The "$interval" argument must be greater than zero.'];
         yield ['0', 'The "$interval" argument must be greater than zero.'];
         yield [0, 'The "$interval" argument must be greater than zero.'];
+        yield ['Monday, Thursday, Saturday', 'Comma-separated values are not supported'];
     }
 
     /**

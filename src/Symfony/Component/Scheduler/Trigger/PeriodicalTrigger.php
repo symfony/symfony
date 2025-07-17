@@ -51,6 +51,10 @@ class PeriodicalTrigger implements StatefulTriggerInterface
 
             $i = $interval;
             if (\is_string($interval)) {
+                if (str_contains($interval, ',')) {
+                    throw new InvalidArgumentException(\sprintf('Invalid interval "%s": Comma-separated values are not supported', $interval));
+                }
+
                 $this->description = \sprintf('every %s', $interval);
                 $i = @\DateInterval::createFromDateString($interval);
 

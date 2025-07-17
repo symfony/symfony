@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-13T11:08:27Z
+
+I tried to deprecate `TranslatableMessage::__toString` but then it creates a deprecation when writing
+```
+if label is empty
+```
+because of the twig implémentation
+```
+public static function testEmpty($value): bool
+    {
+        if ($value instanceof \Countable) {
+            return 0 === \count($value);
+        }
+
+        if ($value instanceof \Traversable) {
+            return !iterator_count($value);
+        }
+
+        if ($value instanceof \Stringable) {
+            return '' === (string) $value;
+        }
+
+        return '' === $value || false === $value || null === $value || [] === $value;
+    }
+```
+Not sure how to do then @stof @xabbuh ?
+
+Also it means that removing the toString method in 8.0 will imply that such thing as
+```
+new TranslatableMessage('');
+new StaticMessage('');
+```
+won't be considered as empty anymore.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-13T14:18:38Z
+
+I extracted the first fix in https://github.com/symfony/symfony/pull/61111
+
+---------------------------------------------------------------------------
+
+by stof at 2025-07-15T08:29:31Z
+
+If the form theme relies on checking whether a TranslatableMessage is empty before translating it, it is broken, as it checks the emptyness of the wrong string.
+A TranslatableMessage could have a non-empty key producing an empty message.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-15T08:50:46Z
+
+> If the form theme relies on checking whether a TranslatableMessage is empty before translating it, it is broken, as it checks the emptyness of the wrong string. A TranslatableMessage could have a non-empty key producing an empty message.
+
+If it's broken then how would you "fix" it @stof ?
+https://github.com/symfony/symfony/blob/36d8d5d464b3fc1d7988145ee01b64dc749bd936/src/Symfony/Bridge/Twig/Resources/views/Form/form_div_layout.html.twig#L304
+
+I'm not sure we could call this broken since it's the same with "string key".
+You could decide to have a non-empty string key producing an empty message too ; and the check will be done before translating. So the check seems consistent.
+
+My main issue is currently the fact that
+- If I have a toString in TranslatableMessage and not StaticMessage, the behavior will be different.
+- If I trigger a deprecation in TranslatableMessage::__toString, it will be trigger in twig.
+
+Should I just add `@deprecated` without a `trigger_deprecation` call ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-15T09:11:22Z
+
+The fix might be to NOT wrap empty strings into TranslatableMessage. Is that possible?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-15T12:24:13Z
+
+> The fix might be to NOT wrap empty strings into TranslatableMessage. Is that possible?
+
+We can "forbidden" this with
+- a `@param non-empty-string` phpdoc
+- An InvalidArgument if a empty string is given on Symfony 8
+- A deprecation on Symfony 7
+
+But that does not solve the fact that a deprecation in the `__toString` method will be triggered by twig/twig when doing the `is empty` test: `'' === (string) $value` because of the current implementation https://github.com/symfony/symfony/pull/61109#issuecomment-3066976660
+
+For this, I dunno what to do @nicolas-grekas :/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-15T12:31:25Z
+
+Can't we replace the empty check by a simple `if msg` one?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-15T13:39:03Z
+
+> Can't we replace the empty check by a simple `if msg` one?
+
+Great, it solves everything.
+
+I just need https://github.com/symfony/symfony/pull/61111 to be merge into 7.4 now.

@@ -98,11 +98,13 @@ class UriSigner
      * Checks that a URI contains the correct hash.
      * Also checks if the URI has not expired (If you used expiration during signing).
      */
+    #[\NoDiscard]
     public function check(string $uri): bool
     {
         return self::STATUS_VALID === $this->doVerify($uri);
     }
 
+    #[\NoDiscard]
     public function checkRequest(Request $request): bool
     {
         return self::STATUS_VALID === $this->doVerify(self::normalize($request));

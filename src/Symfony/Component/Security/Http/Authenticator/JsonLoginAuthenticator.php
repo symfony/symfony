@@ -148,7 +148,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             $credentials['username'] = $this->propertyAccessor->getValue($data, $this->options['username_path']);
 
             if (!\is_string($credentials['username']) || '' === $credentials['username']) {
-                throw new BadRequestHttpException('The key "username" must be a non-empty string.');
+                throw new BadCredentialsException('The key "username" must be a non-empty string.');
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be provided.', $this->options['username_path']), $e);
@@ -159,7 +159,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             $this->propertyAccessor->setValue($data, $this->options['password_path'], null);
 
             if (!\is_string($credentials['password']) || '' === $credentials['password']) {
-                throw new BadRequestHttpException('The key "password" must be a non-empty string.');
+                throw new BadCredentialsException('The key "password" must be a non-empty string.');
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);

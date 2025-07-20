@@ -1,0 +1,19 @@
+imports:
+  - { resource: ../config/default.yml }
+
+services:
+  _defaults: { public: true }
+
+  Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass:
+    public: true
+    tags:
+      - "foo_bar"
+
+  Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass:
+    public: true
+    tags:
+      - "foo_bar"
+
+  Symfony\Component\DependencyInjection\Tests\Fixtures\ServiceLocatorWithAttribute:
+    autoconfigure: true
+    autowire: true

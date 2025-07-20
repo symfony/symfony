@@ -6,6 +6,7 @@ CHANGELOG
 
  * Allow `#[AsAlias]` to be extended
  * Add argument `$target` to `ContainerBuilder::registerAliasForArgument()`
+ * Add `#[AsServiceLocator]` to allow service locator configuration at the class level
 
 7.3
 ---

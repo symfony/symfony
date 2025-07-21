@@ -41,7 +41,6 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallback\A as Instance
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallback\B as InstanceCallbackB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallbackWithArguments\A as InstanceCallbackWithArgumentsA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallbackWithArguments\B as InstanceCallbackWithArgumentsB;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\LazyFoo;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\AToBMapper;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\MapStructMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Source;
@@ -369,14 +368,6 @@ final class ObjectMapperTest extends TestCase
     {
         yield [new ObjectMapper()];
         yield [new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor())];
-    }
-
-    public function testMapInitializesLazyObject()
-    {
-        $lazy = new LazyFoo();
-        $mapper = new ObjectMapper();
-        $mapper->map($lazy, \stdClass::class);
-        $this->assertTrue($lazy->isLazyObjectInitialized());
     }
 
     public function testMapInitializesNativePhp84LazyObject()

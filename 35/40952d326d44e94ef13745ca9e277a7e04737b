@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-19T22:17:00Z
+
+Hi 👋, I think the erros in the tests isn't relevant in the context of this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-20T09:47:53Z
+
+In the ext-redis code patch we have a dedicated branch for clusters, isn't that what we need, instead of doing this live feature-check?
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-20T22:23:18Z
+
+Hi 👋 Thanks a lot for your recommendation!
+I’ve updated the branch and I’m now following that approach.
+Thanks again!
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-20T23:48:49Z
+
+If we want to avoid that [silent error](https://github.com/symfony/symfony/issues/59795#issuecomment-3094849646) when Redis cluster support is disabled, one workaround might be to use `eval` when the number of connections returned is 0. That way, we can proactively catch the issue before it leads to an unexpected empty iterator.
+
+Let me know what you think

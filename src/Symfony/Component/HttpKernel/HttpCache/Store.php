@@ -427,7 +427,7 @@ class Store implements StoreInterface
      */
     protected function generateCacheKey(Request $request): string
     {
-        return 'md'.hash('sha256', $request->getUri());
+        return 'md'.hash('sha256', $request->isMethod('QUERY') ? $request->getContent() : $request->getUri());
     }
 
     /**

@@ -2070,6 +2070,26 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTrue($this->response->headers->has('X-Symfony-Cache'));
         $this->assertEquals('miss', $this->response->headers->get('X-Symfony-Cache'));
     }
+
+    public function testQueryRequestAreCacheable()
+    {
+        $this->setNextResponse(200, ['Cache-Control' => 'public, s-maxage=3600']);
+        $this->request('QUERY', content: '{"foo": "bar"}');
+        $this->assertHttpKernelIsCalled();
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertTraceContains('miss');
+        $this->assertTraceContains('store');
+
+        $this->request('QUERY', content: '{"foo": "bar"}');
+        $this->assertTraceContains('fresh');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertEquals(200, $this->response->getStatusCode());
+
+        $this->request('QUERY', content: '{"foo": "baz"}');
+        $this->assertHttpKernelIsCalled();
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertTraceContains('miss');
+    }
 }
 
 class TestKernel implements HttpKernelInterface

@@ -62,6 +62,7 @@ class Request
     public const METHOD_OPTIONS = 'OPTIONS';
     public const METHOD_TRACE = 'TRACE';
     public const METHOD_CONNECT = 'CONNECT';
+    public const METHOD_QUERY = 'QUERY';
 
     /**
      * @var string[]
@@ -350,6 +351,7 @@ class Request
             case 'POST':
             case 'PUT':
             case 'DELETE':
+            case 'QUERY':
                 if (!isset($server['CONTENT_TYPE'])) {
                     $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
                 }
@@ -1351,7 +1353,7 @@ class Request
      */
     public function isMethodSafe(): bool
     {
-        return \in_array($this->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'TRACE'], true);
+        return \in_array($this->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'TRACE', 'QUERY'], true);
     }
 
     /**
@@ -1359,7 +1361,7 @@ class Request
      */
     public function isMethodIdempotent(): bool
     {
-        return \in_array($this->getMethod(), ['HEAD', 'GET', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'PURGE'], true);
+        return \in_array($this->getMethod(), ['HEAD', 'GET', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'PURGE', 'QUERY'], true);
     }
 
     /**
@@ -1369,7 +1371,7 @@ class Request
      */
     public function isMethodCacheable(): bool
     {
-        return \in_array($this->getMethod(), ['GET', 'HEAD'], true);
+        return \in_array($this->getMethod(), ['GET', 'HEAD', 'QUERY'], true);
     }
 
     /**

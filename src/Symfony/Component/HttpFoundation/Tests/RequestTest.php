@@ -249,6 +249,24 @@ class RequestTest extends TestCase
         // Fragment should not be included in the URI
         $request = Request::create('http://test.com/foo#bar');
         $this->assertEquals('http://test.com/foo', $request->getUri());
+
+        $query = <<<'GRAPHQL'
+        query HeroNameAndFriends($episode: Episode) {
+          hero(episode: $episode) {
+            name
+            friends {
+              name
+            }
+          }
+        }
+        GRAPHQL;
+
+        $request = Request::create('http://example.com/graphql', 'QUERY', content: json_encode(['query' => $query, 'variables' => ['foo' => 'bar']]));
+        $this->assertEquals(
+            ['query' => $query, 'variables' => ['foo' => 'bar']],
+            $request->toArray()
+        );
+        $this->assertTrue($request->isMethodSafe(), 'QUERY requests should be safe');
     }
 
     public function testCreateWithRequestUri()
@@ -2330,6 +2348,7 @@ class RequestTest extends TestCase
             ['OPTIONS', true],
             ['TRACE', true],
             ['CONNECT', false],
+            ['QUERY', true],
         ];
     }
 
@@ -2356,6 +2375,7 @@ class RequestTest extends TestCase
             ['OPTIONS', true],
             ['TRACE', true],
             ['CONNECT', false],
+            ['QUERY', true],
         ];
     }
 
@@ -2382,6 +2402,7 @@ class RequestTest extends TestCase
             ['OPTIONS', false],
             ['TRACE', false],
             ['CONNECT', false],
+            ['QUERY', true],
         ];
     }
 

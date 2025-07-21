@@ -107,7 +107,7 @@ abstract class HttpCacheTestCase extends TestCase
         $this->assertFalse($this->kernel->isCatchingExceptions());
     }
 
-    public function request($method, $uri = '/', $server = [], $cookies = [], $esi = false, $headers = [])
+    public function request($method, $uri = '/', $server = [], $cookies = [], $esi = false, $headers = [], $content = null)
     {
         if (null === $this->kernel) {
             throw new \LogicException('You must call setNextResponse() before calling request().');
@@ -129,7 +129,7 @@ abstract class HttpCacheTestCase extends TestCase
 
         $this->esi = $esi ? new Esi() : null;
         $this->cache = new HttpCache($this->kernel, $this->store, $this->esi, $this->cacheConfig);
-        $this->request = Request::create($uri, $method, [], $cookies, [], $server);
+        $this->request = Request::create($uri, $method, [], $cookies, [], $server, $content);
         $this->request->headers->add($headers);
 
         $this->response = $this->cache->handle($this->request, HttpKernelInterface::MAIN_REQUEST, $this->catch);

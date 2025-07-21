@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by soyuka at 2025-07-20T18:06:39Z
+
+I shuld skip the test for versions lower then 8.4
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-07-21T08:49:34Z
+
+I was using the wrong trait, I've rebased and fixed, now we have an expected deprecation for php < 8.4, do you have a baseline for these?

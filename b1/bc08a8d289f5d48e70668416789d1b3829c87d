@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-07-20T16:06:43Z
+
+Can you please explain a bit more what happens without this change? What error do you get?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-21T07:14:20Z
+
+I'm also wondering about how you experienced this @corradogrimoldi
+Note that this PR should be merge on 8.0 for sure!
+On 7.*, I'm unsure, since the bundle is compatible with Validation 6.4, where the excluded file exists.
+
+---------------------------------------------------------------------------
+
+by corradogrimoldi at 2025-07-21T07:36:49Z
+
+@nicolas-grekas I'm using framework-bundle 7.3 and running composer require symfony/validator I got the 7.3 version and there ExpressionLanguageSyntaxValidator is not present.
+Due to this, when I clear the cache, and reload the application, an exception is raised in vendor/symfony/config/FileLocator.php:
+
+> Symfony\Component\Config\Exception\FileLocatorFileNotFoundException: The file "/usr/local/apache2/htdocs/vendor/symfony/validator/Constraints/ExpressionLanguageSyntaxValidator.php" does not exist.
+
+the exception is catched and due to the fact that $ignoreErrors is set to true, nothing happens to the app
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-21T07:40:29Z
+
+So there's no bug, this is normal behavior and everything works, isn't it?

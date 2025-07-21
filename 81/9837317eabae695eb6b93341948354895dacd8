@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-18T07:51:14Z
+
+PR ready, the failure is a CI artifact and will be solved by merging.
+I now propose to bump DBAL to ^4.3 and ORM to ^3.4 so that me can remove more code paths.

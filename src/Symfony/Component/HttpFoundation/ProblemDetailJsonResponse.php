@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation;
 
-
-use Rami\ProblemDetailBundle\Exceptions\ProblemDetailResponseException;
 use Symfony\Component\HttpFoundation\Exception\ProblemDetailJsonResponseException;
 
 /**
@@ -28,9 +26,8 @@ class ProblemDetailJsonResponse extends Response
         protected ?string $type = null,
         protected ?string $detail = null,
         protected ?string $instance = null,
-        protected ?array $extensions = []
-    )
-    {
+        protected ?array $extensions = [],
+    ) {
         parent::__construct();
 
         if ($this->title && null === $this->type) {
@@ -55,7 +52,7 @@ class ProblemDetailJsonResponse extends Response
     private function checkStatusCode(): void
     {
         if ($this->status < 400 || $this->status > 599) {
-            throw new ProblemDetailJsonResponseException(sprintf('The status code "%s" is not valid a valid HTTP Statuc code error.', $this->statusCode));
+            throw new ProblemDetailJsonResponseException(\sprintf('The status code "%s" is not valid a valid HTTP Statuc code error.', $this->statusCode));
         }
     }
 
@@ -65,6 +62,10 @@ class ProblemDetailJsonResponse extends Response
         $this->statusCode = $this->status;
     }
 
+    /**
+     * @throws ProblemDetailJsonResponseException
+     * @throws \JsonException
+     */
     protected function setProblemContent(): string
     {
         $this->setStatus();
@@ -72,26 +73,27 @@ class ProblemDetailJsonResponse extends Response
         $this->setHeaders();
 
         if (null !== $this->type) {
-            $scheme = parse_url($this->type, PHP_URL_SCHEME);
+            $scheme = parse_url($this->type, \PHP_URL_SCHEME);
             if (null === $scheme) {
-                throw new ProblemDetailResponseException("Invalid url type: $this->type.");
+                throw new ProblemDetailJsonResponseException("Invalid url type: $this->type.");
             }
         }
 
         $problemDetail = [
             'type' => $this->type ?? 'about:blank',
-            'title' =>  $this->title ?? Response::$statusTexts[$this->statusCode] ?? 'Unknown Error',
+            'title' => $this->title ?? Response::$statusTexts[$this->statusCode] ?? 'Unknown Error',
             'detail' => $this->detail ?? null,
             'status' => $this->status,
             'instance' => $this->instance ?? null,
-            ...$this->extensions
+            ...$this->extensions,
         ];
 
         $problemDetail = array_filter($problemDetail, function ($value) {
-            return $value !== null;
+            return null !== $value;
         });
 
-        $content = json_encode($problemDetail, JSON_FORCE_OBJECT|JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR);
+        $content = json_encode($problemDetail, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR);
+
         return $this->setContent($content);
     }
 }

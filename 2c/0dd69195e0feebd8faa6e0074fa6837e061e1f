@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-22T08:37:12Z
+
+LGTM but [the failure](https://github.com/symfony/symfony/actions/runs/16424039766/job/46409722027?pr=61187#step:7:21) seems related?

@@ -50,7 +50,7 @@ interface SessionInterface
     /**
      * Invalidates the current session.
      *
-     * Clears all session attributes and flashes and regenerates the
+     * Clears all session attributes and flushes and regenerates the
      * session and deletes the old session from persistence.
      *
      * @param int|null $lifetime Sets the cookie lifetime for the session cookie. A null value

@@ -1,13 +1,12 @@
 <?php
+
 /*
+ * This file is part of the Symfony package.
  *
- *  * This file is part of the Symfony package.
- *  *
- *  * (c) Fabien Potencier <fabien@symfony.com>
- *  *
- *  * For the full copyright and license information, please view the LICENSE
- *  * file that was distributed with this source code.
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\HttpFoundation;
@@ -75,7 +74,7 @@ class ProblemDetailJsonResponse extends Response
         if (null !== $this->type) {
             $scheme = parse_url($this->type, PHP_URL_SCHEME);
             if (null === $scheme) {
-                throw new ProblemDetailResponseException("Invalid url type: $this->type");
+                throw new ProblemDetailResponseException("Invalid url type: $this->type.");
             }
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -14,9 +15,14 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ProblemDetailJsonResponse;
 
+/**
+ * Problem Detail Response Tests.
+ *
+ * @author Abdellah Ramadan <ramadanabdel24@gmail.com>
+ */
 class ProblemDetailJsonResponseTest extends TestCase
 {
-    public function testNewProblemWithNoParams(): void
+    public function testNewProblemWithNoParams()
     {
         $problemDetails = new ProblemDetailJsonResponse();
         $this->assertEquals(520, $problemDetails->getStatusCode());
@@ -27,13 +33,13 @@ class ProblemDetailJsonResponseTest extends TestCase
         $this->assertSame('Unknown Error', json_decode($problemDetails->getContent(), true)['title']);
     }
 
-    public function testStatusCode(): void
+    public function testStatusCode()
     {
         $problemDetails = new ProblemDetailJsonResponse(404);
-        $this->assertEquals(404, $problemDetails->getStatusCode());;
+        $this->assertEquals(404, $problemDetails->getStatusCode());
     }
 
-    public function testNewProblemWithParams(): void
+    public function testNewProblemWithParams()
     {
         $problemDetails = new ProblemDetailJsonResponse(401, 'Unauthorized', 'https://example.com/not-found-docs', 'No access to this resource');
 
@@ -44,26 +50,26 @@ class ProblemDetailJsonResponseTest extends TestCase
         $this->assertSame('application/problem+json', $problemDetails->headers->get('Content-Type'));
     }
 
-    public function testEmptyTitle(): void
+    public function testEmptyTitle()
     {
         $problemDetails = new ProblemDetailJsonResponse(402);
         $this->assertNotNull(json_decode($problemDetails->getContent(), true)['title']);
         $this->assertSame('Payment Required', json_decode($problemDetails->getContent(), true)['title']);
     }
 
-    public function testExtensions(): void
+    public function testExtensions()
     {
         $problemDetails = new ProblemDetailJsonResponse(extensions: ['foo' => 'bar']);
 
         $this->assertArrayHasKey('foo', json_decode($problemDetails->getContent(), true));
 
         $problemDetails = new ProblemDetailJsonResponse(extensions: ['foo' => 'bar', 'baz' => ['bar' => 'foo']]);
-        $this->assertIsArray( json_decode($problemDetails->getContent(), true)['baz']);
+        $this->assertIsArray(json_decode($problemDetails->getContent(), true)['baz']);
     }
 
-    public function testInstance(): void
+    public function testInstance()
     {
         $problemDetails = new ProblemDetailJsonResponse(instance: 'article/5');
-       $this->assertIsString(json_decode($problemDetails->getContent(), true)['instance']);
+        $this->assertIsString(json_decode($problemDetails->getContent(), true)['instance']);
     }
 }

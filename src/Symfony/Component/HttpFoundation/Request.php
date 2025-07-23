@@ -1912,7 +1912,7 @@ class Request
             'css' => ['text/css'],
             'json' => ['application/json', 'application/x-json'],
             'jsonld' => ['application/ld+json'],
-            'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
+            'xml' => ['text/xml', 'application/xml', 'application/x-xml', 'application/soap+xml'],
             'rdf' => ['application/rdf+xml'],
             'atom' => ['application/atom+xml'],
             'rss' => ['application/rss+xml'],

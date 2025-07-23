@@ -52,7 +52,7 @@ class ProblemDetailJsonResponse extends Response
     private function checkStatusCode(): void
     {
         if ($this->status < 400 || $this->status > 599) {
-            throw new ProblemDetailJsonResponseException(\sprintf('The status code "%s" is not valid a valid HTTP Statuc code error.', $this->statusCode));
+            throw new ProblemDetailJsonResponseException(\sprintf('The status code "%s" is not a valid HTTP Status Code error.', $this->statusCode));
         }
     }
 

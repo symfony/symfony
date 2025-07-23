@@ -1429,4 +1429,41 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
+
+    public function testCheckForUniquenessIsDelegatedToComparator()
+    {
+        $comparatorAsBeenCalled = false;
+
+        $entity = new Person(1, 'Foo');
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $dto = new UpdateEmployeeProfile(2, 'Foo');
+
+        $constraint = new UniqueEntity(
+            fields: ['name'],
+            message: 'myMessage',
+            em: self::EM_NAME,
+            entityClass: Person::class,
+            comparator: function ($value, $foundEntity) use ($dto, $entity, &$comparatorAsBeenCalled) {
+                $comparatorAsBeenCalled = true;
+
+                $this->assertSame($value, $dto);
+                $this->assertSame($foundEntity, $entity);
+
+                // Usually, using `'identifierFieldNames' => ['id'],` would fail validation
+                // because the ids don't match. The comparator specifically allows for
+                // overwriting this behavior.
+
+                return true;
+            },
+        );
+
+        $this->validator->validate($dto, $constraint);
+
+        $this->assertTrue($comparatorAsBeenCalled);
+
+        $this->assertNoViolation();
+    }
 }

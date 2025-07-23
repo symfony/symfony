@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
@@ -70,6 +71,18 @@ class UniqueEntityTest extends TestCase
         $constraint = new UniqueEntity(['value' => 'email']);
 
         $this->assertSame('email', $constraint->fields);
+    }
+
+    public function testOnlyOneOfIdentifierFielsOrComparatorAreAllowed()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('Only "identifierFieldNames" or "comparator" can be used at the same time.');
+
+        new UniqueEntity(
+            fields: ['field'],
+            identifierFieldNames: ['identifier'],
+            comparator: function () {},
+        );
     }
 }
 

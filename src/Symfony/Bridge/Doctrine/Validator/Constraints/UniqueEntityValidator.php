@@ -186,29 +186,33 @@ class UniqueEntityValidator extends ConstraintValidator
         /* If a single entity matched the query criteria, which is the same as
          * the entity being updated by validated object, the criteria is unique.
          */
-        if (!$isValueEntity && !empty($constraint->identifierFieldNames) && 1 === \count($result)) {
-            $fieldValues = $this->getFieldValues($value, $class, $constraint->identifierFieldNames);
-            if (array_values($class->getIdentifierFieldNames()) != array_values($constraint->identifierFieldNames)) {
-                throw new ConstraintDefinitionException(\sprintf('The "%s" entity identifier field names should be "%s", not "%s".', $entityClass, implode(', ', $class->getIdentifierFieldNames()), implode(', ', $constraint->identifierFieldNames)));
-            }
-
-            $entityMatched = true;
-
-            foreach ($constraint->identifierFieldNames as $identifierFieldName) {
-                $propertyValue = $this->getPropertyValue($entityClass, $identifierFieldName, current($result));
-                if ($fieldValues[$identifierFieldName] instanceof \Stringable) {
-                    $fieldValues[$identifierFieldName] = (string) $fieldValues[$identifierFieldName];
+        if (!$isValueEntity && 1 === \count($result)) {
+            if (!empty($constraint->identifierFieldNames)) {
+                $fieldValues = $this->getFieldValues($value, $class, $constraint->identifierFieldNames);
+                if (array_values($class->getIdentifierFieldNames()) != array_values($constraint->identifierFieldNames)) {
+                    throw new ConstraintDefinitionException(\sprintf('The "%s" entity identifier field names should be "%s", not "%s".', $entityClass, implode(', ', $class->getIdentifierFieldNames()), implode(', ', $constraint->identifierFieldNames)));
                 }
-                if ($propertyValue instanceof \Stringable) {
-                    $propertyValue = (string) $propertyValue;
-                }
-                if ($fieldValues[$identifierFieldName] !== $propertyValue) {
-                    $entityMatched = false;
-                    break;
-                }
-            }
 
-            if ($entityMatched) {
+                $entityMatched = true;
+
+                foreach ($constraint->identifierFieldNames as $identifierFieldName) {
+                    $propertyValue = $this->getPropertyValue($entityClass, $identifierFieldName, current($result));
+                    if ($fieldValues[$identifierFieldName] instanceof \Stringable) {
+                        $fieldValues[$identifierFieldName] = (string) $fieldValues[$identifierFieldName];
+                    }
+                    if ($propertyValue instanceof \Stringable) {
+                        $propertyValue = (string) $propertyValue;
+                    }
+                    if ($fieldValues[$identifierFieldName] !== $propertyValue) {
+                        $entityMatched = false;
+                        break;
+                    }
+                }
+
+                if ($entityMatched) {
+                    return;
+                }
+            } elseif (!empty($constraint->comparator) && ($constraint->comparator)($value, current($result))) {
                 return;
             }
         }

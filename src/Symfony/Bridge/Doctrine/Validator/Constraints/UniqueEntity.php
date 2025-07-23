@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * Constraint for the Unique Entity validator.
@@ -37,6 +38,7 @@ class UniqueEntity extends Constraint
     public ?string $errorPath = null;
     public bool|array|string $ignoreNull = true;
     public array $identifierFieldNames = [];
+    public ?\Closure $comparator = null;
 
     /**
      * @param array|string         $fields           The combination of fields that must contain unique values or a set of options
@@ -46,6 +48,9 @@ class UniqueEntity extends Constraint
      * @param string|null          $repositoryMethod The repository method to check uniqueness instead of findBy. The method will receive as its argument
      *                                               a fieldName => value associative array according to the fields option configuration
      * @param string|null          $errorPath        Bind the constraint violation to this field instead of the first one in the fields option configuration
+     * @param callable|null        $comparator       A custom callback to check the uniqueness of the found entity. The first parameter will
+     *                                               be the object this constraint is applied to, the second parameter will be the found entity. The callback
+     *                                               should return true if both are considered to be the same.
      */
     #[HasNamedArguments]
     public function __construct(
@@ -58,6 +63,7 @@ class UniqueEntity extends Constraint
         ?string $errorPath = null,
         bool|string|array|null $ignoreNull = null,
         ?array $identifierFieldNames = null,
+        ?callable $comparator = null,
         ?array $groups = null,
         $payload = null,
         ?array $options = null,
@@ -89,6 +95,11 @@ class UniqueEntity extends Constraint
         $this->errorPath = $errorPath ?? $this->errorPath;
         $this->ignoreNull = $ignoreNull ?? $this->ignoreNull;
         $this->identifierFieldNames = $identifierFieldNames ?? $this->identifierFieldNames;
+        $this->comparator = $comparator === null ? $this->comparator : $comparator(...);
+
+        if ($this->identifierFieldNames !== [] && $this->comparator !== null) {
+            throw new ConstraintDefinitionException('Only "identifierFieldNames" or "comparator" can be used at the same time.');
+        }
     }
 
     /**

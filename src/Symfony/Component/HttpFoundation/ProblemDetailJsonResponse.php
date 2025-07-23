@@ -82,7 +82,7 @@ class ProblemDetailJsonResponse extends Response
         $problemDetail = [
             'type' => $this->type ?? 'about:blank',
             'title' => $this->title ?? Response::$statusTexts[$this->statusCode] ?? 'Unknown Error',
-            'detail' => $this->detail ?? null,
+            'detail' => $this->detail,
             'status' => $this->status,
             'instance' => $this->instance ?? null,
             ...$this->extensions,

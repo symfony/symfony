@@ -84,7 +84,7 @@ class ProblemDetailJsonResponse extends Response
             'title' => $this->title ?? Response::$statusTexts[$this->statusCode] ?? 'Unknown Error',
             'detail' => $this->detail,
             'status' => $this->status,
-            'instance' => $this->instance ?? null,
+            'instance' => $this->instance,
             ...$this->extensions,
         ];
 

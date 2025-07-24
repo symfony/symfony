@@ -21,6 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -147,7 +148,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             $credentials['username'] = $this->propertyAccessor->getValue($data, $this->options['username_path']);
 
             if (!\is_string($credentials['username']) || '' === $credentials['username']) {
-                throw new BadRequestHttpException(\sprintf('The key "%s" must be a non-empty string.', $this->options['username_path']));
+                throw new BadCredentialsException('The key "username" must be a non-empty string.');
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be provided.', $this->options['username_path']), $e);
@@ -158,7 +159,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             $this->propertyAccessor->setValue($data, $this->options['password_path'], null);
 
             if (!\is_string($credentials['password']) || '' === $credentials['password']) {
-                throw new BadRequestHttpException(\sprintf('The key "%s" must be a non-empty string.', $this->options['password_path']));
+                throw new BadCredentialsException('The key "password" must be a non-empty string.');
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);

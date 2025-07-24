@@ -1,0 +1,176 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-06-28T07:15:35Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mdeboer at 2025-06-29T17:45:24Z
+
+Just out of curiosity, do you have any examples where you have a _Translatable_ message, that shouldn't be translated?
+
+Don't get me wrong but to me it really smells. A _Translatable_ object should inherently be _translatable_. Setting the `domain` to false does not really tell me that it shouldn't be translated, rather I would expect a "default" domain to be used like "messages".
+
+But maybe some examples would clear things up for me why this path was chosen.
+
+Thanks in advance! 🙏🏻
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-06-29T19:03:51Z
+
+> Setting the `domain` to false does not really tell me that it shouldn't be translated, rather I would expect a "default" domain to be used like "messages".
+
+Let's just answer this point first @mdeboer, it's the purpose of the `NULL` domain, you can find it in a lot of "domain" options like https://symfony.com/doc/current/reference/forms/types/form.html#translation-domain
+
+> Just out of curiosity, do you have any examples where you have a _Translatable_ message, that shouldn't be translated?
+>
+> Don't get me wrong but to me it really smells. A _Translatable_ object should inherently be _translatable_.
+
+Sure, for instance `EasyAdmin` always translate his labels, title, flash message, and more
+https://github.com/EasyCorp/EasyAdminBundle/blob/4.x/templates/flash_messages.html.twig#L12
+It use messages or EasyAdminBundle as default translation domains based on the context, but support using `Translatable` object in order to use another domain but doesn't support disabling the translation.
+
+Maybe the right behavior would be:
+- to not translate by default
+- to ask users to pass translatableMessage instead
+
+but:
+- it's a big BC break
+- when 99% of labels asked to be translated it ask adding `t()` everywhere
+
+I find it simpler to allow `false` as translation_domain for such library ; especially because it's not the first library I saw with this "translate by default"...
+
+---------------------------------------------------------------------------
+
+by mdeboer at 2025-06-29T20:11:48Z
+
+Thanks for your reply @VincentLanglet
+
+I understand that in case of EasyAdmin it is easier to allow this change, but imho this is a design flaw in EasyAdmin. Why should the framework bend the rules and accommodate this bad design pattern?
+
+Wouldn't something like Rector be of use to refactor EasyAdmin?
+
+Or maybe introduce something like an `UntranslatableMessage`?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-06-29T20:56:07Z
+
+> Thanks for your reply @VincentLanglet
+>
+> I understand that in case of EasyAdmin it is easier to allow this change, but imho this is a design flaw in EasyAdmin. Why should the framework bend the rules and accommodate this bad design pattern?
+
+> Wouldn't something like Rector be of use to refactor EasyAdmin?
+
+No, because
+- it's mainly translated in the view which are twig templates
+- such change would be an HARD BC-break
+
+And while it could be considered as a design flaw, be aware that
+- such libs was implemented before the introduction of translatable interface
+- it could also be considered as a useful shortcut to automatically translate text when it's the case in 99%.
+
+For instance, form labels are translated by default by Symfony, and they allow a false translation domain now, but you could use the same argument to say it shouldn't translate and wait for TranslateMessage in order to produce a translation, or you should pass the label already-translated.
+
+> Or maybe introduce something like an `UntranslatableMessage`?
+
+Might be better indeed
+I update the PR with a `NonTranslatableMessage` @mdeboer
+
+(cc @nicolas-grekas if you want to re-review since the whole PR changed).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-06-30T09:52:07Z
+
+I am not convinced that this really is the way to go. Having something passed around that implements an interface called `TranslatableInterface` which then ends up not being translated is unexpected behaviour to me. Thus I am 👎 on adding this `NonTranslatableMessage` class.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-06-30T09:59:12Z
+
+> I am not convinced that this really is the way to go. Having something passed around that implements an interface called `TranslatableInterface` which then ends up not being translated is unexpected behaviour to me. Thus I am 👎 on adding this `NonTranslatableMessage` class.
+
+What alternative do you propose then for https://github.com/symfony/symfony/pull/60935#issuecomment-3016986580 ? @xabbuh
+
+Moreover this is still an implementation which can be done in the userland code, but it would be useful to provide it by default, in the same way symfony provides IdentityTranslator which is described with the comment:
+```
+IdentityTranslator does not translate anything.
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-06-30T10:05:22Z
+
+The issue you outline in https://github.com/symfony/symfony/pull/60935#issuecomment-3016986580 should be adressed in EasyAdminBundle and if it's simply shipping the `NonTranslatableMessage` class IMO.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-06-30T10:58:40Z
+
+> The issue you outline in [#60935 (comment)](https://github.com/symfony/symfony/pull/60935#issuecomment-3016986580) should be adressed in EasyAdminBundle and if it's simply shipping the `NonTranslatableMessage` class IMO.
+
+So instead of creating a NonTranslatableMessage in Symfony, with a really generic behavior of "Keeping the message as if even if someone try to translate it later", you recommend to add this class in every bundle with this need. That seems odd to me :/.
+
+EasyAdminBundle is not the only one bundle with the `translate` by default behavior.
+
+Seems like a classic behavior of Symfony to me when providing an interface to often
+- Give the real implementation
+- Provide a stub/fixed/basic implementation
+
+If the `NonTranslatableMessage` does not makes sens, the IdentityTranslator shouldn't have a lot more.
+
+That could also allows to simplify code for some libs when you currently have to support `string|TranslatableInterface` now you could only support `TranslatableInterface`...
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-07T08:30:05Z
+
+> LiteralMessage? RawMessage? StaticMessage?
+
+I'm fine with all of three.
+Can also be IdentityMessage (since we have an IdentityTranslator) or FixedMessage.
+
+Any preference @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-07-07T10:42:20Z
+
+I'm also in favor of adding such an implementation in core. I have it in my work project at Incenteev since quite some time (named `ConfiguredMessage` as my initial use case was for messages configured by an admin user that can be used in places using translatable messages otherwise)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-07T19:26:31Z
+
+I like `StaticMessage`, but just my 2 cents
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-10T23:18:41Z
+
+> I like `StaticMessage`, but just my 2 cents
+
+I renamed it to StaticMessage then @OskarStark @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-12T15:08:03Z
+
+PR body would need an update
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-17T22:27:04Z
+
+Ready for review @xabbuh @stof

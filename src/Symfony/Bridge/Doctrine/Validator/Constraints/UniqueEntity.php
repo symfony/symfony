@@ -95,9 +95,9 @@ class UniqueEntity extends Constraint
         $this->errorPath = $errorPath ?? $this->errorPath;
         $this->ignoreNull = $ignoreNull ?? $this->ignoreNull;
         $this->identifierFieldNames = $identifierFieldNames ?? $this->identifierFieldNames;
-        $this->comparator = $comparator === null ? $this->comparator : $comparator(...);
+        $this->comparator = null === $comparator ? $this->comparator : $comparator(...);
 
-        if ($this->identifierFieldNames !== [] && $this->comparator !== null) {
+        if ([] !== $this->identifierFieldNames && null !== $this->comparator) {
             throw new ConstraintDefinitionException('Only "identifierFieldNames" or "comparator" can be used at the same time.');
         }
     }

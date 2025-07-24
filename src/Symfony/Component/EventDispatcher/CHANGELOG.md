@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+ * Add `events` attribute of the `kernel.event_listener` tag
+ * Deprecated the `event` attribute of the `kernel.event_listener` tag
+
 6.0
 ---
 

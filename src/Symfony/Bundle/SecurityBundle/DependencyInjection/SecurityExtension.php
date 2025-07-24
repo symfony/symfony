@@ -391,7 +391,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $defaultProvider = $providerIds[$normalizedName];
 
             $container->setDefinition('security.listener.'.$id.'.user_provider', new ChildDefinition('security.listener.user_provider.abstract'))
-                ->addTag('kernel.event_listener', ['dispatcher' => $firewallEventDispatcherId, 'event' => CheckPassportEvent::class, 'priority' => 2048, 'method' => 'checkPassport'])
+                ->addTag('kernel.event_listener', ['dispatcher' => $firewallEventDispatcherId, 'events' => CheckPassportEvent::class, 'priority' => 2048, 'method' => 'checkPassport'])
                 ->replaceArgument(0, new Reference($defaultProvider));
         } elseif (1 === \count($providerIds)) {
             $defaultProvider = reset($providerIds);
@@ -602,7 +602,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $listener->replaceArgument(2, $contextKey);
         if (null !== $firewallEventDispatcherId) {
             $listener->replaceArgument(4, new Reference($firewallEventDispatcherId));
-            $listener->addTag('kernel.event_listener', ['event' => KernelEvents::RESPONSE, 'method' => 'onKernelResponse']);
+            $listener->addTag('kernel.event_listener', ['events' => KernelEvents::RESPONSE, 'method' => 'onKernelResponse']);
         }
 
         return $this->contextListeners[$contextKey] = $listenerId;

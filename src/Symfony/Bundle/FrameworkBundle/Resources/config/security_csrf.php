@@ -59,6 +59,6 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('framework.csrf_protection.cookie_name'),
             ])
             ->tag('monolog.logger', ['channel' => 'request'])
-            ->tag('kernel.event_listener', ['event' => 'kernel.response', 'method' => 'onKernelResponse'])
+            ->tag('kernel.event_listener', ['events' => 'kernel.response', 'method' => 'onKernelResponse'])
     ;
 };

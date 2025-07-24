@@ -60,7 +60,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         ]);
 
         $this->container->register('app.security_listener', \stdClass::class)
-            ->addTag('kernel.event_listener', ['method' => 'onEvent', 'event' => $configuredEvent]);
+            ->addTag('kernel.event_listener', ['method' => 'onEvent', 'events' => $configuredEvent]);
 
         $this->container->compile();
 
@@ -93,9 +93,9 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         ]);
 
         $this->container->register('app.security_listener', \stdClass::class)
-            ->addTag('kernel.event_listener', ['method' => 'onLogout', 'event' => LogoutEvent::class])
-            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'event' => LoginSuccessEvent::class, 'priority' => 20])
-            ->addTag('kernel.event_listener', ['method' => 'onAuthenticationSuccess', 'event' => AuthenticationEvents::AUTHENTICATION_SUCCESS]);
+            ->addTag('kernel.event_listener', ['method' => 'onLogout', 'events' => LogoutEvent::class])
+            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'events' => LoginSuccessEvent::class, 'priority' => 20])
+            ->addTag('kernel.event_listener', ['method' => 'onAuthenticationSuccess', 'events' => AuthenticationEvents::AUTHENTICATION_SUCCESS]);
 
         $this->container->compile();
 
@@ -136,9 +136,9 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
             ->setPublic(true);
 
         $this->container->register('app.security_listener', \stdClass::class)
-            ->addTag('kernel.event_listener', ['method' => 'onLogout', 'event' => LogoutEvent::class])
-            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'event' => LoginSuccessEvent::class, 'priority' => 20])
-            ->addTag('kernel.event_listener', ['method' => 'onAuthenticationSuccess', 'event' => AuthenticationEvents::AUTHENTICATION_SUCCESS]);
+            ->addTag('kernel.event_listener', ['method' => 'onLogout', 'events' => LogoutEvent::class])
+            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'events' => LoginSuccessEvent::class, 'priority' => 20])
+            ->addTag('kernel.event_listener', ['method' => 'onAuthenticationSuccess', 'events' => AuthenticationEvents::AUTHENTICATION_SUCCESS]);
 
         $this->container->compile();
 
@@ -165,9 +165,9 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
             ->setPublic(true);
 
         $this->container->register('app.security_listener', \stdClass::class)
-            ->addTag('kernel.event_listener', ['method' => 'onLogout', 'event' => LogoutEvent::class, 'dispatcher' => 'security.event_dispatcher.main'])
-            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'event' => LoginSuccessEvent::class, 'priority' => 20])
-            ->addTag('kernel.event_listener', ['method' => 'onAuthenticationSuccess', 'event' => AuthenticationEvents::AUTHENTICATION_SUCCESS]);
+            ->addTag('kernel.event_listener', ['method' => 'onLogout', 'events' => LogoutEvent::class, 'dispatcher' => 'security.event_dispatcher.main'])
+            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'events' => LoginSuccessEvent::class, 'priority' => 20])
+            ->addTag('kernel.event_listener', ['method' => 'onAuthenticationSuccess', 'events' => AuthenticationEvents::AUTHENTICATION_SUCCESS]);
 
         $this->container->compile();
 

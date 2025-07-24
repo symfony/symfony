@@ -23,6 +23,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Tests\Fixtures\BizEvent;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\CustomEvent;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedInvokableListener;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedMultiListener;
@@ -169,10 +170,10 @@ class RegisterListenersPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('foo', SubscriberService::class)->addTag('kernel.event_subscriber', []);
-        $container->register('bar')->addTag('kernel.event_listener', ['event' => 'cold_event']);
+        $container->register('bar')->addTag('kernel.event_listener', ['events' => 'cold_event']);
         $container->register('baz')
-            ->addTag('kernel.event_listener', ['event' => 'event'])
-            ->addTag('kernel.event_listener', ['event' => 'cold_event']);
+            ->addTag('kernel.event_listener', ['events' => 'event'])
+            ->addTag('kernel.event_listener', ['events' => 'cold_event']);
         $container->register('event_dispatcher', 'stdClass');
 
         (new RegisterListenersPass())
@@ -206,14 +207,15 @@ class RegisterListenersPassTest extends TestCase
             public function onFooBar()
             {
             }
-        }))->addTag('kernel.event_listener', ['event' => 'foo.bar']);
-        $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
-        $container->register('baz', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'event']);
+        }))->addTag('kernel.event_listener', ['events' => 'foo.bar']);
+        $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['events' => 'foo.bar']);
+        $container->register('baz', InvokableListenerService::class)->addTag('kernel.event_listener', ['events' => 'event']);
+        $container->register('biz', InvokableListenerService::class)->addTag('kernel.event_listener', ['events' => [CustomEvent::class, BizEvent::class]]);
         $container->register('zar', \get_class(new class {
             public function onFooBarZar()
             {
             }
-        }))->addTag('kernel.event_listener', ['event' => 'foo.bar_zar']);
+        }))->addTag('kernel.event_listener', ['events' => 'foo.bar_zar']);
         $container->register('event_dispatcher', \stdClass::class);
 
         $registerListenersPass = new RegisterListenersPass();
@@ -248,6 +250,22 @@ class RegisterListenersPassTest extends TestCase
             [
                 'addListener',
                 [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('biz')), '__invoke'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    BizEvent::class,
+                    [new ServiceClosureArgument(new Reference('biz')), '__invoke'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
                     'foo.bar_zar',
                     [new ServiceClosureArgument(new Reference('zar')), 'onFooBarZar'],
                     0,
@@ -264,7 +282,7 @@ class RegisterListenersPassTest extends TestCase
 
         $container = new ContainerBuilder();
 
-        $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
+        $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', ['events' => 'foo.bar']);
         $container->register('event_dispatcher', \stdClass::class);
 
         $registerListenersPass = new RegisterListenersPass();
@@ -347,8 +365,64 @@ class RegisterListenersPassTest extends TestCase
             [
                 'addListener',
                 [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onMultipleEvents'],
+                    10,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'foo',
+                    [new ServiceClosureArgument(new Reference('foo')), 'onMultipleEvents'],
+                    10,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'bar',
+                    [new ServiceClosureArgument(new Reference('foo')), 'onMultipleEvents'],
+                    10,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), '__invoke'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    BizEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), '__invoke'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
                     'baz',
                     [new ServiceClosureArgument(new Reference('foo')), 'onBazEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    BizEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onMultipleEventsWithSomeInvalids'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onMultipleEventsWithSomeInvalids'],
                     0,
                 ],
             ],
@@ -361,8 +435,8 @@ class RegisterListenersPassTest extends TestCase
         $container = new ContainerBuilder();
         $eventAliases = [AliasedEvent::class => 'aliased_event'];
         $container->setParameter('event_dispatcher.event_aliases', $eventAliases);
-        $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => AliasedEvent::class, 'method' => 'onEvent']);
-        $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => CustomEvent::class, 'method' => 'onEvent']);
+        $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener', ['events' => AliasedEvent::class, 'method' => 'onEvent']);
+        $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['events' => CustomEvent::class, 'method' => 'onEvent']);
         $container->register('event_dispatcher');
 
         $customEventAlias = [CustomEvent::class => 'custom_event'];
@@ -437,7 +511,7 @@ class RegisterListenersPassTest extends TestCase
         $container->register('event_dispatcher');
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
+        $this->expectExceptionMessage('Service "foo" must define the "events" attribute on "kernel.event_listener" tags.');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
@@ -450,7 +524,7 @@ class RegisterListenersPassTest extends TestCase
         $container->register('event_dispatcher');
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
+        $this->expectExceptionMessage('Service "foo" must define the "events" attribute on "kernel.event_listener" tags.');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
@@ -463,7 +537,7 @@ class RegisterListenersPassTest extends TestCase
         $container->register('event_dispatcher');
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
+        $this->expectExceptionMessage('Service "foo" must define the "events" attribute on "kernel.event_listener" tags.');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
@@ -475,7 +549,7 @@ class RegisterListenersPassTest extends TestCase
         $container->register('subscriber', IncompleteSubscriber::class)
             ->addTag('kernel.event_subscriber')
             ->addTag('kernel.event_listener')
-            ->addTag('kernel.event_listener', ['event' => 'bar', 'method' => 'onBar'])
+            ->addTag('kernel.event_listener', ['events' => 'bar', 'method' => 'onBar'])
         ;
         $container->register('event_dispatcher');
 

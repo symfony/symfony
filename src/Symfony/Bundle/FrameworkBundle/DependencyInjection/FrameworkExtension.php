@@ -1205,9 +1205,9 @@ class FrameworkExtension extends Extension
             if ($workflow['audit_trail']['enabled']) {
                 $listener = new Definition(Workflow\EventListener\AuditTrailListener::class);
                 $listener->addTag('monolog.logger', ['channel' => 'workflow']);
-                $listener->addTag('kernel.event_listener', ['event' => \sprintf('workflow.%s.leave', $name), 'method' => 'onLeave']);
-                $listener->addTag('kernel.event_listener', ['event' => \sprintf('workflow.%s.transition', $name), 'method' => 'onTransition']);
-                $listener->addTag('kernel.event_listener', ['event' => \sprintf('workflow.%s.enter', $name), 'method' => 'onEnter']);
+                $listener->addTag('kernel.event_listener', ['events' => \sprintf('workflow.%s.leave', $name), 'method' => 'onLeave']);
+                $listener->addTag('kernel.event_listener', ['events' => \sprintf('workflow.%s.transition', $name), 'method' => 'onTransition']);
+                $listener->addTag('kernel.event_listener', ['events' => \sprintf('workflow.%s.enter', $name), 'method' => 'onEnter']);
                 $listener->addArgument(new Reference('logger'));
                 $container->setDefinition(\sprintf('.%s.listener.audit_trail', $workflowId), $listener);
             }
@@ -1234,7 +1234,7 @@ class FrameworkExtension extends Extension
                     new Reference('validator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                 ]);
                 foreach ($guardsConfiguration as $eventName => $config) {
-                    $guard->addTag('kernel.event_listener', ['event' => $eventName, 'method' => 'onTransition']);
+                    $guard->addTag('kernel.event_listener', ['events' => $eventName, 'method' => 'onTransition']);
                 }
 
                 $container->setDefinition(\sprintf('.%s.listener.guard', $workflowId), $guard);

@@ -73,7 +73,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/memory.html.twig', 'id' => 'memory', 'priority' => 325])
 
         ->set('data_collector.router', RouterDataCollector::class)
-            ->tag('kernel.event_listener', ['event' => KernelEvents::CONTROLLER, 'method' => 'onKernelController'])
+            ->tag('kernel.event_listener', ['events' => KernelEvents::CONTROLLER, 'method' => 'onKernelController'])
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/router.html.twig', 'id' => 'router', 'priority' => 285])
 
         ->set('.data_collector.command', CommandDataCollector::class)

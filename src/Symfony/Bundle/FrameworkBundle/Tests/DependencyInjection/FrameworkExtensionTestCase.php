@@ -509,7 +509,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $guardDefinition = $container->getDefinition('.workflow.article.listener.guard');
         $this->assertSame([
             [
-                'event' => 'workflow.article.guard.publish',
+                'events' => 'workflow.article.guard.publish',
                 'method' => 'onTransition',
             ],
         ], $guardDefinition->getTag('kernel.event_listener'));

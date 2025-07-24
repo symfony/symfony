@@ -28,6 +28,10 @@ DoctrineBridge
 
  * Deprecate `UniqueEntity::getRequiredOptions()` and `UniqueEntity::getDefaultOption()`
 
+EventDispatcher
+---------------
+ * Deprecate attribute `event` of the `kernel.event_listener` tag  in favor of `events` attribute
+
 FrameworkBundle
 ---------------
 

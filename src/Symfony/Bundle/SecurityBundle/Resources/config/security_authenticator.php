@@ -75,7 +75,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.user_providers'),
             ])
-            ->tag('kernel.event_listener', ['event' => CheckPassportEvent::class, 'priority' => 1024, 'method' => 'checkPassport'])
+            ->tag('kernel.event_listener', ['events' => CheckPassportEvent::class, 'priority' => 1024, 'method' => 'checkPassport'])
 
         ->set('security.listener.user_provider.abstract', UserProviderListener::class)
             ->abstract()

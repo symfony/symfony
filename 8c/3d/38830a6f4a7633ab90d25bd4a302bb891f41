@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by soyuka at 2025-07-01T13:59:01Z
+
+Indeed this is really a nice-to-have functionality. When generating Hypermedia (or probably any JSON) while streaming, it's quite useful to have the current object being serialized to change parts of the data. To illustrate, we use it to generate the IRI of a given object during serialization:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace ApiPlatform\JsonLd\JsonStreamer\ValueTransformer;
+
+use ApiPlatform\Hydra\Collection;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\TypeInfo\Type;
+
+final class IriValueTransformer implements ValueTransformerInterface
+{
+    public function __construct(
+        private readonly IriConverterInterface $iriConverter,
+    ) {
+    }
+
+    public function transform(mixed $value, array $options = []): mixed
+    {
+        if ($options['_current_object'] instanceof Collection) {
+            return $this->iriConverter->getIriFromResource($options['operation']->getClass(), UrlGeneratorInterface::ABS_PATH, $options['operation']);
+        }
+
+        return $this->iriConverter->getIriFromResource(
+            $options['_current_object'],
+            UrlGeneratorInterface::ABS_PATH,
+            $options['operation'] instanceof CollectionOperationInterface ? null : $options['operation'],
+        );
+    }
+
+    public static function getStreamValueType(): Type
+    {
+        return Type::string();
+    }
+}
+```
+
+Without this functionality we're quite locked-out when it comes to transformations like this one: it's recursive so we're using only the node being serialized, as opposed to `$value`.
+With @mtarld we thought of multiple approaches to this problem but many would've impacted performances more then we like for this component.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-07-07T09:47:42Z
+
+Indeed, I changed `$options + ['_current_object' => $data]` to `['_current_object' => $data] + $options`, as it'll override any user-defined value (and therefore prevent its usage to do "hacky" stuff).
+
+Good idea for the doc block, I added the comment.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-16T06:01:47Z
+
+PR title reads weird 😅
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-07-16T07:03:16Z
+
+Indeed 😅. I updated it, does it look better to you?

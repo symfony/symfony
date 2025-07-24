@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\Exception\ProblemDetailJsonResponseException;
 
 /**
- * Problem Detail Response represents a JSON response with a Problem Details object.
+ * Represents a JSON response with a Problem Details object.
  *
  * @author Abdellah Ramadan <ramadanabdel24@gmail.com>
  */

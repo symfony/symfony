@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by NickSdot at 2025-07-22T19:38:47Z
+
+- fabbot failures are unrelated.
+- windows failure should be unrelated?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-23T13:00:26Z
+
+Refactors like this one generally target the feature branch (7.4 at this time). Only bug fixes are pushed to 7.3 (and below), so given `setAccessible()` is no-op, I'd target 7.4.
+
+And indeed, you can safely ignore fabbot recommendations and Windows failures, which are not related to your pull request.
+
+---------------------------------------------------------------------------
+
+by NickSdot at 2025-07-23T14:14:39Z
+
+> Refactors like this one generally target the feature branch (7.4 at this time). Only bug fixes are pushed to 7.3 (and below), so given `setAccessible()` is no-op, I'd target 7.4.
+>
+> And indeed, you can safely ignore fabbot recommendations and Windows failures, which are not related to your pull request.
+
+Hey Alexandre, thanks for the input! Before I change the target branch, here my rational why I believe it should be in 7.3. This [RFC](https://wiki.php.net/rfc/deprecations_php_8_5#deprecate_reflectionsetaccessible) (vote pending) seeks to deprecate the usage in PHP 8.5. If the vote goes through, what I believe based on the internals list discussion, it would unneccessarily spam depcrecation warnings. I agree, it's not a bug, but I think it's a worthy "fix" to have in all supported versions. Wdyt?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-23T14:24:00Z
+
+Ah yes, I missed this one. Makes sense then 👍 If these lines are also present in earlier versions, it might be a good idea to even target 6.4, so it is also compatible with upcoming 8.5 and doesn't trigger deprecations on release.
+
+---------------------------------------------------------------------------
+
+by NickSdot at 2025-07-23T15:04:14Z
+
+Done. 6.4 had a few more. Updated and target branch changed!
+
+Edit: I am a bit confused about the test suite here. 😅 Again not related? If there is anything I must do, please let me know.

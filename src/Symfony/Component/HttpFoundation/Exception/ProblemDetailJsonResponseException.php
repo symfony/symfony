@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Exception;
 
 /**
- * Generic exception.
- *
  * @author Abdellah Ramadan <ramadanabdel24@gmail.com>
  */
 class ProblemDetailJsonResponseException extends \Exception

@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by soyuka at 2025-06-06T14:53:22Z
+
+I'm wondering if this shouldn't actually be the default, I would even not add this as an option as this would simplify the code if a value is null we just skip it. The JsonStreamer should be used for maximum performances, `null` values just add noise and have rather few impact when used in Javascript as they'll just get evaluated as `undefined`.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-06-07T08:21:14Z
+
+I agree with @soyuka; in my opinion, the less noise we have, the better. I updated the PR in that way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-06-27T13:40:03Z
+
+Let's target 7.3 then
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-06-27T13:44:35Z
+
+This PR needs https://github.com/symfony/symfony/pull/60544, which has been merged in 7.4.
+Maybe we can backport it - as it is only internal changes?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-27T14:25:32Z
+
+Omitting a property from the JSON or setting it to `null` is not equivalent, and might behave differently:
+
+- it is observable in Javascript, which has `undefined` and `null` as different types (and if you do `a.myProp === null`, it won't be true for `undefined`)
+- it is different in term of OpenAPI or json-schema specs (it is possible to have a nullable required property in such spec)
+- it might have an impact for parsers in other languages that might be strict about such properties
+
+Always stripping null properties from the output is a no-go to me, as it makes the component incompatible with some kinds of output (and this would be a BC break for projects that rely on those cases)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-06-27T14:29:58Z
+
+I agree with @stof: consuming APIs with fields that can sometimes appear or disappear can really be disturbing. That's also true if a documentation is provided: the response may be different from what's written in the doc because some fields are missing.
+
+To me, it is semantically really different to have a null value or no value at all and it may not be treated the same way in underlying code. The option you proposed first, `skip_null_properties`, looks better to me.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-06-27T20:49:00Z
+
+I see your point, I'm convinced the null type may be required in JSON. I still think that the default for this component should be that it's disabled by default. From an architecture point of view, when it comes to resource oriented APIs or JSON-LD, we don't recommend the use of null values, it adds unnecessary noise and adds complexity to front ends.
+Also as we're all about performances and band-width consumption when it comes to streaming I think that we should go with the less the better.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-07-01T08:21:23Z
+
+You're right @stof, omitting a property from the JSON or setting it to `null` is not the same.
+Therefore, I reintroduced the option, but inverted it so that the default will be to omit null properties (the option became `include_nullable_properties`).
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-01T08:37:02Z
+
+Ah yes! I wanted to comment back to suggest an opt-in to include null values but forgot about it. It seems to be the good compromise!
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-07-01T14:30:20Z
+
+What about `include_null_values` instead of `include_nullable_properties`?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-07-01T15:19:10Z
+
+This might be misleading, IMO.
+For example, if we want to stream `[null, null, null]`, without `include_null_values`, what can we expect? `[null, null, null]`? `[]`? "property" here is important to me.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-01T15:25:46Z
+
+`include_nullable_properties` gives the impression that if set to false, properties that _could_ be null will not be included in the output. That's why I'm a bit reluctant for this naming
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-07-01T15:30:34Z
+
+I see your point, therefore what about `include_null_properties`, or maybe `include_null_property_values`?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-01T15:52:00Z
+
+Both removes the ambiguity, definitely better! Maybe the first one is more accurate (because you include the property and its value, not only the value)
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-07-02T07:52:39Z
+
+I went for `include_null_properties`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-24T08:56:40Z
+
+rebase needed
+still :+1: on my side

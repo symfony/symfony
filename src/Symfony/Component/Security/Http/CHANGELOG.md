@@ -3,7 +3,7 @@ CHANGELOG
 
 7.4
 ---
-
+ * Add support for Enums in `#[IsGranted]`
  * Add support for union types with `#[CurrentUser]`
  * Deprecate callable firewall listeners, extend `AbstractListener` or implement `FirewallListenerInterface` instead
  * Deprecate `AbstractListener::__invoke`

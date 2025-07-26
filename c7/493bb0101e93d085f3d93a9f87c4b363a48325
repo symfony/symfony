@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2025-07-16T08:49:13Z
+
+Switched to a project with AssetMapper correctly installed, the following code
+```js
+import json from './foo.json' with {type: 'json'};
+
+console.log(json)
+```
+
+with the patch suggested in https://github.com/symfony/symfony/pull/61133#pullrequestreview-3023817046 correctly resolves the JSON
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-16T08:56:33Z
+
+This PR is about this:
+```diff
+-import json from './foo.json' with {type: 'json'};
++import jsonPromise from './foo.json';
+```
+
+and then (note the await):
+```js
+console.log(await jsonPromise);
+```
+
+---------------------------------------------------------------------------
+
+by Kocal at 2025-07-16T08:57:43Z
+
+Ah, fine then
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-16T08:58:38Z
+
+We should skip using the loader when `with {type: 'json'};` is in use (same for css BTW).
+
+---------------------------------------------------------------------------
+
+by tacman at 2025-07-20T11:39:21Z
+
+This looks great!  The workflow for loading javascript-routes within a module right now is klunky:
+
+```bash
+bin/console fos:js-routing:dump --format=js --target=public/js/fos_js_routes.js --callback="export default"
+```
+
+and then
+
+```js
+import Routing from "fos-routing";
+import RoutingData from "/js/fos_js_routes.js";
+Routing.setData(RoutingData);
+```
+
+I think the ux-translator component works the same way, dumping javascript instead of json
+
+https://symfony.com/bundles/ux-translator/current/index.html#configuring-the-dumped-translations
+
+Both of these may make for good examples when writing the documentation or blog post about it.

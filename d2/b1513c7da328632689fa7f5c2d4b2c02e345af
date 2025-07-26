@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-07-09T12:29:19Z
+
+ping @smnandre
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-07-09T21:39:34Z
+
+Oops... I missed that, indeed 😶
+
+PR seems very legit  👍
+
+That said, I think it'd be better to add a new test in [TreeNodeTest](https://github.com/jtattevin/symfony/blob/60f3e63c445e8dbd2526c30421aa228f878a525f/src/Symfony/Component/Console/Tests/Helper/TreeNodeTest.php), since this isn’t really the Helper’s responsibility here..
+
+(and I realize there’s currently no test that simply does $node->addChild('string') in TreeNodeTest ... re 😶 )
+
+---------------------------------------------------------------------------
+
+by jtattevin at 2025-07-10T07:17:21Z
+
+I've added the test in TreeNodeTest and also checked that the content is used correctly.
+
+I've kept the test in the helper since it's the visible issue, but I can remove it if it's too redundant.

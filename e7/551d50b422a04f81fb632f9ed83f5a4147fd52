@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-17T10:49:13Z
+
+Shouldn't this target 6.4?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-07-17T10:53:33Z
+
+The test was added by #52981 so the same branch should be targeted right?

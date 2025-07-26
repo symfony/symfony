@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-06-21T15:33:10Z
+
+The CI failures look related.
+
+---------------------------------------------------------------------------
+
+by phcorp at 2025-06-26T11:56:52Z
+
+> Thanks for the PR. Since this is a bugfix, it should target the lowest affected (and maintained) branch. Can you please check which one it is and rebase+retarget?
+
+done. There are failing tests that seem unrelated to this PR and I couldn't change the milestone that was set by the automation

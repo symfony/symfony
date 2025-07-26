@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-06-16T18:18:42Z
+
+The Tests on 8.2 high-deps are failing because this PR
+https://github.com/symfony/symfony/commit/fc7d4134a22d65418aca6d34f6a48c232c261118
+changes the tests and the CI is trying to run on the branch 6.4
+<img width="866" alt="image" src="https://github.com/user-attachments/assets/f7472c6f-f517-4c99-9d72-59e681d6923b" />
+
+How do I solve this ?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-07-17T21:35:15Z
+
+Looks good.
+
+I noticed some failures are related to these changes.
+Would you mind to rebase (solve the conflicts) and fix the tests?
+Regards
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-17T21:54:42Z
+
+> I noticed some failures are related to these changes. Would you ming to rebase (solve the conflicts) and fix the tests? Regards
+
+Hi ; I rebased but I dunno how to fix the test.
+
+See https://github.com/symfony/symfony/actions/runs/16356617489/job/46216379960?pr=60805
+
+The Unit test 8.2 high-deps is checking out the code on Symfony 6.4
+```
+Checking out Symfony 6.4 and running tests with patched components as deps
+```
+So this file changes are lost
+https://github.com/symfony/symfony/pull/60805/files#diff-927362e8296b98f998ae0368419317fd75a34054f520cc354c691ddc22cb5b0c
+
+And of course tests are failing since they don't have the `{{ min }}` value I added then...
+
+Any clue how to fix this @Spomky ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-24T21:10:55Z
+
+Friendly ping @nicolas-grekas you might know how to solve the failure https://github.com/symfony/symfony/pull/60805#issuecomment-2977591053
+
+Test are failing but I feel like I cannot fix them since it runs the 6.4 version and I'm on the 7.4 branch...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-07-25T11:37:19Z
+
+I suggest that we update the `ApiAttributesTest` in the `6.4` after this PR is merged and relax the assertion there.

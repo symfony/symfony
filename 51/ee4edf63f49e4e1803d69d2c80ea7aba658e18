@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-24T19:47:18Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mttsch at 2025-07-25T04:53:42Z
+
+@soyuka As the description will be part of the commit message, there is a small typo:
+
+```php
+$mapper->map($);
+```
+
+->
+
+```php
+$mapper->map($p);
+```

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-11-26T13:23:13Z
+
+Tests need to be updated to reflect the new behavior.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-26T13:24:22Z
+
+And new tests should probably be added covering the case being fixed for array parameters.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2024-11-26T13:24:42Z
+
+Yeah, I am working on the updated tests 👍🏻
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2024-11-26T14:39:26Z
+
+@stof Tests have been added, I added an new testcase which adds a configuration sample for the cases I hit.

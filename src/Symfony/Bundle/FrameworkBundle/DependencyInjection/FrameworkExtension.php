@@ -2211,9 +2211,15 @@ class FrameworkExtension extends Extension
                     $resourceStore = 'null';
                 }
 
-                $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
-                if (!$usedEnvs && !str_contains($resourceStore, ':') && !\in_array($resourceStore, ['flock', 'semaphore', 'in-memory', 'null'], true)) {
-                    $resourceStore = new Reference($resourceStore);
+                if(str_starts_with($resourceStore, '@')) {
+                    $resourceStore = new Reference(substr($resourceStore, 1));
+                    $storeDsn = $resourceStore;
+                } else {
+                    $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
+                    if (!$usedEnvs && !str_contains($resourceStore, ':') && !\in_array($resourceStore,
+                            ['flock', 'semaphore', 'in-memory', 'null'], true)) {
+                        $resourceStore = new Reference($resourceStore);
+                    }
                 }
                 $storeDefinition = new Definition(PersistingStoreInterface::class);
                 $storeDefinition

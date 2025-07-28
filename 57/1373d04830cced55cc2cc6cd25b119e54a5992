@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by tucksaun at 2025-07-28T12:25:05Z
+
+Would this make sense to extract the action in a dedicated repo (in Symfony-tools maybe?) in order to be able to reuse it more easily?
+
+but maybe in a second iteration?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-28T16:43:57Z
+
+@tucksaun that's possible but any repo fits, so it's also fine here I believe: it should make it easier to tweak the action and improve it.

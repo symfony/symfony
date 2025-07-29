@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate `UniqueEntity::getRequiredOptions()` and `UniqueEntity::getDefaultOption()`
+ * Add `comparator` option to `UniqueEntity`
 
 7.3
 ---

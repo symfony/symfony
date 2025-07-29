@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-29T17:57:50Z
+
+That makes me a bit sad, forcing ppl to upgrade to something that's not clearer, just more verbose.
+Or is your plan to remove the $options argument in 8.0?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-07-29T19:54:46Z
+
+This change is needed to be able to throw when `$options` is not `null` in 8.0 (see https://github.com/symfony/symfony/pull/61063/files#diff-1139178a1214882355d082c476f13da20d28746a53f307571f5b5dc3571fe347L87). This PR ensures that you are aware and update your code. My ultimate goal is to deprecate the `$options` arguments of the different constraint classes in 8.1 (doing it earlier is probably a nightmare we cannot solve due to the fact that we cannot simply reorder arguments but also need to take named arguments into account, that will be easier once we know for sure that `$options` will be nothing else than `null`).

@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-26T18:05:42Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ToshY at 2025-07-26T18:08:57Z
+
+> Hey!
+>
+> Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4". Could you update the PR description or change target branch? This helps core maintainers a lot.
+>
+> Cheers!
+>
+> Carsonbot
+
+Accidently clicked to fast on create PR. As it's a bug, based and targeted on `6.4`, so label should be `6.4`.

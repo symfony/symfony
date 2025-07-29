@@ -1,0 +1,575 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-25T16:09:26Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-07-25T16:21:24Z
+
+Hey @bendavies thanks for this optimization proposal! For performance refactoring PRs, we usually target the latest dev branch, in this case, 7.4
+
+---------------------------------------------------------------------------
+
+by bendavies at 2025-07-25T16:45:27Z
+
+> Performance improvements are refactors, which means this should target 7.4. 7.3 being already released, the branch receives bug fixes only.
+>
+> Also, would you mind sharing the test set you used to run benchmarks? In addition to the methodology used as explained in the description, having the opportunity to see the benchmark code would be a plus!
+
+```bash
+# Test individual optimizations
+hyperfine --warmup 1 --runs 10 \
+  --reference 'php test_original.php' \
+  'php test_opt1_fast_path_simple.php' \
+  'php test_opt2_fast_path_union.php' \
+  'php test_opt3_no_string_concat.php' \
+  'php test_opt4_switch_statement.php'
+
+# Test combined optimization
+hyperfine --warmup 1 --runs 10 \
+  --reference 'php test_original.php' \
+  'php test_optimized.php'
+```
+
+<details>
+<summary>test_original.php - Original implementation</summary>
+
+```php
+<?php
+
+function splitOutsideParenthesis(string $type): array
+{
+    $parts = [];
+    $currentPart = '';
+    $parenthesisLevel = 0;
+
+    $typeLength = \strlen($type);
+    for ($i = 0; $i < $typeLength; ++$i) {
+        $char = $type[$i];
+
+        if ('(' === $char) {
+            ++$parenthesisLevel;
+        } elseif (')' === $char) {
+            --$parenthesisLevel;
+        }
+
+        if ('|' === $char && 0 === $parenthesisLevel) {
+            $parts[] = $currentPart;
+            $currentPart = '';
+        } else {
+            $currentPart .= $char;
+        }
+    }
+
+    if ('' !== $currentPart) {
+        $parts[] = $currentPart;
+    }
+
+    return $parts;
+}
+
+$testCases = [
+    'string',
+    'int',
+    'bool',
+    'array',
+    'string|int',
+    'string|int|bool',
+    'string|int|bool|array',
+    'string|(int|bool)',
+    '(string|int)|bool',
+    'string|(int|(bool|float))',
+    '(string|int)|(bool|float)',
+    'MyClass',
+    'string[]',
+    'int[]',
+    '\\Namespace\\Class',
+    'string|int|bool|array|object|resource|callable',
+];
+
+$iterations = 100000;
+
+$start = microtime(true);
+
+for ($i = 0; $i < $iterations; $i++) {
+    foreach ($testCases as $testCase) {
+        splitOutsideParenthesis($testCase);
+    }
+}
+
+$end = microtime(true);
+$duration = ($end - $start) * 1000;
+
+$peakMemory = memory_get_peak_usage(true) / 1024 / 1024;
+
+echo "Original implementation: " . number_format($duration, 2) . "ms for " . ($iterations * count($testCases)) . " operations\n";
+echo "Peak memory usage: " . number_format($peakMemory, 2) . " MB\n";
+```
+
+</details>
+
+<details>
+<summary>test_opt1_fast_path_simple.php - Optimization 1: Fast path for simple types</summary>
+
+```php
+<?php
+
+function splitOutsideParenthesis(string $type): array
+{
+    if (!\str_contains($type, '|')) {
+        return [$type];
+    }
+
+    $parts = [];
+    $currentPart = '';
+    $parenthesisLevel = 0;
+
+    $typeLength = \strlen($type);
+    for ($i = 0; $i < $typeLength; ++$i) {
+        $char = $type[$i];
+
+        if ('(' === $char) {
+            ++$parenthesisLevel;
+        } elseif (')' === $char) {
+            --$parenthesisLevel;
+        }
+
+        if ('|' === $char && 0 === $parenthesisLevel) {
+            $parts[] = $currentPart;
+            $currentPart = '';
+        } else {
+            $currentPart .= $char;
+        }
+    }
+
+    if ('' !== $currentPart) {
+        $parts[] = $currentPart;
+    }
+
+    return $parts;
+}
+
+$testCases = [
+    'string',
+    'int',
+    'bool',
+    'array',
+    'string|int',
+    'string|int|bool',
+    'string|int|bool|array',
+    'string|(int|bool)',
+    '(string|int)|bool',
+    'string|(int|(bool|float))',
+    '(string|int)|(bool|float)',
+    'MyClass',
+    'string[]',
+    'int[]',
+    '\\Namespace\\Class',
+    'string|int|bool|array|object|resource|callable',
+];
+
+$iterations = 100000;
+
+$start = microtime(true);
+
+for ($i = 0; $i < $iterations; $i++) {
+    foreach ($testCases as $testCase) {
+        splitOutsideParenthesis($testCase);
+    }
+}
+
+$end = microtime(true);
+$duration = ($end - $start) * 1000;
+
+$peakMemory = memory_get_peak_usage(true) / 1024 / 1024;
+
+echo "Optimization 1 (fast path simple): " . number_format($duration, 2) . "ms for " . ($iterations * count($testCases)) . " operations\n";
+echo "Peak memory usage: " . number_format($peakMemory, 2) . " MB\n";
+```
+
+</details>
+
+<details>
+<summary>test_opt2_fast_path_union.php - Optimization 2: Fast path for union types</summary>
+
+```php
+<?php
+
+function splitOutsideParenthesis(string $type): array
+{
+    if (!\str_contains($type, '(') && !\str_contains($type, ')')) {
+        return \explode('|', $type);
+    }
+
+    $parts = [];
+    $currentPart = '';
+    $parenthesisLevel = 0;
+
+    $typeLength = \strlen($type);
+    for ($i = 0; $i < $typeLength; ++$i) {
+        $char = $type[$i];
+
+        if ('(' === $char) {
+            ++$parenthesisLevel;
+        } elseif (')' === $char) {
+            --$parenthesisLevel;
+        }
+
+        if ('|' === $char && 0 === $parenthesisLevel) {
+            $parts[] = $currentPart;
+            $currentPart = '';
+        } else {
+            $currentPart .= $char;
+        }
+    }
+
+    if ('' !== $currentPart) {
+        $parts[] = $currentPart;
+    }
+
+    return $parts;
+}
+
+$testCases = [
+    'string',
+    'int',
+    'bool',
+    'array',
+    'string|int',
+    'string|int|bool',
+    'string|int|bool|array',
+    'string|(int|bool)',
+    '(string|int)|bool',
+    'string|(int|(bool|float))',
+    '(string|int)|(bool|float)',
+    'MyClass',
+    'string[]',
+    'int[]',
+    '\\Namespace\\Class',
+    'string|int|bool|array|object|resource|callable',
+];
+
+$iterations = 100000;
+
+$start = microtime(true);
+
+for ($i = 0; $i < $iterations; $i++) {
+    foreach ($testCases as $testCase) {
+        splitOutsideParenthesis($testCase);
+    }
+}
+
+$end = microtime(true);
+$duration = ($end - $start) * 1000;
+
+$peakMemory = memory_get_peak_usage(true) / 1024 / 1024;
+
+echo "Optimization 2 (fast path union): " . number_format($duration, 2) . "ms for " . ($iterations * count($testCases)) . " operations\n";
+echo "Peak memory usage: " . number_format($peakMemory, 2) . " MB\n";
+```
+
+</details>
+
+<details>
+<summary>test_opt3_no_string_concat.php - Optimization 3: Eliminate string concatenation</summary>
+
+```php
+<?php
+
+function splitOutsideParenthesis(string $type): array
+{
+    $parts = [];
+    $start = 0;
+    $parenthesisLevel = 0;
+    $length = \strlen($type);
+
+    for ($i = 0; $i < $length; ++$i) {
+        $char = $type[$i];
+
+        if ('(' === $char) {
+            ++$parenthesisLevel;
+        } elseif (')' === $char) {
+            --$parenthesisLevel;
+        } elseif ('|' === $char && 0 === $parenthesisLevel) {
+            $parts[] = \substr($type, $start, $i - $start);
+            $start = $i + 1;
+        }
+    }
+
+    if ($start < $length) {
+        $parts[] = \substr($type, $start);
+    }
+
+    return $parts;
+}
+
+$testCases = [
+    'string',
+    'int',
+    'bool',
+    'array',
+    'string|int',
+    'string|int|bool',
+    'string|int|bool|array',
+    'string|(int|bool)',
+    '(string|int)|bool',
+    'string|(int|(bool|float))',
+    '(string|int)|(bool|float)',
+    'MyClass',
+    'string[]',
+    'int[]',
+    '\\Namespace\\Class',
+    'string|int|bool|array|object|resource|callable',
+];
+
+$iterations = 100000;
+
+$start = microtime(true);
+
+for ($i = 0; $i < $iterations; $i++) {
+    foreach ($testCases as $testCase) {
+        splitOutsideParenthesis($testCase);
+    }
+}
+
+$end = microtime(true);
+$duration = ($end - $start) * 1000;
+
+$peakMemory = memory_get_peak_usage(true) / 1024 / 1024;
+
+echo "Optimization 3 (no string concat): " . number_format($duration, 2) . "ms for " . ($iterations * count($testCases)) . " operations\n";
+echo "Peak memory usage: " . number_format($peakMemory, 2) . " MB\n";
+```
+
+</details>
+
+<details>
+<summary>test_opt4_switch_statement.php - Optimization 4: Switch statement</summary>
+
+```php
+<?php
+
+function splitOutsideParenthesis(string $type): array
+{
+    $parts = [];
+    $currentPart = '';
+    $parenthesisLevel = 0;
+
+    $typeLength = \strlen($type);
+    for ($i = 0; $i < $typeLength; ++$i) {
+        $char = $type[$i];
+
+        switch ($char) {
+            case '(':
+                ++$parenthesisLevel;
+                $currentPart .= $char;
+                break;
+            case ')':
+                --$parenthesisLevel;
+                $currentPart .= $char;
+                break;
+            case '|':
+                if (0 === $parenthesisLevel) {
+                    $parts[] = $currentPart;
+                    $currentPart = '';
+                } else {
+                    $currentPart .= $char;
+                }
+                break;
+            default:
+                $currentPart .= $char;
+                break;
+        }
+    }
+
+    if ('' !== $currentPart) {
+        $parts[] = $currentPart;
+    }
+
+    return $parts;
+}
+
+$testCases = [
+    'string',
+    'int',
+    'bool',
+    'array',
+    'string|int',
+    'string|int|bool',
+    'string|int|bool|array',
+    'string|(int|bool)',
+    '(string|int)|bool',
+    'string|(int|(bool|float))',
+    '(string|int)|(bool|float)',
+    'MyClass',
+    'string[]',
+    'int[]',
+    '\\Namespace\\Class',
+    'string|int|bool|array|object|resource|callable',
+];
+
+$iterations = 100000;
+
+$start = microtime(true);
+
+for ($i = 0; $i < $iterations; $i++) {
+    foreach ($testCases as $testCase) {
+        splitOutsideParenthesis($testCase);
+    }
+}
+
+$end = microtime(true);
+$duration = ($end - $start) * 1000;
+
+$peakMemory = memory_get_peak_usage(true) / 1024 / 1024;
+
+echo "Optimization 4 (switch statement): " . number_format($duration, 2) . "ms for " . ($iterations * count($testCases)) . " operations\n";
+echo "Peak memory usage: " . number_format($peakMemory, 2) . " MB\n";
+```
+
+</details>
+
+<details>
+<summary>test_optimized.php - Final optimized implementation (all optimizations combined)</summary>
+
+```php
+<?php
+
+function splitOutsideParenthesis(string $type): array
+{
+    if (!\str_contains($type, '|')) {
+        return [$type];
+    }
+
+    if (!\str_contains($type, '(') && !\str_contains($type, ')')) {
+        return \explode('|', $type);
+    }
+
+    $parts = [];
+    $start = 0;
+    $parenthesisLevel = 0;
+    $length = \strlen($type);
+
+    for ($i = 0; $i < $length; ++$i) {
+        $char = $type[$i];
+
+        switch ($char) {
+            case '(':
+                ++$parenthesisLevel;
+                break;
+            case ')':
+                --$parenthesisLevel;
+                break;
+            case '|':
+                if (0 === $parenthesisLevel) {
+                    $parts[] = \substr($type, $start, $i - $start);
+                    $start = $i + 1;
+                }
+                break;
+        }
+    }
+
+    if ($start < $length) {
+        $parts[] = \substr($type, $start);
+    }
+
+    return $parts;
+}
+
+$testCases = [
+    'string',
+    'int',
+    'bool',
+    'array',
+    'string|int',
+    'string|int|bool',
+    'string|int|bool|array',
+    'string|(int|bool)',
+    '(string|int)|bool',
+    'string|(int|(bool|float))',
+    '(string|int)|(bool|float)',
+    'MyClass',
+    'string[]',
+    'int[]',
+    '\\Namespace\\Class',
+    'string|int|bool|array|object|resource|callable',
+];
+
+$iterations = 100000;
+
+$start = microtime(true);
+
+for ($i = 0; $i < $iterations; $i++) {
+    foreach ($testCases as $testCase) {
+        splitOutsideParenthesis($testCase);
+    }
+}
+
+$end = microtime(true);
+$duration = ($end - $start) * 1000;
+
+$peakMemory = memory_get_peak_usage(true) / 1024 / 1024;
+
+echo "Optimized implementation: " . number_format($duration, 2) . "ms for " . ($iterations * count($testCases)) . " operations\n";
+echo "Peak memory usage: " . number_format($peakMemory, 2) . " MB\n";
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by bendavies at 2025-07-26T21:39:56Z
+
+i investigated @dunglas suggestion to use regex.
+a pure regex solution appears to be almost twice as fast as my current solution.
+I'll update this PR on Monday
+
+```
+Summary
+  php test_original.php ran
+    5.53 ± 0.15 times slower than php test_optimized_v2.php <-- pure regex, no loops
+    3.12 ± 0.08 times slower than php test_optimized.php
+````
+
+---------------------------------------------------------------------------
+
+by bendavies at 2025-07-29T15:29:31Z
+
+@dunglas pure regex solution added. reproducing commit message here for completeness:
+
+```
+[OptionsResolver] optimize splitOutsideParenthesis with regex (5.88x faster)
+
+Replace manual string parsing with regex-based implementation using PCRE's
+(*SKIP)(*FAIL) backtracking control verbs. This approach:
+
+Achieves 5.88x performance improvement over the original implementation
+
+The regex pattern '\([^()]*(?:\([^()]*\)[^()]*)*\)(*SKIP)(*FAIL)|\|' works by:
+ 1. Matching parentheses and their contents (including nested parentheses)
+ 2. Using (*SKIP)(*FAIL) to skip these matches entirely
+ 3. Then splitting on the remaining pipe characters outside parentheses
+```
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-29T18:23:49Z
+
+PR title and body would need an update then for the 5. optimization
+
+---------------------------------------------------------------------------
+
+by bendavies at 2025-07-29T20:06:23Z
+
+Got a bit scared after @nicolas-grekas pointed out that my regex only worked for 2 levels, so added a bunch of regression tests a first commit.
+
+added a new recursive regex which supports unlimited depth while maintaining the performance improvement.

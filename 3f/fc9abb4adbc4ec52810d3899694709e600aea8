@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-24T08:22:28Z
+
+This approach is too broad IMHO. There are cases where the class is eg `string` for some internal services.
+
+In https://github.com/symfony/symfony/issues/54095#issuecomment-2922831094, I wrote:
+
+> I'm wondering if we shouldn't add the check when the class is not defined for a service (and thus when the id becomes the class).
+
+Can't we patch the existing compiler pass that copies the id to the class when no class is set, and make it throw when id is not a class?
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2025-07-24T08:39:13Z
+
+> Can't we patch the existing compiler pass that copies the id to the class when no class is set, and make it throw when id is not a class?
+
+But then it would not work if you define a manual id and make a typo in the class (although more of a niche case)
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2025-07-24T08:47:58Z
+
+> There are cases where the class is eg `string` for some internal services.
+
+So we could have something like `['mailer.transport', 'createFromDsn']` at this point? (Not a reference but the service ID as is?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-24T08:52:14Z
+
+There are many ways one can mess up with their DI config. Validating everything adds to the compilation time. That's something we always considered outside of the scope of the compilation step.

@@ -18,8 +18,6 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  * Primarily, the metadata stores serialization groups.
  *
- * @internal
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface AttributeMetadataInterface

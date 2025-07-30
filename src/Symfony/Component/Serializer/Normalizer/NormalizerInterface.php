@@ -18,17 +18,20 @@ use Symfony\Component\Serializer\Exception\LogicException;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @template TData of mixed
+ * @template TResult of array|string|int|float|bool|\ArrayObject|null
  */
 interface NormalizerInterface
 {
     /**
      * Normalizes data into a set of arrays/scalars.
      *
-     * @param mixed                $data    Data to normalize
+     * @param TData                $data    Data to normalize
      * @param string|null          $format  Format the normalization result will be encoded as
      * @param array<string, mixed> $context Context options for the normalizer
      *
-     * @return array|string|int|float|bool|\ArrayObject|null \ArrayObject is used to make sure an empty object is encoded as an object not an array
+     * @return TResult \ArrayObject is used to make sure an empty object is encoded as an object not an array
      *
      * @throws InvalidArgumentException   Occurs when the object given is not a supported type for the normalizer
      * @throws CircularReferenceException Occurs when the normalizer detects a circular reference when no circular
@@ -44,6 +47,8 @@ interface NormalizerInterface
      * @param mixed                $data    Data to normalize
      * @param string|null          $format  The format being (de-)serialized from or into
      * @param array<string, mixed> $context Context options for the normalizer
+     *
+     * @psalm-assert-if-true TData $data
      */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool;
 

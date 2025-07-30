@@ -21,6 +21,9 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @template TData of mixed
+ * @template TType of string
  */
 interface DenormalizerInterface
 {
@@ -29,8 +32,8 @@ interface DenormalizerInterface
     /**
      * Denormalizes data back into an object of the given class.
      *
-     * @param mixed                $data    Data to restore
-     * @param string               $type    The expected class to instantiate
+     * @param TData                $data    Data to restore
+     * @param TType                $type    The expected class to instantiate
      * @param string|null          $format  Format the given data was extracted from
      * @param array<string, mixed> $context Options available to the denormalizer
      *
@@ -51,6 +54,9 @@ interface DenormalizerInterface
      * @param string               $type    The class to which the data should be denormalized
      * @param string|null          $format  The format being deserialized from
      * @param array<string, mixed> $context Options available to the denormalizer
+     *
+     * @psalm-assert-if-true TData $data
+     * @psalm-assert-if-true TType $type
      */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool;
 

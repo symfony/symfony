@@ -32,7 +32,7 @@ trait LockableTrait
     /**
      * Locks a command.
      */
-    private function lock(?string $name = null, bool $blocking = false, float $ttl = 300.0, bool $authRelease = true): bool
+    private function lock(?string $name = null, bool $blocking = false, float $ttl = 300.0, bool $autoRelease = true): bool
     {
         if (!class_exists(SemaphoreStore::class)) {
             throw new LogicException('To enable the locking feature you must install the symfony/lock component. Try running "composer require symfony/lock".');
@@ -62,7 +62,7 @@ trait LockableTrait
             }
         }
 
-        $this->lock = $this->lockFactory->createLock($name, $ttl, $authRelease);
+        $this->lock = $this->lockFactory->createLock($name, $ttl, $autoRelease);
         if (!$this->lock->acquire($blocking)) {
             $this->lock = null;
 

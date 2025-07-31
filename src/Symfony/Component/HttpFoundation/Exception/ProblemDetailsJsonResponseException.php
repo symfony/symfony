@@ -14,6 +14,6 @@ namespace Symfony\Component\HttpFoundation\Exception;
 /**
  * @author Abdellah Ramadan <ramadanabdel24@gmail.com>
  */
-class ProblemDetailsJsonResponseException extends \Exception
+class ProblemDetailsJsonResponseException extends UnexpectedValueException
 {
 }

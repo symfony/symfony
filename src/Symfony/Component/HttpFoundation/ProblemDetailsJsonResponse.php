@@ -20,15 +20,32 @@ use Symfony\Component\HttpFoundation\Exception\ProblemDetailsJsonResponseExcepti
  */
 class ProblemDetailsJsonResponse extends Response
 {
+    /**
+     * @param int|null $status
+     * @param string|null $title
+     * @param string|null $type
+     * @param string|null $detail
+     * @param string|null $instance
+     * @param array|null $extensions
+     * @throws ProblemDetailsJsonResponseException
+     * @throws \JsonException
+     */
     public function __construct(
-        protected ?int $status = null,
-        protected ?string $title = null,
-        protected ?string $type = null,
-        protected ?string $detail = null,
-        protected ?string $instance = null,
-        protected ?array $extensions = [],
+        private ?int $status = null,
+        private ?string $title = null,
+        private readonly ?string $type = null,
+        private readonly ?string $detail = null,
+        private readonly ?string $instance = null,
+        private readonly ?array $extensions = [],
     ) {
         parent::__construct();
+
+        $this->status = $this->status ?? 500;
+        $this->statusCode = $this->status;
+
+        if ($this->status < 400 || $this->status > 599) {
+            throw new ProblemDetailsJsonResponseException(\sprintf('The status code "%s" is not a valid HTTP Status Code error.', $this->statusCode));
+        }
 
         if ($this->title && null === $this->type) {
             $this->title = Response::$statusTexts[$this->status];
@@ -37,40 +54,6 @@ class ProblemDetailsJsonResponse extends Response
         if (null === $this->title && null === $this->detail) {
             $this->title = Response::$statusTexts[$this->status];
         }
-
-        $this->setProblemContent();
-    }
-
-    private function setHeaders(): void
-    {
-        $this->headers->set('Content-Type', 'application/problem+json');
-    }
-
-    /**
-     * @throws ProblemDetailsJsonResponseException
-     */
-    private function checkStatusCode(): void
-    {
-        if ($this->status < 400 || $this->status > 599) {
-            throw new ProblemDetailsJsonResponseException(\sprintf('The status code "%s" is not a valid HTTP Status Code error.', $this->statusCode));
-        }
-    }
-
-    private function setStatus(): void
-    {
-        $this->status = $this->status ?? 520;
-        $this->statusCode = $this->status;
-    }
-
-    /**
-     * @throws ProblemDetailsJsonResponseException
-     * @throws \JsonException
-     */
-    protected function setProblemContent(): string
-    {
-        $this->setStatus();
-        $this->checkStatusCode();
-        $this->setHeaders();
 
         if (null !== $this->type) {
             $scheme = parse_url($this->type, \PHP_URL_SCHEME);
@@ -92,8 +75,11 @@ class ProblemDetailsJsonResponse extends Response
             return null !== $value;
         });
 
+        $this->headers->set('Content-Type', 'application/problem+json');
+
         $content = json_encode($problemDetails, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR);
 
         return $this->setContent($content);
     }
+
 }

@@ -523,10 +523,12 @@ class WorkerTest extends TestCase
     {
         $expectedMessages = [
             new DummyMessage('Hey'),
+            new DummyMessage('There'),
         ];
 
         $receiver = new DummyReceiver([
             [new Envelope($expectedMessages[0])],
+            [new Envelope($expectedMessages[1])],
             [],
         ]);
 
@@ -541,11 +543,9 @@ class WorkerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver) {
             static $i = 0;
-            if (1 < ++$i) {
+            if (2 < ++$i) {
                 $event->getWorker()->stop();
-                $this->assertSame(1, $receiver->getAcknowledgeCount());
-            } else {
-                $this->assertSame(0, $receiver->getAcknowledgeCount());
+                $this->assertSame(2, $receiver->getAcknowledgeCount());
             }
         });
 

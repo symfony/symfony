@@ -69,7 +69,6 @@ class ProblemDetailsJsonResponse extends Response
 
         $content = json_encode($problemDetails, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR);
 
-        return $this->setContent($content);
+        $this->setContent($content);
     }
-
 }

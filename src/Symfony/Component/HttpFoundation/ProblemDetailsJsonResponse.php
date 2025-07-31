@@ -20,16 +20,6 @@ use Symfony\Component\HttpFoundation\Exception\ProblemDetailsJsonResponseExcepti
  */
 class ProblemDetailsJsonResponse extends Response
 {
-    /**
-     * @param int|null $status
-     * @param string|null $title
-     * @param string|null $type
-     * @param string|null $detail
-     * @param string|null $instance
-     * @param array|null $extensions
-     * @throws ProblemDetailsJsonResponseException
-     * @throws \JsonException
-     */
     public function __construct(
         private ?int $status = null,
         private ?string $title = null,

@@ -69,7 +69,7 @@ class ProblemDetailsJsonResponseTest extends TestCase
 
     public function testInstance()
     {
-        $problemDetails = new ProblemDetailsJsonResponse(400,instance: 'article/5');
+        $problemDetails = new ProblemDetailsJsonResponse(400, instance: 'article/5');
         $this->assertIsString(json_decode($problemDetails->getContent(), true)['instance']);
     }
 }

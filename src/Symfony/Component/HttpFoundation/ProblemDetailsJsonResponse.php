@@ -21,39 +21,39 @@ use Symfony\Component\HttpFoundation\Exception\ProblemDetailsJsonResponseExcepti
 class ProblemDetailsJsonResponse extends Response
 {
     public function __construct(
-        private readonly int $status = 500,
-        private readonly string $type = 'about:blank',
-        private ?string $title = null,
-        private readonly ?string $detail = null,
-        private readonly ?string $instance = null,
-        private readonly ?array $extensions = [],
+        int $status = 500,
+        string $type = 'about:blank',
+        ?string $title = null,
+        ?string $detail = null,
+        ?string $instance = null,
+        ?array $extensions = [],
     ) {
         parent::__construct();
 
-        $this->statusCode = $this->status;
+        $this->statusCode = $status;
 
-        if ($this->status < 400 || $this->status > 599) {
+        if ($status < 400 || $status > 599) {
             throw new ProblemDetailsJsonResponseException(\sprintf('The status code "%s" is not a valid HTTP Status Code error.', $this->statusCode));
         }
 
-        if ($this->title && null === $this->type || null === $this->title) {
-            $this->title = Response::$statusTexts[$this->status];
+        if ($title && null === $type || null === $title) {
+            $title = Response::$statusTexts[$status];
         }
 
-        if (null !== $this->type) {
-            $scheme = parse_url($this->type, \PHP_URL_SCHEME);
+        if (null !== $type) {
+            $scheme = parse_url($type, \PHP_URL_SCHEME);
             if (null === $scheme) {
-                throw new ProblemDetailsJsonResponseException("Invalid url type: $this->type.");
+                throw new ProblemDetailsJsonResponseException("Invalid url type: $type.");
             }
         }
 
         $problemDetails = [
-            'type' => $this->type,
-            'title' => $this->title,
-            'detail' => $this->detail,
-            'status' => $this->status,
-            'instance' => $this->instance,
-            ...$this->extensions,
+            'type' => $type,
+            'title' => $title,
+            'detail' => $detail,
+            'status' => $status,
+            'instance' => $instance,
+            ...$extensions,
         ];
 
         $problemDetails = array_filter($problemDetails, function ($value) {

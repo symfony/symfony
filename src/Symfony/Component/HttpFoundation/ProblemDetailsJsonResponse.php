@@ -21,27 +21,22 @@ use Symfony\Component\HttpFoundation\Exception\ProblemDetailsJsonResponseExcepti
 class ProblemDetailsJsonResponse extends Response
 {
     public function __construct(
-        private ?int $status = null,
+        private readonly int $status = 500,
+        private readonly string $type = 'about:blank',
         private ?string $title = null,
-        private readonly ?string $type = null,
         private readonly ?string $detail = null,
         private readonly ?string $instance = null,
         private readonly ?array $extensions = [],
     ) {
         parent::__construct();
 
-        $this->status = $this->status ?? 500;
         $this->statusCode = $this->status;
 
         if ($this->status < 400 || $this->status > 599) {
             throw new ProblemDetailsJsonResponseException(\sprintf('The status code "%s" is not a valid HTTP Status Code error.', $this->statusCode));
         }
 
-        if ($this->title && null === $this->type) {
-            $this->title = Response::$statusTexts[$this->status];
-        }
-
-        if (null === $this->title && null === $this->detail) {
+        if ($this->title && null === $this->type || null === $this->title) {
             $this->title = Response::$statusTexts[$this->status];
         }
 
@@ -53,8 +48,8 @@ class ProblemDetailsJsonResponse extends Response
         }
 
         $problemDetails = [
-            'type' => $this->type ?? 'about:blank',
-            'title' => $this->title ?? Response::$statusTexts[$this->statusCode] ?? 'Unknown Error',
+            'type' => $this->type,
+            'title' => $this->title,
             'detail' => $this->detail,
             'status' => $this->status,
             'instance' => $this->instance,

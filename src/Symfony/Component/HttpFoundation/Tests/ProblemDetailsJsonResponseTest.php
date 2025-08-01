@@ -41,7 +41,7 @@ class ProblemDetailsJsonResponseTest extends TestCase
 
     public function testNewProblemWithParams()
     {
-        $problemDetails = new ProblemDetailsJsonResponse(401, 'Unauthorized', 'https://example.com/not-found-docs', 'No access to this resource');
+        $problemDetails = new ProblemDetailsJsonResponse(401, 'https://example.com/not-found-docs', 'Unauthorized', 'No access to this resource');
 
         $this->assertSame(401, json_decode($problemDetails->getContent(), true)['status']);
         $this->assertSame('Unauthorized', json_decode($problemDetails->getContent(), true)['title']);

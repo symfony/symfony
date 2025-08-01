@@ -16,8 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ProblemDetailsJsonResponse;
 
 /**
- * Problem Detail Response Tests.
- *
  * @author Abdellah Ramadan <ramadanabdel24@gmail.com>
  */
 class ProblemDetailsJsonResponseTest extends TestCase

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-24T07:21:17Z
+
+The PR cannot be merged at the moment as it is based on a bunch of other open pull requests that are paving the way to be able to actually run the tests with PHPUnit 11.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-09-24T07:47:03Z
+
+This is super nice news! Did you already take care of everything required to be "PHPUnit 11 compliant" in already opened PRs ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-09-24T07:49:24Z
+
+@alexandre-daubois The "ensure session storages are opened before destroying them" commit is the only one that is not already part of an open PR. I do not really understand yet why that change is necessary (the flow in `AbstractSessionHandler` is different as `headers_sent()` returns a different result).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-25T14:30:35Z
+
+We need a way to register DebugClassLoader, and maybe a few other things. Basically what we do in SymfonyTestsListenerTrait.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-04-21T04:59:23Z
+
+@symfony/mergers The PR is finally ready to be reviewed.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-22T07:33:28Z
+
+Tests are not actually running with PHPUnit 11.5: https://github.com/symfony/symfony/actions/runs/14563576793/job/40849847611?pr=58370#step:6:44
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-04-22T08:53:01Z
+
+> Tests are not actually running with PHPUnit 11.5: https://github.com/symfony/symfony/actions/runs/14563576793/job/40849847611?pr=58370#step:6:44
+
+Isn't that related to how our CI is configured? I mean the previous commit that is checked out does not have the changes needed in `phpunit` to install PHPUnit 11.5.

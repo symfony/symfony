@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
@@ -39,8 +41,26 @@ class SerializerCacheWarmerTest extends TestCase
         return $this->arrayPool = new PhpArrayAdapter($file, new NullAdapter());
     }
 
-    #[DataProvider('loaderProvider')]
-    public function testWarmUp(array $loaders)
+    #[DataProvider('yamlLoaderProvider')]
+    public function testYamlWarmUp(array $loaders)
+    {
+        $file = sys_get_temp_dir().'/cache-serializer.php';
+        @unlink($file);
+
+        $warmer = new SerializerCacheWarmer($loaders, $file);
+        $warmer->warmUp(\dirname($file), \dirname($file));
+
+        $this->assertFileExists($file);
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
+        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    #[DataProvider('xmlLoaderProvider')]
+    public function testXmlWarmUp(array $loaders)
     {
         $file = sys_get_temp_dir().'/cache-serializer.php';
         @unlink($file);
@@ -53,11 +73,31 @@ class SerializerCacheWarmerTest extends TestCase
         $arrayPool = $this->getArrayPool($file);
 
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
+    }
+
+    #[DataProvider('yamlLoaderProvider')]
+    public function testYamlWarmUpAbsoluteFilePath(array $loaders)
+    {
+        $file = sys_get_temp_dir().'/0/cache-serializer.php';
+        @unlink($file);
+
+        $cacheDir = sys_get_temp_dir().'/1';
+
+        $warmer = new SerializerCacheWarmer($loaders, $file);
+        $warmer->warmUp($cacheDir, $cacheDir);
+
+        $this->assertFileExists($file);
+        $this->assertFileDoesNotExist($cacheDir.'/cache-serializer.php');
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
-    #[DataProvider('loaderProvider')]
-    public function testWarmUpAbsoluteFilePath(array $loaders)
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    #[DataProvider('xmlLoaderProvider')]
+    public function testXmlWarmUpAbsoluteFilePath(array $loaders)
     {
         $file = sys_get_temp_dir().'/0/cache-serializer.php';
         @unlink($file);
@@ -73,11 +113,10 @@ class SerializerCacheWarmerTest extends TestCase
         $arrayPool = $this->getArrayPool($file);
 
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
-        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
-    #[DataProvider('loaderProvider')]
-    public function testWarmUpWithoutBuildDir(array $loaders)
+    #[DataProvider('yamlLoaderProvider')]
+    public function testYamlWarmUpWithoutBuildDir(array $loaders)
     {
         $file = sys_get_temp_dir().'/cache-serializer.php';
         @unlink($file);
@@ -89,25 +128,58 @@ class SerializerCacheWarmerTest extends TestCase
 
         $arrayPool = $this->getArrayPool($file);
 
-        $this->assertFalse($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
         $this->assertFalse($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
-    public static function loaderProvider(): array
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    #[DataProvider('xmlLoaderProvider')]
+    public function testXmlWarmUpWithoutBuildDir(array $loaders)
+    {
+        $file = sys_get_temp_dir().'/cache-serializer.php';
+        @unlink($file);
+
+        $warmer = new SerializerCacheWarmer($loaders, $file);
+        $warmer->warmUp(\dirname($file));
+
+        $this->assertFileDoesNotExist($file);
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
+        $this->assertFalse($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
+    }
+
+    public static function yamlLoaderProvider(): array
     {
         return [
             [
                 [
                     new LoaderChain([
-                        new XmlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/person.xml'),
                         new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/author.yml'),
                     ]),
                 ],
             ],
             [
                 [
-                    new XmlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/person.xml'),
                     new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/author.yml'),
+                ],
+            ],
+        ];
+    }
+
+    public static function xmlLoaderProvider(): array
+    {
+        return [
+            [
+                [
+                    new LoaderChain([
+                        new XmlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/person.xml'),
+                    ]),
+                ],
+            ],
+            [
+                [
+                    new XmlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/person.xml'),
                 ],
             ],
         ];

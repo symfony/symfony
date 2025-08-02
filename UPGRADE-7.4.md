@@ -95,6 +95,7 @@ Serializer
  * Make `AttributeMetadata` and `ClassMetadata` final
  * Deprecate class aliases in the `Annotation` namespace, use attributes instead
  * Deprecate getters in attribute classes in favor of public properties
+ * Deprecate XML configuration format, use YAML or attributes instead
 
 String
 ------

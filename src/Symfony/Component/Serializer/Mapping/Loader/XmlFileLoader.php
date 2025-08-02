@@ -23,6 +23,8 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
  * Loads XML mapping files.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since Symfony 7.4, use another loader instead
  */
 class XmlFileLoader extends FileLoader
 {
@@ -42,6 +44,8 @@ class XmlFileLoader extends FileLoader
         $attributesMetadata = $classMetadata->getAttributesMetadata();
 
         if (isset($this->classes[$classMetadata->getName()])) {
+            trigger_deprecation('symfony/serializer', '7.4', 'XML configuration format is deprecated, use YAML or attributes instead.');
+
             $xml = $this->classes[$classMetadata->getName()];
 
             foreach ($xml->attribute as $attribute) {

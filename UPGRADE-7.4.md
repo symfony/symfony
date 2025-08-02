@@ -231,3 +231,4 @@ Validator
        }
    }
    ```
+ * Deprecate XML configuration format, use YAML or attributes instead

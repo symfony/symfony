@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
@@ -37,13 +39,30 @@ class ValidatorCacheWarmerTest extends TestCase
         return $this->arrayPool = new PhpArrayAdapter($file, new NullAdapter());
     }
 
-    public function testWarmUp()
+    public function testYamlWarmUp()
+    {
+        $validatorBuilder = new ValidatorBuilder();
+        $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/author.yml');
+
+        $file = sys_get_temp_dir().'/cache-validator.php';
+        @unlink($file);
+
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
+        $warmer->warmUp(\dirname($file), \dirname($file));
+
+        $this->assertFileExists($file);
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
+        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testXmlWarmUp()
     {
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
-        $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/author.yml');
-        $validatorBuilder->addMethodMapping('loadValidatorMetadata');
-        $validatorBuilder->enableAttributeMapping();
 
         $file = sys_get_temp_dir().'/cache-validator.php';
         @unlink($file);
@@ -56,16 +75,35 @@ class ValidatorCacheWarmerTest extends TestCase
         $arrayPool = $this->getArrayPool($file);
 
         $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
+    }
+
+    public function testYamlWarmUpAbsoluteFilePath()
+    {
+        $validatorBuilder = new ValidatorBuilder();
+        $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/author.yml');
+
+        $file = sys_get_temp_dir().'/0/cache-validator.php';
+        @unlink($file);
+
+        $cacheDir = sys_get_temp_dir().'/1';
+
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
+        $warmer->warmUp($cacheDir, $cacheDir);
+
+        $this->assertFileExists($file);
+        $this->assertFileDoesNotExist($cacheDir.'/cache-validator.php');
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
         $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
     }
 
-    public function testWarmUpAbsoluteFilePath()
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testXmlWarmUpAbsoluteFilePath()
     {
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
-        $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/author.yml');
-        $validatorBuilder->addMethodMapping('loadValidatorMetadata');
-        $validatorBuilder->enableAttributeMapping();
 
         $file = sys_get_temp_dir().'/0/cache-validator.php';
         @unlink($file);
@@ -81,16 +119,12 @@ class ValidatorCacheWarmerTest extends TestCase
         $arrayPool = $this->getArrayPool($file);
 
         $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
-        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
     }
 
-    public function testWarmUpWithoutBuilDir()
+    public function testYamlWarmUpWithoutBuilDir()
     {
         $validatorBuilder = new ValidatorBuilder();
-        $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/author.yml');
-        $validatorBuilder->addMethodMapping('loadValidatorMetadata');
-        $validatorBuilder->enableAttributeMapping();
 
         $file = sys_get_temp_dir().'/cache-validator.php';
         @unlink($file);
@@ -102,8 +136,27 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $arrayPool = $this->getArrayPool($file);
 
-        $this->assertFalse($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
         $this->assertFalse($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testXmlWarmUpWithoutBuilDir()
+    {
+        $validatorBuilder = new ValidatorBuilder();
+        $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
+
+        $file = sys_get_temp_dir().'/cache-validator.php';
+        @unlink($file);
+
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
+        $warmer->warmUp(\dirname($file));
+
+        $this->assertFileDoesNotExist($file);
+
+        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+
+        $this->assertFalse($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
     }
 
     public function testWarmUpWithAnnotations()

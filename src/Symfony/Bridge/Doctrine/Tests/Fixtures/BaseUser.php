@@ -11,12 +11,17 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class BaseUser
 {
     private $enabled;
 
     public function __construct(
         private readonly int $id,
+
+        #[Assert\NotBlank(groups: ['Registration'])]
+        #[Assert\Length(min: 2, max: 120, groups: ['Registration'])]
         private readonly string $username,
     ) {
     }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
+trigger_deprecation('symfony/validator', '7.4', 'XML configuration format is deprecated, use YAML or attributes instead.');
+
 /**
  * Loads validation metadata from a list of XML files.
  *
@@ -18,6 +20,7 @@ namespace Symfony\Component\Validator\Mapping\Loader;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see FilesLoader
+ * @deprecated since Symfony 7.4, use another loader instead
  */
 class XmlFilesLoader extends FilesLoader
 {

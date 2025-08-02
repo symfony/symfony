@@ -160,7 +160,6 @@ class DoctrineLoaderTest extends TestCase
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
-            ->addXmlMappings([__DIR__.'/../Resources/validator/BaseUser.xml'])
             ->addLoader(
                 new DoctrineLoader(
                     DoctrineTestHelper::createTestEntityManager(

@@ -16,7 +16,6 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -165,9 +164,9 @@ final class UuidTypeTest extends TestCase
     {
         if (interface_exists(Exception::class)) {
             // DBAL 4+
-            return new SQLitePlatform();
+            return new \Doctrine\DBAL\Platforms\SQLitePlatform();
         }
 
-        return new SQLitePlatform();
+        return new \Doctrine\DBAL\Platforms\SqlitePlatform();
     }
 }

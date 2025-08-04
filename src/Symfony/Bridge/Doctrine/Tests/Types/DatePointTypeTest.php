@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Doctrine\Tests\Types;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Types\DatePointType;
@@ -94,9 +93,9 @@ final class DatePointTypeTest extends TestCase
     {
         if (interface_exists(Exception::class)) {
             // DBAL 4+
-            return new SQLitePlatform();
+            return new \Doctrine\DBAL\Platforms\SQLitePlatform();
         }
 
-        return new SQLitePlatform();
+        return new \Doctrine\DBAL\Platforms\SqlitePlatform();
     }
 }

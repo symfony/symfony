@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-08-01T16:12:59Z
+
+this is a first step towards running our tests with PHPUnit 12.3, contains #58370 which needs to be merged first
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-01T16:36:44Z
+
+This has to be automated. Is that the case?
+Otherwise, we're going to have a hard time when merging up, either immediately when merging into 8.0 or during the remaining 6.4 dev cycle

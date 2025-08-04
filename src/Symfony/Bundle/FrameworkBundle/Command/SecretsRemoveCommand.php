@@ -61,7 +61,7 @@ EOF
         if (null === $vault) {
             $io->success('The local vault is disabled.');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         if ($vault->remove($name = $input->getArgument('name'))) {
@@ -74,7 +74,7 @@ EOF
             $io->comment('Note that this secret is overridden in the local vault.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

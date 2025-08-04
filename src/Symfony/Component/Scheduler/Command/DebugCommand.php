@@ -75,7 +75,7 @@ final class DebugCommand extends Command
         if (!$names = $input->getArgument('schedule') ?: $this->scheduleNames) {
             $io->error('No schedules found.');
 
-            return 2;
+            return Command::INVALID;
         }
 
         $date = new \DateTimeImmutable($input->getOption('date'));
@@ -99,7 +99,7 @@ final class DebugCommand extends Command
             );
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

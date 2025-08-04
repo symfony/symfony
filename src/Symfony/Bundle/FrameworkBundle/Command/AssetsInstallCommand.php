@@ -116,7 +116,7 @@ EOT
 
         $rows = [];
         $copyUsed = false;
-        $exitCode = 0;
+        $exitCode = Command::SUCCESS;
         $validAssetDirs = [];
         foreach ($kernel->getBundles() as $bundle) {
             if (!is_dir($originDir = $bundle->getPath().'/Resources/public') && !is_dir($originDir = $bundle->getPath().'/public')) {
@@ -154,7 +154,7 @@ EOT
                     $rows[] = [\sprintf('<fg=yellow;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'WARNING' : '!'), $message, $method];
                 }
             } catch (\Exception $e) {
-                $exitCode = 1;
+                $exitCode = Command::FAILURE;
                 $rows[] = [\sprintf('<fg=red;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */), $message, $e->getMessage()];
             }
         }

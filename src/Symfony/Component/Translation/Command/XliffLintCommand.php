@@ -191,11 +191,13 @@ EOF
 
         if (0 === $erroredFiles) {
             $io->success(\sprintf('All %d XLIFF files contain valid syntax.', $countFiles));
-        } else {
-            $io->warning(\sprintf('%d XLIFF files have valid syntax and %d contain errors.', $countFiles - $erroredFiles, $erroredFiles));
+
+            return Command::SUCCESS;
         }
 
-        return min($erroredFiles, 1);
+        $io->warning(\sprintf('%d XLIFF files have valid syntax and %d contain errors.', $countFiles - $erroredFiles, $erroredFiles));
+
+        return Command::FAILURE;
     }
 
     private function displayJson(SymfonyStyle $io, array $filesInfo): int
@@ -211,7 +213,7 @@ EOF
 
         $io->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
-        return min($errors, 1);
+        return 0 === $errors ? Command::SUCCESS : Command::FAILURE;
     }
 
     /**

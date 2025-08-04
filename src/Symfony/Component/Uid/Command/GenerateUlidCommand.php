@@ -70,7 +70,7 @@ EOF
             } catch (\Exception $e) {
                 $io->error(\sprintf('Invalid timestamp "%s": %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
 
-                return 1;
+                return Command::FAILURE;
             }
         }
 
@@ -81,7 +81,7 @@ EOF
         } else {
             $io->error(\sprintf('Invalid format "%s", supported formats are "%s".', $formatOption, implode('", "', $this->getAvailableFormatOptions())));
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $count = (int) $input->getOption('count');
@@ -92,10 +92,10 @@ EOF
         } catch (\Exception $e) {
             $io->error($e->getMessage());
 
-            return 1;
+            return Command::FAILURE;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

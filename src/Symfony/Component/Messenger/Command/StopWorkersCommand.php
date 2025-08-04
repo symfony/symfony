@@ -59,6 +59,6 @@ EOF
 
         $io->success('Signal successfully sent to stop any running workers.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

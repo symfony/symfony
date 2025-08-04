@@ -95,19 +95,19 @@ EOF
         if (false !== ($time ?? $name ?? $random) && 1 < ((null !== $time) + (null !== $name) + $random)) {
             $io->error('Only one of "--time-based", "--name-based" or "--random-based" can be provided at a time.');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         if (null === $time && null !== $node) {
             $io->error('Option "--node" can only be used with "--time-based".');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         if (null === $name && null !== $namespace) {
             $io->error('Option "--namespace" can only be used with "--name-based".');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         switch (true) {
@@ -118,7 +118,7 @@ EOF
                     } catch (\InvalidArgumentException $e) {
                         $io->error(\sprintf('Invalid node "%s": %s', $node, $e->getMessage()));
 
-                        return 1;
+                        return Command::FAILURE;
                     }
                 }
 
@@ -127,7 +127,7 @@ EOF
                 } catch (\Exception $e) {
                     $io->error(\sprintf('Invalid timestamp "%s": %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
 
-                    return 1;
+                    return Command::FAILURE;
                 }
 
                 $create = fn (): Uuid => $this->factory->timeBased($node)->create(new \DateTimeImmutable($time));
@@ -140,7 +140,7 @@ EOF
                     } catch (\InvalidArgumentException $e) {
                         $io->error(\sprintf('Invalid namespace "%s": %s', $namespace, $e->getMessage()));
 
-                        return 1;
+                        return Command::FAILURE;
                     }
                 }
 
@@ -171,7 +171,7 @@ EOF
         } else {
             $io->error(\sprintf('Invalid format "%s", supported formats are "%s".', $formatOption, implode('", "', $this->getAvailableFormatOptions())));
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $count = (int) $input->getOption('count');
@@ -182,10 +182,10 @@ EOF
         } catch (\Exception $e) {
             $io->error($e->getMessage());
 
-            return 1;
+            return Command::FAILURE;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

@@ -103,7 +103,7 @@ EOF
             'json' => $this->outputJson($io, $outputTable, $uncountableTransports),
         };
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function outputText(SymfonyStyle $io, array $outputTable, array $uncountableTransports): void

@@ -99,7 +99,7 @@ EOF
                     'method' => $method,
                 ]);
 
-                return 0;
+                return Command::SUCCESS;
             }
 
             if (!$route && $matchingRoutes) {
@@ -131,7 +131,7 @@ EOF
             ]);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function findRouteNameContaining(string $name, RouteCollection $routes, string $method): array

@@ -120,7 +120,7 @@ EOF
             $this->displayLog($output, $clientId, $record);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getLogs($socket): iterable

@@ -81,7 +81,7 @@ EOF
         if (!$this->dispatchers->has($dispatcherServiceName)) {
             $io->getErrorStyle()->error(\sprintf('Event dispatcher "%s" is not available.', $dispatcherServiceName));
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $dispatcher = $this->dispatchers->get($dispatcherServiceName);
@@ -95,7 +95,7 @@ EOF
                 if (0 === \count($events)) {
                     $io->getErrorStyle()->warning(\sprintf('The event "%s" does not have any registered listeners.', $event));
 
-                    return 0;
+                    return Command::SUCCESS;
                 } elseif (1 === \count($events)) {
                     $options = ['event' => $events[array_key_first($events)]];
                 } else {
@@ -115,7 +115,7 @@ EOF
         $options['output'] = $io;
         $helper->describe($io, $dispatcher, $options);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

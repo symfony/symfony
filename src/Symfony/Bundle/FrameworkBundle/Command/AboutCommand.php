@@ -91,7 +91,7 @@ EOT
 
         $io->table([], $rows);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private static function formatPath(string $path, string $baseDir): string

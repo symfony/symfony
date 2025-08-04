@@ -135,7 +135,7 @@ EOF
 
             $io->success(\sprintf('All local translations has been sent to "%s" (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $providerTranslations = $provider->read($domains, $locales);
@@ -160,7 +160,7 @@ EOF
 
         $io->success(\sprintf('%s local translations has been sent to "%s" (for "%s" locale(s), and "%s" domain(s)).', $force ? 'All' : 'New', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getDomainsFromTranslatorBag(TranslatorBag $translatorBag): array

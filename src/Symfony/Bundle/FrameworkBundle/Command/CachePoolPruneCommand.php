@@ -58,6 +58,6 @@ EOF
 
         $io->success('Successfully pruned cache pool(s).');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

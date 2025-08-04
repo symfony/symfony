@@ -74,7 +74,7 @@ EOT
         if (!\array_key_exists('SYMFONY_DOTENV_VARS', $_SERVER)) {
             $io->error('Dotenv component is not initialized.');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         if (!$filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? null) {
@@ -123,7 +123,7 @@ EOT
             $io->warning(\sprintf('No variables match the given filter "%s".', $nameFilter));
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

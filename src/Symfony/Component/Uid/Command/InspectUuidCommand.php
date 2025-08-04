@@ -53,7 +53,7 @@ EOF
         } catch (\InvalidArgumentException $e) {
             $io->error($e->getMessage());
 
-            return 1;
+            return Command::FAILURE;
         }
 
         if (new NilUuid() == $uuid) {
@@ -79,6 +79,6 @@ EOF
 
         $io->table(['Label', 'Value'], $rows);
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

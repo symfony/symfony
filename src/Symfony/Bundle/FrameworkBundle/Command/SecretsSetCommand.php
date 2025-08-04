@@ -80,13 +80,13 @@ EOF
         if (null === $vault) {
             $io->error('The local vault is disabled.');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         if ($this->localVault === $vault && !\array_key_exists($name, $this->vault->list())) {
             $io->error(\sprintf('Secret "%s" does not exist in the vault, you cannot override it locally.', $name));
 
-            return 1;
+            return Command::FAILURE;
         }
 
         if (0 < $random = $input->getOption('random') ?? 16) {
@@ -131,7 +131,7 @@ EOF
             $io->comment('Note that this secret is overridden in the local vault.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

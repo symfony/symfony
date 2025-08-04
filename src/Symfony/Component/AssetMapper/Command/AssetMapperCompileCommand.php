@@ -94,7 +94,7 @@ EOT
             ));
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function shortenPath(string $path): string

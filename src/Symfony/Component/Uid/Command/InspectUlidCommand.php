@@ -50,7 +50,7 @@ EOF
         } catch (\InvalidArgumentException $e) {
             $io->error($e->getMessage());
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $io->table(['Label', 'Value'], [
@@ -62,6 +62,6 @@ EOF
             ['Time', $ulid->getDateTime()->format('Y-m-d H:i:s.v \U\T\C')],
         ]);
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

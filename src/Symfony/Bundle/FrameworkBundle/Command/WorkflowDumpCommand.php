@@ -111,7 +111,7 @@ EOF
         ];
         $output->writeln($dumper->dump($definition, $marking, $options));
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

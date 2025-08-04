@@ -201,7 +201,7 @@ EOF
 
         $io->success(\sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function isNfs(string $dir): bool

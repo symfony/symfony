@@ -188,11 +188,13 @@ EOF
 
         if (0 === $erroredFiles) {
             $io->success(\sprintf('All %d YAML files contain valid syntax.', $countFiles));
-        } else {
-            $io->warning(\sprintf('%d YAML files have valid syntax and %d contain errors.%s', $countFiles - $erroredFiles, $erroredFiles, $suggestTagOption ? ' Use the --parse-tags option if you want parse custom tags.' : ''));
+
+            return Command::SUCCESS;
         }
 
-        return min($erroredFiles, 1);
+        $io->warning(\sprintf('%d YAML files have valid syntax and %d contain errors.%s', $countFiles - $erroredFiles, $erroredFiles, $suggestTagOption ? ' Use the --parse-tags option if you want parse custom tags.' : ''));
+
+        return Command::FAILURE;
     }
 
     private function displayJson(SymfonyStyle $io, array $filesInfo): int
@@ -212,7 +214,7 @@ EOF
 
         $io->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
-        return min($errors, 1);
+        return 0 === $errors ? Command::SUCCESS : Command::FAILURE;
     }
 
     private function getFiles(string $fileOrDirectory): iterable

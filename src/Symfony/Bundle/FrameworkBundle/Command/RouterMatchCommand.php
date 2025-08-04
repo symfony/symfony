@@ -109,9 +109,9 @@ EOF
         if (!$matches) {
             $io->error(\sprintf('None of the routes match the path "%s"', $input->getArgument('path_info')));
 
-            return 1;
+            return Command::FAILURE;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

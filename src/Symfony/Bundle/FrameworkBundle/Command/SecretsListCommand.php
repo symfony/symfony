@@ -96,6 +96,6 @@ EOF
 
         $io->comment("Local values override secret values.\nUse <info>secrets:set --local</info> to define them.");
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

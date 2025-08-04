@@ -94,7 +94,7 @@ EOF
             $descriptor->describe($io, $data, $context, $clientId);
         });
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

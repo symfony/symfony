@@ -53,7 +53,7 @@ EOF
         if (null === $this->localVault) {
             $io->error('The local vault is disabled.');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         foreach ($this->vault->list(true) as $name => $value) {
@@ -64,10 +64,10 @@ EOF
             } elseif (null !== $message = $this->localVault->getLastMessage()) {
                 $io->error($message);
 
-                return 1;
+                return Command::FAILURE;
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

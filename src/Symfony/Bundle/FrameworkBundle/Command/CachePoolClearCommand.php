@@ -123,12 +123,12 @@ EOF
         }
 
         if ($failure) {
-            return 1;
+            return Command::FAILURE;
         }
 
         $io->success('Cache was successfully cleared.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

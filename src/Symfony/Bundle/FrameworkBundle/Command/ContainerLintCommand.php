@@ -56,7 +56,7 @@ final class ContainerLintCommand extends Command
         } catch (RuntimeException $e) {
             $errorIo->error($e->getMessage());
 
-            return 2;
+            return Command::INVALID;
         }
 
         $container->setParameter('container.build_time', time());
@@ -66,12 +66,12 @@ final class ContainerLintCommand extends Command
         } catch (InvalidArgumentException $e) {
             $errorIo->error($e->getMessage());
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $io->success('The container was linted successfully: all services are injected with values that are compatible with their type declarations.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getContainerBuilder(bool $resolveEnvVars): ContainerBuilder

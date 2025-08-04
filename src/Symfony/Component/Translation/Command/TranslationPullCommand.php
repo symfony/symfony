@@ -157,7 +157,7 @@ EOF
 
             $io->success(\sprintf('Local translations has been updated from "%s" (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $localTranslations = $this->readLocalTranslations($locales, $domains, $this->transPaths);
@@ -171,6 +171,6 @@ EOF
 
         $io->success(\sprintf('New translations from "%s" has been written locally (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

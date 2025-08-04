@@ -86,7 +86,7 @@ EOF;
 
         $output->writeln(\sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function loadEnv(string $dotenvPath, string $env, array $config): array

@@ -132,7 +132,7 @@ EOT
             $io->warning('No assets found.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

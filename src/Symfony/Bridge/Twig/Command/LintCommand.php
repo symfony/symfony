@@ -208,7 +208,7 @@ EOF
             $io->warning(\sprintf('%d Twig files have valid syntax and %d contain errors.', \count($filesInfo) - $errors, $errors));
         }
 
-        return !$deprecations && !$errors ? 0 : 1;
+        return !$deprecations && !$errors ? Command::SUCCESS : Command::FAILURE;
     }
 
     private function displayJson(OutputInterface $output, array $filesInfo): int
@@ -227,7 +227,7 @@ EOF
 
         $output->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
-        return min($errors, 1);
+        return $errors === 0 ? Command::SUCCESS : Command::FAILURE;
     }
 
     private function renderDeprecation(SymfonyStyle $output, int $line, string $message, string $file, ?GithubActionReporter $githubReporter): void

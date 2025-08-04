@@ -68,6 +68,6 @@ EOF
 
         $this->transport->send($message);
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -50,6 +50,6 @@ EOF
 
         $io->table(['Pool name'], array_map(fn ($pool) => [$pool], $this->poolNames));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

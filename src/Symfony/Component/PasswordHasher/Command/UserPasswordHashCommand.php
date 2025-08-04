@@ -115,7 +115,7 @@ EOF
             if (!$input->isInteractive()) {
                 $errorIo->error('The password must not be empty.');
 
-                return 1;
+                return Command::FAILURE;
             }
             $passwordQuestion = $this->createPasswordQuestion();
             $password = $errorIo->askQuestion($passwordQuestion);
@@ -155,7 +155,7 @@ EOF
 
         $errorIo->success('Password hashing succeeded');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

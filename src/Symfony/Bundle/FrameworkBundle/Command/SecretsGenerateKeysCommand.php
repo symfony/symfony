@@ -65,7 +65,7 @@ EOF
         if (null === $vault) {
             $io->error('The local vault is disabled.');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         if (!$input->getOption('rotate')) {
@@ -76,12 +76,12 @@ EOF
                     $io->caution('DO NOT COMMIT THE DECRYPTION KEY FOR THE PROD ENVIRONMENT⚠️');
                 }
 
-                return 0;
+                return Command::SUCCESS;
             }
 
             $io->warning($vault->getLastMessage());
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $secrets = [];
@@ -89,7 +89,7 @@ EOF
             if (null === $value) {
                 $io->error($vault->getLastMessage());
 
-                return 1;
+                return Command::FAILURE;
             }
 
             $secrets[$name] = $value;
@@ -98,7 +98,7 @@ EOF
         if (!$vault->generateKeys(true)) {
             $io->warning($vault->getLastMessage());
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $io->success($vault->getLastMessage());
@@ -115,6 +115,6 @@ EOF
             $io->caution('DO NOT COMMIT THE DECRYPTION KEY FOR THE PROD ENVIRONMENT⚠️');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

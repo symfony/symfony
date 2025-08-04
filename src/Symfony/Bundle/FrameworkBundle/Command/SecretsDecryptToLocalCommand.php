@@ -59,7 +59,7 @@ EOF
         if (null === $this->localVault) {
             $io->error('The local vault is disabled.');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $secrets = $this->vault->list(true);
@@ -96,9 +96,9 @@ EOF
         }
 
         if ($hadErrors) {
-            return 1;
+            return Command::FAILURE;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

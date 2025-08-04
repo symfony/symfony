@@ -65,7 +65,7 @@ EOF
         if (!$cachePool->hasItem($key)) {
             $io->note(\sprintf('Cache item "%s" does not exist in cache pool "%s".', $key, $pool));
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         if (!$cachePool->deleteItem($key)) {
@@ -74,7 +74,7 @@ EOF
 
         $io->success(\sprintf('Cache item "%s" was successfully deleted.', $key));
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

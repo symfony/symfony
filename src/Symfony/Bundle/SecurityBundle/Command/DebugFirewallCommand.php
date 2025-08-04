@@ -84,7 +84,7 @@ EOF
         if (null === $name) {
             $this->displayFirewallList($io);
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $serviceId = \sprintf('security.firewall.map.context.%s', $name);
@@ -92,7 +92,7 @@ EOF
         if (!$this->contexts->has($serviceId)) {
             $io->error(\sprintf('Firewall %s was not found. Available firewalls are: %s', $name, implode(', ', $this->firewallNames)));
 
-            return 1;
+            return Command::FAILURE;
         }
 
         /** @var FirewallContext $context */
@@ -110,7 +110,7 @@ EOF
 
         $this->displayAuthenticators($name, $io);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function displayFirewallList(SymfonyStyle $io): void

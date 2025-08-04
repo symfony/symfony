@@ -140,7 +140,7 @@ EOF
         $options['show_deprecated'] = $input->getOption('show-deprecated');
         $helper->describe($io, $object, $options);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, string $shortClassName): string

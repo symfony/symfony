@@ -65,7 +65,7 @@ EOF
         if (class_exists($class)) {
             $this->dumpValidatorsForClass($input, $output, $class);
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         try {
@@ -76,10 +76,10 @@ EOF
             $io = new SymfonyStyle($input, $output);
             $io->error(\sprintf('Neither class nor path were found with "%s" argument.', $input->getArgument('class')));
 
-            return 1;
+            return Command::FAILURE;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function dumpValidatorsForClass(InputInterface $input, OutputInterface $output, string $class): void

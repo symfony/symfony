@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-08-04T20:16:21Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-08-04T20:47:40Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-08-05T07:05:25Z
+
+Why not 12.3?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-08-05T07:07:27Z
+
+That's the ultimate goal, but we have to fix issues with every minor update we do for PHPUnit. That's why I am doing it step by step.

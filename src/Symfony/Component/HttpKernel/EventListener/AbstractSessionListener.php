@@ -103,7 +103,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$event->isMainRequest() || (!$this->container->has('initialized_session') && !$event->getRequest()->hasSession())) {
+        if (!$event->isMainRequest() || headers_sent() || (!$this->container->has('initialized_session') && !$event->getRequest()->hasSession())) {
             return;
         }
 

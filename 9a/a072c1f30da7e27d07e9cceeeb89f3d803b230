@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-08-01T06:09:23Z
+
+This PR not only removes unused code, but changes code. Can you please add or modify an existing test case? Thanks
+
+---------------------------------------------------------------------------
+
+by wazum at 2025-08-01T16:10:49Z
+
+That's the best I could come up with. Using only minimal Reflection to fill the `unacks` property.
+Previous attempts using the natural flow resulted in "The acknowledger was not called by the batch handler" fatal errors. I couldn't solve this otherwise.

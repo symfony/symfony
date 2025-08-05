@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-07-22T15:41:59Z
+
+@nicolas-grekas shouldn't we do that work in 6.4, as we'll want to have support for PHP 8.5 in Symfony 6.4 due to our policy ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-22T15:45:06Z
+
+To me, that's comparable to CS fixes. PHP 8.5 might ship the deprecation, although [vote is ongoing](https://wiki.php.net/rfc/deprecate-function-bool-type-juggling) and I wouldn't bet on it passing...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-07-28T08:47:45Z
+
+> To me, that's comparable to CS fixes. PHP 8.5 might ship the deprecation, although [vote is ongoing](https://wiki.php.net/rfc/deprecate-function-bool-type-juggling) and I wouldn't bet on it passing...
+
+I'd say let's wait for the voting to finish and if it passes, re-target `6.4` and otherwise keep things as is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-30T14:34:44Z
+
+The RFC won't pass, that's 99,999% sure now.

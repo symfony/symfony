@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-30T18:27:07Z
+
+If we deprecate XML, why not just keep the code and check for the extension on runtime? If someone needs to dump XML he would need to bring the extension, or am I missing sth?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-30T18:29:05Z
+
+Dumping XML is required for eg phpStorm's Symfony plugin.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-30T18:49:15Z
+
+Ok, thanks for the explanation

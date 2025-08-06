@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2025-07-31T18:18:23Z
+
+I have no clue why the 8.2 low-deps tests fail on a non-existing class that is added with this component, but I suspect it has something to do with the patch magic happening in the action. Has anyone got a pointer on how to solve that?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-07-31T19:04:01Z
+
+Don’t know if it’s related but it looks like you forgot to update `registerMailerConfiguration`’s `$classToServices` in the `FrameworkExtension`: https://github.com/symfony/symfony/blob/39c5025839a8610040e8aa190d962169552c41d4/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L2874
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2025-07-31T19:14:14Z
+
+@MatTheCat You are today's hero, thank you!
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2025-08-01T11:34:25Z
+
+I believe the new test error is not related to the changes here...
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2025-08-06T11:19:10Z
+
+Another test failure, but seems unrelated to the changes here.

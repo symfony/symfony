@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by mamazu at 2025-08-03T10:38:33Z
+
+This issue has been incorrectly tagged with deprecation.
+
+But I would also be happy to apply this to a lower version of Symfony so that more people can have better error messages.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-08-06T06:01:17Z
+
+FYI, such improvements are always merged for the next version.

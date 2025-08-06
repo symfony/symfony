@@ -22,9 +22,6 @@ use Symfony\Component\Webhook\Client\RequestParserInterface;
  */
 abstract class AbstractRequestParserTestCase extends TestCase
 {
-    /**
-     * @dataProvider getPayloads
-     */
     #[DataProvider('getPayloads')]
     public function testParse(string $payload, RemoteEvent|array $expected)
     {

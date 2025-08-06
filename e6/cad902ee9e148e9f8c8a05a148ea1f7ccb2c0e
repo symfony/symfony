@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-05T19:32:34Z
+
+Wow really!
+Which versions of PHP support libxml 2.14?
+This relates directly to https://github.com/symfony/symfony/pull/54383
+Maybe we can withdraw this PR! WDYT ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-05T21:44:07Z
+
+Well, not really:
+
+https://gitlab.gnome.org/GNOME/libxml2/-/issues/211

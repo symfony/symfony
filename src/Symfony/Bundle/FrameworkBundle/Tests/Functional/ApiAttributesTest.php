@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\DomCrawler;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -426,7 +427,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                 </request>
                 XML,
             'responseAssertion' => static function (string $response) {
-                $crawler = new Crawler($response);
+                $crawler = \PHP_VERSION_ID >= 80400 && class_exists(DomCrawler::class) ? new DomCrawler($response) : new Crawler($response);
 
                 self::assertSame('https://symfony.com/errors/validation', $crawler->filterXPath('response/type')->text());
                 self::assertSame('Validation Failed', $crawler->filterXPath('response/title')->text());
@@ -642,7 +643,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                 </request>
                 XML,
             'responseAssertion' => static function (string $response) {
-                $crawler = new Crawler($response);
+                $crawler = \PHP_VERSION_ID >= 80400 && class_exists(DomCrawler::class) ? new DomCrawler($response) : new Crawler($response);
 
                 self::assertSame('https://symfony.com/errors/validation', $crawler->filterXPath('response/type')->text());
                 self::assertSame('Validation Failed', $crawler->filterXPath('response/title')->text());
@@ -860,7 +861,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                 </request>
                 XML,
             'responseAssertion' => static function (string $response) {
-                $crawler = new Crawler($response);
+                $crawler = \PHP_VERSION_ID >= 80400 && class_exists(DomCrawler::class) ? new DomCrawler($response) : new Crawler($response);
 
                 self::assertSame('https://symfony.com/errors/validation', $crawler->filterXPath('response/type')->text());
                 self::assertSame('Validation Failed', $crawler->filterXPath('response/title')->text());

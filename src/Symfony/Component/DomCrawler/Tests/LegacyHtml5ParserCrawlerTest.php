@@ -12,9 +12,14 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\DomCrawler\Crawler;
 
-class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
+#[IgnoreDeprecations]
+#[Group('legacy')]
+class LegacyHtml5ParserCrawlerTest extends AbstractCrawlerTestCase
 {
     public static function getDoctype(): string
     {
@@ -54,10 +59,10 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
         // Html who create a bug specific to the DOM extension (see https://github.com/symfony/symfony/issues/28596)
         $html = $this->getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
 
-        $html5Crawler = $this->createCrawler(null, null, null, true);
+        $html5Crawler = $this->createCrawler();
         $html5Crawler->add($html);
 
-        $nativeCrawler = $this->createCrawler(null, null, null, false);
+        $nativeCrawler = parent::createCrawler();
         $nativeCrawler->add($html);
 
         $this->assertNotEquals($nativeCrawler->filterXPath('//h1')->text(), $html5Crawler->filterXPath('//h1')->text(), 'Native parser and Html5 parser must be different');
@@ -67,7 +72,7 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
     #[TestWith([false])]
     public function testHasHtml5Parser(bool $useHtml5Parser)
     {
-        $crawler = $this->createCrawler(null, null, null, $useHtml5Parser);
+        $crawler = $useHtml5Parser ? $this->createCrawler() : parent::createCrawler();
 
         $r = new \ReflectionProperty($crawler::class, 'html5Parser');
         $html5Parser = $r->getValue($crawler);
@@ -98,5 +103,10 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
 
         yield 'Text' => ['hello world'.$html];
         yield 'Text between comments' => ['<!--c--> test <!--cc-->'.$html];
+    }
+
+    protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null)
+    {
+        return new Crawler($node, $uri, $baseHref, true);
     }
 }

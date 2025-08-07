@@ -71,7 +71,7 @@ class FormTest extends TestCase
      * __construct() should throw a \LogicException if the form attribute is invalid.
      */
     #[DataProvider('constructorThrowsExceptionIfNoRelatedFormProvider')]
-    public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement $node)
+    public function testConstructorThrowsExceptionIfNoRelatedForm(\Dom\Element|\DOMElement $node)
     {
         $this->expectException(\LogicException::class);
 

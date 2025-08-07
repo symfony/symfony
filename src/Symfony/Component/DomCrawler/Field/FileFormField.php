@@ -14,6 +14,10 @@ namespace Symfony\Component\DomCrawler\Field;
 /**
  * FileFormField represents a file form field (an HTML file input tag).
  *
+ * @template T of \Dom\Element|\DOMElement
+ *
+ * @extends FormField<T>
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FileFormField extends FormField
@@ -89,12 +93,14 @@ class FileFormField extends FormField
      */
     protected function initialize(): void
     {
-        if ('input' !== $this->node->nodeName) {
+        if ('input' !== strtolower($this->node->nodeName)) {
             throw new \LogicException(\sprintf('A FileFormField can only be created from an input tag (%s given).', $this->node->nodeName));
         }
 
-        if ('file' !== strtolower($this->node->getAttribute('type'))) {
-            throw new \LogicException(\sprintf('A FileFormField can only be created from an input tag with a type of file (given type is "%s").', $this->node->getAttribute('type')));
+        $type = strtolower($this->node->getAttribute('type') ?? '');
+
+        if ('file' !== $type) {
+            throw new \LogicException(\sprintf('A FileFormField can only be created from an input tag with a type of file (given type is "%s").', $type));
         }
 
         $this->setValue(null);

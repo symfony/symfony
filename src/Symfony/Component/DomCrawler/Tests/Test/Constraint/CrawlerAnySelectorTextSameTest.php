@@ -22,14 +22,14 @@ final class CrawlerAnySelectorTextSameTest extends TestCase
     {
         $constraint = new CrawlerAnySelectorTextSame('ul li', 'Foo');
 
-        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Foo</li>'), '', true));
-        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo'), '', true));
-        self::assertFalse($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo Bar Baz'), '', true));
-        self::assertFalse($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz'), '', true));
+        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Foo</li>', useHtml5Parser: false), '', true));
+        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo', useHtml5Parser: false), '', true));
+        self::assertFalse($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo Bar Baz', useHtml5Parser: false), '', true));
+        self::assertFalse($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz', useHtml5Parser: false), '', true));
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed asserting that the Crawler has at least a node matching selector "ul li" with content "Foo".');
 
-        $constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz'));
+        $constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz', useHtml5Parser: false));
     }
 }

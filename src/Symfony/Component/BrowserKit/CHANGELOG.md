@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `isFirstPage()` and `isLastPage()` methods to the History class for checking navigation boundaries
  * Add PHPUnit constraints: `BrowserHistoryIsOnFirstPage` and `BrowserHistoryIsOnLastPage`
+ * Leverage the native HTML5 parser when using PHP 8.4+
 
 6.4
 ---

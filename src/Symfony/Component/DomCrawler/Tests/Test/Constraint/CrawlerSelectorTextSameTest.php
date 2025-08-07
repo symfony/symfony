@@ -21,12 +21,12 @@ class CrawlerSelectorTextSameTest extends TestCase
     public function testConstraint()
     {
         $constraint = new CrawlerSelectorTextSame('title', 'Foo');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foo'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
+        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foo', useHtml5Parser: false), '', true));
+        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar', useHtml5Parser: false), '', true));
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed asserting that the Crawler has a node matching selector "title" with content "Foo".');
 
-        $constraint->evaluate(new Crawler('<html><head><title>Bar'));
+        $constraint->evaluate(new Crawler('<html><head><title>Bar', useHtml5Parser: false));
     }
 }

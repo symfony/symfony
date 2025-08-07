@@ -14,22 +14,27 @@ namespace Symfony\Component\DomCrawler;
 /**
  * Any HTML element that can link to an URI.
  *
+ * @template T of \Dom\Element|\DOMElement
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class AbstractUriElement
 {
-    protected \DOMElement $node;
+    /**
+     * @var T
+     */
+    protected \Dom\Element|\DOMElement $node;
     protected ?string $method;
 
     /**
-     * @param \DOMElement $node       A \DOMElement instance
+     * @param T           $node
      * @param string|null $currentUri The URI of the page where the link is embedded (or the base href)
      * @param string|null $method     The method to use for the link (GET by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
     public function __construct(
-        \DOMElement $node,
+        \Dom\Element|\DOMElement $node,
         protected ?string $currentUri = null,
         ?string $method = 'GET',
     ) {
@@ -45,8 +50,10 @@ abstract class AbstractUriElement
 
     /**
      * Gets the node associated with this link.
+     *
+     * @return T
      */
-    public function getNode(): \DOMElement
+    public function getNode(): \Dom\Element|\DOMElement
     {
         return $this->node;
     }
@@ -101,11 +108,11 @@ abstract class AbstractUriElement
     }
 
     /**
-     * Sets current \DOMElement instance.
+     * Sets current DOM Element instance.
      *
-     * @param \DOMElement $node A \DOMElement instance
+     * @param T $node
      *
      * @throws \LogicException If given node is not an anchor
      */
-    abstract protected function setNode(\DOMElement $node): void;
+    abstract protected function setNode(\Dom\Element|\DOMElement $node): void;
 }

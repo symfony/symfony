@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `DomCrawler` to leverage PHP 8.4's HTML5-compliant DOM parser
+ * Deprecate using `masterminds/html5`'s parser; use the new `DomCrawler` class instead
+ * [BC BREAK] Type widening on public and protected methods/properties to support both
+   `Dom\*` and `DOM*` native classes for:
+   * properties `FormField::$document`, `$xpath`, `$node` and method `getLabel()`
+   * methods `Form::getFormNode()` and `addField()`
+   * property `AbstractUriElement::$node`, and methods `getNode()` and `setNode()`
+   * methods `Crawler::add()`, `addDocument()`, `addNodeList()`, `addNode()`, `getNode()` and `sibling()`
+
 7.0
 ---
 

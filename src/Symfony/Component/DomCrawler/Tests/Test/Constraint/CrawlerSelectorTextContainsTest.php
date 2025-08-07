@@ -21,9 +21,9 @@ class CrawlerSelectorTextContainsTest extends TestCase
     public function testConstraint()
     {
         $constraint = new CrawlerSelectorTextContains('title', 'Foo');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foobar'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head></head><body>Bar'), '', true));
+        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foobar', useHtml5Parser: false), '', true));
+        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar', useHtml5Parser: false), '', true));
+        $this->assertFalse($constraint->evaluate(new Crawler('<html><head></head><body>Bar', useHtml5Parser: false), '', true));
     }
 
     public function testDoesNotMatchIfNodeTextIsNotExpectedValue()
@@ -33,7 +33,7 @@ class CrawlerSelectorTextContainsTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed asserting that the text "Bar" of the node matching selector "title" contains "Foo".');
 
-        $constraint->evaluate(new Crawler('<html><head><title>Bar'));
+        $constraint->evaluate(new Crawler('<html><head><title>Bar', useHtml5Parser: false));
     }
 
     public function testDoesNotMatchIfNodeDoesNotExist()
@@ -43,6 +43,6 @@ class CrawlerSelectorTextContainsTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed asserting that the Crawler has a node matching selector "title".');
 
-        $constraint->evaluate(new Crawler('<html><head></head><body>Bar'));
+        $constraint->evaluate(new Crawler('<html><head></head><body>Bar', useHtml5Parser: false));
     }
 }

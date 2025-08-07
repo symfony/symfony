@@ -21,13 +21,13 @@ class CrawlerSelectorExistsTest extends TestCase
     public function testConstraint()
     {
         $constraint = new CrawlerSelectorExists('title');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>'), '', true));
+        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>', useHtml5Parser: false), '', true));
         $constraint = new CrawlerSelectorExists('h1');
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>'), '', true));
+        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>', useHtml5Parser: false), '', true));
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed asserting that the Crawler matches selector "h1".');
 
-        $constraint->evaluate(new Crawler('<html><head><title>'));
+        $constraint->evaluate(new Crawler('<html><head><title>', useHtml5Parser: false));
     }
 }

@@ -16,6 +16,8 @@ use Symfony\Component\DomCrawler\Field\FormField;
 /**
  * This is an internal class that must not be used directly.
  *
+ * @template T of \Dom\Element|\DOMElement
+ *
  * @internal
  */
 class FormFieldRegistry
@@ -25,6 +27,8 @@ class FormFieldRegistry
 
     /**
      * Adds a field to the registry.
+     *
+     * @param FormField<T> $field
      */
     public function add(FormField $field): void
     {
@@ -65,7 +69,7 @@ class FormFieldRegistry
     /**
      * Returns the value of the field based on the fully qualified name and its children.
      *
-     * @return FormField|FormField[]|FormField[][]
+     * @return FormField<T>|FormField<T>[]|FormField<T>[][]
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
@@ -123,7 +127,7 @@ class FormFieldRegistry
     /**
      * Returns the list of field with their value.
      *
-     * @return FormField[] The list of fields as [string] Fully qualified name => (mixed) value)
+     * @return FormField<T>[] The list of fields as fully qualified name => value
      */
     public function all(): array
     {

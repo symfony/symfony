@@ -16,6 +16,7 @@ use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
 use Symfony\Component\BrowserKit\Exception\LogicException;
 use Symfony\Component\BrowserKit\Exception\RuntimeException;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\DomCrawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\Process\PhpProcess;
@@ -510,7 +511,11 @@ abstract class AbstractBrowser
             return null;
         }
 
-        $crawler = new Crawler(null, $uri, null, $this->useHtml5Parser);
+        if (\PHP_VERSION_ID >= 80400 && $this->useHtml5Parser && class_exists(DomCrawler::class)) {
+            $crawler = new DomCrawler(null, $uri);
+        } else {
+            $crawler = new Crawler(null, $uri, null, $this->useHtml5Parser);
+        }
         $crawler->addContent($content, $type);
 
         return $crawler;

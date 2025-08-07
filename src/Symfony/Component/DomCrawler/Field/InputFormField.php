@@ -17,6 +17,10 @@ namespace Symfony\Component\DomCrawler\Field;
  * For inputs with type of file, checkbox, or radio, there are other more
  * specialized classes (cf. FileFormField and ChoiceFormField).
  *
+ * @template T of \Dom\Element|\DOMElement
+ *
+ * @extends FormField<T>
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class InputFormField extends FormField
@@ -28,11 +32,12 @@ class InputFormField extends FormField
      */
     protected function initialize(): void
     {
-        if ('input' !== $this->node->nodeName && 'button' !== $this->node->nodeName) {
+        if (!\in_array(strtolower($this->node->nodeName), ['input', 'button'], true)) {
             throw new \LogicException(\sprintf('An InputFormField can only be created from an input or button tag (%s given).', $this->node->nodeName));
         }
 
         $type = strtolower($this->node->getAttribute('type'));
+
         if ('checkbox' === $type) {
             throw new \LogicException('Checkboxes should be instances of ChoiceFormField.');
         }
@@ -41,6 +46,6 @@ class InputFormField extends FormField
             throw new \LogicException('File inputs should be instances of FileFormField.');
         }
 
-        $this->value = $this->node->getAttribute('value');
+        $this->value = $this->node->getAttribute('value') ?? '';
     }
 }

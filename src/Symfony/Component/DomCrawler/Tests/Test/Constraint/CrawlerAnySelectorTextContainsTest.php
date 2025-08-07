@@ -22,10 +22,10 @@ class CrawlerAnySelectorTextContainsTest extends TestCase
     {
         $constraint = new CrawlerAnySelectorTextContains('ul li', 'Foo');
 
-        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Foo</li>'), '', true));
-        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo'), '', true));
-        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo Bar Baz'), '', true));
-        self::assertFalse($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz'), '', true));
+        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Foo</li>', useHtml5Parser: false), '', true));
+        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo', useHtml5Parser: false), '', true));
+        self::assertTrue($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Foo Bar Baz', useHtml5Parser: false), '', true));
+        self::assertFalse($constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz', useHtml5Parser: false), '', true));
     }
 
     public function testDoesNotMatchIfNodeDoesContainExpectedText()
@@ -35,7 +35,7 @@ class CrawlerAnySelectorTextContainsTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed asserting that the text of any node matching selector "ul li" contains "Foo".');
 
-        $constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz'));
+        $constraint->evaluate(new Crawler('<ul><li>Bar</li><li>Baz', useHtml5Parser: false));
     }
 
     public function testDoesNotMatchIfNodeDoesNotExist()
@@ -45,6 +45,6 @@ class CrawlerAnySelectorTextContainsTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed asserting that the Crawler has a node matching selector "ul li".');
 
-        $constraint->evaluate(new Crawler('<html><head><title>Foobar'));
+        $constraint->evaluate(new Crawler('<html><head><title>Foobar', useHtml5Parser: false));
     }
 }

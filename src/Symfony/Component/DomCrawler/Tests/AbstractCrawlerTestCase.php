@@ -24,9 +24,9 @@ abstract class AbstractCrawlerTestCase extends TestCase
 {
     abstract public static function getDoctype(): string;
 
-    protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null, bool $useHtml5Parser = true)
+    protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null)
     {
-        return new Crawler($node, $uri, $baseHref, $useHtml5Parser);
+        return new Crawler($node, $uri, $baseHref, false);
     }
 
     public function testConstructor()
@@ -34,7 +34,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createCrawler();
         $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
 
-        $doc = new \DOMDocument();
+        $doc = $this->createDomDocument();
         $node = $doc->createElement('test');
 
         $crawler = $this->createCrawler($node);
@@ -59,11 +59,11 @@ abstract class AbstractCrawlerTestCase extends TestCase
     {
         $crawler = $this->createCrawler();
         $crawler->add($this->createDomDocument());
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMDocument');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a DOM Document');
 
         $crawler = $this->createCrawler();
         $crawler->add($this->createNodeList());
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNodeList');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a DOM NodeList');
 
         $list = [];
         foreach ($this->createNodeList() as $node) {
@@ -75,7 +75,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
 
         $crawler = $this->createCrawler();
         $crawler->add($this->createNodeList()->item(0));
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a DOM Node');
 
         $crawler = $this->createCrawler();
         $crawler->add($this->getDoctype().'<html><body>Foo</body></html>');
@@ -202,7 +202,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createCrawler();
         $crawler->addDocument($this->createDomDocument());
 
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addDocument() adds nodes from a \DOMDocument');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addDocument() adds nodes from a DOM Document');
     }
 
     public function testAddNodeList()
@@ -210,7 +210,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createCrawler();
         $crawler->addNodeList($this->createNodeList());
 
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodeList() adds nodes from a \DOMNodeList');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodeList() adds nodes from a DOM NodeList');
     }
 
     public function testAddNodes()
@@ -231,12 +231,12 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $this->createCrawler();
         $crawler->addNode($this->createNodeList()->item(0));
 
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a DOM Node');
     }
 
     public function testClear()
     {
-        $doc = new \DOMDocument();
+        $doc = $this->createDomDocument();
         $node = $doc->createElement('test');
 
         $crawler = $this->createCrawler($node);
@@ -421,9 +421,9 @@ abstract class AbstractCrawlerTestCase extends TestCase
 
     public function testEmojis()
     {
-        $crawler = $this->createCrawler('<body><p>Hey 👋</p></body>');
+        $crawler = $this->createCrawler('<head></head><body><p>Hey 👋</p></body>');
 
-        $this->assertSame('<body><p>Hey 👋</p></body>', $crawler->html());
+        $this->assertSame('<head></head><body><p>Hey 👋</p></body>', $crawler->html());
     }
 
     public function testExtract()
@@ -528,6 +528,16 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $crawler = $crawler->filterXPath('//media:category[@scheme="http://gdata.youtube.com/schemas/2007/categories.cat"]');
         $this->assertCount(1, $crawler);
         $this->assertSame('Music', $crawler->text());
+    }
+
+    public function testCaseSentivity()
+    {
+        $crawler = $this->createTestXmlCrawler();
+
+        $crawler = $crawler->filterXPath('//*[local-name() = "CaseSensitiveTag"]');
+        $this->assertCount(1, $crawler);
+        $this->assertSame('Some Content', $crawler->text());
+        $this->assertSame('CaseSensitiveTag', $crawler->nodeName());
     }
 
     public function testFilterXPathWithFakeRoot()
@@ -798,7 +808,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     public function testInvalidLink()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
+        $this->expectExceptionMessage('The selected node should be a DOM Element');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->link();
     }
@@ -806,7 +816,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     public function testInvalidLinks()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
+        $this->expectExceptionMessage('The selected node should be a DOM Element');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->link();
     }
@@ -910,7 +920,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
     public function testInvalidForm()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
+        $this->expectExceptionMessage('The selected node should be a DOM Element');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->form();
     }
@@ -1292,8 +1302,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
 
     public function createTestCrawler($uri = null)
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML($this->getDoctype().'
+        $html = $this->getDoctype().'
             <html>
                 <body>
                     <a href="foo">Foo</a>
@@ -1352,9 +1361,9 @@ abstract class AbstractCrawlerTestCase extends TestCase
                     </div>
                 </body>
             </html>
-        ');
+        ';
 
-        return $this->createCrawler($dom, $uri);
+        return $this->createCrawler($html, $uri);
     }
 
     protected function createTestXmlCrawler($uri = null)
@@ -1369,6 +1378,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
                     <yt:aspectRatio>widescreen</yt:aspectRatio>
                 </media:group>
                 <media:category label="Music" scheme="http://gdata.youtube.com/schemas/2007/categories.cat">Music</media:category>
+                <CaseSensitiveTag>Some Content</CaseSensitiveTag>
             </entry>';
 
         return $this->createCrawler($xml, $uri);

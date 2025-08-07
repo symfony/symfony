@@ -18,6 +18,11 @@ Console
 
  * Deprecate `Symfony\Component\Console\Application::add()` in favor of `addCommand()`
 
+BrowserKit
+----------
+
+ * Leverage the native HTML5 parser when using PHP 8.4+
+
 DependencyInjection
 -------------------
 
@@ -28,6 +33,16 @@ DoctrineBridge
 --------------
 
  * Deprecate `UniqueEntity::getRequiredOptions()` and `UniqueEntity::getDefaultOption()`
+
+DomCrawler
+----------
+
+ * [BC BREAK] Type widening on public and protected methods/properties to support both
+   `Dom\*` and `DOM*` native classes for:
+   * properties `FormField::$document`, `$xpath`, `$node` and method `getLabel()`
+   * methods `Form::getFormNode()` and `addField()`
+   * property `AbstractUriElement::$node`, and methods `getNode()` and `setNode()`
+   * methods `Crawler::add()`, `addDocument()`, `addNodeList()`, `addNode()`, `getNode()` and `sibling()`
 
 FrameworkBundle
 ---------------

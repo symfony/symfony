@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'heure d’Europe de l’Est (Beyrouth)',
         'Asia/Bishkek' => 'heure du Kirghizistan (Bichkek)',
         'Asia/Brunei' => 'heure du Brunei',
-        'Asia/Kolkata' => 'heure de l’Inde (Calcutta)',
+        'Asia/Kolkata' => 'heure de l’Inde (Kolkata)',
         'Asia/Chita' => 'heure de Iakoutsk (Tchita)',
         'Asia/Colombo' => 'heure de l’Inde (Colombo)',
         'Asia/Damascus' => 'heure d’Europe de l’Est (Damas)',

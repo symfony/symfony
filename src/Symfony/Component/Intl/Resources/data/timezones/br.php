@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'eur Europa ar Reter (Bayrut)',
         'Asia/Bishkek' => 'eur Kyrgyzstan (Bishkek)',
         'Asia/Brunei' => 'eur Brunei Darussalam',
-        'Asia/Kolkata' => 'eur cʼhoañv India (Calcutta)',
+        'Asia/Kolkata' => 'eur cʼhoañv India (Kolkata)',
         'Asia/Chita' => 'eur Yakutsk (Tchita)',
         'Asia/Colombo' => 'eur cʼhoañv India (Kolamba)',
         'Asia/Damascus' => 'eur Europa ar Reter (Damask)',

@@ -498,7 +498,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Asia/Beirut',
         'Asia/Bishkek',
         'Asia/Brunei',
-        'Asia/Calcutta',
+        'Asia/Kolkata',
         'Asia/Chita',
         'Asia/Colombo',
         'Asia/Damascus',

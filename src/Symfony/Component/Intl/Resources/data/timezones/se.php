@@ -224,7 +224,7 @@ return [
         'Asia/Beirut' => 'Beirut (nuorti-Eurohpá áigi)',
         'Asia/Bishkek' => 'Bishkek (Kirgisistan áigi)',
         'Asia/Brunei' => 'Brunei (Brunei áigi)',
-        'Asia/Calcutta' => 'Kolkata (India áigi)',
+        'Asia/Kolkata' => 'Kolkata (India áigi)',
         'Asia/Chita' => 'Chita (Ruošša áigi)',
         'Asia/Colombo' => 'Colombo (Sri Lanka áigi)',
         'Asia/Damascus' => 'Damascus (nuorti-Eurohpá áigi)',

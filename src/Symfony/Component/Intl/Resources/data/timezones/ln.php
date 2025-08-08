@@ -217,7 +217,7 @@ return [
         'Asia/Beirut' => 'Ngonga ya Libá (Beirut)',
         'Asia/Bishkek' => 'Ngonga ya Kigizisitá (Bishkek)',
         'Asia/Brunei' => 'Ngonga ya Brineyi (Brunei)',
-        'Asia/Calcutta' => 'Ngonga ya Índɛ (Kolkata)',
+        'Asia/Kolkata' => 'Ngonga ya Índɛ (Kolkata)',
         'Asia/Chita' => 'Ngonga ya Risí (Chita)',
         'Asia/Colombo' => 'Ngonga ya Sirilanka (Colombo)',
         'Asia/Damascus' => 'Ngonga ya Sirí (Damascus)',

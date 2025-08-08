@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Osteuropäesch Zäit (Beirut)',
         'Asia/Bishkek' => 'Kirgisistan-Zäit (Bischkek)',
         'Asia/Brunei' => 'Brunei-Zäit',
-        'Asia/Calcutta' => 'Indesch Zäit (Kalkutta)',
+        'Asia/Kolkata' => 'Indesch Zäit (Kalkutta)',
         'Asia/Chita' => 'Jakutsk-Zäit (Chita)',
         'Asia/Colombo' => 'Indesch Zäit (Colombo)',
         'Asia/Damascus' => 'Osteuropäesch Zäit (Damaskus)',

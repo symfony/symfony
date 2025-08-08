@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Giờ Đông Âu (Beirut)',
         'Asia/Bishkek' => 'Giờ Kyrgystan (Bishkek)',
         'Asia/Brunei' => 'Giờ Brunei Darussalam',
-        'Asia/Calcutta' => 'Giờ Chuẩn Ấn Độ (Kolkata)',
+        'Asia/Kolkata' => 'Giờ Chuẩn Ấn Độ (Kolkata)',
         'Asia/Chita' => 'Giờ Yakutsk (Chita)',
         'Asia/Colombo' => 'Giờ Chuẩn Ấn Độ (Colombo)',
         'Asia/Damascus' => 'Giờ Đông Âu (Damascus)',

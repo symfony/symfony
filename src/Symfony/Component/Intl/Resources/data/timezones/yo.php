@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Àkókò Ìhà Ìlà Oòrùn Europe (Beirut)',
         'Asia/Bishkek' => 'Àkókò Kirigisitaani (Bishkek)',
         'Asia/Brunei' => 'Brunei Darussalam Time',
-        'Asia/Calcutta' => 'Àkókò Àfẹnukò India (Kolkata)',
+        'Asia/Kolkata' => 'Àkókò Àfẹnukò India (Kolkata)',
         'Asia/Chita' => 'Àkókò Yatutsk (Chita)',
         'Asia/Colombo' => 'Àkókò Àfẹnukò India (Colombo)',
         'Asia/Damascus' => 'Àkókò Ìhà Ìlà Oòrùn Europe (Damascus)',

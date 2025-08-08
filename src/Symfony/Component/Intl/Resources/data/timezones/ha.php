@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Lokaci a turai gabas (Beirut)',
         'Asia/Bishkek' => 'Lokacin Kyrgyzstan (Bishkek)',
         'Asia/Brunei' => 'Lokacin Brunei Darussalam',
-        'Asia/Calcutta' => 'Tsayayyen lokacin Indiya (Kolkata)',
+        'Asia/Kolkata' => 'Tsayayyen lokacin Indiya (Kolkata)',
         'Asia/Chita' => 'Lokacin Yakutsk (Chita)',
         'Asia/Colombo' => 'Tsayayyen lokacin Indiya (Colombo)',
         'Asia/Damascus' => 'Lokaci a turai gabas (Damascus)',

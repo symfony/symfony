@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Ora e Evropës Lindore (Bejrut)',
         'Asia/Bishkek' => 'Ora e Kirgizisë (Bishkek)',
         'Asia/Brunei' => 'Ora e Brunei-Durasalamit',
-        'Asia/Calcutta' => 'Ora standarde e Indisë (Kalkutë)',
+        'Asia/Kolkata' => 'Ora standarde e Indisë (Kalkutë)',
         'Asia/Chita' => 'Ora e Jakutskut (Çita)',
         'Asia/Colombo' => 'Ora standarde e Indisë (Kolombo)',
         'Asia/Damascus' => 'Ora e Evropës Lindore (Damask)',

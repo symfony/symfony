@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Austur-Evróputími (Beirút)',
         'Asia/Bishkek' => 'Kirgistan-tími (Bishkek)',
         'Asia/Brunei' => 'Brúneitími',
-        'Asia/Calcutta' => 'Indlandstími (Kalkútta)',
+        'Asia/Kolkata' => 'Indlandstími (Kalkútta)',
         'Asia/Chita' => 'Tími í Yakutsk (Chita)',
         'Asia/Colombo' => 'Indlandstími (Kólombó)',
         'Asia/Damascus' => 'Austur-Evróputími (Damaskus)',

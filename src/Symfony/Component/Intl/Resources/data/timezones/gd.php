@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Àm na Roinn-Eòrpa an Ear (Beirut)',
         'Asia/Bishkek' => 'Àm Cìorgastain (Biškek)',
         'Asia/Brunei' => 'Àm Bhrùnaigh Dàr as-Salàm (Brùnaigh)',
-        'Asia/Calcutta' => 'Àm nan Innseachan (Kolkata)',
+        'Asia/Kolkata' => 'Àm nan Innseachan (Kolkata)',
         'Asia/Chita' => 'Àm Yakutsk (Chita)',
         'Asia/Colombo' => 'Àm nan Innseachan (Colombo)',
         'Asia/Damascus' => 'Àm na Roinn-Eòrpa an Ear (Damascus)',

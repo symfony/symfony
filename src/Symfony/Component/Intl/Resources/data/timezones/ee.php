@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Ɣedzeƒe Europe gaƒoƒome (Beirut)',
         'Asia/Bishkek' => 'Kyrgystan gaƒoƒo me (Bishkek)',
         'Asia/Brunei' => 'Brunei Darussalam gaƒoƒo me',
-        'Asia/Calcutta' => 'India gaƒoƒo me (Kolkata)',
+        'Asia/Kolkata' => 'India gaƒoƒo me (Kolkata)',
         'Asia/Chita' => 'Yakutsk gaƒoƒo me (Chita)',
         'Asia/Colombo' => 'India gaƒoƒo me (Colombo)',
         'Asia/Damascus' => 'Ɣedzeƒe Europe gaƒoƒome (Damascus)',

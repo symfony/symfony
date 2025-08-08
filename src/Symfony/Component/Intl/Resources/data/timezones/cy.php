@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Amser Dwyrain Ewrop (Beirut)',
         'Asia/Bishkek' => 'Amser Kyrgyzstan (Bishkek)',
         'Asia/Brunei' => 'Amser Brunei Darussalam',
-        'Asia/Calcutta' => 'Amser India (Kolkata)',
+        'Asia/Kolkata' => 'Amser India (Kolkata)',
         'Asia/Chita' => 'Amser Yakutsk (Chita)',
         'Asia/Colombo' => 'Amser India (Colombo)',
         'Asia/Damascus' => 'Amser Dwyrain Ewrop (Damascus)',

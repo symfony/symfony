@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => '동유럽 시간(베이루트)',
         'Asia/Bishkek' => '키르기스스탄 시간(비슈케크)',
         'Asia/Brunei' => '브루나이 시간',
-        'Asia/Calcutta' => '인도 표준시(콜카타)',
+        'Asia/Kolkata' => '인도 표준시(콜카타)',
         'Asia/Chita' => '야쿠츠크 시간(치타)',
         'Asia/Colombo' => '인도 표준시(콜롬보)',
         'Asia/Damascus' => '동유럽 시간(다마스쿠스)',

@@ -200,7 +200,7 @@ return [
         'Asia/Barnaul' => 'רוסלאַנד (Barnaul)',
         'Asia/Beirut' => 'לבנון (Beirut)',
         'Asia/Brunei' => 'ברוניי (Brunei)',
-        'Asia/Calcutta' => 'אינדיע (Kolkata)',
+        'Asia/Kolkata' => 'אינדיע (Kolkata)',
         'Asia/Chita' => 'רוסלאַנד (Chita)',
         'Asia/Colombo' => 'סרי־לאַנקאַ (Colombo)',
         'Asia/Damascus' => 'סיריע (Damascus)',

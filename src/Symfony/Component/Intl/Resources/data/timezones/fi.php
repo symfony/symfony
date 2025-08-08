@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Itä-Euroopan aika (Beirut)',
         'Asia/Bishkek' => 'Kirgisian aika (Biškek)',
         'Asia/Brunei' => 'Brunein aika',
-        'Asia/Calcutta' => 'Intian aika (Kalkutta)',
+        'Asia/Kolkata' => 'Intian aika (Kalkutta)',
         'Asia/Chita' => 'Jakutskin aika (Tšita)',
         'Asia/Colombo' => 'Intian aika (Colombo)',
         'Asia/Damascus' => 'Itä-Euroopan aika (Damaskos)',

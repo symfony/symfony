@@ -62,7 +62,7 @@ return [
         'Antarctica/Palmer' => 'Àkókò Shílè (Palmer)',
         'Asia/Anadyr' => 'Ìgbà Rɔshia (Anadyr)',
         'Asia/Barnaul' => 'Ìgbà Rɔshia (Barnaul)',
-        'Asia/Calcutta' => 'Àkókò Àfɛnukò India (Kolkata)',
+        'Asia/Kolkata' => 'Àkókò Àfɛnukò India (Kolkata)',
         'Asia/Colombo' => 'Àkókò Àfɛnukò India (Colombo)',
         'Asia/Dubai' => 'Àkókò Àfɛnukò Gulf (Dubai)',
         'Asia/Jakarta' => 'Àkókò Ìwɔ̀ oorùn Indonesia (Jakarta)',

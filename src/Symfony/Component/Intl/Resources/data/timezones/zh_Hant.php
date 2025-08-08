@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => '東歐時間（貝魯特）',
         'Asia/Bishkek' => '吉爾吉斯時間（比什凱克）',
         'Asia/Brunei' => '汶萊時間',
-        'Asia/Calcutta' => '印度標準時間（加爾各答）',
+        'Asia/Kolkata' => '印度標準時間（加爾各答）',
         'Asia/Chita' => '雅庫次克時間（赤塔）',
         'Asia/Colombo' => '印度標準時間（可倫坡）',
         'Asia/Damascus' => '東歐時間（大馬士革）',

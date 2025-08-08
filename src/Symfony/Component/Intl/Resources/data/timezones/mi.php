@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Wā Uropi Rāwhiti (Beirut)',
         'Asia/Bishkek' => 'Wā Kikitānga (Bishkek)',
         'Asia/Brunei' => 'Wā Poronai Darussalam',
-        'Asia/Calcutta' => 'Wā Īnia (Kolkata)',
+        'Asia/Kolkata' => 'Wā Īnia (Kolkata)',
         'Asia/Chita' => 'Wā Yakutsk (Chita)',
         'Asia/Colombo' => 'Wā Īnia (Colombo)',
         'Asia/Damascus' => 'Wā Uropi Rāwhiti (Damascus)',

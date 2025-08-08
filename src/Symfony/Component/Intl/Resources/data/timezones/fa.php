@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'وقت شرق اروپا (بیروت)',
         'Asia/Bishkek' => 'وقت قرقیزستان (بیشکک)',
         'Asia/Brunei' => 'وقت برونئی دارالسلام',
-        'Asia/Calcutta' => 'وقت هند (کلکته)',
+        'Asia/Kolkata' => 'وقت هند (کلکته)',
         'Asia/Chita' => 'وقت یاکوتسک (چیتا)',
         'Asia/Colombo' => 'وقت هند (کلمبو)',
         'Asia/Damascus' => 'وقت شرق اروپا (دمشق)',

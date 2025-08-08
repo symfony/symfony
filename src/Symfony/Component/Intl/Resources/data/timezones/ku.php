@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Saeta Ewropaya Rojhilat (Beyrût)',
         'Asia/Bishkek' => 'Saeta Qirxizistanê (Bîşkek)',
         'Asia/Brunei' => 'Saeta Brûney Darusselamê',
-        'Asia/Calcutta' => 'Saeta Standard a Hindistanê (Kolkata)',
+        'Asia/Kolkata' => 'Saeta Standard a Hindistanê (Kolkata)',
         'Asia/Chita' => 'Saeta Yakutskê (Çîta)',
         'Asia/Colombo' => 'Saeta Standard a Hindistanê (Kolombo)',
         'Asia/Damascus' => 'Saeta Ewropaya Rojhilat (Şam)',

@@ -215,7 +215,7 @@ return [
         'Asia/Beirut' => 'tempo de Libano (Beirut)',
         'Asia/Bishkek' => 'tempo de Kirgizujo (Bishkek)',
         'Asia/Brunei' => 'tempo de Brunejo (Brunei)',
-        'Asia/Calcutta' => 'tempo de Hindujo (Kolkata)',
+        'Asia/Kolkata' => 'tempo de Hindujo (Kolkata)',
         'Asia/Chita' => 'tempo de Rusujo (Chita)',
         'Asia/Colombo' => 'tempo de Srilanko (Colombo)',
         'Asia/Damascus' => 'tempo de Sirio (Damascus)',

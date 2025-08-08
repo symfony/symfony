@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Eysturevropa tíð (Beirut)',
         'Asia/Bishkek' => 'Kirgisia tíð (Bishkek)',
         'Asia/Brunei' => 'Brunei Darussalam tíð',
-        'Asia/Calcutta' => 'India tíð (Kolkata)',
+        'Asia/Kolkata' => 'India tíð (Kolkata)',
         'Asia/Chita' => 'Yakutsk tíð (Chita)',
         'Asia/Colombo' => 'India tíð (Colombo)',
         'Asia/Damascus' => 'Eysturevropa tíð (Damascus)',

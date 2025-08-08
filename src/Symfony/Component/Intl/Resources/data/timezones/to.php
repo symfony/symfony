@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'houa fakaʻeulope-hahake (Beirut)',
         'Asia/Bishkek' => 'houa fakakīkisitani (Bishkek)',
         'Asia/Brunei' => 'houa fakapulunei (Brunei)',
-        'Asia/Calcutta' => 'houa fakaʻinitia (Kolkata)',
+        'Asia/Kolkata' => 'houa fakaʻinitia (Kolkata)',
         'Asia/Chita' => 'houa fakalūsia-ʻiākutisiki (Chita)',
         'Asia/Colombo' => 'houa fakaʻinitia (Colombo)',
         'Asia/Damascus' => 'houa fakaʻeulope-hahake (Damascus)',

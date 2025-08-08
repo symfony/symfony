@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Saa za Mashariki mwa Ulaya (Beirut)',
         'Asia/Bishkek' => 'Saa za Kyrgystan (Bishkek)',
         'Asia/Brunei' => 'Saa za Brunei Darussalam',
-        'Asia/Calcutta' => 'Saa za Wastani za India (Kolkata)',
+        'Asia/Kolkata' => 'Saa za Wastani za India (Kolkata)',
         'Asia/Chita' => 'Saa za Yakutsk (Chita)',
         'Asia/Colombo' => 'Saa za Wastani za India (Colombo)',
         'Asia/Damascus' => 'Saa za Mashariki mwa Ulaya (Damascus)',

@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Sharqiy Yevropa vaqti (Bayrut)',
         'Asia/Bishkek' => 'Qirgʻiziston vaqti (Bishkek)',
         'Asia/Brunei' => 'Bruney-Dorussalom vaqti',
-        'Asia/Calcutta' => 'Hindiston standart vaqti (Kalkutta)',
+        'Asia/Kolkata' => 'Hindiston standart vaqti (Kalkutta)',
         'Asia/Chita' => 'Yakutsk vaqti (Chita)',
         'Asia/Colombo' => 'Hindiston standart vaqti (Kolombo)',
         'Asia/Damascus' => 'Sharqiy Yevropa vaqti (Damashq)',

@@ -225,7 +225,7 @@ return [
         'Asia/Beirut',
         'Asia/Bishkek',
         'Asia/Brunei',
-        'Asia/Calcutta',
+        'Asia/Kolkata',
         'Asia/Chita',
         'Asia/Colombo',
         'Asia/Damascus',
@@ -646,7 +646,7 @@ return [
         'Asia/Beirut' => 'LB',
         'Asia/Bishkek' => 'KG',
         'Asia/Brunei' => 'BN',
-        'Asia/Calcutta' => 'IN',
+        'Asia/Kolkata' => 'IN',
         'Asia/Chita' => 'RU',
         'Asia/Colombo' => 'LK',
         'Asia/Damascus' => 'SY',
@@ -1233,7 +1233,7 @@ return [
             'Europe/Isle_of_Man',
         ],
         'IN' => [
-            'Asia/Calcutta',
+            'Asia/Kolkata',
         ],
         'IO' => [
             'Indian/Chagos',

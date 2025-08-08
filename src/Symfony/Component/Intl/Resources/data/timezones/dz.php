@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'ཤར་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Beirut་)',
         'Asia/Bishkek' => 'ཀིར་གིས་སཏཱན་ཆུ་ཚོད།། (Bishkek་)',
         'Asia/Brunei' => 'བྷྲུ་ནའི་ཆུ་ཚོད།། (Brunei་)',
-        'Asia/Calcutta' => 'རྒྱ་གར་ཆུ་ཚོད། (Kolkata་)',
+        'Asia/Kolkata' => 'རྒྱ་གར་ཆུ་ཚོད། (Kolkata་)',
         'Asia/Chita' => 'ཡ་ཀུཙིཀི་ཆུ་ཚོད། (Chita་)',
         'Asia/Colombo' => 'རྒྱ་གར་ཆུ་ཚོད། (Colombo་)',
         'Asia/Damascus' => 'ཤར་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Damascus་)',

@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Yuropu Apueeɛ Berɛ (Bɛɛrut)',
         'Asia/Bishkek' => 'Kɛɛgestan Berɛ (Bishkek)',
         'Asia/Brunei' => 'Brunei Darusalam Berɛ',
-        'Asia/Calcutta' => 'India Susudua Berɛ (Kɔɔkata)',
+        'Asia/Kolkata' => 'India Susudua Berɛ (Kɔɔkata)',
         'Asia/Chita' => 'Yakutsk Berɛ (Kyita)',
         'Asia/Colombo' => 'India Susudua Berɛ (Kolombo)',
         'Asia/Damascus' => 'Yuropu Apueeɛ Berɛ (Damaskɔso)',

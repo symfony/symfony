@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Waqtiga Bariga Yurub (Beyruud)',
         'Asia/Bishkek' => 'Waqtiga Kiyrigistaan (Bishkek)',
         'Asia/Brunei' => 'Waqtiga Buruney Daarusalaam',
-        'Asia/Calcutta' => 'Waqtiga Caadiga Ah ee Hindiya (Kolkaata)',
+        'Asia/Kolkata' => 'Waqtiga Caadiga Ah ee Hindiya (Kolkaata)',
         'Asia/Chita' => 'Waqtiyada Yakut (Jiita)',
         'Asia/Colombo' => 'Waqtiga Caadiga Ah ee Hindiya (Kolombo)',
         'Asia/Damascus' => 'Waqtiga Bariga Yurub (Dimishiq)',

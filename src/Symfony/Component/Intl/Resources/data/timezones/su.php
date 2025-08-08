@@ -139,7 +139,7 @@ return [
         'Asia/Anadyr' => 'Rusia (Anadyr)',
         'Asia/Barnaul' => 'Rusia (Barnaul)',
         'Asia/Beirut' => 'Waktu Éropa Timur (Beirut)',
-        'Asia/Calcutta' => 'India (Kolkata)',
+        'Asia/Kolkata' => 'India (Kolkata)',
         'Asia/Chita' => 'Rusia (Chita)',
         'Asia/Damascus' => 'Waktu Éropa Timur (Damascus)',
         'Asia/Famagusta' => 'Waktu Éropa Timur (Famagusta)',

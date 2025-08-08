@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Saaatii Awurooppaa Bahaa (Beirut)',
         'Asia/Bishkek' => 'Sa’aatii Kiyirigiyistan (Bishkek)',
         'Asia/Brunei' => 'Sa’aatii Bruunee Darusalaam (Brunei)',
-        'Asia/Calcutta' => 'Sa’aatii Istaandaardii Hindii (Kolkata)',
+        'Asia/Kolkata' => 'Sa’aatii Istaandaardii Hindii (Kolkata)',
         'Asia/Chita' => 'Sa’aatii Yakutsk (Chita)',
         'Asia/Colombo' => 'Sa’aatii Istaandaardii Hindii (Colombo)',
         'Asia/Damascus' => 'Saaatii Awurooppaa Bahaa (Damascus)',

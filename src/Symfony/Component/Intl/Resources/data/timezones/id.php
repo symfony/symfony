@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Waktu Eropa Timur (Beirut)',
         'Asia/Bishkek' => 'Waktu Kirgizstan (Bishkek)',
         'Asia/Brunei' => 'Waktu Brunei Darussalam',
-        'Asia/Calcutta' => 'Waktu India (Kolkata)',
+        'Asia/Kolkata' => 'Waktu India (Kolkata)',
         'Asia/Chita' => 'Waktu Yakutsk (Chita)',
         'Asia/Colombo' => 'Waktu India (Kolombo)',
         'Asia/Damascus' => 'Waktu Eropa Timur (Damaskus)',

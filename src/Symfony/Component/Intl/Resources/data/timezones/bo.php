@@ -33,7 +33,7 @@ return [
         'Antarctica/Troll' => 'Troll',
         'Asia/Anadyr' => 'ཨུ་རུ་སུ་ (Anadyr)',
         'Asia/Barnaul' => 'ཨུ་རུ་སུ་ (Barnaul)',
-        'Asia/Calcutta' => 'རྒྱ་གར་ (Kolkata)',
+        'Asia/Kolkata' => 'རྒྱ་གར་ (Kolkata)',
         'Asia/Chita' => 'ཨུ་རུ་སུ་ (Chita)',
         'Asia/Irkutsk' => 'ཨུ་རུ་སུ་ (Irkutsk)',
         'Asia/Kamchatka' => 'ཨུ་རུ་སུ་ (Kamchatka)',

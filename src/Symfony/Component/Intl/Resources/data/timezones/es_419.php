@@ -22,7 +22,7 @@ return [
         'America/St_Thomas' => 'hora del Atlántico (Santo Tomás)',
         'Asia/Amman' => 'hora de Europa del Este (Ammán)',
         'Asia/Beirut' => 'hora de Europa del Este (Beirut)',
-        'Asia/Calcutta' => 'hora de India (Calcuta)',
+        'Asia/Kolkata' => 'hora de India (Calcuta)',
         'Asia/Colombo' => 'hora de India (Colombo)',
         'Asia/Damascus' => 'hora de Europa del Este (Damasco)',
         'Asia/Famagusta' => 'hora de Europa del Este (Famagusta)',

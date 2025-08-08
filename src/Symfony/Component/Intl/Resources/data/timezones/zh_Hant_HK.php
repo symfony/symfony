@@ -136,7 +136,7 @@ return [
         'Asia/Ashgabat' => '土庫曼時間（阿什哈巴德）',
         'Asia/Baku' => '亞塞拜疆時間（巴庫）',
         'Asia/Bishkek' => '吉爾吉斯時間（比斯凱克）',
-        'Asia/Calcutta' => '印度時間（加爾各答）',
+        'Asia/Kolkata' => '印度時間（加爾各答）',
         'Asia/Chita' => '雅庫茨克時間（赤塔）',
         'Asia/Colombo' => '印度時間（科倫坡）',
         'Asia/Dubai' => '波斯灣海域時間（杜拜）',

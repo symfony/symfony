@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Temp da l’Europa Orientala (Beirut)',
         'Asia/Bishkek' => 'temp: Kirgisistan (Bischkek)',
         'Asia/Brunei' => 'temp: Brunei (Bandar Seri Begawan)',
-        'Asia/Calcutta' => 'temp: India (Kolkata)',
+        'Asia/Kolkata' => 'temp: India (Kolkata)',
         'Asia/Chita' => 'temp: Russia (Chita)',
         'Asia/Colombo' => 'temp: Sri Lanka (Colombo)',
         'Asia/Damascus' => 'Temp da l’Europa Orientala (Damascus)',

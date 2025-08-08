@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'مشرقی یوٗرپی ٹایِم (بیرٹ)',
         'Asia/Bishkek' => 'کرغزستان ٹائم (بِشکیک)',
         'Asia/Brunei' => 'بروٗنَے دَروٗسَلَم ٹایِم',
-        'Asia/Calcutta' => 'ہِندوستان (Kolkata)',
+        'Asia/Kolkata' => 'ہِندوستان (Kolkata)',
         'Asia/Chita' => 'یَکُٹسک ٹایِم (چیٹا)',
         'Asia/Colombo' => 'ہِندوستان (کولَمبو)',
         'Asia/Damascus' => 'مشرقی یوٗرپی ٹایِم (دَمَسکَس)',

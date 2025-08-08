@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Wektu Eropa sisih Wetan (Beirut)',
         'Asia/Bishkek' => 'Wektu Kirgizstan (Bishkek)',
         'Asia/Brunei' => 'Wektu Brunai Darussalam (Brunei)',
-        'Asia/Calcutta' => 'Wektu Standar India (Kalkuta)',
+        'Asia/Kolkata' => 'Wektu Standar India (Kalkuta)',
         'Asia/Chita' => 'Wektu Yakutsk (Chita)',
         'Asia/Colombo' => 'Wektu Standar India (Kolombo)',
         'Asia/Damascus' => 'Wektu Eropa sisih Wetan (Damaskus)',

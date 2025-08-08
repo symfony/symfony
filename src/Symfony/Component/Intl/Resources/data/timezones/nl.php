@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Oost-Europese tijd (Beiroet)',
         'Asia/Bishkek' => 'Kirgizische tijd (Bisjkek)',
         'Asia/Brunei' => 'Bruneise tijd',
-        'Asia/Calcutta' => 'Indiase tijd (Calcutta)',
+        'Asia/Kolkata' => 'Indiase tijd (Calcutta)',
         'Asia/Chita' => 'Jakoetsk-tijd (Chita)',
         'Asia/Colombo' => 'Indiase tijd (Colombo)',
         'Asia/Damascus' => 'Oost-Europese tijd (Damascus)',

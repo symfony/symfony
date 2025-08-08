@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Doğu Avrupa Saati (Beyrut)',
         'Asia/Bishkek' => 'Kırgızistan Saati (Bişkek)',
         'Asia/Brunei' => 'Brunei Darü’s-Selam Saati',
-        'Asia/Calcutta' => 'Hindistan Standart Saati (Kalküta)',
+        'Asia/Kolkata' => 'Hindistan Standart Saati (Kalküta)',
         'Asia/Chita' => 'Yakutsk Saati (Çita)',
         'Asia/Colombo' => 'Hindistan Standart Saati (Kolombo)',
         'Asia/Damascus' => 'Doğu Avrupa Saati (Şam)',

@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Gündogar Ýewropa wagty (Beýrut)',
         'Asia/Bishkek' => 'Gyrgyzystan wagty (Bişkek)',
         'Asia/Brunei' => 'Bruneý-Darussalam wagty',
-        'Asia/Calcutta' => 'Hindistan standart wagty (Kalkutta)',
+        'Asia/Kolkata' => 'Hindistan standart wagty (Kalkutta)',
         'Asia/Chita' => 'Ýakutsk wagty (Çita)',
         'Asia/Colombo' => 'Hindistan standart wagty (Kolombo)',
         'Asia/Damascus' => 'Gündogar Ýewropa wagty (Damask)',

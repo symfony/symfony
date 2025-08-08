@@ -39,7 +39,7 @@ return [
         'Antarctica/Vostok' => 'témpor de Antarctica (Vostok)',
         'Asia/Anadyr' => 'témpor de Russia (Anadyr)',
         'Asia/Barnaul' => 'témpor de Russia (Barnaul)',
-        'Asia/Calcutta' => 'témpor de India (Kolkata)',
+        'Asia/Kolkata' => 'témpor de India (Kolkata)',
         'Asia/Chita' => 'témpor de Russia (Chita)',
         'Asia/Colombo' => 'témpor de Sri-Lanka (Colombo)',
         'Asia/Dili' => 'témpor de Ost-Timor (Dili)',

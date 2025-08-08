@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Isikhathi sase-Eastern Europe (i-Beirut)',
         'Asia/Bishkek' => 'Isikhathi sase-Kyrgystan (i-Bishkek)',
         'Asia/Brunei' => 'Isikhathi sase-Brunei Darussalam (i-Brunei)',
-        'Asia/Calcutta' => 'Isikhathi sase-India esivamile (i-Kolkata)',
+        'Asia/Kolkata' => 'Isikhathi sase-India esivamile (i-Kolkata)',
         'Asia/Chita' => 'Isikhathi sase-Yakutsk (i-Chita)',
         'Asia/Colombo' => 'Isikhathi sase-India esivamile (i-Colombo)',
         'Asia/Damascus' => 'Isikhathi sase-Eastern Europe (i-Damascus)',

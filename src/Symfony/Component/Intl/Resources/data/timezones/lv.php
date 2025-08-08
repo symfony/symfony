@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Beirūta (Austrumeiropas laiks)',
         'Asia/Bishkek' => 'Biškeka (Kirgizstānas laiks)',
         'Asia/Brunei' => 'Brunejas Darusalamas laiks',
-        'Asia/Calcutta' => 'Kalkāta (Indijas ziemas laiks)',
+        'Asia/Kolkata' => 'Kalkāta (Indijas ziemas laiks)',
         'Asia/Chita' => 'Čita (Jakutskas laiks)',
         'Asia/Colombo' => 'Kolombo (Indijas ziemas laiks)',
         'Asia/Damascus' => 'Damaska (Austrumeiropas laiks)',

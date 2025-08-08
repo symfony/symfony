@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'EET (waxtu ëroop u penku) (Beirut)',
         'Asia/Bishkek' => 'Waxtu Kirgistan (Bishkek)',
         'Asia/Brunei' => 'Brunei Darussalam',
-        'Asia/Calcutta' => 'Waxtu Inde (Kolkata)',
+        'Asia/Kolkata' => 'Waxtu Inde (Kolkata)',
         'Asia/Chita' => 'Yakutsk Waxtu (Chita)',
         'Asia/Colombo' => 'Waxtu Inde (Colombo)',
         'Asia/Damascus' => 'EET (waxtu ëroop u penku) (Damascus)',

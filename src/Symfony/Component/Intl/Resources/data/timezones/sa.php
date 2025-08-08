@@ -138,7 +138,7 @@ return [
         'Asia/Anadyr' => 'रष्यदेश: समय: (Anadyr)',
         'Asia/Barnaul' => 'रष्यदेश: समय: (Barnaul)',
         'Asia/Beirut' => 'पौर्व यूरोपीय समयः (Beirut)',
-        'Asia/Calcutta' => 'भारतः समय: (Kolkata)',
+        'Asia/Kolkata' => 'भारतः समय: (Kolkata)',
         'Asia/Chita' => 'रष्यदेश: समय: (Chita)',
         'Asia/Damascus' => 'पौर्व यूरोपीय समयः (Damascus)',
         'Asia/Famagusta' => 'पौर्व यूरोपीय समयः (Famagusta)',

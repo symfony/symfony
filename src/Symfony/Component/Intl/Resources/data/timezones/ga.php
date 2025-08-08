@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Am Oirthear na hEorpa (Béiriút)',
         'Asia/Bishkek' => 'Am na Cirgeastáine (Bishkek)',
         'Asia/Brunei' => 'Am Bhrúiné Darasalám (Brúiné)',
-        'Asia/Calcutta' => 'Am Caighdeánach na hIndia (Calcúta)',
+        'Asia/Kolkata' => 'Am Caighdeánach na hIndia (Calcúta)',
         'Asia/Chita' => 'Am Iacútsc (Chita)',
         'Asia/Colombo' => 'Am Caighdeánach na hIndia (Colombo)',
         'Asia/Damascus' => 'Am Oirthear na hEorpa (an Damaisc)',

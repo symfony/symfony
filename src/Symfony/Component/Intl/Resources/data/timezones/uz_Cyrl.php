@@ -217,7 +217,7 @@ return [
         'Asia/Beirut' => 'Шарқий Европа вақти (Bayrut)',
         'Asia/Bishkek' => 'Қирғизистон вақти (Bishkek)',
         'Asia/Brunei' => 'Бруней Даруссалом вақти (Bruney)',
-        'Asia/Calcutta' => 'Ҳиндистон вақти (Kalkutta)',
+        'Asia/Kolkata' => 'Ҳиндистон вақти (Kalkutta)',
         'Asia/Chita' => 'Якутск вақти (Chita)',
         'Asia/Colombo' => 'Ҳиндистон вақти (Kolombo)',
         'Asia/Damascus' => 'Шарқий Европа вақти (Damashq)',

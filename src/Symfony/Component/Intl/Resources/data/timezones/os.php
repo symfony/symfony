@@ -73,7 +73,7 @@ return [
         'Asia/Anadyr' => 'Уӕрӕсе рӕстӕг (Anadyr)',
         'Asia/Barnaul' => 'Уӕрӕсе рӕстӕг (Barnaul)',
         'Asia/Beirut' => 'Скӕсӕн Европӕйаг рӕстӕг (Beirut)',
-        'Asia/Calcutta' => 'Инди рӕстӕг (Kolkata)',
+        'Asia/Kolkata' => 'Инди рӕстӕг (Kolkata)',
         'Asia/Chita' => 'Уӕрӕсе рӕстӕг (Chita)',
         'Asia/Damascus' => 'Скӕсӕн Европӕйаг рӕстӕг (Damascus)',
         'Asia/Famagusta' => 'Скӕсӕн Европӕйаг рӕстӕг (Famagusta)',

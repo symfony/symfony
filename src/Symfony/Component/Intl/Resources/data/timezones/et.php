@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Ida-Euroopa aeg (Beirut)',
         'Asia/Bishkek' => 'Kõrgõzstani aeg (Biškek)',
         'Asia/Brunei' => 'Brunei aeg',
-        'Asia/Calcutta' => 'India aeg (Kolkata)',
+        'Asia/Kolkata' => 'India aeg (Kolkata)',
         'Asia/Chita' => 'Jakutski aeg (Tšita)',
         'Asia/Colombo' => 'India aeg (Colombo)',
         'Asia/Damascus' => 'Ida-Euroopa aeg (Damaskus)',

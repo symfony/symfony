@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Ħin ta’ il-Libanu (Bejrut)',
         'Asia/Bishkek' => 'Ħin ta’ il-Kirgiżistan (Bishkek)',
         'Asia/Brunei' => 'Ħin ta’ il-Brunei (Brunei)',
-        'Asia/Calcutta' => 'Ħin ta’ l-Indja (Kolkata)',
+        'Asia/Kolkata' => 'Ħin ta’ l-Indja (Kolkata)',
         'Asia/Chita' => 'Ħin ta’ ir-Russja (Chita)',
         'Asia/Colombo' => 'Ħin ta’ is-Sri Lanka (Colombo)',
         'Asia/Damascus' => 'Ħin ta’ is-Sirja (Damasku)',

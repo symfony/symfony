@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Vzhodnoevropski čas (Bejrut)',
         'Asia/Bishkek' => 'Kirgizistanski čas (Biškek)',
         'Asia/Brunei' => 'Brunejski čas',
-        'Asia/Calcutta' => 'Indijski standardni čas (Kalkuta)',
+        'Asia/Kolkata' => 'Indijski standardni čas (Kalkuta)',
         'Asia/Chita' => 'Jakutski čas (Čita)',
         'Asia/Colombo' => 'Indijski standardni čas (Kolombo)',
         'Asia/Damascus' => 'Vzhodnoevropski čas (Damask)',

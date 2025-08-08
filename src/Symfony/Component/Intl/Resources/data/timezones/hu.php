@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'kelet-európai időzóna (Bejrút)',
         'Asia/Bishkek' => 'kirgizisztáni idő (Biskek)',
         'Asia/Brunei' => 'Brunei Darussalam-i idő',
-        'Asia/Calcutta' => 'indiai téli idő (Kalkutta)',
+        'Asia/Kolkata' => 'indiai téli idő (Kalkutta)',
         'Asia/Chita' => 'jakutszki idő (Csita)',
         'Asia/Colombo' => 'indiai téli idő (Colombo)',
         'Asia/Damascus' => 'kelet-európai időzóna (Damaszkusz)',

@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'شەرقىي ياۋروپا ۋاقتى (Beirut)',
         'Asia/Bishkek' => 'قىرغىزىستان ۋاقتى (Bishkek)',
         'Asia/Brunei' => 'بىرۇنىي دارۇسسالام ۋاقتى (Brunei)',
-        'Asia/Calcutta' => 'ھىندىستان ئۆلچەملىك ۋاقتى (Kolkata)',
+        'Asia/Kolkata' => 'ھىندىستان ئۆلچەملىك ۋاقتى (Kolkata)',
         'Asia/Chita' => 'ياكۇتسك ۋاقتى (Chita)',
         'Asia/Colombo' => 'ھىندىستان ئۆلچەملىك ۋاقتى (Colombo)',
         'Asia/Damascus' => 'شەرقىي ياۋروپا ۋاقتى (Damascus)',

@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => '東ヨーロッパ時間（ベイルート）',
         'Asia/Bishkek' => 'キルギス時間（ビシュケク）',
         'Asia/Brunei' => 'ブルネイ・ダルサラーム時間',
-        'Asia/Calcutta' => 'インド標準時（コルカタ）',
+        'Asia/Kolkata' => 'インド標準時（コルカタ）',
         'Asia/Chita' => 'ヤクーツク時間（チタ）',
         'Asia/Colombo' => 'インド標準時（コロンボ）',
         'Asia/Damascus' => '東ヨーロッパ時間（ダマスカス）',

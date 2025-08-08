@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Eastern European Time (Beirut)',
         'Asia/Bishkek' => 'Kyrgyzstan Time (Bishkek)',
         'Asia/Brunei' => 'Brunei Time',
-        'Asia/Calcutta' => 'India Standard Time (Kolkata)',
+        'Asia/Kolkata' => 'India Standard Time (Kolkata)',
         'Asia/Chita' => 'Yakutsk Time (Chita)',
         'Asia/Colombo' => 'India Standard Time (Colombo)',
         'Asia/Damascus' => 'Eastern European Time (Damascus)',

@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Oge Mpaghara Ọwụwa Anyanwụ Europe (Beirut)',
         'Asia/Bishkek' => 'Oge Kyrgyzstan (Bishkek)',
         'Asia/Brunei' => 'Oge Brunei Darussalam',
-        'Asia/Calcutta' => 'Oge Izugbe India (Kolkata)',
+        'Asia/Kolkata' => 'Oge Izugbe India (Kolkata)',
         'Asia/Chita' => 'Oge Yakutsk (Chita)',
         'Asia/Colombo' => 'Oge Izugbe India (Colombo)',
         'Asia/Damascus' => 'Oge Mpaghara Ọwụwa Anyanwụ Europe (Damascus)',

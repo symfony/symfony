@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'østeuropeisk tid (Beirut)',
         'Asia/Bishkek' => 'kirgisisk tid (Bisjkek)',
         'Asia/Brunei' => 'tidssone for Brunei Darussalam',
-        'Asia/Calcutta' => 'indisk tid (Kolkata)',
+        'Asia/Kolkata' => 'indisk tid (Kolkata)',
         'Asia/Chita' => 'tidssone for Jakutsk (Tsjita)',
         'Asia/Colombo' => 'indisk tid (Colombo)',
         'Asia/Damascus' => 'østeuropeisk tid (Damaskus)',

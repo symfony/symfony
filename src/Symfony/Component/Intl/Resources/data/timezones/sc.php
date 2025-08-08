@@ -225,7 +225,7 @@ return [
         'Asia/Beirut' => 'Ora de s’Europa orientale (Beirut)',
         'Asia/Bishkek' => 'Ora de su Kirghìzistan (Bishkek)',
         'Asia/Brunei' => 'Ora de su Brunei',
-        'Asia/Calcutta' => 'Ora istandard de s’Ìndia (Calcuta)',
+        'Asia/Kolkata' => 'Ora istandard de s’Ìndia (Calcuta)',
         'Asia/Chita' => 'Ora de Yakutsk (Čita)',
         'Asia/Colombo' => 'Ora istandard de s’Ìndia (Colombo)',
         'Asia/Damascus' => 'Ora de s’Europa orientale (Damascu)',

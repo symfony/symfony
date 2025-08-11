@@ -25,12 +25,12 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 final class ArrayShapeType extends CollectionType
 {
     /**
-     * @var array<array{type: Type, optional: bool}>
+     * @var array<array-key, array{type: Type, optional: bool}>
      */
     private readonly array $shape;
 
     /**
-     * @param array<array{type: Type, optional: bool}> $shape
+     * @param array<array-key, array{type: Type, optional: bool}> $shape
      */
     public function __construct(
         array $shape,
@@ -71,7 +71,7 @@ final class ArrayShapeType extends CollectionType
     }
 
     /**
-     * @return array<array{type: Type, optional: bool}>
+     * @return array<array-key, array{type: Type, optional: bool}>
      */
     public function getShape(): array
     {

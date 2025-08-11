@@ -196,7 +196,7 @@ trait TypeFactoryTrait
     }
 
     /**
-     * @param array<array{type: Type, optional?: bool}|Type> $shape
+     * @param array<array-key, array{type: Type, optional?: bool}|Type> $shape
      */
     public static function arrayShape(array $shape, bool $sealed = true, ?Type $extraKeyType = null, ?Type $extraValueType = null): ArrayShapeType
     {

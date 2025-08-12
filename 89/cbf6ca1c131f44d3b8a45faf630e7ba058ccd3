@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-08-11T07:53:10Z
+
+I don't know if we should use `0o` notation, IIRC most other languages use the `0` prefix
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-08-11T07:59:00Z
+
+well, Fixer relies here on [explicit octal PHP notation](https://php.watch/versions/8.1/explicit-octal-notation)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-08-12T12:53:39Z
+
+Alright, not a big fan of it, but I'm not strongly against it either

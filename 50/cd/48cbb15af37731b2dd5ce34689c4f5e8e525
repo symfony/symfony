@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-05T09:43:49Z
+
+Needs to account for https://github.com/symfony/symfony/issues/61027#issuecomment-3151286215? /cc @rvanlaak
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2025-08-05T10:11:05Z
+
+> Needs to account for [#61027 (comment)](https://github.com/symfony/symfony/issues/61027#issuecomment-3151286215)? /cc @rvanlaak
+
+Will verify this within the hour, and potentially provide a commit with a test case to cherry-pick.
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2025-08-05T11:06:41Z
+
+@soyuka @nicolas-grekas added PR https://github.com/soyuka/symfony/pull/2 with a test case and fix for https://github.com/symfony/symfony/issues/61027#issuecomment-3151286215

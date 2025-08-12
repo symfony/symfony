@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by tgalopin at 2024-10-23T07:44:57Z
+
+Indeed thanks for the catch!
+
+If that's good for you I'll handle it using func_get_args to fix the issue on 6.4 (it's a real bug, I think it's worth it)
+
+---------------------------------------------------------------------------
+
+by stof at 2024-10-23T12:22:17Z
+
+Node is a final class, so it can add the argument directly (as there is no issue regarding keeping BC for child classes overriding the method)
+
+---------------------------------------------------------------------------
+
+by AppyGG at 2024-11-06T11:01:50Z
+
+Hi, to help on this issue, is there something to change to allow merge for 6.4 ?
+
+---------------------------------------------------------------------------
+
+by AppyGG at 2025-02-13T10:52:30Z
+
+Hello, small up on this PR, i really think this needs to be fix to improve sanitized content security
+
+I'm uncertain if the `Node.php` class needs modification or if the changes proposed by @tgalopin are good regarding the BC policy ?

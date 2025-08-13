@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-08-13T08:32:33Z
+
+The remaining usages reported are caused by vendor code?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-13T09:42:06Z
+
+They come from nikic/php-parser yes.

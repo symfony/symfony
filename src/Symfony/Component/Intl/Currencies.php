@@ -58,26 +58,29 @@ final class Currencies extends ResourceBundle
     /**
      * @return string[]
      */
-    public static function getNames(?string $displayLocale = null): array
+    public static function getNames(?string $displayLocale = null, bool $obsoleteCurrencies = false): array
     {
-        // ====================================================================
-        // For reference: It is NOT possible to return names indexed by
-        // numeric code here, because some numeric codes map to multiple
-        // 3-letter codes (e.g. 32 => "ARA", "ARP", "ARS")
-        // ====================================================================
-
         $names = self::readEntry(['Names'], $displayLocale);
 
         if ($names instanceof \Traversable) {
             $names = iterator_to_array($names);
         }
 
-        array_walk($names, function (&$value) {
-            $value = $value[self::INDEX_NAME];
-        });
+        $result = [];
+        foreach ($names as $code => $value) {
+            $currencyName = $value[self::INDEX_NAME];
 
-        return self::asort($names, $displayLocale);
+            // If obsoleteCurrencies=false, skip obsolete ones
+            if (!$obsoleteCurrencies && self::isObsolete($code)) {
+                continue;
+            }
+
+            $result[$code] = $currencyName;
+        }
+
+        return self::asort($result, $displayLocale);
     }
+
 
     /**
      * @throws MissingResourceException if the currency code does not exist
@@ -142,5 +145,18 @@ final class Currencies extends ResourceBundle
     protected static function getPath(): string
     {
         return Intl::getDataDirectory().'/'.Intl::CURRENCY_DIR;
+    }
+    /**
+     * Check whether a currency is obsolete based on ICU metadata.
+     * @param string $code ISO 4217 currency code (e.g. "USD", "BEF").
+     */
+    public static function isObsolete(string $code): bool
+    {
+        try {
+            self::readEntry(['Meta', $code], 'meta');
+            return false;
+        } catch (MissingResourceException $e) {
+            return true;
+        }
     }
 }

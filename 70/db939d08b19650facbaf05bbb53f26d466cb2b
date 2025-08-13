@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-12T12:51:17Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-13T07:43:52Z
+
+I made some handcrafted tweaks.
+BTW, would it be possible to tell php-cs-fixer to stop removing whitespaces at the end of lines inside heredocs?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-08-13T07:54:50Z
+
+> BTW, would it be possible to tell php-cs-fixer to stop removing whitespaces at the end of lines inside heredocs?
+
+I think we should find a better way than having the need for trailing spaces in some tests as dealing with them is also a mess when you open these test files in your local IDE for doing other changes in that file and your IDE then strips all trailing whitespaces.
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-08-13T14:58:07Z
+
+> I made some handcrafted tweaks.
+
+👍🏻
+minor, but on [such changes](https://github.com/symfony/symfony/pull/61372/files#diff-8e9161912047044a8fd50e5f96d19e81b1b8057d2887a274d74e9a84b10b45d1R261-R268) i would also recommend to start very first argument in new line. otherwise, argument 0 starts in line 0 (run-in), but argument 1 start in line 1(-ish) (like listed items)
+
+> BTW, would it be possible to tell php-cs-fixer to stop removing whitespaces at the end of lines inside heredocs?
+
+do you have an example of Fixer doing that? I can't see it in this PR, and we tried hard to _not_ remove trailing whitespace inside of string, as it would change the meaning of the code.
+( I also enjoy suggestion of @xabbuh , and would love to have it this way as well - yet regardless of that, Fixer should not change string content)
+
+-----
+
+separately, good to merge, I think ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-13T15:06:08Z
+
+See Fabbot's report in the CI failures: php-cs-fixer suggests many changes inside heredoc that we don't want.
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-08-13T16:15:01Z
+
+ok, thanks for hint what you meant.
+so it's not about heredoc rules. it's becuase Sf ruleset has `no_trailing_whitespace_in_string` enabled, whish is RISKY rule exactly of this reason.
+
+to change the behaviour, we simply need to disable that rule for the project, but tbh - i would rather keep it enabled, as for 99% cases, removal of trailing whitespaces is expected, and as @xabbuh mentioned, having them is also fooling other tools like IDE
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-13T16:19:33Z
+
+Ah that's good to know. This should be disabled to me. Strings are strings - aka not up for CS fixes.
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-08-13T16:24:23Z
+
+that's where we have `no_trailing_whitespace` for non-string trailing whitespaces ;) [non-risky change].
+
+i recommend to not block this PR due to `no_trailing_...` rules, and conclude on those trailing whitespaces separately.
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-08-13T16:24:29Z
+
+from practice, most of cases i had strings i actually wanted to remove such spaces, but happy to go both ways and update the ruleset if concluded (or please, feel free to send such PR as well).
+
+as alternative solution, we can change way we write such strings, eg:
+```diff
+--- a/src/Symfony/Component/Console/Tests/Helper/TableTest.php
++++ b/src/Symfony/Component/Console/Tests/Helper/TableTest.php
+@@ -1832,20 +1832,20 @@ class TableTest extends TestCase
+         ];
+
+         yield 'Borderless style' => [
+-            <<<EOTXT
+-                 ==============================
+-                    ISBN: 99921-58-10-7
+-                   Title: Divine Comedy
+-                  Author: Dante Alighieri
+-                   Price: 9.95
+-                 ==============================
+-                    ISBN: 9971-5-0210-0
+-                   Title: A Tale of Two Cities
+-                  Author: Charles Dickens
+-                   Price: 139.25
+-                 ==============================
+-
+-                EOTXT,
++            implode("\n", [
++                ' ============================== ',
++                '    ISBN: 99921-58-10-7         ',
++                '   Title: Divine Comedy         ',
++                '  Author: Dante Alighieri       ',
++                '   Price: 9.95                  ',
++                ' ============================== ',
++                '    ISBN: 9971-5-0210-0         ',
++                '   Title: A Tale of Two Cities  ',
++                '  Author: Charles Dickens       ',
++                '   Price: 139.25                ',
++                ' ============================== ',
++                '',
++            ]),
+```
+
+benefit? no other tools (like IDE) will complain on trailing whitespaces.

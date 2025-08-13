@@ -849,6 +849,33 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return $output;
     }
 
+    public function __serialize(): array
+    {
+        $data = [];
+        foreach ($this->__sleep() as $key) {
+            try {
+                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
+                    $data[$key] = $r->getValue($this);
+                }
+            } catch (\ReflectionException) {
+                $data[$key] = $this->$key;
+            }
+        }
+
+        return $data;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        \Closure::bind(function ($data) {
+            foreach ($data as $key => $value) {
+                $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
+            }
+
+            $this->__wakeup();
+        }, $this, static::class)($data);
+    }
+
     public function __sleep(): array
     {
         return ['environment', 'debug'];

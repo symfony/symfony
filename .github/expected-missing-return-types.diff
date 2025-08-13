@@ -283,16 +283,6 @@ diff --git a/src/Symfony/Bridge/Monolog/Handler/ConsoleHandler.php b/src/Symfony
 +    public function onTerminate(ConsoleTerminateEvent $event): void
      {
          $this->close();
-diff --git a/src/Symfony/Bridge/Monolog/Handler/ElasticsearchLogstashHandler.php b/src/Symfony/Bridge/Monolog/Handler/ElasticsearchLogstashHandler.php
---- a/src/Symfony/Bridge/Monolog/Handler/ElasticsearchLogstashHandler.php
-+++ b/src/Symfony/Bridge/Monolog/Handler/ElasticsearchLogstashHandler.php
-@@ -158,5 +158,5 @@ class ElasticsearchLogstashHandler extends AbstractHandler
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Bridge/Monolog/Handler/MailerHandler.php b/src/Symfony/Bridge/Monolog/Handler/MailerHandler.php
 --- a/src/Symfony/Bridge/Monolog/Handler/MailerHandler.php
 +++ b/src/Symfony/Bridge/Monolog/Handler/MailerHandler.php
@@ -1336,13 +1326,6 @@ diff --git a/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php b/src/Symfo
 +    public function reset(): void
      {
          $this->commit();
-@@ -303,5 +303,5 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/Cache/Adapter/TraceableAdapter.php b/src/Symfony/Component/Cache/Adapter/TraceableAdapter.php
 --- a/src/Symfony/Component/Cache/Adapter/TraceableAdapter.php
 +++ b/src/Symfony/Component/Cache/Adapter/TraceableAdapter.php
@@ -1434,16 +1417,6 @@ diff --git a/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php b/
 +    public function __invoke(EarlyExpirationMessage $message): void
      {
          $item = $message->getItem();
-diff --git a/src/Symfony/Component/Cache/Traits/AbstractAdapterTrait.php b/src/Symfony/Component/Cache/Traits/AbstractAdapterTrait.php
---- a/src/Symfony/Component/Cache/Traits/AbstractAdapterTrait.php
-+++ b/src/Symfony/Component/Cache/Traits/AbstractAdapterTrait.php
-@@ -285,5 +285,5 @@ trait AbstractAdapterTrait
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php b/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
 --- a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
 +++ b/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
@@ -1454,13 +1427,6 @@ diff --git a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php b/src/
 +    protected function doUnlink(string $file): bool
      {
          return @unlink($file);
-@@ -181,5 +181,5 @@ trait FilesystemCommonTrait
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/Clock/ClockAwareTrait.php b/src/Symfony/Component/Clock/ClockAwareTrait.php
 --- a/src/Symfony/Component/Clock/ClockAwareTrait.php
 +++ b/src/Symfony/Component/Clock/ClockAwareTrait.php
@@ -2328,21 +2294,21 @@ diff --git a/src/Symfony/Component/Console/EventListener/ErrorListener.php b/src
 diff --git a/src/Symfony/Component/Console/Formatter/OutputFormatter.php b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
 --- a/src/Symfony/Component/Console/Formatter/OutputFormatter.php
 +++ b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
-@@ -87,5 +87,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+@@ -88,5 +88,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
       * @return void
       */
 -    public function setDecorated(bool $decorated)
 +    public function setDecorated(bool $decorated): void
      {
          $this->decorated = $decorated;
-@@ -100,5 +100,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+@@ -101,5 +101,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
       * @return void
       */
 -    public function setStyle(string $name, OutputFormatterStyleInterface $style)
 +    public function setStyle(string $name, OutputFormatterStyleInterface $style): void
      {
          $this->styles[strtolower($name)] = $style;
-@@ -127,5 +127,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+@@ -128,5 +128,5 @@ class OutputFormatter implements WrappableOutputFormatterInterface
       * @return string
       */
 -    public function formatAndWrap(?string $message, int $width)
@@ -2488,21 +2454,21 @@ diff --git a/src/Symfony/Component/Console/Helper/Helper.php b/src/Symfony/Compo
 +    public function setHelperSet(?HelperSet $helperSet = null): void
      {
          if (1 > \func_num_args()) {
-@@ -97,5 +97,5 @@ abstract class Helper implements HelperInterface
+@@ -101,5 +101,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function formatTime(int|float $secs, int $precision = 1)
 +    public static function formatTime(int|float $secs, int $precision = 1): string
      {
          $secs = (int) floor($secs);
-@@ -140,5 +140,5 @@ abstract class Helper implements HelperInterface
+@@ -144,5 +144,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function formatMemory(int $memory)
 +    public static function formatMemory(int $memory): string
      {
          if ($memory >= 1024 * 1024 * 1024) {
-@@ -160,5 +160,5 @@ abstract class Helper implements HelperInterface
+@@ -164,5 +164,5 @@ abstract class Helper implements HelperInterface
       * @return string
       */
 -    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
@@ -4272,13 +4238,6 @@ diff --git a/src/Symfony/Component/DependencyInjection/Loader/Configurator/Abstr
 +    public function __call(string $method, array $args): mixed
      {
          if (method_exists($this, 'set'.$method)) {
-@@ -55,5 +55,5 @@ abstract class AbstractConfigurator
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
 --- a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
 +++ b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
@@ -4744,16 +4703,6 @@ diff --git a/src/Symfony/Component/DomCrawler/Link.php b/src/Symfony/Component/D
 +    protected function setNode(\DOMElement $node): void
      {
          if ('a' !== $node->nodeName && 'area' !== $node->nodeName && 'link' !== $node->nodeName) {
-diff --git a/src/Symfony/Component/ErrorHandler/BufferingLogger.php b/src/Symfony/Component/ErrorHandler/BufferingLogger.php
---- a/src/Symfony/Component/ErrorHandler/BufferingLogger.php
-+++ b/src/Symfony/Component/ErrorHandler/BufferingLogger.php
-@@ -44,5 +44,5 @@ class BufferingLogger extends AbstractLogger
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/ErrorHandler/ErrorRenderer/FileLinkFormatter.php b/src/Symfony/Component/ErrorHandler/ErrorRenderer/FileLinkFormatter.php
 --- a/src/Symfony/Component/ErrorHandler/ErrorRenderer/FileLinkFormatter.php
 +++ b/src/Symfony/Component/ErrorHandler/ErrorRenderer/FileLinkFormatter.php
@@ -7010,16 +6959,6 @@ diff --git a/src/Symfony/Component/Form/ResolvedFormTypeInterface.php b/src/Symf
 +    public function finishView(FormView $view, FormInterface $form, array $options): void;
  
      /**
-diff --git a/src/Symfony/Component/Form/Util/OrderedHashMapIterator.php b/src/Symfony/Component/Form/Util/OrderedHashMapIterator.php
---- a/src/Symfony/Component/Form/Util/OrderedHashMapIterator.php
-+++ b/src/Symfony/Component/Form/Util/OrderedHashMapIterator.php
-@@ -66,5 +66,5 @@ class OrderedHashMapIterator implements \Iterator
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/HttpClient/CachingHttpClient.php b/src/Symfony/Component/HttpClient/CachingHttpClient.php
 --- a/src/Symfony/Component/HttpClient/CachingHttpClient.php
 +++ b/src/Symfony/Component/HttpClient/CachingHttpClient.php
@@ -7030,16 +6969,6 @@ diff --git a/src/Symfony/Component/HttpClient/CachingHttpClient.php b/src/Symfon
 +    public function reset(): void
      {
          if ($this->client instanceof ResetInterface) {
-diff --git a/src/Symfony/Component/HttpClient/Chunk/ErrorChunk.php b/src/Symfony/Component/HttpClient/Chunk/ErrorChunk.php
---- a/src/Symfony/Component/HttpClient/Chunk/ErrorChunk.php
-+++ b/src/Symfony/Component/HttpClient/Chunk/ErrorChunk.php
-@@ -102,5 +102,5 @@ class ErrorChunk implements ChunkInterface
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/HttpClient/DecoratorTrait.php b/src/Symfony/Component/HttpClient/DecoratorTrait.php
 --- a/src/Symfony/Component/HttpClient/DecoratorTrait.php
 +++ b/src/Symfony/Component/HttpClient/DecoratorTrait.php
@@ -7070,16 +6999,6 @@ diff --git a/src/Symfony/Component/HttpClient/MockHttpClient.php b/src/Symfony/C
 +    public function reset(): void
      {
          $this->requestsCount = 0;
-diff --git a/src/Symfony/Component/HttpClient/Response/CommonResponseTrait.php b/src/Symfony/Component/HttpClient/Response/CommonResponseTrait.php
---- a/src/Symfony/Component/HttpClient/Response/CommonResponseTrait.php
-+++ b/src/Symfony/Component/HttpClient/Response/CommonResponseTrait.php
-@@ -128,5 +128,5 @@ trait CommonResponseTrait
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/HttpClient/ScopingHttpClient.php b/src/Symfony/Component/HttpClient/ScopingHttpClient.php
 --- a/src/Symfony/Component/HttpClient/ScopingHttpClient.php
 +++ b/src/Symfony/Component/HttpClient/ScopingHttpClient.php
@@ -8067,14 +7986,14 @@ diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php b/
 +    protected function getCasters(): array
      {
          $casters = [
-@@ -98,5 +98,5 @@ abstract class DataCollector implements DataCollectorInterface
+@@ -125,5 +125,5 @@ abstract class DataCollector implements DataCollectorInterface
       * @return void
       */
 -    public function __wakeup()
 +    public function __wakeup(): void
      {
      }
-@@ -119,5 +119,5 @@ abstract class DataCollector implements DataCollectorInterface
+@@ -146,5 +146,5 @@ abstract class DataCollector implements DataCollectorInterface
       * @return void
       */
 -    public function reset()
@@ -8682,7 +8601,7 @@ diff --git a/src/Symfony/Component/HttpKernel/Kernel.php b/src/Symfony/Component
 +    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass): void
      {
          // cache the container
-@@ -858,5 +858,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
+@@ -885,5 +885,5 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
       * @return void
       */
 -    public function __wakeup()
@@ -9030,35 +8949,28 @@ diff --git a/src/Symfony/Component/Ldap/Adapter/EntryManagerInterface.php b/src/
 diff --git a/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php b/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php
 --- a/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php
 +++ b/src/Symfony/Component/Ldap/Adapter/ExtLdap/Connection.php
-@@ -48,5 +48,5 @@ class Connection extends AbstractConnection
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-@@ -68,5 +68,5 @@ class Connection extends AbstractConnection
+@@ -65,5 +65,5 @@ class Connection extends AbstractConnection
       * @return void
       */
 -    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null)
 +    public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null): void
      {
          if (!$this->connection) {
-@@ -101,5 +101,5 @@ class Connection extends AbstractConnection
+@@ -98,5 +98,5 @@ class Connection extends AbstractConnection
       * @return void
       */
 -    public function setOption(string $name, array|string|int|bool $value)
 +    public function setOption(string $name, array|string|int|bool $value): void
      {
          if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
-@@ -111,5 +111,5 @@ class Connection extends AbstractConnection
+@@ -108,5 +108,5 @@ class Connection extends AbstractConnection
       * @return array|string|int|null
       */
 -    public function getOption(string $name)
 +    public function getOption(string $name): array|string|int|null
      {
          if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
-@@ -123,5 +123,5 @@ class Connection extends AbstractConnection
+@@ -120,5 +120,5 @@ class Connection extends AbstractConnection
       * @return void
       */
 -    protected function configureOptions(OptionsResolver $resolver)
@@ -9124,16 +9036,6 @@ diff --git a/src/Symfony/Component/Ldap/Adapter/ExtLdap/EntryManager.php b/src/S
 +    public function applyOperations(string $dn, iterable $operations): static
      {
          $operationsMapped = [];
-diff --git a/src/Symfony/Component/Ldap/Adapter/ExtLdap/Query.php b/src/Symfony/Component/Ldap/Adapter/ExtLdap/Query.php
---- a/src/Symfony/Component/Ldap/Adapter/ExtLdap/Query.php
-+++ b/src/Symfony/Component/Ldap/Adapter/ExtLdap/Query.php
-@@ -39,5 +39,5 @@ class Query extends AbstractQuery
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/Ldap/Entry.php b/src/Symfony/Component/Ldap/Entry.php
 --- a/src/Symfony/Component/Ldap/Entry.php
 +++ b/src/Symfony/Component/Ldap/Entry.php
@@ -9465,28 +9367,28 @@ diff --git a/src/Symfony/Component/Lock/Store/MemcachedStore.php b/src/Symfony/C
 diff --git a/src/Symfony/Component/Lock/Store/MongoDbStore.php b/src/Symfony/Component/Lock/Store/MongoDbStore.php
 --- a/src/Symfony/Component/Lock/Store/MongoDbStore.php
 +++ b/src/Symfony/Component/Lock/Store/MongoDbStore.php
-@@ -209,5 +209,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -213,5 +213,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
       */
 -    public function createTtlIndex(int $expireAfterSeconds = 0)
 +    public function createTtlIndex(int $expireAfterSeconds = 0): void
      {
          $server = $this->getManager()->selectServer();
-@@ -231,5 +231,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -235,5 +235,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @throws LockExpiredException when save is called on an expired lock
       */
 -    public function save(Key $key)
 +    public function save(Key $key): void
      {
          $key->reduceLifetime($this->initialTtl);
-@@ -257,5 +257,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -261,5 +261,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @throws LockExpiredException
       */
 -    public function putOffExpiration(Key $key, float $ttl)
 +    public function putOffExpiration(Key $key, float $ttl): void
      {
          $key->reduceLifetime($ttl);
-@@ -276,5 +276,5 @@ class MongoDbStore implements PersistingStoreInterface
+@@ -280,5 +280,5 @@ class MongoDbStore implements PersistingStoreInterface
       * @return void
       */
 -    public function delete(Key $key)
@@ -9658,16 +9560,6 @@ diff --git a/src/Symfony/Component/Mailer/EventListener/MessageLoggerListener.ph
 +    public function reset(): void
      {
          $this->events = new MessageEvents();
-diff --git a/src/Symfony/Component/Mailer/Transport/Smtp/SmtpTransport.php b/src/Symfony/Component/Mailer/Transport/Smtp/SmtpTransport.php
---- a/src/Symfony/Component/Mailer/Transport/Smtp/SmtpTransport.php
-+++ b/src/Symfony/Component/Mailer/Transport/Smtp/SmtpTransport.php
-@@ -381,5 +381,5 @@ class SmtpTransport extends AbstractTransport
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/AmazonSqsTransport.php b/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/AmazonSqsTransport.php
 --- a/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/AmazonSqsTransport.php
 +++ b/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/AmazonSqsTransport.php
@@ -9685,26 +9577,6 @@ diff --git a/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/AmazonSq
 +    private function getReceiver(): MessageCountAwareInterface&ReceiverInterface
      {
          return $this->receiver ??= new AmazonSqsReceiver($this->connection, $this->serializer);
-diff --git a/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/Connection.php b/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/Connection.php
---- a/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/Connection.php
-+++ b/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/Connection.php
-@@ -74,5 +74,5 @@ class Connection
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-diff --git a/src/Symfony/Component/Messenger/Bridge/Doctrine/Transport/PostgreSqlConnection.php b/src/Symfony/Component/Messenger/Bridge/Doctrine/Transport/PostgreSqlConnection.php
---- a/src/Symfony/Component/Messenger/Bridge/Doctrine/Transport/PostgreSqlConnection.php
-+++ b/src/Symfony/Component/Messenger/Bridge/Doctrine/Transport/PostgreSqlConnection.php
-@@ -42,5 +42,5 @@ final class PostgreSqlConnection extends Connection
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php b/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
 --- a/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
 +++ b/src/Symfony/Component/Messenger/Command/ConsumeMessagesCommand.php
@@ -9940,7 +9812,7 @@ diff --git a/src/Symfony/Component/Mime/Part/DataPart.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Mime/Part/TextPart.php b/src/Symfony/Component/Mime/Part/TextPart.php
 --- a/src/Symfony/Component/Mime/Part/TextPart.php
 +++ b/src/Symfony/Component/Mime/Part/TextPart.php
-@@ -240,5 +240,5 @@ class TextPart extends AbstractPart
+@@ -267,5 +267,5 @@ class TextPart extends AbstractPart
       * @return void
       */
 -    public function __wakeup()
@@ -10110,35 +9982,28 @@ diff --git a/src/Symfony/Component/Process/PhpProcess.php b/src/Symfony/Componen
 diff --git a/src/Symfony/Component/Process/Process.php b/src/Symfony/Component/Process/Process.php
 --- a/src/Symfony/Component/Process/Process.php
 +++ b/src/Symfony/Component/Process/Process.php
-@@ -203,5 +203,5 @@ class Process implements \IteratorAggregate
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-@@ -294,5 +294,5 @@ class Process implements \IteratorAggregate
+@@ -291,5 +291,5 @@ class Process implements \IteratorAggregate
       * @throws LogicException   In case a callback is provided and output has been disabled
       */
 -    public function start(?callable $callback = null, array $env = [])
 +    public function start(?callable $callback = null, array $env = []): void
      {
          if ($this->isRunning()) {
-@@ -1145,5 +1145,5 @@ class Process implements \IteratorAggregate
+@@ -1142,5 +1142,5 @@ class Process implements \IteratorAggregate
       * @throws ProcessTimedOutException In case the timeout was reached
       */
 -    public function checkTimeout()
 +    public function checkTimeout(): void
      {
          if (self::STATUS_STARTED !== $this->status) {
-@@ -1186,5 +1186,5 @@ class Process implements \IteratorAggregate
+@@ -1183,5 +1183,5 @@ class Process implements \IteratorAggregate
       * @return void
       */
 -    public function setOptions(array $options)
 +    public function setOptions(array $options): void
      {
          if ($this->isRunning()) {
-@@ -1283,5 +1283,5 @@ class Process implements \IteratorAggregate
+@@ -1280,5 +1280,5 @@ class Process implements \IteratorAggregate
       * @return void
       */
 -    protected function updateStatus(bool $blocking)
@@ -10523,26 +10388,6 @@ diff --git a/src/Symfony/Component/Routing/Loader/AttributeClassLoader.php b/src
 +    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void;
  
      /**
-diff --git a/src/Symfony/Component/Routing/Loader/Configurator/CollectionConfigurator.php b/src/Symfony/Component/Routing/Loader/Configurator/CollectionConfigurator.php
---- a/src/Symfony/Component/Routing/Loader/Configurator/CollectionConfigurator.php
-+++ b/src/Symfony/Component/Routing/Loader/Configurator/CollectionConfigurator.php
-@@ -47,5 +47,5 @@ class CollectionConfigurator
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-diff --git a/src/Symfony/Component/Routing/Loader/Configurator/ImportConfigurator.php b/src/Symfony/Component/Routing/Loader/Configurator/ImportConfigurator.php
---- a/src/Symfony/Component/Routing/Loader/Configurator/ImportConfigurator.php
-+++ b/src/Symfony/Component/Routing/Loader/Configurator/ImportConfigurator.php
-@@ -39,5 +39,5 @@ class ImportConfigurator
-      * @return void
-      */
--    public function __wakeup()
-+    public function __wakeup(): void
-     {
-         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
 diff --git a/src/Symfony/Component/Routing/Loader/XmlFileLoader.php b/src/Symfony/Component/Routing/Loader/XmlFileLoader.php
 --- a/src/Symfony/Component/Routing/Loader/XmlFileLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/XmlFileLoader.php
@@ -11769,6 +11614,16 @@ diff --git a/src/Symfony/Component/Stopwatch/StopwatchEvent.php b/src/Symfony/Co
 +    public function ensureStopped(): void
      {
          while (\count($this->started)) {
+diff --git a/src/Symfony/Component/String/AbstractString.php b/src/Symfony/Component/String/AbstractString.php
+--- a/src/Symfony/Component/String/AbstractString.php
++++ b/src/Symfony/Component/String/AbstractString.php
+@@ -721,5 +721,5 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
+      * @return void
+      */
+-    public function __wakeup()
++    public function __wakeup(): void
+     {
+     }
 diff --git a/src/Symfony/Component/String/Slugger/AsciiSlugger.php b/src/Symfony/Component/String/Slugger/AsciiSlugger.php
 --- a/src/Symfony/Component/String/Slugger/AsciiSlugger.php
 +++ b/src/Symfony/Component/String/Slugger/AsciiSlugger.php
@@ -11782,7 +11637,7 @@ diff --git a/src/Symfony/Component/String/Slugger/AsciiSlugger.php b/src/Symfony
 diff --git a/src/Symfony/Component/String/UnicodeString.php b/src/Symfony/Component/String/UnicodeString.php
 --- a/src/Symfony/Component/String/UnicodeString.php
 +++ b/src/Symfony/Component/String/UnicodeString.php
-@@ -366,5 +366,5 @@ class UnicodeString extends AbstractUnicodeString
+@@ -377,5 +377,5 @@ class UnicodeString extends AbstractUnicodeString
       * @return void
       */
 -    public function __wakeup()

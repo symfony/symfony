@@ -203,6 +203,25 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * @internal
      */
+    public function __serialize(): array
+    {
+        $data = [];
+        foreach ($this->__sleep() as $key) {
+            try {
+                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
+                    $data[$key] = $r->getValue($this);
+                }
+            } catch (\ReflectionException) {
+                $data[$key] = $this->$key;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @internal
+     */
     public function __sleep(): array
     {
         foreach ($this->data['forms_by_hash'] as &$form) {

@@ -90,6 +90,22 @@ final class Key
         return null !== $this->expiringTime && $this->expiringTime <= microtime(true);
     }
 
+    public function __serialize(): array
+    {
+        $data = [];
+        foreach ($this->__sleep() as $key) {
+            try {
+                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
+                    $data[$key] = $r->getValue($this);
+                }
+            } catch (\ReflectionException) {
+                $data[$key] = $this->$key;
+            }
+        }
+
+        return $data;
+    }
+
     public function __sleep(): array
     {
         if (!$this->serializable) {

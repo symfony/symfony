@@ -46,7 +46,7 @@ class PostgreSqlConnectionTest extends TestCase
         $driverConnection->method('executeStatement')->willReturn(1);
 
         $connection = new PostgreSqlConnection([], $driverConnection);
-        $connection->__wakeup();
+        $connection->__unserialize([]);
     }
 
     public function testListenOnConnection()

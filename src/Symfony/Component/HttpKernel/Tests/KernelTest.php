@@ -358,7 +358,7 @@ EOF
         $env = 'test_env';
         $debug = true;
         $kernel = new KernelForTest($env, $debug);
-        $expected = "O:57:\"Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest\":2:{s:14:\"\0*\0environment\";s:8:\"test_env\";s:8:\"\0*\0debug\";b:1;}";
+        $expected = "O:57:\"Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest\":2:{s:11:\"environment\";s:8:\"test_env\";s:5:\"debug\";b:1;}";
         $this->assertEquals($expected, serialize($kernel));
     }
 

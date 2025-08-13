@@ -83,11 +83,22 @@ class GenericMetadata implements MetadataInterface
      */
     public int $autoMappingStrategy = AutoMappingStrategy::NONE;
 
-    /**
-     * Returns the names of the properties that should be serialized.
-     *
-     * @return string[]
-     */
+    public function __serialize(): array
+    {
+        $data = [];
+        foreach ($this->__sleep() as $key) {
+            try {
+                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
+                    $data[$key] = $r->getValue($this);
+                }
+            } catch (\ReflectionException) {
+                $data[$key] = $this->$key;
+            }
+        }
+
+        return $data;
+    }
+
     public function __sleep(): array
     {
         return [

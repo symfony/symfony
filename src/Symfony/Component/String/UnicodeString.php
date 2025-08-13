@@ -362,6 +362,17 @@ class UnicodeString extends AbstractUnicodeString
         return $prefix === grapheme_extract($this->string, \strlen($prefix), \GRAPHEME_EXTR_MAXBYTES);
     }
 
+    public function __unserialize(array $data): void
+    {
+        \Closure::bind(function ($data) {
+            foreach ($data as $key => $value) {
+                $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
+            }
+
+            $this->__wakeup();
+        }, $this, static::class)($data);
+    }
+
     /**
      * @return void
      */

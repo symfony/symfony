@@ -306,6 +306,22 @@ abstract class Constraint
         return self::PROPERTY_CONSTRAINT;
     }
 
+    public function __serialize(): array
+    {
+        $data = [];
+        foreach ($this->__sleep() as $key) {
+            try {
+                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
+                    $data[$key] = $r->getValue($this);
+                }
+            } catch (\ReflectionException) {
+                $data[$key] = $this->$key;
+            }
+        }
+
+        return $data;
+    }
+
     /**
      * Optimizes the serialized value to minimize storage space.
      *

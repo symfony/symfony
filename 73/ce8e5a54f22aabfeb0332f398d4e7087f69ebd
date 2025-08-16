@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-07-21T10:20:13Z
+
+Should https://github.com/symfony/symfony/blob/3ec571dc4b355374c44f521040b16d05291dba63/src/Symfony/Component/HttpFoundation/Request.php#L257 be updated to add `QUERY` to the list?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-21T11:47:14Z
+
+The same question applies to `create()`. I'm not sure. The RFC says:
+
+> Implementations MAY use a request body of any content type with the QUERY method
+
+I guess that if we may, we can fallback on `application/x-www-form-urlencoded` like other methods
+
+---------------------------------------------------------------------------
+
+by stof at 2025-07-21T11:49:18Z
+
+We should indeed parse a `application/x-www-form-urlencoded` body like for other methods.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-21T12:07:05Z
+
+PR updated. A follow-up PR would be to also support the method in HttpClient. I added support for the method also in WebProfilerBundle
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-21T13:54:44Z
+
+The tests are passing, but failing when reruned [here](https://github.com/symfony/symfony/actions/runs/16418084555/job/46388951872?pr=61173#step:9:12261). Not sure why though. Should we remove `http-kernel@^6.4` from WebProfilerBundle's composer.json?
+
+Status: Needs Review

@@ -192,6 +192,10 @@ class TwigExtension extends Extension
             }
         }
 
+        if (!$container->hasDefinition('cache.system')) {
+            $container->removeDefinition('cache.twig.runtime.rate_limiter_expression_language');
+        }
+
         if (isset($config['autoescape_service'])) {
             $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method'] ?? '__invoke'];
         } else {

@@ -24,6 +24,8 @@ use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Bridge\Twig\Extension\ProfilerExtension;
+use Symfony\Bridge\Twig\Extension\RateLimiterExtension;
+use Symfony\Bridge\Twig\Extension\RateLimiterRuntime;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Bridge\Twig\Extension\SerializerExtension;
 use Symfony\Bridge\Twig\Extension\SerializerRuntime;
@@ -36,6 +38,7 @@ use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator;
 use Symfony\Bundle\TwigBundle\TemplateIterator;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Twig\Cache\ChainCache;
 use Twig\Cache\FilesystemCache;
 use Twig\Cache\ReadOnlyFilesystemCache;
@@ -188,6 +191,22 @@ return static function (ContainerConfigurator $container) {
             ->args([service('serializer')])
 
         ->set('twig.extension.serializer', SerializerExtension::class)
+
+        ->set('twig.runtime.rate_limiter', RateLimiterRuntime::class)
+            ->args([
+                tagged_locator('rate_limiter'),
+                service('request_stack'),
+                service('twig.runtime.rate_limiter_expression_language')->nullOnInvalid(),
+            ])
+
+        ->set('twig.extension.rate_limiter', RateLimiterExtension::class)
+
+        ->set('twig.runtime.rate_limiter_expression_language', ExpressionLanguage::class)
+            ->args([service('cache.twig.runtime.rate_limiter_expression_language')->nullOnInvalid()])
+
+        ->set('cache.twig.runtime.rate_limiter_expression_language')
+            ->parent('cache.system')
+            ->tag('cache.pool')
 
         ->set('controller.template_attribute_listener', TemplateAttributeListener::class)
             ->args([service('twig')])

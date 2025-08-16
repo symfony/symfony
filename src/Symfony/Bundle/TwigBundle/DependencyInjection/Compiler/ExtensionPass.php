@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Extension\RateLimiterExtension;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -145,6 +146,20 @@ class ExtensionPass implements CompilerPassInterface
         if ($container->has('serializer')) {
             $container->getDefinition('twig.runtime.serializer')->addTag('twig.runtime');
             $container->getDefinition('twig.extension.serializer')->addTag('twig.extension');
+        }
+
+        if (!$container->hasDefinition('cache.system')) {
+            $container->removeDefinition('cache.twig.runtime.rate_limiter_expression_language');
+        }
+
+        if ($container->has('limiter') && class_exists(RateLimiterExtension::class)) {
+            $container->getDefinition('twig.runtime.rate_limiter')->addTag('twig.runtime');
+            $container->getDefinition('twig.extension.rate_limiter')->addTag('twig.extension');
+        } else {
+            $container->removeDefinition('twig.runtime.rate_limiter');
+            $container->removeDefinition('twig.extension.rate_limiter');
+            $container->removeDefinition('cache.twig.runtime.rate_limiter_expression_language');
+            $container->removeDefinition('twig.runtime.rate_limiter_expression_language');
         }
     }
 }

@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+7.4
+---
+ * Add support for `rate_limit()` Twig function
+
 7.3
 ---
 

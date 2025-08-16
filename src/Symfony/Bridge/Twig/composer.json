@@ -54,7 +54,8 @@
         "symfony/workflow": "^6.4|^7.0|^8.0",
         "twig/cssinliner-extra": "^3",
         "twig/inky-extra": "^3",
-        "twig/markdown-extra": "^3"
+        "twig/markdown-extra": "^3",
+        "symfony/rate-limiter": "^7.3|^8.0"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.2.2",

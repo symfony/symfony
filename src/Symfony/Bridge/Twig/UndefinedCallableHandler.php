@@ -58,6 +58,7 @@ class UndefinedCallableHandler
         'field_help' => 'form',
         'field_errors' => 'form',
         'field_choices' => 'form',
+        'rate_limit' => 'rate-limiter',
         'logout_url' => 'security-http',
         'logout_path' => 'security-http',
         'is_granted' => 'security-core',

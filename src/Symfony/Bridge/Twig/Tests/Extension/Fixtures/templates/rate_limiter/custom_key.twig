@@ -1,0 +1,6 @@
+{% set limit = rate_limit('anonymous_api', 'custom_key', 50) %}
+{% if limit %}
+    custom_key: allowed
+{% else %}
+    custom_key: denied
+{% endif %}

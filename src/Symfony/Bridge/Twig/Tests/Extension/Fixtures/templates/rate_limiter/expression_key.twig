@@ -1,0 +1,6 @@
+{% set limit = rate_limit('anonymous_api', expression('request.getClientIp()')) %}
+{% if limit %}
+    expression_key: allowed
+{% else %}
+    expression_key: denied
+{% endif %}

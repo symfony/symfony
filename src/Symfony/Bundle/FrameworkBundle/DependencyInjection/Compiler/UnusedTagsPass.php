@@ -76,6 +76,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'property_info.list_extractor',
         'property_info.type_extractor',
         'proxy',
+        'rate_limiter',
         'remote_event.consumer',
         'routing.condition_service',
         'routing.expression_language_function',

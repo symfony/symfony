@@ -38,9 +38,7 @@ class StopWorkerOnRestartSignalListenerTest extends TestCase
         $stopOnSignalListener->onWorkerStarted($workerStartedEvent);
     }
 
-    /**
-     * @dataProvider restartTimeProvider
-     */
+    #[DataProvider('restartTimeProvider')]
     public function testWorkerStopsIfRestartInCache(?int $lastRestartTimeOffset, bool $shouldStop)
     {
         $cachePool = $this->createRestartInCachePool($lastRestartTimeOffset);

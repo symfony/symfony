@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Command;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -33,9 +34,7 @@ class StopWorkersCommandTest extends TestCase
         $tester->execute([]);
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testItSetsCacheItemWithDurationAdded()
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);

@@ -49,7 +49,7 @@ class StopWorkersCommand extends Command
                 and then exit. Worker commands are *not* automatically restarted: that
                 should be handled by a process control system.
 
-                Use the <comment>--duration</comment> option to keep the workers in a paused state (not processing messages) for the given duration (in seconds).
+                Use the <info>--duration</info> option to keep the workers in a paused state (not processing messages) for the given duration (in seconds).
                 During this time, no messages will be handled, and the workers will not resume until the pause period has passed:
 
                     <info>php %command.full_name% --duration=60</info>
@@ -62,11 +62,7 @@ class StopWorkersCommand extends Command
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        if (null !== $duration = $input->getOption('duration')) {
-            if (!is_numeric($duration) || 0 >= $duration) {
-                throw new InvalidOptionException(\sprintf('Option "duration" must be a positive integer, "%s" passed.', $duration));
-            }
-        }
+        $duration = (int) $input->getOption('duration');
 
         $cacheItem = $this->restartSignalCachePool->getItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY);
         $cacheItem->set(microtime(true) + $duration);
@@ -74,7 +70,7 @@ class StopWorkersCommand extends Command
 
         $io->success('Signal successfully sent to stop any running workers.');
         if ($duration > 0) {
-            $io->info(sprintf('Workers will be paused for %s seconds.', $duration));
+            $io->info(\sprintf('Workers will be paused for %s seconds.', $duration));
         }
 
         return 0;

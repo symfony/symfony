@@ -22,11 +22,11 @@ final class TranslatableMessageVisitorTest extends AbstractVisitorTestCase
         $catalogue = $this->extract(new TranslatableMessageVisitor(), self::FIXTURES_FOLDER);
 
         $expectedHeredoc = <<<EOF
-heredoc key with whitespace and escaped \$\n sequences
-EOF;
+            heredoc key with whitespace and escaped \$\n sequences
+            EOF;
         $expectedNowdoc = <<<'EOF'
-nowdoc key with whitespace and nonescaped \$\n sequences
-EOF;
+            nowdoc key with whitespace and nonescaped \$\n sequences
+            EOF;
 
         $this->assertEquals(
             [

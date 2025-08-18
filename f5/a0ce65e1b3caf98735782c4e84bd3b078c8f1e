@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by mttsch at 2025-08-16T17:37:46Z
+
+I was doing some local experimentation during which one these tests failed due to this timezone. While I did not dig any further why that was the case exactly/why it was missing in this setup, using explicitly not recommended timezones for these tests seem unnecessary.

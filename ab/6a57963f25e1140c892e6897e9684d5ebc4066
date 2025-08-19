@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-08-15T07:17:03Z
+
+i'd do the icu update first yes
+
+for this PR it will also impact the timezone form type, but i dont think it matters much
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-08-15T09:51:36Z
+
+My mistake, data were updated by #60157; I needed to order the test’s zones and update the timezone <=> country mapping. Should be good now.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-08-19T13:46:50Z
+
+Given that we update the ICU data in the LTS version, fixes to the data generator should indeed be merged in 6.4, otherwise the next update will still use the old data generator (until the EOL of 6.4)

@@ -30,5 +30,9 @@ interface CollectionMapperInterface
      *
      * @throws WrappedMappingException      When mapping at least one of the source objects has failed.
      */
-    public function map(iterable $sourceCollection, string|null $target = null, CollectionMapperExceptionPolicy $policy): \Generator;
+    public function map(
+        iterable $sourceCollection,
+        string|null $target = null,
+        CollectionMapperThrowPolicy $policy = CollectionMapperThrowPolicy::FAIL_SAFE
+    ): \Generator;
 }

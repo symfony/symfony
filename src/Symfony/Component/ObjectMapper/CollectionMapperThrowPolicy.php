@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\ObjectMapper;
 
-enum CollectionMapperExceptionPolicy: string
+enum CollectionMapperThrowPolicy: string
 {
     case FAIL_EARLY = 'fail_early';
     case FAIL_SAFE = 'fail_safe';

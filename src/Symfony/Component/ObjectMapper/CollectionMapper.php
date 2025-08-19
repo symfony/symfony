@@ -26,19 +26,27 @@ final class CollectionMapper implements CollectionMapperInterface
     {
     }
 
-    public function map(iterable $sourceCollection, ?string $target = null, CollectionMapperExceptionPolicy $policy): \Generator
+    public function map(
+        iterable $sourceCollection,
+        ?string $target = null,
+        CollectionMapperThrowPolicy $policy = CollectionMapperThrowPolicy::FAIL_SAFE
+    ): \Generator
     {
         return match ($policy) {
-            CollectionMapperExceptionPolicy::FAIL_EARLY => yield from $this->mapFailEarly($sourceCollection, $target),
-            CollectionMapperExceptionPolicy::FAIL_SAFE => yield from $this->mapFailSafe($sourceCollection, $target),
-            CollectionMapperExceptionPolicy::IGNORE_ALL_ERRORS => yield from $this->mapIgnoreAllErrors($sourceCollection, $target)
+            CollectionMapperThrowPolicy::FAIL_EARLY => yield from $this->mapFailEarly($sourceCollection, $target),
+            CollectionMapperThrowPolicy::FAIL_SAFE => yield from $this->mapFailSafe($sourceCollection, $target),
+            CollectionMapperThrowPolicy::IGNORE_ALL_ERRORS => yield from $this->mapIgnoreAllErrors($sourceCollection, $target)
         };
     }
 
     private function mapFailEarly(iterable $sourceCollection, ?string $target = null): \Generator
     {
-        foreach ($sourceCollection as $sourceObject) {
-            yield $this->mapper->map($sourceObject, $target);
+        try {
+            foreach ($sourceCollection as $sourceObject) {
+                yield $this->mapper->map($sourceObject, $target);
+            }
+        } catch (\Throwable $ex) {
+            throw new WrappedMappingException('Mapping source collection has failed.', [$ex]);
         }
     }
 

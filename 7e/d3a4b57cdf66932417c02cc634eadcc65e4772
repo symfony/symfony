@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by KiloSierraCharlie at 2025-08-04T12:50:57Z
+
+Sorry about that @Chris53897. Mistake resolved with commit.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-08-05T14:04:04Z
+
+Thanks for working on this @KiloSierraCharlie. There's still some logic needed to change the endpoint host if an `inboxId` is provided?
+
+---------------------------------------------------------------------------
+
+by KiloSierraCharlie at 2025-08-05T16:35:09Z
+
+Apoligies @kbond & @nicolas-grekas - new commit e767fd6 with all changes submitted to branch.
+
+---------------------------------------------------------------------------
+
+by KiloSierraCharlie at 2025-08-05T18:57:40Z
+
+@kbond Thanks for the suggestion, I think you're right - adding a seperate DSN makes it clearer as to which Mailtrap environment is being used. I've created a new transport which extends the original.
+
+Unit tests for this new DSN added also.
+
+---------------------------------------------------------------------------
+
+by KiloSierraCharlie at 2025-08-05T19:39:33Z
+
+I'll get there eventually :cry:
+
+---------------------------------------------------------------------------
+
+by KiloSierraCharlie at 2025-08-06T17:33:05Z
+
+Accidentally merge-commit'd instead of rebasing hence the force-push...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-08-18T19:59:26Z
+
+why not a single DSN scheme + optional DSN inboxId parameter? https://github.com/railsware/mailtrap-php/tree/main/src/Bridge/Symfony#sandbox
+
+---------------------------------------------------------------------------
+
+by KiloSierraCharlie at 2025-08-18T20:12:00Z
+
+@ro0NL
+> why not a single DSN scheme + optional DSN inboxId parameter? https://github.com/railsware/mailtrap-php/tree/main/src/Bridge/Symfony#sandbox
+
+The initial PR was with a single DSN and optional inboxId param, however [it was suggested to implement a separate DSN](https://github.com/symfony/symfony/pull/61315#pullrequestreview-3088991997) to ensure that prod/sandbox enviornments are clearer to identify for users.

@@ -13,7 +13,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\D;
 
 final class CollectionMapperTest extends TestCase
 {
-    public function testMappingSucceeds()
+    public function testMapSucceeds()
     {
         $source = [
             new C(
@@ -46,7 +46,7 @@ final class CollectionMapperTest extends TestCase
         self::assertSame('bar2', $secondTarget->bat);
     }
 
-    public function testMappingFailSafe()
+    public function testMapFailSafe()
     {
         $sourceCollection = self::createSourceCollection();
 
@@ -81,7 +81,7 @@ final class CollectionMapperTest extends TestCase
         self::assertSame('value4', $secondTarget->bat);
     }
 
-    public function testMappingFailEarly()
+    public function testMapFailEarly()
     {
         $sourceCollection = self::createSourceCollection();
 
@@ -108,7 +108,7 @@ final class CollectionMapperTest extends TestCase
         self::assertSame('value2', $firstTarget->bat);
     }
 
-    public function testMappingIgnoreErrors()
+    public function testMapIgnoreErrors()
     {
         $sourceCollection = self::createSourceCollection();
 
@@ -131,6 +131,45 @@ final class CollectionMapperTest extends TestCase
         $secondTarget = $targetCollection[1];
         self::assertSame('value3', $secondTarget->baz);
         self::assertSame('value4', $secondTarget->bat);
+    }
+
+    public function testMapIntoExistingCollection()
+    {
+        $sourceCollection = [ 
+            new class('value1', 'value2') {
+                public function __construct(public string $baz, public string $bat) {}
+            },
+            new class('value3', 'value4') {
+                public function __construct(public string $baz, public string $bat) {}
+            }
+        ];
+
+        $targetCollection = [ 
+            new class('value5', 'value6') {
+                public function __construct(public string $baz, public string $bat) {}
+            },
+            new class('value7', 'value8') {
+                public function __construct(public string $baz, public string $bat) {}
+            }
+        ];
+
+        $mapper = new CollectionMapper(new ObjectMapper());
+
+        $result = iterator_to_array($mapper->map($sourceCollection, $targetCollection));
+
+        self::assertCount(2, $targetCollection);
+
+        $first = $targetCollection[0];
+        self::assertSame('value1', $first->baz);
+        self::assertSame('value2', $first->bat);
+
+        $second = $targetCollection[1];
+        self::assertSame('value3', $second->baz);
+        self::assertSame('value4', $second->bat);
+
+        self::assertCount(2, $result);
+        self::assertSame($first, $result[0]);
+        self::assertSame($second, $result[1]);
     }
 
     /**

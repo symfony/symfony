@@ -29,13 +29,39 @@ final class CollectionMapper implements CollectionMapperInterface
     ) {
     }
 
-    public function map(iterable $sourceCollection, ?string $target = null): \Generator
+    public function map(iterable $sourceCollection, array|string|null $target = null): \Generator
     {
-        return match ($this->throwPolicy) {
-            CollectionMapperThrowPolicy::FAIL_EARLY => yield from $this->mapFailEarly($sourceCollection, $target),
-            CollectionMapperThrowPolicy::FAIL_SAFE => yield from $this->mapFailSafe($sourceCollection, $target),
-            CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS => yield from $this->mapIgnoreMappingErrors($sourceCollection, $target)
-        };
+        if (!is_array($target)) {
+            return match ($this->throwPolicy) {
+                CollectionMapperThrowPolicy::FAIL_EARLY => yield from $this->mapFailEarly($sourceCollection, $target),
+                CollectionMapperThrowPolicy::FAIL_SAFE => yield from $this->mapFailSafe($sourceCollection, $target),
+                CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS => yield from $this->mapIgnoreMappingErrors($sourceCollection, $target)
+            };
+        }
+
+        $sourceCollection = is_array($sourceCollection)
+            ? $sourceCollection 
+            : iterator_to_array($sourceCollection);
+
+        $targetCollection = $this->mapArray($sourceCollection, $target);
+
+        foreach ($targetCollection as $targetObject) {
+            yield $targetObject;
+        }
+    }
+
+    private function mapArray(array $sourceCollection, array $targetCollection): array
+    {
+        assert(count($sourceCollection) === count($targetCollection));
+
+        for ($i = 0; $i < count($sourceCollection); $i++) {
+            $sourceObject = $sourceCollection[$i];
+            $targetObject = $targetCollection[$i];
+
+            $this->mapper->map($sourceObject, $targetObject);
+        }
+
+        return $targetCollection;
     }
 
     private function mapFailEarly(iterable $sourceCollection, ?string $target = null): \Generator

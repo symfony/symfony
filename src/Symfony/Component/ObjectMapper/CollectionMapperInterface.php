@@ -31,5 +31,5 @@ interface CollectionMapperInterface
      * @throws WrappedMappingException      When mapping at least one of the source objects has failed.
      * @throws MappingException          When the mapping configuration is wrong
      */
-    public function map(iterable $sourceCollection, ?string $target = null): \Generator;
+    public function map(iterable $sourceCollection, array|string|null $target = null): \Generator;
 }

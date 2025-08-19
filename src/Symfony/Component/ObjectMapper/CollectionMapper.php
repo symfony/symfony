@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ObjectMapper;
 
+use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\WrappedMappingException;
 
 /**
@@ -22,31 +23,25 @@ use Symfony\Component\ObjectMapper\Exception\WrappedMappingException;
  */
 final class CollectionMapper implements CollectionMapperInterface
 {
-    public function __construct(private ObjectMapperInterface $mapper)
-    {
+    public function __construct(
+        private ObjectMapperInterface $mapper,
+        private string $throwPolicy = CollectionMapperThrowPolicy::FAIL_SAFE
+    ) {
     }
 
-    public function map(
-        iterable $sourceCollection,
-        ?string $target = null,
-        CollectionMapperThrowPolicy $policy = CollectionMapperThrowPolicy::FAIL_SAFE
-    ): \Generator
+    public function map(iterable $sourceCollection, ?string $target = null): \Generator
     {
-        return match ($policy) {
+        return match ($this->throwPolicy) {
             CollectionMapperThrowPolicy::FAIL_EARLY => yield from $this->mapFailEarly($sourceCollection, $target),
             CollectionMapperThrowPolicy::FAIL_SAFE => yield from $this->mapFailSafe($sourceCollection, $target),
-            CollectionMapperThrowPolicy::IGNORE_ALL_ERRORS => yield from $this->mapIgnoreAllErrors($sourceCollection, $target)
+            CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS => yield from $this->mapIgnoreMappingErrors($sourceCollection, $target)
         };
     }
 
     private function mapFailEarly(iterable $sourceCollection, ?string $target = null): \Generator
     {
-        try {
-            foreach ($sourceCollection as $sourceObject) {
-                yield $this->mapper->map($sourceObject, $target);
-            }
-        } catch (\Throwable $ex) {
-            throw new WrappedMappingException('Mapping source collection has failed.', [$ex]);
+        foreach ($sourceCollection as $sourceObject) {
+            yield $this->mapper->map($sourceObject, $target);
         }
     }
 
@@ -57,22 +52,22 @@ final class CollectionMapper implements CollectionMapperInterface
         foreach ($sourceCollection as $sourceObject) {
             try {
                 yield $this->mapper->map($sourceObject, $target);
-            } catch (\Throwable $ex) {
+            } catch (MappingException $ex) {
                 $exceptions[] = $ex;
             }
         }
 
         if ($exceptions) {
-            throw new WrappedMappingException('Mapping source collection has failed.', $exceptions);
+            throw new WrappedMappingException($exceptions);
         }
     }
 
-    private function mapIgnoreAllErrors(iterable $sourceCollection, ?string $target = null): \Generator
+    private function mapIgnoreMappingErrors(iterable $sourceCollection, ?string $target = null): \Generator
     {
         foreach ($sourceCollection as $sourceObject) {
             try {
                 yield $this->mapper->map($sourceObject, $target);
-            } catch (\Throwable) {
+            } catch (MappingException) {
                 /* Ignore */
             }
         }

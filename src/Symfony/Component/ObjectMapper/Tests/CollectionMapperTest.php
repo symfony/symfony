@@ -5,6 +5,7 @@ namespace Symfony\Component\ObjectMapper\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ObjectMapper\CollectionMapper;
 use Symfony\Component\ObjectMapper\CollectionMapperThrowPolicy;
+use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\WrappedMappingException;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
@@ -49,18 +50,18 @@ final class CollectionMapperTest extends TestCase
     {
         $sourceCollection = self::createSourceCollection();
 
-        $mapper = new CollectionMapper(new ObjectMapper());
+        $mapper = new CollectionMapper(new ObjectMapper(), CollectionMapperThrowPolicy::FAIL_SAFE);
 
         $targetCollection = [];
 
         try {
-            foreach ($mapper->map($sourceCollection, D::class, CollectionMapperThrowPolicy::FAIL_SAFE) as $targetObject) {
+            foreach ($mapper->map($sourceCollection, D::class) as $targetObject) {
                 $targetCollection[] = $targetObject;
             }
 
             self::fail('Mapping second object should have thrown!');
         } catch (WrappedMappingException $ex) {
-            self::assertSame('Mapping source collection has failed.', $ex->getMessage());
+            self::assertSame('Mapping source collection has failed. See property "exceptions" for details.', $ex->getMessage());
             self::assertCount(1, $ex->exceptions);
             self::assertSame('The property "baz" does not exist on "class@anonymous".', $ex->exceptions[0]->getMessage());
         }
@@ -84,20 +85,18 @@ final class CollectionMapperTest extends TestCase
     {
         $sourceCollection = self::createSourceCollection();
 
-        $mapper = new CollectionMapper(new ObjectMapper());
+        $mapper = new CollectionMapper(new ObjectMapper(), CollectionMapperThrowPolicy::FAIL_EARLY);
 
         $targetCollection = [];
 
         try {
-            foreach ($mapper->map($sourceCollection, D::class, CollectionMapperThrowPolicy::FAIL_EARLY) as $targetObject) {
+            foreach ($mapper->map($sourceCollection, D::class) as $targetObject) {
                 $targetCollection[] = $targetObject;
             }
 
             self::fail('Mapping should have thrown!');
-        } catch (WrappedMappingException $ex) {
-            self::assertSame('Mapping source collection has failed.', $ex->getMessage());
-            self::assertCount(1, $ex->exceptions);
-            self::assertSame('The property "baz" does not exist on "class@anonymous".', $ex->exceptions[0]->getMessage());
+        } catch (MappingException $ex) {
+            self::assertSame('The property "baz" does not exist on "class@anonymous".', $ex->getMessage());
         }
 
         self::assertCount(1, $targetCollection, 'Only the first mapping should have been successful!');
@@ -113,10 +112,10 @@ final class CollectionMapperTest extends TestCase
     {
         $sourceCollection = self::createSourceCollection();
 
-        $mapper = new CollectionMapper(new ObjectMapper());
+        $mapper = new CollectionMapper(new ObjectMapper(), CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS);
 
         $targetCollection = iterator_to_array(
-            $mapper->map($sourceCollection, D::class, CollectionMapperThrowPolicy::IGNORE_ALL_ERRORS)
+            $mapper->map($sourceCollection, D::class)
         );
 
         self::assertCount(2, $targetCollection, '2 mappings should have been successful!');

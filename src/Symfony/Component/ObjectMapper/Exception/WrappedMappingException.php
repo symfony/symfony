@@ -16,13 +16,13 @@ namespace Symfony\Component\ObjectMapper\Exception;
  *
  * @author Martin Komischke <martin.komischke@gmail.com>
  */
-final class WrappedMappingException extends RuntimeException
+final class WrappedMappingException extends MappingException
 {
     /**
-     * @param array<\Throwable> $exceptions The collection of exceptions reveals which discrete mapping has failed.
+     * @param array<MappingException> $exceptions The collection of exceptions reveals which discrete mapping has failed.
      */
-    public function __construct(string $message, public readonly array $exceptions)
+    public function __construct(public readonly array $exceptions)
     {
-        parent::__construct($message);
+        parent::__construct('Mapping source collection has failed. See property "exceptions" for details.');
     }
 }

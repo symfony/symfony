@@ -11,18 +11,14 @@
 
 namespace Symfony\Component\ObjectMapper;
 
-enum CollectionMapperThrowPolicy: string
+final readonly class CollectionMapperThrowPolicy
 {
-    case FAIL_EARLY = 'fail_early';
-    case FAIL_SAFE = 'fail_safe';
-    case IGNORE_ALL_ERRORS = 'ignore_all_errors';
+    /** Stop at first error. */
+    const FAIL_EARLY = 'fail_early';
 
-    public static function getDescription(self $self): string
-    {
-        return match ($self) {
-            self::FAIL_EARLY => 'Stop at first error.',
-            self::FAIL_SAFE => 'Collect all errors, then throw.',
-            self::IGNORE_ALL_ERRORS => 'Continue processing, ignore all errors.'
-        };
-    }
+    /** Collect mapping errors, then throw. */
+    const FAIL_SAFE = 'fail_safe';
+
+    /** Continue processing, ignore mapping errors. */
+    const IGNORE_MAPPING_ERRORS = 'ignore_mapping_errors';
 }

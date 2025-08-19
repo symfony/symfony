@@ -29,10 +29,7 @@ interface CollectionMapperInterface
      * @return \Generator<int, object, mixed, void> yields a target object for each source object
      *
      * @throws WrappedMappingException      When mapping at least one of the source objects has failed.
+     * @throws MappingException          When the mapping configuration is wrong
      */
-    public function map(
-        iterable $sourceCollection,
-        string|null $target = null,
-        CollectionMapperThrowPolicy $policy = CollectionMapperThrowPolicy::FAIL_SAFE
-    ): \Generator;
+    public function map(iterable $sourceCollection, ?string $target = null): \Generator;
 }

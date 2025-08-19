@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2025-08-19T07:04:00Z
+
+Indeed. Previously it returned an empty array or `null` (if the argument was nullable). Now it always returns `null` and may cause errors for non-nullable array arguments. An argument like `#[MapUploadedFile] array $files` should return `[]` and not `null`.

@@ -42,7 +42,7 @@ class ArgvInputTest extends TestCase
     /**
      * @dataProvider provideOptions
      */
-    public function testParseOptions($input, $options, $expectedOptions, $message)
+    public function testParseOptions(array $input, array $options, array $expectedOptions, string $message)
     {
         $input = new ArgvInput($input);
         $input->bind(new InputDefinition($options));
@@ -53,14 +53,14 @@ class ArgvInputTest extends TestCase
     /**
      * @dataProvider provideNegatableOptions
      */
-    public function testParseOptionsNegatable($input, $options, $expectedOptions, $message)
+    public function testParseOptionsNegatable(array $input, array $options, array $expectedOptions, string $message)
     {
         $input = new ArgvInput($input);
         $input->bind(new InputDefinition($options));
         $this->assertEquals($expectedOptions, $input->getOptions(), $message);
     }
 
-    public static function provideOptions()
+    public static function provideOptions(): array
     {
         return [
             [
@@ -186,7 +186,7 @@ class ArgvInputTest extends TestCase
         ];
     }
 
-    public static function provideNegatableOptions()
+    public static function provideNegatableOptions(): array
     {
         return [
             [
@@ -237,7 +237,7 @@ class ArgvInputTest extends TestCase
     /**
      * @dataProvider provideInvalidInput
      */
-    public function testInvalidInput($argv, $definition, $expectedExceptionMessage)
+    public function testInvalidInput(array $argv, InputDefinition $definition, string $expectedExceptionMessage)
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -248,7 +248,7 @@ class ArgvInputTest extends TestCase
     /**
      * @dataProvider provideInvalidNegatableInput
      */
-    public function testInvalidInputNegatable($argv, $definition, $expectedExceptionMessage)
+    public function testInvalidInputNegatable(array $argv, InputDefinition $definition, string $expectedExceptionMessage)
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -507,13 +507,13 @@ class ArgvInputTest extends TestCase
     /**
      * @dataProvider provideGetParameterOptionValues
      */
-    public function testGetParameterOptionEqualSign($argv, $key, $default, $onlyParams, $expected)
+    public function testGetParameterOptionEqualSign(array $argv, string|array $key, string $default, bool $onlyParams, string $expected)
     {
         $input = new ArgvInput($argv);
         $this->assertEquals($expected, $input->getParameterOption($key, $default, $onlyParams), '->getParameterOption() returns the expected value');
     }
 
-    public static function provideGetParameterOptionValues()
+    public static function provideGetParameterOptionValues(): array
     {
         return [
             [['app/console', 'foo:bar'], '-e', 'default', false, 'default'],

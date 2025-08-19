@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -136,7 +137,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
         return new CommandCompletionTester($application->find('translation:extract'));
     }
 
-    private function getBundle($path)
+    private function getBundle(string $path): BundleInterface&MockObject
     {
         $bundle = $this->createMock(BundleInterface::class);
         $bundle

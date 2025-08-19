@@ -351,7 +351,7 @@ abstract class AbstractCrawlerTestCase extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->text('my value'));
     }
 
-    public static function provideInnerTextExamples()
+    public static function provideInnerTextExamples(): array
     {
         return [
             [

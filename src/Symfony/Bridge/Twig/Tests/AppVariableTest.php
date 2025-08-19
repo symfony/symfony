@@ -299,7 +299,7 @@ class AppVariableTest extends TestCase
         $this->appVariable->setRequestStack($requestStackMock);
     }
 
-    protected function setTokenStorage($user)
+    protected function setTokenStorage($user): void
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->appVariable->setTokenStorage($tokenStorage);
@@ -310,7 +310,7 @@ class AppVariableTest extends TestCase
         $token->method('getUser')->willReturn($user);
     }
 
-    private function setFlashMessages($sessionHasStarted = true)
+    private function setFlashMessages($sessionHasStarted = true): array
     {
         $flashMessages = [
             'notice' => ['Notice #1 message'],

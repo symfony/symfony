@@ -34,7 +34,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
         static::deleteTmpDir();
     }
 
-    protected static function deleteTmpDir()
+    protected static function deleteTmpDir(): void
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.static::getVarDir())) {
             return;
@@ -68,7 +68,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
         );
     }
 
-    protected static function getVarDir()
+    protected static function getVarDir(): string
     {
         return 'FB'.substr(strrchr(static::class, '\\'), 1);
     }

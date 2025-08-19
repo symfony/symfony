@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Helper\HelperInterface;
@@ -87,7 +88,7 @@ class HelperSetTest extends TestCase
         }
     }
 
-    private function getGenericMockHelper($name, ?HelperSet $helperset = null)
+    private function getGenericMockHelper($name, ?HelperSet $helperset = null): HelperInterface&MockObject
     {
         $mock_helper = $this->createMock(HelperInterface::class);
         $mock_helper->expects($this->any())

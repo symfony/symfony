@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+
 class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 {
     /**
@@ -138,13 +140,13 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
     }
 
-    private function assertAllowed($client, $path)
+    private function assertAllowed(KernelBrowser $client, string $path): void
     {
         $client->request('GET', $path);
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
-    private function assertRestricted($client, $path)
+    private function assertRestricted(KernelBrowser $client, string $path): void
     {
         $client->request('GET', $path);
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
@@ -156,7 +158,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
     }
 
-    public static function provideLegacyClientOptions()
+    public static function provideLegacyClientOptions(): iterable
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml', 'enable_authenticator_manager' => true]];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];

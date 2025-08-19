@@ -362,12 +362,12 @@ class InputDefinitionTest extends TestCase
     /**
      * @dataProvider getGetSynopsisData
      */
-    public function testGetSynopsis(InputDefinition $definition, $expectedSynopsis, $message = null)
+    public function testGetSynopsis(InputDefinition $definition, string $expectedSynopsis, ?string $message = null)
     {
         $this->assertEquals($expectedSynopsis, $definition->getSynopsis(), $message ? '->getSynopsis() '.$message : '');
     }
 
-    public static function getGetSynopsisData()
+    public static function getGetSynopsisData(): array
     {
         return [
             [new InputDefinition([new InputOption('foo')]), '[--foo]', 'puts optional options in square brackets'],

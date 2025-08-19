@@ -354,7 +354,7 @@ class RequestTest extends TestCase
         $this->assertSame($expected, $request->server->get('REQUEST_URI'), 'Normalize the request URI.');
     }
 
-    public static function getRequestUriData()
+    public static function getRequestUriData(): iterable
     {
         $message = 'Do not modify the path.';
         yield ['/foo', '/foo', $message];
@@ -535,7 +535,7 @@ class RequestTest extends TestCase
         $this->assertEquals('custom', $request->getFormat('application/vnd.foo.api;myversion=2.3'));
     }
 
-    public static function getFormatToMimeTypeMapProvider()
+    public static function getFormatToMimeTypeMapProvider(): array
     {
         return [
             ['txt', ['text/plain']],
@@ -778,7 +778,7 @@ class RequestTest extends TestCase
         $this->assertEquals($expected, Request::create($pathinfo)->getRelativeUriForPath($path));
     }
 
-    public static function getRelativeUriForPathData()
+    public static function getRelativeUriForPathData(): array
     {
         return [
             ['me.png', '/foo', '/me.png'],
@@ -841,7 +841,7 @@ class RequestTest extends TestCase
         $this->assertSame($expectedQuery, $request->getQueryString(), $msg);
     }
 
-    public static function getQueryStringNormalizationData()
+    public static function getQueryStringNormalizationData(): array
     {
         return [
             ['foo', 'foo=', 'works with valueless parameters'],
@@ -1058,7 +1058,7 @@ class RequestTest extends TestCase
         $this->assertEquals($expected, $request->getClientIps());
     }
 
-    public static function getClientIpsForwardedProvider()
+    public static function getClientIpsForwardedProvider(): array
     {
         //              $expected                                  $remoteAddr  $httpForwarded                                       $trustedProxies
         return [
@@ -1071,7 +1071,7 @@ class RequestTest extends TestCase
         ];
     }
 
-    public static function getClientIpsProvider()
+    public static function getClientIpsProvider(): array
     {
         //        $expected                          $remoteAddr                 $httpForwardedFor            $trustedProxies
         return [
@@ -1167,7 +1167,7 @@ class RequestTest extends TestCase
         $this->assertSame(array_reverse(explode(',', $httpXForwardedFor)), $request->getClientIps());
     }
 
-    public static function getClientIpsWithConflictingHeadersProvider()
+    public static function getClientIpsWithConflictingHeadersProvider(): array
     {
         //        $httpForwarded                   $httpXForwardedFor
         return [
@@ -1201,7 +1201,7 @@ class RequestTest extends TestCase
         $this->assertSame($expectedIps, $clientIps);
     }
 
-    public static function getClientIpsWithAgreeingHeadersProvider()
+    public static function getClientIpsWithAgreeingHeadersProvider(): array
     {
         //        $httpForwarded                               $httpXForwardedFor
         return [
@@ -1278,7 +1278,7 @@ class RequestTest extends TestCase
         $this->assertSame($a, $b);
     }
 
-    public static function getContentCanBeCalledTwiceWithResourcesProvider()
+    public static function getContentCanBeCalledTwiceWithResourcesProvider(): array
     {
         return [
             'Fetch then fetch' => [false, false],
@@ -1288,7 +1288,7 @@ class RequestTest extends TestCase
         ];
     }
 
-    public static function provideOverloadedMethods()
+    public static function provideOverloadedMethods(): array
     {
         return [
             ['PUT'],
@@ -1791,7 +1791,7 @@ class RequestTest extends TestCase
         $this->assertSame($expectedPathInfo, $request->getPathInfo(), 'pathInfo');
     }
 
-    public static function getBaseUrlData()
+    public static function getBaseUrlData(): array
     {
         return [
             [
@@ -1975,7 +1975,7 @@ class RequestTest extends TestCase
         $this->assertSame($expect, $me->invoke($request, $string, $prefix));
     }
 
-    public static function urlencodedStringPrefixData()
+    public static function urlencodedStringPrefixData(): array
     {
         return [
             ['foo', 'foo', 'foo'],
@@ -2150,7 +2150,7 @@ class RequestTest extends TestCase
         $this->assertEquals($subRequestUri, $subRequest->getRequestUri(), '->getRequestUri() is correct in sub request');
     }
 
-    public static function iisRequestUriProvider()
+    public static function iisRequestUriProvider(): array
     {
         return [
             [
@@ -2271,7 +2271,7 @@ class RequestTest extends TestCase
         }
     }
 
-    public static function getHostValidities()
+    public static function getHostValidities(): array
     {
         return [
             ['.a', false],
@@ -2284,7 +2284,7 @@ class RequestTest extends TestCase
         ];
     }
 
-    public static function getLongHostNames()
+    public static function getLongHostNames(): array
     {
         return [
             ['a'.str_repeat('.a', 40000)],
@@ -2302,7 +2302,7 @@ class RequestTest extends TestCase
         $this->assertEquals($idempotent, $request->isMethodIdempotent());
     }
 
-    public static function methodIdempotentProvider()
+    public static function methodIdempotentProvider(): array
     {
         return [
             ['HEAD', true],
@@ -2321,14 +2321,14 @@ class RequestTest extends TestCase
     /**
      * @dataProvider methodSafeProvider
      */
-    public function testMethodSafe($method, $safe)
+    public function testMethodSafe(string $method, bool $safe)
     {
         $request = new Request();
         $request->setMethod($method);
         $this->assertEquals($safe, $request->isMethodSafe());
     }
 
-    public static function methodSafeProvider()
+    public static function methodSafeProvider(): array
     {
         return [
             ['HEAD', true],
@@ -2347,14 +2347,14 @@ class RequestTest extends TestCase
     /**
      * @dataProvider methodCacheableProvider
      */
-    public function testMethodCacheable($method, $cacheable)
+    public function testMethodCacheable(string $method, bool $cacheable)
     {
         $request = new Request();
         $request->setMethod($method);
         $this->assertEquals($cacheable, $request->isMethodCacheable());
     }
 
-    public static function methodCacheableProvider()
+    public static function methodCacheableProvider(): array
     {
         return [
             ['HEAD', true],
@@ -2390,7 +2390,7 @@ class RequestTest extends TestCase
         $this->assertSame($expected, $request->getProtocolVersion());
     }
 
-    public static function protocolVersionProvider()
+    public static function protocolVersionProvider(): array
     {
         return [
             'untrusted with empty via' => ['HTTP/2.0', false, '', 'HTTP/2.0'],
@@ -2407,7 +2407,7 @@ class RequestTest extends TestCase
         ];
     }
 
-    public static function nonstandardRequestsData()
+    public static function nonstandardRequestsData(): array
     {
         return [
             ['',  '', '/', 'http://host:8080/', ''],
@@ -2593,7 +2593,7 @@ class RequestTest extends TestCase
         $this->assertFalse($request->isSecure());
     }
 
-    public static function trustedProxiesRemoteAddr()
+    public static function trustedProxiesRemoteAddr(): array
     {
         return [
             ['1.1.1.1', ['REMOTE_ADDR'], ['1.1.1.1']],
@@ -2613,7 +2613,7 @@ class RequestTest extends TestCase
         $this->assertEquals($safePreferenceExpected, $request->preferSafeContent());
     }
 
-    public static function preferSafeContentData()
+    public static function preferSafeContentData(): array
     {
         return [
             [[], false],

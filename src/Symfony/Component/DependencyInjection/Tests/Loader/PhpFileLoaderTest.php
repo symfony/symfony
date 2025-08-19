@@ -76,7 +76,7 @@ class PhpFileLoaderTest extends TestCase
     /**
      * @dataProvider provideConfig
      */
-    public function testConfig($file)
+    public function testConfig(string $file)
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
@@ -90,7 +90,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertStringMatchesFormatFile($fixtures.'/config/'.$file.'.expected.yml', $dumper->dump());
     }
 
-    public static function provideConfig()
+    public static function provideConfig(): iterable
     {
         yield ['basic'];
         yield ['object'];

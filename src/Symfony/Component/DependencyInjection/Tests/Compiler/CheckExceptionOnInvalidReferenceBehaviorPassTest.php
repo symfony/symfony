@@ -156,7 +156,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    private function process(ContainerBuilder $container)
+    private function process(ContainerBuilder $container): void
     {
         $pass = new CheckExceptionOnInvalidReferenceBehaviorPass();
         $pass->process($container);

@@ -22,7 +22,7 @@ class ScalarNodeTest extends TestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testNormalize($value)
+    public function testNormalize(mixed $value)
     {
         $node = new ScalarNode('test');
         $this->assertSame($value, $node->normalize($value));
@@ -86,7 +86,7 @@ class ScalarNodeTest extends TestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues(mixed $value)
     {
         $node = new ScalarNode('test');
 
@@ -130,7 +130,7 @@ class ScalarNodeTest extends TestCase
      *
      * @param mixed $value
      */
-    public function testValidNonEmptyValues($value)
+    public function testValidNonEmptyValues(mixed $value)
     {
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);
@@ -156,7 +156,7 @@ class ScalarNodeTest extends TestCase
      *
      * @param mixed $value
      */
-    public function testNotAllowedEmptyValuesThrowException($value)
+    public function testNotAllowedEmptyValuesThrowException(mixed $value)
     {
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);

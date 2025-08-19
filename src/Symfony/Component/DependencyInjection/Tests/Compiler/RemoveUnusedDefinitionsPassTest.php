@@ -155,7 +155,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('foo'));
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         (new RemoveUnusedDefinitionsPass())->process($container);
     }

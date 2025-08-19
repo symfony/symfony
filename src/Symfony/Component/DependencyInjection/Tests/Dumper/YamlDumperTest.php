@@ -173,7 +173,7 @@ class YamlDumperTest extends TestCase
     /**
      * @dataProvider provideDefaultClasses
      */
-    public function testDumpHandlesDefaultAttribute($class, $expectedFile)
+    public function testDumpHandlesDefaultAttribute(string $class, string $expectedFile)
     {
         $container = new ContainerBuilder();
         $container
@@ -189,7 +189,7 @@ class YamlDumperTest extends TestCase
         $this->assertSame(file_get_contents(self::$fixturesPath.'/yaml/'.$expectedFile), $dumper->dump());
     }
 
-    public static function provideDefaultClasses()
+    public static function provideDefaultClasses(): iterable
     {
         yield [FooClassWithDefaultArrayAttribute::class, 'services_with_default_array.yml'];
         yield [FooClassWithDefaultObjectAttribute::class, 'services_with_default_object.yml'];
@@ -235,7 +235,7 @@ class YamlDumperTest extends TestCase
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/yaml/container_with_env_placeholders.yml'), $dumper->dump());
     }
 
-    private function assertEqualYamlStructure(string $expected, string $yaml, string $message = '')
+    private function assertEqualYamlStructure(string $expected, string $yaml, string $message = ''): void
     {
         $parser = new Parser();
 

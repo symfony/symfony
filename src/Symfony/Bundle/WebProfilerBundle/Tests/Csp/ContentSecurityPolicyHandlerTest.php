@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Csp;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator;
@@ -22,7 +23,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
     /**
      * @dataProvider provideRequestAndResponses
      */
-    public function testGetNonces($nonce, $expectedNonce, Request $request, Response $response)
+    public function testGetNonces(string $nonce, array $expectedNonce, Request $request, Response $response)
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
 
@@ -32,7 +33,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
     /**
      * @dataProvider provideRequestAndResponsesForOnKernelResponse
      */
-    public function testOnKernelResponse($nonce, $expectedNonce, Request $request, Response $response, array $expectedCsp)
+    public function testOnKernelResponse(string $nonce, array $expectedNonce, Request $request, Response $response, array $expectedCsp)
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
 
@@ -193,7 +194,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
         ];
     }
 
-    private static function createRequest(array $headers = [])
+    private static function createRequest(array $headers = []): Request
     {
         $request = new Request();
         $request->headers->add($headers);
@@ -201,7 +202,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
         return $request;
     }
 
-    private static function createResponse(array $headers = [])
+    private static function createResponse(array $headers = []): Response
     {
         $response = new Response();
         $response->headers->add($headers);
@@ -209,7 +210,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
         return $response;
     }
 
-    private function mockNonceGenerator($value)
+    private function mockNonceGenerator(string $value): NonceGenerator&MockObject
     {
         $generator = $this->createMock(NonceGenerator::class);
 

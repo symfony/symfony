@@ -25,7 +25,7 @@ class RedisProxiesTest extends TestCase
      * @testWith ["Redis"]
      *           ["RedisCluster"]
      */
-    public function testRedisProxy($class)
+    public function testRedisProxy(string $class)
     {
         $version = version_compare(phpversion('redis'), '6', '>') ? '6' : '5';
         $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}{$version}Proxy.php");

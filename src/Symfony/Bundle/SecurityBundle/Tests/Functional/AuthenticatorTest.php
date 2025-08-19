@@ -18,7 +18,7 @@ class AuthenticatorTest extends AbstractWebTestCase
      *
      * @dataProvider provideEmails
      */
-    public function testLegacyGlobalUserProvider($email)
+    public function testLegacyGlobalUserProvider(string $email)
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'implicit_user_provider.yml']);
 
@@ -31,7 +31,7 @@ class AuthenticatorTest extends AbstractWebTestCase
     /**
      * @dataProvider provideEmails
      */
-    public function testFirewallUserProvider($email, $withinFirewall)
+    public function testFirewallUserProvider(string $email, bool $withinFirewall)
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'firewall_user_provider.yml']);
 
@@ -49,7 +49,7 @@ class AuthenticatorTest extends AbstractWebTestCase
     /**
      * @dataProvider provideEmails
      */
-    public function testWithoutUserProvider($email)
+    public function testWithoutUserProvider(string $email)
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'no_user_provider.yml']);
 

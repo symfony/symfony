@@ -176,7 +176,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertSame([null], $container->getDefinition('bar')->getArguments());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new ResolveInvalidReferencesPass();
         $pass->process($container);

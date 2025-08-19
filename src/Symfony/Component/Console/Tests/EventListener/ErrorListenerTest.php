@@ -120,7 +120,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleTerminate($this->getConsoleTerminateEvent($this->createMock(InputInterface::class), 255));
     }
 
-    private function getConsoleTerminateEvent(InputInterface $input, $exitCode)
+    private function getConsoleTerminateEvent(InputInterface $input, int $exitCode): ConsoleTerminateEvent
     {
         return new ConsoleTerminateEvent(new Command('test:run'), $input, $this->createMock(OutputInterface::class), $exitCode);
     }

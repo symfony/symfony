@@ -113,7 +113,7 @@ class ParameterBagTest extends TestCase
     /**
      * @dataProvider provideGetThrowParameterNotFoundExceptionData
      */
-    public function testGetThrowParameterNotFoundException($parameterKey, $exceptionMessage)
+    public function testGetThrowParameterNotFoundException(string $parameterKey, string $exceptionMessage)
     {
         $bag = new ParameterBag([
             'foo' => 'foo',
@@ -128,7 +128,7 @@ class ParameterBagTest extends TestCase
         $bag->get($parameterKey);
     }
 
-    public static function provideGetThrowParameterNotFoundExceptionData()
+    public static function provideGetThrowParameterNotFoundExceptionData(): array
     {
         return [
             ['foo1', 'You have requested a non-existent parameter "foo1". Did you mean this: "foo"?'],
@@ -336,7 +336,7 @@ class ParameterBagTest extends TestCase
     /**
      * @dataProvider stringsWithSpacesProvider
      */
-    public function testResolveStringWithSpacesReturnsString($expected, $test, $description)
+    public function testResolveStringWithSpacesReturnsString(string $expected, string $test, string $description)
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 
@@ -347,7 +347,7 @@ class ParameterBagTest extends TestCase
         }
     }
 
-    public static function stringsWithSpacesProvider()
+    public static function stringsWithSpacesProvider(): array
     {
         return [
             ['bar', '%foo%', 'Parameters must be wrapped by %.'],

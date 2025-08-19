@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\MissingInputException;
@@ -338,7 +339,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertSame('b', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public static function getInputs()
+    public static function getInputs(): array
     {
         return [
             ['$'], // 1 byte character
@@ -351,7 +352,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
     /**
      * @dataProvider getInputs
      */
-    public function testAskWithAutocompleteWithMultiByteCharacter($character)
+    public function testAskWithAutocompleteWithMultiByteCharacter(string $character)
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -525,7 +526,7 @@ EOD;
     /**
      * @dataProvider getAskConfirmationData
      */
-    public function testAskConfirmation($question, $expected, $default = true)
+    public function testAskConfirmation(string $question, bool $expected, bool $default = true)
     {
         $dialog = new QuestionHelper();
 
@@ -534,7 +535,7 @@ EOD;
         $this->assertEquals($expected, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question), 'confirmation question should '.($expected ? 'pass' : 'cancel'));
     }
 
-    public static function getAskConfirmationData()
+    public static function getAskConfirmationData(): array
     {
         return [
             ['', true],
@@ -591,7 +592,7 @@ EOD;
     /**
      * @dataProvider simpleAnswerProvider
      */
-    public function testSelectChoiceFromSimpleChoices($providedAnswer, $expectedValue)
+    public function testSelectChoiceFromSimpleChoices(int|string $providedAnswer, string $expectedValue)
     {
         $possibleChoices = [
             'My environment 1',
@@ -610,7 +611,7 @@ EOD;
         $this->assertSame($expectedValue, $answer);
     }
 
-    public static function simpleAnswerProvider()
+    public static function simpleAnswerProvider(): array
     {
         return [
             [0, 'My environment 1'],
@@ -625,7 +626,7 @@ EOD;
     /**
      * @dataProvider specialCharacterInMultipleChoice
      */
-    public function testSpecialCharacterChoiceFromMultipleChoiceList($providedAnswer, $expectedValue)
+    public function testSpecialCharacterChoiceFromMultipleChoiceList(string $providedAnswer, array $expectedValue)
     {
         $possibleChoices = [
             '.',
@@ -645,7 +646,7 @@ EOD;
         $this->assertSame($expectedValue, $answer);
     }
 
-    public static function specialCharacterInMultipleChoice()
+    public static function specialCharacterInMultipleChoice(): array
     {
         return [
             ['.', ['.']],
@@ -656,7 +657,7 @@ EOD;
     /**
      * @dataProvider answerProvider
      */
-    public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue)
+    public function testSelectChoiceFromChoiceList(string $providedAnswer, string $expectedValue)
     {
         $possibleChoices = [
             'env_1' => 'My environment 1',
@@ -929,7 +930,7 @@ EOD;
         $this->assertStringEndsWith("\033[1D\033[K\033[2D\033[K\033[1D\033[K", stream_get_contents($stream));
     }
 
-    protected function getInputStream($input)
+    protected function getInputStream(string $input)
     {
         $stream = fopen('php://memory', 'r+', false);
         fwrite($stream, $input);
@@ -938,12 +939,12 @@ EOD;
         return $stream;
     }
 
-    protected function createOutputInterface()
+    protected function createOutputInterface(): StreamOutput
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));
     }
 
-    protected function createInputInterfaceMock($interactive = true)
+    protected function createInputInterfaceMock($interactive = true): InputInterface&MockObject
     {
         $mock = $this->createMock(InputInterface::class);
         $mock->expects($this->any())

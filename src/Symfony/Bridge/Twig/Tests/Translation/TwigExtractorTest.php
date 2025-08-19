@@ -55,7 +55,7 @@ class TwigExtractorTest extends TestCase
         }
     }
 
-    public static function getExtractData()
+    public static function getExtractData(): array
     {
         return [
             ['{{ "new key" | trans() }}', ['new key' => 'messages']],

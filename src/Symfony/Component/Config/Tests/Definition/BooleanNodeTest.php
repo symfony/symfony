@@ -48,7 +48,7 @@ class BooleanNodeTest extends TestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues(mixed $value)
     {
         $node = new BooleanNode('test');
 

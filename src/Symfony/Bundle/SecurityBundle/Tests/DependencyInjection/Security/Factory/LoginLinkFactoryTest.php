@@ -38,7 +38,7 @@ class LoginLinkFactoryTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.authenticator.login_link_handler.firewall1'));
     }
 
-    private function processConfig(array $config, LoginLinkFactory $factory)
+    private function processConfig(array $config, LoginLinkFactory $factory): mixed
     {
         $nodeDefinition = new ArrayNodeDefinition('login-link');
         $factory->addConfiguration($nodeDefinition);

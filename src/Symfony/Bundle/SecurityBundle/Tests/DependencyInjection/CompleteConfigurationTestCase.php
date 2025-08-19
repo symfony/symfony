@@ -726,7 +726,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertSame('(?:^/register$|^/documentation$)', $container->getDefinition($requestMatcherId)->getArgument(0));
     }
 
-    protected function getContainer($file)
+    protected function getContainer(string $file): ContainerBuilder
     {
         $file .= '.'.$this->getFileExtension();
 

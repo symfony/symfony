@@ -88,7 +88,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public static function renderProvider()
+    public static function renderProvider(): array
     {
         $books = [
             ['99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'],
@@ -1538,12 +1538,12 @@ EOTXT;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    protected function getOutputStream($decorated = false)
+    protected function getOutputStream(bool $decorated = false): StreamOutput
     {
         return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, $decorated);
     }
 
-    protected function getOutputContent(StreamOutput $output)
+    protected function getOutputContent(StreamOutput $output): string
     {
         rewind($output->getStream());
 

@@ -29,7 +29,7 @@ class TemplateAttributeListenerTest extends TestCase
         $twig = $this->createMock(Environment::class);
         $twig->expects($this->exactly(3))
             ->method('render')
-            ->willReturnCallback(function (...$args) {
+            ->willReturnCallback(function (...$args): string {
                 static $series = [
                     ['templates/foo.html.twig', ['foo' => 'bar']],
                     ['templates/foo.html.twig', ['bar' => 'Bar', 'buz' => 'def']],

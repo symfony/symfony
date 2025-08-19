@@ -34,7 +34,7 @@ class TranslatorCacheTest extends TestCase
         $this->deleteTmpDir();
     }
 
-    protected function deleteTmpDir()
+    protected function deleteTmpDir(): void
     {
         if (!file_exists($dir = $this->tmpDir)) {
             return;

@@ -23,7 +23,7 @@ class UrlHelperTest extends TestCase
     /**
      * @dataProvider getGenerateAbsoluteUrlData
      */
-    public function testGenerateAbsoluteUrl($expected, $path, $pathinfo)
+    public function testGenerateAbsoluteUrl(string $expected, string $path, string $pathinfo)
     {
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
@@ -32,7 +32,7 @@ class UrlHelperTest extends TestCase
         $this->assertEquals($expected, $helper->getAbsoluteUrl($path));
     }
 
-    public static function getGenerateAbsoluteUrlData()
+    public static function getGenerateAbsoluteUrlData(): array
     {
         return [
             ['http://localhost/foo.png', '/foo.png', '/foo/bar.html'],
@@ -58,7 +58,7 @@ class UrlHelperTest extends TestCase
     /**
      * @dataProvider getGenerateAbsoluteUrlRequestContextData
      */
-    public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    public function testGenerateAbsoluteUrlWithRequestContext(string $path, string $baseUrl, string $host, string $scheme, int $httpPort, int $httpsPort, string $expected)
     {
         if (!class_exists(RequestContext::class)) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
@@ -74,7 +74,7 @@ class UrlHelperTest extends TestCase
     /**
      * @dataProvider getGenerateAbsoluteUrlRequestContextData
      */
-    public function testGenerateAbsoluteUrlWithRequestContextAwareInterface($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    public function testGenerateAbsoluteUrlWithRequestContextAwareInterface(string $path, string $baseUrl, string $host, string $scheme, int $httpPort, int $httpsPort, string $expected)
     {
         if (!class_exists(RequestContext::class)) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
@@ -106,7 +106,7 @@ class UrlHelperTest extends TestCase
     /**
      * @dataProvider getGenerateAbsoluteUrlRequestContextData
      */
-    public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path)
+    public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext(string $path)
     {
         if (!class_exists(RequestContext::class)) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
@@ -117,7 +117,7 @@ class UrlHelperTest extends TestCase
         $this->assertEquals($path, $helper->getAbsoluteUrl($path));
     }
 
-    public static function getGenerateAbsoluteUrlRequestContextData()
+    public static function getGenerateAbsoluteUrlRequestContextData(): array
     {
         return [
             ['/foo.png', '/foo', 'localhost', 'http', 80, 443, 'http://localhost/foo.png'],
@@ -149,7 +149,7 @@ class UrlHelperTest extends TestCase
     /**
      * @dataProvider getGenerateRelativePathData
      */
-    public function testGenerateRelativePath($expected, $path, $pathinfo)
+    public function testGenerateRelativePath(string $expected, string $path, string $pathinfo)
     {
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
@@ -158,7 +158,7 @@ class UrlHelperTest extends TestCase
         $this->assertEquals($expected, $urlHelper->getRelativePath($path));
     }
 
-    public static function getGenerateRelativePathData()
+    public static function getGenerateRelativePathData(): array
     {
         return [
             ['../foo.png', '/foo.png', '/foo/bar.html'],

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Security;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -34,7 +35,7 @@ class FirewallContextTest extends TestCase
         $this->assertEquals($config, $context->getConfig());
     }
 
-    private function getExceptionListenerMock()
+    private function getExceptionListenerMock(): ExceptionListener&MockObject
     {
         return $this
             ->getMockBuilder(ExceptionListener::class)
@@ -42,7 +43,7 @@ class FirewallContextTest extends TestCase
             ->getMock();
     }
 
-    private function getLogoutListenerMock()
+    private function getLogoutListenerMock(): LogoutListener&MockObject
     {
         return $this
             ->getMockBuilder(LogoutListener::class)

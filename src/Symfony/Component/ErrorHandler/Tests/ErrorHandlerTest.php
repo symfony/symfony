@@ -272,7 +272,7 @@ class ErrorHandlerTest extends TestCase
 
             $logger = $this->createMock(LoggerInterface::class);
 
-            $warnArgCheck = function ($logLevel, $message, $context) {
+            $warnArgCheck = function (string $logLevel, string $message, array $context): void {
                 $this->assertEquals('info', $logLevel);
                 $this->assertEquals('User Deprecated: foo', $message);
                 $this->assertArrayHasKey('exception', $context);
@@ -298,7 +298,7 @@ class ErrorHandlerTest extends TestCase
             $logger = $this->createMock(LoggerInterface::class);
 
             $line = null;
-            $logArgCheck = function ($level, $message, $context) use (&$line) {
+            $logArgCheck = function ($level, string $message, array $context) use (&$line): void {
                 $this->assertArrayHasKey('exception', $context);
                 $exception = $context['exception'];
 
@@ -350,7 +350,7 @@ class ErrorHandlerTest extends TestCase
 
     public function testHandleDeprecation()
     {
-        $logArgCheck = function ($level, $message, $context) {
+        $logArgCheck = function (string $level, $message, array $context) {
             $this->assertEquals(LogLevel::INFO, $level);
             $this->assertArrayHasKey('exception', $context);
             $exception = $context['exception'];
@@ -379,7 +379,7 @@ class ErrorHandlerTest extends TestCase
             $logger = $this->createMock(LoggerInterface::class);
             $handler = ErrorHandler::register();
 
-            $logArgCheck = function ($level, $message, $context) use ($expectedMessage, $exception) {
+            $logArgCheck = function (string $level, string $message, array $context) use ($expectedMessage, $exception): void {
                 $this->assertSame('critical', $level);
                 $this->assertSame($expectedMessage, $message);
                 $this->assertArrayHasKey('exception', $context);
@@ -403,7 +403,7 @@ class ErrorHandlerTest extends TestCase
                 $this->assertSame($enhancedMessage ?? $exception->getMessage(), $e->getMessage());
             }
 
-            $handler->setExceptionHandler(function ($e) use ($exception, $enhancedMessage) {
+            $handler->setExceptionHandler(function (\Throwable $e) use ($exception, $enhancedMessage): void {
                 $this->assertInstanceOf($exception::class, $e);
                 $this->assertSame($enhancedMessage ?? $exception->getMessage(), $e->getMessage());
             });
@@ -499,7 +499,7 @@ class ErrorHandlerTest extends TestCase
             ->method('log')
             ->with(LogLevel::CRITICAL, 'Uncaught Exception: Foo message', ['exception' => $exception]);
 
-        $handler->setExceptionHandler(function () use ($handler, $mockLogger) {
+        $handler->setExceptionHandler(function () use ($handler, $mockLogger): void {
             $handler->setDefaultLogger($mockLogger);
         });
 
@@ -519,7 +519,7 @@ class ErrorHandlerTest extends TestCase
                 'line' => 123,
             ];
 
-            $logArgCheck = function ($level, $message, $context) {
+            $logArgCheck = function ($level, string $message, array $context): void {
                 $this->assertEquals('Fatal Parse Error: foo', $message);
                 $this->assertArrayHasKey('exception', $context);
                 $this->assertInstanceOf(FatalError::class, $context['exception']);
@@ -546,7 +546,7 @@ class ErrorHandlerTest extends TestCase
         $exception = new \Error("Class 'IReallyReallyDoNotExistAnywhereInTheRepositoryISwear' not found");
 
         $handler = new ErrorHandler();
-        $handler->setExceptionHandler(function () use (&$args) {
+        $handler->setExceptionHandler(function () use (&$args): void {
             $args = \func_get_args();
         });
 
@@ -560,7 +560,7 @@ class ErrorHandlerTest extends TestCase
     {
         $this->expectException(\Exception::class);
         $handler = new ErrorHandler();
-        $handler->setExceptionHandler(function ($e) use ($handler) {
+        $handler->setExceptionHandler(function (\Throwable $e) use ($handler): void {
             $handler->setExceptionHandler(null);
             $handler->handleException($e);
         });

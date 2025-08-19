@@ -58,7 +58,7 @@ class ParserTest extends TestCase
         $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
-    public static function getParseData()
+    public static function getParseData(): array
     {
         $arguments = new Node\ArgumentsNode();
         $arguments->addElement(new Node\ConstantNode('arg1'));
@@ -244,7 +244,7 @@ class ParserTest extends TestCase
         ];
     }
 
-    private static function createGetAttrNode($node, $item, $type)
+    private static function createGetAttrNode($node, $item, $type): Node\GetAttrNode
     {
         return new Node\GetAttrNode($node, new Node\ConstantNode($item, Node\GetAttrNode::ARRAY_CALL !== $type), new Node\ArgumentsNode(), $type);
     }
@@ -252,7 +252,7 @@ class ParserTest extends TestCase
     /**
      * @dataProvider getInvalidPostfixData
      */
-    public function testParseWithInvalidPostfixData($expr, $names = [])
+    public function testParseWithInvalidPostfixData(string $expr, array $names = [])
     {
         $this->expectException(SyntaxError::class);
         $lexer = new Lexer();
@@ -260,7 +260,7 @@ class ParserTest extends TestCase
         $parser->parse($lexer->tokenize($expr), $names);
     }
 
-    public static function getInvalidPostfixData()
+    public static function getInvalidPostfixData(): array
     {
         return [
             [

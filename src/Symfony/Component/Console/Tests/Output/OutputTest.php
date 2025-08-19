@@ -97,14 +97,14 @@ class OutputTest extends TestCase
     /**
      * @dataProvider provideWriteArguments
      */
-    public function testWriteRawMessage($message, $type, $expectedOutput)
+    public function testWriteRawMessage(string $message, int $type, string $expectedOutput)
     {
         $output = new TestOutput();
         $output->writeln($message, $type);
         $this->assertEquals($expectedOutput, $output->output);
     }
 
-    public static function provideWriteArguments()
+    public static function provideWriteArguments(): array
     {
         return [
             ['<info>foo</info>', Output::OUTPUT_RAW, "<info>foo</info>\n"],
@@ -146,7 +146,7 @@ class OutputTest extends TestCase
     /**
      * @dataProvider verbosityProvider
      */
-    public function testWriteWithVerbosityOption($verbosity, $expected, $msg)
+    public function testWriteWithVerbosityOption(int $verbosity, string $expected, string $msg)
     {
         $output = new TestOutput();
 
@@ -161,7 +161,7 @@ class OutputTest extends TestCase
         $this->assertEquals($expected, $output->output, $msg);
     }
 
-    public static function verbosityProvider()
+    public static function verbosityProvider(): array
     {
         return [
             [Output::VERBOSITY_QUIET, '2', '->write() in QUIET mode only outputs when an explicit QUIET verbosity is passed'],

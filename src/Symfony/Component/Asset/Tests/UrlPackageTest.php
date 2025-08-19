@@ -25,7 +25,7 @@ class UrlPackageTest extends TestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testGetUrl($baseUrls, string $format, string $path, string $expected)
+    public function testGetUrl(string|array $baseUrls, string $format, string $path, string $expected)
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format));
         $this->assertSame($expected, $package->getUrl($path));

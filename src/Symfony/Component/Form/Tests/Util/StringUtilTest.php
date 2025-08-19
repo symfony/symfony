@@ -27,7 +27,7 @@ class StringUtilTest extends TestCase
     /**
      * @dataProvider trimProvider
      */
-    public function testTrim($data, $expectedData)
+    public function testTrim(string $data, string $expectedData)
     {
         $this->assertSame($expectedData, StringUtil::trim($data));
     }
@@ -35,7 +35,7 @@ class StringUtilTest extends TestCase
     /**
      * @dataProvider spaceProvider
      */
-    public function testTrimUtf8Separators($hex)
+    public function testTrimUtf8Separators(string $hex)
     {
         // Convert hexadecimal representation into binary
         // H: hex string, high nibble first (UCS-2BE)
@@ -90,7 +90,7 @@ class StringUtilTest extends TestCase
     /**
      * @dataProvider fqcnToBlockPrefixProvider
      */
-    public function testFqcnToBlockPrefix($fqcn, $expectedBlockPrefix)
+    public function testFqcnToBlockPrefix(string $fqcn, string $expectedBlockPrefix)
     {
         $blockPrefix = StringUtil::fqcnToBlockPrefix($fqcn);
 

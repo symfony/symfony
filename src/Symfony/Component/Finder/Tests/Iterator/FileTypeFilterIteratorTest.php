@@ -18,7 +18,7 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($mode, $expected)
+    public function testAccept(int $mode, array $expected)
     {
         $inner = new InnerTypeIterator(self::$files);
 
@@ -27,7 +27,7 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
         $this->assertIterator($expected, $iterator);
     }
 
-    public static function getAcceptData()
+    public static function getAcceptData(): array
     {
         $onlyFiles = [
             'test.py',

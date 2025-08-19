@@ -40,7 +40,7 @@ class ButtonTest extends TestCase
     /**
      * @dataProvider getDisabledStates
      */
-    public function testDisabledIfParentIsDisabled($parentDisabled, $buttonDisabled, $result)
+    public function testDisabledIfParentIsDisabled(bool $parentDisabled, bool $buttonDisabled, bool $result)
     {
         $form = $this->getFormBuilder()
             ->setDisabled($parentDisabled)
@@ -57,7 +57,7 @@ class ButtonTest extends TestCase
         $this->assertSame($result, $button->isDisabled());
     }
 
-    public static function getDisabledStates()
+    public static function getDisabledStates(): array
     {
         return [
             // parent, button, result

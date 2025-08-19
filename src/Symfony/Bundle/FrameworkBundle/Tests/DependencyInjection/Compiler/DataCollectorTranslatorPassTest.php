@@ -70,7 +70,7 @@ class DataCollectorTranslatorPassTest extends TestCase
         $this->assertTrue($this->container->hasDefinition('data_collector.translation'));
     }
 
-    public static function getImplementingTranslatorBagInterfaceTranslatorClassNames()
+    public static function getImplementingTranslatorBagInterfaceTranslatorClassNames(): array
     {
         return [
             [Translator::class],
@@ -102,7 +102,7 @@ class DataCollectorTranslatorPassTest extends TestCase
         $this->assertFalse($this->container->hasDefinition('data_collector.translation'));
     }
 
-    public static function getNotImplementingTranslatorBagInterfaceTranslatorClassNames()
+    public static function getNotImplementingTranslatorBagInterfaceTranslatorClassNames(): array
     {
         return [
             ['Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag'],

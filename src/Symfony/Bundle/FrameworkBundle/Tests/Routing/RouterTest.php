@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -519,7 +520,7 @@ class RouterTest extends TestCase
         $this->assertSame('1 or 0', $route->getCondition());
     }
 
-    public static function getNonStringValues()
+    public static function getNonStringValues(): array
     {
         return [[null], [false], [true], [new \stdClass()], [['foo', 'bar']], [[[]]]];
     }
@@ -599,7 +600,7 @@ class RouterTest extends TestCase
         $this->assertEquals(['GET', 'POST'], $route->getMethods());
     }
 
-    public static function getContainerParameterForRoute()
+    public static function getContainerParameterForRoute(): iterable
     {
         yield 'String' => ['"foo"'];
         yield 'Integer' => [0];
@@ -607,7 +608,7 @@ class RouterTest extends TestCase
         yield 'Boolean false' => [false];
     }
 
-    private function getServiceContainer(RouteCollection $routes): Container
+    private function getServiceContainer(RouteCollection $routes): Container&MockObject
     {
         $loader = $this->createMock(LoaderInterface::class);
 

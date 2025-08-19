@@ -89,7 +89,7 @@ class FileLinkFormatterTest extends TestCase
     /**
      * @dataProvider providePathMappings
      */
-    public function testIdeFileLinkFormatWithPathMappingParameters($mappings)
+    public function testIdeFileLinkFormatWithPathMappingParameters(array $mappings)
     {
         $params = array_reduce($mappings, function ($c, $m) {
             return "$c&".implode('>', $m);
@@ -102,7 +102,7 @@ class FileLinkFormatterTest extends TestCase
         }
     }
 
-    public static function providePathMappings()
+    public static function providePathMappings(): iterable
     {
         yield 'single path mapping' => [
             [

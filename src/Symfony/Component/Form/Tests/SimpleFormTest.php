@@ -78,7 +78,7 @@ class SimpleFormTest extends TestCase
     /**
      * @dataProvider provideFormNames
      */
-    public function testGetPropertyPath($name, $propertyPath)
+    public function testGetPropertyPath(null|string|int $name, ?PropertyPath $propertyPath)
     {
         $config = new FormConfigBuilder($name, null, new EventDispatcher());
         $form = new Form($config);
@@ -233,7 +233,7 @@ class SimpleFormTest extends TestCase
     /**
      * @dataProvider getDisabledStates
      */
-    public function testAlwaysDisabledIfParentDisabled($parentDisabled, $disabled, $result)
+    public function testAlwaysDisabledIfParentDisabled(bool $parentDisabled, bool $disabled, bool $result)
     {
         $parent = $this->getBuilder()->setDisabled($parentDisabled)->getForm();
         $child = $this->getBuilder()->setDisabled($disabled)->getForm();
@@ -243,7 +243,7 @@ class SimpleFormTest extends TestCase
         $this->assertSame($result, $child->isDisabled());
     }
 
-    public static function getDisabledStates()
+    public static function getDisabledStates(): array
     {
         return [
             // parent, button, result

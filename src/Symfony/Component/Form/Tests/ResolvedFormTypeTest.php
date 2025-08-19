@@ -154,7 +154,7 @@ class ResolvedFormTypeTest extends TestCase
     /**
      * @dataProvider provideTypeClassBlockPrefixTuples
      */
-    public function testBlockPrefixDefaultsToFQCNIfNoName($typeClass, $blockPrefix)
+    public function testBlockPrefixDefaultsToFQCNIfNoName(string $typeClass, string $blockPrefix)
     {
         $resolvedType = new ResolvedFormType(new $typeClass());
 

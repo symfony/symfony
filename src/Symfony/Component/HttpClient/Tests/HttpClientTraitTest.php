@@ -151,7 +151,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertStringMatchesFormat($expected, $result);
     }
 
-    public static function provideNormalizeBodyMultipartForwardStream()
+    public static function provideNormalizeBodyMultipartForwardStream(): iterable
     {
         if (!\extension_loaded('openssl')) {
             throw self::markTestSkipped('Extension openssl required.');
@@ -290,7 +290,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame($expected, self::removeDotSegments($url));
     }
 
-    public static function provideRemoveDotSegments()
+    public static function provideRemoveDotSegments(): iterable
     {
         yield ['', ''];
         yield ['', '.'];
@@ -339,7 +339,7 @@ class HttpClientTraitTest extends TestCase
         self::prepareRequest('POST', 'http://example.com', ['json' => ['foo' => 'bar'], 'body' => '<html/>'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    public static function providePrepareAuthBasic()
+    public static function providePrepareAuthBasic(): iterable
     {
         yield ['foo:bar', 'Zm9vOmJhcg=='];
         yield [['foo', 'bar'], 'Zm9vOmJhcg=='];
@@ -356,7 +356,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame('Authorization: Basic '.$result, $options['normalized_headers']['authorization'][0]);
     }
 
-    public static function provideFingerprints()
+    public static function provideFingerprints(): iterable
     {
         foreach (['md5', 'sha1', 'sha256'] as $algo) {
             $hash = hash($algo, $algo);
@@ -369,7 +369,7 @@ class HttpClientTraitTest extends TestCase
     /**
      * @dataProvider provideFingerprints
      */
-    public function testNormalizePeerFingerprint($fingerprint, $expected)
+    public function testNormalizePeerFingerprint(string $fingerprint, array $expected)
     {
         self::assertSame($expected, $this->normalizePeerFingerprint($fingerprint));
     }

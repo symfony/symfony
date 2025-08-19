@@ -19,7 +19,7 @@ class SizeRangeFilterIteratorTest extends RealIteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($size, $expected)
+    public function testAccept(array $size, array $expected)
     {
         $inner = new InnerSizeIterator(self::$files);
 
@@ -28,7 +28,7 @@ class SizeRangeFilterIteratorTest extends RealIteratorTestCase
         $this->assertIterator($expected, $iterator);
     }
 
-    public static function getAcceptData()
+    public static function getAcceptData(): array
     {
         $lessThan1KGreaterThan05K = [
             '.foo',

@@ -56,7 +56,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadFullConfiguration($format)
+    public function testLoadFullConfiguration(string $format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -101,7 +101,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadCustomTemplateEscapingGuesserConfiguration($format)
+    public function testLoadCustomTemplateEscapingGuesserConfiguration(string $format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -115,7 +115,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadDefaultTemplateEscapingGuesserConfiguration($format)
+    public function testLoadDefaultTemplateEscapingGuesserConfiguration(string $format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -178,7 +178,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testTwigLoaderPaths($format)
+    public function testTwigLoaderPaths(string $format)
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -207,7 +207,7 @@ class TwigExtensionTest extends TestCase
         ], $paths);
     }
 
-    public static function getFormats()
+    public static function getFormats(): array
     {
         return [
             ['php'],
@@ -219,7 +219,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider stopwatchExtensionAvailabilityProvider
      */
-    public function testStopwatchExtensionAvailability($debug, $stopwatchEnabled, $expected)
+    public function testStopwatchExtensionAvailability(bool $debug, bool $stopwatchEnabled, bool $expected)
     {
         $container = $this->createContainer();
         $container->setParameter('kernel.debug', $debug);
@@ -290,7 +290,7 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals(new Reference('my_converter'), $bodyRenderer->getArgument('$converter'));
     }
 
-    private function createContainer()
+    private function createContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
@@ -311,7 +311,7 @@ class TwigExtensionTest extends TestCase
         return $container;
     }
 
-    private function compileContainer(ContainerBuilder $container)
+    private function compileContainer(ContainerBuilder $container): void
     {
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
@@ -319,7 +319,7 @@ class TwigExtensionTest extends TestCase
         $container->compile();
     }
 
-    private function loadFromFile(ContainerBuilder $container, $file, $format)
+    private function loadFromFile(ContainerBuilder $container, string $file, string $format): void
     {
         $locator = new FileLocator(__DIR__.'/Fixtures/'.$format);
 

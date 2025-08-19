@@ -118,7 +118,7 @@ EOT;
         ];
     }
 
-    private function getOutputStream($verbosity): StreamOutput
+    private function getOutputStream(int $verbosity): StreamOutput
     {
         return new StreamOutput(fopen('php://memory', 'r+', false), $verbosity, false);
     }

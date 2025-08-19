@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
@@ -28,7 +29,7 @@ class WebDebugToolbarListenerTest extends TestCase
     /**
      * @dataProvider getInjectToolbarTests
      */
-    public function testInjectToolbar($content, $expected)
+    public function testInjectToolbar(string $content, string $expected)
     {
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $m = new \ReflectionMethod($listener, 'injectToolbar');
@@ -39,7 +40,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals($expected, $response->getContent());
     }
 
-    public static function getInjectToolbarTests()
+    public static function getInjectToolbarTests(): array
     {
         return [
             ['<html><head></head><body></body></html>', "<html><head></head><body>\nWDT\n</body></html>"],
@@ -60,7 +61,7 @@ class WebDebugToolbarListenerTest extends TestCase
     /**
      * @dataProvider provideRedirects
      */
-    public function testHtmlRedirectionIsIntercepted($statusCode)
+    public function testHtmlRedirectionIsIntercepted(int $statusCode)
     {
         $response = new Response('Some content', $statusCode);
         $response->headers->set('Location', 'https://example.com/');
@@ -138,7 +139,7 @@ class WebDebugToolbarListenerTest extends TestCase
      *
      * @dataProvider provideRedirects
      */
-    public function testToolbarIsNotInjectedOnRedirection($statusCode)
+    public function testToolbarIsNotInjectedOnRedirection(int $statusCode)
     {
         $response = new Response('<html><head></head><body></body></html>', $statusCode);
         $response->headers->set('Location', 'https://example.com/');
@@ -360,7 +361,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    protected function getTwigMock($render = 'WDT')
+    protected function getTwigMock($render = 'WDT'): Environment&MockObject
     {
         $templating = $this->createMock(Environment::class);
         $templating->expects($this->any())

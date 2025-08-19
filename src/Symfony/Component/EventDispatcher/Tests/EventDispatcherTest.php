@@ -137,7 +137,7 @@ class EventDispatcherTest extends TestCase
     public function testDispatchForClosure()
     {
         $invoked = 0;
-        $listener = function () use (&$invoked) {
+        $listener = function () use (&$invoked): void {
             ++$invoked;
         };
         $this->dispatcher->addListener('pre.foo', $listener);
@@ -163,13 +163,13 @@ class EventDispatcherTest extends TestCase
     public function testDispatchByPriority()
     {
         $invoked = [];
-        $listener1 = function () use (&$invoked) {
+        $listener1 = function () use (&$invoked): void {
             $invoked[] = '1';
         };
-        $listener2 = function () use (&$invoked) {
+        $listener2 = function () use (&$invoked): void {
             $invoked[] = '2';
         };
-        $listener3 = function () use (&$invoked) {
+        $listener3 = function () use (&$invoked): void {
             $invoked[] = '3';
         };
         $this->dispatcher->addListener('pre.foo', $listener1, -10);
@@ -303,7 +303,7 @@ class EventDispatcherTest extends TestCase
     public function testHasListenersIsLazy()
     {
         $called = 0;
-        $listener = [function () use (&$called) { ++$called; }, 'onFoo'];
+        $listener = [function () use (&$called): void { ++$called; }, 'onFoo'];
         $this->dispatcher->addListener('foo', $listener);
         $this->assertTrue($this->dispatcher->hasListeners());
         $this->assertTrue($this->dispatcher->hasListeners('foo'));

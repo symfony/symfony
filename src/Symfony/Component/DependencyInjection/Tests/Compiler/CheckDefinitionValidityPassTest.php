@@ -157,7 +157,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new CheckDefinitionValidityPass();
         $pass->process($container);

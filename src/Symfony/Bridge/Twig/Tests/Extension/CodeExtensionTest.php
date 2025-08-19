@@ -246,7 +246,7 @@ HTML;
         return new CodeExtension(new FileLinkFormatter('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar'), \DIRECTORY_SEPARATOR.'project', 'UTF-8');
     }
 
-    private function render(string $template, array $context = [])
+    private function render(string $template, array $context = []): string
     {
         $twig = new Environment(
             new ArrayLoader(['index' => $template]),

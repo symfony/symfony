@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class RememberMeCookieTest extends AbstractWebTestCase
 {
     /** @dataProvider getSessionRememberMeSecureCookieFlagAutoHttpsMap */
-    public function testSessionRememberMeSecureCookieFlagAuto($https, $expectedSecureFlag)
+    public function testSessionRememberMeSecureCookieFlagAuto(bool $https, bool $expectedSecureFlag)
     {
         $client = $this->createClient(['test_case' => 'RememberMeCookie', 'root_config' => 'config.yml']);
 
@@ -31,7 +31,7 @@ class RememberMeCookieTest extends AbstractWebTestCase
         $this->assertSame($expectedSecureFlag, $cookies['']['/']['REMEMBERME']->isSecure());
     }
 
-    public static function getSessionRememberMeSecureCookieFlagAutoHttpsMap()
+    public static function getSessionRememberMeSecureCookieFlagAutoHttpsMap(): array
     {
         return [
             [true, true],

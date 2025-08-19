@@ -126,7 +126,7 @@ class CacheDataCollectorTest extends TestCase
         $this->assertInstanceOf(Data::class, $collector->getCalls());
     }
 
-    private function getCacheDataCollectorStatisticsFromEvents(array $traceableAdapterEvents)
+    private function getCacheDataCollectorStatisticsFromEvents(array $traceableAdapterEvents): array
     {
         $traceableAdapterMock = $this->createMock(TraceableAdapter::class);
         $traceableAdapterMock->method('getCalls')->willReturn($traceableAdapterEvents);

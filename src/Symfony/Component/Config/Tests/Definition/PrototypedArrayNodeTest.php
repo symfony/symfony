@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 use Symfony\Component\Config\Definition\VariableNode;
@@ -264,7 +265,7 @@ class PrototypedArrayNodeTest extends TestCase
      *
      * @dataProvider getDataForKeyRemovedLeftValueOnly
      */
-    public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, array $children, array $expected)
+    public function testMappedAttributeKeyIsRemovedLeftValueOnly(BaseNode $value, array $children, array $expected)
     {
         $node = new PrototypedArrayNode('root');
         $node->setKeyAttribute('id', true);

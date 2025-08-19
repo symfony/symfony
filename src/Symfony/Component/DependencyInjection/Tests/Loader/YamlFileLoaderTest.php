@@ -84,7 +84,7 @@ class YamlFileLoaderTest extends TestCase
     /**
      * @dataProvider provideInvalidFiles
      */
-    public function testLoadInvalidFile($file)
+    public function testLoadInvalidFile(string $file)
     {
         $this->expectException(InvalidArgumentException::class);
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
@@ -92,7 +92,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load($file.'.yml');
     }
 
-    public static function provideInvalidFiles()
+    public static function provideInvalidFiles(): array
     {
         return [
             ['bad_parameters'],

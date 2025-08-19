@@ -27,7 +27,7 @@ use Twig\TwigFilter;
 
 class TwigNodeProvider
 {
-    public static function getModule($content)
+    public static function getModule($content): ModuleNode
     {
         $emptyNodeExists = class_exists(EmptyNode::class);
 
@@ -42,7 +42,7 @@ class TwigNodeProvider
         );
     }
 
-    public static function getTransFilter($message, $domain = null, $arguments = null)
+    public static function getTransFilter($message, $domain = null, $arguments = null): FilterExpression
     {
         if (!$arguments) {
             $arguments = $domain ? [
@@ -74,7 +74,7 @@ class TwigNodeProvider
         );
     }
 
-    public static function getTransTag($message, $domain = null)
+    public static function getTransTag($message, $domain = null): TransNode
     {
         return new TransNode(
             new BodyNode([], ['data' => $message]),
@@ -82,7 +82,7 @@ class TwigNodeProvider
         );
     }
 
-    public static function getTransDefaultDomainTag($domain)
+    public static function getTransDefaultDomainTag($domain): TransDefaultDomainNode
     {
         return new TransDefaultDomainNode(
             new ConstantExpression($domain, 0)

@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 
 abstract class AbstractQuestionHelperTestCase extends TestCase
 {
-    protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
+    protected function createStreamableInputInterfaceMock($stream = null, $interactive = true): StreamableInputInterface&MockObject
     {
         $mock = $this->createMock(StreamableInputInterface::class);
         $mock->expects($this->any())

@@ -89,7 +89,7 @@ class ProxyDumperTest extends TestCase
         $this->assertStringMatchesFormat('%A$container->'.$access.'[\'foo\'] = %A', $code);
     }
 
-    public static function getPrivatePublicDefinitions()
+    public static function getPrivatePublicDefinitions(): array
     {
         return [
             [

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -39,7 +40,7 @@ class TranslatorTest extends TestCase
         $this->deleteTmpDir();
     }
 
-    protected function deleteTmpDir()
+    protected function deleteTmpDir(): void
     {
         if (!file_exists($dir = $this->tmpDir)) {
             return;
@@ -253,7 +254,7 @@ class TranslatorTest extends TestCase
         $this->assertSame('bar', $translator->trans('foo', [], 'ccc', 'fr'));
     }
 
-    protected function getCatalogue($locale, $messages, $resources = [])
+    protected function getCatalogue($locale, $messages, $resources = []): MessageCatalogue
     {
         $catalogue = new MessageCatalogue($locale);
         foreach ($messages as $key => $translation) {
@@ -266,7 +267,7 @@ class TranslatorTest extends TestCase
         return $catalogue;
     }
 
-    protected function getLoader()
+    protected function getLoader(): LoaderInterface&MockObject
     {
         $loader = $this->createMock(LoaderInterface::class);
         $loader
@@ -302,7 +303,7 @@ class TranslatorTest extends TestCase
         return $loader;
     }
 
-    protected function getContainer($loader)
+    protected function getContainer($loader):ContainerInterface&MockObject
     {
         $container = $this->createMock(ContainerInterface::class);
         $container

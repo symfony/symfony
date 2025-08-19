@@ -38,14 +38,14 @@ class ContainerParametersResourceCheckerTest extends TestCase
     /**
      * @dataProvider isFreshProvider
      */
-    public function testIsFresh(callable $mockContainer, $expected)
+    public function testIsFresh(callable $mockContainer, bool $expected)
     {
         $mockContainer($this->container, $this);
 
         $this->assertSame($expected, $this->resourceChecker->isFresh($this->resource, time()));
     }
 
-    public static function isFreshProvider()
+    public static function isFreshProvider(): iterable
     {
         yield 'not fresh on missing parameter' => [function (MockObject $container) {
             $container->method('hasParameter')->with('locales')->willReturn(false);

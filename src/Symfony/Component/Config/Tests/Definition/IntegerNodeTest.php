@@ -49,7 +49,7 @@ class IntegerNodeTest extends TestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues(mixed $value)
     {
         $node = new IntegerNode('test');
 

@@ -40,7 +40,7 @@ class EmptyAppTest extends TestCase
         $this->deleteTempDir();
     }
 
-    private function deleteTempDir()
+    private function deleteTempDir(): void
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/EmptyAppKernel')) {
             return;

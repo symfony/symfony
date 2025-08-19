@@ -19,6 +19,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Doctrine\Persistence\Proxy;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
@@ -229,7 +230,7 @@ class EntityUserProviderTest extends TestCase
         }
     }
 
-    private function getManager($em, $name = null)
+    private function getManager($em, $name = null): ManagerRegistry&MockObject
     {
         $manager = $this->createMock(ManagerRegistry::class);
         $manager->expects($this->any())
@@ -240,7 +241,7 @@ class EntityUserProviderTest extends TestCase
         return $manager;
     }
 
-    private function getObjectManager($repository)
+    private function getObjectManager($repository): ObjectManager&MockObject
     {
         $objectManager = $this->createMock(ObjectManager::class);
         $objectManager->method('getRepository')
@@ -249,7 +250,7 @@ class EntityUserProviderTest extends TestCase
         return $objectManager;
     }
 
-    private function createSchema($em)
+    private function createSchema($em): void
     {
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema([

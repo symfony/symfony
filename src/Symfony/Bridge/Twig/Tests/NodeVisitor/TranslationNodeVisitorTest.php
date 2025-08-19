@@ -73,7 +73,7 @@ class TranslationNodeVisitorTest extends TestCase
         $this->testMessagesExtraction($node, [[$message, TranslationNodeVisitor::UNDEFINED_DOMAIN]]);
     }
 
-    public static function getMessagesExtractionTestData()
+    public static function getMessagesExtractionTestData(): array
     {
         $message = 'new key';
         $domain = 'domain';

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -183,7 +184,7 @@ EOT
             , $output, true);
     }
 
-    protected function getInputStream($input)
+    protected function getInputStream(string $input)
     {
         $stream = fopen('php://memory', 'r+', false);
         fwrite($stream, $input);
@@ -192,7 +193,7 @@ EOT
         return $stream;
     }
 
-    protected function createOutputInterface()
+    protected function createOutputInterface(): StreamOutput
     {
         $output = new StreamOutput(fopen('php://memory', 'r+', false));
         $output->setDecorated(false);
@@ -200,7 +201,7 @@ EOT
         return $output;
     }
 
-    protected function createInputInterfaceMock($interactive = true)
+    protected function createInputInterfaceMock($interactive = true): InputInterface&MockObject
     {
         $mock = $this->createMock(InputInterface::class);
         $mock->expects($this->any())
@@ -210,7 +211,7 @@ EOT
         return $mock;
     }
 
-    private function assertOutputContains($expected, StreamOutput $output, $normalize = false)
+    private function assertOutputContains($expected, StreamOutput $output, $normalize = false): void
     {
         rewind($output->getStream());
         $stream = stream_get_contents($output->getStream());

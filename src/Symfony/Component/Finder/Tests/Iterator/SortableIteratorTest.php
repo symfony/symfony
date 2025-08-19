@@ -68,7 +68,7 @@ class SortableIteratorTest extends RealIteratorTestCase
         }
     }
 
-    public static function getAcceptData()
+    public static function getAcceptData(): array
     {
         $sortByName = [
             '.bar',

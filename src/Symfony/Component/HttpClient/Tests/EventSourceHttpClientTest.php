@@ -138,7 +138,7 @@ TXT
     /**
      * @dataProvider contentTypeProvider
      */
-    public function testContentType($contentType, $expected)
+    public function testContentType(string $contentType, bool|EventSourceException $expected)
     {
         $chunk = new DataChunk(0, '');
         $response = new MockResponse('', ['canceled' => false, 'http_method' => 'GET', 'url' => 'http://localhost:8080/events', 'response_headers' => ['content-type: '.$contentType]]);
@@ -177,7 +177,7 @@ TXT
         }
     }
 
-    public static function contentTypeProvider()
+    public static function contentTypeProvider(): array
     {
         return [
             ['text/event-stream', true],

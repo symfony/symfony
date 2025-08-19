@@ -29,7 +29,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
     private EntityManager $em;
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $manager = $this->createMock(ManagerRegistry::class);
 

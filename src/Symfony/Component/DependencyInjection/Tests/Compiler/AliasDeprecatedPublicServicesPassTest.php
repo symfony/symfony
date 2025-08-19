@@ -58,7 +58,7 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
         (new AliasDeprecatedPublicServicesPass())->process($container);
     }
 
-    public static function processWithMissingAttributeProvider()
+    public static function processWithMissingAttributeProvider(): array
     {
         return [
             ['package', ['version' => '1.2']],

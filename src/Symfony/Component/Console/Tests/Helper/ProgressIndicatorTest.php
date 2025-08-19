@@ -146,7 +146,7 @@ class ProgressIndicatorTest extends TestCase
     /**
      * @dataProvider provideFormat
      */
-    public function testFormats($format)
+    public function testFormats(string $format)
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream(), $format);
         $bar->start('Starting...');
@@ -170,12 +170,12 @@ class ProgressIndicatorTest extends TestCase
         ];
     }
 
-    protected function getOutputStream($decorated = true, $verbosity = StreamOutput::VERBOSITY_NORMAL)
+    protected function getOutputStream(bool $decorated = true, int $verbosity = StreamOutput::VERBOSITY_NORMAL): StreamOutput
     {
         return new StreamOutput(fopen('php://memory', 'r+', false), $verbosity, $decorated);
     }
 
-    protected function generateOutput($expected)
+    protected function generateOutput(string $expected)
     {
         $count = substr_count($expected, "\n");
 

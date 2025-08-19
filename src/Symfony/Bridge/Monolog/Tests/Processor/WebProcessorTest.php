@@ -101,7 +101,7 @@ class WebProcessorTest extends TestCase
         return RecordFactory::create($level, $message);
     }
 
-    private function isExtraFieldsSupported()
+    private function isExtraFieldsSupported(): bool
     {
         $monologWebProcessorClass = new \ReflectionClass(\Monolog\Processor\WebProcessor::class);
 

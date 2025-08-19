@@ -167,7 +167,7 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testCreateResponseFromStreamed()
     {
-        $response = new StreamedResponse(function () {
+        $response = new StreamedResponse(function (): void {
             echo "Line 1\n";
             flush();
 

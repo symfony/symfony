@@ -47,7 +47,7 @@ class ImageTest extends TestCase
     /**
      * @dataProvider getGetUriTests
      */
-    public function testGetUri($url, $currentUri, $expected)
+    public function testGetUri(string $url, string $currentUri, string $expected)
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(\sprintf('<html><img alt="foo" src="%s" /></html>', $url));
@@ -56,7 +56,7 @@ class ImageTest extends TestCase
         $this->assertEquals($expected, $image->getUri());
     }
 
-    public static function getGetUriTests()
+    public static function getGetUriTests(): array
     {
         return [
             ['/foo.png', 'http://localhost/bar/foo/', 'http://localhost/foo.png'],

@@ -401,7 +401,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertFalse($container->getDefinition('child1')->isAutoconfigured());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new ResolveChildDefinitionsPass();
         $pass->process($container);

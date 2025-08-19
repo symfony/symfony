@@ -107,7 +107,7 @@ class DebugExtensionTest extends TestCase
         $this->assertSame($expectedOutput, $container->findDefinition('cli_dumper_public')->getArgument(0));
     }
 
-    private function createContainer()
+    private function createContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
@@ -121,7 +121,7 @@ class DebugExtensionTest extends TestCase
         return $container;
     }
 
-    private function compileContainer(ContainerBuilder $container)
+    private function compileContainer(ContainerBuilder $container): void
     {
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);

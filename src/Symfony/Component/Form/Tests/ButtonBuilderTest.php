@@ -20,7 +20,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  */
 class ButtonBuilderTest extends TestCase
 {
-    public static function getValidNames()
+    public static function getValidNames(): array
     {
         return [
             ['reset'],
@@ -34,7 +34,7 @@ class ButtonBuilderTest extends TestCase
     /**
      * @dataProvider getValidNames
      */
-    public function testValidNames($name)
+    public function testValidNames(string|int $name)
     {
         $this->assertInstanceOf(ButtonBuilder::class, new ButtonBuilder($name));
     }
@@ -47,7 +47,7 @@ class ButtonBuilderTest extends TestCase
         $this->assertInstanceOf(ButtonBuilder::class, new ButtonBuilder('button[]'));
     }
 
-    public static function getInvalidNames()
+    public static function getInvalidNames(): array
     {
         return [
             [''],
@@ -59,7 +59,7 @@ class ButtonBuilderTest extends TestCase
     /**
      * @dataProvider getInvalidNames
      */
-    public function testInvalidNames($name)
+    public function testInvalidNames(string|bool|null $name)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Buttons cannot have empty names.');

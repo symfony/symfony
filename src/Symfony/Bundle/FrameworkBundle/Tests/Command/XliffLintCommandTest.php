@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\XliffLintCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -71,7 +72,7 @@ EOF;
         return new CommandTester($command);
     }
 
-    private function getKernelAwareApplicationMock()
+    private function getKernelAwareApplicationMock(): Application&MockObject
     {
         $kernel = $this->createMock(KernelInterface::class);
         $kernel

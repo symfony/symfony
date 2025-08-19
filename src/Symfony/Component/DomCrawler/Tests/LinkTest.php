@@ -72,7 +72,7 @@ class LinkTest extends TestCase
     /**
      * @dataProvider getGetUriTests
      */
-    public function testGetUri($url, $currentUri, $expected)
+    public function testGetUri(string $url, string $currentUri, string $expected)
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(\sprintf('<html><a href="%s">foo</a></html>', $url));
@@ -84,7 +84,7 @@ class LinkTest extends TestCase
     /**
      * @dataProvider getGetUriTests
      */
-    public function testGetUriOnArea($url, $currentUri, $expected)
+    public function testGetUriOnArea(string $url, string $currentUri, string $expected)
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(\sprintf('<html><map><area href="%s" /></map></html>', $url));
@@ -96,7 +96,7 @@ class LinkTest extends TestCase
     /**
      * @dataProvider getGetUriTests
      */
-    public function testGetUriOnLink($url, $currentUri, $expected)
+    public function testGetUriOnLink(string $url, string $currentUri, string $expected)
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(\sprintf('<html><head><link href="%s" /></head></html>', $url));
@@ -105,7 +105,7 @@ class LinkTest extends TestCase
         $this->assertEquals($expected, $link->getUri());
     }
 
-    public static function getGetUriTests()
+    public static function getGetUriTests(): array
     {
         return [
             ['/foo', 'http://localhost/bar/foo/', 'http://localhost/foo'],

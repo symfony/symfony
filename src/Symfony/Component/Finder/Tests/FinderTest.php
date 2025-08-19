@@ -300,7 +300,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     /**
      * @dataProvider getRegexNameTestData
      */
-    public function testRegexName($regex)
+    public function testRegexName(string $regex)
     {
         $finder = $this->buildFinder();
         $finder->name($regex);
@@ -1472,7 +1472,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
-    public static function getContainsTestData()
+    public static function getContainsTestData(): array
     {
         return [
             ['', '', []],
@@ -1490,7 +1490,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ];
     }
 
-    public static function getRegexNameTestData()
+    public static function getRegexNameTestData(): array
     {
         return [
             ['~.*t\\.p.+~i'],
@@ -1511,7 +1511,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
-    public static function getTestPathData()
+    public static function getTestPathData(): array
     {
         return [
             ['', '', []],

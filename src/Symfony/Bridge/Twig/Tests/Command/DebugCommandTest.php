@@ -84,7 +84,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringMatchesFormat($output, $tester->getDisplay(true));
     }
 
-    public static function getDebugTemplateNameTestData()
+    public static function getDebugTemplateNameTestData(): iterable
     {
         $defaultPaths = [
             'templates/' => null,

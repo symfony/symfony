@@ -39,7 +39,7 @@ class CompletionInputTest extends TestCase
         $this->assertEquals($expectedValue, $input->getCompletionValue(), 'Unexpected value');
     }
 
-    public static function provideBindData()
+    public static function provideBindData(): iterable
     {
         // option names
         yield 'optname-minimal-input' => [CompletionInput::fromTokens(['bin/console', '-'], 1), CompletionInput::TYPE_OPTION_NAME, null, '-'];
@@ -90,7 +90,7 @@ class CompletionInputTest extends TestCase
         $this->assertEquals($expectedValue, $input->getCompletionValue(), 'Unexpected value');
     }
 
-    public static function provideBindWithLastArrayArgumentData()
+    public static function provideBindWithLastArrayArgumentData(): iterable
     {
         yield [CompletionInput::fromTokens(['bin/console'], 1), null];
         yield [CompletionInput::fromTokens(['bin/console', 'symfony', 'sensiolabs'], 3), null];
@@ -114,7 +114,7 @@ class CompletionInputTest extends TestCase
     /**
      * @dataProvider provideFromStringData
      */
-    public function testFromString($inputStr, array $expectedTokens)
+    public function testFromString(string $inputStr, array $expectedTokens)
     {
         $input = CompletionInput::fromString($inputStr, 1);
 
@@ -123,7 +123,7 @@ class CompletionInputTest extends TestCase
         $this->assertEquals($expectedTokens, $tokensProperty->getValue($input));
     }
 
-    public static function provideFromStringData()
+    public static function provideFromStringData(): iterable
     {
         yield ['bin/console cache:clear', ['bin/console', 'cache:clear']];
         yield ['bin/console --env prod', ['bin/console', '--env', 'prod']];

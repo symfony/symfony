@@ -79,7 +79,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testSubmitIfNameInRequest($method)
+    public function testSubmitIfNameInRequest(string $method)
     {
         $form = $this->createForm('param1', $method);
 
@@ -96,7 +96,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testDoNotSubmitIfWrongRequestMethod($method)
+    public function testDoNotSubmitIfWrongRequestMethod(string $method)
     {
         $form = $this->createForm('param1', $method);
 
@@ -114,7 +114,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testDoNoSubmitSimpleFormIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNoSubmitSimpleFormIfNameNotInRequestAndNotGetRequest(string $method)
     {
         $form = $this->createForm('param1', $method, false);
 
@@ -130,7 +130,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testDoNotSubmitCompoundFormIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNotSubmitCompoundFormIfNameNotInRequestAndNotGetRequest(string $method)
     {
         $form = $this->createForm('param1', $method, true);
 
@@ -159,7 +159,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testSubmitFormWithEmptyNameIfAtLeastOneFieldInRequest($method)
+    public function testSubmitFormWithEmptyNameIfAtLeastOneFieldInRequest(string $method)
     {
         $form = $this->createForm('', $method, true);
         $form->add($this->createForm('param1'));
@@ -188,7 +188,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testDoNotSubmitFormWithEmptyNameIfNoFieldInRequest($method)
+    public function testDoNotSubmitFormWithEmptyNameIfNoFieldInRequest(string $method)
     {
         $form = $this->createForm('', $method, true);
         $form->add($this->createForm('param1'));
@@ -206,7 +206,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testMergeParamsAndFiles($method)
+    public function testMergeParamsAndFiles(string $method)
     {
         $form = $this->createForm('param1', $method, true);
         $form->add($this->createForm('field1'));
@@ -251,7 +251,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testMergeParamsAndFilesMultiple($method)
+    public function testMergeParamsAndFilesMultiple(string $method)
     {
         $form = $this->createForm('param1', $method, true);
         $form->add($this->createBuilder('field1', false, ['allow_file_upload' => true, 'multiple' => true])->getForm());
@@ -287,7 +287,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testParamTakesPrecedenceOverFile($method)
+    public function testParamTakesPrecedenceOverFile(string $method)
     {
         $form = $this->createForm('param1', $method);
         $file = $this->getUploadedFile();
@@ -349,7 +349,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitFileIfNoParam($method)
+    public function testSubmitFileIfNoParam(string $method)
     {
         $form = $this->createBuilder('param1', false, ['allow_file_upload' => true])
             ->setMethod($method)
@@ -371,7 +371,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitMultipleFiles($method)
+    public function testSubmitMultipleFiles(string $method)
     {
         $form = $this->createBuilder('param1', false, ['allow_file_upload' => true])
             ->setMethod($method)
@@ -395,7 +395,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitFileWithNamelessForm($method)
+    public function testSubmitFileWithNamelessForm(string $method)
     {
         $form = $this->createForm('', $method, true);
         $fileForm = $this->createBuilder('document', false, ['allow_file_upload' => true])->getForm();

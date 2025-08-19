@@ -34,7 +34,7 @@ class UndefinedFunctionErrorEnhancerTest extends TestCase
         $this->assertSame($expectedLine, $error->getLine());
     }
 
-    public static function provideUndefinedFunctionData()
+    public static function provideUndefinedFunctionData(): array
     {
         return [
             [

@@ -29,7 +29,7 @@ class WrappedListenerTest extends TestCase
         $this->assertStringMatchesFormat($expected, $wrappedListener->getPretty());
     }
 
-    public static function provideListenersToDescribe()
+    public static function provideListenersToDescribe(): array
     {
         return [
             [new FooListener(), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::__invoke'],

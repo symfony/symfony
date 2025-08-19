@@ -43,14 +43,14 @@ class ResponseFunctionalTest extends TestCase
     /**
      * @dataProvider provideCookie
      */
-    public function testCookie($fixture)
+    public function testCookie(string $fixture)
     {
         $result = file_get_contents(\sprintf('http://localhost:8054/%s.php', $fixture));
         $result = preg_replace_callback('/expires=[^;]++/', fn ($m) => str_replace('-', ' ', $m[0]), $result);
         $this->assertStringMatchesFormatFile(__DIR__.\sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
     }
 
-    public static function provideCookie()
+    public static function provideCookie(): iterable
     {
         foreach (glob(__DIR__.'/Fixtures/response-functional/*.php') as $file) {
             if (str_contains($file, 'cookie')) {

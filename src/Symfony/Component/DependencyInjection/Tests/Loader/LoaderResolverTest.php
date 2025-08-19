@@ -41,7 +41,7 @@ class LoaderResolverTest extends TestCase
         ]);
     }
 
-    public static function provideResourcesToLoad()
+    public static function provideResourcesToLoad(): array
     {
         return [
             ['ini_with_wrong_ext.xml', 'ini', IniFileLoader::class],
@@ -54,7 +54,7 @@ class LoaderResolverTest extends TestCase
     /**
      * @dataProvider provideResourcesToLoad
      */
-    public function testResolvesForcedType($resource, $type, $expectedClass)
+    public function testResolvesForcedType(string $resource, string $type, string $expectedClass)
     {
         $this->assertInstanceOf($expectedClass, $this->resolver->resolve($resource, $type));
     }

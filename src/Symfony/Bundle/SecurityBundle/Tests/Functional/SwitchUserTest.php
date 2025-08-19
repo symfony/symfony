@@ -19,7 +19,7 @@ class SwitchUserTest extends AbstractWebTestCase
     /**
      * @dataProvider getTestParameters
      */
-    public function testSwitchUser($originalUser, $targetUser, $expectedUser, $expectedStatus)
+    public function testSwitchUser(string $originalUser, string $targetUser, string $expectedUser, int $expectedStatus)
     {
         $client = $this->createAuthenticatedClient($originalUser, ['root_config' => 'switchuser.yml']);
 
@@ -63,7 +63,7 @@ class SwitchUserTest extends AbstractWebTestCase
         $this->assertSame('dunglas', $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public static function getTestParameters()
+    public static function getTestParameters(): array
     {
         return [
             'unauthorized_user_cannot_switch' => ['user_cannot_switch_1', 'user_cannot_switch_1', 'user_cannot_switch_1', 403],

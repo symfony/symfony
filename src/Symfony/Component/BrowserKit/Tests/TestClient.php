@@ -19,12 +19,12 @@ class TestClient extends AbstractBrowser
     protected ?Response $nextResponse = null;
     protected string $nextScript;
 
-    public function setNextResponse(Response $response)
+    public function setNextResponse(Response $response): void
     {
         $this->nextResponse = $response;
     }
 
-    public function setNextScript(string $script)
+    public function setNextScript(string $script): void
     {
         $this->nextScript = $script;
     }

@@ -37,7 +37,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
         $this->assertEquals($expected, $this->getGuesser($classMetadata)->guessType('TestEntity', 'field'));
     }
 
-    public static function requiredType()
+    public static function requiredType(): iterable
     {
         yield [Types::DATE_IMMUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
         yield [Types::DATE_MUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', [], Guess::HIGH_CONFIDENCE)];
@@ -126,7 +126,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
         $this->assertNull($this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
     }
 
-    private function getGuesser(ClassMetadata $classMetadata)
+    private function getGuesser(ClassMetadata $classMetadata): DoctrineOrmTypeGuesser
     {
         $em = $this->createMock(ObjectManager::class);
         $em->expects($this->once())->method('getClassMetaData')->with('TestEntity')->willReturn($classMetadata);

@@ -38,7 +38,7 @@ class HtmlSanitizerAllTest extends TestCase
         $this->assertSame($expected, $this->createSanitizer()->sanitizeFor('head', $input));
     }
 
-    public static function provideSanitizeHead()
+    public static function provideSanitizeHead(): iterable
     {
         $cases = [
             // Scripts
@@ -71,7 +71,7 @@ class HtmlSanitizerAllTest extends TestCase
         $this->assertSame($expected, $this->createSanitizer()->sanitize($input));
     }
 
-    public static function provideSanitizeBody()
+    public static function provideSanitizeBody(): iterable
     {
         $cases = [
             // Text

@@ -19,7 +19,7 @@ class NumberComparatorTest extends TestCase
     /**
      * @dataProvider getConstructorTestData
      */
-    public function testConstructor($successes, $failures)
+    public function testConstructor(array $successes, array $failures)
     {
         foreach ($successes as $s) {
             new NumberComparator($s);
@@ -38,7 +38,7 @@ class NumberComparatorTest extends TestCase
     /**
      * @dataProvider getTestData
      */
-    public function testTest($test, $match, $noMatch)
+    public function testTest(?string $test, array $match, array $noMatch)
     {
         $c = new NumberComparator($test);
 
@@ -51,7 +51,7 @@ class NumberComparatorTest extends TestCase
         }
     }
 
-    public static function getTestData()
+    public static function getTestData(): array
     {
         return [
             ['< 1000', ['500', '999'], ['1000', '1500']],
@@ -81,7 +81,7 @@ class NumberComparatorTest extends TestCase
         ];
     }
 
-    public static function getConstructorTestData()
+    public static function getConstructorTestData(): array
     {
         return [
             [

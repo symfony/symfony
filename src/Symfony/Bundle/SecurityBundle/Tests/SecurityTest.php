@@ -56,7 +56,7 @@ class SecurityTest extends TestCase
     /**
      * @dataProvider getUserTests
      */
-    public function testGetUser($userInToken, $expectedUser)
+    public function testGetUser(?InMemoryUser $userInToken, ?InMemoryUser $expectedUser)
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())
@@ -74,7 +74,7 @@ class SecurityTest extends TestCase
         $this->assertSame($expectedUser, $security->getUser());
     }
 
-    public static function getUserTests()
+    public static function getUserTests(): iterable
     {
         yield [null, null];
 
@@ -115,7 +115,7 @@ class SecurityTest extends TestCase
         $this->assertSame($expectedFirewallConfig, $security->getFirewallConfig($request));
     }
 
-    public static function getFirewallConfigTests()
+    public static function getFirewallConfigTests(): iterable
     {
         $request = new Request();
 

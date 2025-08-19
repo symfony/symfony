@@ -178,7 +178,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         ], 'security.event_dispatcher.main');
     }
 
-    private function assertListeners(array $expectedListeners, string $dispatcherId = 'security.event_dispatcher.main')
+    private function assertListeners(array $expectedListeners, string $dispatcherId = 'security.event_dispatcher.main'): void
     {
         $actualListeners = [];
         foreach ($this->container->findDefinition($dispatcherId)->getMethodCalls() as $methodCall) {

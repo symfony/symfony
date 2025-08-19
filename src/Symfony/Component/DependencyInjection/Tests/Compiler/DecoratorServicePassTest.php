@@ -312,7 +312,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['prop' => new Reference('bar.inner')], $container->getDefinition('bar')->getProperties());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new DecoratorServicePass();
         $pass->process($container);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -239,7 +240,7 @@ class ApplicationTest extends TestCase
         return $event->getError()->getMessage();
     }
 
-    private function getKernel(array $bundles, $useDispatcher = false)
+    private function getKernel(array $bundles, $useDispatcher = false): KernelInterface&MockObject
     {
         $container = $this->createMock(ContainerInterface::class);
 
@@ -310,7 +311,7 @@ class ApplicationTest extends TestCase
         return $kernel;
     }
 
-    private function createBundleMock(array $commands)
+    private function createBundleMock(array $commands): Bundle&MockObject
     {
         $bundle = $this->createMock(Bundle::class);
         $bundle

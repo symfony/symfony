@@ -309,7 +309,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public static function provideAdditionalRequestMatcherConstraints()
+    public static function provideAdditionalRequestMatcherConstraints(): iterable
     {
         yield 'Invalid configuration with path' => [['path' => '^/url']];
         yield 'Invalid configuration with host' => [['host' => 'example.com']];
@@ -933,7 +933,7 @@ class SecurityExtensionTest extends TestCase
         ]);
     }
 
-    protected function getRawContainer()
+    protected function getRawContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -951,7 +951,7 @@ class SecurityExtensionTest extends TestCase
         return $container;
     }
 
-    protected function getContainer()
+    protected function getContainer(): ContainerBuilder
     {
         $container = $this->getRawContainer();
         $container->compile();

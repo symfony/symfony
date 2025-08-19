@@ -76,7 +76,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $this->assertEquals([[self::$message, null]], $visitor->getMessages());
     }
 
-    public static function getDefaultDomainAssignmentTestData()
+    public static function getDefaultDomainAssignmentTestData(): array
     {
         return [
             [TwigNodeProvider::getTransFilter(self::$message)],

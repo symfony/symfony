@@ -60,7 +60,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
         );
     }
 
-    private function getMatcher(RouteCollection $routes, RequestContext $context)
+    private function getMatcher(RouteCollection $routes, RequestContext $context): RedirectableCompiledUrlMatcher
     {
         $dumper = new CompiledUrlMatcherDumper($routes);
 

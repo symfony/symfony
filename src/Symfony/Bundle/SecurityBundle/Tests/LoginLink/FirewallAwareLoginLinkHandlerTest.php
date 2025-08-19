@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\LoginLink;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\LoginLink\FirewallAwareLoginLinkHandler;
@@ -54,7 +55,7 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
         $this->assertSame($user, $actualUser);
     }
 
-    private function createFirewallMap(string $firewallName)
+    private function createFirewallMap(string $firewallName): FirewallMap&MockObject
     {
         $map = $this->createMock(FirewallMap::class);
         $map->expects($this->any())
@@ -64,7 +65,7 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
         return $map;
     }
 
-    private function createLocator(array $linkers)
+    private function createLocator(array $linkers): ContainerInterface&MockObject
     {
         $locator = $this->createMock(ContainerInterface::class);
         $locator->expects($this->any())

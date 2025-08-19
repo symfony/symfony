@@ -64,7 +64,7 @@ class AbstractFactoryTest extends TestCase
         }
     }
 
-    public static function getFailureHandlers()
+    public static function getFailureHandlers(): array
     {
         return [
             [null, true],
@@ -132,7 +132,7 @@ class AbstractFactoryTest extends TestCase
         $node->finalize($normalizedConfig);
     }
 
-    public static function getSuccessHandlers()
+    public static function getSuccessHandlers(): array
     {
         return [
             [null, true],
@@ -140,7 +140,7 @@ class AbstractFactoryTest extends TestCase
         ];
     }
 
-    protected function callFactory(string $firewallName, array $config, string $userProviderId, string $defaultEntryPointId)
+    protected function callFactory(string $firewallName, array $config, string $userProviderId, string $defaultEntryPointId): void
     {
         (new StubFactory())->createAuthenticator($this->container, $firewallName, $config, $userProviderId);
     }

@@ -21,13 +21,13 @@ class PackageTest extends TestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testGetUrl($version, $format, $path, $expected)
+    public function testGetUrl(?string $version, string $format, string $path, string $expected)
     {
         $package = new Package($version ? new StaticVersionStrategy($version, $format) : new EmptyVersionStrategy());
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public static function getConfigs()
+    public static function getConfigs(): array
     {
         return [
             ['v1', '', 'http://example.com/foo', 'http://example.com/foo'],

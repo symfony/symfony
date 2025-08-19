@@ -24,7 +24,7 @@ class RequestMatcherTest extends TestCase
     /**
      * @dataProvider getMethodData
      */
-    public function testMethod($requestMethod, $matcherMethod, $isMatch)
+    public function testMethod(string $requestMethod, array|string $matcherMethod, bool $isMatch)
     {
         $matcher = new RequestMatcher();
         $matcher->matchMethod($matcherMethod);
@@ -36,7 +36,7 @@ class RequestMatcherTest extends TestCase
         $this->assertSame($isMatch, $matcher->matches($request));
     }
 
-    public static function getMethodData()
+    public static function getMethodData(): array
     {
         return [
             ['get', 'get', true],
@@ -70,7 +70,7 @@ class RequestMatcherTest extends TestCase
     /**
      * @dataProvider getHostData
      */
-    public function testHost($pattern, $isMatch)
+    public function testHost(string $pattern, bool $isMatch)
     {
         $matcher = new RequestMatcher();
         $request = Request::create('', 'get', [], [], [], ['HTTP_HOST' => 'foo.example.com']);
@@ -97,7 +97,7 @@ class RequestMatcherTest extends TestCase
         $this->assertTrue($matcher->matches($request));
     }
 
-    public static function getHostData()
+    public static function getHostData(): array
     {
         return [
             ['.*\.example\.com', true],

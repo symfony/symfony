@@ -27,7 +27,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ObjectsProvider
 {
-    public static function getRouteCollections()
+    public static function getRouteCollections(): array
     {
         $collection1 = new RouteCollection();
         foreach (self::getRoutes() as $name => $route) {
@@ -37,7 +37,7 @@ class ObjectsProvider
         return ['route_collection_1' => $collection1];
     }
 
-    public static function getRoutes()
+    public static function getRoutes(): array
     {
         return [
             'route_1' => new RouteStub(
@@ -62,7 +62,7 @@ class ObjectsProvider
         ];
     }
 
-    public static function getContainerParameters()
+    public static function getContainerParameters(): iterable
     {
         yield 'parameters_1' => new ParameterBag([
             'integer' => 12,
@@ -90,7 +90,7 @@ class ObjectsProvider
         yield 'deprecated_parameters' => $parameterBag;
     }
 
-    public static function getContainerParameter()
+    public static function getContainerParameter(): array
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('database_name', 'symfony');
@@ -110,7 +110,7 @@ class ObjectsProvider
         ];
     }
 
-    public static function getContainerDeprecations()
+    public static function getContainerDeprecations(): array
     {
         $builderWithDeprecations = new ContainerBuilder();
         $builderWithDeprecations->setParameter('kernel.cache_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
@@ -128,7 +128,7 @@ class ObjectsProvider
         ];
     }
 
-    public static function getContainerBuilders()
+    public static function getContainerBuilders(): array
     {
         $builder1 = new ContainerBuilder();
         $builder1->setDefinitions(self::getContainerDefinitions());
@@ -137,7 +137,7 @@ class ObjectsProvider
         return ['builder_1' => $builder1];
     }
 
-    public static function getContainerDefinitionsWithExistingClasses()
+    public static function getContainerDefinitionsWithExistingClasses(): array
     {
         return [
             'existing_class_def_1' => new Definition(ClassWithDocComment::class),
@@ -145,7 +145,7 @@ class ObjectsProvider
         ];
     }
 
-    public static function getContainerDefinitions()
+    public static function getContainerDefinitions(): array
     {
         $definition1 = new Definition('Full\\Qualified\\Class1');
         $definition2 = new Definition('Full\\Qualified\\Class2');
@@ -190,7 +190,7 @@ class ObjectsProvider
         ];
     }
 
-    public static function getContainerBuildersWithPriorityTags()
+    public static function getContainerBuildersWithPriorityTags(): array
     {
         $builder = new ContainerBuilder();
         $builder->setDefinitions(self::getContainerDefinitionsWithPriorityTags());
@@ -198,7 +198,7 @@ class ObjectsProvider
         return ['builder' => $builder];
     }
 
-    public static function getContainerDefinitionsWithPriorityTags()
+    public static function getContainerDefinitionsWithPriorityTags(): array
     {
         $definition1 = new Definition('Full\\Qualified\\Class1');
         $definition2 = new Definition('Full\\Qualified\\Class2');
@@ -242,7 +242,7 @@ class ObjectsProvider
         ];
     }
 
-    public static function getContainerAliases()
+    public static function getContainerAliases(): array
     {
         return [
             'alias_1' => new Alias('service_1', true),
@@ -250,7 +250,7 @@ class ObjectsProvider
         ];
     }
 
-    public static function getEventDispatchers()
+    public static function getEventDispatchers(): array
     {
         $eventDispatcher = new EventDispatcher();
 

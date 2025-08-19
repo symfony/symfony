@@ -168,7 +168,7 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage->parse('node.', ['node']);
     }
 
-    public static function shortCircuitProviderEvaluate()
+    public static function shortCircuitProviderEvaluate(): array
     {
         $object = new class(static::fail(...)) {
             private \Closure $fail;
@@ -192,7 +192,7 @@ class ExpressionLanguageTest extends TestCase
         ];
     }
 
-    public static function shortCircuitProviderCompile()
+    public static function shortCircuitProviderCompile(): array
     {
         return [
             ['false and foo', ['foo' => 'foo'], false],
@@ -278,7 +278,7 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider getRegisterCallbacks
      */
-    public function testRegisterAfterParse($registerCallback)
+    public function testRegisterAfterParse(callable $registerCallback)
     {
         $this->expectException(\LogicException::class);
         $el = new ExpressionLanguage();
@@ -289,7 +289,7 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider getRegisterCallbacks
      */
-    public function testRegisterAfterEval($registerCallback)
+    public function testRegisterAfterEval(callable $registerCallback)
     {
         $this->expectException(\LogicException::class);
         $el = new ExpressionLanguage();
@@ -300,7 +300,7 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider provideNullSafe
      */
-    public function testNullSafeEvaluate($expression, $foo)
+    public function testNullSafeEvaluate(string $expression, mixed $foo)
     {
         $expressionLanguage = new ExpressionLanguage();
         $this->assertNull($expressionLanguage->evaluate($expression, ['foo' => $foo]));
@@ -309,13 +309,13 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider provideNullSafe
      */
-    public function testNullSafeCompile($expression, $foo)
+    public function testNullSafeCompile(string $expression, mixed $foo)
     {
         $expressionLanguage = new ExpressionLanguage();
         $this->assertNull(eval(\sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))));
     }
 
-    public static function provideNullSafe()
+    public static function provideNullSafe(): iterable
     {
         $foo = new class extends \stdClass {
             public function bar()
@@ -348,7 +348,7 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider provideInvalidNullSafe
      */
-    public function testNullSafeEvaluateFails($expression, $foo, $message)
+    public function testNullSafeEvaluateFails(string $expression, mixed $foo, string $message)
     {
         $expressionLanguage = new ExpressionLanguage();
 
@@ -360,7 +360,7 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider provideInvalidNullSafe
      */
-    public function testNullSafeCompileFails($expression, $foo)
+    public function testNullSafeCompileFails(string $expression, mixed $foo)
     {
         $expressionLanguage = new ExpressionLanguage();
 
@@ -381,7 +381,7 @@ class ExpressionLanguageTest extends TestCase
         }
     }
 
-    public static function provideInvalidNullSafe()
+    public static function provideInvalidNullSafe(): iterable
     {
         yield ['foo?.bar.baz', (object) ['bar' => null], 'Unable to get property "baz" of non-object "foo?.bar".'];
         yield ['foo?.bar["baz"]', (object) ['bar' => null], 'Unable to get an item of non-array "foo?.bar".'];
@@ -400,13 +400,13 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider provideNullCoalescing
      */
-    public function testNullCoalescingCompile($expression, $foo)
+    public function testNullCoalescingCompile(string $expression, mixed $foo)
     {
         $expressionLanguage = new ExpressionLanguage();
         $this->assertSame(eval(\sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))), 'default');
     }
 
-    public static function provideNullCoalescing()
+    public static function provideNullCoalescing(): iterable
     {
         $foo = new class extends \stdClass {
             public function bar()
@@ -440,7 +440,7 @@ class ExpressionLanguageTest extends TestCase
         $registerCallback($el);
     }
 
-    public static function getRegisterCallbacks()
+    public static function getRegisterCallbacks(): array
     {
         return [
             [

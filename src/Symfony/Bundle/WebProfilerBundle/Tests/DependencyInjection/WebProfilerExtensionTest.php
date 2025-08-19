@@ -37,7 +37,7 @@ class WebProfilerExtensionTest extends TestCase
     private MockObject&KernelInterface $kernel;
     private ?ContainerBuilder $container;
 
-    public static function assertSaneContainer(Container $container)
+    public static function assertSaneContainer(Container $container): void
     {
         $removedIds = $container->getRemovedIds();
         $errors = [];
@@ -95,7 +95,7 @@ class WebProfilerExtensionTest extends TestCase
     /**
      * @dataProvider getDebugModes
      */
-    public function testDefaultConfig($debug)
+    public function testDefaultConfig(bool $debug)
     {
         $this->container->setParameter('kernel.debug', $debug);
 
@@ -108,7 +108,7 @@ class WebProfilerExtensionTest extends TestCase
         self::assertSaneContainer($this->getCompiledContainer());
     }
 
-    public static function getDebugModes()
+    public static function getDebugModes(): array
     {
         return [
             ['debug' => false],
@@ -134,7 +134,7 @@ class WebProfilerExtensionTest extends TestCase
         }
     }
 
-    public static function getToolbarConfig()
+    public static function getToolbarConfig(): array
     {
         return [
             [
@@ -175,7 +175,7 @@ class WebProfilerExtensionTest extends TestCase
         }
     }
 
-    public static function getInterceptRedirectsToolbarConfig()
+    public static function getInterceptRedirectsToolbarConfig(): array
     {
         return [
             [
@@ -199,7 +199,7 @@ class WebProfilerExtensionTest extends TestCase
         ];
     }
 
-    private function getCompiledContainer()
+    private function getCompiledContainer(): ContainerBuilder
     {
         if ($this->container->has('web_profiler.debug_toolbar')) {
             $this->container->getDefinition('web_profiler.debug_toolbar')->setPublic(true);

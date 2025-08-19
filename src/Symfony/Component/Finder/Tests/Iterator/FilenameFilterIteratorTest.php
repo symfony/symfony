@@ -18,7 +18,7 @@ class FilenameFilterIteratorTest extends IteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($matchPatterns, $noMatchPatterns, $expected)
+    public function testAccept(array $matchPatterns, array $noMatchPatterns, array $expected)
     {
         $inner = new InnerNameIterator(['test.php', 'test.py', 'foo.php']);
 
@@ -27,7 +27,7 @@ class FilenameFilterIteratorTest extends IteratorTestCase
         $this->assertIterator($expected, $iterator);
     }
 
-    public static function getAcceptData()
+    public static function getAcceptData(): array
     {
         return [
             [['test.*'], [], ['test.php', 'test.py']],

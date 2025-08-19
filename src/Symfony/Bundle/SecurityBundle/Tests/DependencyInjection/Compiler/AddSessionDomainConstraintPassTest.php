@@ -120,7 +120,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
-    private function createContainer($sessionStorageOptions)
+    private function createContainer($sessionStorageOptions): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.bundles_metadata', []);

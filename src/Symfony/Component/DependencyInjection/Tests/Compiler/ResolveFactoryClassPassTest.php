@@ -46,7 +46,7 @@ class ResolveFactoryClassPassTest extends TestCase
         $this->assertSame(['Baz\Qux', 'getInstance'], $factory->getFactory()[0]->getFactory());
     }
 
-    public static function provideFulfilledFactories()
+    public static function provideFulfilledFactories(): array
     {
         return [
             [['Foo\Bar', 'create']],
@@ -58,7 +58,7 @@ class ResolveFactoryClassPassTest extends TestCase
     /**
      * @dataProvider provideFulfilledFactories
      */
-    public function testIgnoresFulfilledFactories($factory)
+    public function testIgnoresFulfilledFactories(array $factory)
     {
         $container = new ContainerBuilder();
         $definition = new Definition();

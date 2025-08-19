@@ -31,7 +31,7 @@ class RegisterMappingsPassTest extends TestCase
         ]);
     }
 
-    private function process(ContainerBuilder $container, array $managerParamNames)
+    private function process(ContainerBuilder $container, array $managerParamNames): void
     {
         $pass = new ConcreteMappingsPass(
             new Definition('\stdClass'),
@@ -43,7 +43,7 @@ class RegisterMappingsPassTest extends TestCase
         $pass->process($container);
     }
 
-    private function createBuilder()
+    private function createBuilder(): ContainerBuilder
     {
         $container = new ContainerBuilder();
 

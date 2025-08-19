@@ -19,7 +19,7 @@ class TranslationFilesTest extends TestCase
     /**
      * @dataProvider provideTranslationFiles
      */
-    public function testTranslationFileIsValid($filePath)
+    public function testTranslationFileIsValid(string $filePath)
     {
         $document = new \DOMDocument();
         $document->loadXML(file_get_contents($filePath));
@@ -32,7 +32,7 @@ class TranslationFilesTest extends TestCase
     /**
      * @dataProvider provideTranslationFiles
      */
-    public function testTranslationFileIsValidWithoutEntityLoader($filePath)
+    public function testTranslationFileIsValidWithoutEntityLoader(string $filePath)
     {
         $document = new \DOMDocument();
         $document->loadXML(file_get_contents($filePath));
@@ -42,7 +42,7 @@ class TranslationFilesTest extends TestCase
         $this->assertCount(0, $errors, \sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
-    public static function provideTranslationFiles()
+    public static function provideTranslationFiles(): array
     {
         return array_map(
             fn ($filePath) => (array) $filePath,

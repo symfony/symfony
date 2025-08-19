@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\PathPackage;
@@ -22,13 +23,13 @@ class PathPackageTest extends TestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testGetUrl($basePath, $format, $path, $expected)
+    public function testGetUrl(string $basePath, string $format, string $path, string $expected)
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format));
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public static function getConfigs()
+    public static function getConfigs(): array
     {
         return [
             ['/foo', '', 'http://example.com/foo', 'http://example.com/foo'],
@@ -53,14 +54,14 @@ class PathPackageTest extends TestCase
     /**
      * @dataProvider getContextConfigs
      */
-    public function testGetUrlWithContext($basePathRequest, $basePath, $format, $path, $expected)
+    public function testGetUrlWithContext(string $basePathRequest, string $basePath, string $format, string $path, $expected)
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format), $this->getContext($basePathRequest));
 
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public static function getContextConfigs()
+    public static function getContextConfigs(): array
     {
         return [
             ['', '/foo', '', '/baz', '/baz?v1'],
@@ -88,7 +89,7 @@ class PathPackageTest extends TestCase
         $this->assertSame('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
     }
 
-    private function getContext($basePath)
+    private function getContext(string $basePath): ContextInterface&MockObject
     {
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->any())->method('getBasePath')->willReturn($basePath);

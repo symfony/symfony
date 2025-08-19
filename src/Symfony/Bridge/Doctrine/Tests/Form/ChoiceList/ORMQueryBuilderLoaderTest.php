@@ -50,7 +50,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $this->checkIdentifierType(SingleIntIdEntity::class, class_exists(ArrayParameterType::class) ? ArrayParameterType::INTEGER : Connection::PARAM_INT_ARRAY);
     }
 
-    protected function checkIdentifierType(string $classname, $expectedType)
+    protected function checkIdentifierType(string $classname, $expectedType): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -273,7 +273,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     /**
      * @return (LegacyQueryMock&MockObject)|(Query&MockObject)
      */
-    private function getQueryMock(): AbstractQuery
+    private function getQueryMock(): AbstractQuery&MockObject
     {
         $class = ((new \ReflectionClass(Query::class))->isFinal()) ? LegacyQueryMock::class : Query::class;
 

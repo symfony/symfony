@@ -19,7 +19,7 @@ class ConfirmationQuestionTest extends TestCase
     /**
      * @dataProvider normalizerUsecases
      */
-    public function testDefaultRegexUsecases($default, $answers, $expected, $message)
+    public function testDefaultRegexUsecases(bool $default, array $answers, bool $expected, string $message)
     {
         $sut = new ConfirmationQuestion('A question', $default);
 
@@ -30,7 +30,7 @@ class ConfirmationQuestionTest extends TestCase
         }
     }
 
-    public static function normalizerUsecases()
+    public static function normalizerUsecases(): array
     {
         return [
             [

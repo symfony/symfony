@@ -450,7 +450,7 @@ class SecurityDataCollectorTest extends TestCase
         ];
     }
 
-    private function getRoleHierarchy()
+    private function getRoleHierarchy(): RoleHierarchy
     {
         return new RoleHierarchy([
             'ROLE_ADMIN' => ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],

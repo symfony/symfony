@@ -29,19 +29,19 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 
     private string $cacheDir;
 
-    public function onKernelException(ExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event): void
     {
         if ($event->getThrowable() instanceof Danger) {
             $event->setResponse(new Response('It\'s dangerous to go alone. Take this ⚔'));
         }
     }
 
-    public function halloweenAction()
+    public function halloweenAction(): Response
     {
         return new Response('halloween');
     }
 
-    public function dangerousAction()
+    public function dangerousAction(): never
     {
         throw new Danger();
     }

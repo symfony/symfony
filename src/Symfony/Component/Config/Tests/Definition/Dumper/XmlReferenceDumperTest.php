@@ -33,7 +33,7 @@ class XmlReferenceDumperTest extends TestCase
         $this->assertEquals(str_replace('http://example.org/schema/dic/acme_root', 'http://symfony.com/schema/dic/symfony', $this->getConfigurationAsString()), $dumper->dump($configuration, 'http://symfony.com/schema/dic/symfony'));
     }
 
-    private function getConfigurationAsString()
+    private function getConfigurationAsString(): string
     {
         return str_replace("\n", \PHP_EOL, <<<'EOL'
 <!-- Namespace: http://example.org/schema/dic/acme_root -->

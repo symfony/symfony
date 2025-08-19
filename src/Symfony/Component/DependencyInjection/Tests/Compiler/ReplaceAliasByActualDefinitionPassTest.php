@@ -62,7 +62,7 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
         $this->process($container);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new ReplaceAliasByActualDefinitionPass();
         $pass->process($container);

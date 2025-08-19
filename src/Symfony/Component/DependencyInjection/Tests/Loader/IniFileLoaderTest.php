@@ -37,7 +37,7 @@ class IniFileLoaderTest extends TestCase
     /**
      * @dataProvider getTypeConversions
      */
-    public function testTypeConversions($key, $value, $supported)
+    public function testTypeConversions(string $key, mixed $value, bool $supported)
     {
         $this->loader->load('types.ini');
         $parameters = $this->container->getParameterBag()->all();
@@ -48,7 +48,7 @@ class IniFileLoaderTest extends TestCase
      * @dataProvider getTypeConversions
      * This test illustrates where our conversions differs from INI_SCANNER_TYPED introduced in PHP 5.6.1
      */
-    public function testTypeConversionsWithNativePhp($key, $value, $supported)
+    public function testTypeConversionsWithNativePhp(string $key, mixed $value, bool $supported)
     {
         if (!$supported) {
             $this->markTestSkipped(\sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
@@ -58,7 +58,7 @@ class IniFileLoaderTest extends TestCase
         $this->assertSame($value, $expected['parameters'][$key], '->load() converts values to PHP types');
     }
 
-    public static function getTypeConversions()
+    public static function getTypeConversions(): array
     {
         return [
             ['true_comment', true, true],
@@ -98,7 +98,7 @@ class IniFileLoaderTest extends TestCase
      *
      * @dataProvider getLegacyTypeConversions
      */
-    public function testLegacyTypeConversionsWithNativePhp($key, $value, $supported)
+    public function testLegacyTypeConversionsWithNativePhp(string $key, mixed $value, bool $supported)
     {
         if (!$supported) {
             $this->markTestSkipped(\sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
@@ -108,7 +108,7 @@ class IniFileLoaderTest extends TestCase
         $this->assertSame($value, $expected['parameters'][$key], '->load() converts values to PHP types');
     }
 
-    public static function getLegacyTypeConversions()
+    public static function getLegacyTypeConversions(): array
     {
         return [
             ['true_comment', true, true],

@@ -65,7 +65,7 @@ class FinalizationTest extends TestCase
         ], $this->process($tree, [$a, $b]));
     }
 
-    protected function process(NodeInterface $tree, array $configs)
+    protected function process(NodeInterface $tree, array $configs): array
     {
         $processor = new Processor();
 

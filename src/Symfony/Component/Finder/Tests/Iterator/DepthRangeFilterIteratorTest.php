@@ -18,7 +18,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($minDepth, $maxDepth, $expected)
+    public function testAccept(int $minDepth, int $maxDepth, array $expected)
     {
         $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->toAbsolute(), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
@@ -30,7 +30,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public static function getAcceptData()
+    public static function getAcceptData(): array
     {
         $lessThan1 = [
             '.git',

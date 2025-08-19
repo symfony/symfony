@@ -201,7 +201,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
-    private function processConfig(array $config, AccessTokenFactory $factory)
+    private function processConfig(array $config, AccessTokenFactory $factory): mixed
     {
         $nodeDefinition = new ArrayNodeDefinition('access_token');
         $factory->addConfiguration($nodeDefinition);

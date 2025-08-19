@@ -351,7 +351,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame('decorated1', $container->getDefinition('s1.inner')->getClass());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         (new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()))->process($container);
     }

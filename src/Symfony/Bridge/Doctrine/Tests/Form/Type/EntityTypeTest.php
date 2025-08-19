@@ -86,14 +86,14 @@ class EntityTypeTest extends BaseTypeTestCase
         }
     }
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [
             new DoctrineOrmExtension($this->emRegistry),
         ]);
     }
 
-    protected function persist(array $entities)
+    protected function persist(array $entities): void
     {
         foreach ($entities as $entity) {
             $this->em->persist($entity);

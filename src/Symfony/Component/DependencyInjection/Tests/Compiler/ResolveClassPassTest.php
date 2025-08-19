@@ -23,7 +23,7 @@ class ResolveClassPassTest extends TestCase
     /**
      * @dataProvider provideValidClassId
      */
-    public function testResolveClassFromId($serviceId)
+    public function testResolveClassFromId(string $serviceId)
     {
         $container = new ContainerBuilder();
         $def = $container->register($serviceId);
@@ -33,7 +33,7 @@ class ResolveClassPassTest extends TestCase
         $this->assertSame($serviceId, $def->getClass());
     }
 
-    public static function provideValidClassId()
+    public static function provideValidClassId(): iterable
     {
         yield ['Acme\UnknownClass'];
         yield [CaseSensitiveClass::class];
@@ -42,7 +42,7 @@ class ResolveClassPassTest extends TestCase
     /**
      * @dataProvider provideInvalidClassId
      */
-    public function testWontResolveClassFromId($serviceId)
+    public function testWontResolveClassFromId(string $serviceId)
     {
         $container = new ContainerBuilder();
         $def = $container->register($serviceId);
@@ -52,7 +52,7 @@ class ResolveClassPassTest extends TestCase
         $this->assertNull($def->getClass());
     }
 
-    public static function provideInvalidClassId()
+    public static function provideInvalidClassId(): iterable
     {
         yield [\stdClass::class];
         yield ['bar'];

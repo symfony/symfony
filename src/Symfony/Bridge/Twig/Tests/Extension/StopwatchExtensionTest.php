@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\StopwatchExtension;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -42,7 +43,7 @@ class StopwatchExtensionTest extends TestCase
         }
     }
 
-    public static function getTimingTemplates()
+    public static function getTimingTemplates(): array
     {
         return [
             ['{% stopwatch "foo" %}something{% endstopwatch %}', 'foo'],
@@ -54,7 +55,7 @@ class StopwatchExtensionTest extends TestCase
         ];
     }
 
-    protected function getStopwatch($events = [])
+    protected function getStopwatch($events = []): Stopwatch&MockObject
     {
         $events = \is_array($events) ? $events : [$events];
         $stopwatch = $this->createMock(Stopwatch::class);

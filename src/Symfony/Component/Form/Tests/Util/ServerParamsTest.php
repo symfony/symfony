@@ -41,14 +41,14 @@ class ServerParamsTest extends TestCase
     }
 
     /** @dataProvider getGetPostMaxSizeTestData */
-    public function testGetPostMaxSize($size, $bytes)
+    public function testGetPostMaxSize(string $size, int $bytes)
     {
         $serverParams = new DummyServerParams($size);
 
         $this->assertEquals($bytes, $serverParams->getPostMaxSize());
     }
 
-    public static function getGetPostMaxSizeTestData()
+    public static function getGetPostMaxSizeTestData(): array
     {
         return [
             ['2k', 2048],

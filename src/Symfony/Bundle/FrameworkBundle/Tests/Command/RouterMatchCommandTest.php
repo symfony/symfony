@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
@@ -52,7 +53,7 @@ class RouterMatchCommandTest extends TestCase
         return new CommandTester($application->find('router:match'));
     }
 
-    private function getRouter()
+    private function getRouter(): RouterInterface&MockObject
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
@@ -70,7 +71,7 @@ class RouterMatchCommandTest extends TestCase
         return $router;
     }
 
-    private function getKernel()
+    private function getKernel(): KernelInterface&MockObject
     {
         $container = $this->createMock(ContainerInterface::class);
         $container

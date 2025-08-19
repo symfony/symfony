@@ -53,7 +53,7 @@ class GeneratedConfigTest extends TestCase
         parent::tearDown();
     }
 
-    public static function fixtureNames()
+    public static function fixtureNames(): iterable
     {
         $array = [
             'ScalarNormalizedTypes' => 'scalar_normalized_types',
@@ -183,7 +183,7 @@ class GeneratedConfigTest extends TestCase
         return $loader();
     }
 
-    private function assertDirectorySame($expected, $current)
+    private function assertDirectorySame(string $expected, string $current): void
     {
         $expectedFiles = [];
         foreach (new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($expected, \FilesystemIterator::SKIP_DOTS)) as $file) {

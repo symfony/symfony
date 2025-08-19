@@ -42,7 +42,7 @@ class NoTemplatingEntryTest extends TestCase
         $this->deleteTempDir();
     }
 
-    protected function deleteTempDir()
+    protected function deleteTempDir(): void
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/NoTemplatingEntryKernel')) {
             return;

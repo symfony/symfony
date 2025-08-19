@@ -21,7 +21,7 @@ class DotenvTest extends TestCase
     /**
      * @dataProvider getEnvDataWithFormatErrors
      */
-    public function testParseWithFormatError($data, $error)
+    public function testParseWithFormatError(string $data, string $error)
     {
         $dotenv = new Dotenv();
 
@@ -33,7 +33,7 @@ class DotenvTest extends TestCase
         }
     }
 
-    public static function getEnvDataWithFormatErrors()
+    public static function getEnvDataWithFormatErrors(): array
     {
         $tests = [
             ['FOO=BAR BAZ', "A value containing spaces must be surrounded by quotes in \".env\" at line 1.\n...FOO=BAR BAZ...\n             ^ line 1 offset 11"],
@@ -66,13 +66,13 @@ class DotenvTest extends TestCase
     /**
      * @dataProvider getEnvData
      */
-    public function testParse($data, $expected)
+    public function testParse(string $data, array $expected)
     {
         $dotenv = new Dotenv();
         $this->assertSame($expected, $dotenv->parse($data));
     }
 
-    public static function getEnvData()
+    public static function getEnvData(): array
     {
         putenv('LOCAL=local');
         $_ENV['LOCAL'] = 'local';

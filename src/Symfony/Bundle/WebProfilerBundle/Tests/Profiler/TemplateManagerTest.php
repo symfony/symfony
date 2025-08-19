@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Profiler;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -24,8 +25,8 @@ use Twig\Loader\LoaderInterface;
  */
 class TemplateManagerTest extends TestCase
 {
-    protected Environment $twigEnvironment;
-    protected Profiler $profiler;
+    protected Environment&MockObject $twigEnvironment;
+    protected Profiler&MockObject $profiler;
     protected TemplateManager $templateManager;
 
     protected function setUp(): void
@@ -62,7 +63,7 @@ class TemplateManagerTest extends TestCase
         $this->assertEquals('@Foo/Collector/foo.html.twig', $this->templateManager->getName(new ProfileDummy(), 'foo'));
     }
 
-    public function profilerHasCallback($panel)
+    public function profilerHasCallback(string $panel): bool
     {
         return match ($panel) {
             'foo',
@@ -71,7 +72,7 @@ class TemplateManagerTest extends TestCase
         };
     }
 
-    public function profileHasCollectorCallback($panel)
+    public function profileHasCollectorCallback(string $panel): bool
     {
         return match ($panel) {
             'foo',
@@ -80,7 +81,7 @@ class TemplateManagerTest extends TestCase
         };
     }
 
-    protected function mockTwigEnvironment()
+    protected function mockTwigEnvironment(): Environment&MockObject
     {
         $this->twigEnvironment = $this->createMock(Environment::class);
 

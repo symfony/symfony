@@ -501,13 +501,13 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->assertEquals([], $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls());
     }
 
-    private function process(ContainerBuilder $container)
+    private function process(ContainerBuilder $container): void
     {
         $pass = new RegisterEventListenersAndSubscribersPass('doctrine.connections', 'doctrine.dbal.%s_connection.event_manager', 'doctrine');
         $pass->process($container);
     }
 
-    private function createBuilder($multipleConnections = false)
+    private function createBuilder($multipleConnections = false): ContainerBuilder
     {
         $container = new ContainerBuilder();
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use Closure;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Console\Application;
@@ -139,7 +140,7 @@ class CommandTest extends TestCase
     /**
      * @dataProvider provideInvalidCommandNames
      */
-    public function testInvalidCommandNames($name)
+    public function testInvalidCommandNames(string $name)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Command name "%s" is invalid.', $name));
@@ -359,7 +360,7 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'from the code...'.\PHP_EOL, $tester->getDisplay());
     }
 
-    public static function getSetCodeBindToClosureTests()
+    public static function getSetCodeBindToClosureTests(): array
     {
         return [
             [true, 'not bound to the command'],
@@ -370,7 +371,7 @@ class CommandTest extends TestCase
     /**
      * @dataProvider getSetCodeBindToClosureTests
      */
-    public function testSetCodeBindToClosure($previouslyBound, $expected)
+    public function testSetCodeBindToClosure(bool $previouslyBound, string $expected)
     {
         $code = createClosure();
         if ($previouslyBound) {
@@ -394,7 +395,7 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'bound'.\PHP_EOL, $tester->getDisplay());
     }
 
-    private static function createClosure()
+    private static function createClosure(): Closure
     {
         return function (InputInterface $input, OutputInterface $output) {
             $output->writeln(isset($this) ? 'bound' : 'not bound');
@@ -411,7 +412,7 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'from the code...'.\PHP_EOL, $tester->getDisplay());
     }
 
-    public function callableMethodCommand(InputInterface $input, OutputInterface $output)
+    public function callableMethodCommand(InputInterface $input, OutputInterface $output): void
     {
         $output->writeln('from the code...');
     }

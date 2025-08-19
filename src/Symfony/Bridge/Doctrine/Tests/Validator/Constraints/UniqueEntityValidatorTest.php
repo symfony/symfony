@@ -48,7 +48,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     private const EM_NAME = 'foo';
 
     protected ?ObjectManager $em;
-    protected ManagerRegistry $registry;
+    protected MockObject&ManagerRegistry $registry;
     protected MockObject&EntityRepository $repository;
     protected TestRepositoryFactory $repositoryFactory;
 
@@ -70,7 +70,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
-    protected function createRegistryMock($em = null)
+    protected function createRegistryMock($em = null): MockObject&ManagerRegistry
     {
         $registry = $this->createMock(ManagerRegistry::class);
 
@@ -92,7 +92,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         return new UniqueEntityValidator($this->registry);
     }
 
-    private function createSchema($em)
+    private function createSchema($em): void
     {
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema([

@@ -61,7 +61,7 @@ class TranslationExtensionTest extends TestCase
         $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
     }
 
-    public static function getTransTests()
+    public static function getTransTests(): array
     {
         return [
             // trans tag

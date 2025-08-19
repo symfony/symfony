@@ -67,7 +67,7 @@ class ArrayInputTest extends TestCase
     /**
      * @dataProvider provideOptions
      */
-    public function testParseOptions($input, $options, $expectedOptions, $message)
+    public function testParseOptions(array $input, array $options, array $expectedOptions, string $message)
     {
         $input = new ArrayInput($input, new InputDefinition($options));
 
@@ -125,7 +125,7 @@ class ArrayInputTest extends TestCase
     /**
      * @dataProvider provideInvalidInput
      */
-    public function testParseInvalidInput($parameters, $definition, $expectedExceptionMessage)
+    public function testParseInvalidInput(array $parameters, InputDefinition $definition, string $expectedExceptionMessage)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);

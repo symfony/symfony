@@ -21,7 +21,7 @@ use Symfony\Component\Form\NativeRequestHandler;
  */
 class FormConfigTest extends TestCase
 {
-    public static function getHtml4Ids()
+    public static function getHtml4Ids(): array
     {
         return [
             ['z0'],
@@ -131,7 +131,7 @@ class FormConfigTest extends TestCase
         self::assertSame('PATCH', $formConfigBuilder->getMethod());
     }
 
-    private function getConfigBuilder($name = 'name')
+    private function getConfigBuilder($name = 'name'): FormConfigBuilder
     {
         return new FormConfigBuilder($name, null, new EventDispatcher());
     }

@@ -184,7 +184,7 @@ class OutputFormatterTest extends TestCase
         }
     }
 
-    public static function provideInlineStyleOptionsCases()
+    public static function provideInlineStyleOptionsCases(): array
     {
         return [
             ['<unknown=_unknown_>'],
@@ -199,7 +199,7 @@ class OutputFormatterTest extends TestCase
         ];
     }
 
-    public static function provideInlineStyleTagsWithUnknownOptions()
+    public static function provideInlineStyleTagsWithUnknownOptions(): array
     {
         return [
             ['<options=abc;>', 'abc'],
@@ -288,7 +288,7 @@ class OutputFormatterTest extends TestCase
         }
     }
 
-    public static function provideDecoratedAndNonDecoratedOutput()
+    public static function provideDecoratedAndNonDecoratedOutput(): array
     {
         return [
             ['<error>some error</error>', 'some error', "\033[37;41msome error\033[39;49m"],

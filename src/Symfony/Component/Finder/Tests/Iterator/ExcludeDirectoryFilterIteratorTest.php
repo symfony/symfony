@@ -19,7 +19,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($directories, $expected)
+    public function testAccept(array $directories, array $expected)
     {
         $inner = new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->toAbsolute(), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
@@ -28,7 +28,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
         $this->assertIterator($expected, $iterator);
     }
 
-    public static function getAcceptData()
+    public static function getAcceptData(): array
     {
         $foo = [
             '.bar',

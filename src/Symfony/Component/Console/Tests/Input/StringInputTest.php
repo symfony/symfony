@@ -22,7 +22,7 @@ class StringInputTest extends TestCase
     /**
      * @dataProvider getTokenizeData
      */
-    public function testTokenize($input, $tokens, $message)
+    public function testTokenize(string $input, array $tokens, string $message)
     {
         $input = new StringInput($input);
         $r = new \ReflectionClass(ArgvInput::class);
@@ -42,7 +42,7 @@ class StringInputTest extends TestCase
         $this->assertEquals('bar', $input->getOption('foo'));
     }
 
-    public static function getTokenizeData()
+    public static function getTokenizeData(): array
     {
         return [
             ['', [], '->tokenize() parses an empty string'],

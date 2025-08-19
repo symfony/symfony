@@ -57,7 +57,7 @@ class TraceableCommandTest extends TestCase
         $this->assertLoopOutputCorrectness($output);
     }
 
-    public function assertLoopOutputCorrectness(string $output)
+    public function assertLoopOutputCorrectness(string $output): void
     {
         $completeChar = '\\' !== \DIRECTORY_SEPARATOR ? '▓' : '=';
         self::assertMatchesRegularExpression('~3/3\s+\['.$completeChar.'+]\s+100%~u', $output);

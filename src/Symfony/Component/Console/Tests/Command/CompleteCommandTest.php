@@ -81,7 +81,7 @@ class CompleteCommandTest extends TestCase
         }
     }
 
-    public static function provideInputAndCurrentOptionValues()
+    public static function provideInputAndCurrentOptionValues(): iterable
     {
         yield [[], 'The "--current" option must be set and it must be an integer'];
         yield [['--current' => 'a'], 'The "--current" option must be set and it must be an integer'];
@@ -100,7 +100,7 @@ class CompleteCommandTest extends TestCase
         $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
     }
 
-    public static function provideCompleteCommandNameInputs()
+    public static function provideCompleteCommandNameInputs(): iterable
     {
         yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello', 'ahoy']];
         yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello', 'ahoy']];
@@ -117,7 +117,7 @@ class CompleteCommandTest extends TestCase
         $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
     }
 
-    public static function provideCompleteCommandInputDefinitionInputs()
+    public static function provideCompleteCommandInputDefinitionInputs(): iterable
     {
         yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
         yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
@@ -125,7 +125,7 @@ class CompleteCommandTest extends TestCase
         yield 'custom-aliased' => [['bin/console', 'ahoy'], ['Fabien', 'Robin', 'Wouter']];
     }
 
-    private function execute(array $input)
+    private function execute(array $input): void
     {
         // run in verbose mode to assert exceptions
         $this->tester->execute($input ? ($input + ['--shell' => 'bash', '--api-version' => CompleteCommand::COMPLETION_API_VERSION]) : $input, ['verbosity' => OutputInterface::VERBOSITY_DEBUG]);

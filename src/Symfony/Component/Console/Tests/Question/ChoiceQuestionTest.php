@@ -39,7 +39,7 @@ class ChoiceQuestionTest extends TestCase
         }
     }
 
-    public static function selectUseCases()
+    public static function selectUseCases(): array
     {
         return [
             [
@@ -107,7 +107,7 @@ class ChoiceQuestionTest extends TestCase
     /**
      * @dataProvider selectAssociativeChoicesProvider
      */
-    public function testSelectAssociativeChoices($providedAnswer, $expectedValue)
+    public function testSelectAssociativeChoices(string $providedAnswer, string $expectedValue)
     {
         $question = new ChoiceQuestion('A question', [
             '0' => 'First choice',
@@ -119,7 +119,7 @@ class ChoiceQuestionTest extends TestCase
         $this->assertSame($expectedValue, $question->getValidator()($providedAnswer));
     }
 
-    public static function selectAssociativeChoicesProvider()
+    public static function selectAssociativeChoicesProvider(): array
     {
         return [
             'select "0" choice by key' => ['0', '0'],

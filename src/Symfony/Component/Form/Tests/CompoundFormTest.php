@@ -588,7 +588,7 @@ class CompoundFormTest extends TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testSubmitPostOrPutRequest($method)
+    public function testSubmitPostOrPutRequest(string $method)
     {
         $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
@@ -636,7 +636,7 @@ class CompoundFormTest extends TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testSubmitPostOrPutRequestWithEmptyRootFormName($method)
+    public function testSubmitPostOrPutRequestWithEmptyRootFormName(string $method)
     {
         $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
@@ -684,7 +684,7 @@ class CompoundFormTest extends TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testSubmitPostOrPutRequestWithSingleChildForm($method)
+    public function testSubmitPostOrPutRequestWithSingleChildForm(string $method)
     {
         $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);
@@ -721,7 +721,7 @@ class CompoundFormTest extends TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testSubmitPostOrPutRequestWithSingleChildFormUploadedFile($method)
+    public function testSubmitPostOrPutRequestWithSingleChildFormUploadedFile(string $method)
     {
         $path = tempnam(sys_get_temp_dir(), 'sf');
         touch($path);

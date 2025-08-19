@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\FirePHPHandler;
 use Symfony\Component\EventDispatcher\EventDispatcher;

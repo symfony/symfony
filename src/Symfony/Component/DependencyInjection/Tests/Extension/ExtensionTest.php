@@ -26,7 +26,7 @@ class ExtensionTest extends TestCase
     /**
      * @dataProvider getResolvedEnabledFixtures
      */
-    public function testIsConfigEnabledReturnsTheResolvedValue($enabled)
+    public function testIsConfigEnabledReturnsTheResolvedValue(bool $enabled)
     {
         $extension = new EnableableExtension();
         $this->assertSame($enabled, $extension->isConfigEnabled(new ContainerBuilder(), ['enabled' => $enabled]));

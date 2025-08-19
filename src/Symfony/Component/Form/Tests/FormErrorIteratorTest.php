@@ -26,7 +26,7 @@ class FormErrorIteratorTest extends TestCase
     /**
      * @dataProvider findByCodesProvider
      */
-    public function testFindByCodes($code, $violationsCount)
+    public function testFindByCodes(string|array $code, int $violationsCount)
     {
         $formBuilder = new FormBuilder(
             'form',

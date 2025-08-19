@@ -125,7 +125,7 @@ class ProfilerControllerTest extends WebTestCase
     /**
      * @dataProvider getEmptyTokenCases
      */
-    public function testToolbarActionWithEmptyToken($token)
+    public function testToolbarActionWithEmptyToken(?string $token)
     {
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $twig = $this->createMock(Environment::class);
@@ -137,7 +137,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public static function getEmptyTokenCases()
+    public static function getEmptyTokenCases(): array
     {
         return [
             [null],
@@ -149,7 +149,7 @@ class ProfilerControllerTest extends WebTestCase
     /**
      * @dataProvider getOpenFileCases
      */
-    public function testOpeningDisallowedPaths($path, $isAllowed)
+    public function testOpeningDisallowedPaths(string $path, bool $isAllowed)
     {
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $twig = $this->createMock(Environment::class);
@@ -166,7 +166,7 @@ class ProfilerControllerTest extends WebTestCase
         }
     }
 
-    public static function getOpenFileCases()
+    public static function getOpenFileCases(): array
     {
         return [
             ['README.md', true],
@@ -182,7 +182,7 @@ class ProfilerControllerTest extends WebTestCase
     /**
      * @dataProvider provideCspVariants
      */
-    public function testReturns404onTokenNotFound($withCsp)
+    public function testReturns404onTokenNotFound(bool $withCsp)
     {
         $twig = $this->createMock(Environment::class);
         $profiler = $this->createMock(Profiler::class);
@@ -232,7 +232,7 @@ class ProfilerControllerTest extends WebTestCase
     /**
      * @dataProvider provideCspVariants
      */
-    public function testSearchResultsAction($withCsp)
+    public function testSearchResultsAction(bool $withCsp)
     {
         $twig = $this->createMock(Environment::class);
         $profiler = $this->createMock(Profiler::class);
@@ -499,7 +499,7 @@ class ProfilerControllerTest extends WebTestCase
         return $dumpDataCollector;
     }
 
-    private function assertDefaultPanel(string $expectedPanel, Profile $profile)
+    private function assertDefaultPanel(string $expectedPanel, Profile $profile): void
     {
         $profiler = $this->createMock(Profiler::class);
         $profiler

@@ -119,7 +119,7 @@ class XmlDumperTest extends TestCase
         $this->assertEquals($expectedXmlDump, $dumper->dump());
     }
 
-    public static function provideDecoratedServicesData()
+    public static function provideDecoratedServicesData(): array
     {
         $fixturesPath = realpath(__DIR__.'/../Fixtures/');
 
@@ -154,7 +154,7 @@ class XmlDumperTest extends TestCase
     /**
      * @dataProvider provideCompiledContainerData
      */
-    public function testCompiledContainerCanBeDumped($containerFile)
+    public function testCompiledContainerCanBeDumped(string $containerFile)
     {
         $fixturesPath = __DIR__.'/../Fixtures';
         $container = require $fixturesPath.'/containers/'.$containerFile.'.php';
@@ -165,7 +165,7 @@ class XmlDumperTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public static function provideCompiledContainerData()
+    public static function provideCompiledContainerData(): array
     {
         return [
             ['container8'],
@@ -301,7 +301,7 @@ class XmlDumperTest extends TestCase
         $this->assertSame(file_get_contents(self::$fixturesPath.'/xml/'.$expectedFile), $dumper->dump());
     }
 
-    public static function provideDefaultClasses()
+    public static function provideDefaultClasses(): iterable
     {
         yield [FooClassWithDefaultArrayAttribute::class, 'services_with_default_array.xml'];
         yield [FooClassWithDefaultObjectAttribute::class, 'services_with_default_object.xml'];

@@ -42,12 +42,12 @@ class TestHttpClient extends HttpBrowser
         $this->cookieJar = $cookieJar ?? new CookieJar();
     }
 
-    public function setNextResponse(Response $response)
+    public function setNextResponse(Response $response): void
     {
         $this->nextResponse = $response;
     }
 
-    public function setNextScript(string $script)
+    public function setNextScript(string $script): void
     {
         $this->nextScript = $script;
     }

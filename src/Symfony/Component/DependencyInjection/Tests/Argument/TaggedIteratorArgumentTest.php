@@ -116,7 +116,7 @@ class TaggedIteratorArgumentTest extends TestCase
         $this->assertSame($expectedDefaultPriorityMethod, $taggedIteratorArgument->getDefaultPriorityMethod());
     }
 
-    public static function defaultPriorityMethodProvider()
+    public static function defaultPriorityMethodProvider(): iterable
     {
         yield 'No indexAttribute and no defaultPriorityMethod' => [
             null,

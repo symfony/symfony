@@ -197,7 +197,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertEquals($content, $response->getContent());
     }
 
-    private function getMockHttpClient(string $ipAddr, string $content)
+    private function getMockHttpClient(string $ipAddr, string $content): MockHttpClient
     {
         return new MockHttpClient(new MockResponse($content, ['primary_ip' => $ipAddr]));
     }

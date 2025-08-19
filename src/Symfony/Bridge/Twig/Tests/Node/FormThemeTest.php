@@ -110,7 +110,7 @@ class FormThemeTest extends TestCase
         );
     }
 
-    protected function getVariableGetter($name)
+    protected function getVariableGetter(string $name): string
     {
         return \sprintf('($context["%s"] ?? null)', $name);
     }

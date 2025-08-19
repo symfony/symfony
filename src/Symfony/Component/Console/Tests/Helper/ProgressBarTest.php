@@ -1120,7 +1120,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     /**
      * @dataProvider provideFormat
      */
-    public function testFormatsWithoutMax($format)
+    public function testFormatsWithoutMax(string $format)
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->setFormat($format);
@@ -1177,12 +1177,12 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         );
     }
 
-    protected function getOutputStream($decorated = true, $verbosity = StreamOutput::VERBOSITY_NORMAL)
+    protected function getOutputStream(bool $decorated = true, int $verbosity = StreamOutput::VERBOSITY_NORMAL): StreamOutput
     {
         return new StreamOutput(fopen('php://memory', 'r+', false), $verbosity, $decorated);
     }
 
-    protected function generateOutput($expected)
+    protected function generateOutput(string $expected): string
     {
         $count = substr_count($expected, "\n");
 

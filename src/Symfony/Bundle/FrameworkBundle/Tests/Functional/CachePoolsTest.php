@@ -67,7 +67,7 @@ class CachePoolsTest extends AbstractWebTestCase
         }
     }
 
-    private function doTestCachePools($options, $adapterClass)
+    private function doTestCachePools(array $options, string $adapterClass)
     {
         static::bootKernel($options);
         $container = static::getContainer();

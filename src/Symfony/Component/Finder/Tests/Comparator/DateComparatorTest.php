@@ -36,7 +36,7 @@ class DateComparatorTest extends TestCase
     /**
      * @dataProvider getTestData
      */
-    public function testTest($test, $match, $noMatch)
+    public function testTest(string $test, array $match, array $noMatch)
     {
         $c = new DateComparator($test);
 
@@ -49,7 +49,7 @@ class DateComparatorTest extends TestCase
         }
     }
 
-    public static function getTestData()
+    public static function getTestData(): array
     {
         return [
             ['< 2005-10-10', [strtotime('2005-10-09')], [strtotime('2005-10-15')]],

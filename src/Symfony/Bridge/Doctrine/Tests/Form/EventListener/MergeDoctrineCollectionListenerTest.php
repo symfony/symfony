@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 class MergeDoctrineCollectionListenerTest extends TestCase
 {
@@ -34,12 +35,12 @@ class MergeDoctrineCollectionListenerTest extends TestCase
         $this->factory = $this->createMock(FormFactoryInterface::class);
     }
 
-    protected function getBuilder()
+    protected function getBuilder(): FormBuilder
     {
         return new FormBuilder('name', null, $this->dispatcher, $this->factory);
     }
 
-    protected function getForm()
+    protected function getForm(): FormInterface
     {
         return $this->getBuilder()
             ->setData($this->collection)

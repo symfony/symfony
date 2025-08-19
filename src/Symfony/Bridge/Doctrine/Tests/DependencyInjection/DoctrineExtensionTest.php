@@ -80,7 +80,7 @@ class DoctrineExtensionTest extends TestCase
         $method->invoke($this->extension, $emConfigs, $bundles);
     }
 
-    public static function getAutomappingData()
+    public static function getAutomappingData(): array
     {
         return [
             [
@@ -340,7 +340,7 @@ class DoctrineExtensionTest extends TestCase
         );
     }
 
-    protected function invokeLoadCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
+    protected function invokeLoadCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName): void
     {
         $method = new \ReflectionMethod($this->extension, 'loadObjectManagerCacheDriver');
 

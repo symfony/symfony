@@ -35,7 +35,7 @@ class DumperTest extends TestCase
     /**
      * @dataProvider provideVariables
      */
-    public function testInvoke($variable)
+    public function testInvoke(mixed $variable)
     {
         $output = $this->createMock(OutputInterface::class);
         $output->method('isDecorated')->willReturn(false);

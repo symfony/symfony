@@ -16,12 +16,12 @@ namespace Symfony\Component\ObjectMapper\Exception;
  *
  * @author Martin Komischke <martin.komischke@gmail.com>
  */
-final class MapMultipleAggregateException extends RuntimeException
+final class WrappedMappingException extends RuntimeException
 {
     /**
-     * @param array<\Throwable> $innerExceptions The collection of inner exceptions reveals which discrete mapping has failed.
+     * @param array<\Throwable> $exceptions The collection of exceptions reveals which discrete mapping has failed.
      */
-    public function __construct(string $message, public readonly array $innerExceptions)
+    public function __construct(string $message, public readonly array $exceptions)
     {
         parent::__construct($message);
     }

@@ -11,24 +11,24 @@
 
 namespace Symfony\Component\ObjectMapper;
 
-use Symfony\Component\ObjectMapper\Exception\MapMultipleAggregateException;
+use Symfony\Component\ObjectMapper\Exception\WrappedMappingException;
 
 /**
- * Map multiple objects using the ObjectMapper
+ * Map a collection of objects using the ObjectMapper
  *
  * @experimental
  *
  * @author Martin Komischke <martin.komischke@gmail.com>
  */
-interface MapMultipleInterface
+interface CollectionMapperInterface
 {
     /**
      * @template T of object
      * 
-     * @param array<T> $sourceCollection The array of objects to map from
+     * @param iterable<T> $sourceCollection The objects to map from
      * @return \Generator<int, object, mixed, void> yields a target object for each source object
      *
-     * @throws MapMultipleAggregateException      When mapping at least one of the source objects has failed.
+     * @throws WrappedMappingException      When mapping at least one of the source objects has failed.
      */
-    public function yieldMappedObjects(array $sourceCollection, string|null $target = null): \Generator;
+    public function map(iterable $sourceCollection, string|null $target = null, CollectionMapperExceptionPolicy $policy): \Generator;
 }

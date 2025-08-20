@@ -142,7 +142,17 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             }
         }
 
-        // todo: throw an exception if the root node name is not correctly configured (bc)
+        // Validate root node existence and, if configured by the user, its name
+        if (!$rootNode instanceof \DOMNode) {
+            throw new NotEncodableValueException('Invalid XML data: no root node found.');
+        }
+
+        if (\array_key_exists(self::ROOT_NODE_NAME, $context)) {
+            $expectedRootName = (string) $context[self::ROOT_NODE_NAME];
+            if ($expectedRootName !== $rootNode->nodeName) {
+                throw new NotEncodableValueException(\sprintf('Expected root node "%s", but found "%s".', $expectedRootName, $rootNode->nodeName));
+            }
+        }
 
         if ($rootNode->hasChildNodes()) {
             $data = $this->parseXml($rootNode, $context);

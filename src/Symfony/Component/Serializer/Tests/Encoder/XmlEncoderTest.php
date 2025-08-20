@@ -772,6 +772,24 @@ class XmlEncoderTest extends TestCase
         $this->encoder->decode(' ', 'xml');
     }
 
+    public function testDecodeThrowsOnRootNodeNameMismatch()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('Expected root node "expectedRoot", but found "wrongRoot".');
+
+        $xml = '<?xml version="1.0"?><wrongRoot><item>value</item></wrongRoot>';
+        $this->encoder->decode($xml, 'xml', ['xml_root_node_name' => 'expectedRoot']);
+    }
+
+    public function testDecodeThrowsWhenNoRootNodeFound()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('Invalid XML data: no root node found.');
+
+        $xml = '<?xml version="1.0"?><response><a>1</a></response>';
+        $this->encoder->decode($xml, 'xml', [XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE, \XML_COMMENT_NODE, \XML_ELEMENT_NODE]]);
+    }
+
     protected static function getXmlSource(): string
     {
         return '<?xml version="1.0"?>'."\n".

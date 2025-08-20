@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-07T22:15:35Z
+
+I'm not entirely sure if this qualifies as a breaking change 🤔
+If it is, I can update the `UPGRADE.md`  and change the target branch from `7.4` to `8.0`.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-07T22:43:40Z
+
+I believe the errors in this PR will be resolved by [PR #61360](https://github.com/symfony/symfony/pull/61360) :smile:.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-09T13:43:04Z
+
+I think the errors aren't relevant in the context of this PR
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-10T21:55:06Z
+
+@GromNaN Thanks a lot for all your suggestions! I’ve made the changes ❤️
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-19T23:32:17Z
+
+Thanks for the suggestions! 🙌
+I’ve made the changes

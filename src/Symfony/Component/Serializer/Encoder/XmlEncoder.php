@@ -16,6 +16,8 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
+use function Symfony\Contracts\Deprecation\trigger_deprecation;
+
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author John Wards <jwards@whiteoctober.co.uk>
@@ -63,6 +65,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const CDATA_WRAPPING_PATTERN = 'cdata_wrapping_pattern';
     public const IGNORE_EMPTY_ATTRIBUTES = 'ignore_empty_attributes';
     public const PRESERVE_NUMERIC_KEYS = 'preserve_numeric_keys';
+    public const VALIDATE_ROOT_NODE_NAME = 'xml_validate_root_node_name';
 
     private array $defaultContext = [
         self::AS_COLLECTION => false,
@@ -78,6 +81,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::CDATA_WRAPPING_PATTERN => '/[<>&]/',
         self::IGNORE_EMPTY_ATTRIBUTES => false,
         self::PRESERVE_NUMERIC_KEYS => false,
+        self::VALIDATE_ROOT_NODE_NAME => false,
     ];
 
     public function __construct(array $defaultContext = [])
@@ -147,10 +151,15 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             throw new NotEncodableValueException('Invalid XML data: no root node found.');
         }
 
+        $shouldValidateRoot = (bool) ($context[self::VALIDATE_ROOT_NODE_NAME] ?? $this->defaultContext[self::VALIDATE_ROOT_NODE_NAME] ?? false);
         if (\array_key_exists(self::ROOT_NODE_NAME, $context)) {
             $expectedRootName = (string) $context[self::ROOT_NODE_NAME];
             if ($expectedRootName !== $rootNode->nodeName) {
-                throw new NotEncodableValueException(\sprintf('Expected root node "%s", but found "%s".', $expectedRootName, $rootNode->nodeName));
+                if ($shouldValidateRoot) {
+                    throw new NotEncodableValueException(\sprintf('Expected root node "%s", but found "%s".', $expectedRootName, $rootNode->nodeName));
+                }
+
+                trigger_deprecation('symfony/serializer', '7.4', 'Decoding XML with a mismatching root node name is deprecated and will throw an exception in 8.0. Expected root node "%s", but found "%s". Set the "%s" context option to true to enable validation now.', $expectedRootName, $rootNode->nodeName, self::VALIDATE_ROOT_NODE_NAME);
             }
         }
 

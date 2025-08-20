@@ -778,7 +778,7 @@ class XmlEncoderTest extends TestCase
         $this->expectExceptionMessage('Expected root node "expectedRoot", but found "wrongRoot".');
 
         $xml = '<?xml version="1.0"?><wrongRoot><item>value</item></wrongRoot>';
-        $this->encoder->decode($xml, 'xml', ['xml_root_node_name' => 'expectedRoot']);
+        $this->encoder->decode($xml, 'xml', ['xml_root_node_name' => 'expectedRoot', 'xml_validate_root_node_name' => true]);
     }
 
     public function testDecodeThrowsWhenNoRootNodeFound()

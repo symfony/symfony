@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by KiloSierraCharlie at 2025-08-18T21:45:28Z
+
+Not sure if symfony-docs requires updating or a sendgrid specific page adding, or if the README.md within symfony/sendgrid-mailer will be sufficient?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-08-19T06:18:56Z
+
+> Not sure if symfony-docs requires updating or a sendgrid specific page adding, or if the README.md within symfony/sendgrid-mailer will be sufficient?
+
+We don't document bridges in the docs. Everything should be documented in the README file.

@@ -1432,7 +1432,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testCheckForUniquenessIsDelegatedToComparator()
     {
-        $comparatorAsBeenCalled = false;
+        $comparatorHasBeenCalled = false;
 
         $entity = new Person(1, 'Foo');
 
@@ -1446,8 +1446,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
             em: self::EM_NAME,
             entityClass: Person::class,
-            comparator: function ($value, $foundEntity) use ($dto, $entity, &$comparatorAsBeenCalled) {
-                $comparatorAsBeenCalled = true;
+            comparator: function ($value, $foundEntity) use ($dto, $entity, &$comparatorHasBeenCalled) {
+                $comparatorHasBeenCalled = true;
 
                 $this->assertSame($value, $dto);
                 $this->assertSame($foundEntity, $entity);
@@ -1462,7 +1462,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($dto, $constraint);
 
-        $this->assertTrue($comparatorAsBeenCalled);
+        $this->assertTrue($comparatorHasBeenCalled);
 
         $this->assertNoViolation();
     }

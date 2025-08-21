@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-20T20:57:11Z
+
+What about keeping the code? Maybe it could help some project upgrade more easily?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-08-20T21:03:33Z
+
+Why would a project run their testsuite on PHP 8.5 (which is not released yet) without using the latest patch release of their PHPUnit version ? I don't see why phpunit-bridge should maintain code covering that weird case (phpunit-bridge installs the latest version anyway AFAICT)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-08-21T05:42:53Z
+
+> Why would a project run their testsuite on PHP 8.5 (which is not released yet) without using the latest patch release of their PHPUnit version ?
+
+Well, someone still stuck on 12.0, 12.1, 12.2 for whatever reason would not get the patch. But I also doubt that in this someone would update to PHP 8.5.
+
+Patching vendor code instead always bears the risk of breaking things inadvertently. The theoretical benefit of keeping it doesn’t outweigh that for me.

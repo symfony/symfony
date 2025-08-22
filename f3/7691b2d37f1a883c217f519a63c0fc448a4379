@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-08-22T09:59:25Z
+
+@mtarld In which component do you miss a changelog entry?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-08-22T10:01:50Z
+
+Something like https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/TypeInfo/CHANGELOG.md?plain=1#L35 for the 3 components?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-08-22T10:02:27Z
+
+Nvm, I missed these, sorry for the noise.

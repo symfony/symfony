@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-08-21T16:42:07Z
+
+Seems this PR would fix #60946 (ping @Nayte91)?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-08-21T17:41:25Z
+
+@GromNaN the PR includes autoconfiguration rules to add the tag.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-22T07:43:40Z
+
+PR updated, thanks for the reviews.
+
+```yaml
+controllers:
+    resource: attributes
+    type: tagged_services
+```

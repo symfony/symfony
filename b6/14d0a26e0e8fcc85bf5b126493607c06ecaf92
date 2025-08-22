@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-31T08:42:41Z
+
+~Or maybe these files can be generated as in https://github.com/symfony/symfony/pull/59620?~
+~We could use a script to generate them and commit the result?~
+/cc @valtzu @GromNaN WDYT?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-31T13:19:36Z
+
+Little bit off topic, but what do you think about a JsonSchema component? we could also reuse this in symfony/ai
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-07-31T13:46:19Z
+
+> Or maybe these files can be generated as in #59620? We could use a script to generate them and commit the result?
+
+Routing and service loaders would have to use the config tree for their configuration. This is not currently the case, but it could be an idea for standardisation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-31T13:47:42Z
+
+Why ? Loaders don't care about schema validity, they already load what they know about and fail on error.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-31T13:48:33Z
+
+> what do you think about a JsonSchema component
+
+not mine to write, that typically the kind of stuff I'd rather outsource to another lib
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-07-31T13:54:45Z
+
+> Why ? Loaders don't care about schema validity, they already load what they know about and fail on error.
+
+I mean, if you want to leverage the `JsonSchemaGenerator` that is created in #59620, you need a config tree. If your idea is different, then I don't know what you want to use as a reference to generate the JSON schema with a script.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-31T14:00:17Z
+
+Got it, sorry! OK, so not generated, hand-written :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-21T10:53:36Z
+
+PR updated.
+Note that this cannot support yaml tags, so no autocompletion after `!service` for example.
+The only way to provide this would be to ship a language server. Out of reach I fear.

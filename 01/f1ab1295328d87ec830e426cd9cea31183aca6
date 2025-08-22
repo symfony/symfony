@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-07-09T11:31:51Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.4 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-07-09T11:47:42Z
+
+> Attributes attached to the invokable class are lost by the time we have a `Command` added to the Application.
+
+Can you elaborate on this? Why are they lost?
+
+Also: Please _always_ provide tests that cover your change.
+
+---------------------------------------------------------------------------
+
+by weitzman at 2025-07-09T11:59:19Z
+
+@derrabus - I added a hyperlink to the OP explaining whats meant by "wrapping command". Let me know if its still unclear.
+
+If anyone can suggest an existing test to modify, I will do so.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-07-09T12:04:39Z
+
+I don't understand why **you need** to access attributes of the wrapped invokable command **from** the actual `Command` class. Attributes should not be read at runtime (for performance). You can create an autoconfiguration mechanism to read the attributes during container compilation and inject them into a service.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-07-09T12:17:01Z
+
+Jérôme has a good point about manipulating the command at compile time instead of runtime. When accessing the service you get the real instance .
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-07-09T13:55:33Z
+
+> Let me know if its still unclear.
+
+It is. Your link is pointing to some line in our codebase, but that line does not explain your use-case. It neither tells me what you're trying to achieve, nor why you want to do that, nor how you tried to do that.
+
+> If anyone can suggest an existing test to modify, I will do so.
+
+This is a new feature, which means we need new tests. You can have a look at the existing test suite for inspiration, but we won't write those tests for you. And we won't merge a new feature without any tests.
+
+---------------------------------------------------------------------------
+
+by weitzman at 2025-07-09T14:57:03Z
+
+Apologies for not including my use case originally. I'm no Symfony expert, so your expertise here is much appreciated.
+
+I'm the maintainer of [Drush](https://github.com/drush-ops/drush), the CLI for Drupal. Drush is a happy user of the *standalone* Console component.
+
+I am exploring using Invokable Commands in our next version. Symfony made this possible in May in #60394. Drush has no command services at this time, so the suggestion to read Attributes at compile time won't work. We need a runtime solution, and so will other standalone Console users. We could read the Attributes as we add commands to the Application, but then we would have to store them separate from the Command object. Or we would have to extend Command and add a method to get the callable with its Attributes. That feels awkward enough that we wouldn't support Invokable Commands which is a shame IMO - they are great.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-07-09T15:50:38Z
+
+Thanks for the context.
+
+I see that Drush is built with `consolidation/annotated-command`. Looking at [its documentation](https://github.com/consolidation/annotated-command/blob/4.x/README.md#example-annotated-command-class) for the `FieldLabels` and `DefaultFields` attributes, it looks very close to what we built with invokable commands. I do think that the two attribute systems (Symfony and Consolidation) are mutually exclusive to configure the command.
+
+---------------------------------------------------------------------------
+
+by weitzman at 2025-07-09T16:01:28Z
+
+We are working to remove the dependency on consolidation/annotated-command in favor native Symfony Console conventions. See https://github.com/drush-ops/drush/pull/6135. This Console PR is part of the effort.
+
+Symfony Console supports a few Attributes like AsCommand and Argument and Option - we need a lot more in Drush. We can add declare Attribute classes and add them to our Invokable Commands but we can't cleanly read the Attributes - thus this PR.
+
+FYI, I removed the return type hint to an Internal class.
+
+---------------------------------------------------------------------------
+
+by weitzman at 2025-07-10T00:35:47Z
+
+I have added tests to the PR. I'm getting a failure because I removed the return type hint to an internal class. How can we best resolve this?
+
+So, do we think this is solvable for us and other standalone Console users? I hope so.
+
+---------------------------------------------------------------------------
+
+by weitzman at 2025-07-14T13:49:34Z
+
+I think I've addressed all feedback. The one test failure is unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by weitzman at 2025-07-14T21:25:56Z
+
+Changelog entry added.
+
+---------------------------------------------------------------------------
+
+by weitzman at 2025-07-16T20:52:12Z
+
+Test failure looks unrelated.
+
+---------------------------------------------------------------------------
+
+by antonkomarev at 2025-07-16T21:00:21Z
+
+Getter name `getCode` looks like status code. Those were my initial thoughts when I read the PR title.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-07-17T06:05:14Z
+
+> Getter name `getCode` looks like status code. Those were my initial thoughts when I read the PR title.
+
+This name matches the existing `setCode`. If it was returning the status code, we would name it `getStatusCode`.
+
+---------------------------------------------------------------------------
+
+by weitzman at 2025-07-28T17:27:20Z
+
+Anything else needed here before merge? Thanks all.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-08-05T17:38:18Z
+
+@symfony/mergers Could you review this PR please?

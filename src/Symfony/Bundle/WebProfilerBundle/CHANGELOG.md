@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for the `QUERY` HTTP method in the profiler
+ * Add `APP_RUNTIME` display in the configuration dashboard
 
 7.3
 ---

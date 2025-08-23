@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate implementing `__sleep/wakeup()` on kernels; use `__(un)serialize()` instead
  * Deprecate implementing `__sleep/wakeup()` on data collectors; use `__(un)serialize()` instead
  * Make `Profile` final and `Profiler::__sleep()` internal
+ * Add `APP_RUNTIME` display in the Symfony Profiler configuration dashboard
 
 7.3
 ---

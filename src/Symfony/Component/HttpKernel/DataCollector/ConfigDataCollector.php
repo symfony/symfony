@@ -64,6 +64,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'zend_opcache_status' => \extension_loaded('Zend OPcache') ? (filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN) ? 'Enabled' : 'Not enabled') : 'Not installed',
             'bundles' => [],
             'sapi_name' => \PHP_SAPI,
+            'app_runtime' => $_SERVER['APP_RUNTIME'] ?? null,
         ];
 
         if (isset($this->kernel)) {
@@ -247,6 +248,14 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     public function getSapiName(): string
     {
         return $this->data['sapi_name'];
+    }
+
+    /**
+     * Gets the application runtime.
+     */
+    public function getAppRuntime(): ?string
+    {
+        return $this->data['app_runtime'];
     }
 
     public function getName(): string

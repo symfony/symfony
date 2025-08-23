@@ -278,6 +278,16 @@
         <a href="{{ path('_profiler_phpinfo') }}">View full PHP configuration</a>
     </p>
 
+    {% if collector.appRuntime %}
+        <h2>Application Runtime</h2>
+        <div class="metrics">
+            <div class="metric">
+                <span class="value">{{ collector.appRuntime }}</span>
+                <span class="label">Runtime</span>
+            </div>
+        </div>
+    {% endif %}
+
     {% if collector.bundles %}
         <h2>Enabled Bundles <small>({{ collector.bundles|length }})</small></h2>
         <table>

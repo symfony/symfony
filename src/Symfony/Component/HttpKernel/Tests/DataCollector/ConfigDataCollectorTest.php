@@ -77,6 +77,23 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame($eom, $c->getSymfonyEom());
         $this->assertSame($eol, $c->getSymfonyEol());
     }
+
+    public function testGetAppRuntime()
+    {
+        $c = new ConfigDataCollector();
+        
+        // Test without APP_RUNTIME set
+        $c->collect(new Request(), new Response());
+        $this->assertNull($c->getAppRuntime());
+        
+        // Test with APP_RUNTIME set
+        $_SERVER['APP_RUNTIME'] = 'Symfony\\Runtime\\SymfonyRuntime';
+        $c->collect(new Request(), new Response());
+        $this->assertSame('Symfony\\Runtime\\SymfonyRuntime', $c->getAppRuntime());
+        
+        // Clean up
+        unset($_SERVER['APP_RUNTIME']);
+    }
 }
 
 class KernelForTest extends Kernel

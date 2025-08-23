@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-02-14T18:26:54Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.3 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mamazu at 2025-02-14T19:54:58Z
+
+Oddly enough the tests work locally. Any idea why? Or is there a way to generate the expected output from the input?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-02-15T07:07:10Z
+
+Can you share some before/after screenshots?
+
+---------------------------------------------------------------------------
+
+by mamazu at 2025-02-15T12:07:39Z
+
+Added screenshots oddly enough it does not show the deprecation notice I added.
+
+---------------------------------------------------------------------------
+
+by mamazu at 2025-02-17T19:48:56Z
+
+Okay the last remaining error I presume is because the CI tests do not use a true color terminal. Question: should I set the CI colors to use `COLORTERM=truecolor` or should I update the test output to expect the smaller color set?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2025-03-26T07:55:46Z
+
+@mamazu I like this a lot. Thanks!
+
+Two quick comments:
+
+**(1)**: I'd use the HTTP method colors from the OpenAPI standard (and keep `ANY` without color). See e.g. Swagger:
+
+![http-colors](https://github.com/user-attachments/assets/e5f7c45d-8943-496a-beff-3cbbc5562afb)
+
+**(2)**: I'm divided about outputting the controller. It's useful, but it will break the table design for most people.
+
+See your screenshot. Even if you use very short controllers (most folks will display long FQCN) the resulting table is pretty wide. In practice, each row could be displayed in two rows instead. So, why not display each route in two lines since the beginning to avoid breaking the design?
+
+---------------------------------------------------------------------------
+
+by mamazu at 2025-03-27T00:11:47Z
+
+@javiereguiluz Thanks for the feedback.
+
+1) Updated. There wasn't much of a difference.
+
+2) For me the main reason to use the debug:router is to see which controller belongs to which route. But I didn't want to remove the route name name. And the problem with multiple lines per entry destroys the command's grepability.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-04-09T07:08:27Z
+
+Because you mentioned "grepability", another approach can also be to use `--format=json` and then use [jq](https://jqlang.org) binary
+
+---------------------------------------------------------------------------
+
+by mamazu at 2025-04-09T07:54:32Z
+
+You are completely correct, the text representation contains the least amount of infos anyways, so any other format for searching would also work.
+
+---------------------------------------------------------------------------
+
+by mamazu at 2025-04-22T20:33:52Z
+
+The test failures aren't related to the feature.
+
+---------------------------------------------------------------------------
+
+by mamazu at 2025-05-01T22:25:22Z
+
+@nicolas-grekas So I've removed the deprecation. (I don't know if I can remove the deprecation tag from the PR) Secondly I don't know how the pipeline failures are related to the feature. Could you please restart it or is there anything else I could do?
+
+---------------------------------------------------------------------------
+
+by mamazu at 2025-07-06T12:15:01Z
+
+Rebased to 7.4 and fixed the conflicts.
+
+---------------------------------------------------------------------------
+
+by mamazu at 2025-08-14T14:34:16Z
+
+@nicolas-grekas Can you have a look at this again please. It should be ready to merge.

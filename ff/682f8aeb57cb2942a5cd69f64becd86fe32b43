@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by jbdelhommeau at 2025-06-30T12:02:53Z
+
+@Kocal 🎁
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2025-07-01T10:22:02Z
+
+@Kocal @jbdelhommeau Not sure about the naming of the option guys.
+
+By default the command consumes from `receivers`/`transports`.
+
+There is the option [`--queues`](https://symfony.com/doc/current/messenger.html#limit-consuming-to-specific-queues) but it's only for some implementations like AMQP.
+
+So I guess we could have 2 options:
+- `--exclude-queues`
+- `--exclude-receivers` or `--exclude-tranports` (I prefer the later on my end because the config key name is `transports`)
+
+Starting with the second option sounds more appropriate to me as it's not bound to some protocol/technologies. Also the current implementation is about `receivers`/`transports` not `queues`.
+
+---------------------------------------------------------------------------
+
+by jbdelhommeau at 2025-07-01T12:53:34Z
+
+I just push an new version more aligned with @B-Galati feedbacks.
+
+---------------------------------------------------------------------------
+
+by jbdelhommeau at 2025-07-10T14:16:29Z
+
+> Please add a line in the changelog file of the component (you can borrow from the PR title)
+
+Done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-21T06:15:04Z
+
+(please rebase to get rid of the merge commit and trigger tests again)

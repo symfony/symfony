@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-08-06T14:19:56Z
+
+ping @GromNaN & @chalasr
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-08-06T14:22:09Z
+
+Looks good. Can you think of a test case that would help avoiding regressions?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-08-06T16:14:38Z
+
+I added tests + rebased + targeted branch 7.3
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-08-06T16:18:52Z
+
+👍 push needed to re-trigger the pipeline
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-08-07T09:13:42Z
+
+All green 🎉 Thanks for the review

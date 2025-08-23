@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by simonjamain at 2025-07-12T09:54:24Z
+
+> Can you please bench this patch? It should preserve the order while still providing the perf benefit:
+>
+> ```diff
+> --- a/src/Symfony/Component/Security/Core/Role/RoleHierarchy.php
+> +++ b/src/Symfony/Component/Security/Core/Role/RoleHierarchy.php
+> @@ -54,8 +54,11 @@ class RoleHierarchy implements RoleHierarchyInterface
+>              $this->map[$main] = $roles;
+>              $visited = [];
+>              $additionalRoles = $roles;
+> -            while ($role = array_shift($additionalRoles)) {
+> +            while (null !== $role = key($additionalRoles)) {
+> +                $role = $additionalRoles[$role];
+> +
+>                  if (!isset($this->hierarchy[$role])) {
+> +                    next($additionalRoles);
+>                      continue;
+>                  }
+>
+> @@ -68,6 +71,8 @@ class RoleHierarchy implements RoleHierarchyInterface
+>                  foreach (array_diff($this->hierarchy[$role], $visited) as $additionalRole) {
+>                      $additionalRoles[] = $additionalRole;
+>                  }
+> +
+> +                next($additionalRoles);
+>              }
+>
+> ```
+
+Great, I'll check that this week.

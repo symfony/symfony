@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by soyuka at 2025-07-16T09:06:04Z
+
+We're already using this on a project and it works quite well.
+
+---------------------------------------------------------------------------
+
+by crtl at 2025-08-04T13:01:43Z
+
+How do you use it? How is this supposed when using sources only?
+Ive tried using MapCollection transformer but it will throw exception:
+```php
+class UserDto {
+/**
+     * @var OrganizationMembershipDto[]
+     */
+    #[Map(transform: new MapCollection(), source: "memberships")]
+    public array $memberships;
+
+}
+```
+
+```
+$dto = $this->mapper->map($user, UserDto::class);
+```
+
+will throw:
+```
+Symfony\Component\ObjectMapper\Exception\MappingException : Mapping target not found for source "App\Entity\User\OrganizationMembership".
+ /var/www/vendor/symfony/object-mapper/ObjectMapper.php:58
+ /var/www/src/Dto/Response/ObjectMapper/Transformer/MapCollection.php:30
+ /var/www/vendor/symfony/object-mapper/ObjectMapper.php:225
+ /var/www/vendor/symfony/object-mapper/ObjectMapper.php:259
+ /var/www/vendor/symfony/object-mapper/ObjectMapper.php:176
+ /var/www/vendor/symfony/object-mapper/ObjectMapper.php:139
+```
+
+Like ive mentioned in #61116 theres is currently no API in object mapper to provide metadata to transformers and without this transformers are unable to guess type of target value.
+Having to set the target on the source breaks SRP and erodes the actual purpose of object mapper.
+
+TDLR; Only works when mapping target is defined on source.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-08-06T07:49:23Z
+
+@crtl related to https://github.com/symfony/symfony/pull/61310

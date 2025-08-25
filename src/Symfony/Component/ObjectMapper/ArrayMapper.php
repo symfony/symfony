@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\ObjectMapper;
 
-use Exception;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\WrappedMappingException;
 
@@ -26,13 +25,13 @@ final class ArrayMapper
 {
     public function __construct(
         private ObjectMapperInterface $mapper,
-        private string $throwPolicy = CollectionMapperThrowPolicy::FAIL_SAFE
+        private string $throwPolicy = CollectionMapperThrowPolicy::FAIL_SAFE,
     ) {
     }
 
     public function map(array $source, array $target): void
     {
-        assert(count($source) === count($target));
+        \assert(\count($source) === \count($target));
 
         switch ($this->throwPolicy) {
             case CollectionMapperThrowPolicy::FAIL_EARLY:
@@ -48,16 +47,15 @@ final class ArrayMapper
                 break;
 
             default:
-                throw new Exception(sprintf('Throw policy "%s" is not yet supported!', $this->throwPolicy));
-        };
+                throw new \Exception(\sprintf('Throw policy "%s" is not yet supported!', $this->throwPolicy));
+        }
     }
 
     private function mapFailEarly(array $source, array $target): void
     {
-        for ($i = 0; $i < count($source); $i++) {
+        for ($i = 0; $i < \count($source); ++$i) {
             $sourceObject = $source[$i];
             $targetObject = $target[$i];
-            
             $this->mapper->map($sourceObject, $targetObject);
         }
     }
@@ -66,10 +64,9 @@ final class ArrayMapper
     {
         $exceptions = [];
 
-        for ($i = 0; $i < count($source); $i++) {
+        for ($i = 0; $i < \count($source); ++$i) {
             $sourceObject = $source[$i];
             $targetObject = $target[$i];
-
             try {
                 $this->mapper->map($sourceObject, $targetObject);
             } catch (MappingException $ex) {
@@ -84,7 +81,7 @@ final class ArrayMapper
 
     private function mapIgnoreMappingErrors(array $source, array $target): void
     {
-        for ($i = 0; $i < count($source); $i++) {
+        for ($i = 0; $i < \count($source); ++$i) {
             $sourceObject = $source[$i];
             $targetObject = $target[$i];
 

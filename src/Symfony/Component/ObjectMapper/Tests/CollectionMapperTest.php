@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\ObjectMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -135,22 +144,30 @@ final class CollectionMapperTest extends TestCase
 
     public function testMapIntoExistingCollection()
     {
-        $sourceCollection = [ 
+        $sourceCollection = [
             new class('value1', 'value2') {
-                public function __construct(public string $baz, public string $bat) {}
+                public function __construct(public string $baz, public string $bat)
+                {
+                }
             },
             new class('value3', 'value4') {
-                public function __construct(public string $baz, public string $bat) {}
-            }
+                public function __construct(public string $baz, public string $bat)
+                {
+                }
+            },
         ];
 
-        $targetCollection = [ 
+        $targetCollection = [
             new class('value5', 'value6') {
-                public function __construct(public string $baz, public string $bat) {}
+                public function __construct(public string $baz, public string $bat)
+                {
+                }
             },
             new class('value7', 'value8') {
-                public function __construct(public string $baz, public string $bat) {}
-            }
+                public function __construct(public string $baz, public string $bat)
+                {
+                }
+            },
         ];
 
         $mapper = new CollectionMapper(new ObjectMapper());
@@ -181,18 +198,18 @@ final class CollectionMapperTest extends TestCase
             new class('value1', 'value2') {
                 public function __construct(
                     public string $baz,
-                    public string $bat
+                    public string $bat,
                 ) {
                 }
             },
-            new class(/* Nothing to map produces an exception */) {},
+            new class { /* Nothing to map produces an exception */ },
             new class('value3', 'value4') {
                 public function __construct(
                     public string $baz,
-                    public string $bat
+                    public string $bat,
                 ) {
                 }
-            }
+            },
         ];
     }
 }

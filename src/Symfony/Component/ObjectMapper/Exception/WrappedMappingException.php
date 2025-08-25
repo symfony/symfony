@@ -19,7 +19,7 @@ namespace Symfony\Component\ObjectMapper\Exception;
 final class WrappedMappingException extends MappingException
 {
     /**
-     * @param array<MappingException> $exceptions The collection of exceptions reveals which discrete mapping has failed.
+     * @param array<MappingException> $exceptions the collection of exceptions reveals which discrete mapping has failed
      */
     public function __construct(public readonly array $exceptions)
     {

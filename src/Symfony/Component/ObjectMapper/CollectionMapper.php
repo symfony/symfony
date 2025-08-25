@@ -15,7 +15,7 @@ use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\WrappedMappingException;
 
 /**
- * Map a collection of objects using the ObjectMapper
+ * Map a collection of objects using the ObjectMapper.
  *
  * @experimental
  *
@@ -25,30 +25,30 @@ final class CollectionMapper implements CollectionMapperInterface
 {
     public function __construct(
         private ObjectMapperInterface $mapper,
-        private string $throwPolicy = CollectionMapperThrowPolicy::FAIL_SAFE
+        private string $throwPolicy = CollectionMapperThrowPolicy::FAIL_SAFE,
     ) {
     }
 
     public function map(iterable $sourceCollection, array|string|null $target = null): \Generator
     {
-        if (is_array($target)) {
+        if (\is_array($target)) {
             yield from $this->mapArray($sourceCollection, $target);
         } else {
             return match ($this->throwPolicy) {
                 CollectionMapperThrowPolicy::FAIL_EARLY => yield from $this->mapFailEarly($sourceCollection, $target),
                 CollectionMapperThrowPolicy::FAIL_SAFE => yield from $this->mapFailSafe($sourceCollection, $target),
-                CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS => yield from $this->mapIgnoreMappingErrors($sourceCollection, $target)
+                CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS => yield from $this->mapIgnoreMappingErrors($sourceCollection, $target),
             };
         }
     }
 
     private function mapArray(iterable $sourceCollection, array $target): \Generator
     {
-        $sourceCollection = is_array($sourceCollection)
-            ? $sourceCollection 
+        $sourceCollection = \is_array($sourceCollection)
+            ? $sourceCollection
             : iterator_to_array($sourceCollection);
 
-        assert(count($sourceCollection) === count($target));
+        \assert(\count($sourceCollection) === \count($target));
 
         $mapper = new ArrayMapper($this->mapper, $this->throwPolicy);
         $mapper->map($sourceCollection, $target);

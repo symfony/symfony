@@ -14,11 +14,11 @@ namespace Symfony\Component\ObjectMapper;
 final readonly class CollectionMapperThrowPolicy
 {
     /** Stop at first error. */
-    const FAIL_EARLY = 'fail_early';
+    public const FAIL_EARLY = 'fail_early';
 
     /** Collect mapping errors, then throw. */
-    const FAIL_SAFE = 'fail_safe';
+    public const FAIL_SAFE = 'fail_safe';
 
     /** Continue processing, ignore mapping errors. */
-    const IGNORE_MAPPING_ERRORS = 'ignore_mapping_errors';
+    public const IGNORE_MAPPING_ERRORS = 'ignore_mapping_errors';
 }

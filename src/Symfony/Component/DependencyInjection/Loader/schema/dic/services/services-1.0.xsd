@@ -139,6 +139,7 @@
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
+    <xsd:attribute name="inherit-configuration" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="service">
@@ -169,6 +170,7 @@
     <xsd:attribute name="decoration-priority" type="xsd:integer" />
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
+    <xsd:attribute name="inherit-configuration" type="boolean" />
     <xsd:attribute name="constructor" type="xsd:string" />
   </xsd:complexType>
 
@@ -186,6 +188,7 @@
     <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
+    <xsd:attribute name="inherit-configuration" type="boolean" />
     <xsd:attribute name="constructor" type="xsd:string" />
   </xsd:complexType>
 
@@ -211,6 +214,7 @@
     <xsd:attribute name="parent" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
+    <xsd:attribute name="inherit-configuration" type="boolean" />
     <xsd:attribute name="constructor" type="xsd:string" />
   </xsd:complexType>
 

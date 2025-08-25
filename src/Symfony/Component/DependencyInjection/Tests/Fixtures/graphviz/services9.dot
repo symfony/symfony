@@ -40,6 +40,7 @@ digraph sc {
   node_a_factory [label="a_factory\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_a_service [label="a_service\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_b_service [label="b_service\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_without_inherited_config [label="without_inherited_config\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo2 [label="foo2\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo3 [label="foo3\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foobaz [label="foobaz\n\n", shape=record, fillcolor="#ff9999", style="filled"];

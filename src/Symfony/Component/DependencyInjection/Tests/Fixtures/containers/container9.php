@@ -4,8 +4,10 @@ require_once __DIR__.'/../includes/classes.php';
 require_once __DIR__.'/../includes/foo.php';
 
 use Bar\FooClass;
+use Bar\FooInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -196,5 +198,13 @@ $container->register('a_service', 'Bar')
 $container->register('b_service', 'Bar')
     ->setFactory([new Reference('a_factory'), 'getBar'])
     ->setPublic(true);
+
+$container
+    ->register('without_inherited_config', FooClass::class)
+    ->setPublic(true)
+    ->setInstanceofConditionals([
+        FooInterface::class => (new ChildDefinition(''))->setShared(false),
+    ])
+    ->setInheritConfiguration(false);
 
 return $container;

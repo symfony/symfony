@@ -2,7 +2,11 @@
 
 namespace Bar;
 
-class FooClass
+interface FooInterface
+{
+}
+
+class FooClass implements FooInterface
 {
     public $qux;
     public $foo;

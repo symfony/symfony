@@ -146,4 +146,6 @@ return function (ContainerConfigurator $c) {
 
     $s->alias('alias_for_foo', 'foo')->private()->public();
     $s->alias('alias_for_alias', service('alias_for_foo'));
+
+    $s->set('without_inherited_config', FooClass::class)->public()->inheritConfiguration(false);
 };

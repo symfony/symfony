@@ -294,4 +294,15 @@ class PhpFileLoaderTest extends TestCase
 
         $this->assertIsString($container->getExtensionConfig('acme')[0]['color']);
     }
+
+    public function testInheritConfiguration()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new PhpFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures').'/config'));
+        $loader->load('inherit_configuration.php');
+
+        self::assertFalse($container->getDefinition('foo')->shouldInheritConfiguration());
+        self::assertTrue($container->getDefinition('bar')->shouldInheritConfiguration());
+    }
 }

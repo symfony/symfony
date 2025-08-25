@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Attribute\WithoutInheritedConfiguration;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -59,6 +60,14 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             return $definition;
         }
 
+        if (
+            ($reflectionClass = $container->getReflectionClass($class, false) ?: false)
+            && $definition->isAutoconfigured()
+            && $reflectionClass->getAttributes(WithoutInheritedConfiguration::class)
+        ) {
+            $definition->setInheritConfiguration(false);
+        }
+
         $conditionals = $this->mergeConditionals($autoconfiguredInstanceof, $instanceofConditionals, $container);
 
         $definition->setInstanceofConditionals([]);
@@ -66,15 +75,20 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         $instanceofTags = [];
         $instanceofCalls = [];
         $instanceofBindings = [];
-        $reflectionClass = null;
         $parent = $definition instanceof ChildDefinition ? $definition->getParent() : null;
 
         foreach ($conditionals as $interface => $instanceofDefs) {
-            if ($interface !== $class && !($reflectionClass ??= $container->getReflectionClass($class, false) ?: false)) {
+            if ($interface !== $class && !$reflectionClass) {
                 continue;
             }
 
-            if ($interface !== $class && !is_subclass_of($class, $interface)) {
+            if (
+                $interface !== $class
+                && (
+                    !$definition->shouldInheritConfiguration()
+                    || !is_subclass_of($class, $interface)
+                )
+            ) {
                 continue;
             }
 

@@ -86,6 +86,7 @@ class ServicesConfigurator extends AbstractConfigurator
 
         $definition->setAutowired($defaults->isAutowired());
         $definition->setAutoconfigured($defaults->isAutoconfigured());
+        $definition->setInheritConfiguration($defaults->shouldInheritConfiguration());
         // deep clone, to avoid multiple process of the same instance in the passes
         $definition->setBindings(unserialize(serialize($defaults->getBindings())));
         $definition->setChanges([]);

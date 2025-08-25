@@ -248,6 +248,7 @@ class XmlFileLoader extends FileLoader
         }
         $definition->setAutowired($defaults->isAutowired());
         $definition->setAutoconfigured($defaults->isAutoconfigured());
+        $definition->setInheritConfiguration($defaults->shouldInheritConfiguration());
         $definition->setChanges([]);
 
         foreach (['class', 'public', 'shared', 'synthetic', 'abstract'] as $key) {
@@ -270,6 +271,10 @@ class XmlFileLoader extends FileLoader
 
         if ($value = $service->getAttribute('autoconfigure')) {
             $definition->setAutoconfigured(XmlUtils::phpize($value));
+        }
+
+        if ($value = $service->getAttribute('inherit-configuration')) {
+            $definition->setInheritConfiguration(XmlUtils::phpize($value));
         }
 
         if ($files = $this->getChildren($service, 'file')) {

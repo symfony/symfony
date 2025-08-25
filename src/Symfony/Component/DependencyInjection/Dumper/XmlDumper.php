@@ -212,6 +212,10 @@ class XmlDumper extends Dumper
             $xmlAttr .= ' autoconfigure="true"';
         }
 
+        if (!$definition->shouldInheritConfiguration()) {
+            $xmlAttr .= ' inherit-configuration="false"';
+        }
+
         if ($definition->isAbstract()) {
             $xmlAttr .= ' abstract="true"';
         }

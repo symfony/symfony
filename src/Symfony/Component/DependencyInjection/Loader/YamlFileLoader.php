@@ -63,6 +63,7 @@ class YamlFileLoader extends FileLoader
         'decoration_on_invalid' => 'decoration_on_invalid',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
+        'inherit_configuration' => 'inherit_configuration',
         'bind' => 'bind',
         'constructor' => 'constructor',
     ];
@@ -85,6 +86,7 @@ class YamlFileLoader extends FileLoader
         'tags' => 'tags',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
+        'inherit_configuration' => 'inherit_configuration',
         'bind' => 'bind',
         'constructor' => 'constructor',
     ];
@@ -98,6 +100,7 @@ class YamlFileLoader extends FileLoader
         'calls' => 'calls',
         'tags' => 'tags',
         'autowire' => 'autowire',
+        'inherit_configuration' => 'inherit_configuration',
         'bind' => 'bind',
         'constructor' => 'constructor',
     ];
@@ -107,6 +110,7 @@ class YamlFileLoader extends FileLoader
         'tags' => 'tags',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
+        'inherit_configuration' => 'inherit_configuration',
         'bind' => 'bind',
     ];
 
@@ -479,6 +483,9 @@ class YamlFileLoader extends FileLoader
         if (isset($defaults['autoconfigure'])) {
             $definition->setAutoconfigured($defaults['autoconfigure']);
         }
+        if (isset($defaults['inherit_configuration'])) {
+            $definition->setInheritConfiguration($defaults['inherit_configuration']);
+        }
 
         $definition->setChanges($changes);
 
@@ -688,6 +695,10 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['autoconfigure'])) {
             $definition->setAutoconfigured($service['autoconfigure']);
+        }
+
+        if (isset($service['inherit_configuration'])) {
+            $definition->setInheritConfiguration($service['inherit_configuration']);
         }
 
         if (\array_key_exists('namespace', $service) && !\array_key_exists('resource', $service)) {

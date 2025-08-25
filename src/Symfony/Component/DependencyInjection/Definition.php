@@ -33,6 +33,7 @@ class Definition
     private array $calls = [];
     private array $instanceof = [];
     private bool $autoconfigured = false;
+    private bool $inheritConfiguration = true;
     private string|array|null $configurator = null;
     private array $tags = [];
     private bool $public = false;
@@ -413,6 +414,25 @@ class Definition
     public function isAutoconfigured(): bool
     {
         return $this->autoconfigured;
+    }
+
+    /**
+     * Sets whether instanceof conditionals should be applied to the current definition.
+     *
+     * @return $this
+     */
+    public function setInheritConfiguration(bool $inheritConfiguration): static
+    {
+        $this->changes['inheritConfiguration'] = true;
+
+        $this->inheritConfiguration = $inheritConfiguration;
+
+        return $this;
+    }
+
+    public function shouldInheritConfiguration(): bool
+    {
+        return $this->inheritConfiguration;
     }
 
     /**

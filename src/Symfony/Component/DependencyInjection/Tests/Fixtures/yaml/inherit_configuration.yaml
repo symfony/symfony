@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        inherit_configuration: false
+
+    foo:
+        class: Foo
+    bar:
+        class: Bar
+        inherit_configuration: true

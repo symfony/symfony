@@ -77,6 +77,7 @@ class ProjectServiceContainer extends Container
             'service_from_static_method' => 'getServiceFromStaticMethodService',
             'tagged_iterator' => 'getTaggedIteratorService',
             'throwing_one' => 'getThrowingOneService',
+            'without_inherited_config' => 'getWithoutInheritedConfigService',
         ];
         $this->aliases = [
             'alias_for_alias' => 'foo',
@@ -473,6 +474,16 @@ class ProjectServiceContainer extends Container
     protected static function getThrowingOneService($container)
     {
         return $container->services['throwing_one'] = new \Bar\FooClass(throw new RuntimeException('No-no-no-no'));
+    }
+
+    /**
+     * Gets the public 'without_inherited_config' shared service.
+     *
+     * @return \Bar\FooClass
+     */
+    protected static function getWithoutInheritedConfigService($container)
+    {
+        return $container->services['without_inherited_config'] = new \Bar\FooClass();
     }
 
     /**

@@ -22,6 +22,7 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
     use Traits\AutoconfigureTrait;
     use Traits\AutowireTrait;
     use Traits\BindTrait;
+    use Traits\InheritConfigurationTrait;
     use Traits\PublicTrait;
 
     public const FACTORY = 'defaults';

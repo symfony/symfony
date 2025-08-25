@@ -111,6 +111,10 @@ class YamlDumper extends Dumper
             $code .= "        autoconfigure: true\n";
         }
 
+        if (!$definition->shouldInheritConfiguration()) {
+            $code .= "        inherit_configuration: false\n";
+        }
+
         if ($definition->isAbstract()) {
             $code .= "        abstract: true\n";
         }

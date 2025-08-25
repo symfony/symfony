@@ -159,6 +159,7 @@
     <service id="b_service" class="Bar" public="true">
       <factory service="a_factory" method="getBar"/>
     </service>
+    <service id="without_inherited_config" class="Bar\FooClass" public="true" inherit-configuration="false"/>
     <service id="alias_for_foo" alias="foo" public="true"/>
     <service id="alias_for_alias" alias="foo" public="true"/>
   </services>

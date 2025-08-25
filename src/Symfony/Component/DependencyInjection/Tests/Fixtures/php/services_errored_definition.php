@@ -51,6 +51,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             'runtime_error' => 'getRuntimeErrorService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
             'tagged_iterator' => 'getTaggedIteratorService',
+            'without_inherited_config' => 'getWithoutInheritedConfigService',
         ];
         $this->aliases = [
             'alias_for_alias' => 'foo',
@@ -422,6 +423,16 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             yield 0 => ($container->services['foo'] ?? self::getFooService($container));
             yield 1 => ($container->privates['tagged_iterator_foo'] ??= new \Bar());
         }, 2));
+    }
+
+    /**
+     * Gets the public 'without_inherited_config' shared service.
+     *
+     * @return \Bar\FooClass
+     */
+    protected static function getWithoutInheritedConfigService($container)
+    {
+        return $container->services['without_inherited_config'] = new \Bar\FooClass();
     }
 
     /**

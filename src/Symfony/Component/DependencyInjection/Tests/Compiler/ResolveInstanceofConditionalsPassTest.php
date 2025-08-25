@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Attribute\WithoutInheritedConfiguration;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -177,6 +179,62 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         $def = $container->getDefinition('normal_service');
         $this->assertFalse($def->isAutowired());
+    }
+
+    #[TestWith([true, ['local_instanceof_tag_on_parent' => [[]], 'autoconfigured_tag_on_parent' => [[]]]], 'with inheritConfiguration true')]
+    #[TestWith([false, []], 'with inheritConfiguration false')]
+    public function testInheritConfiguration(bool $inheritConfiguration, array $expectedTags)
+    {
+        $container = new ContainerBuilder();
+        $def = $container->register('normal_service', self::class);
+        $def->setAutoconfigured(true);
+        $def->setInheritConfiguration($inheritConfiguration);
+        $def->setInstanceofConditionals([
+            parent::class => (new ChildDefinition(''))
+                ->addTag('local_instanceof_tag_on_parent'),
+            self::class => (new ChildDefinition(''))
+                ->addTag('local_instanceof_tag_on_self'),
+        ]);
+        $container->registerForAutoconfiguration(parent::class)
+            ->addTag('autoconfigured_tag_on_parent')
+        ;
+        $container->registerForAutoconfiguration(self::class)
+            ->addTag('autoconfigured_tag_on_self')
+        ;
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $def = $container->getDefinition('normal_service');
+
+        $this->assertSame(['local_instanceof_tag_on_self' => [[]], 'autoconfigured_tag_on_self' => [[]]] + $expectedTags, $def->getTags());
+    }
+
+    #[TestWith([true, ['autoconfigured_tag_on_self' => [[]]]], 'with autoconfigure true')]
+    #[TestWith([false, ['local_instanceof_tag_on_parent' => [[]]]], 'with autoconfigure false')]
+    public function testWithoutInheritedConfigurationAttribute(bool $autoconfigure, array $expectedTags)
+    {
+        $container = new ContainerBuilder();
+        $def = $container->register('normal_service', WithNoInheritedConfig::class);
+        $def->setAutoconfigured($autoconfigure);
+        $def->setInheritConfiguration(true);
+        $def->setInstanceofConditionals([
+            WithConfigInterface::class => (new ChildDefinition(''))
+                ->addTag('local_instanceof_tag_on_parent'),
+            WithNoInheritedConfig::class => (new ChildDefinition(''))
+                ->addTag('local_instanceof_tag_on_self'),
+        ]);
+        $container->registerForAutoconfiguration(WithConfigInterface::class)
+            ->addTag('autoconfigured_tag_on_parent')
+        ;
+        $container->registerForAutoconfiguration(WithNoInheritedConfig::class)
+            ->addTag('autoconfigured_tag_on_self')
+        ;
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $def = $container->getDefinition('normal_service');
+
+        $this->assertSame(['local_instanceof_tag_on_self' => [[]]] + $expectedTags, $def->getTags());
     }
 
     public function testBadInterfaceThrowsException()
@@ -410,4 +468,13 @@ class DecoratorWithBehavior implements ResetInterface, ResourceCheckerInterface,
     public static function getSubscribedServices(): array
     {
     }
+}
+
+interface WithConfigInterface
+{
+}
+
+#[WithoutInheritedConfiguration]
+class WithNoInheritedConfig implements WithConfigInterface
+{
 }

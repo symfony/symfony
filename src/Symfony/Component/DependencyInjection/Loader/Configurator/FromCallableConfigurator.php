@@ -24,6 +24,7 @@ class FromCallableConfigurator extends AbstractServiceConfigurator
     use Traits\BindTrait;
     use Traits\DecorateTrait;
     use Traits\DeprecateTrait;
+    use Traits\InheritConfigurationTrait;
     use Traits\LazyTrait;
     use Traits\PublicTrait;
     use Traits\ShareTrait;

@@ -29,6 +29,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
     use Traits\ConstructorTrait;
     use Traits\DeprecateTrait;
     use Traits\FactoryTrait;
+    use Traits\InheritConfigurationTrait;
     use Traits\LazyTrait;
     use Traits\ParentTrait;
     use Traits\PropertyTrait;

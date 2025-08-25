@@ -530,6 +530,21 @@ class getThrowingOneService extends ProjectServiceContainer
     }
 }
 
+    [Container%s/getWithoutInheritedConfigService.php] => <?php
+%A
+class getWithoutInheritedConfigService extends ProjectServiceContainer
+{
+    /**
+     * Gets the public 'without_inherited_config' shared service.
+     *
+     * @return \Bar\FooClass
+     */
+    public static function do($container, $lazyLoad = true)
+    {
+        return $container->services['without_inherited_config'] = new \Bar\FooClass();
+    }
+}
+
     [Container%s/ProjectServiceContainer.php] => <?php
 
 namespace Container%s;
@@ -591,6 +606,7 @@ class ProjectServiceContainer extends Container
             'service_from_static_method' => 'getServiceFromStaticMethodService',
             'tagged_iterator' => 'getTaggedIteratorService',
             'throwing_one' => 'getThrowingOneService',
+            'without_inherited_config' => 'getWithoutInheritedConfigService',
         ];
         $this->aliases = [
             'alias_for_alias' => 'foo',
@@ -727,6 +743,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
 (require __DIR__.'/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
+require __DIR__.'/Container%s/getWithoutInheritedConfigService.php';
 require __DIR__.'/Container%s/getThrowingOneService.php';
 require __DIR__.'/Container%s/getTaggedIteratorService.php';
 require __DIR__.'/Container%s/getServiceFromStaticMethodService.php';

@@ -33,6 +33,7 @@ class ServiceConfigurator extends AbstractServiceConfigurator
     use Traits\FactoryTrait;
     use Traits\FileTrait;
     use Traits\FromCallableTrait;
+    use Traits\InheritConfigurationTrait;
     use Traits\LazyTrait;
     use Traits\ParentTrait;
     use Traits\PropertyTrait;

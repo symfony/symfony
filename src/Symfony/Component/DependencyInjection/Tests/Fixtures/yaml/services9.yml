@@ -191,3 +191,7 @@ services:
         class: Bar
         factory: ['@a_factory', 'getBar']
         public: true
+    without_inherited_config:
+        class: Bar\FooClass
+        public: true
+        inherit_configuration: false

@@ -1356,4 +1356,15 @@ class XmlFileLoaderTest extends TestCase
 
         self::assertInstanceOf(RemoteCallerSocket::class, $container->get(RemoteCaller::class));
     }
+
+    public function testInheritConfiguration()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('inherit_configuration.xml');
+
+        self::assertFalse($container->getDefinition('foo')->shouldInheritConfiguration());
+        self::assertTrue($container->getDefinition('bar')->shouldInheritConfiguration());
+    }
 }

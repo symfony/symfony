@@ -1219,4 +1219,15 @@ class YamlFileLoaderTest extends TestCase
 
         $loader->load('tagged_deprecated.yml');
     }
+
+    public function testInheritConfiguration()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('inherit_configuration.yaml');
+
+        self::assertFalse($container->getDefinition('foo')->shouldInheritConfiguration());
+        self::assertTrue($container->getDefinition('bar')->shouldInheritConfiguration());
+    }
 }

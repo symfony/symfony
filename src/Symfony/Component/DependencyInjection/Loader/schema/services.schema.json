@@ -255,6 +255,7 @@
         "decoration_on_invalid": { "oneOf": [ { "enum": ["exception", "ignore"] }, { "type": "null" } ], "$comment": "Use null (without quotes) for NULL_ON_INVALID_REFERENCE." },
         "autowire": { "type": "boolean" },
         "autoconfigure": { "type": "boolean" },
+        "inherit_configuration": { "type": "boolean" },
         "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
         "constructor": { "type": "string" },
         "from_callable": { "$ref": "#/$defs/parameterValue", "$comment": "Will be wrapped by factory ['Closure','fromCallable'] and sets lazy=true unless class is 'Closure'." }
@@ -287,6 +288,7 @@
         "tags": { "$ref": "#/$defs/tags" },
         "autowire": { "type": "boolean" },
         "autoconfigure": { "type": "boolean" },
+        "inherit_configuration": { "type": "boolean" },
         "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
         "constructor": { "type": "string" }
       },
@@ -324,6 +326,7 @@
         "tags": { "$ref": "#/$defs/tags" },
         "autowire": { "type": "boolean" },
         "autoconfigure": { "type": "boolean" },
+        "inherit_configuration": { "type": "boolean" },
         "bind": {
           "type": "object",
           "additionalProperties": { "$ref": "#/$defs/parameterValue" }

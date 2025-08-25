@@ -253,7 +253,7 @@ class AppVariableTest extends TestCase
 
     public function testGetCurrentRoute()
     {
-        $this->setRequestStack(new Request(attributes: ['_route' => 'some_route']));
+        $this->setRequestStack(new Request(attributes: [Request::ATTRIBUTE_ROUTE => 'some_route']));
 
         $this->assertSame('some_route', $this->appVariable->getCurrent_route());
     }

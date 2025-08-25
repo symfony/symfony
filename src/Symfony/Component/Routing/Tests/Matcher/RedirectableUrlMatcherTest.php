@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -63,7 +64,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
             ->expects($this->once())
             ->method('redirect')
             ->with('/foo', 'foo', 'ftp')
-            ->willReturn(['_route' => 'foo'])
+            ->willReturn([Request::ATTRIBUTE_ROUTE => 'foo'])
         ;
         $matcher->match('/foo');
     }
@@ -92,7 +93,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
             ->with('/foo/baz', 'foo', 'https')
             ->willReturn(['redirect' => 'value'])
         ;
-        $this->assertEquals(['_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'], $matcher->match('/foo/baz'));
+        $this->assertEquals([Request::ATTRIBUTE_ROUTE => 'foo', 'bar' => 'baz', 'redirect' => 'value'], $matcher->match('/foo/baz'));
     }
 
     public function testSchemeRedirectForRoot()
@@ -106,7 +107,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
             ->method('redirect')
             ->with('/', 'foo', 'https')
             ->willReturn(['redirect' => 'value']);
-        $this->assertEquals(['_route' => 'foo', 'redirect' => 'value'], $matcher->match('/'));
+        $this->assertEquals([Request::ATTRIBUTE_ROUTE => 'foo', 'redirect' => 'value'], $matcher->match('/'));
     }
 
     public function testSlashRedirectWithParams()
@@ -121,7 +122,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
             ->with('/foo/baz/', 'foo', null)
             ->willReturn(['redirect' => 'value'])
         ;
-        $this->assertEquals(['_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'], $matcher->match('/foo/baz'));
+        $this->assertEquals([Request::ATTRIBUTE_ROUTE => 'foo', 'bar' => 'baz', 'redirect' => 'value'], $matcher->match('/foo/baz'));
     }
 
     public function testRedirectPreservesUrlEncoding()
@@ -140,7 +141,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
         $matcher = $this->getUrlMatcher($coll, new RequestContext());
         $matcher->expects($this->once())->method('redirect')->with('/foo', 'foo', 'https')->willReturn([]);
-        $this->assertSame(['_route' => 'foo'], $matcher->match('/foo'));
+        $this->assertSame([Request::ATTRIBUTE_ROUTE => 'foo'], $matcher->match('/foo'));
     }
 
     public function testFallbackPage()
@@ -150,16 +151,16 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $coll->add('bar', new Route('/{name}'));
 
         $matcher = $this->getUrlMatcher($coll);
-        $matcher->expects($this->once())->method('redirect')->with('/foo/', 'foo')->willReturn(['_route' => 'foo']);
-        $this->assertSame(['_route' => 'foo'], $matcher->match('/foo'));
+        $matcher->expects($this->once())->method('redirect')->with('/foo/', 'foo')->willReturn([Request::ATTRIBUTE_ROUTE => 'foo']);
+        $this->assertSame([Request::ATTRIBUTE_ROUTE => 'foo'], $matcher->match('/foo'));
 
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
         $coll->add('bar', new Route('/{name}/'));
 
         $matcher = $this->getUrlMatcher($coll);
-        $matcher->expects($this->once())->method('redirect')->with('/foo', 'foo')->willReturn(['_route' => 'foo']);
-        $this->assertSame(['_route' => 'foo'], $matcher->match('/foo/'));
+        $matcher->expects($this->once())->method('redirect')->with('/foo', 'foo')->willReturn([Request::ATTRIBUTE_ROUTE => 'foo']);
+        $this->assertSame([Request::ATTRIBUTE_ROUTE => 'foo'], $matcher->match('/foo/'));
     }
 
     public function testMissingTrailingSlashAndScheme()
@@ -180,7 +181,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
 
         $matcher = $this->getUrlMatcher($coll);
         $expected = [
-            '_route' => 'b',
+            Request::ATTRIBUTE_ROUTE => 'b',
             'customerId' => '123',
         ];
         $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons/'));
@@ -197,7 +198,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher = $this->getUrlMatcher($coll);
         $matcher->expects($this->once())->method('redirect')->with('/123')->willReturn([]);
 
-        $this->assertEquals(['_route' => 'a', 'a' => '123'], $matcher->match('/123/'));
+        $this->assertEquals([Request::ATTRIBUTE_ROUTE => 'a', 'a' => '123'], $matcher->match('/123/'));
     }
 
     public function testTrailingRequirementWithDefaultA()
@@ -208,7 +209,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher = $this->getUrlMatcher($coll);
         $matcher->expects($this->once())->method('redirect')->with('/fr-fr')->willReturn([]);
 
-        $this->assertEquals(['_route' => 'a', 'a' => 'aaa'], $matcher->match('/fr-fr/'));
+        $this->assertEquals([Request::ATTRIBUTE_ROUTE => 'a', 'a' => 'aaa'], $matcher->match('/fr-fr/'));
     }
 
     protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)

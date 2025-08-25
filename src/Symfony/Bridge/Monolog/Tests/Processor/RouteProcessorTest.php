@@ -144,7 +144,7 @@ class RouteProcessorTest extends TestCase
     {
         return $this->mockRequest([
             '_controller' => $controller,
-            '_route' => self::TEST_ROUTE,
+            Request::ATTRIBUTE_ROUTE => self::TEST_ROUTE,
             '_route_params' => self::TEST_PARAMS,
         ]);
     }

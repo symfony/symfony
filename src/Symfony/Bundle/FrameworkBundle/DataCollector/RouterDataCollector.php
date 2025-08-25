@@ -28,8 +28,8 @@ class RouterDataCollector extends BaseRouterDataCollector
             $controller = $controller[0];
         }
 
-        if ($controller instanceof RedirectController && $request->attributes->has('_route')) {
-            return $request->attributes->get('_route');
+        if ($controller instanceof RedirectController && $request->attributes->has(Request::ATTRIBUTE_ROUTE)) {
+            return $request->attributes->get(Request::ATTRIBUTE_ROUTE);
         }
 
         return parent::guessRoute($request, $controller);

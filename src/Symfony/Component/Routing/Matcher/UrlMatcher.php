@@ -195,7 +195,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             $name = $defaults['_canonical_route'];
             unset($defaults['_canonical_route']);
         }
-        $attributes['_route'] = $name;
+        $attributes[Request::ATTRIBUTE_ROUTE] = $name;
 
         if ($mapping = $route->getOption('mapping')) {
             $attributes['_route_mapping'] = $mapping;

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 
@@ -30,7 +31,7 @@ class RedirectableCompiledUrlMatcher extends CompiledUrlMatcher implements Redir
             'scheme' => $scheme,
             'httpPort' => $this->context->getHttpPort(),
             'httpsPort' => $this->context->getHttpsPort(),
-            '_route' => $route,
+            Request::ATTRIBUTE_ROUTE => $route,
         ];
     }
 }

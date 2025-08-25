@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\HttpFoundation\Request;
 
 $route = new Route('/blog/{slug}', ['_controller' => BlogController::class]);
 $routes = new RouteCollection();
@@ -30,7 +31,7 @@ $parameters = $matcher->match('/blog/lorem-ipsum');
 // $parameters = [
 //     '_controller' => 'App\Controller\BlogController',
 //     'slug' => 'lorem-ipsum',
-//     '_route' => 'blog_show'
+//     Request::ATTRIBUTE_ROUTE => 'blog_show'
 // ]
 
 // Routing can also generate URLs for a given route

@@ -103,8 +103,8 @@ class HttpUtils
     {
         if ('/' !== $path[0]) {
             // Shortcut if request has already been matched before
-            if ($request->attributes->has('_route')) {
-                return $path === $request->attributes->get('_route');
+            if ($request->attributes->has(Request::ATTRIBUTE_ROUTE)) {
+                return $path === $request->attributes->get(Request::ATTRIBUTE_ROUTE);
             }
 
             try {
@@ -115,7 +115,7 @@ class HttpUtils
                     $parameters = $this->urlMatcher->match($request->getPathInfo());
                 }
 
-                return isset($parameters['_route']) && $path === $parameters['_route'];
+                return isset($parameters[Request::ATTRIBUTE_ROUTE]) && $path === $parameters[Request::ATTRIBUTE_ROUTE];
             } catch (MethodNotAllowedException|ResourceNotFoundException) {
                 return false;
             }

@@ -71,7 +71,7 @@ class RedirectControllerTest extends TestCase
         $attributes = [
             'route' => $route,
             'permanent' => $permanent,
-            '_route' => 'current-route',
+            Request::ATTRIBUTE_ROUTE => 'current-route',
             '_route_params' => [
                 'route' => $route,
                 'permanent' => $permanent,
@@ -350,7 +350,7 @@ class RedirectControllerTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The parameter "path" or "route" is required to configure the redirect action in "_redirect" routing configuration.');
 
-        (new RedirectController())(new Request([], [], ['_route' => '_redirect']));
+        (new RedirectController())(new Request([], [], [Request::ATTRIBUTE_ROUTE => '_redirect']));
     }
 
     public function testAmbiguousPathAndRouteParameter()
@@ -358,7 +358,7 @@ class RedirectControllerTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Ambiguous redirection settings, use the "path" or "route" parameter, not both: "/foo" and "bar" found respectively in "_redirect" routing configuration.');
 
-        (new RedirectController())(new Request([], [], ['_route' => '_redirect', '_route_params' => ['path' => '/foo', 'route' => 'bar']]));
+        (new RedirectController())(new Request([], [], [Request::ATTRIBUTE_ROUTE => '_redirect', '_route_params' => ['path' => '/foo', 'route' => 'bar']]));
     }
 
     private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')

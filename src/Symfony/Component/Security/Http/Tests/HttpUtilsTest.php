@@ -277,7 +277,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('match')
             ->with('/foo/bar')
-            ->willReturn(['_route' => 'foobar'])
+            ->willReturn([Request::ATTRIBUTE_ROUTE => 'foobar'])
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -292,7 +292,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('matchRequest')
             ->with($request)
-            ->willReturn(['_route' => 'foobar'])
+            ->willReturn([Request::ATTRIBUTE_ROUTE => 'foobar'])
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -324,7 +324,7 @@ class HttpUtilsTest extends TestCase
         ;
 
         $request = $this->getRequest();
-        $request->attributes->set('_route', 'route_name');
+        $request->attributes->set(Request::ATTRIBUTE_ROUTE, 'route_name');
 
         $utils = new HttpUtils(null, $urlMatcher);
         $this->assertTrue($utils->checkRequestPath($request, 'route_name'));

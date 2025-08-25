@@ -43,7 +43,7 @@ class RouterDataCollectorTest extends TestCase
         $collector = new RouterDataCollector();
 
         $request = Request::create('http://test.com/foo?bar=baz');
-        $request->attributes->set('_route', 'current-route');
+        $request->attributes->set(Request::ATTRIBUTE_ROUTE, 'current-route');
 
         $response = new RedirectResponse('http://test.com/redirect');
 

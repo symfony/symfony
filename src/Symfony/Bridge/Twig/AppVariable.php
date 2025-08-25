@@ -199,7 +199,7 @@ class AppVariable
             throw new \RuntimeException('The "app.current_route" variable is not available.');
         }
 
-        return $this->getRequest()?->attributes->get('_route');
+        return $this->getRequest()?->attributes->get(Request::ATTRIBUTE_ROUTE);
     }
 
     /**

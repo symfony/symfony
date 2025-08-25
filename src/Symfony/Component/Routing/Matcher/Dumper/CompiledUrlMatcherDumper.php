@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -261,7 +262,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
             'vars' => [],
         ];
         $state->getVars = static function ($m) use ($state) {
-            if ('_route' === $m[1]) {
+            if (Request::ATTRIBUTE_ROUTE === $m[1]) {
                 return '?:';
             }
 
@@ -430,7 +431,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
         }
 
         return [
-            ['_route' => $name] + $defaults,
+            [Request::ATTRIBUTE_ROUTE => $name] + $defaults,
             $vars,
             array_flip($route->getMethods()) ?: null,
             array_flip($route->getSchemes()) ?: null,

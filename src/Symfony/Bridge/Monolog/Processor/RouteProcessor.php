@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Monolog\Processor;
 use Monolog\LogRecord;
 use Monolog\ResettableInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -63,7 +64,7 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface, Resett
 
         $currentRequestData = [
             'controller' => $request->attributes->get('_controller'),
-            'route' => $request->attributes->get('_route'),
+            'route' => $request->attributes->get(Request::ATTRIBUTE_ROUTE),
         ];
 
         if ($this->includeParams) {

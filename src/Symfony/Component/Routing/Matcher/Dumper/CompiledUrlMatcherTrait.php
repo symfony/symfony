@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -52,7 +53,7 @@ trait CompiledUrlMatcherTrait
             $this->context->setScheme(key($allowSchemes));
             try {
                 if ($ret = $this->doMatch($pathinfo)) {
-                    return $this->redirect($pathinfo, $ret['_route'], $this->context->getScheme()) + $ret;
+                    return $this->redirect($pathinfo, $ret[Request::ATTRIBUTE_ROUTE], $this->context->getScheme()) + $ret;
                 }
             } finally {
                 $this->context->setScheme($scheme);
@@ -60,7 +61,7 @@ trait CompiledUrlMatcherTrait
         } elseif ('/' !== $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/') {
             $pathinfo = $trimmedPathinfo === $pathinfo ? $pathinfo.'/' : $trimmedPathinfo;
             if ($ret = $this->doMatch($pathinfo, $allow, $allowSchemes)) {
-                return $this->redirect($pathinfo, $ret['_route']) + $ret;
+                return $this->redirect($pathinfo, $ret[Request::ATTRIBUTE_ROUTE]) + $ret;
             }
             if ($allowSchemes) {
                 goto redirect_scheme;
@@ -93,7 +94,7 @@ trait CompiledUrlMatcherTrait
                     continue;
                 }
                 if ('{' === $requiredHost[0] && $hostMatches) {
-                    $hostMatches['_route'] = $ret['_route'];
+                    $hostMatches[Request::ATTRIBUTE_ROUTE] = $ret[Request::ATTRIBUTE_ROUTE];
                     $ret = $this->mergeDefaults($hostMatches, $ret);
                 }
             }

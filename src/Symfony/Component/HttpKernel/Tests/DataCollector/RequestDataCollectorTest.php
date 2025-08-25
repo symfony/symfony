@@ -360,7 +360,7 @@ class RequestDataCollectorTest extends TestCase
     {
         $request = Request::create('http://test.com/foo?bar=baz');
         $request->attributes->set('foo', 'bar');
-        $request->attributes->set('_route', 'foobar');
+        $request->attributes->set(Request::ATTRIBUTE_ROUTE, 'foobar');
         $request->attributes->set('_route_params', $routeParams);
         $request->attributes->set('resource', fopen(__FILE__, 'r'));
         $request->attributes->set('object', new \stdClass());

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
@@ -35,7 +36,7 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
                 try {
                     $ret = parent::match($pathinfo);
 
-                    return $this->redirect($pathinfo, $ret['_route'] ?? null, $this->context->getScheme()) + $ret;
+                    return $this->redirect($pathinfo, $ret[Request::ATTRIBUTE_ROUTE] ?? null, $this->context->getScheme()) + $ret;
                 } catch (ExceptionInterface) {
                     throw $e;
                 } finally {
@@ -48,7 +49,7 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
                     $pathinfo = $trimmedPathinfo === $pathinfo ? $pathinfo.'/' : $trimmedPathinfo;
                     $ret = parent::match($pathinfo);
 
-                    return $this->redirect($pathinfo, $ret['_route'] ?? null) + $ret;
+                    return $this->redirect($pathinfo, $ret[Request::ATTRIBUTE_ROUTE] ?? null) + $ret;
                 } catch (ExceptionInterface) {
                     if ($this->allowSchemes) {
                         goto redirect_scheme;

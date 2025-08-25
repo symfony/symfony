@@ -316,7 +316,7 @@ class SecurityExtensionTest extends TestCase
         yield 'Invalid configuration with port' => [['port' => 80]];
         yield 'Invalid configuration with methods' => [['methods' => ['POST']]];
         yield 'Invalid configuration with ips' => [['ips' => ['0.0.0.0']]];
-        yield 'Invalid configuration with attributes' => [['attributes' => ['_route' => 'foo_route']]];
+        yield 'Invalid configuration with attributes' => [['attributes' => [Request::ATTRIBUTE_ROUTE => 'foo_route']]];
         yield 'Invalid configuration with route' => [['route' => 'foo_route']];
     }
 
@@ -334,7 +334,7 @@ class SecurityExtensionTest extends TestCase
                 ],
             ],
             'access_control' => [
-                ['attributes' => ['_route' => 'foo_route']],
+                ['attributes' => [Request::ATTRIBUTE_ROUTE => 'foo_route']],
             ],
         ]);
 
@@ -351,8 +351,8 @@ class SecurityExtensionTest extends TestCase
         $attributesRequestMatcher = $container->getDefinition((string) $chainRequestMatcherConstructorArguments[0][0]);
 
         $this->assertCount(1, $attributesRequestMatcher->getArguments());
-        $this->assertArrayHasKey('_route', $attributesRequestMatcher->getArgument(0));
-        $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)['_route']);
+        $this->assertArrayHasKey(Request::ATTRIBUTE_ROUTE, $attributesRequestMatcher->getArgument(0));
+        $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)[Request::ATTRIBUTE_ROUTE]);
     }
 
     public function testRegisterAccessControlWithSpecifiedRoute()
@@ -386,8 +386,8 @@ class SecurityExtensionTest extends TestCase
         $attributesRequestMatcher = $container->getDefinition((string) $chainRequestMatcherConstructorArguments[0][0]);
 
         $this->assertCount(1, $attributesRequestMatcher->getArguments());
-        $this->assertArrayHasKey('_route', $attributesRequestMatcher->getArgument(0));
-        $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)['_route']);
+        $this->assertArrayHasKey(Request::ATTRIBUTE_ROUTE, $attributesRequestMatcher->getArgument(0));
+        $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)[Request::ATTRIBUTE_ROUTE]);
     }
 
     public function testRegisterAccessControlWithSpecifiedAttributesThrowsException()
@@ -404,7 +404,7 @@ class SecurityExtensionTest extends TestCase
                 ],
             ],
             'access_control' => [
-                ['route' => 'anything', 'attributes' => ['_route' => 'foo_route']],
+                ['route' => 'anything', 'attributes' => [Request::ATTRIBUTE_ROUTE => 'foo_route']],
             ],
         ]);
 

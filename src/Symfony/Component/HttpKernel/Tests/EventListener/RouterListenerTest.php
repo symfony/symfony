@@ -144,7 +144,7 @@ class RouterListenerTest extends TestCase
     public static function getLoggingParameterData()
     {
         return [
-            [['_route' => 'foo'], 'Matched route "{route}".', ['route' => 'foo', 'route_parameters' => ['_route' => 'foo'], 'request_uri' => 'http://localhost/', 'method' => 'GET']],
+            [[Request::ATTRIBUTE_ROUTE => 'foo'], 'Matched route "{route}".', ['route' => 'foo', 'route_parameters' => [Request::ATTRIBUTE_ROUTE => 'foo'], 'request_uri' => 'http://localhost/', 'method' => 'GET']],
             [[], 'Matched route "{route}".', ['route' => 'n/a', 'route_parameters' => [], 'request_uri' => 'http://localhost/', 'method' => 'GET']],
         ];
     }

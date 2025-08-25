@@ -170,7 +170,7 @@ trait BrowserKitAssertionsTrait
 
     public static function assertRouteSame(string $expectedRoute, array $parameters = [], string $message = ''): void
     {
-        $constraint = new ResponseConstraint\RequestAttributeValueSame('_route', $expectedRoute);
+        $constraint = new ResponseConstraint\RequestAttributeValueSame(Request::ATTRIBUTE_ROUTE, $expectedRoute);
         $constraints = [];
         foreach ($parameters as $key => $value) {
             $constraints[] = new ResponseConstraint\RequestAttributeValueSame($key, $value);

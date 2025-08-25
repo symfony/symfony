@@ -42,6 +42,8 @@ class_exists(ServerBag::class);
  */
 class Request
 {
+    public const ATTRIBUTE_ROUTE = '_route';
+
     public const HEADER_FORWARDED = 0b000001; // When using RFC 7239
     public const HEADER_X_FORWARDED_FOR = 0b000010;
     public const HEADER_X_FORWARDED_HOST = 0b000100;

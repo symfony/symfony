@@ -104,7 +104,7 @@ class RouterListener implements EventSubscriberInterface
             }
 
             $this->logger?->info('Matched route "{route}".', [
-                'route' => $parameters['_route'] ?? 'n/a',
+                'route' => $parameters[Request::ATTRIBUTE_ROUTE] ?? 'n/a',
                 'route_parameters' => $parameters,
                 'request_uri' => $request->getUri(),
                 'method' => $request->getMethod(),
@@ -144,7 +144,7 @@ class RouterListener implements EventSubscriberInterface
             }
 
             $request->attributes->add($attributes);
-            unset($parameters['_route'], $parameters['_controller']);
+            unset($parameters[Request::ATTRIBUTE_ROUTE], $parameters['_controller']);
             $request->attributes->set('_route_params', $parameters);
         } catch (ResourceNotFoundException $e) {
             $message = \sprintf('No route found for "%s %s"', $request->getMethod(), $request->getUriForPath($request->getPathInfo()));

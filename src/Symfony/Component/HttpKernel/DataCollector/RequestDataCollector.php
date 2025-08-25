@@ -49,7 +49,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $attributes = [];
         $route = '';
         foreach ($request->attributes->all() as $key => $value) {
-            if ('_route' === $key) {
+            if (Request::ATTRIBUTE_ROUTE === $key) {
                 $route = \is_object($value) ? $value->getPath() : $value;
                 $attributes[$key] = $route;
             } else {
@@ -155,7 +155,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 'sf_redirect',
                 json_encode([
                     'token' => $response->headers->get('x-debug-token'),
-                    'route' => $request->attributes->get('_route', 'n/a'),
+                    'route' => $request->attributes->get(Request::ATTRIBUTE_ROUTE, 'n/a'),
                     'method' => $request->getMethod(),
                     'controller' => $this->parseController($request->attributes->get('_controller')),
                     'status_code' => $statusCode,

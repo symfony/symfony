@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
@@ -334,7 +335,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 $this->assertEquals(['ROLE_ADMIN'], $attributes);
                 $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[0]);
                 $this->assertSame(AttributesRequestMatcher::class, $def->getClass());
-                $this->assertSame(['_controller' => 'AdminController::index', '_route' => 'admin'], $def->getArgument(0));
+                $this->assertSame(['_controller' => 'AdminController::index', Request::ATTRIBUTE_ROUTE => 'admin'], $def->getArgument(0));
             }
         }
 

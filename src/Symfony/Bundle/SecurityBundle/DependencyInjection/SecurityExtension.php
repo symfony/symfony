@@ -37,6 +37,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\Extension\PasswordHasher\PasswordHasherExtension;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\IpsRequestMatcher;
@@ -225,10 +226,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $attributes = $access['attributes'];
 
                 if ($access['route']) {
-                    if (\array_key_exists('_route', $attributes)) {
+                    if (\array_key_exists(Request::ATTRIBUTE_ROUTE, $attributes)) {
                         throw new InvalidConfigurationException('The "route" option should not be specified alongside "attributes._route" option. Use just one of the options.');
                     }
-                    $attributes['_route'] = $access['route'];
+                    $attributes[Request::ATTRIBUTE_ROUTE] = $access['route'];
                 }
 
                 $matcher = $this->createRequestMatcher(

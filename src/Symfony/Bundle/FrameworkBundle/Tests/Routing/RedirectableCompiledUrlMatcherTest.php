@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\RedirectableCompiledUrlMatcher;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -35,7 +36,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
                 'scheme' => null,
                 'httpPort' => $context->getHttpPort(),
                 'httpsPort' => $context->getHttpsPort(),
-                '_route' => 'foo',
+                Request::ATTRIBUTE_ROUTE => 'foo',
             ],
             $matcher->match('/foo')
         );
@@ -56,7 +57,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
                 'scheme' => 'https',
                 'httpPort' => $context->getHttpPort(),
                 'httpsPort' => $context->getHttpsPort(),
-                '_route' => 'foo',
+                Request::ATTRIBUTE_ROUTE => 'foo',
             ],
             $matcher->match('/foo')
         );

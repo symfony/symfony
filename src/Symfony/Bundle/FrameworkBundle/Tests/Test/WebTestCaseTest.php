@@ -419,7 +419,7 @@ class WebTestCaseTest extends TestCase
         $client = $this->createMock(KernelBrowser::class);
         $request = new Request();
         $request->attributes->set('foo', 'bar');
-        $request->attributes->set('_route', 'homepage');
+        $request->attributes->set(Request::ATTRIBUTE_ROUTE, 'homepage');
         $client->expects($this->any())->method('getRequest')->willReturn($request);
 
         return $this->getTester($client);

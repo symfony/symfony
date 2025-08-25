@@ -81,18 +81,80 @@ class ConfigDataCollectorTest extends TestCase
     public function testGetAppRuntime()
     {
         $c = new ConfigDataCollector();
-        
-        // Test without APP_RUNTIME set
+
         $c->collect(new Request(), new Response());
         $this->assertNull($c->getAppRuntime());
-        
-        // Test with APP_RUNTIME set
+
         $_SERVER['APP_RUNTIME'] = 'Symfony\\Runtime\\SymfonyRuntime';
         $c->collect(new Request(), new Response());
         $this->assertSame('Symfony\\Runtime\\SymfonyRuntime', $c->getAppRuntime());
-        
-        // Clean up
+
         unset($_SERVER['APP_RUNTIME']);
+    }
+
+    public function testGetAppRuntimeFromComposerJson()
+    {
+        $tempDir = sys_get_temp_dir().'/sf_runtime_'.uniqid();
+        @mkdir($tempDir);
+
+        $composerJson = [
+            'name' => 'example/app',
+            'type' => 'project',
+            'extra' => [
+                'runtime' => [
+                    'class' => 'App\\CustomRuntime',
+                ],
+            ],
+        ];
+        file_put_contents($tempDir.'/composer.json', json_encode($composerJson));
+
+        $kernel = new class('test', true, $tempDir) extends KernelForTest {
+            public function __construct(string $environment, bool $debug, private string $pdir)
+            {
+                parent::__construct($environment, $debug);
+            }
+            public function getProjectDir(): string
+            {
+                return $this->pdir;
+            }
+        };
+
+        $c = new ConfigDataCollector();
+        $c->setKernel($kernel);
+        $c->collect(new Request(), new Response());
+        $this->assertSame('App\\CustomRuntime', $c->getAppRuntime());
+
+        @unlink($tempDir.'/composer.json');
+        @rmdir($tempDir);
+    }
+
+    public function testGetAppRuntimeFallback()
+    {
+        $tempDir = sys_get_temp_dir().'/sf_runtime_'.uniqid();
+        @mkdir($tempDir);
+
+        $kernel = new class('test', true, $tempDir) extends KernelForTest {
+            public function __construct(string $environment, bool $debug, private string $pdir)
+            {
+                parent::__construct($environment, $debug);
+            }
+            public function getProjectDir(): string
+            {
+                return $this->pdir;
+            }
+        };
+
+        $c = new ConfigDataCollector();
+        $c->setKernel($kernel);
+        $c->collect(new Request(), new Response());
+
+        if (class_exists('Symfony\\Runtime\\SymfonyRuntime')) {
+            $this->assertSame('Symfony\\Runtime\\SymfonyRuntime', $c->getAppRuntime());
+        } else {
+            $this->assertNull($c->getAppRuntime());
+        }
+
+        @rmdir($tempDir);
     }
 }
 

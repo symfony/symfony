@@ -64,7 +64,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'zend_opcache_status' => \extension_loaded('Zend OPcache') ? (filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN) ? 'Enabled' : 'Not enabled') : 'Not installed',
             'bundles' => [],
             'sapi_name' => \PHP_SAPI,
-            'app_runtime' => $_SERVER['APP_RUNTIME'] ?? null,
+            'app_runtime_resolved' => $this->resolveAppRuntime(),
         ];
 
         if (isset($this->kernel)) {
@@ -250,12 +250,9 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['sapi_name'];
     }
 
-    /**
-     * Gets the application runtime.
-     */
     public function getAppRuntime(): ?string
     {
-        return $this->data['app_runtime'];
+        return $this->data['app_runtime_resolved'] ?? null;
     }
 
     public function getName(): string
@@ -280,5 +277,41 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         }
 
         return $versionState;
+    }
+
+    private function resolveAppRuntime(): ?string
+    {
+        static $cachedResolvedRuntime;
+
+        if (null !== $cachedResolvedRuntime) {
+            return $cachedResolvedRuntime;
+        }
+
+        $envRuntime = $_SERVER['APP_RUNTIME'] ?? null;
+        if (\is_string($envRuntime) && '' !== $envRuntime) {
+            return $cachedResolvedRuntime = $envRuntime;
+        }
+
+        if (isset($this->kernel)) {
+            $composerJsonPath = $this->kernel->getProjectDir().'/composer.json';
+            if (is_file($composerJsonPath) && is_readable($composerJsonPath)) {
+                $json = @file_get_contents($composerJsonPath);
+                if (false !== $json) {
+                    $decoded = json_decode($json, true);
+                    if (\is_array($decoded)) {
+                        $runtimeClass = $decoded['extra']['runtime']['class'] ?? null;
+                        if (\is_string($runtimeClass) && '' !== $runtimeClass) {
+                            return $cachedResolvedRuntime = $runtimeClass;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (class_exists('Symfony\\Runtime\\SymfonyRuntime')) {
+            return $cachedResolvedRuntime = 'Symfony\\Runtime\\SymfonyRuntime';
+        }
+
+        return $cachedResolvedRuntime = null;
     }
 }

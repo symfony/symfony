@@ -16,6 +16,7 @@ CHANGELOG
 7.4
 ---
 
+ * Add `#[SerializeResponse]` attribute to automatically serialize controller return values to JSON
  * Add support for the `QUERY` HTTP method
  * Deprecate implementing `__sleep/wakeup()` on kernels; use `__(un)serialize()` instead
  * Deprecate implementing `__sleep/wakeup()` on data collectors; use `__(un)serialize()` instead

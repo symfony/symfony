@@ -35,6 +35,7 @@ use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\IsSignatureValidAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
+use Symfony\Component\HttpKernel\EventListener\SerializeResponseListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
 
 return static function (ContainerConfigurator $container) {
@@ -152,6 +153,12 @@ return static function (ContainerConfigurator $container) {
         ->set('controller.is_signature_valid_attribute_listener', IsSignatureValidAttributeListener::class)
             ->args([
                 service('uri_signer'),
+            ])
+            ->tag('kernel.event_subscriber')
+
+        ->set('controller.serialize_response_listener', SerializeResponseListener::class)
+            ->args([
+                service('serializer')->nullOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
 

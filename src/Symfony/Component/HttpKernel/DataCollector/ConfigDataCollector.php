@@ -281,15 +281,9 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
 
     private function resolveAppRuntime(): ?string
     {
-        static $cachedResolvedRuntime;
-
-        if (null !== $cachedResolvedRuntime) {
-            return $cachedResolvedRuntime;
-        }
-
         $envRuntime = $_SERVER['APP_RUNTIME'] ?? null;
         if (\is_string($envRuntime) && '' !== $envRuntime) {
-            return $cachedResolvedRuntime = $envRuntime;
+            return $envRuntime;
         }
 
         if (isset($this->kernel)) {
@@ -301,7 +295,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
                     if (\is_array($decoded)) {
                         $runtimeClass = $decoded['extra']['runtime']['class'] ?? null;
                         if (\is_string($runtimeClass) && '' !== $runtimeClass) {
-                            return $cachedResolvedRuntime = $runtimeClass;
+                            return $runtimeClass;
                         }
                     }
                 }
@@ -309,9 +303,9 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         }
 
         if (class_exists('Symfony\\Runtime\\SymfonyRuntime')) {
-            return $cachedResolvedRuntime = 'Symfony\\Runtime\\SymfonyRuntime';
+            return 'Symfony\\Runtime\\SymfonyRuntime';
         }
 
-        return $cachedResolvedRuntime = null;
+        return null;
     }
 }

@@ -118,7 +118,8 @@ class SwitchUserListenerTest extends TestCase
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, urlGenerator: $this->createMock(UrlGeneratorInterface::class), targetRoute: 'whatever');
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
 
         $this->assertInstanceOf(RedirectResponse::class, $this->event->getResponse());
         $this->assertSame($this->request->getUri(), $this->event->getResponse()->getTargetUrl());

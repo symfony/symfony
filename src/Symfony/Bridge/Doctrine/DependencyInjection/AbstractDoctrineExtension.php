@@ -75,8 +75,11 @@ abstract class AbstractDoctrineExtension extends Extension
                 $bundleMetadata = null;
                 foreach ($container->getParameter('kernel.bundles') as $name => $class) {
                     if ($mappingName === $name) {
+                        /** @var array<string,array> $bundlesMetadata */
+                        $bundlesMetadata = $container->getParameter('kernel.bundles_metadata');
+
                         $bundle = new \ReflectionClass($class);
-                        $bundleMetadata = $container->getParameter('kernel.bundles_metadata')[$name];
+                        $bundleMetadata = $bundlesMetadata[$name];
 
                         break;
                     }

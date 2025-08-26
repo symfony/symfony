@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-08-26T11:45:13Z
+
+Adding the tag in the list will avoid having it reported as unused tag in the container logs in case the new loader service gets removed due to older dependencies.
+Given that `symfony/routing` is a mandatory dependency, that special case (using `symfony/routing` 7.3 with FrameworkBundle 7.4+) is the only case where it could have an impact.

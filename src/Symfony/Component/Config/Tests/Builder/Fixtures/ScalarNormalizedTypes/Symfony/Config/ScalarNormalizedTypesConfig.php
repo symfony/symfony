@@ -20,6 +20,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     private $object;
     private $listObject;
     private $keyedListObject;
+    private $variablePrototypeArray;
     private $nested;
     private $_usedProperties = [];
 
@@ -116,6 +117,19 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
         return $this->keyedListObject[$class];
     }
 
+    /**
+     * @param ParamConfigurator|array<ParamConfigurator|mixed> $value
+     *
+     * @return $this
+     */
+    public function variablePrototypeArray(ParamConfigurator|array $value): static
+    {
+        $this->_usedProperties['variablePrototypeArray'] = true;
+        $this->variablePrototypeArray = $value;
+
+        return $this;
+    }
+
     public function nested(array $value = []): \Symfony\Config\ScalarNormalizedTypes\NestedConfig
     {
         if (null === $this->nested) {
@@ -165,6 +179,12 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
             unset($value['keyed_list_object']);
         }
 
+        if (array_key_exists('variable_prototype_array', $value)) {
+            $this->_usedProperties['variablePrototypeArray'] = true;
+            $this->variablePrototypeArray = $value['variable_prototype_array'];
+            unset($value['variable_prototype_array']);
+        }
+
         if (array_key_exists('nested', $value)) {
             $this->_usedProperties['nested'] = true;
             $this->nested = new \Symfony\Config\ScalarNormalizedTypes\NestedConfig($value['nested']);
@@ -193,6 +213,9 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
         }
         if (isset($this->_usedProperties['keyedListObject'])) {
             $output['keyed_list_object'] = array_map(fn ($v) => $v instanceof \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig ? $v->toArray() : $v, $this->keyedListObject);
+        }
+        if (isset($this->_usedProperties['variablePrototypeArray'])) {
+            $output['variable_prototype_array'] = $this->variablePrototypeArray;
         }
         if (isset($this->_usedProperties['nested'])) {
             $output['nested'] = $this->nested->toArray();

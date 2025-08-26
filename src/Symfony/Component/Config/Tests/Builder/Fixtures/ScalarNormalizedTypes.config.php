@@ -28,4 +28,9 @@ return static function (ScalarNormalizedTypesConfig $config) {
         'nested_object' => true,
         'nested_list_object' => ['one', 'two'],
     ]);
+
+    $config->variablePrototypeArray([
+        'key' => 'value',
+        'nested_list' => ['one', 'two'],
+    ]);
 };

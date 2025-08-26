@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * This class is automatically generated to help in creating a config.
  */
-class TransportsConfig
+class TransportsConfig 
 {
     private $dsn;
     private $serializer;

@@ -11,6 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection;
 
+use Composer\InstalledVersions;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
+use Doctrine\Persistence\Mapping\Driver\ClassLocator;
+use Doctrine\Persistence\Mapping\Driver\FileClassLocator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +22,7 @@ use Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
@@ -53,6 +58,54 @@ class DoctrineExtensionTest extends TestCase
         $this->extension
             ->method('getMappingResourceExtension')
             ->willReturn('orm');
+    }
+
+    public function testMappingClassLocatorIsNotRegisteredWhenDriversConstructorDoesntAcceptIt()
+    {
+        if ($this->isClassLocatorSupportedByORM()) {
+            $this->markTestSkipped('This test is only relevant for versions of doctrine/orm < 3.6.0, which did not support ClassLocator');
+        }
+
+        $driverClass = AttributeDriver::class;
+        $driverName = 'default_attribute';
+        $container = $this->createContainer();
+        $dirs = [__DIR__.'/../Fixtures'];
+
+        $locatorServiceId = $this->invokeRegisterMappingClassLocatorService($driverClass, $driverName, $container, $dirs);
+
+        $this->assertNull($locatorServiceId);
+    }
+
+    public function testRegisterMappingClassLocatorService()
+    {
+        if (!$this->isClassLocatorSupportedByPersistence() || !$this->isClassLocatorSupportedByORM()) {
+            $this->markTestSkipped('This test is only relevant for versions of doctrine/persistence >= 4.1 and doctrine/orm >= 3.6');
+        }
+
+        $driverClass = AttributeDriver::class;
+        $driverName = 'default_attribute';
+        $container = $this->createContainer();
+        $dirs = [__DIR__.'/../Fixtures'];
+
+        $locatorServiceId = $this->invokeRegisterMappingClassLocatorService($driverClass, $driverName, $container, $dirs);
+
+        $this->assertSame('doctrine.orm.default_attribute_mapping_class_locator', $locatorServiceId);
+        $classLocator = $container->get($locatorServiceId);
+        $this->assertInstanceOf(FileClassLocator::class, $classLocator);
+
+        $classNames = $classLocator->getClassNames();
+        $this->assertGreaterThan(1, \count($classNames));
+
+        $finderServiceId = 'doctrine.orm.default_attribute_mapping_class_finder';
+        $finderDefinition = $container->getDefinition($finderServiceId);
+
+        $this->assertSame(Finder::class, $finderDefinition->getClass());
+        $this->assertTrue($finderDefinition->isShared());
+        $this->assertSame([
+            ['files', []],
+            ['name', ['*.php']],
+            ['in', [$dirs]],
+        ], $finderDefinition->getMethodCalls());
     }
 
     public function testFixManagersAutoMappingsWithTwoAutomappings()
@@ -333,5 +386,26 @@ class DoctrineExtensionTest extends TestCase
             'kernel.container_class' => 'kernel',
             'kernel.project_dir' => __DIR__,
         ], $data)));
+    }
+
+    /** @param string[] $dirs */
+    private function invokeRegisterMappingClassLocatorService(string $driverClass, string $driverName, ContainerBuilder $container, array $dirs): ?string
+    {
+        $method = new \ReflectionMethod($this->extension, 'registerMappingClassLocatorService');
+
+        /** @var string $locatorServiceId */
+        $locatorServiceId = $method->invoke($this->extension, $driverClass, $driverName, $container, $dirs);
+
+        return $locatorServiceId;
+    }
+
+    private function isClassLocatorSupportedByPersistence(): bool
+    {
+        return interface_exists(ClassLocator::class);
+    }
+
+    private function isClassLocatorSupportedByORM(): bool
+    {
+        return version_compare(InstalledVersions::getVersion('doctrine/orm'), '3.6', '>=');
     }
 }

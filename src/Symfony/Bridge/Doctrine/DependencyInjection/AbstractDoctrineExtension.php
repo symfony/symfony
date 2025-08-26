@@ -11,11 +11,17 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection;
 
+use Doctrine\Persistence\Mapping\Driver\ClassLocator;
+use Doctrine\Persistence\Mapping\Driver\FileClassLocator;
+use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 /**
  * This abstract classes groups common code that Doctrine Object Manager extensions (ORM, MongoDB, CouchDB) need.
@@ -30,6 +36,8 @@ abstract class AbstractDoctrineExtension extends Extension
     protected array $aliasMap = [];
 
     /**
+     * @var array<string,array<string,string>> An array of directory paths by namespace, indexed by driver type.
+     *
      * Used inside metadata driver method to simplify aggregation of data.
      */
     protected array $drivers = [];
@@ -185,7 +193,8 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         foreach ($this->drivers as $driverType => $driverPaths) {
-            $mappingService = $this->getObjectManagerElementName($objectManager['name'].'_'.$driverType.'_metadata_driver');
+            $driverName = $objectManager['name'].'_'.$driverType;
+            $mappingService = $this->getObjectManagerElementName($driverName.'_metadata_driver');
             if ($container->hasDefinition($mappingService)) {
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args = $mappingDriverDef->getArguments();
@@ -203,6 +212,19 @@ abstract class AbstractDoctrineExtension extends Extension
                 $mappingDriverDef->addMethodCall('setGlobalBasename', ['mapping']);
             }
 
+            if ('attribute' === $driverType) {
+                $driverClass = $mappingDriverDef->getClass();
+
+                /** @var string[] $directoryPaths */
+                $directoryPaths = $mappingDriverDef->getArgument(0);
+
+                $classLocator = $this->registerMappingClassLocatorService($driverClass, $driverName, $container, $directoryPaths);
+
+                if (null !== $classLocator) {
+                    $mappingDriverDef->replaceArgument(0, new Reference($classLocator));
+                }
+            }
+
             $container->setDefinition($mappingService, $mappingDriverDef);
 
             foreach ($driverPaths as $prefix => $driverPath) {
@@ -211,6 +233,61 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         $container->setDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'), $chainDriverDef);
+    }
+
+    /**
+     * @param class-string<MappingDriver> $driverClass
+     * @param string[]                    $dirs
+     *
+     * @return ?string service id, or null if not available
+     */
+    private function registerMappingClassLocatorService(string $driverClass, string $driverName, ContainerBuilder $container, array $dirs): ?string
+    {
+        // Available since doctrine/persistence >= 4.1
+        if (!interface_exists(ClassLocator::class)) {
+            return null;
+        }
+
+        $parameter = new \ReflectionParameter([$driverClass, '__construct'], 0);
+
+        $parameterType = TypeResolver::create()->resolve($parameter);
+
+        // It's possible that doctrine/persistence:^4.1 is installed with the older versions of ORM/ODM.
+        // In this case it's necessary to check for actual driver support.
+        if (!$parameterType->isIdentifiedBy(ClassLocator::class)) {
+            return null;
+        }
+
+        $classLocator = $this->getObjectManagerElementName($driverName.'_mapping_class_locator');
+
+        $locatorDefinition = new Definition(
+            FileClassLocator::class,
+            [new Reference($this->registerMappingClassFinderService($driverName, $container, $dirs))],
+        );
+
+        $container->setDefinition($classLocator, $locatorDefinition);
+
+        return $classLocator;
+    }
+
+    /** @param string[] $dirs */
+    private function registerMappingClassFinderService(string $driverName, ContainerBuilder $container, array $dirs): string
+    {
+        $finderService = $this->getObjectManagerElementName($driverName.'_mapping_class_finder');
+
+        if ($container->hasDefinition($finderService)) {
+            $finderDefinition = $container->getDefinition($finderService);
+        } else {
+            $finderDefinition = new Definition(Finder::class, []);
+        }
+
+        $finderDefinition->addMethodCall('files');
+        $finderDefinition->addMethodCall('name', ['*.php']);
+        $finderDefinition->addMethodCall('in', [$dirs]);
+
+        $container->setDefinition($finderService, $finderDefinition);
+
+        return $finderService;
     }
 
     /**

@@ -134,7 +134,7 @@
         "async-aws/sns": "^1.0",
         "cache/integration-tests": "dev-master",
         "doctrine/collections": "^1.8|^2.0",
-        "doctrine/data-fixtures": "^1.1",
+        "doctrine/data-fixtures": "^1.1|^2.0",
         "doctrine/dbal": "^3.6|^4",
         "doctrine/orm": "^2.15|^3",
         "dragonmantank/cron-expression": "^3.1",

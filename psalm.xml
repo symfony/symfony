@@ -35,6 +35,8 @@
                 <referencedClass name="Random\*"/>
                 <!-- These classes have been added in PHP 8.4 -->
                 <referencedClass name="BcMath\Number"/>
+                <!-- This class is available from doctrine/persistence >= 4.1 -->
+                <referencedClass name="Doctrine\Persistence\Mapping\Driver\FileClassLocator"/>
             </errorLevel>
         </UndefinedClass>
         <UndefinedDocblockClass>

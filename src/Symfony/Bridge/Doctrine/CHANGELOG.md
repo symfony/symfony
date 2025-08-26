@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate `UniqueEntity::getRequiredOptions()` and `UniqueEntity::getDefaultOption()`
+ * Add support for `ClassLocator` from `doctrine/persistence` >= 4.1
 
 7.3
 ---

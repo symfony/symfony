@@ -57,9 +57,9 @@ class DateTimeNormalizerTest extends TestCase
 
     public function testNormalizeUsingTimeZonePassedInConstructor()
     {
-        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('Japan')]);
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('Asia/Tokyo')]);
 
-        $this->assertSame('2016-12-01T00:00:00+09:00', $normalizer->normalize(new \DateTime('2016/12/01', new \DateTimeZone('Japan'))));
+        $this->assertSame('2016-12-01T00:00:00+09:00', $normalizer->normalize(new \DateTime('2016/12/01', new \DateTimeZone('Asia/Tokyo'))));
         $this->assertSame('2016-12-01T09:00:00+09:00', $normalizer->normalize(new \DateTime('2016/12/01', new \DateTimeZone('UTC'))));
     }
 
@@ -76,9 +76,9 @@ class DateTimeNormalizerTest extends TestCase
     public static function normalizeUsingTimeZonePassedInContextProvider()
     {
         yield ['2016-12-01T00:00:00+00:00', new \DateTime('2016/12/01', new \DateTimeZone('UTC')), null];
-        yield ['2016-12-01T00:00:00+09:00', new \DateTime('2016/12/01', new \DateTimeZone('Japan')), new \DateTimeZone('Japan')];
-        yield ['2016-12-01T09:00:00+09:00', new \DateTime('2016/12/01', new \DateTimeZone('UTC')), new \DateTimeZone('Japan')];
-        yield ['2016-12-01T09:00:00+09:00', new \DateTimeImmutable('2016/12/01', new \DateTimeZone('UTC')), new \DateTimeZone('Japan')];
+        yield ['2016-12-01T00:00:00+09:00', new \DateTime('2016/12/01', new \DateTimeZone('Asia/Tokyo')), new \DateTimeZone('Asia/Tokyo')];
+        yield ['2016-12-01T09:00:00+09:00', new \DateTime('2016/12/01', new \DateTimeZone('UTC')), new \DateTimeZone('Asia/Tokyo')];
+        yield ['2016-12-01T09:00:00+09:00', new \DateTimeImmutable('2016/12/01', new \DateTimeZone('UTC')), new \DateTimeZone('Asia/Tokyo')];
     }
 
     /**
@@ -142,7 +142,7 @@ class DateTimeNormalizerTest extends TestCase
                 '2018-12-01T18:03:06.067634',
                 new \DateTimeZone('UTC')
             ),
-            new \DateTimeZone('Europe/Kiev'),
+            new \DateTimeZone('Europe/Kyiv'),
         ];
 
         yield [
@@ -184,7 +184,7 @@ class DateTimeNormalizerTest extends TestCase
 
     public function testDenormalizeUsingTimezonePassedInConstructor()
     {
-        $timezone = new \DateTimeZone('Japan');
+        $timezone = new \DateTimeZone('Asia/Tokyo');
         $expected = new \DateTime('2016/12/01 17:35:00', $timezone);
         $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => $timezone]);
 
@@ -217,18 +217,18 @@ class DateTimeNormalizerTest extends TestCase
     {
         yield 'with timezone' => [
             '2016/12/01 17:35:00',
-            new \DateTimeImmutable('2016/12/01 17:35:00', new \DateTimeZone('Japan')),
-            new \DateTimeZone('Japan'),
+            new \DateTimeImmutable('2016/12/01 17:35:00', new \DateTimeZone('Asia/Tokyo')),
+            new \DateTimeZone('Asia/Tokyo'),
         ];
         yield 'with timezone as string' => [
             '2016/12/01 17:35:00',
-            new \DateTimeImmutable('2016/12/01 17:35:00', new \DateTimeZone('Japan')),
-            'Japan',
+            new \DateTimeImmutable('2016/12/01 17:35:00', new \DateTimeZone('Asia/Tokyo')),
+            'Asia/Tokyo',
         ];
         yield 'with format without timezone information' => [
             '2016.12.01 17:35:00',
-            new \DateTimeImmutable('2016/12/01 17:35:00', new \DateTimeZone('Japan')),
-            new \DateTimeZone('Japan'),
+            new \DateTimeImmutable('2016/12/01 17:35:00', new \DateTimeZone('Asia/Tokyo')),
+            new \DateTimeZone('Asia/Tokyo'),
             'Y.m.d H:i:s',
         ];
         yield 'ignored with format with timezone information' => [

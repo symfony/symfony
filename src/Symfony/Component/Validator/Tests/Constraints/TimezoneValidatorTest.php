@@ -277,6 +277,11 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
      */
     public function testDeprecatedTimezonesAreValidWithBC(string $timezone)
     {
+        // Skip test if the timezone is not available in the current timezone database
+        if (!\in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC), true)) {
+            $this->markTestSkipped(sprintf('Timezone "%s" is not available in the current timezone database', $timezone));
+        }
+
         $constraint = new Timezone(\DateTimeZone::ALL_WITH_BC);
 
         $this->validator->validate($timezone, $constraint);

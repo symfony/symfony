@@ -28,7 +28,7 @@ class ListObjectConfig
     }
 
     /**
-     * @param ParamConfigurator|array<ParamConfigurator|mixed> $value
+     * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
      *
      * @return $this
      */

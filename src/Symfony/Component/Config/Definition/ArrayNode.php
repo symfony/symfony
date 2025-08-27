@@ -32,11 +32,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $removeExtraKeys = true;
     protected $normalizeKeys = true;
 
-    public function getNormalizeKeys(): bool
-    {
-        return $this->normalizeKeys;
-    }
-
     /**
      * @return void
      */

@@ -26,10 +26,6 @@ return [
             'settings' => ['one', 'two'],
         ],
     ],
-    'variable_prototype_array' => [
-        'key' => 'value',
-        'nested_list' => ['one', 'two'],
-    ],
     'nested' => [
         'nested_object' => true,
         'nested_list_object' => ['one', 'two'],

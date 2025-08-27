@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2025-08-26T06:42:02Z
+
+Looks good to me.
+An env var is always a string anyway, so supporting JSON here makes sense.
+
+You could add `JSON_THROW_ON_ERROR` and fail clearly on invalid JSON,
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-26T07:42:07Z
+
+Very close to #45535.
+
+Did you consider populating `$_SERVER['APP_RUNTIME_OPTIONS']` in your `index.php` file instead? Just wondering about alternatives:
+```diff
+--- a/public/index.php
++++ b/public/index.php
+@@ -4,6 +4,10 @@ use App\Kernel;
+
+ require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+
++if (is_string($_SERVER['APP_RUNTIME_OPTIONS'] ??= $_ENV['APP_RUNTIME_OPTIONS'] ?? [])) {
++    $_SERVER['APP_RUNTIME_OPTIONS'] = json_decode($_SERVER['APP_RUNTIME_OPTIONS'], true, JSON_THROW_ON_ERROR);
++}
++
+ return function (array $context) {
+     return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+ };
+```
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-08-26T08:13:32Z
+
+ > Did you consider populating `$_SERVER['APP_RUNTIME_OPTIONS']` in your `index.php` file instead? Just wondering about alternatives:
+>
+> ```diff
+> --- a/public/index.php
+> +++ b/public/index.php
+> @@ -4,6 +4,10 @@ use App\Kernel;
+>
+>  require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+>
+> +if (is_string($_SERVER['APP_RUNTIME_OPTIONS'] ??= $_ENV['APP_RUNTIME_OPTIONS'] ?? [])) {
+> +    $_SERVER['APP_RUNTIME_OPTIONS'] = json_decode($_SERVER['APP_RUNTIME_OPTIONS'], true, JSON_THROW_ON_ERROR);
+> +}
+> +
+>  return function (array $context) {
+>      return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+>  };
+> ```
+
+"Funny", I currently only used the bin/console so I added a similar check in my bin/console file but indeed, I will certainly have the same need in the index.php.
+
+I think adding this directly in Symfony runtime will
+- avoid people to add this themself
+- avoid having to add this on different php files (index.php, bin/console, another ?)
+
+I'm only sad about the fact it's obviously considered as a new feature and I'll have to wait 7.4 ^^
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-26T08:17:54Z
+
+(please add a line in the changelog of the component)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-08-26T10:16:21Z
+
+> (please add a line in the changelog of the component)
+
+Updated

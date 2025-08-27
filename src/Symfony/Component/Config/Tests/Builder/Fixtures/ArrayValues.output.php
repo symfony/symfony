@@ -20,5 +20,23 @@ return [
     ],
     'error_pages' => [
         'with_trace' => false,
-    ]
+    ],
+    'places' => [
+        [
+            'name' => 'foo',
+            'metadata' => [
+                'key' => 'value',
+                'key2' => [
+                    'some_other_value',
+                    true,
+                ],
+            ],
+        ],
+        [
+            'name' => 'bar',
+            'metadata' => [
+                'some' => 'metadata',
+            ],
+        ],
+    ],
 ];

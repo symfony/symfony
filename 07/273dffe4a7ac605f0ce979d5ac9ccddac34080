@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-08-22T10:38:00Z
+
+The table in the PR header does not match our standards
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-08-22T11:56:00Z
+
+> The table in the PR header does not match our standards
+
+I understood that as long as MIT was present this was ok, I removed the columns that are not relevant...
+
+---------------------------------------------------------------------------
+
+by soyuka at 2025-08-25T08:47:31Z
+
+@GromNaN probably that warming up https://github.com/symfony/symfony/pull/61515 would be even better :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-08-27T09:11:53Z
+
+As this is a perf improvment, it cannot be considered as a bug and as such, it will be merged in 7.4.

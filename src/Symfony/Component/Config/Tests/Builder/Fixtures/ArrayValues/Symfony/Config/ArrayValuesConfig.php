@@ -4,6 +4,7 @@ namespace Symfony\Config;
 
 require_once __DIR__.\DIRECTORY_SEPARATOR.'ArrayValues'.\DIRECTORY_SEPARATOR.'TransportsConfig.php';
 require_once __DIR__.\DIRECTORY_SEPARATOR.'ArrayValues'.\DIRECTORY_SEPARATOR.'ErrorPagesConfig.php';
+require_once __DIR__.\DIRECTORY_SEPARATOR.'ArrayValues'.\DIRECTORY_SEPARATOR.'PlacesConfig.php';
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
@@ -14,6 +15,7 @@ class ArrayValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuild
 {
     private $transports;
     private $errorPages;
+    private $places;
     private $_usedProperties = [];
 
     /**
@@ -56,6 +58,13 @@ class ArrayValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuild
         return $this->errorPages;
     }
 
+    public function places(array $value = []): \Symfony\Config\ArrayValues\PlacesConfig
+    {
+        $this->_usedProperties['places'] = true;
+
+        return $this->places[] = new \Symfony\Config\ArrayValues\PlacesConfig($value);
+    }
+
     public function getExtensionAlias(): string
     {
         return 'array_values';
@@ -75,6 +84,12 @@ class ArrayValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuild
             unset($value['error_pages']);
         }
 
+        if (array_key_exists('places', $value)) {
+            $this->_usedProperties['places'] = true;
+            $this->places = array_map(fn ($v) => new \Symfony\Config\ArrayValues\PlacesConfig($v), $value['places']);
+            unset($value['places']);
+        }
+
         if ([] !== $value) {
             throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
         }
@@ -88,6 +103,9 @@ class ArrayValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuild
         }
         if (isset($this->_usedProperties['errorPages'])) {
             $output['error_pages'] = $this->errorPages instanceof \Symfony\Config\ArrayValues\ErrorPagesConfig ? $this->errorPages->toArray() : $this->errorPages;
+        }
+        if (isset($this->_usedProperties['places'])) {
+            $output['places'] = array_map(fn ($v) => $v->toArray(), $this->places);
         }
 
         return $output;

@@ -44,7 +44,7 @@ final class DumpCompletionCommand extends Command
         $fullCommand = @realpath($fullCommand) ?: $fullCommand;
 
         $this
-            ->setName(self::$defaultName)
+            ->setName($commandName)
             ->setHelp(<<<EOH
 The <info>%command.name%</> command dumps the shell completion script required
 to use shell autocompletion (currently only bash completion is supported).

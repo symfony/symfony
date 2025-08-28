@@ -100,7 +100,7 @@ class DebugFormatterHelper extends Helper
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'debug_formatter';
     }

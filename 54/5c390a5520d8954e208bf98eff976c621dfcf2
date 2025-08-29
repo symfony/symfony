@@ -1,0 +1,208 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-08-15T09:07:10Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-08-15T09:37:28Z
+
+I think it's pretty much ready for a first review @javiereguiluz.
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-08-15T12:39:02Z
+
+> perhaps an alternative API could be `getCurrencyCodesForCountry(string $country, ?bool $active = null)` + `existsForCountry(string $country, ?bool $active = null)`
+>
+> ?
+
+I will add this ASAP 👍🏻
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-08-15T16:36:25Z
+
+I added the requested methods + tender filter but I need to add fews tests to ensure all uses cases are covered. I also need to update the CHANGELOG. I'll continue this ASAP.
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-08-18T13:40:02Z
+
+I’ve applied the requested changes, this should be ready for a second review.
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-08-20T12:40:24Z
+
+> nice :) should we run the compilation again as a final step?
+
+Do we have extra compilation processes beside the one that I used to update the `meta.php` file (`Resources/bin/update-data.php`)? BTW, the data are up to date.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-08-20T12:56:29Z
+
+no, but we have a docker [`compile`](https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/Intl/Resources/bin/compile), but im not sure from what env it's usually done. It shouldnt matter much :)
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-08-20T14:22:00Z
+
+> no, but we have a docker [`compile`](https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/Intl/Resources/bin/compile), but im not sure from what env it's usually done. It shouldnt matter much :)
+
+I tried running the `compile` script from my machine and I had to specify the CPP compiler to version 17 (instead of the actual 20 which seems to be too newer) to make it work.
+
+ The default `compile` was failing with the following output:
+
+```txt
+---------------------------------------------------------------------------
+                      ICU Resource Bundle Compilation
+---------------------------------------------------------------------------
+Starting git clone. This may take a while...
+Git clone to /tmp/icu-data complete.
+Checking out `release-77-1` for version `77`...
+Building genrb.
+Running configure...
+Running make...
+[1/6] libicudata.so...Error while running:
+    /tmp/icu-data/icu4c/source/stubdata$ make 2>&1 && make install 2>&1
+Output:
+---------------------------------------------------------------------------
+   c++   ...  stubdata.cpp
+In file included from ../common/unicode/platform.h:25,
+                 from ../common/unicode/ptypes.h:46,
+                 from ../common/unicode/umachine.h:46,
+                 from ../common/unicode/utypes.h:38,
+                 from stubdata.h:29,
+                 from stubdata.cpp:22:
+../common/unicode/uversion.h:105:57: warning: nested namespace definitions only available with '-std=c++17' or '-std=gnu++17' [-Wc++17-extensions]
+  105 | #       define U_ICU_NAMESPACE U_ICU_ENTRY_POINT_RENAME(icu)
+      |                                                         ^~~
+../common/unicode/uvernum.h:121:50: note: in definition of macro 'U_DEF_ICU_ENTRY_POINT_RENAME'
+  121 | #       define U_DEF_ICU_ENTRY_POINT_RENAME(x,y) x ## y
+      |                                                  ^
+../common/unicode/uvernum.h:123:47: note: in expansion of macro 'U_DEF2_ICU_ENTRY_POINT_RENAME'
+  123 | #       define U_ICU_ENTRY_POINT_RENAME(x)    U_DEF2_ICU_ENTRY_POINT_RENAME(x,U_ICU_VERSION_SUFFIX)
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../common/unicode/uversion.h:105:32: note: in expansion of macro 'U_ICU_ENTRY_POINT_RENAME'
+  105 | #       define U_ICU_NAMESPACE U_ICU_ENTRY_POINT_RENAME(icu)
+      |                                ^~~~~~~~~~~~~~~~~~~~~~~~
+../common/unicode/uversion.h:180:33: note: in expansion of macro 'U_ICU_NAMESPACE'
+  180 | #define U_HEADER_ONLY_NAMESPACE U_ICU_NAMESPACE::U_HEADER_NESTED_NAMESPACE
+      |                                 ^~~~~~~~~~~~~~~
+../common/unicode/uversion.h:182:11: note: in expansion of macro 'U_HEADER_ONLY_NAMESPACE'
+  182 | namespace U_HEADER_ONLY_NAMESPACE {}
+      |           ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../common/unicode/udata.h:25,
+                 from stubdata.h:30:
+../common/unicode/localpointer.h:561:26: error: parameter declared 'auto'
+  561 | template <typename Type, auto closeFunction>
+      |                          ^~~~
+../common/unicode/localpointer.h:573:76: error: template argument 2 is invalid
+  573 |     explicit LocalOpenPointer(std::unique_ptr<Type, decltype(closeFunction)> &&p)
+      |                                                                            ^
+../common/unicode/localpointer.h:583:78: error: template argument 2 is invalid
+  583 |     LocalOpenPointer &operator=(std::unique_ptr<Type, decltype(closeFunction)> &&p) {
+      |                                                                              ^
+../common/unicode/localpointer.h:599:59: error: template argument 2 is invalid
+  599 |     operator std::unique_ptr<Type, decltype(closeFunction)> () && {
+      |                                                           ^
+../common/unicode/localpointer.h:551:81: note: invalid template non-type parameter
+  551 |     using LocalPointerClassName = internal::LocalOpenPointer<Type, closeFunction>
+      |                                                                                 ^
+../common/unicode/udata.h:434:1: note: in expansion of macro 'U_DEFINE_LOCAL_OPEN_POINTER'
+  434 | U_DEFINE_LOCAL_OPEN_POINTER(LocalUDataMemoryPointer, UDataMemory, udata_close);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** Failed compilation command follows: ----------------------------------------------------------
+c++ -D_REENTRANT -DU_HAVE_ELF_H=1 -DU_HAVE_STRTOD_L=1 -DU_HAVE_XLOCALE_H=0 -I../common -DU_ALL_IMPLEMENTATION -DU_ATTRIBUTE_DEPRECATED= --std=c++0x -W -Wall -pedantic -Wpointer-arith -Wwrite-strings -Wno-long-long -c -DPIC -fPIC -o stubdata.o stubdata.cpp
+--- ( rebuild with "make VERBOSE=1 " to show all parameters ) --------
+make: *** [../config/mh-linux:51: stubdata.o] Error 1
+---------------------------------------------------------------------------
+```
+
+Here is my edited `compile` file:
+
+```bash
+#!/usr/bin/env bash
+
+[[ ! -d /tmp/symfony/icu ]] && mkdir -p /tmp/symfony/icu
+
+# I had to specify the --platform to make it work on my ARM machine, otherwise docker try to obtain the same architecture as the host (not found for ARM for jakzal/php-intl)
+docker run \
+    --platform=linux/amd64 \
+    -e CXXFLAGS="-std=c++17 -fext-numeric-literals" \
+    -it --rm --name symfony-intl \
+    -u $(id -u):$(id -g) \
+    -v /tmp/symfony/icu:/tmp \
+    -v $(pwd):/symfony \
+    -w /symfony \
+    jakzal/php-intl:8.3-74.1 \
+    php src/Symfony/Component/Intl/Resources/bin/update-data.php
+```
+
+Apart from that, the image is already on the latest version of ICU :
+https://github.com/jakzal/docker-symfony-intl/blob/eb082792c4e9e935e1efab783752235a05a63b9d/Dockerfile#L2C1-L2C21
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-08-20T14:26:07Z
+
+Should I commit this environment parameter that solves this issue in this PR?
+
+```
+-e CXXFLAGS="-std=c++17 -fext-numeric-literals" \
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-08-20T14:38:58Z
+
+> make it work on my ARM machine
+
+the image is an AMD one, and latest is jakzal/php-intl:8.4-77.1
+
+if adding CXXFLAGS solves the compatibility issue, it seems fine to me. ideally some GHA job commits the latest diff to a PR, but that's another story.
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-08-20T14:57:26Z
+
+> the image is an AMD one, and latest is jakzal/php-intl:8.4-77.1
+
+Do you want me to update the image to the latest version? Don’t you think it might be better to stick with the lowest supported PHP version for the Symfony version in use (8.2 or higher for the upcoming Symfony 7.4), so we can be sure that the `update-data.php` script can run in any situation?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-08-20T15:00:14Z
+
+generally, for what is a compilation artifact, im curious how it compiles on latest php yes. But this could be a separate PR, another concern is the compilation thru docker is not enforced by any means. If we update a thousand language files, it's impossible to review. Hence the docker compile.
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-08-20T15:03:30Z
+
+Okay, in that case, apart from the updated image version, I think this PR is complete!
+
+Thank you all for your reviews and comments.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-08-20T15:19:21Z
+
+sorry for noise :)
+
+turns out we're already updated to icu 77: https://github.com/symfony/symfony/pull/60157
+
+so the bookkeeping here done to `compile` is correct :+1: even though im not sure the latest compile was done from a php8.4 image, but OK :)
+
+we should update `getIcuStubVersion` still.

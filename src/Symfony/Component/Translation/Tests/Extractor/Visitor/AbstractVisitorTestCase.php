@@ -21,7 +21,7 @@ abstract class AbstractVisitorTestCase extends TestCase
     /**
      * @param string|iterable<string> $resource Files, a file or a directory
      */
-    public function extract(NodeVisitor $visitor, string|iterable $resource): MessageCatalogue
+    protected function extract(NodeVisitor $visitor, string|iterable $resource): MessageCatalogue
     {
         $extractor = new PhpAstExtractor([$visitor]);
         $extractor->setPrefix('prefix');

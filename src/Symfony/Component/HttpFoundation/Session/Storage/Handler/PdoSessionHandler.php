@@ -219,7 +219,7 @@ class PdoSessionHandler extends AbstractSessionHandler
                 $table->addColumn($this->timeCol, Types::INTEGER)->setNotnull(true);
                 break;
             case 'sqlsrv':
-                $table->addColumn($this->idCol, Types::TEXT)->setLength(128)->setNotnull(true);
+                $table->addColumn($this->idCol, Types::STRING)->setLength(128)->setNotnull(true);
                 $table->addColumn($this->dataCol, Types::BLOB)->setNotnull(true);
                 $table->addColumn($this->lifetimeCol, Types::INTEGER)->setUnsigned(true)->setNotnull(true);
                 $table->addColumn($this->timeCol, Types::INTEGER)->setUnsigned(true)->setNotnull(true);

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by santysisi at 2025-09-01T03:41:57Z
+
+I think (though I might be wrong) that the pipeline errors are not relevant in the context of this PR.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-09-01T08:16:24Z
+
+Hi 😊 I hope you're doing well!
+Thank you so much for your comments ❤️
+I've made the changes, please let me know if anything else needs to be adjusted :smile:
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-09-01T11:55:50Z
+
+> On closer review, this makes me think we also need to fix the call to isReadOnly in ReflectionExtractor on L365 - we might need to check for asym there also. Can you have a look?
+
+Thanks for pointing that out! Maybe I’m wrong, but I think it might not be necessary to update the call to `isReadOnly` on L365, since the `isAllowedProperty` method is executed beforehand and already checks for asymmetric visibility.

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-06-16T14:08:19Z
+
+@nicolas-grekas Is it the way to go? If yes, I'll finish this PR asap
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-08-06T15:51:29Z
+
+I updated the PR
+
+* Added test
+* Used `$value`
+* change the base branch to 7.3. Actually, the bug does not exist in 6.4. Only on 7.0 and higher.

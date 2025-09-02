@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2025-07-29T20:25:45Z
+
+Are you using the connection for the messenger exclusively? If so, you could use DBAL's portability middleware to control the casing of result columns.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-08-25T08:32:56Z
+
+> Because the FirebirdPlatform is not part of the doctrine/dbal package, I was unable to use instanceof for platform detection.
+
+Why would you be unable to use `instanceof` ?
+
+---------------------------------------------------------------------------
+
+by DSsatwareAG at 2025-08-26T06:51:22Z
+
+> > Because the FirebirdPlatform is not part of the doctrine/dbal package, I was unable to use instanceof for platform detection.
+>
+> Why would you be unable to use `instanceof` ?
+
+You’re right — I can use instanceof. My initial concern was a potential fatal if the class wasn’t available. I will updated the PR.
+
+---------------------------------------------------------------------------
+
+by DSsatwareAG at 2025-09-02T07:20:10Z
+
+> @derrabus wrote this:
+>
+> > Are you using the connection for the messenger exclusively? If so, you could use DBAL's portability middleware to control the casing of result columns.
+>
+> WDYT of this proposal? Applicable?
+
+Unfortunately not applicable here — the Doctrine connection is shared, not Messenger‑exclusive.

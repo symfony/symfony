@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-19T13:55:00Z
+
+> Given that the main motivation for this is to explain in an API or in twig the reasons why the access is not granted, I'm tempted to pre-filter the failed votes already, or add an extra getter AccessDecision::failedVotes to help create these small extensions ?
+
+this is already covered by the AccessDecision::getMessage method
+
+---------------------------------------------------------------------------
+
+by florentdestremau at 2025-08-29T09:12:10Z
+
+Will update the changelogs in the next few days !
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-29T09:13:51Z
+
+They're already up to date ;)
+~The only thing that might be missing is test cases but that's just getters so not critical to me.~
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-01T10:54:28Z
+
+> I don't have good alternative names, but I'm wondering if the method/function names couldn't be better. 🤔
+
+- `getAccessDecision()` and `getAccessDecisionForUser()`?
+- `checkAccess()` / `checkAccessForUser()`
+
+For twig, I can't think of a better name than `access_decision[_for_user]`.
+
+---------------------------------------------------------------------------
+
+by florentdestremau at 2025-09-02T16:19:10Z
+
+using a getter style might be easier to self-explain the fact that it's an object you're getting and not a boolean. For twig this is redundant indeed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-03T10:17:06Z
+
+PR ready, comments addressed.

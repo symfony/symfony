@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\IsTrue;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -187,5 +188,23 @@ class XmlFileLoaderTest extends TestCase
         $this->expectUserDeprecationMessage('Since symfony/validator 7.3: Using constraints not supporting named arguments is deprecated. Try adding the HasNamedArguments attribute to Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutNamedArguments.');
 
         $loader->loadClassMetadata($metadata);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLengthConstraintValueOptionTriggersDeprecation()
+    {
+        $this->expectDeprecation('Since symfony/validator 7.3: Using the "value" option in configuration for the "Length" constraint is deprecated. Use "exactly" instead.');
+
+        $loader = new XmlFileLoader(__DIR__.'/constraint-mapping-exactly-value.xml');
+        $metadata = new ClassMetadata(Entity_81::class);
+        $loader->loadClassMetadata($metadata);
+        $constraints = $metadata->getPropertyMetadata('title')[0]->constraints;
+
+        self::assertCount(1, $constraints);
+        self::assertInstanceOf(Length::class, $constraints[0]);
+        self::assertSame(6, $constraints[0]->min);
+        self::assertSame(6, $constraints[0]->max);
     }
 }

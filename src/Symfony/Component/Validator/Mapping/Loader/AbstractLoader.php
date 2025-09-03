@@ -101,6 +101,15 @@ abstract class AbstractLoader implements LoaderInterface
                 return new $className($options);
             }
 
+            if (isset($options['value']) && \in_array($name, ['Length', 'Count'], true)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Using the "value" option in configuration for the "%s" constraint is deprecated. Use "exactly" instead.', $name);
+
+                if (!isset($options['exactly'])) {
+                    $options['exactly'] = $options['value'];
+                    unset($options['value']);
+                }
+            }
+
             return new $className(...$options);
         }
 

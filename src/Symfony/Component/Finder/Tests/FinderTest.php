@@ -1656,6 +1656,37 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
     }
 
+    public function testImmutable()
+    {
+        $finder = $this->buildFinder();
+        self::assertSame($finder, $finder->immutable(false));
+        $immutableFinder = $finder->immutable();
+
+        self::assertNotSame($finder, $immutableFinder);
+        self::assertSame($immutableFinder, $immutableFinder->immutable());
+        self::assertNotSame($immutableFinder, $finder);
+        self::assertNotSame($immutableFinder, $immutableFinder->files());
+        self::assertNotSame($immutableFinder, $immutableFinder->in(self::$tmpDir));
+        self::assertNotSame($immutableFinder, $immutableFinder->name('*.php'));
+        self::assertNotSame($immutableFinder, $immutableFinder->notName('*.php'));
+        self::assertNotSame($immutableFinder, $immutableFinder->path('foo'));
+        self::assertNotSame($immutableFinder, $immutableFinder->notPath('foo'));
+        self::assertNotSame($immutableFinder, $immutableFinder->contains('foo'));
+        self::assertNotSame($immutableFinder, $immutableFinder->notContains('foo'));
+        self::assertNotSame($immutableFinder, $immutableFinder->size('> 1K'));
+        self::assertNotSame($immutableFinder, $immutableFinder->date('since yesterday'));
+        self::assertNotSame($immutableFinder, $immutableFinder->depth('> 1'));
+        self::assertNotSame($immutableFinder, $immutableFinder->sortByName());
+        self::assertNotSame($immutableFinder, $immutableFinder->sortByModifiedTime());
+        self::assertNotSame($immutableFinder, $immutableFinder->reverseSorting());
+        self::assertNotSame($immutableFinder, $immutableFinder->sortByCaseInsensitiveName());
+        self::assertNotSame($immutableFinder, $immutableFinder->sort(fn () => true));
+        self::assertNotSame($immutableFinder, $immutableFinder->filter(fn ()=> true));
+        self::assertNotSame($immutableFinder, $immutableFinder->followLinks());
+        self::assertNotSame($immutableFinder, $immutableFinder->append([]));
+        self::assertNotSame($immutableFinder, $immutableFinder->ignoreUnreadableDirs());
+    }
+
     protected function buildFinder()
     {
         return Finder::create()->exclude('gitignore');

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `Finder::immutable()` to make the finder return a clone of itself when a modification method is called
+
 6.4
 ---
 

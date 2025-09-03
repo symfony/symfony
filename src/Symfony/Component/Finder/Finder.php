@@ -66,6 +66,8 @@ class Finder implements \IteratorAggregate, \Countable
     private array $notPaths = [];
     private bool $ignoreUnreadableDirs = false;
 
+    private bool $immutable = false;
+
     private static array $vcsPatterns = ['.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg'];
 
     public function __construct()
@@ -82,15 +84,34 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Makes the current Finder immutable or not.
+     *
+     * An immutable Finder returns a clone of itself when a modification method is called.
+     * This allows to keep a "base" finder as a prototype and create several modified
+     * versions of it.
+     */
+    public function immutable(bool $immutable = true): static
+    {
+        if ($this->immutable === $immutable) {
+            return $this;
+        }
+
+        $this->immutable = $immutable;
+
+        return clone $this;
+    }
+
+    /**
      * Restricts the matching to directories only.
      *
      * @return $this
      */
     public function directories(): static
     {
-        $this->mode = Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->mode = Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -100,9 +121,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function files(): static
     {
-        $this->mode = Iterator\FileTypeFilterIterator::ONLY_FILES;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->mode = Iterator\FileTypeFilterIterator::ONLY_FILES;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -123,11 +145,12 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function depth(string|int|array $levels): static
     {
+        $finder = $this->immutable ? clone $this : $this;
         foreach ((array) $levels as $level) {
-            $this->depths[] = new NumberComparator($level);
+            $finder->depths[] = new NumberComparator($level);
         }
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -151,11 +174,12 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function date(string|array $dates): static
     {
+        $finder = $this->immutable ? clone $this : $this;
         foreach ((array) $dates as $date) {
-            $this->dates[] = new DateComparator($date);
+            $finder->dates[] = new DateComparator($date);
         }
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -176,9 +200,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function name(string|array $patterns): static
     {
-        $this->names = array_merge($this->names, (array) $patterns);
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->names = array_merge($finder->names, (array) $patterns);
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -192,9 +217,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function notName(string|array $patterns): static
     {
-        $this->notNames = array_merge($this->notNames, (array) $patterns);
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->notNames = array_merge($finder->notNames, (array) $patterns);
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -214,9 +240,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function contains(string|array $patterns): static
     {
-        $this->contains = array_merge($this->contains, (array) $patterns);
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->contains = array_merge($finder->contains, (array) $patterns);
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -236,9 +263,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function notContains(string|array $patterns): static
     {
-        $this->notContains = array_merge($this->notContains, (array) $patterns);
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->notContains = array_merge($finder->notContains, (array) $patterns);
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -260,9 +288,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function path(string|array $patterns): static
     {
-        $this->paths = array_merge($this->paths, (array) $patterns);
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->paths = array_merge($finder->paths, (array) $patterns);
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -284,9 +313,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function notPath(string|array $patterns): static
     {
-        $this->notPaths = array_merge($this->notPaths, (array) $patterns);
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->notPaths = array_merge($finder->notPaths, (array) $patterns);
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -306,11 +336,12 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function size(string|int|array $sizes): static
     {
+        $finder = $this->immutable ? clone $this : $this;
         foreach ((array) $sizes as $size) {
-            $this->sizes[] = new NumberComparator($size);
+            $finder->sizes[] = new NumberComparator($size);
         }
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -328,9 +359,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function exclude(string|array $dirs): static
     {
-        $this->exclude = array_merge($this->exclude, (array) $dirs);
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->exclude = array_merge($finder->exclude, (array) $dirs);
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -344,13 +376,14 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function ignoreDotFiles(bool $ignoreDotFiles): static
     {
+        $finder = $this->immutable ? clone $this : $this;
         if ($ignoreDotFiles) {
-            $this->ignore |= static::IGNORE_DOT_FILES;
+            $finder->ignore |= static::IGNORE_DOT_FILES;
         } else {
-            $this->ignore &= ~static::IGNORE_DOT_FILES;
+            $finder->ignore &= ~static::IGNORE_DOT_FILES;
         }
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -364,13 +397,14 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function ignoreVCS(bool $ignoreVCS): static
     {
+        $finder = $this->immutable ? clone $this : $this;
         if ($ignoreVCS) {
-            $this->ignore |= static::IGNORE_VCS_FILES;
+            $finder->ignore |= static::IGNORE_VCS_FILES;
         } else {
-            $this->ignore &= ~static::IGNORE_VCS_FILES;
+            $finder->ignore &= ~static::IGNORE_VCS_FILES;
         }
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -382,13 +416,14 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function ignoreVCSIgnored(bool $ignoreVCSIgnored): static
     {
+        $finder = $this->immutable ? clone $this : $this;
         if ($ignoreVCSIgnored) {
-            $this->ignore |= static::IGNORE_VCS_IGNORED_FILES;
+            $finder->ignore |= static::IGNORE_VCS_IGNORED_FILES;
         } else {
-            $this->ignore &= ~static::IGNORE_VCS_IGNORED_FILES;
+            $finder->ignore &= ~static::IGNORE_VCS_IGNORED_FILES;
         }
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -420,9 +455,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function sort(\Closure $closure): static
     {
-        $this->sort = $closure;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->sort = $closure;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -436,9 +472,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function sortByExtension(): static
     {
-        $this->sort = SortableIterator::SORT_BY_EXTENSION;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->sort = SortableIterator::SORT_BY_EXTENSION;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -452,9 +489,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function sortByName(bool $useNaturalSort = false): static
     {
-        $this->sort = $useNaturalSort ? SortableIterator::SORT_BY_NAME_NATURAL : SortableIterator::SORT_BY_NAME;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->sort = $useNaturalSort ? SortableIterator::SORT_BY_NAME_NATURAL : SortableIterator::SORT_BY_NAME;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -468,9 +506,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function sortByCaseInsensitiveName(bool $useNaturalSort = false): static
     {
-        $this->sort = $useNaturalSort ? SortableIterator::SORT_BY_NAME_NATURAL_CASE_INSENSITIVE : SortableIterator::SORT_BY_NAME_CASE_INSENSITIVE;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->sort = $useNaturalSort ? SortableIterator::SORT_BY_NAME_NATURAL_CASE_INSENSITIVE : SortableIterator::SORT_BY_NAME_CASE_INSENSITIVE;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -484,9 +523,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function sortBySize(): static
     {
-        $this->sort = SortableIterator::SORT_BY_SIZE;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->sort = SortableIterator::SORT_BY_SIZE;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -500,9 +540,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function sortByType(): static
     {
-        $this->sort = SortableIterator::SORT_BY_TYPE;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->sort = SortableIterator::SORT_BY_TYPE;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -518,9 +559,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function sortByAccessedTime(): static
     {
-        $this->sort = SortableIterator::SORT_BY_ACCESSED_TIME;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->sort = SortableIterator::SORT_BY_ACCESSED_TIME;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -530,9 +572,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function reverseSorting(): static
     {
-        $this->reverseSorting = true;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->reverseSorting = true;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -550,9 +593,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function sortByChangedTime(): static
     {
-        $this->sort = SortableIterator::SORT_BY_CHANGED_TIME;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->sort = SortableIterator::SORT_BY_CHANGED_TIME;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -568,9 +612,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function sortByModifiedTime(): static
     {
-        $this->sort = SortableIterator::SORT_BY_MODIFIED_TIME;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->sort = SortableIterator::SORT_BY_MODIFIED_TIME;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -588,13 +633,14 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function filter(\Closure $closure, bool $prune = false): static
     {
-        $this->filters[] = $closure;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->filters[] = $closure;
 
         if ($prune) {
-            $this->pruneFilters[] = $closure;
+            $finder->pruneFilters[] = $closure;
         }
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -604,9 +650,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function followLinks(): static
     {
-        $this->followLinks = true;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->followLinks = true;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -618,9 +665,10 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function ignoreUnreadableDirs(bool $ignore = true): static
     {
-        $this->ignoreUnreadableDirs = $ignore;
+        $finder = $this->immutable ? clone $this : $this;
+        $finder->ignoreUnreadableDirs = $ignore;
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -634,6 +682,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function in(string|array $dirs): static
     {
+        $finder = $this->immutable ? clone $this : $this;
         $resolvedDirs = [];
 
         foreach ((array) $dirs as $dir) {
@@ -647,9 +696,9 @@ class Finder implements \IteratorAggregate, \Countable
             }
         }
 
-        $this->dirs = array_merge($this->dirs, ...$resolvedDirs);
+        $finder->dirs = array_merge($finder->dirs, ...$resolvedDirs);
 
-        return $this;
+        return $finder;
     }
 
     /**
@@ -702,20 +751,21 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function append(iterable $iterator): static
     {
+        $finder = $this->immutable ? clone $this : $this;
         if ($iterator instanceof \IteratorAggregate) {
-            $this->iterators[] = $iterator->getIterator();
+            $finder->iterators[] = $iterator->getIterator();
         } elseif ($iterator instanceof \Iterator) {
-            $this->iterators[] = $iterator;
+            $finder->iterators[] = $iterator;
         } else {
             $it = new \ArrayIterator();
             foreach ($iterator as $file) {
                 $file = $file instanceof \SplFileInfo ? $file : new \SplFileInfo($file);
                 $it[$file->getPathname()] = $file;
             }
-            $this->iterators[] = $it;
+            $finder->iterators[] = $it;
         }
 
-        return $this;
+        return $finder;
     }
 
     /**

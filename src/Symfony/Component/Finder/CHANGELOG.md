@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add early directory pruning to `Finder::filter()`
+ * Extend `name()` and `notName()` to allow overwriting existing names/notNames filters.
+ * Added `resetName()` and `resetNotName()` to reset names/notNames filters
 
 6.2
 ---

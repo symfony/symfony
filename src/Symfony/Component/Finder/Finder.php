@@ -169,14 +169,19 @@ class Finder implements \IteratorAggregate, \Countable
      *     $finder->name(['test.py', 'test.php'])
      *
      * @param string|string[] $patterns A pattern (a regexp, a glob, or a string) or an array of patterns
+     * @param bool            $overwriteExistingNames Whether to overwrite existing names or add them
      *
      * @return $this
      *
      * @see FilenameFilterIterator
      */
-    public function name(string|array $patterns): static
+    public function name(string|array $patterns, bool $overwriteExistingNames = false): static
     {
-        $this->names = array_merge($this->names, (array) $patterns);
+        if ($overwriteExistingNames) {
+            $this->names = (array) $patterns;
+        } else {
+            $this->names = array_merge($this->names, (array) $patterns);
+        }
 
         return $this;
     }
@@ -185,15 +190,42 @@ class Finder implements \IteratorAggregate, \Countable
      * Adds rules that files must not match.
      *
      * @param string|string[] $patterns A pattern (a regexp, a glob, or a string) or an array of patterns
+     * @param bool            $overwriteExistingNotNames Whether to overwrite existing names or add them
      *
      * @return $this
      *
      * @see FilenameFilterIterator
      */
-    public function notName(string|array $patterns): static
+    public function notName(string|array $patterns, bool $overwriteExistingNotNames = false): static
     {
-        $this->notNames = array_merge($this->notNames, (array) $patterns);
+        if ($overwriteExistingNotNames) {
+            $this->notNames = (array) $patterns;
+        } else {
+            $this->notNames = array_merge($this->notNames, (array) $patterns);
+        }
 
+        return $this;
+    }
+
+    /**
+     * Adds possibility to reset name filter
+     *
+     * @return $this
+     */
+    public function resetNames(): static
+    {
+        $this->names = [];
+        return $this;
+    }
+
+    /**
+     * Adds possibility to reset notName filter
+     *
+     * @return $this
+     */
+    public function resetNotNames(): static
+    {
+        $this->notNames = [];
         return $this;
     }
 

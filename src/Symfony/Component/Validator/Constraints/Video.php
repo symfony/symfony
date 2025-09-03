@@ -84,7 +84,7 @@ class Video extends File
 
     // The constant for a wrong MIME type is taken from the parent class.
     public string $mimeTypesMessage = 'This file is not a valid video.';
-    public string $sizeNotDetectedMessage = 'The size of the video could not be detected.';
+    public string $sizeNotDetectedMessage = 'The dimensions of the video could not be detected.';
     public string $maxWidthMessage = 'The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.';
     public string $minWidthMessage = 'The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.';
     public string $maxHeightMessage = 'The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.';

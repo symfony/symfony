@@ -1,0 +1,151 @@
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-07-10T14:45:30Z
+
+# Another Edge-Case
+
+After I just found #61023 I also tried having properties and getter methods called `isFoo` and `canFoo` (no `getFoo` at this time) in the `ObjectWithBooleanPropertyAndIsserWithSameName` class:
+```php
+class ObjectWithBooleanPropertyAndIsserWithSameName
+{
+    private $foo = 'foo';
+
+    private $isFoo = true;
+
+    private $canFoo = false;
+
+    public function isFoo()
+    {
+        return $this->isFoo;
+    }
+
+    public function canFoo()
+    {
+        return $this->canFoo;
+    }
+}
+```
+
+This results in
+```php
+[
+  'isFoo' => true,
+  'foo' => true, // it's using the isFoo isser method!
+]
+```
+
+**Notice, that for the `canFoo` property it's using the `isFoo` method to get the value and prints `foo` as result name.**
+
+Reading through the linked PR I wonder if my PR also classifies as "new feature" instead of "bugfix"?
+cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-07-10T14:59:09Z
+
+# Extended Edge-Case
+```php
+class ObjectWithBooleanPropertyAndIsserWithSameName
+{
+    public $foo = 'foo';
+
+    private $getFoo = 'getFoo';
+
+    private $hasFoo = 'hasFoo';
+
+    private $canFoo = 'canFoo';
+
+    private $isFoo = 'isFoo';
+
+    public function getFoo()
+    {
+        return $this->getFoo;
+    }
+
+    public function hasFoo()
+    {
+        return $this->hasFoo;
+    }
+
+    public function canFoo()
+    {
+        return $this->canFoo;
+    }
+
+    public function isFoo()
+    {
+        return $this->isFoo;
+    }
+}
+```
+
+Results in
+```php
+[
+  'foo' => 'getFoo',
+  'isFoo' => 'isFoo'
+]
+```
+
+So we may also want to add the `$reflClass->hasProperty($name)` check I added for issers for `get`, `has` and `can`?
+
+That would result in:
+```php
+[
+    'getFoo' => 'getFoo',
+    'hasFoo' => 'hasFoo',
+    'canFoo' => 'canFoo',
+    'isFoo' => 'isFoo',
+    'foo' => 'getFoo'
+]
+```
+
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-08-04T10:54:30Z
+
+What do you think, how should we proceed here? Should we do the `hasProperty` check I added for `issers` for all getter-like methods? Then we would do the check for:
+- getters
+- hassers
+- canners
+- issers
+
+IMO it would definitely make sense for `has`, `can` and `is`. For `get` it's debatable.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-03T09:46:12Z
+
+~:-1: on my side, this looks extremely specific to one use case. I don't think the new behavior would be a generic expectation. This looks too much into private details.~
+
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-09-03T10:08:57Z
+
+Hey @nicolas-grekas, thanks for chiming in. I just want to give a little summary, why I think the current state can lead to unnoticed bugs which may be hard to debug.
+
+I had this little sidenote in the linked issue https://github.com/symfony/symfony/issues/61096:
+> Sidenote: When using the JetBrains IDE [Generate Getter](https://www.jetbrains.com/help/idea/generating-code.html#generate-getters-setters) feature on a boolean property called like $isX, it will automatically create an isser method with the same name like the property. This is how I ran into this.
+
+So imagine the following steps:
+- Create a class with the property `private bool $isOwner = true;`
+- Use the "Generate Getter" feature of JetBrains. By default this creates a getter with the signature `public function isOwner(): bool`
+- Create a class instance and set this property to false
+- Use the Symfony Serializer with the default configuration to serialize the value
+- Deserialize the output back to an instance of that class: `isOwner` is never assigned. It will have its default value (`true`) instead of `false`.
+
+The problem is, that de-/serialization doesn't behave deterministically in this case. The issue has a more detailed description why.
+
+Although my implementation might not be the way to go, I really would like to have a solution for this case.
+
+I get your point, that this looks into private details, but the current state (deciding on getters, canners, hassers and issers) also already does this. So if it's done in one way (serialization), it should also work in the opposite direction (deserialization). I don't really think, that this is extremely specific and it definitely would be my expectation, that it should work in both directions. What do you think?
+
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-09-03T14:20:17Z
+
+Thank you very much, this is exactly what I would expect.
+
+I first noticed it for issers, that's why I implemented it only there. Afterwards I saw it would make sense for all accessors, but wanted to get feedback by Symfony Core members. Thanks for understanding and adjusting the PR!
+
+Edit: Also I love your adjustment of the match-statement. Very readable and clever to assign `$i` the way you did to get rid of the separate `is`-ifelse-branch.

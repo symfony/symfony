@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-03T07:31:21Z
+
+Looks like a bugfix to me, should target 6.4 then (the changelog line should be remove while rebasing)
+
+---------------------------------------------------------------------------
+
+by dmitryuk at 2025-09-03T07:44:59Z
+
+> Looks like a bugfix to me, should target 6.4 then (the changelog line should be remove while rebasing)
+
+Rebased 6.4, thanks

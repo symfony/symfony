@@ -1656,6 +1656,16 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
     }
 
+    public function testClone()
+    {
+        $finder = $this->buildFinder();
+        $finder->files()->name('*.php')->in(self::$tmpDir);
+        $clone = $finder->clone();
+
+        self::assertNotSame($finder, $clone);
+        self::assertEquals($finder, $clone);
+    }
+
     protected function buildFinder()
     {
         return Finder::create()->exclude('gitignore');

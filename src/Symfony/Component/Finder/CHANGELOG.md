@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `Finder::clone()` to duplicate a Finder instance with the same configuration
+
 6.4
 ---
 

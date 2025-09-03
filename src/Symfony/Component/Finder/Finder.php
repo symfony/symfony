@@ -82,6 +82,16 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Clones the current Finder to get a new instance with the same configuration
+     * that can be modified independently.
+     */
+    #[\NoDiscard]
+    public function clone(): static
+    {
+        return clone $this;
+    }
+
+    /**
      * Restricts the matching to directories only.
      *
      * @return $this

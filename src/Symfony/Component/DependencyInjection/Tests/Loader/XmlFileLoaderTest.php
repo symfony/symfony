@@ -1286,4 +1286,26 @@ class XmlFileLoaderTest extends TestCase
 
         self::assertInstanceOf(RemoteCallerSocket::class, $container->get(RemoteCaller::class));
     }
+
+    public function testXmlParseExceptionIncludesFilenameAndPosition()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader(
+            $container,
+            new FileLocator(__DIR__.'/../Fixtures/xml')
+        );
+
+        $invalidXMLFileName = 'services31.xml';
+
+        try {
+            $loader->load($invalidXMLFileName);
+            $this->fail('Expected an InvalidArgumentException due to invalid XML.');
+        } catch (\InvalidArgumentException $e) {
+            $message = $e->getMessage();
+
+            $this->assertStringContainsString($invalidXMLFileName, $message, 'Exception message should contain the filename.');
+            $this->assertStringContainsString('This element is not expected', $message, 'Exception message should contain XML error details.');
+            $this->assertMatchesRegularExpression('/line \d+, column \d+/', $message, 'Exception message should contain line and column information.');
+        }
+    }
 }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-03T14:25:26Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-09-03T14:44:46Z
+
+Rebased. I also added a functional test using 2 in-memory sqlite databases. Other tests use mocks.

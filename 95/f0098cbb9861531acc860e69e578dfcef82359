@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-01-09T14:34:30Z
+
+Looks like a PR should be contributed upstream to fix this:
+```
+  1x: Method "Alchemy\BinaryDriver\AbstractBinary::getName()" might add "string" as a native return type declaration in the future. Do the same in child class "FFMpeg\Driver\FFProbeDriver" now to avoid errors or add an explicit @return annotation to suppress this message.
+```
+Can you submit it?
+
+---------------------------------------------------------------------------
+
+by symfonyaml at 2025-01-09T20:08:10Z
+
+> Looks like a PR should be contributed upstream to fix this:
+>
+> ```
+>   1x: Method "Alchemy\BinaryDriver\AbstractBinary::getName()" might add "string" as a native return type declaration in the future. Do the same in child class "FFMpeg\Driver\FFProbeDriver" now to avoid errors or add an explicit @return annotation to suppress this message.
+> ```
+>
+> Can you submit it?
+
+@nicolas-grekas PR created in the `PHP-FFMpeg/PHP-FFMpeg` repo https://github.com/PHP-FFMpeg/PHP-FFMpeg/pull/940
+
+---------------------------------------------------------------------------
+
+by mindaugasvcs at 2025-02-27T11:42:03Z
+
+I have done this a long time ago. Just why use classes instead of ffprobe directly?
+
+```php
+$json = shell_exec('ffprobe -hide_banner -loglevel quiet -show_error -show_format -show_streams -print_format json '.$value);
+if (!$json) {
+    throw new LogicException('This validator requires ffprobe installed and enabled in the PATH system variable.');
+}
+
+```
+
+---------------------------------------------------------------------------
+
+by mindaugasvcs at 2025-02-27T11:51:13Z
+
+> Q	A
+> Branch?	7.3
+> Bug fix?	no
+> New feature?	yes
+> Deprecations?	no
+> License	MIT
+> ## Purpose
+> Inspired by the [Image constraint](https://github.com/symfony/symfony/blob/4ed9d032c7b61ae49d526565bbc8fdbcf76d74c3/src/Symfony/Component/Validator/Constraints/Image.php), I've added a new feature to the Validator component for validating Video files using the [PHP-FFMpeg library](https://github.com/PHP-FFMpeg/PHP-FFMpeg).
+>
+> This constraint use exactly the same concept as the Image one, with the same options except for the corrupted options _(detectcorrupted, corruptedmessage)_ I think we can definitely apply more options for video files, but first I just want to check if everyone is okay with this constraint.
+>
+> ## Exemple
+> ```
+> namespace App\Entity;
+>
+> use Symfony\Component\HttpFoundation\File\File;
+> use Symfony\Component\Validator\Constraints as Assert;
+>
+> class Tutorial
+> {
+>     #[Video(maxWidth: 1920, maxHeight: 1080)]
+>     private File $video;
+> }
+> ```
+
+Tell me you are not promoter of this useless ffmpeg wrapper.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-27T12:07:58Z
+
+@mindaugasvcs please express yourself in a more friendly manner. You might be right that the wrapper is not needed, but calling the wrapper "useless" or suggesting bad intentions as a hidden "promoter" is detrimental to having a constructive discussion. Open source requires respectful discussions.
+
+---------------------------------------------------------------------------
+
+by symfonyaml at 2025-02-27T12:46:50Z
+
+@mindaugasvcs I agree that using ffmpeg is not fantastic, I am totally open for better suggestions and good intentions ;)
+
+---------------------------------------------------------------------------
+
+by mindaugasvcs at 2025-02-27T12:50:57Z
+
+> @mindaugasvcs please express yourself in a more friendly manner. You might be right that the wrapper is not needed, but calling the wrapper "useless" or suggesting bad intentions as a hidden "promoter" is detrimental to having a constructive discussion. Open source requires respectful discussions.
+
+First of all, you should not have accepted this PR in the first place as we now both agree the wrapper is not needed. I believe this PR should not be a part of the framework. I asked you long time before about such validator, you gave me no answer back then. And now? WTF?!  May I ask to explain yourself?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-02-27T14:47:47Z
+
+@mindaugasvcs Let's keep the discussion constructive. If you raised this idea earlier, I understand your frustration. That said, decisions in open source evolve based on contributions. Discussions are only a first step. Here, we have a patch, and that's how things happen.
+
+If you have strong technical reasons why this validator should not be part of the framework, let's focus on those. Do you see specific downsides beyond just the existence of the wrapper?
+
+---------------------------------------------------------------------------
+
+by mindaugasvcs at 2025-02-27T18:34:23Z
+
+> @mindaugasvcs Let's keep the discussion constructive. If you raised this idea earlier, I understand your frustration. That said, decisions in open source evolve based on contributions. Discussions are only a first step. Here, we have a patch, and that's how things happen.
+>
+> If you have strong technical reasons why this validator should not be part of the framework, let's focus on those. Do you see specific downsides beyond just the existence of the wrapper?
+
+Reasons why including such a basic video validator is bad idea:
+
+1. Working with videos isn't so straightforward as working with images: videos can have multiple video streams, multiple audio streams, multiple text streams, videos can even be 3D aka stereo ones. Not every Symfony web site / web app needs a validator of videos, even if they needed one, they would most probably find this implementation too basic.
+2. Validation of videos should be left for a custom implementation at application level because it's very dependent of business needs. Other reasons why: SOLID and ease of configuration: possibility to pass constraint values via DI, system admins sometimes aren't programmers.
+3. No other major web framework provides support for video files out of box (most probably because of reasons I just outlined).
+
+Reasons why this wrapper is bad as implementation of such idea:
+
+1. One more layer of complexity and maintenance: when this project dies the implementation will automatically turn into technical debt.
+2. It's not supported by PHP nor PHP community.
+3. Enormous amount of time spent just to learn how to use it, even for basic stuff.
+
+---------------------------------------------------------------------------
+
+by mindaugasvcs at 2025-03-05T12:40:30Z
+
+?
+
+---------------------------------------------------------------------------
+
+by mindaugasvcs at 2025-09-02T18:09:48Z
+
+Is Symfony framework still community project?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-02T18:11:02Z
+
+What does this mean @mindaugasvcs ?
+
+---------------------------------------------------------------------------
+
+by symfonyaml at 2025-09-02T18:30:47Z
+
+> I updated the PR to remove any dependency on external libs. I also added checks to reject videos with several streams and checks for the video codec + container format.
+
+@nicolas-grekas thank you so much for taking over on this PR, so much appreciated, I was very busy sorry.
+
+And yes Symfony is the best community project  ❤️

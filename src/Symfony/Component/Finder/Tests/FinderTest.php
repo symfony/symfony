@@ -237,6 +237,11 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder->name('test.p{hp,y}');
         $this->assertIterator($this->toAbsolute(['test.php', 'test.py']), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->name('test.ph*');
+        $finder->name('test.py', true);
+        $this->assertIterator($this->toAbsolute(['test.py']), $finder->in(self::$tmpDir)->getIterator());
     }
 
     public function testNameWithArrayParam()
@@ -284,6 +289,13 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->name('test.py');
         $finder->notName('*.p{hp,y}');
         $this->assertIterator([], $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder();
+        $finder->name('test.ph*');
+        $finder->name('test.py');
+        $finder->notName('*.php');
+        $finder->notName('*.py', true);
+        $this->assertIterator($this->toAbsolute(['test.php']), $finder->in(self::$tmpDir)->getIterator());
     }
 
     public function testNotNameWithArrayParam()

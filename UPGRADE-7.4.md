@@ -40,6 +40,13 @@ DomCrawler
 
  * Disabling HTML5 parsing is deprecated; Symfony 8 will unconditionally use the native HTML5 parser
 
+Finder
+----------
+
+* Extend `name()` and `notName()` to allow overwriting existing names/notNames filters.
+* Added `resetName()` and `resetNotName()` to reset names/notNames filters
+
+
 FrameworkBundle
 ---------------
 

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-09-04T08:33:40Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-04T08:39:46Z
+
+failures are related
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-04T08:51:00Z
+
+I have pushed another commit. I guess it doesn't actually make much sense running any of the deprecation handling tests with PHPUnit >= 10.0 as the feature isn't usable with that version anyway.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-04T09:00:56Z
+
+Status: Needs review

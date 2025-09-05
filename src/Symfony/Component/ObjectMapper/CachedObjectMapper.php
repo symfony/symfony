@@ -12,6 +12,8 @@
 namespace Symfony\Component\ObjectMapper;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
@@ -23,8 +25,6 @@ use Symfony\Component\VarExporter\VarExporter;
 /**
  * Cached Object to object mapper that generates and caches compiled mapping functions.
  *
- * @experimental
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class CachedObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInterface
@@ -33,6 +33,7 @@ final class CachedObjectMapper implements ObjectMapperInterface, ObjectMapperAwa
     use ObjectMapperTrait;
 
     private array $cachedMappings = [];
+    private ?Filesystem $fs = null;
 
     /**
      * Tracks recursive references.
@@ -53,9 +54,6 @@ final class CachedObjectMapper implements ObjectMapperInterface, ObjectMapperAwa
         $this->transformCallableLocator = $transformCallableLocator;
         $this->conditionCallableLocator = $conditionCallableLocator;
         $this->objectMapper = $objectMapper;
-        if (!is_dir($this->cacheDir)) {
-            mkdir($this->cacheDir, 0o775, true);
-        }
     }
 
     public function map(object $source, object|string|null $target = null): object
@@ -83,9 +81,19 @@ final class CachedObjectMapper implements ObjectMapperInterface, ObjectMapperAwa
             $cacheFile = $this->cacheDir.'/'.$cacheKey.'.php';
 
             if (!file_exists($cacheFile) || $this->debug) {
+                $this->fs ??= new Filesystem();
                 $mappingData = $this->getMappingMetadata($source, $targetClass);
                 $code = $this->generateMappingCode($mappingData, $sourceClass, $targetClass);
-                file_put_contents($cacheFile, $code, \LOCK_EX);
+
+                $tmpFile = $this->fs->tempnam(\dirname($cacheFile), basename($cacheFile));
+
+                try {
+                    $this->fs->dumpFile($tmpFile, $code);
+                    $this->fs->rename($tmpFile, $cacheFile, true);
+                    $this->fs->chmod($cacheFile, 0o666 & ~umask());
+                } catch (IOException $e) {
+                    throw new MappingException(\sprintf('Failed to write "%s" mapping file.', $cacheFile), previous: $e);
+                }
             }
 
             $this->cachedMappings[$cacheKey] = require $cacheFile;
@@ -145,7 +153,7 @@ final class CachedObjectMapper implements ObjectMapperInterface, ObjectMapperAwa
     }
 
     /**
-     * @return array{constructorParams: array<non-empty-string, array{defaultValue: mixed|null, hasDefault: bool, name: non-empty-string, propertyIsMappable: bool}>, hasConstructor: bool, properties: array<array-key, array{isConstructorParam: bool, mapping: Metadata\Mapping|null, sourceProperty: string, targetProperty: string}>, targetTransform: array<array-key, callable(mixed, object):mixed|string>|callable(mixed, object):mixed|string|null}
+     * @return array{constructorParams: array<non-empty-string, array{defaultValue: mixed|null, hasDefault: bool, name: non-empty-string, propertyIsMappable: bool}>, hasConstructor: bool, properties: list<array{isConstructorParam: bool, mapping: Symfony\Component\ObjectMapper\Metadata\Mapping|null, source: non-empty-string, target: string}>, targetTransform: array<array-key, callable(mixed, object):mixed|string>|callable(mixed, object):mixed|string|null}
      */
     private function getMappingMetadata(object $source, string $targetClass): array
     {

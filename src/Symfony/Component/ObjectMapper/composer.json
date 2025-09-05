@@ -18,6 +18,7 @@
     "require": {
         "php": ">=8.2",
         "psr/container": "^2.0",
+        "symfony/filesystem": "^7.2|^8.0",
         "symfony/var-exporter": "^7.2|^8.0"
     },
     "require-dev": {

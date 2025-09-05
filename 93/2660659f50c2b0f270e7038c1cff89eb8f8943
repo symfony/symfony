@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by god107 at 2025-09-05T19:12:31Z
+
+Not sure what to do with those failing checks. Most of them looks like false positives. Like check for common typos - "numer" is correct polish word for english "number".

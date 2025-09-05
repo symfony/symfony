@@ -19,3 +19,4 @@ class SimpleSource
     #[Map(target: 'bar')]
     public string $foo = '';
 }
+

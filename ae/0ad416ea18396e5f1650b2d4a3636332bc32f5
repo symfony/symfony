@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-09-05T11:24:16Z
+
+@nicolas-grekas it's ready for another review. I also created `protected function getNormalizerForAccessors($accessorPrefixes = null): ObjectNormalizer`, as it's done for some other test groups.
+
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-09-05T11:46:45Z
+
+Thanks for the approval. Did you see my comment on the `// accessors` comment? Can we resolve the conversation?

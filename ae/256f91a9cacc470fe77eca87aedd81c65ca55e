@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-08-21T06:09:43Z
+
+Nice, it was on my list!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-08-21T07:04:40Z
+
+>Nice, it was on my list!
+
+it seems we shared the same list at some point :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-08-22T21:56:40Z
+
+Appreciate the feedback @nicolas-grekas 🙏, all points have been addressed.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-08-25T13:39:59Z
+
+The Fabbot failures are false positives, are there any other failures I might have overlooked?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-08-27T13:33:34Z
+
+Opps, I didn't see the new CS output, it should be ok now. Thanks!
+
+(remaining checks are unrelated or false positives)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-09-03T08:35:46Z
+
+>@fabpot Looks super nice! Can we read phpdocs to extract a description for each argument/option?
+
+Yes, absolutely! we can do that. Just to mention though, arguments and options already support a `description` option that serves the same purpose, do you think that could be enough for your case?
+
+For example:
+```php
+class UserInput
+{
+    #[Argument(description: 'The user email address.')]
+    public string $email;
+}
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-09-03T09:51:44Z
+
+Thanks for the review! this is ready on my side.
+
+Looking forward to starting work on the follow-up PRs/features :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-09-06T13:20:27Z
+
+> > @fabpot Looks super nice! Can we read phpdocs to extract a description for each argument/option?
+>
+> Yes, absolutely! we can do that. Just to mention though, arguments and options already support a `description` option that serves the same purpose, do you think that could be enough for your case?
+>
+> For example:
+>
+> ```
+> class UserInput
+> {
+>     #[Argument(description: 'The user email address.')]
+>     public string $email;
+> }
+> ```
+
+Indeed, that's good enough.

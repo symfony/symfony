@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-05T17:22:40Z
+
+I wouldn't add that to general DI values yet. The closure() function will allow it anyway, properly.

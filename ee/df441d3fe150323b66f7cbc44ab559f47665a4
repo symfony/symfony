@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2025-07-06T15:38:44Z
+
+Nice one 👍🏻
+Question: would it be possible to include this in the profiler like the workflow dump ?
+We can even imagine each role box colored depending on the current user roles from this config map
+
+---------------------------------------------------------------------------
+
+by damienfern at 2025-07-07T15:39:32Z
+
+> Nice one 👍🏻
+> Question: would it be possible to include this in the profiler like the workflow dump ?
+
+Yes, I had also this in mind for a second PR, once this one gets merged.
+
+> We can even imagine each role box colored depending on the current user roles from this config map
+
+Great idea ! I'll keep it in mind :)

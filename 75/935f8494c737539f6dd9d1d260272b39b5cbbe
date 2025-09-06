@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-05T09:45:56Z
+
+src/Symfony/Component/DependencyInjection/Loader/Configurator/Traits/ConfiguratorTrait.php
+src/Symfony/Component/DependencyInjection/Loader/Configurator/Traits/FromCallableTrait.php
+src/Symfony/Component/DependencyInjection/Loader/Configurator/ContainerConfigurator.php (the closure function)
+
+I'd go with a new fixture yes - to cover all these cases

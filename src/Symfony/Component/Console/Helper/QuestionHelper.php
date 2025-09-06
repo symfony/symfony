@@ -129,7 +129,7 @@ class QuestionHelper extends Helper
                 }
 
                 if (false === $ret) {
-                    throw new MissingInputException('Aborted.');
+                    throw new MissingInputException('Aborted. Unable to read input of question: '.$question->getQuestion());
                 }
                 if ($question->isTrimmable()) {
                     $ret = trim($ret);
@@ -271,7 +271,7 @@ class QuestionHelper extends Helper
             // as opposed to fgets(), fread() returns an empty string when the stream content is empty, not false.
             if (false === $c || ('' === $ret && '' === $c && null === $question->getDefault())) {
                 shell_exec('stty '.$sttyMode);
-                throw new MissingInputException('Aborted while asking: '.$question->getQuestion());
+                throw new MissingInputException('Aborted. Trying to autocomplete: '.$question->getQuestion());
             } elseif ("\177" === $c) { // Backspace Character
                 if (0 === $numMatches && 0 !== $i) {
                     --$i;
@@ -443,7 +443,7 @@ class QuestionHelper extends Helper
         }
 
         if (false === $value) {
-            throw new MissingInputException('Aborted.');
+            throw new MissingInputException('Aborted. Unable to read hidden input.');
         }
         if ($trimmable) {
             $value = trim($value);

@@ -220,7 +220,7 @@ class CommandTesterTest extends TestCase
         $tester = new CommandTester($command);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Aborted while asking: choice');
+        $this->expectExceptionMessage('Aborted. Unable to read input of question: choice');
 
         $tester->execute([]);
     }

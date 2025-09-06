@@ -740,7 +740,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
     public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
     {
         $this->expectException(MissingInputException::class);
-        $this->expectExceptionMessage('Aborted while asking: Choice');
+        $this->expectExceptionMessage('Aborted. Trying to autocomplete: Choice');
         (new QuestionHelper())->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));
     }
 

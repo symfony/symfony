@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\Exception\ProblemDetailsJsonResponseException;
+use Symfony\Component\HttpFoundation\Exception\ProblemJsonResponseException;
 
 /**
  * Represents a JSON response with a Problem Details object.
  *
  * @author Abdellah Ramadan <ramadanabdel24@gmail.com>
  */
-class ProblemDetailsJsonResponse extends Response
+class ProblemJsonResponse extends Response
 {
     public function __construct(
         int $status = 500,
@@ -33,7 +33,7 @@ class ProblemDetailsJsonResponse extends Response
         $this->statusCode = $status;
 
         if ($status < 400 || $status > 599) {
-            throw new ProblemDetailsJsonResponseException(\sprintf('The status code "%s" is not a valid HTTP Status Code error.', $this->statusCode));
+            throw new ProblemJsonResponseException(\sprintf('The status code "%s" is not a valid HTTP Status Code error.', $this->statusCode));
         }
 
         if ($title && null === $type || null === $title) {
@@ -43,7 +43,7 @@ class ProblemDetailsJsonResponse extends Response
         if (null !== $type) {
             $scheme = parse_url($type, \PHP_URL_SCHEME);
             if (null === $scheme) {
-                throw new ProblemDetailsJsonResponseException("Invalid url type: $type.");
+                throw new ProblemJsonResponseException("Invalid url type: $type.");
             }
         }
 

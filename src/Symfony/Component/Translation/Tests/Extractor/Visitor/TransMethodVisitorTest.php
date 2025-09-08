@@ -101,14 +101,16 @@ final class TransMethodVisitorTest extends AbstractVisitorTestCase
             $catalogue->all(),
         );
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translation.html.php:2']], $catalogue->getMetadata('single-quoted key'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translation.html.php:37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translation-73.html.php:8']], $catalogue->getMetadata("nowdoc\nindented\n  further"));
+        $fixtureFolder = str_replace(\DIRECTORY_SEPARATOR, '/', self::FIXTURES_FOLDER);
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-short.html.php:2']], $catalogue->getMetadata('translatable-short single-quoted key'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-short.html.php:37']], $catalogue->getMetadata('translatable-short other-domain-test-no-params-short-array', 'not_messages'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translation.html.php:2']], $catalogue->getMetadata('single-quoted key'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translation.html.php:37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translation-73.html.php:8']], $catalogue->getMetadata("nowdoc\nindented\n  further"));
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-short-fqn.html.php:2']], $catalogue->getMetadata('translatable-short-fqn single-quoted key'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-short-fqn.html.php:37']], $catalogue->getMetadata('translatable-short-fqn other-domain-test-no-params-short-array', 'not_messages'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translatable-short.html.php:2']], $catalogue->getMetadata('translatable-short single-quoted key'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translatable-short.html.php:37']], $catalogue->getMetadata('translatable-short other-domain-test-no-params-short-array', 'not_messages'));
+
+        $this->assertEquals(['sources' => [$fixtureFolder.'translatable-short-fqn.html.php:2']], $catalogue->getMetadata('translatable-short-fqn single-quoted key'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translatable-short-fqn.html.php:37']], $catalogue->getMetadata('translatable-short-fqn other-domain-test-no-params-short-array', 'not_messages'));
     }
 }

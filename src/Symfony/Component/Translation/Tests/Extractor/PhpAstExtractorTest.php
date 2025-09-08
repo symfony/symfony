@@ -29,8 +29,10 @@ final class PhpAstExtractorTest extends TestCase
 
         $extractor->extract($resource, $catalogue);
 
+        $fixtureFolder = str_replace(\DIRECTORY_SEPARATOR, '/', self::FIXTURES_FOLDER);
+
         $this->assertEquals(['messages' => ['example' => 'example']], $catalogue->all());
-        $this->assertEquals(['sources' => [preg_replace('{[\\\\/]+}', '/', self::FIXTURES_FOLDER).'translation.html.php:1']], $catalogue->getMetadata('example'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translation.html.php:1']], $catalogue->getMetadata('example'));
     }
 
     public static function resourcesProvider(): \Generator

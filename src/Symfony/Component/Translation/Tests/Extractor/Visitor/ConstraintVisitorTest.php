@@ -41,6 +41,8 @@ final class ConstraintVisitorTest extends AbstractVisitorTestCase
             $catalogue->all(),
         );
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'validator-constraints.php:7']], $catalogue->getMetadata('message-in-constraint-attribute', 'validators'));
+        $fixtureFolder = str_replace(\DIRECTORY_SEPARATOR, '/', self::FIXTURES_FOLDER);
+
+        $this->assertEquals(['sources' => [$fixtureFolder.'validator-constraints.php:7']], $catalogue->getMetadata('message-in-constraint-attribute', 'validators'));
     }
 }

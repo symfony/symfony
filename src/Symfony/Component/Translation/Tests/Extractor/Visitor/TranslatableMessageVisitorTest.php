@@ -70,10 +70,12 @@ final class TranslatableMessageVisitorTest extends AbstractVisitorTestCase
             $catalogue->all(),
         );
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable.html.php:3']], $catalogue->getMetadata('translatable single-quoted key'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable.html.php:38']], $catalogue->getMetadata('translatable other-domain-test-no-params-short-array', 'not_messages'));
+        $fixtureFolder = str_replace(\DIRECTORY_SEPARATOR, '/', self::FIXTURES_FOLDER);
 
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-fqn.html.php:2']], $catalogue->getMetadata('translatable-fqn single-quoted key'));
-        $this->assertEquals(['sources' => [self::FIXTURES_FOLDER.'translatable-fqn.html.php:37']], $catalogue->getMetadata('translatable-fqn other-domain-test-no-params-short-array', 'not_messages'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translatable.html.php:3']], $catalogue->getMetadata('translatable single-quoted key'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translatable.html.php:38']], $catalogue->getMetadata('translatable other-domain-test-no-params-short-array', 'not_messages'));
+
+        $this->assertEquals(['sources' => [$fixtureFolder.'translatable-fqn.html.php:2']], $catalogue->getMetadata('translatable-fqn single-quoted key'));
+        $this->assertEquals(['sources' => [$fixtureFolder.'translatable-fqn.html.php:37']], $catalogue->getMetadata('translatable-fqn other-domain-test-no-params-short-array', 'not_messages'));
     }
 }

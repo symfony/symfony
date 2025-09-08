@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-09-07T21:12:54Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-09-08T08:00:44Z
+
+Thanks @GromNaN The fix seems correct to me.
+
+PHP seems to store the sign in the last bit.
+
+Therefore, when we do 1 << 63, PHP automatically transforms the value to a float instead of going in negative values for safety purpose. That was probably the reason why psalm was failing
+
+As you said, this is not an issue if we have a float for the following calculations as long as we don't reach the value (1 << 62) /1000 + 1

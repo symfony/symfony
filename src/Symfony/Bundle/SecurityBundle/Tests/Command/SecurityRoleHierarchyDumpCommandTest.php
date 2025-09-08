@@ -45,7 +45,7 @@ class SecurityRoleHierarchyDumpCommandTest extends TestCase
 
             EXPECTED);
 
-        $this->assertSame($expectedOutput, $output);
+        $this->assertSame($expectedOutput, self::normalizeLineBreaks($output));
     }
 
     public function testExecuteWithCustomDirection()
@@ -79,5 +79,10 @@ class SecurityRoleHierarchyDumpCommandTest extends TestCase
 
         $this->assertSame(Command::FAILURE, $exitCode);
         $this->assertStringContainsString('Invalid direction', $commandTester->getDisplay());
+    }
+
+    private static function normalizeLineBreaks($text)
+    {
+        return str_replace(\PHP_EOL, "\n", $text);
     }
 }

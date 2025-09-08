@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-07T11:46:25Z
+
+Do you have an idea why this test did not fail in the CI?
+
+---------------------------------------------------------------------------
+
+by vrana at 2025-09-07T16:03:23Z
+
+https://github.com/symfony/symfony/actions/runs/16697898320/job/47264645560?pr=61308 says:
+
+> No tests executed!
+> OK src\Symfony/Component/Console

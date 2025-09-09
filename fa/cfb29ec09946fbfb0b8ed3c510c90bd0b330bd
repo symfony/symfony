@@ -1,0 +1,216 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-08T06:57:53Z
+
+~:-1: that's strictly the same~
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-09-08T07:24:31Z
+
+`>=` is the default operator:
+
+https://github.com/sebastianbergmann/phpunit/blob/864e93c73b6e4caf189461cdbdf63853c54271e2/src/Metadata/Version/Requirement.php#L45
+
+I don't think that we should apply this change.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-09-08T12:22:16Z
+
+Hi everyone, I hope you're all doing well! 😄
+Thank you so much for your comments.
+
+I believe this change is necessary.
+
+You can see the difference in the execution of the tests on PHP 8.5 between this PR and another one. There are a few minor skipped tests.
+
+For example, here's a case related to the `VarDumper` component.
+I'll share two screenshots to show the difference:
+
+In this PR:
+<img width="862" height="370" alt="Screenshot from 2025-09-08 09-07-33" src="https://github.com/user-attachments/assets/fc4d08a9-6889-4ad1-80c7-91838607e217" />
+
+In the other PR:
+<img width="862" height="370" alt="Screenshot from 2025-09-08 09-06-42" src="https://github.com/user-attachments/assets/8050f903-ea0c-489d-8aa4-f6f350d21dd4" />
+
+I also ran the tests locally to confirm the behavior.
+
+I added `#[RequiresPhp('8.3')]` to the test `SerializerTest::testCollectDenormalizationErrorsDefaultContext` and ran it with different PHP versions:
+
+```php
+    #[RequiresPhp('8.3')] // This is only in my local for this example
+    public function testCollectDenormalizationErrorsDefaultContext()
+    {
+        $data = ['variadic' => ['a random string']];
+        $serializer = new Serializer([new UidNormalizer(), new ObjectNormalizer()], [], [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]);
+
+        $this->expectException(PartialDenormalizationException::class);
+
+        $serializer->denormalize($data, DummyWithVariadicParameter::class);
+    }
+```
+
+* **PHP 8.3**
+ <img width="1297" height="399" alt="Screenshot from 2025-09-08 09-16-52" src="https://github.com/user-attachments/assets/0143739f-94cd-4d72-918a-f584d77295c8" />
+* **PHP 8.4**
+<img width="1292" height="447" alt="Screenshot from 2025-09-08 09-17-06" src="https://github.com/user-attachments/assets/e7d018a1-d992-4d74-8170-87a43b6f9ebd" />
+
+Then, I changed the annotation to `#[RequiresPhp('>=8.3')]`
+
+```php
+    #[RequiresPhp('>=8.3')] // This is only in my local for this example
+    public function testCollectDenormalizationErrorsDefaultContext()
+    {
+        $data = ['variadic' => ['a random string']];
+        $serializer = new Serializer([new UidNormalizer(), new ObjectNormalizer()], [], [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]);
+
+        $this->expectException(PartialDenormalizationException::class);
+
+        $serializer->denormalize($data, DummyWithVariadicParameter::class);
+    }
+```
+
+* This time, on **PHP 8.4**, the test was executed
+<img width="1292" height="447" alt="Screenshot from 2025-09-08 09-17-33" src="https://github.com/user-attachments/assets/5d2f660b-2d20-4871-8eaa-2d1cc427f194" />
+
+So this small change ensures that the tests run correctly across PHP versions that meet the requirement.
+
+Let me know what you think! 😊
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-08T12:29:25Z
+
+Looks like you're right, this can be experimented with by running this and tweaking the annotation:
+`./phpunit src/Symfony/Component/ErrorHandler/ --filter testReturnTypePhp83`
+
+But this looks like a phpunit issue, can you open one there?
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-09-08T12:43:15Z
+
+I might be wrong, but from what I can tell, this doesn’t seem to be a bug in PHPUnit. 🤔 If I'm mistaken and it is an actual issue, apologies in advance for the confusion.
+
+According to the PHPUnit documentation on [requiresphp](https://docs.phpunit.de/en/12.3/attributes.html#requiresphp)
+"The RequiresPhp(string $versionRequirement) attribute can be used to [skip the execution of a test](https://docs.phpunit.de/en/12.3/writing-tests-for-phpunit.html#writing-tests-for-phpunit-skipping-tests-skipping-tests-using-attributes) when the PHP version used to run PHPUnit does not match the **specified version requirement**."
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-09-08T12:45:27Z
+
+Another thing I wanted to mention, if this isn't actually a PHPUnit issue, I think we could consider changing `>=` to `^` instead
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-08T12:47:21Z
+
+/cc @sebastianbergmann can you please help us clarify this? `@requires PHP 8.4` used to mean `>=`, so it might be confusing to have `#[RequiresPhp('8.4')]` mean something different.
+
+---------------------------------------------------------------------------
+
+by sebastianbergmann at 2025-09-08T14:29:08Z
+
+Here is a test case class with four test methods that each uses a different string argument for the `#[RequiresPhp(string $versionRequirement)]` attribute:
+#### `Test.php`
+```php
+<?php declare(strict_types=1);
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\TestCase;
+
+#[DoesNotPerformAssertions]
+final class Test extends TestCase
+{
+    #[RequiresPhp('8.3')]
+    public function testOne(): void
+    {
+    }
+
+    #[RequiresPhp('>= 8.3')]
+    public function testTwo(): void
+    {
+    }
+
+    #[RequiresPhp('^8.3')]
+    public function testThree(): void
+    {
+    }
+
+    #[RequiresPhp('~8.3')]
+    public function testFour(): void
+    {
+    }
+}
+```
+
+Running the tests shown above using PHPUnit 12.3.8, PHPUnit 11.5.36, and PHPUnit 10.5.52 with PHP 8.4.12 shows the same behaviour:
+
+```
+❯ ./phpunit --debug Test.php
+PHPUnit Started (PHPUnit 12.3.8 using PHP 8.4.12 (cli) on Linux)
+Test Runner Configured
+Bootstrap Finished (/usr/local/src/phpunit/tests/bootstrap.php)
+Event Facade Sealed
+Test Suite Loaded (4 tests)
+Test Runner Started
+Test Suite Sorted
+Test Runner Execution Started (4 tests)
+Test Suite Started (Test, 4 tests)
+Test Preparation Started (Test::testOne)
+Test Skipped (Test::testOne)
+PHP 8.3 is required.
+Test Preparation Started (Test::testTwo)
+Test Prepared (Test::testTwo)
+Test Passed (Test::testTwo)
+Test Finished (Test::testTwo)
+Test Preparation Started (Test::testThree)
+Test Prepared (Test::testThree)
+Test Passed (Test::testThree)
+Test Finished (Test::testThree)
+Test Preparation Started (Test::testFour)
+Test Prepared (Test::testFour)
+Test Passed (Test::testFour)
+Test Finished (Test::testFour)
+Test Suite Finished (Test, 4 tests)
+Test Runner Execution Finished
+Test Runner Finished
+PHPUnit Finished (Shell Exit Code: 0)
+```
+
+As can be seen above, the test that is attributed with `#[RequiresPhp('8.3')]` is skipped on PHP 8.4.12 as the version constraint `'8.3'` does not match PHP 8.4.12 whereas `>= 8.3`, `^8.3`, and `~8.3` do.
+
+This is the current behaviour and has been since PHPUnit 10. Any change to how `#[RequiresPhp('8.3')]` is interpreted would be a break in backward compatibility.
+
+Instead of changing how `#[RequiresPhp('8.3')]` is interpreted (as `#[RequiresPhp('>= 8.3')]`, for example), I would rather deprecate `$versionRequirement` string arguments for attributes such as `#[RequiresPhp(string $versionRequirement)]` that do not begin with an explicit version comparison operator such as `>=`, `^`, or `~`.
+
+Using just `'8.3'` has always been confusing and probably should have never been supported in the first place.
+
+**TL;DR:** My advice to you: replace attributes such as `#[RequiresPhp('8.3')]` with `#[RequiresPhp('^8.3')]`, for example.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-08T14:43:13Z
+
+Thanks for the feedback @sebastianbergmann !
+
+Let's do this then of course (but with the `>=` operator, which is the one we use in the composer.json files also)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-08T14:48:09Z
+
+(please rebase while addressing my review comments, we might have added a few more attributes meanwhile)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-08T14:55:11Z
+
+Thanks @sebastianbergmann for taking the time to write this up. Much appreciated! :)
+
+---------------------------------------------------------------------------
+
+by stof at 2025-09-08T15:00:37Z
+
+@sebastianbergmann was this already the case for the `@requires` annotation in PHPUnit 9 ? Or is this a subtle difference between annotations and attributes (that was not communicated and so Rector failed to account for it for instance) ? Reading the source code, I have the impression it defaulted to `>=`: https://github.com/sebastianbergmann/phpunit/blob/dcf66f408d3f1a953a099503455b65e2616f1285/src/Util/Test.php#L205

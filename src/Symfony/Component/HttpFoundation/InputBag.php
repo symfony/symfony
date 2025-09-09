@@ -90,10 +90,10 @@ final class InputBag extends ParameterBag
      *
      * @throws BadRequestException if the input cannot be converted to an enum
      */
-    public function getEnum(string $key, string $class, ?\BackedEnum $default = null): ?\BackedEnum
+    public function getEnum(string $key, string $class, ?\BackedEnum $default = null, bool $defaultIfUnexpectedValue = false): ?\BackedEnum
     {
         try {
-            return parent::getEnum($key, $class, $default);
+            return parent::getEnum($key, $class, $default, $defaultIfUnexpectedValue);
         } catch (UnexpectedValueException $e) {
             throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
         }

@@ -177,7 +177,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @throws UnexpectedValueException if the parameter value cannot be converted to an enum
      */
-    public function getEnum(string $key, string $class, ?\BackedEnum $default = null): ?\BackedEnum
+    public function getEnum(string $key, string $class, ?\BackedEnum $default = null, bool $defaultIfUnexpectedValue = false): ?\BackedEnum
     {
         $value = $this->get($key);
 
@@ -188,6 +188,10 @@ class ParameterBag implements \IteratorAggregate, \Countable
         try {
             return $class::from($value);
         } catch (\ValueError|\TypeError $e) {
+            if ($defaultIfUnexpectedValue) {
+                return $default;
+            }
+
             throw new UnexpectedValueException(\sprintf('Parameter "%s" cannot be converted to enum: %s.', $key, $e->getMessage()), $e->getCode(), $e);
         }
     }

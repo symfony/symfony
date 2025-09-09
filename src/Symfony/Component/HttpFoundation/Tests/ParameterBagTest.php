@@ -357,6 +357,16 @@ class ParameterBagTest extends TestCase
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
 
+    public function testGetEnumWithDefaultIfUnexpectedValue()
+    {
+        $bag = new ParameterBag(['unexpected-value' => 2]);
+
+        $this->assertSame(
+            FooEnum::Bar,
+            $bag->getEnum('unexpected-value', FooEnum::class, FooEnum::Bar, true),
+        );
+    }
+
     public function testGetEnumThrowsExceptionWithInvalidValueType()
     {
         $bag = new ParameterBag(['invalid-value' => ['foo']]);

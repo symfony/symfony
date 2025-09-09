@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-08-23T09:45:28Z
+
+The implementation does not seem to do what you describe. It still uses the HtmlDumper for all non-CLI SAPIs but uses it also for some cases of CLI SAPIs.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-23T09:55:45Z
+
+I'm not sure to get what you mean. The goal is to use CliDumper if we're in a CLI env, just as before. But if we're in another env _or_ the Accept header is present with `text/html`, then we use HtmlDumper.
+
+If you debug a JSON API, you don't want to HTML output because it messes with the output.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-23T09:56:37Z
+
+This is **not** what your new condition does
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-23T10:02:00Z
+
+I'm sorry, I don't get where the condition is wrong :confused: Could you maybe precisely point at the mistake please?
+
+> It still uses the HtmlDumper for all non-CLI SAPIs
+
+It is the current behavior. All this PR does is "forcing" the HTML output in case of the Accept header.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-23T10:32:43Z
+
+ @alexandre-daubois in your condition, anything that is not a CLI SAPI will still use the HtmlDumper. what you changed is that you use the HtmlDumper in *more* cases, not less cases.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-23T11:34:20Z
+
+Alright, I think I figured out the problem, thank you for your explanation. Is it better now? If the header is present with the good value, we chose HtmlDumper. Otherwise, we fallback on CliDumper (just like proposed in https://github.com/symfony/symfony/pull/54772#issuecomment-2135615307 actually).
+
+At this point, I'm not 100% sure if this should be considered a bug or a feature :thinking:
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-23T11:45:25Z
+
+I would treat it as a feature.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-23T12:07:41Z
+
+It is now updated with your suggestions, thank you!
+
+---------------------------------------------------------------------------
+
+by Jimbolino at 2024-08-23T14:00:10Z
+
+I would recommend to create a new "plain text only" dumper, and use that as the default fallback (if no accept html header is present)
+HtmlDumper and CliDumper are imho not good fallbacks for most usecases
+
+---------------------------------------------------------------------------
+
+by pierresh at 2024-08-23T14:14:58Z
+
+> I would recommend to create a new "plain text only" dumper, and use that as the default fallback (if no accept html header is present) HtmlDumper and CliDumper are imho not good fallbacks for most usecases
+
+You are right, the CliDumper does not output anything if it is not in a terminal. I tried to see what would be the result of CliDumper in Chrome dev tool and it is just empty.
+
+Thus the problem I reported in [54772](https://github.com/symfony/symfony/pull/54772) (and probably the one described in [49754](https://github.com/symfony/symfony/issues/49754) as well) is not solved by using CLiDumper instead of HtmlDumper. A plain text dumper is indeed necessary.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-23T14:30:58Z
+
+@pierresh I think that your case could (and should) be solved by launching a local VarDumper server so the output doesn't messes up with your API response
+
+---------------------------------------------------------------------------
+
+by Jimbolino at 2024-08-23T14:43:13Z
+
+> @pierresh I think that your case could (and should) be solved by launching a local VarDumper server so the output doesn't messes up with your API response
+
+a dd() will (and should) always mess up the output, no one excepts valid formatted json output if they call dd(), else you would return a new JsonResponse() instead of calling dd().
+
+Also when debugging production / staging / docker etc, its not always possible to launch a VarDumper server.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-26T07:41:48Z
+
+I'm not convinced that using `dd()` is the most suitable solution for debugging a production application. Apart from that, have you looked at the static property `AbstractDumper::$defaultOutput`, but also `AbstractDumper::setOutput()`? You can pass any callable/resource/output-path to it, which may solve your issue.
+
+I think that the conversation is moving away from the original purpose of the PR. Perhaps it's a good idea to continue the discussion in the respective issues to avoid any confusion? :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-09T15:12:17Z
+
+Does this really work on Symfony apps? Don't we register another handler that'd also need a similar logic, but that'd use the request_stack instead of the globals to get the accept header?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-10-14T18:46:58Z
+
+I tried with a new Symfony app and a dummy controller like the following:
+
+```php
+class HomeController
+{
+    #[Route(path: '/')]
+    public function home(): Response
+    {
+        dd(PHP_SAPI);
+    }
+}
+```
+
+It dumped the value in the CLI, and dumped as HTML in the browser when adding `Accept: text/html`. Is there a place or a case I'm missing?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-07-31T12:32:30Z
+
+Thank you!

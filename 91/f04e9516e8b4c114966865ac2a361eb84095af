@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by okhoshi at 2025-04-08T14:23:10Z
+
+> Are you suggesting this should be enabled by default, but we don't change it because that'd change the existing behavior?
+
+The existing behavior is preserved if the new `$handleSilent` argument is set to true, hence why it's the default value. But it would be more consistent across the different verbosities if it was set to false.

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-09-10T10:36:55Z
+
+Wow thanks for digging into that mess. Can we somehow ensure this for the future via automatic checks?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-09-10T10:47:13Z
+
+> Wow thanks for digging into that mess. Can we somehow ensure this for the future via automatic checks?
+
+That's something to be careful during reviews.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-09-10T10:49:51Z
+
+> Wow thanks for digging into that mess. Can we somehow ensure this for the future via automatic checks?
+
+I'll try to think about how this could be done.
+The general case is that any prototyped array node should have a corresponding `fixXmlConfig` on the parent node. But I think we have a few weird cases where we normalize things differently (when the prototyped node does not use a proper plural name), preventing us to enforce this rule strictly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-10T11:00:00Z
+
+> Wow thanks for digging into that mess. Can we somehow ensure this for the future via automatic checks?
+
+Part of it is approving ;) #60568
+Then I'm playing with something like what @stof suggests this morning, PR to come.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-10T12:01:37Z
+
+I figured more XSD mismatches, see https://github.com/symfony/symfony/compare/61e187964ffe16ac4d328f10e9a3fcfbac4765ee..a94730f3b8a3bd7df7b57d7296e58a92c356881c

@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-08-29T10:29:24Z
+
+The feature seems nice, but I'm still trying to grasp what it really does. If I understand correctly and if we take Sylius example, is the following code correct?
+
+```php
+use Sylius\Component\Product\Model\ProductTranslation;
+
+#[ValidationFor(ProductTranslation::class)]
+class MyProductTranslation
+{
+    #[Assert\NotBlank(groups: ['my_app'])]
+    #[Assert\Length(min: 10, groups: ['my_app'])]
+    public string $name = '';
+}
+```
+
+Then on validation, Sylius' `ProductTranslation` constraints would be overridden by the ones defined in `MyProductTranslation`. Is that right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-29T10:33:55Z
+
+@alexandre-daubois you've got it right, provided you also configure the `sylius.form.type.product_translation.validation_groups` parameter as explained in the doc.
+That's already doable using yaml and xml but not using plain PHP attributes.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-08-29T10:39:50Z
+
+Could we find a proper tribute name with something like `#[As*]`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-29T10:41:23Z
+
+@OskarStark that's not a service. `As*` is for services to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-29T14:42:05Z
+
+Thank you @alexandre-daubois and @stof, I addressed your comments.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-09-05T11:38:52Z
+
+We have the same issue when removing XML and Yaml for Validation we require a way that a Project can add new validations to third party classes of @sulu.
+
+We are fine with whatever alternative Symfony provides our CMS users, personally I would maybe go more with something like:
+
+```php
+class CustomUserValidationProvider
+{
+    #[UserValidationProviderFor(User::class)]
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('name', new NotBlank());
+    }
+}
+```
+
+Very similar how you could already have `loadValidatorMetadata` on the Entity itself [see PHP way here](https://symfony.com/doc/current/validation.html). But we could add both kind of ways.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-09-05T11:47:49Z
+
+@alexander-schranz that would be a separate feature, which can totally be added in parallel if projects prefer using the PHP metadata API than adding attributes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-05T12:01:39Z
+
+@alexander-schranz thanks for chiming in and for the proposal.
+On my side, I prefer the attribute-way because it doesn't require learning about the ClassMetadata API, which is totally different than attributes.
+I get that config classes like this might be unusual, but they're nonetheless a very good substrate for configuration via attributes. I ensured such classes could be made abstract, to prevent using them for anything else.

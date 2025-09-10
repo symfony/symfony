@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-09-08T15:29:58Z
+
+Reading it from cookies is a bad idea, as the security of the CSRF protection has never been evaluated for such usage, which is a totally different behavior (a cookie could be submitted based on a stored value rather than a value submitted as part of the request, which has to be known by the attacker submitting the request)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-08T16:11:19Z
+
+I'd rather make this explicit using an option on the attribute. Fishing for security values is calling for troubles :)
+
+---------------------------------------------------------------------------
+
+by webda2l at 2025-09-08T17:05:49Z
+
+> I'd rather make this explicit using an option on the attribute. Fishing for security values is calling for troubles :)
+
+A simple improvement could be to allow `tokenKey` as a Symfony Expression as well that its current string format, to handle more advanced scenarios.
+
+```
+#[IsCsrfTokenValid(
+   id: new Expression('"delete-item-" ~ args["post"].getId()'),
+   tokenKey: 'token'               // Default behavior by reading request.getPayload
+   tokenKey: new Expression('request.query.getString("_token")'),     // Simple
+   tokenKey: new Expression('request.getPayload().get("token") ?? request.query.get("_token")'),    // More advanced
+)]
+```
+
+But the naming `tokenKey` is not the best so...
+So, it could require a new field `value` / `valueExpr` / `tokenValue` / `tokenExpr`, but will require an extra check to trigger an error if `tokenKey` and this new field are both set.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-09T06:55:09Z
+
+we could use a bitfield - that'd prevent everybody needed this from figuring out the correct expression (there's only a very limited way of reading that token - and we even don't want to open for things like cookies):
+`#[IsCsrfTokenValid(tokenSource: IsCsrfTokenValid::SOURCE_QUERY | IsCsrfTokenValid::SOURCE_HEADER)]`

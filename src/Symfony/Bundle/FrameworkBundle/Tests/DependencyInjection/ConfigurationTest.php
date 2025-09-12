@@ -29,6 +29,7 @@ use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
@@ -985,6 +986,9 @@ class ConfigurationTest extends TestCase
             ],
             'json_streamer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(JsonStreamWriter::class),
+            ],
+            'object_mapper' => [
+                'enabled' => class_exists(ObjectMapperInterface::class),
             ],
         ];
     }

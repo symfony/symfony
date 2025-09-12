@@ -38,6 +38,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
@@ -194,6 +195,7 @@ class Configuration implements ConfigurationInterface
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode, $enableIfStandalone);
         $this->addJsonStreamerSection($rootNode, $enableIfStandalone);
+        $this->addObjectMapperSection($rootNode, $enableIfStandalone);
 
         return $treeBuilder;
     }
@@ -2747,6 +2749,18 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('json_streamer')
                     ->info('JSON streamer configuration')
                     ->{$enableIfStandalone('symfony/json-streamer', StreamWriterInterface::class)}()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addObjectMapperSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('object_mapper')
+                    ->info('Object Mapper configuration')
+                    ->{$enableIfStandalone('symfony/object-mapper', ObjectMapperInterface::class)}()
                 ->end()
             ->end()
         ;

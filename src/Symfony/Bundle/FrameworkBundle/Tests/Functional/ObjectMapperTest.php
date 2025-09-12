@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ObjectMapped;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ObjectToBeMapped;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Antoine Bluchet <soyuka@gmail.com>
  */
 class ObjectMapperTest extends AbstractWebTestCase
 {
@@ -25,6 +25,16 @@ class ObjectMapperTest extends AbstractWebTestCase
 
         /** @var Symfony\Component\ObjectMapper\ObjectMapperInterface<ObjectMapped> */
         $objectMapper = static::getContainer()->get('object_mapper.alias');
+        $mapped = $objectMapper->map(new ObjectToBeMapped());
+        $this->assertSame($mapped->a, 'transformed');
+    }
+
+    public function testCachedObjectMapper()
+    {
+        static::bootKernel(['test_case' => 'ObjectMapper']);
+
+        /** @var Symfony\Component\ObjectMapper\ObjectMapperInterface<ObjectMapped> */
+        $objectMapper = static::getContainer()->get('object_mapper.cached.alias');
         $mapped = $objectMapper->map(new ObjectToBeMapped());
         $this->assertSame($mapped->a, 'transformed');
     }

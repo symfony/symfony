@@ -1,9 +1,15 @@
 imports:
     - { resource: ../config/default.yml }
 
+framework:
+  object_mapper:
+    enabled: true
 services:
     object_mapper.alias:
         alias: object_mapper
         public: true
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\TransformCallable:
         autoconfigure: true
+    object_mapper.cached.alias:
+        alias: object_mapper.cached
+        public: true

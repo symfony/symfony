@@ -1,0 +1,200 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2024-03-21T14:14:45Z
+
+An alternative idea, also suggested by the comment that you've linked, was to use attributes for stamps. Can you elaborate why you dismissed that idea in favor of an interface?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-03-21T14:32:11Z
+
+> An alternative idea, also suggested by the comment that you've linked, was to use attributes for stamps. Can you elaborate why you dismissed that idea in favor of an interface?
+
+I misunderstood/forgot about the comment when working on this and the only idea I had in mind was an interface.
+
+Then, I reread the comment and even found https://github.com/symfony/symfony/pull/50812
+but I'm not sure what would be the interest of attributes here.
+
+IMHO the interface is simpler:
+- A feature with `#[DelayStamp(123)]` would require to declare every stamps as attributes, you cannot use this for other libs if they don't declare their stamps as attribute.
+- A feature `#[AutoStamp(new DelayStamp(123))]` solve the previous issue but It still require extra manipulation with `ReflectionClass` when the `instanceof SelfStampableInterface` and a getter does all the job.
+
+Also, dynamic stamps would be impossible with attribute.
+
+This would be useful for the LockStamp in https://github.com/symfony/symfony/pull/54141,
+you could have
+```
+class Message implements SelfStampableInterface
+{
+     public function __construct(private int $projectId) {}
+
+     // With this stamp, I ensure there is never 2 messages for the same Id in the queue
+     public function getStamps(): array {
+         return [new LockStamp(self::class . $this->projectId)];
+     }
+}
+```
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-03-21T16:49:45Z
+
+> i tend to prefer stamps as attributes for the sake of decoupling
+>
+> having runtime flexibility is nice, but IMHO it needs to be scalable, eg. we might want to use additional services to compute a stamp
+>
+> in that sense, middleware layer already brings full runtime flexibility in userland to apply default stamps
+>
+> for compiling stamps as-a-service from attributes, take this:
+>
+> ```
+> $stampServiceDef = new Definition($attr->getName(), $attr->getArguments());
+> ```
+
+Sorry, I don't understand how will be solved, in the simple way, the
+```php
+class Message implements SelfStampableInterface
+{
+     public function __construct(private int $projectId) {}
+
+     // With this stamp, I ensure there is never 2 messages for the same Id in the queue
+     public function getStamps(): array {
+         return [new LockStamp(self::class . $this->projectId)];
+     }
+}
+```
+situation with
+```php
+#[LockStamp()] // Error missing first param.
+class Message implements SelfStampableInterface
+{
+     public function __construct(private int $projectId) {}
+}
+```
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-05-30T07:11:51Z
+
+> perhaps self-stamping is the way to go for such simple runtime usecases
+>
+> no strong opinion :)
+>
+> > `#[LockStamp()] `
+>
+> it could compute a key from the message payload by default
+
+With a method, you also can add the stamp conditionnaly
+```
+public function getStamps(): array {
+         return $this->foo ? [new FooStamp()] : [new BarStamp()];
+     }
+```
+
+@derrabus do you have time for a new look ? :)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-06-11T12:17:08Z
+
+Maybe you have some time for a review @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-11-06T19:35:17Z
+
+Friendly ping @derrabus ; would you have time for a review ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2024-11-06T19:42:51Z
+
+Unfortunately not at the moment. 😞
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-11-06T20:21:45Z
+
+Looking at this after some time has passed make me think that stamps could simply be attributes on classes, and this would actually make this feature real. All it need it that all stamps extend `\Attribute` and some outer middleware exist in the dispatcher to expand those as stamps.
+
+Except maybe that it wouldn't allow dynamism in stamp data, do you have any real life use case for such dynamism?
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-07T11:17:03Z
+
+Stamps themselves should not be attributes, as they are metadata about a particular message, not about the class. For instance, there are some stamps that are added based on how the message is dispatched or how it is read from the queue.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-07T11:32:39Z
+
+@ro0NL for applying automatic stamps on messages using a given class, I'd rather have a `AutoStamp` attribute (name to be bikeshed) taking a Stamp as argument (allowing to repeat the attribute) than making stamps themselves as attributes while stamps themselves cannot always be attributes. It would reduce confusion IMO.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2024-11-07T11:53:48Z
+
+> Except maybe that it wouldn't allow dynamism in stamp data, do you have any real life use case for such dynamism?
+
+This is a big loss for me. I have some stamp like "DeduplicateStamp" or "DelayStamp" which are added by default (because used 99% of the time) but I need the ability to skip them sometimes. I have also stamp which are added based on the size of the data.
+
+This PR doesn't forbid stamp as attribute, it can still be done in another PR by someone else.
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-11-07T13:12:48Z
+
+> stamps _could_ be attributes, if the metadata is constant. Otherwise dont apply the stamp as an attribute on your message.
+
+Definitely agree, stamps are basically no more no less than very simple DTOs, exactly what attributes also are in the end.
+
+Whereas @stof is right about the fact that *some* stamps shouldn't be, my opinion is that those which can should directly be attributes. There's no need add an indirection layer here: the most direct implementation would also be the most readable in the end.
+
+---------------------------------------------------------------------------
+
+by pounard at 2024-11-07T13:13:31Z
+
+> This is a big loss for me. I have some stamp like "DeduplicateStamp" or "DelayStamp" which are added by default (because used 99% of the time) but I need the ability to skip them sometimes. I have also stamp which are added based on the size of the data.
+
+OK, I'll stop talking now about attributes, this is not what the issue is about, thanks for answering.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-01-24T11:19:04Z
+
+Hi @derrabus @ro0NL @stof
+
+It's unclear to me how to move this forward.
+Stamp as attribute is a nice feature but should be done in another PR as it's unrealted.
+Therefor I don't think there is a current request change here ; it might just require your review then ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-02-07T10:01:56Z
+
+Hi @ro0NL @derrabus I rework the PR to use a middleware, if you want to review again.
+
+Also I wonder if you have a better name in minde than `SelfStampableInterface` and `Add SelfStampableStampMiddleware`.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-27T16:02:59Z
+
+This would simplify a lot when using DeduplicateStamp with same message in many places
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-06-27T16:05:06Z
+
+> This would simplify a lot when using DeduplicateStamp with same message in many places
+
+That's the reason I implemented both ;)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-06-27T16:44:02Z
+
+@derrabus @ro0NL @stof it's ready to be reviewed.
+
+Friendly ping @OskarStark @nicolas-grekas if you wanna review

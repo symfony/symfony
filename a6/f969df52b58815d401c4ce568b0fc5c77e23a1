@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-09-10T14:04:09Z
+
+> I'm not deprecating the `fixXmlConfig()` - it would be way too early.
+
+I agree. Such deprecation should wait for a future 8.x release happening after the EOM of 6.4 LTS (to avoid issues for bundles wanting to keep support for the 6.4 LTS until its EOM, which is something we should not discourage as that's relevant for a maintained LTS)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-10T14:19:26Z
+
+Comments addressed @stof
+I had to add support for defaultNull on ArrayNode (we used VariableNode as a hack around this limitation for now)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-10T15:11:56Z
+
+FTR, I tried this idea:
+
+> When defining a config tree, any prototyped array node should have a corresponding fixXmlConfig on the parent node. And reciprocally, the plural form given to fixXmlConfig should have a corresponding prototyped array in the children.
+
+<details>
+
+<summary>This is the patch I wrote to do so.</summary>
+
+```diff
+--- a/src/Symfony/Component/Config/Definition/Builder/ArrayNodeDefinition.php
++++ b/src/Symfony/Component/Config/Definition/Builder/ArrayNodeDefinition.php
+@@ -491,6 +491,23 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
+         if (false !== $this->addDefaultChildren) {
+             throw new InvalidDefinitionException(\sprintf('->addDefaultChildrenIfNoneSet() is not applicable to concrete nodes at path "%s".', $path));
+         }
++
++        $pluralFromRemap = isset($this->normalization) ? array_column($this->normalization->remappings, 1) : [];
++
++        foreach ($this->children as $name => $child) {
++            if ($child instanceof self && isset($child->prototype)) {
++                if (!\in_array($name, $pluralFromRemap, true)) {
++                    trigger_deprecation('symfony/config', '7.4', 'Config node "%s" defines a prototyped child "%s" but lacks a matching singular remapping; use the second argument of arrayNode() to define one on that child.', $path, $name);
++                }
++            }
++        }
++
++        foreach ($pluralFromRemap as $plural) {
++            $child = $this->children[$plural] ?? null;
++            if (!$child instanceof self || !isset($child->prototype)) {
++                trigger_deprecation('symfony/config', '7.4', 'Config node "%s" defines a singular remapping for "%s" but has no corresponding prototyped array child.', $path, $plural);
++            }
++        }
+     }
+```
+
+</details>
+
+But this doesn't work in practice:
+- We do have nodes that are defined as prototypes but are only accepted as attributes (thus strings) in the XML This works thanks to a beforeNormalization hook - an example of that is the `framework.trusted_hosts` setting.
+- And we do have array nodes with non-prototype children that do have plural/singular mappings - an example is the `framework.workflows` tree.
+
+Which means this PR is our current best hope to improve the situation and I don't have any follow up in mind.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-09-11T05:19:56Z
+
+I saw you are using `diff` in the PR header for the following example:
+<img width="1534" height="404" alt="CleanShot 2025-09-11 at 07 19 24@2x" src="https://github.com/user-attachments/assets/990e2f10-2384-45c5-9012-3da2d49aef5e" />
+
+but no `+` or `-` were added

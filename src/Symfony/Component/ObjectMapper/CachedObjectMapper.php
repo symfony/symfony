@@ -12,9 +12,9 @@
 namespace Symfony\Component\ObjectMapper;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
+use Symfony\Component\ObjectMapper\Internal\ObjectMapperTrait;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -47,7 +47,6 @@ final class CachedObjectMapper implements ObjectMapperInterface, ObjectMapperAwa
         ?ContainerInterface $transformCallableLocator = null,
         ?ContainerInterface $conditionCallableLocator = null,
         ?ObjectMapperInterface $objectMapper = null,
-        private readonly bool $debug = false,
     ) {
         $this->metadataFactory = $metadataFactory;
         $this->propertyAccessor = $propertyAccessor;
@@ -75,25 +74,20 @@ final class CachedObjectMapper implements ObjectMapperInterface, ObjectMapperAwa
             throw new MappingException(\sprintf('Mapping target class "%s" does not exist for source "%s".', $target, get_debug_type($source)));
         }
 
-        $cacheKey = str_replace(['\\', '/'], '_', $sourceClass.'-to-'.$targetClass);
+        $cacheKey = hash('xxh128', $sourceClass.'-to-'.$targetClass);
 
         if (!isset($this->cachedMappings[$cacheKey])) {
             $cacheFile = $this->cacheDir.'/'.$cacheKey.'.php';
 
-            if (!file_exists($cacheFile) || $this->debug) {
+            if (!is_file($cacheFile)) {
                 $this->fs ??= new Filesystem();
                 $mappingData = $this->getMappingMetadata($source, $targetClass);
                 $code = $this->generateMappingCode($mappingData, $sourceClass, $targetClass);
 
                 $tmpFile = $this->fs->tempnam(\dirname($cacheFile), basename($cacheFile));
-
-                try {
-                    $this->fs->dumpFile($tmpFile, $code);
-                    $this->fs->rename($tmpFile, $cacheFile, true);
-                    $this->fs->chmod($cacheFile, 0o666 & ~umask());
-                } catch (IOException $e) {
-                    throw new MappingException(\sprintf('Failed to write "%s" mapping file.', $cacheFile), previous: $e);
-                }
+                $this->fs->dumpFile($tmpFile, $code);
+                $this->fs->rename($tmpFile, $cacheFile, true);
+                $this->fs->chmod($cacheFile, 0o666 & ~umask());
             }
 
             $this->cachedMappings[$cacheKey] = require $cacheFile;
@@ -301,6 +295,11 @@ final class CachedObjectMapper implements ObjectMapperInterface, ObjectMapperAwa
             }
 
             $lines[] = "{$indentation}if (is_object(\$value) && MappingHelper::hasMappingTarget(\$value, \$metadataFactory)) {";
+            // $lines[] = "{$indentation}    \$value = match (true) {";
+            // $lines[] = "{$indentation}        \$value === \$source => \$target,";
+            // $lines[] = "{$indentation}        \$objectMap->offsetExists(\$value) => \$objectMap[\$value],";
+            // $lines[] = "{$indentation}        default => \$objectMapper->map(\$value),";
+            // $lines[] = "{$indentation}    };";
             $lines[] = "{$indentation}    if (\$value === \$source) {";
             $lines[] = "{$indentation}        \$value = \$target;";
             $lines[] = "{$indentation}    } elseif (\$objectMap->offsetExists(\$value)) {";

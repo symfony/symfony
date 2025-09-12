@@ -9,10 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ObjectMapper;
+namespace Symfony\Component\ObjectMapper\Internal;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
+use Symfony\Component\ObjectMapper\MappingHelper;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -33,14 +34,8 @@ trait ObjectMapperTrait
      *
      * @return list<array{isConstructorParam: bool, mapping: Mapping|null, source: non-empty-string, target: string}>
      */
-    private function analyzeProperties(
-        \ReflectionClass $refl,
-        object $readMetadataFrom,
-        \ReflectionClass $sourceRefl,
-        \ReflectionClass $targetRefl,
-        object $source,
-        array $constructorParams,
-    ): array {
+    private function analyzeProperties(\ReflectionClass $refl, object $readMetadataFrom, \ReflectionClass $sourceRefl, \ReflectionClass $targetRefl, object $source, array $constructorParams): array
+    {
         $properties = [];
         foreach ($refl->getProperties() as $property) {
             if ($property->isStatic()) {
@@ -86,7 +81,7 @@ trait ObjectMapperTrait
         return $properties;
     }
 
-    protected function checkCondition(Mapping $mapping, mixed $value, object $source, ?object $target): bool
+    private function checkCondition(Mapping $mapping, mixed $value, object $source, ?object $target): bool
     {
         if (($if = $mapping->if) && ($fn = MappingHelper::getCallable($if, $this->conditionCallableLocator)) && !MappingHelper::call($fn, $value, $source, $target)) {
             return false;
@@ -95,7 +90,7 @@ trait ObjectMapperTrait
         return true;
     }
 
-    protected function applyTransforms(Mapping $map, mixed $value, object $source, ?object $target): mixed
+    private function applyTransforms(Mapping $map, mixed $value, object $source, ?object $target): mixed
     {
         if (!$transforms = $map->transform) {
             return $value;
@@ -119,7 +114,7 @@ trait ObjectMapperTrait
     /**
      * @param Mapping[] $metadata
      */
-    protected function getMapTarget(array $metadata, mixed $value, object $source, ?object $target): ?Mapping
+    private function getMapTarget(array $metadata, mixed $value, object $source, ?object $target): ?Mapping
     {
         $mapTo = null;
         foreach ($metadata as $mapAttribute) {
@@ -136,7 +131,7 @@ trait ObjectMapperTrait
     /**
      * @return ?\ReflectionClass<object|T>
      */
-    protected function getSourceReflectionClass(object $source): ?\ReflectionClass
+    private function getSourceReflectionClass(object $source): ?\ReflectionClass
     {
         $metadata = $this->metadataFactory->create($source);
         try {

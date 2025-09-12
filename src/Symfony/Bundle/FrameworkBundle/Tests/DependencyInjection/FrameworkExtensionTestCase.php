@@ -2666,6 +2666,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->loadFromExtension('framework', []);
         });
         $this->assertTrue($container->has('object_mapper'));
+        $this->assertTrue($container->has('object_mapper.cached'));
+        $this->assertTrue($container->hasParameter('.object_mapper.cache_dir'));
     }
 
     protected function createContainer(array $data = [])

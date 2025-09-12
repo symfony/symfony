@@ -7,3 +7,6 @@ services:
         public: true
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\TransformCallable:
         autoconfigure: true
+    object_mapper.cached.alias:
+        alias: object_mapper.cached
+        public: true

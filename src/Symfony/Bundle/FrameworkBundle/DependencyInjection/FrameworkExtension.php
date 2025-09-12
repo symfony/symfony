@@ -153,9 +153,6 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
-use Symfony\Component\ObjectMapper\ConditionCallableInterface;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
-use Symfony\Component\ObjectMapper\TransformCallableInterface;
 use Symfony\Component\Process\Messenger\RunProcessMessageHandler;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
@@ -665,12 +662,8 @@ class FrameworkExtension extends Extension
             $loader->load('mime_type.php');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
-            $loader->load('object_mapper.php');
-            $container->registerForAutoconfiguration(TransformCallableInterface::class)
-                ->addTag('object_mapper.transform_callable');
-            $container->registerForAutoconfiguration(ConditionCallableInterface::class)
-                ->addTag('object_mapper.condition_callable');
+        if ($this->readConfigEnabled('object_mapper', $container, $config['object_mapper'])) {
+            $this->registerObjectMapperConfiguration($container, $loader);
         }
 
         $container->registerForAutoconfiguration(PackageInterface::class)
@@ -3576,5 +3569,11 @@ class FrameworkExtension extends Extension
         $composerConfig = json_decode((new Filesystem())->readFile($composerFilePath), true, flags: \JSON_THROW_ON_ERROR);
 
         return isset($composerConfig['extra']['public-dir']) ? $projectDir.'/'.$composerConfig['extra']['public-dir'] : $defaultPublicDir;
+    }
+
+    private function registerObjectMapperConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        $loader->load('object_mapper.php');
+        $container->setParameter('.object_mapper.cache_dir', '%kernel.cache_dir%/object_mapper');
     }
 }

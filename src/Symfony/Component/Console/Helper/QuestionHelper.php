@@ -254,14 +254,18 @@ class QuestionHelper extends Helper
         $r = [$inputStream];
         $w = [];
 
+        // Register signal handler to restore terminal on exit
+        $this->registerTerminalRestoreHandler($sttyMode);
+
         // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
         shell_exec('stty -icanon -echo');
 
         // Add highlighted text style
         $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
 
-        // Read a keypress
-        while (!feof($inputStream)) {
+        try {
+            // Read a keypress
+            while (!feof($inputStream)) {
             while ($isStdin && 0 === @stream_select($r, $w, $w, 0, 100)) {
                 // Give signal handlers a chance to run
                 $r = [$inputStream];
@@ -371,9 +375,10 @@ class QuestionHelper extends Helper
                 $cursor->restorePosition();
             }
         }
-
-        // Reset stty so it behaves normally again
-        shell_exec('stty '.$sttyMode);
+        } finally {
+            // Always restore terminal settings, even if an exception occurs
+            $this->restoreTerminal($sttyMode);
+        }
 
         return $fullChoice;
     }
@@ -590,5 +595,36 @@ class QuestionHelper extends Helper
         }
 
         return $cloneStream;
+    }
+
+    /**
+     * Register signal handlers to restore terminal settings on exit.
+     */
+    private function registerTerminalRestoreHandler(string $sttyMode): void
+    {
+        if (!\function_exists('pcntl_signal') || !$sttyMode) {
+            return;
+        }
+
+        $restoreHandler = function () use ($sttyMode) {
+            shell_exec('stty '.$sttyMode);
+        };
+
+        // Register handlers for common termination signals
+        foreach ([\SIGINT, \SIGQUIT, \SIGTERM, \SIGUSR1, \SIGUSR2] as $signal) {
+            if (\defined($signal)) {
+                pcntl_signal($signal, $restoreHandler);
+            }
+        }
+    }
+
+    /**
+     * Restore terminal settings.
+     */
+    private function restoreTerminal(string $sttyMode): void
+    {
+        if ($sttyMode) {
+            shell_exec('stty '.$sttyMode);
+        }
     }
 }

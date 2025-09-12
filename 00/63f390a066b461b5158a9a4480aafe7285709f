@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-04-04T05:02:58Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-04T08:41:53Z
+
+this new store should probably in a bridge package, so that we can manage its dependency properly.
+
+---------------------------------------------------------------------------
+
+by natepage at 2025-04-09T06:00:30Z
+
+@stof Thank you for your feedback, I did move it to its own bridge, I'm not sure if I've done everything required from a structural POV.
+
+I still didn't touch the tests yet
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-04-09T10:14:22Z
+
+> this new store should probably in a bridge package, so that we can manage its dependency properly.
+
+While I agree on that @stof, right now there is no Bridge namespace:
+![CleanShot 2025-04-09 at 12 14 02@2x](https://github.com/user-attachments/assets/07a2ca59-f4ff-42fc-9973-661ac9b4c7b5)
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-09T10:37:31Z
+
+@OskarStark this does not prevent us from _adding_ it if we need it.
+
+---------------------------------------------------------------------------
+
+by natepage at 2025-04-09T10:41:16Z
+
+@stof @OskarStark thank you for taking the time to review this 😄
+
+I've actually updated the PR to add this Bridge namespace following the structure from the Messenger SQS example, but the package validation is failing and I'm unsure why as I've placed the composer.json file exactly in the same level as the Messenger SQS one, trying to investigate that right now
+
+---------------------------------------------------------------------------
+
+by natepage at 2025-04-09T10:55:49Z
+
+Yay! Package checks are passing, the match case for `component_bridge` wasn't behaving as expected, back onto PHP tests 😄
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-04-09T11:00:50Z
+
+Yes, we need to keep in mind, that we need to configure a proper split for the repo etc.
+
+---------------------------------------------------------------------------
+
+by natepage at 2025-04-10T12:42:26Z
+
+@stof @OskarStark
+
+The current state of this is:
+
+- Moved the logic into its own component bridge
+- Implemented integration tests by using localstack in CI to have a local DynamoDB instance
+- Updated the default options logic based on feedback
+- Implemented unit tests for the store constructor logic (DSN/Options)
+
+I have re-requested your reviews, thank you 😄
+
+---------------------------------------------------------------------------
+
+by natepage at 2025-05-23T02:07:10Z
+
+Hi there! 👋
+I'm sure everybody is quite busy prepping for 7.3 release, but just a gentle follow up on this one,
+I would like to know if anything else is needed from me so I can organise myself to have time to spend on this, thank you 😄

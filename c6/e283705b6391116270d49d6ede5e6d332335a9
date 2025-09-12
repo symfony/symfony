@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-08-25T11:23:30Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by philpichet at 2025-08-25T11:26:26Z
+
+After some research, the 'best' practice is to send only one raw with all value comma separated. But I found that Symfony handle some values of Vary by default.
+
+Should I also open a PR to send only one row ?
+
+---------------------------------------------------------------------------
+
+by philpichet at 2025-09-05T19:13:09Z
+
+Should I remove this part
+```
+This code is partially based on the Rack-Cache library by Ryan Tomayko,
+ * which is released under the MIT license.
+ ```
+ that break the CI ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-05T19:30:42Z
+
+That's a false-positive, it should be ignored. Thanks for the follow up, I'll have a look ASAP.
+
+---------------------------------------------------------------------------
+
+by philpichet at 2025-09-08T18:28:37Z
+
+I think we can remove the check part on headers.
+The function `requestMatch` do it for use with this
+```
+$v1 = $env1[$key] ?? null;
+            $v2 = $env2[$key] ?? null;
+            if ($v1 !== $v2) {
+                return false;
+            }
+```
+
+- case 1:
+Two request with the header `Foo: foo` returning the same headers ( not specially the same body)
+````
+< HTTP/1.1 200 OK
+< Content-Type: application/json
+< Vary: Accept-Encoding
+< Vary: Foo
+< Content-Length: 1234
+```
+$v1 === $v2 : remove old response and keep last
+
+- case 2:
+Two request with the header request1 `Foo: foo` and request2 `Foo:bar`
+````
+< HTTP/1.1 200 OK
+< Content-Type: application/json
+< Vary: Accept-Encoding
+< Vary: Foo
+< Content-Length: 1234
+```
+$v1 !== $v2 : remove old response and keep last
+
+- case 3:
+Two requests with on first request `Foo:bar` and last `FooBar: fooBar` and  responses :
+1 :
+````
+< HTTP/1.1 200 OK
+< Content-Type: application/json
+< Vary: Accept-Encoding
+< Vary: Foo
+< Content-Length: 1234
+```
+2 :
+````
+< HTTP/1.1 200 OK
+< Content-Type: application/json
+< Vary: Accept-Encoding
+< Vary: FooBar
+< Content-Length: 1234
+```
+$v1 = null and $v2 = 'fooBar`
+$v1 !== $v2 :keep previous response as Foobar don't exist.
+
+What do you think of this ? Am I missing something in my reflection ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-09T15:52:55Z
+
+Please update the patch as you see fit, I prefer reviewing patches :)

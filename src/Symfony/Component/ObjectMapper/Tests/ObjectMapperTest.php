@@ -281,9 +281,16 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame($b->lastName, 'arakusa');
     }
 
-    #[DataProvider('serviceLocatorObjectMapperProvider')]
-    public function testServiceLocator(ObjectMapperInterface $objectMapper)
+    public function testServiceLocator()
     {
+        $conditionCallableLocator = self::getServiceLocator([ConditionCallable::class => new ConditionCallable()]);
+        $transformCallableLocator = self::getServiceLocator([TransformCallable::class => new TransformCallable()]);
+
+        $objectMapper = new ObjectMapper(
+            conditionCallableLocator: $conditionCallableLocator,
+            transformCallableLocator: $transformCallableLocator,
+        );
+
         $a = new ServiceLocatorA();
         $a->foo = 'nok';
 
@@ -314,25 +321,6 @@ final class ObjectMapperTest extends TestCase
                 return $this->factories[$id];
             }
         };
-    }
-
-    /**
-     * @return iterable<array{0: ObjectMapperInterface}>
-     */
-    public static function serviceLocatorObjectMapperProvider(): iterable
-    {
-        $conditionCallableLocator = self::getServiceLocator([ConditionCallable::class => new ConditionCallable()]);
-        $transformCallableLocator = self::getServiceLocator([TransformCallable::class => new TransformCallable()]);
-
-        yield [new ObjectMapper(
-            conditionCallableLocator: $conditionCallableLocator,
-            transformCallableLocator: $transformCallableLocator,
-        )];
-        yield [new CachedObjectMapper(
-            self::getCacheDir(),
-            conditionCallableLocator: $conditionCallableLocator,
-            transformCallableLocator: $transformCallableLocator,
-        )];
     }
 
     #[DataProvider('objectMapperProvider')]

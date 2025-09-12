@@ -12,6 +12,7 @@
 namespace Symfony\Component\ObjectMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\ObjectMapper\CachedObjectMapper;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
@@ -22,6 +23,10 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassWithoutTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\D;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\A as ServiceLocatorA;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\B as ServiceLocatorB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\ConditionCallable;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\TransformCallable;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SimpleSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SimpleTarget;
 
@@ -87,10 +92,11 @@ final class CachedObjectMapperTest extends TestCase
         $source->foo = 'test';
 
         $result = $mapper->map($source);
-        $this->assertFileExists(self::getCacheDir().'/'.
-            str_replace(['\\', '/'], '_', SimpleSource::class.'-to-'.SimpleTarget::class).'.php');
+        $fileName = hash('xxh128', SimpleSource::class.'-to-'.SimpleTarget::class).'.php';
+        $this->assertFileExists(self::getCacheDir().'/'.$fileName);
         $this->assertInstanceOf(SimpleTarget::class, $result);
         $this->assertEquals('test', $result->bar);
+        $this->assertEquals(file_get_contents(__DIR__.'/Fixtures/generated/'.$fileName), file_get_contents(self::getCacheDir().'/'.$fileName));
     }
 
     public function testCacheIsReused()
@@ -195,5 +201,49 @@ final class CachedObjectMapperTest extends TestCase
     public static function getStdClass(): \stdClass
     {
         return new \stdClass();
+    }
+
+    public function testServiceLocator()
+    {
+        $fileName = hash('xxh128', ServiceLocatorA::class.'-to-'.ServiceLocatorB::class).'.php';
+        $conditionCallableLocator = self::getServiceLocator([ConditionCallable::class => new ConditionCallable()]);
+        $transformCallableLocator = self::getServiceLocator([TransformCallable::class => new TransformCallable()]);
+
+        $objectMapper = new CachedObjectMapper(
+            self::getCacheDir(),
+            conditionCallableLocator: $conditionCallableLocator,
+            transformCallableLocator: $transformCallableLocator,
+        );
+        $a = new ServiceLocatorA();
+        $a->foo = 'nok';
+
+        $b = $objectMapper->map($a);
+        $this->assertSame($b->bar, 'notmapped');
+        $this->assertInstanceOf(ServiceLocatorB::class, $b);
+
+        $a->foo = 'ok';
+        $b = $objectMapper->map($a);
+        $this->assertInstanceOf(ServiceLocatorB::class, $b);
+        $this->assertSame($b->bar, 'transformedok');
+        $this->assertEquals(file_get_contents(__DIR__.'/Fixtures/generated/'.$fileName), file_get_contents(self::getCacheDir().'/'.$fileName));
+    }
+
+    private static function getServiceLocator(array $factories): ContainerInterface
+    {
+        return new class($factories) implements ContainerInterface {
+            public function __construct(private array $factories)
+            {
+            }
+
+            public function has(string $id): bool
+            {
+                return isset($this->factories[$id]);
+            }
+
+            public function get(string $id): mixed
+            {
+                return $this->factories[$id];
+            }
+        };
     }
 }

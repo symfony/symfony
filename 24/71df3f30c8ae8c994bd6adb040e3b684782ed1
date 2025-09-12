@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-09-10T17:38:28Z
+
+This should also be done on `ControllerArgumentsEvent`, which has a proxy method
+
+---------------------------------------------------------------------------
+
+by stof at 2025-09-10T19:25:11Z
+
+And as this is not fixing a bug but improving type declarations for static analysis, it should target the 7.4 branch.
+
+---------------------------------------------------------------------------
+
+by 7-zete-7 at 2025-09-11T18:56:39Z
+
+Thanks for the review!
+
+I'll make the suggested edits tomorrow.

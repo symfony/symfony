@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use PhpParser\Parser;
@@ -3575,5 +3576,24 @@ class FrameworkExtension extends Extension
     {
         $loader->load('object_mapper.php');
         $container->setParameter('.object_mapper.cache_dir', '%kernel.cache_dir%/object_mapper');
+
+		if (!$container->getParameter('kernel.debug')) {
+            $container->registerAttributeForAutoconfiguration(Map::class, function (ChildDefinition $definition, Constraint $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflector) {
+                if (!$reflector instanceof \ReflectionClass) {
+                    return;
+                }
+
+                $cl = $reflector->getName();
+                $source = $attribute->source ?? $cl;
+                $target = $attribute->target ?? $cl;
+
+                if ($source !== $target) {
+                    $definition->addTag('object_mapper.attribute_metadata', [
+                        'source' => $source,
+                        'target' => $target,
+                    ]);
+                }
+            });
+        }
     }
 }

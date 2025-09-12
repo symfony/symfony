@@ -110,6 +110,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'workflow',
         'object_mapper.transform_callable',
         'object_mapper.condition_callable',
+        'object_mapper.attribute_metadata',
     ];
 
     public function process(ContainerBuilder $container): void

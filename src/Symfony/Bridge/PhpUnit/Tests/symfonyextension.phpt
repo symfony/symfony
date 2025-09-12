@@ -21,6 +21,7 @@ Time: %s, Memory: %s
 OK, but there were issues!
 Tests: 76, Assertions: 76, Deprecations: 1.
 
+
 PHPUnit %s
 
 Runtime:       PHP %s

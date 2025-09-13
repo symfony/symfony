@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by doMynation at 2025-09-03T15:07:41Z
+
+Bumping this, as that would IMO be a great addition to the framework. Preparing the request with some session data before the request is emitted can be very useful to mock previous user interactions in multi-step operations.
+
+---------------------------------------------------------------------------
+
+by cyve at 2025-09-06T15:23:43Z
+
+I added a PR in the documentation : https://github.com/symfony/symfony-docs/pull/21352

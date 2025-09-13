@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2025-09-12T06:40:06Z
+
+Hi @HypeMC,
+
+The proposed fix may cause other issues.
+To me `%b` adds nothing here and it not only breaks the FQDN but also paths (especially on Windows). regex or JSON could be broken but not sure they are used here.
+
+What if we completely remove this line and rely on the loop instead?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-09-12T15:04:41Z
+
+ @Spomky Hi.
+
+> The proposed fix may cause other issues.
+
+Do you have any examples you could share?
+
+> but also paths (especially on Windows).
+
+Have you experienced problems with paths on any other OS?
+
+> What if we completely remove this line and rely on the loop instead?
+
+I haven't tested it, but that might reintroduce the original issue #43665 tried to fix.

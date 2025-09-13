@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-11T12:17:17Z
+
+Thanks for the PR. Can you please expand on the motivations for this change?
+
+---------------------------------------------------------------------------
+
+by ker0x at 2025-09-11T13:53:28Z
+
+The sole reason for this PR is to reduce maintenance costs. Both [button_widget](https://github.com/symfony/symfony/blob/7.4/src/Symfony/Bridge/Twig/Resources/views/Form/form_div_layout.html.twig#L228) and [form_label_content](https://github.com/symfony/symfony/blob/7.4/src/Symfony/Bridge/Twig/Resources/views/Form/form_div_layout.html.twig#L303) share the same code to render the label

@@ -1,0 +1,154 @@
+---------------------------------------------------------------------------
+
+by santysisi at 2025-05-09T22:43:16Z
+
+Hi 👋
+I'll update this version [7.3](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bundle/SecurityBundle/composer.json#L31) to `7.4` once the new minor dev version is released.
+
+Edit: I updated this [version](https://github.com/symfony/symfony/pull/60395/files#diff-7d688544a05114818e70f6104ac2e13702eb2f2f0710f4fcb97d2182e7fb2d87L21) to 7.3 because I need this [method](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Component/HttpFoundation/UriSigner.php#L119) from `UriSigner`.
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-05-12T13:45:53Z
+
+This is looking great @santysisi! I'll give it a more thorough review after 7.3 is released.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-05-19T04:37:22Z
+
+We could also consider adding an extra argument to the attribute called `methods` to restrict the validation to specific HTTP methods. This would align with the current behavior of the [IsCsrfTokenValid](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Component/Security/Http/Attribute/IsCsrfTokenValid.php#L34) attribute.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-05-30T03:40:30Z
+
+> We could also consider adding an extra argument to the attribute called `methods` to restrict the validation to specific HTTP methods. This would align with the current behavior of the [IsCsrfTokenValid](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Component/Security/Http/Attribute/IsCsrfTokenValid.php#L34) attribute.
+
+> Hi 👋 I'll update this version [7.3](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Bundle/SecurityBundle/composer.json#L31) to `7.4` once the new minor dev version is released.
+>
+> Edit: I updated this [version](https://github.com/symfony/symfony/pull/60395/files#diff-7d688544a05114818e70f6104ac2e13702eb2f2f0710f4fcb97d2182e7fb2d87L21) to 7.3 because I need this [method](https://github.com/symfony/symfony/blob/7.3/src/Symfony/Component/HttpFoundation/UriSigner.php#L119) from `UriSigner`.
+
+ready these 2 changes :rocket:
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-06-05T01:26:36Z
+
+I believe the error is not relevant 🤔
+I only rebased the branch to resolve some conflicts, so there shouldn't be any functional changes introduced.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-06-07T05:09:52Z
+
+Hi @nicolas-grekas  👋,
+
+Thanks so much for all your suggestions. I really appreciate them ❤️
+I believe everything is now addressed. Please let me know if there's anything else I should change!
+
+Thanks again! ❤️
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-06-28T17:51:17Z
+
+Hi @stof , thanks for your suggestion!
+I've made the changes accordingly, let me know if there's anything else you'd like me to adjust.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-07-08T07:42:05Z
+
+I think it should be possible to specify a `signer` service on the attribute, in case you have different signers with different secrets.
+
+```php
+#[IsSignatureValid(signer: 'my_custom_signer_service']
+public function someAction(): Response
+```
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-08T22:49:02Z
+
+> I think it should be possible to specify a `signer` service on the attribute, in case you have different signers with different secrets.
+>
+> ```
+> #[IsSignatureValid(signer: 'my_custom_signer_service']
+> public function someAction(): Response
+> ```
+
+I really like the idea! :heart:
+
+Maybe we could add a `CompilerPass` to create a `ServiceLocator` for the `IsSignatureValidAttributeListener`, containing the available `UriSigner` services. If the developer provides the optional `signer` argument, we could look it up in the locator. If it doesn’t exist, we can throw a meaningful error.
+
+The only thing I’m unsure about is whether this approach is allowed, since currently there are no `CompilerPasses` in the `symfony/security-http` component :thinking:
+
+But if others agree, I’d be happy to implement this change
+I really like the direction! :heart:
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-12T19:54:18Z
+
+Hi @ruudk 👋 Thanks so much for your suggestions ❤️
+I think it's a really good idea 🚀
+I've made the necessary changes to implement it 💪
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-12T19:54:59Z
+
+status: needs review
+
+I think the error in the test is not relevant in the context of the PR
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-07-15T19:26:12Z
+
+Awesome, let's wait for some others to take a look. As I said, I *think* tagged services is the way to go but maybe someone has a different idea.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-07-18T06:54:54Z
+
+I did not go over all comments, but for me it looks false this live inside `Security` namespace.
+
+The UriSigner I can use currently without any SecurityBundle / Security services, so from my point of view the attribute should work also without any security related service and be more part of the FrameworkBundle like the UriSigner service itself.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-19T19:45:47Z
+
+> I did not go over all comments, but for me it looks false this live inside `Security` namespace.
+>
+> The UriSigner I can use currently without any SecurityBundle / Security services, so from my point of view the attribute should work also without any security related service and be more part of the FrameworkBundle like the UriSigner service itself.
+
+Hi 👋 First of all, thank you very much for your comment 😊
+
+You're right. When I started working on this feature, I saw this new attribute as something similar to `IsGranted` or `IsCsrfTokenValid`, which is why I initially placed it in the `symfony/security-http` component and the `symfony/security-bundle` bundle.
+
+However, you're right that `UriSigner` resides in the `symfony/http-foundation` component and can be used without the `symfony/security-bundle` or any other security components. Therefore, it would make more sense for this attribute to reside in `HttpFoundation` and be part of the `FrameworkBundle` instead of the `SecurityBundle`.
+
+Thanks again for the comment!
+
+What do you think, @kbond?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-07-21T14:20:28Z
+
+Yeah, this is a good point. I wonder if `http-kernel` would be the better spot? This component has other controller-related attributes/listeners.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-07-21T14:45:03Z
+
+@kbond HttpKernel sounds good for me if I look at the attributes there: https://github.com/symfony/symfony/tree/7.4/src/Symfony/Component/HttpKernel/Attribute
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-21T22:42:14Z
+
+Moved the attribute to the `HttpKernel` component :smile:

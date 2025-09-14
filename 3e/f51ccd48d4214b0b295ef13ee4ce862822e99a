@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2025-06-11T12:51:52Z
+
+> this should have a GitHub Actions workflow running the tool in CI, otherwise it won't be enforced.
+
+totally agree,
+the main idea here is really to see how it behaves on the codebase as per issue comment
+
+> and does not require a mention in changelog either
+
+top make sens, lets not add it and update the desc
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-06-12T07:24:08Z
+
+i do think I've addressed the comments (standard to chose, exclude fixtures, and composer min)
+
+for the adding ci, I am not so aware of best practice of it (when no vendor lock) so please review appreciated
+(inspired by the psalm one and some reading)
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-06-25T10:08:50Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-07-13T12:45:49Z
+
+Should I change something in the actual config fixer or we are aligned with current conf ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-07-13T15:33:58Z
+
+> Should I change something in the actual config fixer or we are aligned with current conf ?
+
+I still think we should keep `{token: token}` in core.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-07-14T17:29:33Z
+
+> > Should I change something in the actual config fixer or we are aligned with current conf ?
+>
+> I still think we should keep `{token: token}` in core.
+
+I think it's the case in the PR.
+The default ruleset keeps `{token: token}`
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-07-15T09:57:16Z
+
+Indeed, actual config looks relevant as per symfony twig style :)
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-07-26T07:33:18Z
+
+Rebase needed due to recent twig files change
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-08-07T09:28:25Z
+
+Rebased and updated tool to latest
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-08-07T09:42:20Z
+
+Ci is failing, especially https://github.com/symfony/symfony/actions/runs/16800582091/job/47580841817?pr=60761
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-08-07T10:10:17Z
+
+I think the issue is with your PR title

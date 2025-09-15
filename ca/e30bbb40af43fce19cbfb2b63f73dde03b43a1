@@ -1,0 +1,115 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-08-09T00:46:08Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-09T18:25:04Z
+
+If we want to avoid changing the priority, we can add a condition to check whether the request has the _vary_by_language attribute set to true, and the response's Vary header contains only Accept-Language.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-19T14:47:59Z
+
+> check whether the request has the _vary_by_language
+
+let's do this, so that this won't interfere with app's listeners
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-20T02:28:34Z
+
+status: needs work
+
+There is a problem, i will try to resolve that problem tomorrow
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-22T22:18:08Z
+
+status: needs review
+
+The problem was resolved by sending the 'Accept-Language' header at the end
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-08-27T09:19:08Z
+
+Many thanks @santysisi.
+Looks good to me. I have just one question: how `Vary: *` is covered?
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-27T22:00:09Z
+
+Thanks for the review! 🙌
+
+Regarding [`Vary: *`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Vary#sect), I don't think it's currently covered.
+
+I tested it locally, and it seems that when the response includes `Vary: *`, it still gets cached. I'm not sure if that's a bug or expected behavior, but it happens regardless of this PR, so it doesn't appear to be introduced by these changes.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-08-28T07:55:11Z
+
+I found in [RFC9111 section4.1](https://datatracker.ietf.org/doc/html/rfc9111#section-4.1) the following sentence: `A stored response with a Vary header field value containing a member "*" always fails to match.`.
+So I understand `Vary *` should be treated as a relevant case and left untouched (no append).
+
+May I suggest to add 2 test cases.
+
+```php
+    yield 'vary * (no append) — vary_by_language=true' => [
+        'responseVary'   => ['*'],
+        'cacheVary'      => ['X-Foo'],
+        'varyByLanguage' => true,
+        'expectedVary'   => ['*'],
+    ];
+
+    yield 'vary * (no append) — vary_by_language=false' => [
+        'responseVary'   => ['*'],
+        'cacheVary'      => ['X-Foo'],
+        'varyByLanguage' => false,
+        'expectedVary'   => ['*'],
+    ];
+```
+
+Edit: and `hasRelevantVaryHeader` to directly return `true` if `*` is present.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-08-28T22:13:34Z
+
+Hey, thanks a lot for your suggestions! The change has been made
+
+Edit: I'm not sure if it's necessary to add the modification to the `hasRelevantVaryHeader` method to directly return `true` when `*` is present. With the current condition, I believe it already returns true in that case (your suggested test seems to confirm that behavior, thanks again for the suggestion! :heart: ). But if you still think the change is needed, I'm happy to update it! :smile:
+
+---------------------------------------------------------------------------
+
+by cdaguerre at 2025-09-04T13:33:02Z
+
+This should also fix: https://github.com/symfony/symfony/issues/58663
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-09-05T22:23:40Z
+
+Hi! Thanks a lot for your suggestions. I’ve made the changes you recommended.
+Please let me know if there’s anything else needed.
+Thanks again! ❤️
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-09-08T22:19:08Z
+
+Hi Nicolas, thanks a lot for your suggestions! :heart:
+The changes have been made. Please let me know if there's anything else you'd like to adjust

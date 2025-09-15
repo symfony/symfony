@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-15T12:11:30Z
+
+I'd rather bump the min version of Yaml, the changes were on purpose to me, to ensure these alternatives worked.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-15T12:18:27Z
+
+Maybe the issue then is that #60204 added two new features (glob and enum support) and we only test on of them no matter how we build the fixtures. I'm gonna create a second test to test both features properly.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-15T13:18:09Z
+
+Status: Needs Review

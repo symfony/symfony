@@ -102,6 +102,7 @@ use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpFoundation\UriSignerInterface;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
@@ -767,8 +768,16 @@ class FrameworkExtension extends Extension
             ->addTag('mime.mime_type_guesser');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
-        $container->registerForAutoconfiguration(UriSigner::class)
-            ->addTag('kernel.uri_signer');
+        if (!interface_exists(UriSignerInterface::class)) {
+            $container->removeAlias(UriSignerInterface::class);
+            $container->registerForAutoconfiguration(UriSigner::class)
+                ->addTag('kernel.uri_signer');
+        } else {
+            $container->getAlias(UriSigner::class)
+                ->setDeprecated('symfony/framework-bundle', '7.4', 'The "%alias_id%" autowiring alias is deprecated and will be removed in 8.0, use "UriSignerInterface" instead.');
+            $container->registerForAutoconfiguration(UriSignerInterface::class)
+                ->addTag('kernel.uri_signer');
+        }
 
         $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
             $tagAttributes = get_object_vars($attribute);

@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpFoundation\UriSignerInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpCache\SurrogateInterface;
 
@@ -33,7 +33,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     public function __construct(
         private ?SurrogateInterface $surrogate,
         private FragmentRendererInterface $inlineStrategy,
-        private ?UriSigner $signer = null,
+        private ?UriSignerInterface $signer = null,
     ) {
     }
 

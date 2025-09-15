@@ -12,6 +12,7 @@ CHANGELOG
  * Add `framework.type_info.aliases` option
  * Add `KernelBrowser::getSession()`
  * Add autoconfiguration tag `kernel.uri_signer` to `Symfony\Component\HttpFoundation\UriSigner`
+ * Add `UriSignerInterface` as an alias of the `uri_signer` service
 
 7.3
 ---

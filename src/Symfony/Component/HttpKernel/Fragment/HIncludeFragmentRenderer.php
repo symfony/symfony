@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpFoundation\UriSignerInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Twig\Environment;
 
@@ -29,7 +29,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      */
     public function __construct(
         private ?Environment $twig = null,
-        private ?UriSigner $signer = null,
+        private ?UriSignerInterface $signer = null,
         private ?string $globalDefaultTemplate = null,
         private string $charset = 'utf-8',
     ) {

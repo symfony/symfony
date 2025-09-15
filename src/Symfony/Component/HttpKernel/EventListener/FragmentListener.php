@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpFoundation\UriSignerInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -37,7 +37,7 @@ class FragmentListener implements EventSubscriberInterface
      * @param string $fragmentPath The path that triggers this listener
      */
     public function __construct(
-        private UriSigner $signer,
+        private UriSignerInterface $signer,
         private string $fragmentPath = '/_fragment',
     ) {
     }

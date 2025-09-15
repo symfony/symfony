@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpFoundation\UriSignerInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
@@ -26,7 +26,7 @@ final class FragmentUriGenerator implements FragmentUriGeneratorInterface
 {
     public function __construct(
         private string $fragmentPath,
-        private ?UriSigner $signer = null,
+        private ?UriSignerInterface $signer = null,
         private ?RequestStack $requestStack = null,
     ) {
     }

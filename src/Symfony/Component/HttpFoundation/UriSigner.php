@@ -14,14 +14,13 @@ namespace Symfony\Component\HttpFoundation;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Exception\ExpiredSignedUriException;
 use Symfony\Component\HttpFoundation\Exception\LogicException;
-use Symfony\Component\HttpFoundation\Exception\SignedUriException;
 use Symfony\Component\HttpFoundation\Exception\UnsignedUriException;
 use Symfony\Component\HttpFoundation\Exception\UnverifiedSignedUriException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class UriSigner
+class UriSigner implements UriSignerInterface
 {
     private const STATUS_VALID = 1;
     private const STATUS_INVALID = 2;
@@ -94,10 +93,6 @@ class UriSigner
         return $this->buildUrl($url, $params);
     }
 
-    /**
-     * Checks that a URI contains the correct hash.
-     * Also checks if the URI has not expired (If you used expiration during signing).
-     */
     public function check(string $uri): bool
     {
         return self::STATUS_VALID === $this->doVerify($uri);
@@ -108,14 +103,6 @@ class UriSigner
         return self::STATUS_VALID === $this->doVerify(self::normalize($request));
     }
 
-    /**
-     * Verify a Request or string URI.
-     *
-     * @throws UnsignedUriException         If the URI is not signed
-     * @throws UnverifiedSignedUriException If the signature is invalid
-     * @throws ExpiredSignedUriException    If the URI has expired
-     * @throws SignedUriException
-     */
     public function verify(Request|string $uri): void
     {
         $uri = self::normalize($uri);

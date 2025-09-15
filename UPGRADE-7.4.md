@@ -44,6 +44,7 @@ FrameworkBundle
 ---------------
 
  * Deprecate `Symfony\Bundle\FrameworkBundle\Console\Application::add()` in favor of `addCommand()`
+ * Deprecate the `UriSigner` autowiring aliases, use `UriSignerInterface` instead
 
 HtmlSanitizer
 -------------

@@ -37,6 +37,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpFoundation\UriSignerInterface;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
@@ -164,6 +165,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->lazy()
         ->alias(UriSigner::class, 'uri_signer')
+        ->alias(UriSignerInterface::class, 'uri_signer')
 
         ->set('config_cache_factory', ResourceCheckerConfigCacheFactory::class)
             ->args([

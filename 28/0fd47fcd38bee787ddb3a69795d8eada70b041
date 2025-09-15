@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-15T12:30:29Z
+
+cc @santysisi
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-09-15T13:03:31Z
+
+In my opinion, this is a good feature, giving developers the ability to choose which `UriSigner` to use adds flexibility. I know it’s a niche use case, but I personally appreciate having that option.
+
+For context, I’ve been working in another [PR](https://github.com/symfony/symfony/pull/61747)
+
+Also, just as a reference, the [#[AsEventListener]](https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/EventDispatcher/Attribute/AsEventListener.php) attribute already allows choosing a specific dispatcher via its dispatcher argument
+
+But if this cc was just to confirm the change is okay. I think it is! 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-15T13:07:23Z
+
+@santysisi it does give that flexibility, but would you have a concrete use case? We're not looking for nice to haves but for actually useful features ;)

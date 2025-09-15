@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-12T11:57:42Z
+
+> like one more step: when this is used, the marking store should pass the enum instance to the object instead of the string.
+
+Of course! I commented the @tucksaun PR!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-04-12T15:39:06Z
+
+Maybe it's a naive question: would it be hard to also support UnitEnums? Recent implementations to support enums in workflow seem way simpler than what I tried a few years ago, so maybe UnitEnum wouldn't be a big deal now?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-13T07:57:42Z
+
+I think it would be hard. And with unit enum, i fail to see what you save in your db
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-14T08:35:44Z
+
+Thinking about it, I'll need to rework a bit the PR. We'll need to store the fact it's an enum in the configuration, to be able to configure the marking store. ATM, we convert the enum in the configuration class, and it's too early and we loose the information
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2025-04-14T10:27:46Z
+
+@lyrixx nice work! This is similar to something I quickly tried and it seemed to work well.
+
+> We'll need to store the fact it's an enum in the configuration, to be able to configure the marking store.
+
+Do we? I mean, we have to if we want to enforce integrity end-to-end. So does that mean we want to go with an enum-dedicated marking store that we configure automatically when one uses an enum like proposed here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-16T08:58:56Z
+
+I think so yes: when places is configured to an enum class, we should only support storing enums.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-09T13:39:44Z
+
+> We'll need to store the fact it's an enum in the configuration
+
+@lyrixx don't miss this part ;)
+
+---------------------------------------------------------------------------
+
+by kira0269 at 2025-08-13T13:32:17Z
+
+Hello everyone !
+
+I have been following this "Enum support" topic for a while since I often use the Workflow component.
+
+One argument someone gave me **against** enum support is that using an enum as closed list of places does not allow to extend it.
+
+I really like this PR for what it brings: improve DX without reducing possibilities.
+
+I'd like to point out a possible issue: what happen for workflows (not state machines) with multiple states at a time ?
+Imagine the following situation:
+
+```php
+enum PlacesA: string
+{
+    case PlaceOne = 'place_one';
+    case PlaceTwo = 'place_two';
+}
+
+enum PlacesB: string
+{
+    case PlaceStart = 'place_one';
+    case PlaceEnd = 'place_two';
+}
+
+$marking = new Marking();
+$marking->mark(PlacesA::PlaceOne->value);  // $marking->getPlaces() = ['place_one' => 1]
+$marking->mark(PlacesB::PlaceStart->value); // $marking->getPlaces() = ['place_one' => 2]
+```
+
+It's not possible since the subject must return a valid marking representation (like ['string' => 1, '...']).
+Maybe implementing a new `EnumMarkingStore` and a `EnumMarking` could be the solution instead of trying to mix everything ?
+
+WDYT ?

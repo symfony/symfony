@@ -17,10 +17,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
+use Symfony\Component\Security\Http\Exception\InvalidCsrfTokenException;
 
 /**
  * Handles the IsCsrfTokenValid attribute on controllers.
@@ -70,7 +70,7 @@ final class IsCsrfTokenValidAttributeListener implements EventSubscriberInterfac
             null === $tokenValue
             || !$this->csrfTokenManager->isTokenValid(new CsrfToken($id, $tokenValue))
         ) {
-            throw new InvalidCsrfTokenException('Invalid CSRF token.');
+            throw new InvalidCsrfTokenException();
         }
     }
 

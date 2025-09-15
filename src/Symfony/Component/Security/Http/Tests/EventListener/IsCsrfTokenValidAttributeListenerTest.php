@@ -22,11 +22,12 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\EventListener\IsCsrfTokenValidAttributeListener;
+use Symfony\Component\Security\Http\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsCsrfTokenValidAttributeController;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsCsrfTokenValidAttributeMethodsController;
 
@@ -224,6 +225,30 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 
         $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);
         $listener->onKernelControllerArguments($event);
+    }
+
+    public function testTheThrownExceptionCarriesA403StatusAndIsNotAnAuthenticationFailure()
+    {
+        $request = new Request([], ['_token' => 'bar']);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsCsrfTokenValidAttributeMethodsController(), 'withInvalidTokenKey'],
+            [],
+            $request,
+            null
+        );
+
+        $listener = new IsCsrfTokenValidAttributeListener($this->createStub(CsrfTokenManagerInterface::class));
+
+        try {
+            $listener->onKernelControllerArguments($event);
+            $this->fail('Expected an InvalidCsrfTokenException.');
+        } catch (InvalidCsrfTokenException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+            // an AuthenticationException would be turned into a login redirect by the firewall
+            $this->assertNotInstanceOf(AuthenticationException::class, $e);
+        }
     }
 
     public function testIsCsrfTokenValidThrowExceptionWhenInvalidMatchingToken()

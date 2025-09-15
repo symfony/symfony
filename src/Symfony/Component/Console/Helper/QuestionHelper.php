@@ -254,18 +254,52 @@ class QuestionHelper extends Helper
         $r = [$inputStream];
         $w = [];
 
-        // Register signal handler to restore terminal on exit
-        $this->registerTerminalRestoreHandler($sttyMode);
-
         // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
         shell_exec('stty -icanon -echo');
+
+        // Prepare terminal restore function and safety shutdown hook
+        $restored = false;
+        $restoreTerminal = function () use (&$restored, $sttyMode) {
+            if ($restored) {
+                return;
+            }
+            shell_exec('stty '.$sttyMode);
+            $restored = true;
+        };
+        register_shutdown_function($restoreTerminal);
+
+        // Save and install temporary signal handlers that restore TTY then delegate
+        $signalSupport = \function_exists('pcntl_async_signals') && \function_exists('pcntl_signal') && \function_exists('pcntl_signal_get_handler');
+        $installedSignals = [];
+        $previousHandlers = [];
+        if ($signalSupport) {
+            pcntl_async_signals(true);
+            $signals = [\SIGINT];
+            foreach ($signals as $sig) {
+                $previousHandlers[$sig] = @pcntl_signal_get_handler($sig);
+                $installedSignals[] = $sig;
+                pcntl_signal($sig, function (int $signo) use ($restoreTerminal, &$previousHandlers, $output) {
+                    if ($signo === \SIGINT) {
+                        $output->writeln('^C');
+                    }
+                    $restoreTerminal();
+                    $handler = $previousHandlers[$signo] ?? \SIG_DFL;
+                    if (\is_callable($handler)) {
+                        $handler($signo);
+                        return;
+                    }
+                    if ($handler === \SIG_DFL) {
+                        exit(128 + $signo);
+                    }
+                });
+            }
+        }
 
         // Add highlighted text style
         $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
 
-        try {
-            // Read a keypress
-            while (!feof($inputStream)) {
+        // Read a keypress
+        while (!feof($inputStream)) {
             while ($isStdin && 0 === @stream_select($r, $w, $w, 0, 100)) {
                 // Give signal handlers a chance to run
                 $r = [$inputStream];
@@ -274,7 +308,13 @@ class QuestionHelper extends Helper
 
             // as opposed to fgets(), fread() returns an empty string when the stream content is empty, not false.
             if (false === $c || ('' === $ret && '' === $c && null === $question->getDefault())) {
-                shell_exec('stty '.$sttyMode);
+                $restoreTerminal();
+                // Restore original handlers if installed
+                if ($signalSupport) {
+                    foreach ($installedSignals as $sig) {
+                        pcntl_signal($sig, $previousHandlers[$sig] ?? \SIG_DFL);
+                    }
+                }
                 throw new MissingInputException('Aborted while asking: '.$question->getQuestion());
             } elseif ("\177" === $c) { // Backspace Character
                 if (0 === $numMatches && 0 !== $i) {
@@ -375,9 +415,15 @@ class QuestionHelper extends Helper
                 $cursor->restorePosition();
             }
         }
-        } finally {
-            // Always restore terminal settings, even if an exception occurs
-            $this->restoreTerminal($sttyMode);
+
+        // Reset stty so it behaves normally again
+        $restoreTerminal();
+
+        // Restore original handlers if installed
+        if ($signalSupport) {
+            foreach ($installedSignals as $sig) {
+                pcntl_signal($sig, $previousHandlers[$sig] ?? \SIG_DFL);
+            }
         }
 
         return $fullChoice;
@@ -595,36 +641,5 @@ class QuestionHelper extends Helper
         }
 
         return $cloneStream;
-    }
-
-    /**
-     * Register signal handlers to restore terminal settings on exit.
-     */
-    private function registerTerminalRestoreHandler(string $sttyMode): void
-    {
-        if (!\function_exists('pcntl_signal') || !$sttyMode) {
-            return;
-        }
-
-        $restoreHandler = function () use ($sttyMode) {
-            shell_exec('stty '.$sttyMode);
-        };
-
-        // Register handlers for common termination signals
-        foreach ([\SIGINT, \SIGQUIT, \SIGTERM, \SIGUSR1, \SIGUSR2] as $signal) {
-            if (\defined($signal)) {
-                pcntl_signal($signal, $restoreHandler);
-            }
-        }
-    }
-
-    /**
-     * Restore terminal settings.
-     */
-    private function restoreTerminal(string $sttyMode): void
-    {
-        if ($sttyMode) {
-            shell_exec('stty '.$sttyMode);
-        }
     }
 }

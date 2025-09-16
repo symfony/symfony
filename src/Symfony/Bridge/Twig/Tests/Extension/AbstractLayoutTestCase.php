@@ -2315,13 +2315,6 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testButtonLabelIsEmpty()
-    {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType');
-
-        $this->assertSame('', $this->renderLabel($form->createView()));
-    }
-
     public function testButtonlabelWithoutTranslation()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [

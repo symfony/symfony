@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-15T17:56:29Z
+
+Status: needs work
+
+While adding tests, I figured out the normalization logic is broken, as highlighted by the failures when using XML.

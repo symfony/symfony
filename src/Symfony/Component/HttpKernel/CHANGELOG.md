@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate implementing `__sleep/wakeup()` on data collectors; use `__(un)serialize()` instead
  * Add `#[IsSignatureValid]` attribute to validate URI signatures
  * Make `Profile` final and `Profiler::__sleep()` internal
+ * Make `Kernel::$requestStackSize` and `Kernel::$resetServices` protected to allow overriding `handle()` in subclasses
 
 7.3
 ---

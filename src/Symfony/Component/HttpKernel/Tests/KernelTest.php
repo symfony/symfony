@@ -539,6 +539,46 @@ class KernelTest extends TestCase
         }
     }
 
+    public function testSubclassCanOverrideHandleAndAccessProtectedFields()
+    {
+        $kernel = new OverridableHandleKernel(null, null, 'test');
+
+        $response = $kernel->handle(new Request());
+        $this->assertSame('custom', $response->getContent());
+
+        $ref = new \ReflectionObject($kernel);
+
+        $propStack = $ref->getProperty('requestStackSize');
+        $this->assertSame(0, $propStack->getValue($kernel));
+
+        $propReset = $ref->getProperty('resetServices');
+        $this->assertTrue($propReset->getValue($kernel));
+    }
+
+    public function testServicesResetterWorksWithOverriddenHandle()
+    {
+        $kernel = new OverridableHandleKernel(function (ContainerBuilder $container) {
+            $container->addCompilerPass(new ResettableServicePass());
+            $container->register('one', ResettableService::class)
+                ->setPublic(true)
+                ->addTag('kernel.reset', ['method' => 'reset']);
+            $container->register('services_resetter', ServicesResetter::class)->setPublic(true);
+        }, null, 'resetting');
+
+        ResettableService::$counter = 0;
+        $request = new Request();
+
+        $kernel->handle($request);
+        $kernel->getContainer()->get('one');
+
+        $this->assertEquals(0, ResettableService::$counter);
+        $this->assertFalse($kernel->getContainer()->initialized('services_resetter'));
+
+        $kernel->handle($request);
+
+        $this->assertEquals(1, ResettableService::$counter);
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      */
@@ -723,5 +763,22 @@ class KernelForTestWithLoadClassCache extends KernelForTest
 {
     public function doLoadClassCache(): void
     {
+    }
+}
+
+class OverridableHandleKernel extends CustomProjectDirKernel
+{
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
+    {
+        $this->boot();
+
+        ++$this->requestStackSize;
+        $this->resetServices = true;
+
+        try {
+            return new Response('custom');
+        } finally {
+            --$this->requestStackSize;
+        }
     }
 }

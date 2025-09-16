@@ -65,8 +65,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     private string $projectDir;
     private ?string $warmupDir = null;
-    private int $requestStackSize = 0;
-    private bool $resetServices = false;
+    protected int $requestStackSize = 0;
+    protected bool $resetServices = false;
 
     /**
      * @var array<string, bool>

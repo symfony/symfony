@@ -1,0 +1,200 @@
+---------------------------------------------------------------------------
+
+by tucksaun at 2025-04-02T08:30:43Z
+
+Thank you for the questions @alexandre-daubois
+
+> So, if I get this right, you propose to bring reduced scope.
+
+Yes, because in my mind the fact that the Workflow uses strings internally is ok. If PHP was allowing to cast Backed Enums to string it would actually “just” work. So in my opinion we don’t need to deal with Enum internally, only at the component boundaries and where it makes the more sense: places.
+
+> I also shared a backed enum marking store, I'm sharing it here just for reference 🙂 [#54582 (comment)](https://github.com/symfony/symfony/issues/54582#issuecomment-2056181069)
+
+Yes! I’ve seen it and it is interesting. But I tried to find a solution that does not require my team to implement a custom service for each workflow (our project requires a tons of them and it would make onboarding new developers on the project more easy).
+
+> But does it make sense to improve the marking store without bringing support to the Framework config as well? From my experience, devs mostly declare their workflows in `framework.yaml` (and other formats of course). And this last point was a **pain** to implement right. Maybe things changed since?
+
+Good question! I didn’t had a look initially because the project I’m working on is using YAML and I’m not sure we can do much more than what is currently possible using `!php:enum`:
+```yaml
+framework:
+    workflows:
+        my_workflow:
+        # …
+            places:
+                - !php/enum App\Enumeration\ObjectStatus::Draft->value
+                - !php/enum App\Enumeration\ObjectStatus::Received->value
+         # …
+```
+
+But I was convinced we could do something in FrameworkBundle for the PHP format so I quickly tried something this morning working with the normalization process and managed to make it work to support the following snippet:
+```php
+// config/packages/workflow.php
+
+return static function (FrameworkConfig $framework): void {
+    $missionWorkflow = $framework->workflows()->workflows('mission');
+    $missionWorkflow
+        ->type('state_machine')
+        ->supports(\App\Entity\MyObject::class)
+        ->initialMarking([\App\Enumeration\ObjectStatus::Draft]);
+    // …
+    $missionWorkflow->transition()
+        ->name('complete')
+            ->from([\App\Enumeration\ObjectStatus::Draft])
+            ->to([\App\Enumeration\ObjectStatus::Received])
+};
+```
+and it also seems to allow removing the `->value` in YAML (and it should be backward compatible):
+```yaml
+framework:
+    workflows:
+        my_workflow:
+        # …
+            places:
+                - !php/enum App\Enumeration\ObjectStatus::Draft
+                - !php/enum App\Enumeration\ObjectStatus::Received
+         # …
+```
+
+So if this current PR is accepted I can work on improving the support in FrameworkBundle for 7.4.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-04-02T08:48:57Z
+
+> Good question! I didn’t had a look initially because the project I’m working on is using YAML and I’m not sure we can do much more than what is currently possible using `!php:enum`:
+>
+> ```yaml
+> framework:
+>     workflows:
+>         my_workflow:
+>         # …
+>             places:
+>                 - !php/enum App\Enumeration\ObjectStatus::Draft->value
+>                 - !php/enum App\Enumeration\ObjectStatus::Received->value
+>          # …
+> ```
+
+Doesn't it defeat the purpose of enumerations? The consensus was that places are finite and precisely defined in the configuration, making them already "strongly typed" (as trying to move to an undefined place throws an exception), which makes workflow places actually enum of their kind. This was the biggest reason for not going further with this idea, thus supporting enumeration didn't bring anything actually.
+
+But anyway I get what you mean. Although discussions around enum support have concluded in the past that it wasn't worth the effort, perhaps opinions have changed in the last few years. I'd be happy to hear other people's opinion on this, and don't get me wrong: I think I'd be glad to see this feature implemented given the number of times it's been requested by the community. 🙂 I just want to clarify the points that led to the subject being dropped the last few times, so that we can move in the right direction and eliminate show stoppers. Thank you for digging the subject!
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-02T09:11:21Z
+
+using a type of `BackedEnum` in the Workflow component does not provide any type safety guarantee. Enums give extra type safety when your type is the specific enum you intend to support. But the workflow component allows configuring the list of places and transitions, and so cannot define an enum for the parameter type.
+As far as the workflow component is concerned, the list of places and transitions is not a closed list (and so is a bad fit for an enum).
+
+If you access the backing value each time you use your enum, you just use a more verbose syntax for string constants, with no additional type safety compared to string constants.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-04T12:30:47Z
+
+This makes completely sense to me.
+I'm just not a fan of the union on the setter that this requires.
+What about checking in the compiler pass which enum class setters use and give that to an augmented marking store so that it knows it should cast to enums before calling the setter?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-10T14:51:31Z
+
+I'm fine with this.
+
+And I like @nicolas-grekas comment. **BUT**, this could be hard to support all cases.
+We could at least use the `support` option configuration. If one uses support_strategy, we could not.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-10T15:00:28Z
+
+> We could at least use the support option configuration. If one uses support_strategy, we could not.
+
+Would work for me - making simple cases simple.
+
+Another idea (draft, for another PR):
+support defining places via an enum (a backed one):
+```yaml
+places: !php/enum FOO
+```
+This would make the workflow still use strings for places, but use enums for the marking store.
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2025-04-10T15:56:09Z
+
+hi folks
+
+Sorry for the delay in the response (busy week here)
+
+> The consensus was that places are finite and precisely defined in the configuration, making them already "strongly typed" (as trying to move to an undefined place throws an exception), which makes workflow places actually enum of their kind. This was the biggest reason for not going further with this idea, thus supporting enumeration didn't bring anything actually.
+
+I would agree if the Workflow was the only place where one could set those values. But when using the `MethodMarkingStore`, it calls public methods, so nothing is preventing a call to `setStatus` with an inappropriate value or an external database alteration. One can do it manually but Enums can help here (preventing the use of values not allowed in the set). This is not entirely error-proof and can still let business logic errors happen or inconsistent states, but in some contexts (eg. government projects) you are asked to use every possible protection measure 🤪
+
+Please note I don't apply this reasoning to transitions as those are only usable via the Worfklow system.
+
+> But the workflow component allows configuring the list of places and transitions, and so cannot define an enum for the parameter type.
+
+In my view, this is the responsibility of the configuration (which is not part of this PR), and one can easily do it when using PHP for configuration:
+```php
+foreach (\App\Enumeration\ObjectStatus::cases() as $case) {
+    $myWorkflow->place()->name($case->value);
+}
+```
+And IF someone is willing to add to the syntactic sugar later (like @nicolas-grekas idea) on or globally improve Enums support in configuration, they are free to do it.
+
+> As far as the workflow component is concerned, the list of places and transitions is not a closed list (and so is a bad fit for an enum).
+
+Is it not the opposite of what @alexandre-daubois is saying? ("The consensus was that places are finite and precisely defined in the configuration, making them already "strongly typed"")
+
+> If you access the backing value each time you use your enum, you just use a more verbose syntax for string constants, with no additional type safety compared to string constants.
+
+Maybe I'm not seeing what you refer to: I don't think I'm constantly accessing the backing value here. Am I missing something?
+
+> I'm just not a fan of the union on the setter that this requires.
+
+Yes indeed, but this looked like a good middle ground to me as it does not involve too much implementation on Symfony's side. Plus, it makes it kind of BC and provides an upgrade path.
+
+> What about checking in the compiler pass which enum class setters use and give that to an augmented marking store so that it knows it should cast to enums before calling the setter?
+
+As @lyrixx said, it seemed a bit complicated to do "quickly" and in a performant way.
+But using `supports` and a compiler pass might make it easier indeed.
+However, this will probably require some refactoring as the `MethodMarkingStore` is quite closed for now.
+I'm okay to work on such a feature if we are willing to go this way (I already have something locally that I tried using reflection to know which Enum type to instantiate)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-04-10T16:29:39Z
+
+Perhaps I misspoke, so to clarify: when I said "finite values", I meant that if we use workflow transitions, we're constrained to the values of a defined set. But actually, values can be non-finite in the sense that any string can be used to define a workflow place. Maybe this explains the feeling of "two opposite ideas" we seemed to give
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-12T10:03:00Z
+
+> Another idea (draft, for another PR): support defining places via an enum (a backed one):
+>
+> ```yaml
+> places: !php/enum FOO
+> ```
+
+Actually, this is super easy :) I'll open a PR soon (except for XML 🥺)
+
+**edit**: here we go https://github.com/symfony/symfony/pull/60204
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-12T10:48:34Z
+
+@tucksaun I think you can leverage https://github.com/symfony/symfony/pull/60204 to configure the marking store. Now we can be 100% sure the places are BackedEnum.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-09-15T13:18:44Z
+
+> > As far as the workflow component is concerned, the list of places and transitions is not a closed list (and so is a bad fit for an enum).
+>
+> Is it not the opposite of what @alexandre-daubois is saying? ("The consensus was that places are finite and precisely defined in the configuration, making them already "strongly typed"")
+
+The list is finite for a given workflow instance in your project. The list of places is not finite in the workflow component, as it allows projects to configure the list of places. This means that the code in the component cannot benefit from type safety by using an enum as parameter type. Your own code could benefit from it in a `setStatus` method (or whatever the name).
+This is why the marking store is the most important part of this support (configuration shortcuts are indeed just syntactic sugar for PHP config files, even though they provide a lot more values in declarative formats like Yaml).

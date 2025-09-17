@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-05-22T15:50:11Z
+
+CI failure is unrelated
+
+```
+1) Symfony\Component\HttpClient\Tests\AmpHttpClientTest::testNonBlockingStream
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'<1>'
++''
+
+/home/runner/work/symfony/symfony/src/Symfony/Component/HttpClient/Tests/HttpClientTestCase.php:128
+```
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-09-10T11:53:51Z
+
+For the référence comment with https://github.com/symfony/symfony/pull/60243
+I think you need to update the messenger data collector and traceables sub logic
+You can check how it was done for others in the PR
+The goal is to stop collecting data if the profiler is disabled on runtime
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-09-16T05:55:16Z
+
+@andrew-demb Are you still interested in working on this PR?
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-09-16T06:43:41Z
+
+@fabpot yeah, sure. Thanks for the ping.
+@94noni, now it seems that I got it. Thanks for the help.
+
+PR updated.
+I'm not sure whether it should be considered a feature or a bug fix. For now, I left this as a new feature (target 7.4). Refs: https://github.com/symfony/symfony/pull/60515#discussion_r2102872959
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-09-16T06:59:12Z
+
+nice 👍🏻
+as https://github.com/symfony/symfony/pull/60243 was merged as bugfix (and paving the foundation of those dev data collect stuff to be ignored), perhaps this one can be also
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-09-16T11:17:45Z
+
+Reclassified these changes to bugfix - changed target branch, updated PR description, dropped entry from the changelog.

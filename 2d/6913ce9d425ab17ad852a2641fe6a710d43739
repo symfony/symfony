@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2025-08-23T15:23:13Z
+
+Since native serialization is handled within `Key` class, maybe it'd make sense to do the same for JSON? Just remove the `LockKeyNormalizer` and implement `\JsonSerializable` on `Key` instead. What do you think?
+
+EDIT: right, it would not work on deserialization..

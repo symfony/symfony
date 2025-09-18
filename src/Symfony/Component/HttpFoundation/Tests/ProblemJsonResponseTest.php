@@ -23,10 +23,9 @@ class ProblemJsonResponseTest extends TestCase
     public function testNewProblemWithNoParams()
     {
         $problemDetails = new ProblemJsonResponse();
+
         $this->assertSame(500, $problemDetails->getStatusCode());
-
         $this->assertSame('about:blank', json_decode($problemDetails->getContent(), true)['type']);
-
         $this->assertSame('application/problem+json', $problemDetails->headers->get('Content-Type'));
         $this->assertSame('Internal Server Error', json_decode($problemDetails->getContent(), true)['title']);
     }
@@ -34,6 +33,7 @@ class ProblemJsonResponseTest extends TestCase
     public function testStatusCode()
     {
         $problemDetails = new ProblemJsonResponse(404);
+
         $this->assertSame(404, $problemDetails->getStatusCode());
     }
 
@@ -51,6 +51,7 @@ class ProblemJsonResponseTest extends TestCase
     public function testEmptyTitle()
     {
         $problemDetails = new ProblemJsonResponse(402);
+
         $this->assertNotNull(json_decode($problemDetails->getContent(), true)['title']);
         $this->assertSame('Payment Required', json_decode($problemDetails->getContent(), true)['title']);
     }
@@ -60,14 +61,19 @@ class ProblemJsonResponseTest extends TestCase
         $problemDetails = new ProblemJsonResponse(500, extensions: ['foo' => 'bar']);
 
         $this->assertArrayHasKey('foo', json_decode($problemDetails->getContent(), true));
+    }
 
+    public function testContentIsArray()
+    {
         $problemDetails = new ProblemJsonResponse(400, extensions: ['foo' => 'bar', 'baz' => ['bar' => 'foo']]);
+
         $this->assertIsArray(json_decode($problemDetails->getContent(), true)['baz']);
     }
 
     public function testInstance()
     {
         $problemDetails = new ProblemJsonResponse(400, instance: 'article/5');
+
         $this->assertIsString(json_decode($problemDetails->getContent(), true)['instance']);
     }
 }

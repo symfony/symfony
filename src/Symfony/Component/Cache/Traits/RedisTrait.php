@@ -217,7 +217,7 @@ trait RedisTrait
                 do {
                     $host = $hosts[$hostIndex]['host'] ?? $hosts[$hostIndex]['path'];
                     $port = $hosts[$hostIndex]['port'] ?? 0;
-                    $passAuth = isset($params['auth']) && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
+                    $passAuth = (isset($params['redis_sentinel_auth']) || isset($params['auth'])) && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
                     $address = false;
 
                     if (isset($hosts[$hostIndex]['host']) && $tls) {
@@ -240,12 +240,12 @@ trait RedisTrait
                             ];
 
                             if ($passAuth) {
-                                $options['auth'] = $params['auth'];
+                                $options['auth'] = $params['redis_sentinel_auth'] ?? $params['auth'];
                             }
 
                             $sentinel = new \RedisSentinel($options);
                         } else {
-                            $extra = $passAuth ? [$params['auth']] : [];
+                            $extra = $passAuth ? [$params['redis_sentinel_auth'] ?? $params['auth']] : [];
 
                             $sentinel = @new $sentinelClass($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...$extra);
                         }

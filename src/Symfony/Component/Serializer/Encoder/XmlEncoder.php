@@ -65,7 +65,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const CDATA_WRAPPING_PATTERN = 'cdata_wrapping_pattern';
     public const IGNORE_EMPTY_ATTRIBUTES = 'ignore_empty_attributes';
     public const PRESERVE_NUMERIC_KEYS = 'preserve_numeric_keys';
-    public const VALIDATE_ROOT_NODE_NAME = 'xml_validate_root_node_name';
+    public const VALIDATE_ROOT_NODE_NAME = 'validate_root_node_name';
+    public const VALIDATE_ROOT_NODE_EXISTS = 'validate_root_node_exists';
 
     private array $defaultContext = [
         self::AS_COLLECTION => false,
@@ -82,6 +83,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::IGNORE_EMPTY_ATTRIBUTES => false,
         self::PRESERVE_NUMERIC_KEYS => false,
         self::VALIDATE_ROOT_NODE_NAME => false,
+        self::VALIDATE_ROOT_NODE_EXISTS => false,
     ];
 
     public function __construct(array $defaultContext = [])
@@ -147,8 +149,18 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         // Validate root node existence and, if configured by the user, its name
+        $shouldValidateRootExists = (bool) ($context[self::VALIDATE_ROOT_NODE_EXISTS] ?? $this->defaultContext[self::VALIDATE_ROOT_NODE_EXISTS] ?? false);
         if (!$rootNode instanceof \DOMNode) {
-            throw new NotEncodableValueException('Invalid XML data: no root node found.');
+            if ($shouldValidateRootExists) {
+                throw new NotEncodableValueException('Invalid XML data: no root node found.');
+            }
+
+            trigger_deprecation('symfony/serializer', '7.4', 'Decoding XML without a root node is deprecated and will throw a NotEncodableValueException in 8.0.');
+
+            // TODO: Uncomment in 8.0
+            // throw new NotEncodableValueException('Invalid XML data: no root node found.');
+
+            return [];
         }
 
         $shouldValidateRoot = (bool) ($context[self::VALIDATE_ROOT_NODE_NAME] ?? $this->defaultContext[self::VALIDATE_ROOT_NODE_NAME] ?? false);
@@ -160,6 +172,11 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                 }
 
                 trigger_deprecation('symfony/serializer', '7.4', 'Decoding XML with a mismatching root node name is deprecated and will throw an exception in 8.0. Expected root node "%s", but found "%s". Set the "%s" context option to true to enable validation now.', $expectedRootName, $rootNode->nodeName, self::VALIDATE_ROOT_NODE_NAME);
+
+                // TODO: Uncomment in 8.0
+                // throw new NotEncodableValueException(\sprintf('Expected root node "%s", but found "%s".', $expectedRootName, $rootNode->nodeName));
+
+                return [];
             }
         }
 

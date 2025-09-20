@@ -778,7 +778,7 @@ class XmlEncoderTest extends TestCase
         $this->expectExceptionMessage('Expected root node "expectedRoot", but found "wrongRoot".');
 
         $xml = '<?xml version="1.0"?><wrongRoot><item>value</item></wrongRoot>';
-        $this->encoder->decode($xml, 'xml', ['xml_root_node_name' => 'expectedRoot', 'xml_validate_root_node_name' => true]);
+        $this->encoder->decode($xml, 'xml', ['xml_root_node_name' => 'expectedRoot', XmlEncoder::VALIDATE_ROOT_NODE_NAME => true]);
     }
 
     public function testDecodeThrowsWhenNoRootNodeFound()
@@ -787,20 +787,21 @@ class XmlEncoderTest extends TestCase
         $this->expectExceptionMessage('Invalid XML data: no root node found.');
 
         $xml = '<?xml version="1.0"?><response><a>1</a></response>';
-        $this->encoder->decode($xml, 'xml', [XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE, \XML_COMMENT_NODE, \XML_ELEMENT_NODE]]);
+        $this->encoder->decode($xml, 'xml', [
+            XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE, \XML_COMMENT_NODE, \XML_ELEMENT_NODE],
+            XmlEncoder::VALIDATE_ROOT_NODE_EXISTS => true
+        ]);
     }
 
-    protected static function getXmlSource(): string
+    public function testDecodeReturnsEmptyArrayWhenNoRootNodeFoundAndValidationDisabled()
     {
-        return '<?xml version="1.0"?>'."\n".
-            '<response>'.
-            '<foo>foo</foo>'.
-            '<bar>a</bar><bar>b</bar>'.
-            '<baz><key>val</key><key2>val</key2><item key="A B">bar</item>'.
-            '<item><title>title1</title></item><item><title>title2</title></item>'.
-            '<Barry><FooBar id="1"><Baz>Ed</Baz></FooBar></Barry></baz>'.
-            '<qux>1</qux>'.
-            '</response>'."\n";
+        $xml = '<?xml version="1.0"?><response><a>1</a></response>';
+        $result = $this->encoder->decode($xml, 'xml', [
+            XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE, \XML_COMMENT_NODE, \XML_ELEMENT_NODE],
+            XmlEncoder::VALIDATE_ROOT_NODE_EXISTS => false
+        ]);
+
+        $this->assertSame([], $result);
     }
 
     protected static function getNamespacedXmlSource(): string

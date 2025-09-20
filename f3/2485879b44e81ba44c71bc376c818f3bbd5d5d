@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-09-18T10:26:22Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by frozenbrain at 2025-09-18T12:50:19Z
+
+If non-promoted constructor parameters are now valid mapping targets, should we also support putting the `Map` attribute on those as well? Promoted parameters already support it, therefore I believe this should be also possible for non-promoted ones.
+
+Also, one thing I noticed is that with this change a property with the same name as the constructor parameter has to exist, is that intentional? For example, the following code throws an exception, because `Target::$name` does not exist:
+```php
+class Target {
+    #[Map(if: false)]
+    private string $nameUpper;
+
+    public function __construct(string $name)
+    {
+        $this->nameUpper = strtoupper($name);
+    }
+}
+
+$mapper = new ObjectMapper();
+
+$source = new stdClass();
+$source->name = 'John';
+
+$target = $mapper->map($source, Target::class);
+```
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2025-09-18T14:33:56Z
+
+@frozenbrain nice catch, the PR now covers that case as well. See commit e6009b3653a3168ad4741cf9bb63ec3f290f1c87 for details on the fix.
+
+The issue related to [the following comment](https://github.com/symfony/symfony/blob/9c99c367eae55ea30e888ac2f53cab5589b0b2be/src/Symfony/Component/ObjectMapper/ObjectMapper.php#L107):
+
+```php
+// this may be filled later on see storeValue
+```
+
+When the property name differs from the constructor argument name, the constructor argument's value did actually not get filled in at a later time. It are the properties that get iterated over later on, which isn't aware of the constructor argument name anymore (as property field had a different name).
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2025-09-19T08:43:36Z
+
+Failing check is unrelated.
+
+@soyuka can you help with reviewing this PR?

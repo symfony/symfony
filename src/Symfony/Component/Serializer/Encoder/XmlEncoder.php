@@ -16,8 +16,6 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
-use function Symfony\Contracts\Deprecation\trigger_deprecation;
-
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author John Wards <jwards@whiteoctober.co.uk>

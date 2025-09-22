@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2025-09-20T03:08:38Z
+
+Is that something happening in basic cases ? I'm not experiencing it locally, would you have any reproducer or (a bit) more detailed explanation on "when" that would happen ?
+
+---------------------------------------------------------------------------
+
+by xDeSwa at 2025-09-20T06:33:37Z
+
+> **when set eager**
+
+<img width="694" height="370" alt="eager_controller json" src="https://github.com/user-attachments/assets/0e7f8b0f-8e9d-4ada-b1d0-a989b5a58c50" />
+
+> **Dump**
+<img width="657" height="230" alt="dd_array_importmaprenderer" src="https://github.com/user-attachments/assets/34d5a3d1-a8e3-46d5-81fb-bda6f68601eb" />
+
+> **Source HTML**
+<img width="953" height="243" alt="source_webpage" src="https://github.com/user-attachments/assets/a91a815f-0352-430b-a68b-6daf467360f1" />

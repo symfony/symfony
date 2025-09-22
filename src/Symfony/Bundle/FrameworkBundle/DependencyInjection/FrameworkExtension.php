@@ -1821,6 +1821,11 @@ class FrameworkExtension extends Extension
             $validatorBuilder->addMethodCall('addYamlMappings', [$files['yml']]);
         }
 
+        if ($config['mapping']['metadata'] ?? false) {
+            $config['mapping']['metadata']['namespaces'] = $config['mapping']['namespaces'];
+            $validatorBuilder->addMethodCall('addArrayMapping', [$config['mapping']['metadata']]);
+        }
+
         $definition = $container->findDefinition('validator.email');
         $definition->replaceArgument(0, $config['email_validation_mode']);
 

@@ -309,7 +309,7 @@
     <xsd:complexType name="validation">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="static-method" type="xsd:string" />
-            <xsd:element name="mapping" type="file_mapping" />
+            <xsd:element name="mapping" type="validator_mapping" />
             <xsd:element name="auto-mapping" type="auto_mapping" />
             <xsd:element name="not-compromised-password" type="not-compromised-password" />
         </xsd:choice>
@@ -328,6 +328,69 @@
         <xsd:sequence>
             <xsd:element name="path" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
         </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="validator_mapping">
+        <xsd:sequence>
+            <xsd:element name="path" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="namespace" type="validator_namespace" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="metadata" type="validator_class_metadata" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="validator_namespace">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="prefix" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="validator_class_metadata">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="group-sequence-provider" type="validator_group_sequence_provider" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="group-sequence" type="validator_group_sequence" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="constraint" type="validator_constraint" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="property" type="validator_property" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="getter" type="validator_getter" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="validator_group_sequence_provider">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="service" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="validator_group_sequence">
+        <xsd:sequence>
+            <xsd:element name="group" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="validator_property">
+        <xsd:sequence>
+            <xsd:element name="constraint" type="validator_constraint" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="validator_getter">
+        <xsd:sequence>
+            <xsd:element name="constraint" type="validator_constraint" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="property" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="validator_constraint" mixed="true">
+        <xsd:element name="option" type="validator_option" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:complexType>
+
+    <xsd:complexType name="validator_option" mixed="true">
+        <xsd:choice minOccurs="0">
+            <xsd:element name="constraint" type="validator_constraint" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="auto_mapping">

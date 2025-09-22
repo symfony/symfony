@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\Loader\ArrayLoader;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
@@ -43,6 +44,7 @@ class ValidatorBuilder
     private array $loaders = [];
     private array $xmlMappings = [];
     private array $yamlMappings = [];
+    private array $arrayMapping = [];
     private array $methodMappings = [];
     private array $attributeMappings = [];
     private bool $enableAttributeMapping = false;
@@ -150,6 +152,24 @@ class ValidatorBuilder
     }
 
     /**
+     * Adds a PHP array constraint mapping to the validator.
+     *
+     * @param array<class-string, array> $mapping
+     *
+     * @return $this
+     */
+    public function addArrayMapping(array $mapping): static
+    {
+        if (null !== $this->metadataFactory) {
+            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+        }
+
+        $this->arrayMapping = array_merge_recursive($this->arrayMapping, $mapping);
+
+        return $this;
+    }
+
+    /**
      * Adds classes with mapping constraints as attributes.
      *
      * The keys are the classes on which the constraints should be added.
@@ -239,7 +259,7 @@ class ValidatorBuilder
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory): static
     {
-        if ($this->xmlMappings || $this->yamlMappings || $this->methodMappings || $this->attributeMappings || $this->enableAttributeMapping) {
+        if ($this->xmlMappings || $this->yamlMappings || $this->arrayMapping || $this->methodMappings || $this->attributeMappings || $this->enableAttributeMapping) {
             throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
         }
 
@@ -341,12 +361,16 @@ class ValidatorBuilder
     {
         $loaders = [];
 
-        foreach ($this->xmlMappings as $xmlMapping) {
-            $loaders[] = new XmlFileLoader($xmlMapping);
+        foreach ($this->xmlMappings as $mapping) {
+            $loaders[] = new XmlFileLoader($mapping);
         }
 
-        foreach ($this->yamlMappings as $yamlMappings) {
-            $loaders[] = new YamlFileLoader($yamlMappings);
+        foreach ($this->yamlMappings as $mapping) {
+            $loaders[] = new YamlFileLoader($mapping);
+        }
+
+        if ($this->arrayMapping) {
+            $loaders[] = new ArrayLoader($this->arrayMapping);
         }
 
         foreach ($this->methodMappings as $methodName) {

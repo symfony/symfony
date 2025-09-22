@@ -26,31 +26,19 @@ class YamlFileLoader extends FileLoader
 {
     protected array $classes;
 
+    private ArrayLoader $arrayLoader;
+    private YamlParser $yamlParser;
+
     public function __construct(string $file)
     {
         $this->file = $file;
     }
 
-    /**
-     * Caches the used YAML parser.
-     */
-    private YamlParser $yamlParser;
-
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
-        if (!isset($this->classes)) {
-            $this->loadClassesFromYaml();
-        }
+        $this->classes ??= $this->loadClassesFromYaml();
 
-        if (isset($this->classes[$metadata->getClassName()])) {
-            $classDescription = $this->classes[$metadata->getClassName()];
-
-            $this->loadClassMetadataFromYaml($metadata, $classDescription);
-
-            return true;
-        }
-
-        return false;
+        return $this->arrayLoader->loadClassMetadata($metadata);
     }
 
     /**
@@ -60,49 +48,30 @@ class YamlFileLoader extends FileLoader
      */
     public function getMappedClasses(): array
     {
-        if (!isset($this->classes)) {
-            $this->loadClassesFromYaml();
-        }
+        $this->classes ??= $this->loadClassesFromYaml();
 
         return array_keys($this->classes);
     }
 
+    protected function addNamespaceAlias(string $alias, string $namespace): void
+    {
+        $this->classes ??= $this->loadClassesFromYaml();
+
+        $this->arrayLoader->addNamespaceAlias($alias, $namespace);
+
+        $this->namespaces[$alias] = $namespace;
+    }
+
     /**
-     * Parses a collection of YAML nodes.
-     *
-     * @param array $nodes The YAML nodes
-     *
-     * @return array<array|scalar|Constraint>
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0
      */
     protected function parseNodes(array $nodes): array
     {
-        $values = [];
+        trigger_deprecation('symfony/validator', '7.4', 'The %s method is deprecated.', __METHOD__);
 
-        foreach ($nodes as $name => $childNodes) {
-            if (is_numeric($name) && \is_array($childNodes) && 1 === \count($childNodes)) {
-                $options = current($childNodes);
+        $this->classes ??= $this->loadClassesFromYaml();
 
-                if (\is_array($options)) {
-                    $options = $this->parseNodes($options);
-                }
-
-                if (null !== $options && (!\is_array($options) || array_is_list($options))) {
-                    $options = [
-                        'value' => $options,
-                    ];
-                }
-
-                $values[] = $this->newConstraint(key($childNodes), $options);
-            } else {
-                if (\is_array($childNodes)) {
-                    $childNodes = $this->parseNodes($childNodes);
-                }
-
-                $values[$name] = $childNodes;
-            }
-        }
-
-        return $values;
+        return $this->arrayLoader->parseNodes($nodes);
     }
 
     /**
@@ -132,61 +101,15 @@ class YamlFileLoader extends FileLoader
         return $classes;
     }
 
-    private function loadClassesFromYaml(): void
+    private function loadClassesFromYaml(): array
     {
         parent::__construct($this->file);
 
         $this->yamlParser ??= new YamlParser();
-        $this->classes = $this->parseFile($this->file);
+        $classes = $this->parseFile($this->file);
+        $this->arrayLoader = new ArrayLoader($classes);
+        unset($classes['namespaces']);
 
-        if (isset($this->classes['namespaces'])) {
-            foreach ($this->classes['namespaces'] as $alias => $namespace) {
-                $this->addNamespaceAlias($alias, $namespace);
-            }
-
-            unset($this->classes['namespaces']);
-        }
-    }
-
-    private function loadClassMetadataFromYaml(ClassMetadata $metadata, array $classDescription): void
-    {
-        if (isset($classDescription['group_sequence_provider'])) {
-            if (\is_string($classDescription['group_sequence_provider'])) {
-                $metadata->setGroupProvider($classDescription['group_sequence_provider']);
-            }
-            $metadata->setGroupSequenceProvider(
-                (bool) $classDescription['group_sequence_provider']
-            );
-        }
-
-        if (isset($classDescription['group_sequence'])) {
-            $metadata->setGroupSequence($classDescription['group_sequence']);
-        }
-
-        if (isset($classDescription['constraints']) && \is_array($classDescription['constraints'])) {
-            foreach ($this->parseNodes($classDescription['constraints']) as $constraint) {
-                $metadata->addConstraint($constraint);
-            }
-        }
-
-        if (isset($classDescription['properties']) && \is_array($classDescription['properties'])) {
-            foreach ($classDescription['properties'] as $property => $constraints) {
-                if (null !== $constraints) {
-                    foreach ($this->parseNodes($constraints) as $constraint) {
-                        $metadata->addPropertyConstraint($property, $constraint);
-                    }
-                }
-            }
-        }
-
-        if (isset($classDescription['getters']) && \is_array($classDescription['getters'])) {
-            foreach ($classDescription['getters'] as $getter => $constraints) {
-                if (null !== $constraints) {
-                    foreach ($this->parseNodes($constraints) as $constraint) {
-                        $metadata->addGetterConstraint($getter, $constraint);
-                    }
-                }
-            }
-        }
+        return $classes;
     }
 }

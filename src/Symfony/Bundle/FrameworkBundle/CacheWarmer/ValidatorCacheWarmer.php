@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
+use Symfony\Component\Validator\Mapping\Loader\ArrayLoader;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
@@ -78,7 +79,7 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * @param LoaderInterface[] $loaders
      *
-     * @return list<XmlFileLoader|YamlFileLoader|AttributeLoader>
+     * @return list<XmlFileLoader|YamlFileLoader|ArrayLoader|AttributeLoader>
      */
     private function extractSupportedLoaders(array $loaders): array
     {

@@ -81,12 +81,12 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         return
             $this->updateLevel()
             && parent::isHandling($record)
-            && (!$this->interactiveOnly || ($this->input && $this->input->isInteractive()));
+            && (!$this->interactiveOnly || $this->input?->isInteractive());
     }
 
     public function getBubble(): bool
     {
-        if ($this->isInteractiveOnlyEnabled()) {
+        if ($this->interactiveOnly && $this->input?->isInteractive()) {
             return false;
         }
 
@@ -118,6 +118,7 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
      */
     public function close(): void
     {
+        $this->input = null;
         $this->output = null;
 
         parent::close();
@@ -197,10 +198,5 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         }
 
         return true;
-    }
-
-    private function isInteractiveOnlyEnabled(): bool
-    {
-        return $this->interactiveOnly && $this->input && $this->input->isInteractive();
     }
 }

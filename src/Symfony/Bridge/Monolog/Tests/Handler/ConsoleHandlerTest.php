@@ -235,4 +235,30 @@ class ConsoleHandlerTest extends TestCase
         $this->assertStringContainsString('Before terminate message.', $out = $output->fetch());
         $this->assertStringContainsString('After terminate message.', $out);
     }
+
+    public function testInteractiveOnly()
+    {
+        $output = $this->createMock(OutputInterface::class);
+
+        $message = RecordFactory::create(Level::Info, 'My info message');
+        $interactiveInput = $this->createMock(InputInterface::class);
+        $interactiveInput
+            ->method('isInteractive')
+            ->willReturn(true);
+        $handler = new ConsoleHandler(interactiveOnly: true);
+        $handler->setInput($interactiveInput);
+        $handler->setOutput($output);
+        self::assertTrue($handler->isHandling($message), '->isHandling returns true when input is interactive');
+        self::assertFalse($handler->getBubble(), '->getBubble returns false when input is interactive and interactiveOnly is true');
+
+        $nonInteractiveInput = $this->createMock(InputInterface::class);
+        $nonInteractiveInput
+            ->method('isInteractive')
+            ->willReturn(false);
+        $handler = new ConsoleHandler(interactiveOnly: true);
+        $handler->setInput($nonInteractiveInput);
+        $handler->setOutput($output);
+        self::assertFalse($handler->isHandling($message), '->isHandling returns false when input is not interactive');
+        self::assertTrue($handler->getBubble(), '->getBubble returns true when input is not interactive and interactiveOnly is true');
+    }
 }

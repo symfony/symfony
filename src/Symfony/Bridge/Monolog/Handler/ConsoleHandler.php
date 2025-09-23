@@ -20,6 +20,7 @@ use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -52,6 +53,8 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         OutputInterface::VERBOSITY_DEBUG => Level::Debug,
     ];
 
+    private ?InputInterface $input = null;
+
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
      *                                                until the output is set, e.g. by using console events)
@@ -64,6 +67,7 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         bool $bubble = true,
         array $verbosityLevelMap = [],
         private array $consoleFormatterOptions = [],
+        private bool $interactiveOnly = false,
     ) {
         parent::__construct(Level::Debug, $bubble);
 
@@ -74,7 +78,19 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
 
     public function isHandling(LogRecord $record): bool
     {
-        return $this->updateLevel() && parent::isHandling($record);
+        return
+            $this->updateLevel()
+            && parent::isHandling($record)
+            && (!$this->interactiveOnly || ($this->input && $this->input->isInteractive()));
+    }
+
+    public function getBubble(): bool
+    {
+        if ($this->isInteractiveOnlyEnabled()) {
+            return false;
+        }
+
+        return parent::getBubble();
     }
 
     public function handle(LogRecord $record): bool
@@ -82,6 +98,11 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         // we have to update the logging level each time because the verbosity of the
         // console output might have changed in the meantime (it is not immutable)
         return $this->updateLevel() && parent::handle($record);
+    }
+
+    public function setInput(InputInterface $input): void
+    {
+        $this->input = $input;
     }
 
     /**
@@ -108,6 +129,8 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
      */
     public function onCommand(ConsoleCommandEvent $event): void
     {
+        $this->setInput($event->getInput());
+
         $output = $event->getOutput();
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -174,5 +197,10 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         }
 
         return true;
+    }
+
+    private function isInteractiveOnlyEnabled(): bool
+    {
+        return $this->interactiveOnly && $this->input && $this->input->isInteractive();
     }
 }

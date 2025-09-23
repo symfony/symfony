@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-08-07T07:33:31Z
+
+@nicolas-grekas the scheduler test is already fixed with #51271 / #51274 and not related to your change!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-22T15:16:05Z
+
+Thanks for the review @GromNaN - PR updated.

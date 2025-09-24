@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by alebedev80 at 2025-09-18T08:39:58Z
+
+@fabpot please review
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2025-09-23T04:11:04Z
+
+@nicolas-grekas thank you! i've committed yours changes. Please check it
+
+---------------------------------------------------------------------------
+
+by stof at 2025-09-23T09:31:27Z
+
+Should we really add new events that are specific to the LOX24 bridge instead of having a proper abstraction in the component that can implemented by the different bridges ?
+Notifier bridges are not meant to be full SDKs for a given provider. They are meant to implement the shared abstraction of the component on top of a given provider.
+
+You could totally implement a remote event parser as part of a LOX24 SDK supporting all their features (outside Symfony core), but this does not belong to the notifier bridge IMO.
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2025-09-24T05:51:45Z
+
+@stof @nicolas-grekas i've removed LOX24 specific webhooks parsing logic. please check
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2025-09-24T06:50:12Z
+
+which conflicts i need to resolve?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-09-24T06:51:39Z
+
+> which conflicts i need to resolve?
+
+Maybe because the class name has changed from `LOX24RequestParser` to `Lox24RequestParser`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-24T06:51:49Z
+
+the LOX24RequestParser file/class has been renamed to Lox24RequestParser
+you'd need to fetch branch 7.4 and rebase on top of it to get the change
+can you do it?
+
+---------------------------------------------------------------------------
+
+by alebedev80 at 2025-09-24T07:25:32Z
+
+> Please, unify the error messages.
+
+@fabpot done. please check this

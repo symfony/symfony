@@ -1,0 +1,130 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-04-17T20:11:33Z
+
+*I removed the direct mentions to avoid notification spam when the PR is merged*
+
+---------------------------------------------------------------------------
+
+by garak at 2025-04-17T21:00:11Z
+
+How is it "problematic"?
+
+---------------------------------------------------------------------------
+
+by wkania at 2025-04-17T21:32:01Z
+
+@garak For example, Doctrine Migrations for PostgreSQL will generate migrations using the TIMESTAMP type instead of DATE. The schema will never be fully synchronized if you try to force it. Relational databases have dedicated data types for storing DATE and DATETIME, which is why PHP's DateTime is represented by two separate types in Doctrine.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-04-17T21:57:48Z
+
+First of all, thank you for bringing up this topic. Secondly: Naming things is hard.
+
+`DatePoint` is the class that the type maps to, so the name `DatePointType` is totally accurate for that class. I have no clue what a "date time point" is.
+
+My proposal: Keep the `DatePointType` as it is and introduce a new `DatePointDateType` that maps `DatePoint` objects to `DATE` columns.
+
+---------------------------------------------------------------------------
+
+by wkania at 2025-04-17T22:11:23Z
+
+@derrabus Ok, so we're leaning more towards Symfony's naming conventions rather than Doctrine's. You contribute a lot to Doctrine, so this is an important note.
+ Also, I will add a separate entry in the Changelog.
+
+---------------------------------------------------------------------------
+
+by wkania at 2025-04-18T16:26:06Z
+
+@derrabus After the changes you suggested, this is how it will look.
+
+```yaml
+doctrine:
+    dbal:
+        types:
+            date_point: Symfony\Bridge\Doctrine\Types\DatePointType
+            date_point_date: Symfony\Bridge\Doctrine\Types\DatePointDateType
+```
+
+```php
+#[ORM\Column(type: 'date_point_date')]
+public DatePoint $birthday;
+
+#[ORM\Column(type: 'date_point')]
+public DatePoint $createdAt;
+
+---------------------------------------------------------------------------
+
+by wkania at 2025-05-18T15:14:59Z
+
+Added missing [test](https://github.com/symfony/symfony/pull/60437)
+
+---------------------------------------------------------------------------
+
+by wkania at 2025-05-29T20:05:57Z
+
+Updated Changelog 7.3 ->7.4.
+
+---------------------------------------------------------------------------
+
+by wkania at 2025-05-29T20:43:33Z
+
+@carsonbot label Feature
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-30T08:03:57Z
+
+Just an idea: What about keeping the name add make it configurable instead of having two types?
+
+---------------------------------------------------------------------------
+
+by wkania at 2025-05-30T20:57:46Z
+
+@OskarStark
+I see several drawbacks to this solution:
+
+  - Doctrine provides two separate classes for this: `DateImmutableType` and `DateTimeImmutableType`
+  (see: [Doctrine DBAL Types](https://github.com/doctrine/dbal/tree/4.2.x/src/Types)).
+
+  - We would need to extend the `Type` class and implement two interfaces:
+  `PhpDateTimeMappingType` and `PhpDateTimeTimeMappingType`.
+
+  - If we introduce some kind of parameter to handle formatting, we won’t be able to use it in
+  [DatePointType](https://github.com/symfony/symfony/blob/7.4/src/Symfony/Bridge/Doctrine/Types/DatePointType.php) , which is where the decision about the database storage format
+  should be made. The [convertToDatabaseValue](https://github.com/doctrine/dbal/blob/d6cfa1f13527a037f331a0614eca7511d76b2aae/src/Types/DateImmutableType.php#L32) method does not allow for that, and it's precisely this method that causes problems in your idea. Each platform (db) has specific format for: `getDateFormatString`, `getDateTimeFormatString` and `getTimeFormatString`.
+
+- We should also keep in mind the existence of `TimeImmutableType`, which ideally should have a corresponding type named `DatePointTimeType`.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-09-15T15:44:37Z
+
+> Just an idea: What about keeping the name add make it configurable instead of having two types?
+
+Configurable types are hard to achieve in DBAL (and supported properly only in DBAL 4 IIRC)
+
+---------------------------------------------------------------------------
+
+by wkania at 2025-09-16T06:36:07Z
+
+> Naming :) what about DayPointType (and TimePointType)? can you please rebase?
+
+DayPoint sounds better. So we will have:
+
+```doctrine:
+    dbal:
+        types:
+            date_point: Symfony\Bridge\Doctrine\Types\DatePointType
+            day_point: Symfony\Bridge\Doctrine\Types\DayPointType
+            time_point: Symfony\Bridge\Doctrine\Types\TimePointType
+```
+
+  I will rebase, rename and add TimePointType later today.
+
+---------------------------------------------------------------------------
+
+by wkania at 2025-09-16T18:27:42Z
+
+Rebased, renamed and added TimePointType. Falling tests not related.

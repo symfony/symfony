@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2025-09-22T19:58:26Z
+
+Could this kind of modification be considered as a BC?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-23T07:03:48Z
+
+> Could this kind of modification be considered as a BC?
+
+It is yes: the point of the factories it to abstract away the exact UUID number and replace them with abstractions like `TimeBasedUidInterface`, which V7 also implements, like V6.

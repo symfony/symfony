@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-03-11T13:53:49Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2025-03-12T12:56:46Z
+
+@ro0NL this is offtopic for this PR, feel free to discuss in https://github.com/symfony/symfony/issues/58715.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2025-03-12T13:16:11Z
+
+> but OK. please preserve BC at all cost.
+
+Yes, this is expected to be 100% BC, it's opt-in for 7.x for sure, maybe it makes sense to change that for 8.x, but that's not up to me.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2025-03-17T15:21:49Z
+
+Config part https://github.com/symfony/monolog-bundle/pull/504

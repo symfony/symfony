@@ -17,8 +17,8 @@ use Doctrine\ORM\Id\AbstractIdGenerator;
 use Symfony\Component\Uid\Factory\NameBasedUuidFactoryInterface;
 use Symfony\Component\Uid\Factory\RandomBasedUuidFactoryInterface;
 use Symfony\Component\Uid\Factory\TimeBasedUuidFactoryInterface;
-use Symfony\Component\Uid\Factory\UuidFactoryInterface;
 use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\Uid\Factory\UuidFactoryInterface;
 use Symfony\Component\Uid\Uuid;
 
 final class UuidGenerator extends AbstractIdGenerator

@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\IdGenerator;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\Factory\UuidFactoryInterface;
 use Symfony\Component\Uid\TimeBasedUidInterface;
 use Symfony\Component\Uid\Uuid;

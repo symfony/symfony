@@ -15,7 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Entity;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
-use Symfony\Component\Uid\Factory\UlidFactory;
+use Symfony\Component\Uid\Factory\UlidFactoryInterface;
 use Symfony\Component\Uid\Ulid;
 
 class UlidGeneratorTest extends TestCase
@@ -34,7 +34,7 @@ class UlidGeneratorTest extends TestCase
     {
         $ulid = new Ulid('00000000000000000000000000');
         $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();
-        $factory = $this->createMock(UlidFactory::class);
+        $factory = $this->createMock(UlidFactoryInterface::class);
         $factory->expects($this->any())
             ->method('create')
             ->willReturn($ulid);

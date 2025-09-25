@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-23T16:04:37Z
+
+Ah, I can already tell you I made a mistake: the sequence should be consumed in child factories, not in the main one !
+
+---------------------------------------------------------------------------
+
+by momito69 at 2025-09-23T16:23:39Z
+
+@nicolas-grekas looks good I'll try you suggestion. And about  the sequence  I'll take care of it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-24T09:34:49Z
+
+I pushed commit https://github.com/symfony/symfony/pull/61807/commits/ea77e069ea9a821a243ef9fed34125aeb8491d53 on your fork, please fetch before working on this again.
+A quick rebase is needed (I can take care of it before merging also)
+Some more tests would be nice, ensuring exceptions are tested.

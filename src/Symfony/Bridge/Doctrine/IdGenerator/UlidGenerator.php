@@ -14,13 +14,13 @@ namespace Symfony\Bridge\Doctrine\IdGenerator;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Id\AbstractIdGenerator;
-use Symfony\Component\Uid\Factory\UlidFactory;
+use Symfony\Component\Uid\Factory\UlidFactoryInterface;
 use Symfony\Component\Uid\Ulid;
 
 final class UlidGenerator extends AbstractIdGenerator
 {
     public function __construct(
-        private readonly ?UlidFactory $factory = null,
+        private readonly ?UlidFactoryInterface $factory = null,
     ) {
     }
 

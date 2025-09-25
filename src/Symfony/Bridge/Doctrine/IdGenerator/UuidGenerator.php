@@ -14,19 +14,20 @@ namespace Symfony\Bridge\Doctrine\IdGenerator;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Id\AbstractIdGenerator;
-use Symfony\Component\Uid\Factory\NameBasedUuidFactory;
-use Symfony\Component\Uid\Factory\RandomBasedUuidFactory;
-use Symfony\Component\Uid\Factory\TimeBasedUuidFactory;
+use Symfony\Component\Uid\Factory\NameBasedUuidFactoryInterface;
+use Symfony\Component\Uid\Factory\RandomBasedUuidFactoryInterface;
+use Symfony\Component\Uid\Factory\TimeBasedUuidFactoryInterface;
+use Symfony\Component\Uid\Factory\UuidFactoryInterface;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\Uuid;
 
 final class UuidGenerator extends AbstractIdGenerator
 {
-    private readonly UuidFactory $protoFactory;
-    private UuidFactory|NameBasedUuidFactory|RandomBasedUuidFactory|TimeBasedUuidFactory $factory;
+    private readonly UuidFactoryInterface $protoFactory;
+    private UuidFactoryInterface|NameBasedUuidFactoryInterface|RandomBasedUuidFactoryInterface|TimeBasedUuidFactoryInterface $factory;
     private ?string $entityGetter = null;
 
-    public function __construct(?UuidFactory $factory = null)
+    public function __construct(?UuidFactoryInterface $factory = null)
     {
         $this->protoFactory = $this->factory = $factory ?? new UuidFactory();
     }

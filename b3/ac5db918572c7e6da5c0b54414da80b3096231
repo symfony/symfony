@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-09-25T07:31:48Z
+
+I confirmed this PR fixes #59852. Should it be considered a bugfix and target 6.4 then?

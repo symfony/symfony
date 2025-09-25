@@ -21,7 +21,7 @@ use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV6;
 
-class MockUuidFactory extends UuidFactory
+class MockUuidFactory implements UuidFactoryInterface
 {
     private \Iterator $sequence;
 
@@ -55,9 +55,9 @@ class MockUuidFactory extends UuidFactory
         };
     }
 
-    public function randomBased(): RandomBasedUuidFactory
+    public function randomBased(): RandomBasedUuidFactoryInterface
     {
-        return new class($this->create(...)) extends RandomBasedUuidFactory {
+        return new class($this->create(...)) implements RandomBasedUuidFactoryInterface {
             public function __construct(
                 private \Closure $create,
             ) {
@@ -74,13 +74,13 @@ class MockUuidFactory extends UuidFactory
         };
     }
 
-    public function timeBased(Uuid|string|null $node = null): TimeBasedUuidFactory
+    public function timeBased(Uuid|string|null $node = null): TimeBasedUuidFactoryInterface
     {
         if (\is_string($node ??= $this->timeBasedNode)) {
             $node = Uuid::fromString($node);
         }
 
-        return new class($this->create(...), $node) extends TimeBasedUuidFactory {
+        return new class($this->create(...), $node) implements TimeBasedUuidFactoryInterface {
             public function __construct(
                 private \Closure $create,
                 private ?Uuid $node = null,
@@ -108,13 +108,13 @@ class MockUuidFactory extends UuidFactory
         };
     }
 
-    public function nameBased(Uuid|string|null $namespace = null): NameBasedUuidFactory
+    public function nameBased(Uuid|string|null $namespace = null): NameBasedUuidFactoryInterface
     {
         if (null === $namespace ??= $this->nameBasedNamespace) {
             throw new LogicException(\sprintf('A namespace should be defined when using "%s()".', __METHOD__));
         }
 
-        return new class($this->create(...), $namespace) extends NameBasedUuidFactory {
+        return new class($this->create(...), $namespace) implements NameBasedUuidFactoryInterface {
             public function __construct(
                 private \Closure $create,
                 private Uuid|string $namespace,

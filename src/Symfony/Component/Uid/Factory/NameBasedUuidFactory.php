@@ -15,7 +15,7 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV5;
 
-class NameBasedUuidFactory
+class NameBasedUuidFactory implements NameBasedUuidFactoryInterface
 {
     public function __construct(
         private string $class,

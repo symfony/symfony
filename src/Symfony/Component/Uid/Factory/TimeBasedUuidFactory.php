@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid\Factory;
 use Symfony\Component\Uid\TimeBasedUidInterface;
 use Symfony\Component\Uid\Uuid;
 
-class TimeBasedUuidFactory
+class TimeBasedUuidFactory implements TimeBasedUuidFactoryInterface
 {
     /**
      * @param class-string<Uuid&TimeBasedUidInterface> $class

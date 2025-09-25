@@ -13,7 +13,7 @@ namespace Symfony\Component\Uid\Factory;
 
 use Symfony\Component\Uid\UuidV4;
 
-class RandomBasedUuidFactory
+class RandomBasedUuidFactory implements RandomBasedUuidFactoryInterface
 {
     /**
      * @param class-string $class

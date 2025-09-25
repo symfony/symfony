@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Uid\Factory;
 
-use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\TimeBasedUidInterface;
+use Symfony\Component\Uid\Uuid;
 
-class UlidFactory implements UlidFactoryInterface
+interface TimeBasedUuidFactoryInterface
 {
-    public function create(?\DateTimeInterface $time = null): Ulid
-    {
-        return new Ulid(null === $time ? null : Ulid::generate($time));
-    }
+    public function create(?\DateTimeInterface $time = null): Uuid&TimeBasedUidInterface;
 }

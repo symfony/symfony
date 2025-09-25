@@ -18,7 +18,7 @@ use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV7;
 
-class UuidFactory
+class UuidFactory implements UuidFactoryInterface
 {
     private string $defaultClass;
     private string $timeBasedClass;
@@ -52,12 +52,12 @@ class UuidFactory
         return new $class();
     }
 
-    public function randomBased(): RandomBasedUuidFactory
+    public function randomBased(): RandomBasedUuidFactoryInterface
     {
         return new RandomBasedUuidFactory($this->randomBasedClass);
     }
 
-    public function timeBased(Uuid|string|null $node = null): TimeBasedUuidFactory
+    public function timeBased(Uuid|string|null $node = null): TimeBasedUuidFactoryInterface
     {
         $node ??= $this->timeBasedNode;
 
@@ -71,7 +71,7 @@ class UuidFactory
     /**
      * @throws LogicException When no namespace is defined
      */
-    public function nameBased(Uuid|string|null $namespace = null): NameBasedUuidFactory
+    public function nameBased(Uuid|string|null $namespace = null): NameBasedUuidFactoryInterface
     {
         $namespace ??= $this->nameBasedNamespace;
 

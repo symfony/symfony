@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-19T08:56:23Z
+
+/cc @wouterj As you added the class back then #40145 you maybe have use cases in mind where being able to extend this class is necessary. In that case we may have to figure out a different solution.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2025-09-19T12:29:13Z
+
+I believe there is a general policy to not make value objects final if they don't have an interface (or at least back then). Making this class final means your custom `RememberMeHandlerInterface` implementation cannot customize the value object (e.g. if it needs to store more data). Can't remember if I had a concrete use-case.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-19T15:07:07Z
+
+An alternative solution I have in mind is triggering a deprecation in case the custom implementation has its own constructor but does not also override the two static factory methods. Otherwise we risk that custom implementations break in 8.0 with our new constructor signature.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-09-21T07:50:57Z
+
+Although Wouter's rule make sense most of the times, I'm fine making this class final because I think the security-http API that exposes it doesn't make it a good extension point anyway.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-22T07:37:50Z
+
+> An alternative solution I have in mind is triggering a deprecation in case the custom implementation has its own constructor but does not also override the two static factory methods. Otherwise we risk that custom implementations break in 8.0 with our new constructor signature.
+
+OK, on closer inspection I understand the motivation - having the constructor part of a public API since we're calling new `static()`.
+What about triggering a deprecation from the factories when the constructor is overridden and has more than 2 required arguments?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-25T08:45:39Z
+
+> What about triggering a deprecation from the factories when the constructor is overridden and has more than 2 required arguments?
+
+works as well, I updated the PR accordingly

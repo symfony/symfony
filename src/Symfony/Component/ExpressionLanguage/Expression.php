@@ -16,7 +16,7 @@ namespace Symfony\Component\ExpressionLanguage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Expression
+class Expression implements \Stringable
 {
     public function __construct(
         protected string $expression,

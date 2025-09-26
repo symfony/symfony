@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-25T14:13:39Z
+
+Do we have a test case where sequences are defined using XML? I'm wondering how this is presented to GroupSequence objects by the loader.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-25T16:32:33Z
+
+we do: https://github.com/symfony/symfony/blob/0c7ba5507d4daee0dfadea010004bfa90f497cf8/src/Symfony/Component/Validator/Tests/Mapping/Loader/constraint-mapping.xml#L11-L14

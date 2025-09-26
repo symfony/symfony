@@ -228,10 +228,114 @@ class PhpFileLoader extends FileLoader
 
         $servicesConfigurator = $containerConfigurator->services();
         foreach ($config->getServices() as $id => $class) {
-            if (\is_array($class)) {
-                $servicesConfigurator->set($class['id'], $class['class'] ?? null);
-            } else {
+            if (!\is_array($class)) {
                 $servicesConfigurator->set($id, $class);
+
+                continue;
+            }
+
+            $serviceConfigurator = $servicesConfigurator->set($class['id'], $class['class'] ?? null);
+
+            if (isset($class['alias'])) {
+                $servicesConfigurator->alias($class['id'], $class['alias']);
+
+                // nothing else to do with aliases
+                continue;
+            }
+
+            if (isset($class['parent'])) {
+                $serviceConfigurator->parent($class['parent']);
+            }
+
+            if (isset($class['shared'])) {
+                $serviceConfigurator->share($class['shared']);
+            }
+
+            if (isset($class['synthetic'])) {
+                $serviceConfigurator->synthetic($class['synthetic']);
+            }
+
+            if (isset($class['lazy'])) {
+                $serviceConfigurator->lazy($class['lazy']);
+            }
+
+            if (null !== $public = $class['public'] ?? null) {
+                $serviceConfigurator->{$public ? 'public' : 'private'}();
+            }
+
+            if (isset($class['abstract'])) {
+                $serviceConfigurator->abstract($class['abstract']);
+            }
+
+            if (isset($class['deprecated'])) {
+                if (\is_array($class['deprecated'])) {
+                    $serviceConfigurator->deprecate($class['deprecated']['package'], $class['deprecated']['version'], $class['deprecated']['message'] ?? '');
+                } else {
+                    $serviceConfigurator->deprecate('', '', $class['deprecated']);
+                }
+            }
+
+            if (isset($class['factory'])) {
+                $serviceConfigurator->factory($class['factory']);
+            }
+
+            if (isset($class['constructor'])) {
+                $serviceConfigurator->constructor($class['constructor']);
+            }
+
+            if (isset($class['file'])) {
+                $serviceConfigurator->file($class['file']);
+            }
+
+            if (isset($class['arguments'])) {
+                $serviceConfigurator->args($class['arguments']);
+            }
+
+            foreach ($class['properties'] ?? [] as $property => $value) {
+                $serviceConfigurator->property($property, $value);
+            }
+
+            if (isset($class['configurator'])) {
+                $serviceConfigurator->configurator($class['configurator']);
+            }
+
+            foreach ($class['calls'] ?? [] as $call) {
+                if (isset($call['method'])) {
+                    $serviceConfigurator->call($call['method'], $call['arguments'] ?? [], $call['returns_clone'] ?? false);
+                } elseif (isset($call[0])) {
+                    $serviceConfigurator->call($call[0], $call[1] ?? [], $call[2] ?? false);
+                }
+            }
+
+            foreach ($class['tags'] ?? [] as $tag) {
+                if (\is_array($tag)) {
+                    $name = $tag['name'];
+                    unset($tag['name']);
+                    $serviceConfigurator->tag($name, $tag);
+                } else {
+                    $serviceConfigurator->tag($tag);
+                }
+            }
+
+            if (isset($class['decorates'])) {
+                $serviceConfigurator->decorate(
+                    $class['decorates'],
+                    $class['decoration_inner_name'] ?? null,
+                    $class['decoration_priority'] ?? 0,
+                    $class['decoration_on_invalid'] ?? 'exception'
+                );
+            }
+
+            if (isset($class['autowire'])) {
+                $serviceConfigurator->autowire($class['autowire']);
+            }
+
+            if (isset($class['autoconfigure'])) {
+                $serviceConfigurator->autoconfigure($class['autoconfigure']);
+            }
+
+            foreach ($class['bind'] ?? [] as $argument => $value) {
+                $serviceConfigurator->bind($argument, $value);
             }
         }
     }

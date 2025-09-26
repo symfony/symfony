@@ -38,16 +38,16 @@ final class ConfigTraitsGenerator
 
             $class = new TraitBuilder('Symfony\Config', $alias);
             $class->addMethod($alias, <<<'PHP'
-            /**
-             * @param COMMENT $config
-             */
-            public function NAME(array $config): static
-            {
-                $this->NAMEConfig->configure($config);
+                /**
+                 * @param COMMENT $config
+                 */
+                public function NAME(array $config): static
+                {
+                    $this->NAMEConfig->configure($config);
 
-                return $this;
-            }
-            PHP, [
+                    return $this;
+                }
+                PHP, [
                 'COMMENT' => ArrayShapeGenerator::generate($configuration->getConfigTreeBuilder()->buildTree()),
                 'NAME' => $alias,
             ]);
@@ -67,11 +67,11 @@ final class ConfigTraitsGenerator
 
     private function getFullPath(ClassBuilder|TraitBuilder $class): string
     {
-        $directory = $this->outputDir . \DIRECTORY_SEPARATOR . $class->getDirectory();
+        $directory = $this->outputDir.\DIRECTORY_SEPARATOR.$class->getDirectory();
         if (!is_dir($directory)) {
-            @mkdir($directory, 0777, true);
+            @mkdir($directory, 0o777, true);
         }
 
-        return $directory . \DIRECTORY_SEPARATOR . $class->getFilename();
+        return $directory.\DIRECTORY_SEPARATOR.$class->getFilename();
     }
 }

@@ -107,7 +107,7 @@ public function NAME(): string
         foreach ($configurationKeys as $configurationKey) {
             $camelCaseKey = $this->camelCase($configurationKey);
 
-            $class->addProperty(sprintf('%sConfig', $camelCaseKey), sprintf('%sConfig', ucfirst($camelCaseKey)));
+            $class->addProperty(\sprintf('%sConfig', $camelCaseKey), \sprintf('%sConfig', ucfirst($camelCaseKey)));
         }
 
         $class->addMethod('__construct', <<<'PHP'
@@ -117,8 +117,8 @@ public function NAME(): string
                 $this->builders = [BUILDERS];
             }
             PHP, [
-                'BUILDERS' => implode(", ", array_map(fn ($alias) => sprintf('$this->%sConfig', $this->camelCase($alias)), $configurationKeys)),
-                'CONFIGS' => implode("\n", array_map(fn ($alias) => sprintf('    $this->%sConfig = new %sConfig();', $this->camelCase($alias), ucfirst($this->camelCase($alias))), $configurationKeys)),
+            'BUILDERS' => implode(', ', array_map(fn ($alias) => \sprintf('$this->%sConfig', $this->camelCase($alias)), $configurationKeys)),
+            'CONFIGS' => implode("\n", array_map(fn ($alias) => \sprintf('    $this->%sConfig = new %sConfig();', $this->camelCase($alias), ucfirst($this->camelCase($alias))), $configurationKeys)),
         ]);
 
         $class->addMethod('getBuilders', <<<'PHP'
@@ -133,6 +133,7 @@ public function NAME(): string
 
         return function () use ($path, $traitsClosure) {
             $traitsClosure();
+
             return require_once $path;
         };
     }

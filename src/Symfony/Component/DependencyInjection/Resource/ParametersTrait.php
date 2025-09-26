@@ -16,9 +16,9 @@ trait ParametersTrait
     private array $parameters = [];
 
     /**
-     * @var array<string, array|bool|string|int|float|\UnitEnum|null> $parameters
+     * @param array<string, array|bool|string|int|float|\UnitEnum|null> $parameters
      */
-    function parameters(array $parameters): static
+    public function parameters(array $parameters): static
     {
         $this->parameters = $parameters;
 

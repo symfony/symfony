@@ -722,6 +722,84 @@ class ConfigurationTest extends TestCase
         $this->assertSame(['data-example-attr' => 'value'], $config['form']['csrf_protection']['field_attr'] ?? []);
     }
 
+    public function testCsrfProtectionDisabledWhenValueIsFalse()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(false), [
+            [
+                'csrf_protection' => false,
+            ],
+        ]);
+
+        $this->assertEquals([
+            'enabled' => false,
+            'stateless_token_ids' => [],
+            'check_header' => false,
+            'cookie_name' => 'csrf-token',
+        ], $config['csrf_protection']);
+    }
+
+    public function testCsrfProtectionEnabledWhenValueIsTrue()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(false), [
+            [
+                'csrf_protection' => true,
+            ],
+        ]);
+
+        $this->assertEquals([
+            'enabled' => true,
+            'stateless_token_ids' => [],
+            'check_header' => false,
+            'cookie_name' => 'csrf-token',
+        ], $config['csrf_protection']);
+    }
+
+    public function testCsrfProtectionEnabledWhenValueIsNull()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(false), [
+            [
+                'csrf_protection' => null,
+            ],
+        ]);
+
+        $this->assertEquals([
+            'enabled' => true,
+            'stateless_token_ids' => [],
+            'check_header' => false,
+            'cookie_name' => 'csrf-token',
+        ], $config['csrf_protection']);
+    }
+
+    public function testCsrfProtectionEnabledWhenStatelessTokenIdIsConfigured()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(false), [
+            [
+                'csrf_protection' => [
+                    'stateless_token_ids' => [
+                        'submit',
+                        'authenticate',
+                        'logout',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            'enabled' => true,
+            'stateless_token_ids' => [
+                'submit',
+                'authenticate',
+                'logout',
+            ],
+            'check_header' => false,
+            'cookie_name' => 'csrf-token',
+        ], $config['csrf_protection']);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [

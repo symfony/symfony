@@ -2223,11 +2223,9 @@ class RequestTest extends TestCase
         Request::setFactory(null);
     }
 
-    /**
-     * @dataProvider getLongHostNames
-     */
-    public function testVeryLongHosts($host)
+    public function testVeryLongHosts()
     {
+        $host = 'a'.str_repeat('.a', 40000);
         $start = microtime(true);
 
         $request = Request::create('/');
@@ -2267,14 +2265,6 @@ class RequestTest extends TestCase
             ['[::1]', true],
             ['[::1]:80', true, '[::1]', 80],
             [str_repeat('.', 101), false],
-        ];
-    }
-
-    public static function getLongHostNames()
-    {
-        return [
-            ['a'.str_repeat('.a', 40000)],
-            [str_repeat(':', 101)],
         ];
     }
 
@@ -2645,6 +2635,71 @@ class RequestTest extends TestCase
         foreach ((new \ReflectionClass(Request::class))->getConstants() as $constant => $value) {
             $this->assertNotSame(0b10000000, $value, sprintf('The constant "%s" should not use the reserved value "0b10000000".', $constant));
         }
+    }
+
+    /**
+     * @dataProvider provideMalformedUrls
+     */
+    public function testMalformedUrls(string $url, string $expectedException)
+    {
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage($expectedException);
+
+        Request::create($url);
+    }
+
+    public static function provideMalformedUrls(): array
+    {
+        return [
+            ['http://normal.com[@vulndetector.com/', 'Invalid URI: Userinfo is malformed.'],
+            ['http://[normal.com@vulndetector.com/', 'Invalid URI: Userinfo is malformed.'],
+            ['http://normal.com@[vulndetector.com/', 'Invalid URI: Host is malformed.'],
+            ['http://[[normal.com@][vulndetector.com/', 'Invalid URI: Userinfo is malformed.'],
+            ['http://[vulndetector.com]', 'Invalid URI: Host is malformed.'],
+            ['http://[0:0::vulndetector.com]:80', 'Invalid URI: Host is malformed.'],
+            ['http://[2001:db8::vulndetector.com]', 'Invalid URI: Host is malformed.'],
+            ['http://[malicious.com]', 'Invalid URI: Host is malformed.'],
+            ['http://[evil.org]', 'Invalid URI: Host is malformed.'],
+            ['http://[internal.server]', 'Invalid URI: Host is malformed.'],
+            ['http://[192.168.1.1]', 'Invalid URI: Host is malformed.'],
+            ['http://192.abc.1.1', 'Invalid URI: Host is malformed.'],
+            ['http://[localhost]', 'Invalid URI: Host is malformed.'],
+            ["\x80https://example.com", 'Invalid URI: Scheme is malformed.'],
+            ['>https://example.com', 'Invalid URI: Scheme is malformed.'],
+            ["http\x0b://example.com", 'Invalid URI: Scheme is malformed.'],
+            ["https\x80://example.com", 'Invalid URI: Scheme is malformed.'],
+            ['http>://example.com', 'Invalid URI: Scheme is malformed.'],
+            ['0http://example.com', 'Invalid URI: Scheme is malformed.'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideLegitimateUrls
+     */
+    public function testLegitimateUrls(string $url)
+    {
+        $request = Request::create($url);
+
+        $this->assertInstanceOf(Request::class, $request);
+    }
+
+    public static function provideLegitimateUrls(): array
+    {
+        return [
+            ['http://example.com'],
+            ['https://example.com'],
+            ['http://example.com:8080'],
+            ['https://example.com:8443'],
+            ['http://user:pass@example.com'],
+            ['http://user:pass@example.com:8080'],
+            ['http://user:pass@example.com/path'],
+            ['http://[2001:db8::1]'],
+            ['http://[2001:db8::1]:8080'],
+            ['http://[2001:db8::1]/path'],
+            ['http://[::1]'],
+            ['http://example.com/path'],
+            [':path'],
+        ];
     }
 }
 

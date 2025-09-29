@@ -13,6 +13,7 @@ CHANGELOG
  * Allow passing invokable commands to `Symfony\Component\Console\Tester\CommandTester`
  * Add `#[Input]` attribute to support DTOs in commands
  * Add optional timeout for interaction in `QuestionHelper`
+ * Handle signals for text inputs in `QuestionHelper`
 
 7.3
 ---

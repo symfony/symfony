@@ -140,7 +140,11 @@ class MailjetApiTransport extends AbstractApiTransport
         }
 
         $forbiddenHeadersLowercase = \array_map('strtolower', self::FORBIDDEN_HEADERS);
-        $headerToMessageLowercase = \array_map('strtolower', self::HEADER_TO_MESSAGE);
+
+        $headerToMessageLowercase = \array_combine(
+            \array_map('strtolower', \array_keys(self::HEADER_TO_MESSAGE)),
+            \array_values(self::HEADER_TO_MESSAGE)
+        );
 
         foreach ($email->getHeaders()->all() as $headerName => $header) {
             if ($convertConf = $headerToMessageLowercase[$headerName] ?? false) {

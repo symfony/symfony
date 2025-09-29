@@ -962,7 +962,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
     }
 
     #[DataProvider('modeProvider')]
-    public function testExitCommandOnEmptySingleLineInputSIGINT(string $mode)
+    public function testExitCommandOnInputSIGINT(string $mode)
     {
         if (!SignalRegistry::isSupported()) {
             $this->markTestSkipped('pcntl signals not available');

@@ -139,11 +139,11 @@ class MailjetApiTransport extends AbstractApiTransport
             $message['HTMLPart'] = $html;
         }
 
-        $forbiddenHeadersLowercase = \array_map('strtolower', self::FORBIDDEN_HEADERS);
+        $forbiddenHeadersLowercase = array_map('strtolower', self::FORBIDDEN_HEADERS);
 
-        $headerToMessageLowercase = \array_combine(
-            \array_map('strtolower', \array_keys(self::HEADER_TO_MESSAGE)),
-            \array_values(self::HEADER_TO_MESSAGE)
+        $headerToMessageLowercase = array_combine(
+            array_map('strtolower', array_keys(self::HEADER_TO_MESSAGE)),
+            array_values(self::HEADER_TO_MESSAGE)
         );
 
         foreach ($email->getHeaders()->all() as $headerName => $header) {
@@ -152,7 +152,7 @@ class MailjetApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            if (\in_array($headerName, $forbiddenHeadersLowercase, TRUE)) {
+            if (\in_array($headerName, $forbiddenHeadersLowercase, true)) {
                 continue;
             }
 

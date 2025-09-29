@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-09-29T09:37:46Z
+
+The whole method looks weird to me. If the value is an int that can also be represented as a float without precision loss, return the float ? Why doing that ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-29T09:46:48Z
+
+> The whole method looks weird to me. If the value is an int that can also be represented as a float without precision loss, return the float ? Why doing that ?
+
+I was wondering the same but getting rid of the cast means that the `NumberType` will then return integers where it previously returned floats leading to several related test failures.
+
+This piece of code was introduced in #18358 to fix #18346.

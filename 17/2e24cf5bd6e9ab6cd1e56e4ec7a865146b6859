@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-09-26T17:36:44Z
+
+the changelog mentions using the `$loader` variable as a replacement, but there is no such example neither in the PR description nor in the upgrade file.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-26T18:08:19Z
+
+yeah, I think this is too niche anyway
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-29T16:10:03Z
+
+PR updated, I figured out a BC layer!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-29T17:20:50Z
+
+Tests added

@@ -26,8 +26,11 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Process;
 
 #[Group('tty')]
 class QuestionHelperTest extends AbstractQuestionHelperTestCase
@@ -956,6 +959,31 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $stream = $output->getStream();
         rewind($stream);
         $this->assertStringEndsWith("\033[1D\033[K\033[2D\033[K\033[1D\033[K", stream_get_contents($stream));
+    }
+
+    #[DataProvider('modeProvider')]
+    public function testExitCommandOnEmptySingleLineInputSIGINT(string $mode)
+    {
+        if (!SignalRegistry::isSupported()) {
+            $this->markTestSkipped('pcntl signals not available');
+        }
+
+        $p = new Process(['php', dirname(__DIR__).'/Fixtures/application_test_sigint.php', $mode]);
+        $p->setPty(true);
+        $p->setTimeout(2); // the process will auto shutdown if not killed by SIGINT, to prevent blocking
+        $p->start();
+
+        $this->expectException(ProcessSignaledException::class);
+        $this->expectExceptionMessage('The process has been signaled with signal "2".');
+        $p->wait();
+    }
+
+    public static function modeProvider(): array
+    {
+        return [
+            ['single'],
+            ['multi'],
+        ];
     }
 
     protected function getInputStream($input)

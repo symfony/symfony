@@ -516,7 +516,7 @@ class QuestionHelper extends Helper
 
         if (!$question->isMultiline()) {
             $cp = $this->setIOCodepage();
-            $ret = fgets($inputStream, 4096);
+            $ret = $this->doReadInput($inputStream, "\n");
 
             return $this->resetIOCodepage($cp, $ret);
         }
@@ -526,14 +526,8 @@ class QuestionHelper extends Helper
             return false;
         }
 
-        $ret = '';
         $cp = $this->setIOCodepage();
-        while (false !== ($char = fgetc($multiLineStreamReader))) {
-            if ("\x4" === $char || \PHP_EOL === "{$ret}{$char}") {
-                break;
-            }
-            $ret .= $char;
-        }
+        $ret = $this->doReadInput($multiLineStreamReader, "\x4");
 
         if (stream_get_meta_data($inputStream)['seekable']) {
             fseek($inputStream, ftell($multiLineStreamReader));
@@ -602,5 +596,37 @@ class QuestionHelper extends Helper
         }
 
         return $cloneStream;
+    }
+
+    /**
+     * @param resource $inputStream
+     */
+    private function doReadInput($inputStream, string $exitChar): string
+    {
+        $ret = '';
+        $isStdin = 'php://stdin' === (stream_get_meta_data($inputStream)['uri'] ?? null);
+        $r = [$inputStream];
+        $w = [];
+
+        while (!feof($inputStream)) {
+            while ($isStdin && 0 === @stream_select($r, $w, $w, 0, 100)) {
+                // Give signal handlers a chance to run
+                $r = [$inputStream];
+            }
+            $char = fread($inputStream, 1);
+
+            // as opposed to fgets(), fread() returns an empty string when the stream content is empty, not false.
+            if (false === $char || ('' === $ret && '' === $char)) {
+                throw new MissingInputException('Aborted.');
+            }
+
+            if ($exitChar === $char || \PHP_EOL === "{$ret}{$char}") {
+                break;
+            }
+
+            $ret .= $char;
+        }
+
+        return $ret;
     }
 }

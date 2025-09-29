@@ -20,7 +20,6 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -142,13 +141,13 @@ class MailjetApiTransport extends AbstractApiTransport
             $message['HTMLPart'] = $html;
         }
 
-        foreach ($email->getHeaders()->all() as $header) {
-            if ($convertConf = self::HEADER_TO_MESSAGE[$header->getName()] ?? false) {
+        foreach ($email->getHeaders()->all() as $headerName => $header) {
+            if ($convertConf = self::HEADER_TO_MESSAGE[$headerName] ?? false) {
                 $message[$convertConf[0]] = $this->castCustomHeader($header->getBodyAsString(), $convertConf[1]);
                 continue;
             }
 
-            if ($this->isHeaderForbidden($header)) {
+            if ($this->isHeaderForbidden($headerName)) {
                 continue;
             }
 
@@ -211,14 +210,12 @@ class MailjetApiTransport extends AbstractApiTransport
         };
     }
 
-    private function isHeaderForbidden(HeaderInterface $header): bool
+    private function isHeaderForbidden(string $headerName): bool
     {
         if (NULL === $this->forbiddenHeadersLowercase) {
             $this->forbiddenHeadersLowercase = \array_map('strtolower', self::FORBIDDEN_HEADERS);
         }
 
-        return \in_array(
-            \strtolower($header->getName()), $this->forbiddenHeadersLowercase, TRUE
-        );
+        return \in_array($headerName, $this->forbiddenHeadersLowercase, TRUE);
     }
 }

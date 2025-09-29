@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-01-21T23:53:35Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2025-01-22T13:26:45Z
+
+Can we bring this to CachingHttpClient (with a BC layer) instead of introducing a new class that is the good implementation of caching but with a name that is much less clear ?
+Also, having the RFC id in the class name is a bad idea to me, as it would be a pain if a new RFC gets released to replace the current one (which happened multiple times for RFCs related to HTTP)
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2025-02-19T11:35:49Z
+
+UPDATE:
+- CI failure on PHP 8.5 is unrelated
+- Psalm failure seems to be a false positive to me
+- Tests pass locally on low deps, but not on github actions. I need to look at it.
+- I don't know how to please fabbot. Should I not make any change to the upgrade file ?
+
+Otherwise, PR is ready on my side. Ready for another reviews.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-17T08:29:48Z
+
+Not sure about locking as a first step, maybe just some pointer would be enough: while writing, we use some random key name, and once the cache is populated, we update some other pointer key, this one predictably derived from the request. When the cache is stale or empty, that'd mean writing many concurrent streams to the cache backend for the same request, until one finished and wins of the others. No ideal, but at least correct from a behavioral perspective.
+The next step would be to wrap everything in one may $cache->get() callback, which would the act as the lock unit, possibly capable of serving something while revalidating and/or waiting/streaming while the concurrent write thread is doing its job. I'd be fine doing this next step in a follow up PR if that's too involving for this one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-27T14:24:39Z
+
+@Lctrs WDYT of our comments? Difficult topic :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-05T12:27:47Z
+
+Can you please maybe expand in the PR description? Think about a blog post we could derive from it :)
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2025-09-05T12:43:34Z
+
+I'm currently on holiday. I'll get back to it next week. Including my thoughts on possible race conditions discussed earlier.
+
+> Can you please maybe expand in the PR description? Think about a blog post we could derive from it :)
+
+May you be more specific ? You want me to explain the code ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-05T12:45:23Z
+
+What we could put in the doc about it yes (thus not internal details of course)
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2025-09-08T22:18:50Z
+
+@nicolas-grekas Done. Hope it's what you had in mind.
+
+About concurrent requests, due to the async nature of the implementation - and unless I'm missing something -, wrapping everything in a `$cache->get()` call won't do the trick. We may have to bring `symfony/lock` to the party to implement request coalescing.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2025-09-09T10:51:36Z
+
+> About concurrent requests, I understand that the cached response will become available only after the last chunk has been received. This means the concurrency model is: duplicate requests until one completes. That's totally fine to me.
+There's just one issue I think: during this warmup phase, two concurrent requests can corrupt the chunks of the other one.
+We could fix this by adding a random value in the chunk cache, stored also in the final item, so that we can be sure we're dealing with the correct chain of chunks.
+Does this make sense?
+
+I don't think the probability of having different responses for doing the 2 same requests in a very short time span is very high but who knows ?
+
+That being said, the only reason the cached response is made available at the last chunk is because of the chunks count. If we change the logic of the reconstitution of cached responses' content by turning the chunks' cache entry as a linked list (ie. `array{content: string, next_chunk: string|null}`, we could make it work by generating a random id or using chunks' offsets), we could write status code, headers, etc. of the response in the cache in the first chunk (`chunks_count` would be replaced by `first_chunk` pointing to the key of the first chunk in the cache). I believe this would make it easier to implement request coalescing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-09T10:57:11Z
+
+Linked list works for me too. I'd just not use offsets as it's always possible for two concurrent requests to yield different chunks.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2025-09-09T13:01:22Z
+
+@nicolas-grekas done.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2025-09-28T22:12:39Z
+
+@nicolas-grekas I reverted to commit the cache on last chunk. I also tweaked the cases when we want to clear the cache.

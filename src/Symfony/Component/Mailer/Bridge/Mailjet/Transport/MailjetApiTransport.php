@@ -30,25 +30,25 @@ class MailjetApiTransport extends AbstractApiTransport
     private const HOST = 'api.mailjet.com';
     private const API_VERSION = '3.1';
     private const FORBIDDEN_HEADERS = [
-        'Date', 'X-CSA-Complaints', 'Message-Id', 'X-MJ-StatisticsContactsListID',
-        'DomainKey-Status', 'Received-SPF', 'Authentication-Results', 'Received',
-        'From', 'Sender', 'Subject', 'To', 'Cc', 'Bcc', 'Reply-To', 'Return-Path', 'Delivered-To', 'DKIM-Signature',
-        'X-Feedback-Id', 'X-Mailjet-Segmentation', 'List-Id', 'X-MJ-MID', 'X-MJ-ErrorMessage',
-        'X-Mailjet-Debug', 'User-Agent', 'X-Mailer', 'X-MJ-WorkflowID',
+        'date', 'x-csa-complaints', 'message-id', 'x-mj-statisticscontactslistid',
+        'domainkey-status', 'received-spf', 'authentication-results', 'received',
+        'from', 'sender', 'subject', 'to', 'cc', 'bcc', 'reply-to', 'return-path', 'delivered-to', 'dkim-signature',
+        'x-feedback-id', 'x-mailjet-segmentation', 'list-id', 'x-mj-mid', 'x-mj-errormessage',
+        'x-mailjet-debug', 'user-agent', 'x-mailer', 'x-mj-workflowid',
     ];
     private const HEADER_TO_MESSAGE = [
-        'X-MJ-TemplateLanguage' => ['TemplateLanguage', 'bool'],
-        'X-MJ-TemplateID' => ['TemplateID', 'int'],
-        'X-MJ-TemplateErrorReporting' => ['TemplateErrorReporting', 'json'],
-        'X-MJ-TemplateErrorDeliver' => ['TemplateErrorDeliver', 'bool'],
-        'X-MJ-Vars' => ['Variables', 'json'],
-        'X-MJ-CustomID' => ['CustomID', 'string'],
-        'X-MJ-EventPayload' => ['EventPayload', 'string'],
-        'X-Mailjet-Campaign' => ['CustomCampaign', 'string'],
-        'X-Mailjet-DeduplicateCampaign' => ['DeduplicateCampaign', 'bool'],
-        'X-Mailjet-Prio' => ['Priority', 'int'],
-        'X-Mailjet-TrackClick' => ['TrackClicks', 'string'],
-        'X-Mailjet-TrackOpen' => ['TrackOpens', 'string'],
+        'x-mj-templatelanguage' => ['TemplateLanguage', 'bool'],
+        'x-mj-templateid' => ['TemplateID', 'int'],
+        'x-mj-templateerrorreporting' => ['TemplateErrorReporting', 'json'],
+        'x-mj-templateerrordeliver' => ['TemplateErrorDeliver', 'bool'],
+        'x-mj-vars' => ['Variables', 'json'],
+        'x-mj-customid' => ['CustomID', 'string'],
+        'x-mj-eventpayload' => ['EventPayload', 'string'],
+        'x-mailjet-campaign' => ['CustomCampaign', 'string'],
+        'x-mailjet-deduplicatecampaign' => ['DeduplicateCampaign', 'bool'],
+        'x-mailjet-prio' => ['Priority', 'int'],
+        'x-mailjet-trackclick' => ['TrackClicks', 'string'],
+        'x-mailjet-trackopen' => ['TrackOpens', 'string'],
     ];
 
     public function __construct(
@@ -139,20 +139,13 @@ class MailjetApiTransport extends AbstractApiTransport
             $message['HTMLPart'] = $html;
         }
 
-        $forbiddenHeadersLowercase = array_map('strtolower', self::FORBIDDEN_HEADERS);
-
-        $headerToMessageLowercase = array_combine(
-            array_map('strtolower', array_keys(self::HEADER_TO_MESSAGE)),
-            array_values(self::HEADER_TO_MESSAGE)
-        );
-
         foreach ($email->getHeaders()->all() as $headerName => $header) {
-            if ($convertConf = $headerToMessageLowercase[$headerName] ?? false) {
+            if ($convertConf = self::HEADER_TO_MESSAGE[$headerName] ?? false) {
                 $message[$convertConf[0]] = $this->castCustomHeader($header->getBodyAsString(), $convertConf[1]);
                 continue;
             }
 
-            if (\in_array($headerName, $forbiddenHeadersLowercase, true)) {
+            if (\in_array($headerName, self::FORBIDDEN_HEADERS, true)) {
                 continue;
             }
 

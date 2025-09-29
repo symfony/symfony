@@ -20,6 +20,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -50,6 +51,8 @@ class MailjetApiTransport extends AbstractApiTransport
         'X-Mailjet-TrackClick' => ['TrackClicks', 'string'],
         'X-Mailjet-TrackOpen' => ['TrackOpens', 'string'],
     ];
+
+    private ?array $forbiddenHeadersLowercase = null;
 
     public function __construct(
         private string $publicKey,
@@ -144,7 +147,8 @@ class MailjetApiTransport extends AbstractApiTransport
                 $message[$convertConf[0]] = $this->castCustomHeader($header->getBodyAsString(), $convertConf[1]);
                 continue;
             }
-            if (\in_array($header->getName(), self::FORBIDDEN_HEADERS, true)) {
+
+            if ($this->isHeaderForbidden($header)) {
                 continue;
             }
 
@@ -205,5 +209,16 @@ class MailjetApiTransport extends AbstractApiTransport
             'json' => json_decode($value, true, 512, \JSON_THROW_ON_ERROR),
             'string' => $value,
         };
+    }
+
+    private function isHeaderForbidden(HeaderInterface $header): bool
+    {
+        if (NULL === $this->forbiddenHeadersLowercase) {
+            $this->forbiddenHeadersLowercase = \array_map('strtolower', self::FORBIDDEN_HEADERS);
+        }
+
+        return \in_array(
+            \strtolower($header->getName()), $this->forbiddenHeadersLowercase, TRUE
+        );
     }
 }

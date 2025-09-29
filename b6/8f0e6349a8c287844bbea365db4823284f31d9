@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-09-29T11:12:00Z
+
+Comments addressed in 07aa0c888c9639071b7294233fcca08598750394.
+
+I used `|` as the delimiter for the generated info/deprecation/default value. I also hesitated to use `/` maybe.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-09-29T14:10:58Z
+
+New review addressed in 0bf17d2d04b1a2c16f34df4e08e914b77cd4f1bf (comments refactoring, nullable prototyped arrays et al)

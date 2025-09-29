@@ -51,8 +51,6 @@ class MailjetApiTransport extends AbstractApiTransport
         'X-Mailjet-TrackOpen' => ['TrackOpens', 'string'],
     ];
 
-    private ?array $forbiddenHeadersLowercase = null;
-
     public function __construct(
         private string $publicKey,
         #[\SensitiveParameter] private string $privateKey,
@@ -141,13 +139,15 @@ class MailjetApiTransport extends AbstractApiTransport
             $message['HTMLPart'] = $html;
         }
 
+        $forbiddenHeadersLowercase = \array_map('strtolower', self::FORBIDDEN_HEADERS);
+
         foreach ($email->getHeaders()->all() as $headerName => $header) {
             if ($convertConf = self::HEADER_TO_MESSAGE[$headerName] ?? false) {
                 $message[$convertConf[0]] = $this->castCustomHeader($header->getBodyAsString(), $convertConf[1]);
                 continue;
             }
 
-            if ($this->isHeaderForbidden($headerName)) {
+            if (\in_array($headerName, $forbiddenHeadersLowercase, TRUE)) {
                 continue;
             }
 
@@ -208,14 +208,5 @@ class MailjetApiTransport extends AbstractApiTransport
             'json' => json_decode($value, true, 512, \JSON_THROW_ON_ERROR),
             'string' => $value,
         };
-    }
-
-    private function isHeaderForbidden(string $headerName): bool
-    {
-        if (NULL === $this->forbiddenHeadersLowercase) {
-            $this->forbiddenHeadersLowercase = \array_map('strtolower', self::FORBIDDEN_HEADERS);
-        }
-
-        return \in_array($headerName, $this->forbiddenHeadersLowercase, TRUE);
     }
 }

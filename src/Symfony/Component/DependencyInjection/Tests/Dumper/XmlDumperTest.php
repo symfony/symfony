@@ -76,7 +76,7 @@ class XmlDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container11.php';
         $dumper = new XmlDumper($container);
         $this->assertEquals('<?xml version="1.0" encoding="utf-8"?>
-<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://symfony.com/schema/services-1.0.xsd">
   <services>
     <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
     <service id="foo" class="FooClass" public="true">
@@ -98,7 +98,7 @@ class XmlDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container12.php';
         $dumper = new XmlDumper($container);
         $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://symfony.com/schema/services-1.0.xsd\">
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\">
@@ -125,7 +125,7 @@ class XmlDumperTest extends TestCase
 
         return [
             ["<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://symfony.com/schema/services-1.0.xsd\">
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\" decoration-inner-name=\"bar.woozy\"/>
@@ -133,7 +133,7 @@ class XmlDumperTest extends TestCase
 </container>
 ", include $fixturesPath.'/containers/container15.php'],
             ["<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://symfony.com/schema/services-1.0.xsd\">
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\"/>
@@ -141,7 +141,7 @@ class XmlDumperTest extends TestCase
 </container>
 ", include $fixturesPath.'/containers/container16.php'],
             ["<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://symfony.com/schema/services-1.0.xsd\">
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
     <service id=\"decorator\" decorates=\"decorated\" decoration-on-invalid=\"null\" decoration-inner-name=\"decorated.inner\" decoration-priority=\"1\"/>

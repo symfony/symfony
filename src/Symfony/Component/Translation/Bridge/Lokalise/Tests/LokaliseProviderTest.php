@@ -817,7 +817,7 @@ class LokaliseProviderTest extends ProviderTestCase
 
         yield ['en', 'messages', <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 https://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
     <header>
       <tool tool-id="lokalise.com" tool-name="Lokalise"/>
@@ -834,8 +834,7 @@ class LokaliseProviderTest extends ProviderTestCase
     </body>
   </file>
 </xliff>
-XLIFF
-            ,
+XLIFF,
             $expectedTranslatorBagEn,
         ];
 
@@ -847,7 +846,7 @@ XLIFF
 
         yield ['en_US', 'messages', <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 https://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en-US">
     <header>
       <tool tool-id="lokalise.com" tool-name="Lokalise"/>
@@ -864,8 +863,7 @@ XLIFF
     </body>
   </file>
 </xliff>
-XLIFF
-            ,
+XLIFF,
             $expectedTranslatorBagEnUS,
         ];
 
@@ -877,7 +875,7 @@ XLIFF
 
         yield ['fr', 'messages', <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 https://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
     <header>
       <tool tool-id="lokalise.com" tool-name="Lokalise"/>
@@ -894,8 +892,7 @@ XLIFF
     </body>
   </file>
 </xliff>
-XLIFF
-            ,
+XLIFF,
             $expectedTranslatorBagFr,
         ];
     }
@@ -929,7 +926,7 @@ XLIFF
                 'en' => [
                     'messages' => <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 https://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
     <header>
       <tool tool-id="lokalise.com" tool-name="Lokalise"/>
@@ -946,11 +943,10 @@ XLIFF
     </body>
   </file>
 </xliff>
-XLIFF
-                    ,
+XLIFF,
                     'validators' => <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 https://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
     <header>
       <tool tool-id="lokalise.com" tool-name="Lokalise"/>
@@ -967,13 +963,12 @@ XLIFF
     </body>
   </file>
 </xliff>
-XLIFF
-                    ,
+XLIFF,
                 ],
                 'fr' => [
                     'messages' => <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 https://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
     <header>
       <tool tool-id="lokalise.com" tool-name="Lokalise"/>
@@ -990,11 +985,10 @@ XLIFF
     </body>
   </file>
 </xliff>
-XLIFF
-                    ,
+XLIFF,
                     'validators' => <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 https://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
     <header>
       <tool tool-id="lokalise.com" tool-name="Lokalise"/>
@@ -1011,8 +1005,7 @@ XLIFF
     </body>
   </file>
 </xliff>
-XLIFF
-                    ,
+XLIFF,
                 ],
             ],
             $expectedTranslatorBag,

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <routes xmlns="http://symfony.com/schema/routing"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://symfony.com/schema/routing">
+        xsi:schemaLocation="https://symfony.com/schema/routing-1.0.xsd">
 
     <route id="utf8_one" path="/one" />
     <route id="utf8_two" path="/two" />

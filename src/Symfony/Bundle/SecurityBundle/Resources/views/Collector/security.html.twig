@@ -189,7 +189,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ not collector.firewall or not collector.token ? 'disabled' }}">
+    <span class="label {{ not collector.firewall or not collector.firewall.security_enabled ? 'disabled' }}">
         <span class="icon" aria-hidden="true">{{ source('@Security/Collector/icon.svg') }}</span>
         <strong>Security</strong>
     </span>
@@ -199,7 +199,71 @@
     <h2>Security</h2>
     {% if collector.enabled %}
         <div class="sf-tabs">
-            <div class="tab {{ collector.token is empty ? 'disabled' }}">
+            <div class="tab {{ (not collector.firewall or collector.firewall.security_enabled is empty) ? 'disabled' }}">
+                <h3 class="tab-title">Firewall</h3>
+                <div class="tab-content">
+                    {% if collector.firewall %}
+                        <div class="metrics">
+                            <div class="metric">
+                                <span class="value">{{ collector.firewall.name }}</span>
+                                <span class="label">Name</span>
+                            </div>
+                            <div class="metric">
+                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.firewall.security_enabled ? 'yes' : 'no') ~ '.svg') }}</span>
+                                <span class="label">Security enabled</span>
+                            </div>
+                            <div class="metric">
+                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg') }}</span>
+                                <span class="label">Stateless</span>
+                            </div>
+                        </div>
+
+                        {% if collector.firewall.security_enabled %}
+                            <h4>Configuration</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="key">Key</th>
+                                        <th scope="col">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>provider</th>
+                                        <td>{{ collector.firewall.provider ?: '(none)' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>context</th>
+                                        <td>{{ collector.firewall.context ?: '(none)' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>entry_point</th>
+                                        <td>{{ collector.firewall.entry_point ?: '(none)' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>user_checker</th>
+                                        <td>{{ collector.firewall.user_checker ?: '(none)' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>access_denied_handler</th>
+                                        <td>{{ collector.firewall.access_denied_handler ?: '(none)' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>access_denied_url</th>
+                                        <td>{{ collector.firewall.access_denied_url ?: '(none)' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>authenticators</th>
+                                        <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth: 1) }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="tab {{ collector.token is empty ? 'disabled' : 'active' }}">
                 <h3 class="tab-title">Token</h3>
 
                 <div class="tab-content">
@@ -273,70 +337,6 @@
                                 {% endif %}
                             </p>
                         </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="tab {{ (not collector.firewall or collector.firewall.security_enabled is empty) ? 'disabled' }}">
-                <h3 class="tab-title">Firewall</h3>
-                <div class="tab-content">
-                    {% if collector.firewall %}
-                        <div class="metrics">
-                            <div class="metric">
-                                <span class="value">{{ collector.firewall.name }}</span>
-                                <span class="label">Name</span>
-                            </div>
-                            <div class="metric">
-                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.firewall.security_enabled ? 'yes' : 'no') ~ '.svg') }}</span>
-                                <span class="label">Security enabled</span>
-                            </div>
-                            <div class="metric">
-                                <span class="value">{{ source('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg') }}</span>
-                                <span class="label">Stateless</span>
-                            </div>
-                        </div>
-
-                        {% if collector.firewall.security_enabled %}
-                            <h4>Configuration</h4>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th scope="col" class="key">Key</th>
-                                        <th scope="col">Value</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th>provider</th>
-                                        <td>{{ collector.firewall.provider ?: '(none)' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>context</th>
-                                        <td>{{ collector.firewall.context ?: '(none)' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>entry_point</th>
-                                        <td>{{ collector.firewall.entry_point ?: '(none)' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>user_checker</th>
-                                        <td>{{ collector.firewall.user_checker ?: '(none)' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>access_denied_handler</th>
-                                        <td>{{ collector.firewall.access_denied_handler ?: '(none)' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>access_denied_url</th>
-                                        <td>{{ collector.firewall.access_denied_url ?: '(none)' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>authenticators</th>
-                                        <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth: 1) }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        {% endif %}
                     {% endif %}
                 </div>
             </div>

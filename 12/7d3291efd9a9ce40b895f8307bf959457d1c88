@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-09-29T20:58:29Z
+
+Another valid alternative could be moving all these attributes under a namespace that provides context, e.g. `Symfony\Component\Console\Input\Mapping as Map`. This way, users will have the option to use `#[Map\Input]` or just `#[Input]`, just like Doctrine ORM does currently `#[ORM\Column]`.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-09-30T13:20:34Z
+
+To me, attributes prefixed with `Map` should be about mapping.
+Mapping is the process of defining how data from one form or structure corresponds to another. In practice, this means defining how each piece of input data corresponds to a property in an output object.
+
+That's why `MapInput` makes sense to me here, as it's about mapping the input to an object.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-09-30T14:35:47Z
+
+@yceruto I understand your POV but share Mathias' opinion. The concept of `mapping` in the sense of `transform/convert` is far more present for `#[Input]`, which makes me think it's worth it and I don't feel like it brings inconsistency.

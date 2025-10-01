@@ -28,6 +28,8 @@ abstract class AbstractPipes implements PipesInterface
     private bool $blocked = true;
     private ?string $lastError = null;
 
+    private bool $stdinClosed = false;
+
     /**
      * @param resource|string|\Iterator $input
      */
@@ -100,6 +102,9 @@ abstract class AbstractPipes implements PipesInterface
      */
     protected function write(): ?array
     {
+        if ($this->stdinClosed) {
+            return null;
+        }
         if (!isset($this->pipes[0])) {
             return null;
         }
@@ -135,7 +140,11 @@ abstract class AbstractPipes implements PipesInterface
 
         foreach ($w as $stdin) {
             if (isset($this->inputBuffer[0])) {
-                $written = fwrite($stdin, $this->inputBuffer);
+                $written = @fwrite($stdin, $this->inputBuffer);
+                if (false === $written) {
+                    $this->closeStdin();
+                    return null;
+                }
                 $this->inputBuffer = substr($this->inputBuffer, $written);
                 if (isset($this->inputBuffer[0])) {
                     return [$this->pipes[0]];
@@ -148,7 +157,11 @@ abstract class AbstractPipes implements PipesInterface
                     if (!isset($data[0])) {
                         break;
                     }
-                    $written = fwrite($stdin, $data);
+                    $written = @fwrite($stdin, $data);
+                    if (false === $written) {
+                        $this->closeStdin();
+                        return null;
+                    }
                     $data = substr($data, $written);
                     if (isset($data[0])) {
                         $this->inputBuffer = $data;
@@ -171,12 +184,38 @@ abstract class AbstractPipes implements PipesInterface
             $this->input = null;
             fclose($this->pipes[0]);
             unset($this->pipes[0]);
+            $this->stdinClosed = true;
         } elseif (!$w) {
             return [$this->pipes[0]];
         }
 
         return null;
     }
+
+    /**
+     * Closes the child process STDIN and prevents further writes (idempotent).
+     */
+    public function closeStdin(): void
+    {
+        if ($this->stdinClosed) {
+            return;
+        }
+        $this->stdinClosed = true;
+
+        if (isset($this->pipes[0])) {
+            @fclose($this->pipes[0]);
+            unset($this->pipes[0]);
+        }
+
+        $this->inputBuffer = '';
+
+        if ($this->input instanceof \Symfony\Component\Process\InputStream) {
+            $this->input->close();
+        }
+
+        $this->input = null;
+    }
+
 
     /**
      * @internal

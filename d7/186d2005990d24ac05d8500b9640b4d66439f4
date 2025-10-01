@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-26T17:35:39Z
+
+Ah, I think we should remove the TZ info, it should be implicit: `+00:00` should be removed
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-09-29T08:23:19Z
+
+> Ah, I think we should remove the TZ info, it should be implicit: +00:00 should be removed
+
+@nicolas-grekas Ok, I'll remove the +00:00 even though I deliberately put it there to avoid any confusion with the source XML files.
+
+@stof The methods that process the `meta.php` file were added in the 7.4 branch. I'll do the required changes in `Currencies` in #61837 (also in 7.4) if it's ok for you as it'll be the sole place the data are used

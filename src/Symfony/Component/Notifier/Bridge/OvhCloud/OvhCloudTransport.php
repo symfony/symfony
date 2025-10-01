@@ -28,20 +28,17 @@ final class OvhCloudTransport extends AbstractTransport
 {
     protected const HOST = 'eu.api.ovh.com';
 
-    private string $applicationKey;
-    private string $applicationSecret;
-    private string $consumerKey;
-    private string $serviceName;
     private ?string $sender = null;
     private bool $noStopClause = false;
 
-    public function __construct(string $applicationKey, #[\SensitiveParameter] string $applicationSecret, #[\SensitiveParameter] string $consumerKey, string $serviceName, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->applicationKey = $applicationKey;
-        $this->applicationSecret = $applicationSecret;
-        $this->consumerKey = $consumerKey;
-        $this->serviceName = $serviceName;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $applicationKey,
+        #[\SensitiveParameter] private string $applicationSecret,
+        #[\SensitiveParameter] private string $consumerKey,
+        private string $serviceName,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -75,6 +72,9 @@ final class OvhCloudTransport extends AbstractTransport
         return $message instanceof SmsMessage;
     }
 
+    /**
+     * @see https://eu.api.ovh.com/console/?section=%2Fsms&branch=v1#post-/sms/-serviceName-/jobs
+     */
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
@@ -125,7 +125,7 @@ final class OvhCloudTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(\sprintf('Unable to send the SMS: %s.', $error['message']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s".', $error['message'] ?? 'Unknown error'), $response);
         }
 
         $success = $response->toArray(false);
@@ -134,7 +134,11 @@ final class OvhCloudTransport extends AbstractTransport
             throw new TransportException(\sprintf('Attempt to send the SMS to invalid receivers: "%s".', implode(',', $success['invalidReceivers'])), $response);
         }
 
-        $sentMessage = new SentMessage($message, (string) $this);
+        $additionalInfo = [
+            'totalCreditsRemoved' => $success['totalCreditsRemoved'] ?? null,
+        ];
+
+        $sentMessage = new SentMessage($message, (string) $this, $additionalInfo);
         $sentMessage->setMessageId($success['ids'][0]);
 
         return $sentMessage;

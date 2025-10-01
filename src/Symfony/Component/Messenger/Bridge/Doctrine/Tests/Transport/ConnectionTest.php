@@ -11,22 +11,29 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection as DBALConnection;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
+use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\NamedObject;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -294,6 +301,110 @@ class ConnectionTest extends TestCase
         self::assertSame('1', $id);
     }
 
+    public function testKeepalive()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $connection = new Connection(['redeliver_timeout' => 30, 'table_name' => 'messenger_messages'], $driverConnection);
+
+        $queryBuilder->expects($this->once())
+            ->method('update')
+            ->with('messenger_messages')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('set')
+            ->with('delivered_at', '?')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('id = ?')
+            ->willReturnSelf();
+
+        $driverConnection->expects($this->once())
+            ->method('beginTransaction');
+
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('UPDATE');
+
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->with('UPDATE')
+            ->willReturn(1);
+
+        $driverConnection->expects($this->once())
+            ->method('commit');
+
+        $connection->keepalive('1');
+    }
+
+    public function testKeepaliveRollback()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $connection = new Connection(['redeliver_timeout' => 30, 'table_name' => 'messenger_messages'], $driverConnection);
+
+        $queryBuilder->expects($this->once())
+            ->method('update')
+            ->with('messenger_messages')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('set')
+            ->with('delivered_at', '?')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('id = ?')
+            ->willReturnSelf();
+
+        $driverConnection->expects($this->once())
+            ->method('beginTransaction');
+
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('UPDATE');
+
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->willThrowException($this->createMock(DBALException::class));
+
+        $driverConnection->expects($this->never())
+            ->method('commit');
+
+        $driverConnection->expects($this->once())
+            ->method('rollBack');
+
+        $this->expectException(TransportException::class);
+
+        $connection->keepalive('1');
+    }
+
+    public function testKeepaliveThrowsExceptionWhenRedeliverTimeoutIsLessThenInterval()
+    {
+        $driverConnection = $this->getDBALConnectionMock();
+
+        $connection = new Connection(['redeliver_timeout' => 30], $driverConnection);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Doctrine redeliver_timeout (30s) cannot be smaller than the keepalive interval (60s).');
+
+        $connection->keepalive('1', 60);
+    }
+
     private function getDBALConnectionMock()
     {
         $driverConnection = $this->createMock(DBALConnection::class);
@@ -303,7 +414,7 @@ class ConnectionTest extends TestCase
             $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE SKIP LOCKED');
         }
 
-        $configuration = $this->createMock(\Doctrine\DBAL\Configuration::class);
+        $configuration = $this->createMock(Configuration::class);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $driverConnection->method('getConfiguration')->willReturn($configuration);
 
@@ -312,11 +423,7 @@ class ConnectionTest extends TestCase
         $schemaConfig->method('getMaxIdentifierLength')->willReturn(63);
         $schemaConfig->method('getDefaultTableOptions')->willReturn([]);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
-        if (method_exists(DBALConnection::class, 'createSchemaManager')) {
-            $driverConnection->method('createSchemaManager')->willReturn($schemaManager);
-        } else {
-            $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
-        }
+        $driverConnection->method('createSchemaManager')->willReturn($schemaManager);
 
         return $driverConnection;
     }
@@ -339,20 +446,18 @@ class ConnectionTest extends TestCase
         return $queryBuilder;
     }
 
-    private function getResultMock($expectedResult)
+    private function getResultMock($expectedResult): Result&MockObject
     {
-        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : ResultStatement::class);
+        $stmt = $this->createMock(Result::class);
 
         $stmt->expects($this->once())
-            ->method(class_exists(Result::class) ? 'fetchAssociative' : 'fetch')
+            ->method('fetchAssociative')
             ->willReturn($expectedResult);
 
         return $stmt;
     }
 
-    /**
-     * @dataProvider buildConfigurationProvider
-     */
+    #[DataProvider('buildConfigurationProvider')]
     public function testBuildConfiguration(string $dsn, array $options, string $expectedConnection, string $expectedTableName, int $expectedRedeliverTimeout, string $expectedQueue, bool $expectedAutoSetup)
     {
         $config = Connection::buildConfiguration($dsn, $options);
@@ -500,9 +605,9 @@ class ConnectionTest extends TestCase
             'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
-        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : ResultStatement::class);
+        $stmt = $this->createMock(Result::class);
         $stmt->expects($this->once())
-            ->method(class_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
+            ->method('fetchAllAssociative')
             ->willReturn([$message1, $message2]);
 
         $driverConnection
@@ -536,22 +641,15 @@ class ConnectionTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[1]['headers']);
     }
 
-    /**
-     * @dataProvider providePlatformSql
-     */
+    #[DataProvider('providePlatformSql')]
     public function testGeneratedSql(AbstractPlatform $platform, string $expectedSql)
     {
         $driverConnection = $this->createMock(DBALConnection::class);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $driverConnection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($driverConnection));
 
-        if (class_exists(Result::class)) {
-            $result = $this->createMock(Result::class);
-            $result->method('fetchAssociative')->willReturn(false);
-        } else {
-            $result = $this->createMock(ResultStatement::class);
-            $result->method('fetch')->willReturn(false);
-        }
+        $result = $this->createMock(Result::class);
+        $result->method('fetchAssociative')->willReturn(false);
 
         $driverConnection->expects($this->once())->method('beginTransaction');
         $driverConnection
@@ -575,29 +673,100 @@ class ConnectionTest extends TestCase
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
         ];
 
-        if (class_exists(MariaDBPlatform::class)) {
-            yield 'MariaDB' => [
-                new MariaDBPlatform(),
+        if (class_exists(MySQL80Platform::class) && !method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'MySQL8 & DBAL<3.8' => [
+                new MySQL80Platform(),
                 'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
             ];
         }
 
-        yield 'SQL Server' => [
-            class_exists(SQLServerPlatform::class) && !class_exists(SQLServer2012Platform::class) ? new SQLServerPlatform() : new SQLServer2012Platform(),
-            \sprintf('SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK%s) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ', method_exists(QueryBuilder::class, 'forUpdate') ? ', READPAST' : ''),
+        if (class_exists(MySQL80Platform::class) && method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'MySQL8 & DBAL>=3.8' => [
+                new MySQL80Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            ];
+        }
+
+        yield 'MariaDB' => [
+            new MariaDBPlatform(),
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
         ];
 
-        if (!class_exists(MySQL57Platform::class)) {
-            // DBAL >= 4
-            yield 'Oracle' => [
-                new OraclePlatform(),
-                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC FETCH NEXT 1 ROWS ONLY) FOR UPDATE SKIP LOCKED',
+        if (interface_exists(DBALException::class)) {
+            // DBAL 4+
+            $mariaDbPlatformClass = 'Doctrine\DBAL\Platforms\MariaDB1060Platform';
+        } else {
+            $mariaDbPlatformClass = 'Doctrine\DBAL\Platforms\MariaDb1060Platform';
+        }
+
+        if (class_exists($mariaDbPlatformClass)) {
+            yield 'MariaDB106' => [
+                new $mariaDbPlatformClass(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            ];
+        }
+
+        if (class_exists(MySQL57Platform::class)) {
+            yield 'Postgres & DBAL<4' => [
+                new PostgreSQLPlatform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
             ];
         } else {
-            // DBAL < 4
-            yield 'Oracle' => [
+            yield 'Postgres & DBAL>=4' => [
+                new PostgreSQLPlatform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            ];
+        }
+
+        if (class_exists(PostgreSQL94Platform::class)) {
+            yield 'Postgres94' => [
+                new PostgreSQL94Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+            ];
+        }
+
+        if (class_exists(PostgreSQL100Platform::class) && !method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'Postgres10 & DBAL<3.8' => [
+                new PostgreSQL100Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+            ];
+        }
+
+        if (class_exists(PostgreSQL100Platform::class) && method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'Postgres10 & DBAL>=3.8' => [
+                new PostgreSQL100Platform(),
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            ];
+        }
+
+        if (!method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'SQL Server & DBAL<3.8' => [
+                class_exists(SQLServerPlatform::class) && !class_exists(SQLServer2012Platform::class) ? new SQLServerPlatform() : new SQLServer2012Platform(),
+                'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+            ];
+        }
+
+        if (method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'SQL Server & DBAL>=3.8' => [
+                class_exists(SQLServerPlatform::class) && !class_exists(SQLServer2012Platform::class) ? new SQLServerPlatform() : new SQLServer2012Platform(),
+                'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK, READPAST) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+            ];
+        }
+
+        if (!method_exists(QueryBuilder::class, 'forUpdate')) {
+            yield 'Oracle & DBAL<3.8' => [
                 new OraclePlatform(),
                 \sprintf('SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE%s', method_exists(QueryBuilder::class, 'forUpdate') ? ' SKIP LOCKED' : ''),
+            ];
+        } elseif (class_exists(MySQL57Platform::class)) {
+            yield 'Oracle & 3.8<=DBAL<4' => [
+                new OraclePlatform(),
+                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT a.id FROM (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE SKIP LOCKED',
+            ];
+        } else {
+            yield 'Oracle & DBAL>=4' => [
+                new OraclePlatform(),
+                'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC FETCH NEXT 1 ROWS ONLY) FOR UPDATE SKIP LOCKED',
             ];
         }
     }
@@ -632,12 +801,10 @@ class ConnectionTest extends TestCase
         $connection = new Connection([], $driverConnection);
         $connection->configureSchema($schema, $driverConnection, fn () => true);
         $table = $schema->getTable('messenger_messages');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 
-    /**
-     * @dataProvider provideFindAllSqlGeneratedByPlatform
-     */
+    #[DataProvider('provideFindAllSqlGeneratedByPlatform')]
     public function testFindAllSqlGenerated(AbstractPlatform $platform, string $expectedSql)
     {
         $driverConnection = $this->createMock(DBALConnection::class);
@@ -646,13 +813,8 @@ class ConnectionTest extends TestCase
             return new QueryBuilder($driverConnection);
         });
 
-        if (class_exists(Result::class)) {
-            $result = $this->createMock(Result::class);
-            $result->method('fetchAllAssociative')->willReturn([]);
-        } else {
-            $result = $this->createMock(ResultStatement::class);
-            $result->method('fetchAll')->willReturn([]);
-        }
+        $result = $this->createMock(Result::class);
+        $result->method('fetchAllAssociative')->willReturn([]);
 
         $driverConnection
             ->expects($this->once())
@@ -672,12 +834,10 @@ class ConnectionTest extends TestCase
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) LIMIT 50',
         ];
 
-        if (class_exists(MariaDBPlatform::class)) {
-            yield 'MariaDB' => [
-                new MariaDBPlatform(),
-                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) LIMIT 50',
-            ];
-        }
+        yield 'MariaDB' => [
+            new MariaDBPlatform(),
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) LIMIT 50',
+        ];
 
         yield 'SQL Server' => [
             class_exists(SQLServerPlatform::class) && !class_exists(SQLServer2012Platform::class) ? new SQLServerPlatform() : new SQLServer2012Platform(),
@@ -703,6 +863,12 @@ class ConnectionTest extends TestCase
     {
         $driverConnection = $this->createMock(DBALConnection::class);
         $driverConnection->method('getDatabasePlatform')->willReturn(new OraclePlatform());
+
+        // Mock the result returned by executeQuery to be an Oracle version 12.1.0 or higher.
+        $result = $this->createMock(Result::class);
+        $result->method('fetchOne')->willReturn('12.1.0');
+        $driverConnection->method('executeQuery')->willReturn($result);
+
         $schema = new Schema();
 
         $connection = new Connection(['table_name' => 'messenger_messages'], $driverConnection);
@@ -712,7 +878,14 @@ class ConnectionTest extends TestCase
         $sequences = $schema->getSequences();
         $this->assertCount(1, $sequences);
         $sequence = array_pop($sequences);
-        $sequenceNameSuffix = substr($sequence->getName(), -\strlen($expectedSuffix));
+        if ($sequence instanceof NamedObject) {
+            // DBAL 4.4+
+            $sequenceName = $sequence->getObjectName()->toString();
+        } else {
+            // DBAL < 4.4
+            $sequenceName = $sequence->getName();
+        }
+        $sequenceNameSuffix = substr($sequenceName, -\strlen($expectedSuffix));
         $this->assertSame($expectedSuffix, $sequenceNameSuffix);
     }
 }

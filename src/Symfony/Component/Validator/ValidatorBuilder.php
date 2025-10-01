@@ -11,18 +11,12 @@
 
 namespace Symfony\Component\Validator;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\PsrCachedReader;
-use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
-use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
@@ -50,14 +44,14 @@ class ValidatorBuilder
     private array $xmlMappings = [];
     private array $yamlMappings = [];
     private array $methodMappings = [];
-    private ?Reader $annotationReader = null;
+    private array $attributeMappings = [];
     private bool $enableAttributeMapping = false;
     private ?MetadataFactoryInterface $metadataFactory = null;
     private ConstraintValidatorFactoryInterface $validatorFactory;
     private ?ContainerInterface $groupProviderLocator = null;
     private ?CacheItemPoolInterface $mappingCache = null;
     private ?TranslatorInterface $translator = null;
-    private ?string $translationDomain = null;
+    private string|false|null $translationDomain = null;
 
     /**
      * Adds an object initializer to the validator.
@@ -156,6 +150,27 @@ class ValidatorBuilder
     }
 
     /**
+     * Adds classes with mapping constraints as attributes.
+     *
+     * The keys are the classes on which the constraints should be added.
+     * The values are the classes that contain the constraints to add as attributes.
+     *
+     * @param array<class-string, list<class-string>> $classes
+     *
+     * @return $this
+     */
+    public function addAttributeMappings(array $classes): static
+    {
+        if (null !== $this->metadataFactory) {
+            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+        }
+
+        $this->attributeMappings = array_merge_recursive($this->attributeMappings, $classes);
+
+        return $this;
+    }
+
+    /**
      * Enables constraint mapping using the given static method.
      *
      * @return $this
@@ -190,18 +205,6 @@ class ValidatorBuilder
     }
 
     /**
-     * @deprecated since Symfony 6.4, use "enableAttributeMapping()" instead.
-     *
-     * @return $this
-     */
-    public function enableAnnotationMapping(): static
-    {
-        trigger_deprecation('symfony/validator', '6.4', 'Method "%s()" is deprecated, use "enableAttributeMapping()" instead.', __METHOD__);
-
-        return $this->enableAttributeMapping();
-    }
-
-    /**
      * Enables attribute-based constraint mapping.
      *
      * @return $this
@@ -218,54 +221,13 @@ class ValidatorBuilder
     }
 
     /**
-     * @deprecated since Symfony 6.4, use "disableAttributeMapping()" instead
-     *
-     * @return $this
-     */
-    public function disableAnnotationMapping(): static
-    {
-        trigger_deprecation('symfony/validator', '6.4', 'Method "%s()" is deprecated, use "disableAttributeMapping()" instead.', __METHOD__);
-
-        return $this->disableAttributeMapping();
-    }
-
-    /**
      * Disables attribute-based constraint mapping.
      *
      * @return $this
      */
     public function disableAttributeMapping(): static
     {
-        $this->annotationReader = null;
         $this->enableAttributeMapping = false;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since Symfony 6.4 without replacement
-     *
-     * @return $this
-     */
-    public function setDoctrineAnnotationReader(?Reader $reader): static
-    {
-        trigger_deprecation('symfony/validator', '6.4', 'Method "%s()" is deprecated without replacement.', __METHOD__);
-
-        $this->annotationReader = $reader;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since Symfony 6.4 without replacement
-     *
-     * @return $this
-     */
-    public function addDefaultDoctrineAnnotationReader(): static
-    {
-        trigger_deprecation('symfony/validator', '6.4', 'Method "%s()" is deprecated without replacement.', __METHOD__);
-
-        $this->annotationReader = $this->createAnnotationReader();
 
         return $this;
     }
@@ -277,7 +239,7 @@ class ValidatorBuilder
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory): static
     {
-        if (\count($this->xmlMappings) > 0 || \count($this->yamlMappings) > 0 || \count($this->methodMappings) > 0 || $this->enableAttributeMapping) {
+        if ($this->xmlMappings || $this->yamlMappings || $this->methodMappings || $this->attributeMappings || $this->enableAttributeMapping) {
             throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
         }
 
@@ -355,6 +317,16 @@ class ValidatorBuilder
     /**
      * @return $this
      */
+    public function disableTranslation(): static
+    {
+        $this->translationDomain = false;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function addLoader(LoaderInterface $loader): static
     {
         $this->loaders[] = $loader;
@@ -381,10 +353,8 @@ class ValidatorBuilder
             $loaders[] = new StaticMethodLoader($methodName);
         }
 
-        if ($this->enableAttributeMapping && $this->annotationReader) {
-            $loaders[] = new AnnotationLoader($this->annotationReader);
-        } elseif ($this->enableAttributeMapping) {
-            $loaders[] = new AttributeLoader();
+        if ($this->enableAttributeMapping || $this->attributeMappings) {
+            $loaders[] = new AttributeLoader($this->enableAttributeMapping, $this->attributeMappings);
         }
 
         return array_merge($loaders, $this->loaders);
@@ -427,18 +397,5 @@ class ValidatorBuilder
         $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
 
         return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers, $this->groupProviderLocator);
-    }
-
-    private function createAnnotationReader(): Reader
-    {
-        if (!class_exists(AnnotationReader::class)) {
-            throw new LogicException('Enabling annotation based constraint mapping requires the packages doctrine/annotations and symfony/cache to be installed.');
-        }
-
-        if (class_exists(ArrayAdapter::class)) {
-            return new PsrCachedReader(new AnnotationReader(), new ArrayAdapter());
-        }
-
-        throw new LogicException('Enabling annotation based constraint mapping requires the packages doctrine/annotations and symfony/cache to be installed.');
     }
 }

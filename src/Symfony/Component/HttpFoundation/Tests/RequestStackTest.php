@@ -17,6 +17,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestStackTest extends TestCase
 {
+    public function testConstruct()
+    {
+        $request = Request::create('/foo');
+        $requestStack = new RequestStack([$request]);
+        $this->assertSame($request, $requestStack->getCurrentRequest());
+    }
+
     public function testGetCurrentRequest()
     {
         $requestStack = new RequestStack();

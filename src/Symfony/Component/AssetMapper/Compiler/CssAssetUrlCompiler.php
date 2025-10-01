@@ -51,7 +51,7 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
         return preg_replace_callback(self::ASSET_URL_PATTERN, function ($matches) use ($asset, $assetMapper, $commentBlocks) {
             $matchPos = $matches[0][1];
 
-            // Ignore matchs inside comments
+            // Ignore matches inside comments
             foreach ($commentBlocks as $block) {
                 if ($matchPos > $block[0]) {
                     if ($matchPos < $block[1]) {

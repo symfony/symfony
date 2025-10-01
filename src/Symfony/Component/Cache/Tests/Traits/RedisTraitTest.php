@@ -11,18 +11,17 @@
 
 namespace Symfony\Component\Cache\Tests\Traits;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
-/**
- * @requires extension redis
- */
+#[RequiresPhpExtension('redis')]
 class RedisTraitTest extends TestCase
 {
-    /**
-     * @dataProvider provideCreateConnection
-     */
+    #[DataProvider('provideCreateConnection')]
     public function testCreateConnection(string $dsn, string $expectedClass)
     {
         if (!class_exists($expectedClass)) {
@@ -57,7 +56,7 @@ class RedisTraitTest extends TestCase
 
     public static function provideCreateConnection(): array
     {
-        $hosts = array_map(fn ($host) => \sprintf('host[%s]', $host), explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
+        $hosts = array_map(fn ($host) => \sprintf('host[%s]', $host), explode(' ', getenv('REDIS_CLUSTER_HOSTS') ?: ''));
 
         return [
             [
@@ -80,13 +79,12 @@ class RedisTraitTest extends TestCase
     }
 
     /**
-     * Due to a bug in phpredis, the persistent connection will keep its last selected database. So when re-using
+     * Due to a bug in phpredis, the persistent connection will keep its last selected database. So when reusing
      * a persistent connection, the database has to be re-selected, too.
      *
      * @see https://github.com/phpredis/phpredis/issues/1920
-     *
-     * @group integration
      */
+    #[Group('integration')]
     public function testPconnectSelectsCorrectDatabase()
     {
         if (!class_exists(\Redis::class)) {
@@ -134,9 +132,7 @@ class RedisTraitTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideDbIndexDsnParameter
-     */
+    #[DataProvider('provideDbIndexDsnParameter')]
     public function testDbIndexDsnParameter(string $dsn, int $expectedDb)
     {
         if (!getenv('REDIS_AUTHENTICATED_HOST')) {
@@ -180,9 +176,7 @@ class RedisTraitTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidDbIndexDsnParameter
-     */
+    #[DataProvider('provideInvalidDbIndexDsnParameter')]
     public function testInvalidDbIndexDsnParameter(string $dsn)
     {
         if (!getenv('REDIS_AUTHENTICATED_HOST')) {

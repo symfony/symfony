@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\PasswordHasher\Tests\Hasher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 
 /**
@@ -31,9 +35,7 @@ class NativePasswordHasherTest extends TestCase
         new NativePasswordHasher(null, null, 32);
     }
 
-    /**
-     * @dataProvider validRangeData
-     */
+    #[DataProvider('validRangeData')]
     public function testCostInRange($cost)
     {
         $this->assertInstanceOf(NativePasswordHasher::class, new NativePasswordHasher(null, null, $cost));
@@ -98,9 +100,7 @@ class NativePasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify($hasher->hash($plainPassword), $plainPassword));
     }
 
-    /**
-     * @requires PHP < 8.4
-     */
+    #[RequiresPhp('<8.4')]
     public function testBcryptWithNulByteWithNativePasswordHash()
     {
         $hasher = new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT);
@@ -150,5 +150,39 @@ class NativePasswordHasherTest extends TestCase
 
         $hasher = new NativePasswordHasher(5, 11000, 5);
         $this->assertTrue($hasher->needsRehash($hash));
+    }
+
+    public function testLowOpsLimitsThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/\$opsLimit must be (\d+) or greater\./');
+
+        new NativePasswordHasher(2);
+    }
+
+    public function testLowMemLimitThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/\$memLimit must be (\d+)(.?) or greater\./');
+
+        new NativePasswordHasher(3, 9999);
+    }
+
+    #[TestWith([1])]
+    #[TestWith([40])]
+    public function testInvalidCostThrows(int $cost)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/\$cost must be in the range of (\d+)-(\d+)\./');
+
+        new NativePasswordHasher(4, 11000, $cost);
+    }
+
+    public function testHashTooLongPasswordThrows()
+    {
+        $this->expectException(InvalidPasswordException::class);
+
+        $hasher = new NativePasswordHasher(4, 11000, 4);
+        $hasher->hash(str_repeat('a', 5000));
     }
 }

@@ -138,7 +138,7 @@ class DataPartTest extends TestCase
 
     public function testFromPathWithUrl()
     {
-        if (!\in_array('http', stream_get_wrappers())) {
+        if (!\in_array('http', stream_get_wrappers(), true)) {
             $this->markTestSkipped('"http" stream wrapper is not enabled.');
         }
 

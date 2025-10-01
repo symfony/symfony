@@ -22,6 +22,9 @@ namespace Symfony\Component\Security\Core\User;
  * this interface. Objects that implement this interface are created and
  * loaded by different objects that implement UserProviderInterface.
  *
+ * The __serialize/__unserialize() magic methods can be implemented on the user
+ * class to prevent sensitive credentials from being put in the session storage.
+ *
  * @see UserProviderInterface
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -50,12 +53,14 @@ interface UserInterface
      * This is important if, at any given point, sensitive information like
      * the plain-text password is stored on this object.
      *
-     * @return void
+     * @deprecated since Symfony 7.3, erase credentials using the "__serialize()" method instead
      */
-    public function eraseCredentials();
+    public function eraseCredentials(): void;
 
     /**
      * Returns the identifier for this user (e.g. username or email address).
+     *
+     * @return non-empty-string
      */
     public function getUserIdentifier(): string;
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
@@ -183,9 +184,7 @@ class SerializerTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider getMissingKeyTests
-     */
+    #[DataProvider('getMissingKeyTests')]
     public function testDecodingFailsWithMissingKeys(array $data, string $expectedMessage)
     {
         $this->expectException(MessageDecodingFailedException::class);

@@ -29,16 +29,13 @@ final class TwilioTransport extends AbstractTransport
 {
     protected const HOST = 'api.twilio.com';
 
-    private string $accountSid;
-    private string $authToken;
-    private string $from;
-
-    public function __construct(string $accountSid, #[\SensitiveParameter] string $authToken, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->accountSid = $accountSid;
-        $this->authToken = $authToken;
-        $this->from = $from;
-
+    public function __construct(
+        private string $accountSid,
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -60,7 +57,7 @@ final class TwilioTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
-        if (!preg_match('/^[a-zA-Z0-9\s]{2,11}$/', $from) && !preg_match('/^\+[1-9]\d{1,14}$/', $from)) {
+        if (!preg_match('/^[a-zA-Z0-9\s]{2,11}$/', $from) && !preg_match('/^(?:whatsapp:)?\+[1-9]\d{1,14}$/', $from)) {
             throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
         }
 

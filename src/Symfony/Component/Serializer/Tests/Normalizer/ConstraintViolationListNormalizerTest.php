@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
@@ -113,9 +114,7 @@ error',
         $this->assertEquals($expected, $normalizer->normalize($list));
     }
 
-    /**
-     * @dataProvider payloadFieldsProvider
-     */
+    #[DataProvider('payloadFieldsProvider')]
     public function testNormalizePayloadFields($fields, ?array $expected = null)
     {
         $constraint = new NotNull();

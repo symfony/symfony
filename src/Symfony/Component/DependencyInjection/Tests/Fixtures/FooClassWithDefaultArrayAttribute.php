@@ -7,6 +7,6 @@ class FooClassWithDefaultArrayAttribute
     public function __construct(
         array $array = ['a', 'b', 'c'],
         bool $firstOptional = false,
-        bool $secondOptional = false
+        bool $secondOptional = false,
     ) {}
 }

@@ -20,12 +20,13 @@ use Symfony\Component\Notifier\Message\SentMessage;
  */
 final class SlackSentMessage extends SentMessage
 {
-    private string $channelId;
-
-    public function __construct(MessageInterface $original, string $transport, string $channelId, string $messageId)
-    {
+    public function __construct(
+        MessageInterface $original,
+        string $transport,
+        private string $channelId,
+        string $messageId,
+    ) {
         parent::__construct($original, $transport);
-        $this->channelId = $channelId;
         $this->setMessageId($messageId);
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
@@ -24,7 +25,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     private static string $message = 'message';
     private static string $domain = 'domain';
 
-    /** @dataProvider getDefaultDomainAssignmentTestData */
+    #[DataProvider('getDefaultDomainAssignmentTestData')]
     public function testDefaultDomainAssignment(Node $node)
     {
         $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
@@ -50,7 +51,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $this->assertEquals([[self::$message, self::$domain]], $visitor->getMessages());
     }
 
-    /** @dataProvider getDefaultDomainAssignmentTestData */
+    #[DataProvider('getDefaultDomainAssignmentTestData')]
     public function testNewModuleWithoutDefaultDomainTag(Node $node)
     {
         $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);

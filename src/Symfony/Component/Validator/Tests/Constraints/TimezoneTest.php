@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Timezone;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -25,12 +26,12 @@ class TimezoneTest extends TestCase
     public function testValidTimezoneConstraints()
     {
         new Timezone();
-        new Timezone(['zone' => \DateTimeZone::ALL]);
+        new Timezone(zone: \DateTimeZone::ALL);
         new Timezone(\DateTimeZone::ALL_WITH_BC);
-        new Timezone([
-            'zone' => \DateTimeZone::PER_COUNTRY,
-            'countryCode' => 'AR',
-        ]);
+        new Timezone(
+            zone: \DateTimeZone::PER_COUNTRY,
+            countryCode: 'AR',
+        );
 
         $this->addToAssertionCount(1);
     }
@@ -38,25 +39,23 @@ class TimezoneTest extends TestCase
     public function testExceptionForGroupedTimezonesByCountryWithWrongZone()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new Timezone([
-            'zone' => \DateTimeZone::ALL,
-            'countryCode' => 'AR',
-        ]);
+        new Timezone(
+            zone: \DateTimeZone::ALL,
+            countryCode: 'AR',
+        );
     }
 
     public function testExceptionForGroupedTimezonesByCountryWithoutZone()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new Timezone(['countryCode' => 'AR']);
+        new Timezone(countryCode: 'AR');
     }
 
-    /**
-     * @dataProvider provideInvalidZones
-     */
+    #[DataProvider('provideInvalidZones')]
     public function testExceptionForInvalidGroupedTimezones(int $zone)
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new Timezone(['zone' => $zone]);
+        new Timezone(zone: $zone);
     }
 
     public static function provideInvalidZones(): iterable
@@ -71,16 +70,16 @@ class TimezoneTest extends TestCase
         $metadata = new ClassMetadata(TimezoneDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame(\DateTimeZone::ALL, $aConstraint->zone);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame(\DateTimeZone::PER_COUNTRY, $bConstraint->zone);
         self::assertSame('DE', $bConstraint->countryCode);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'TimezoneDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

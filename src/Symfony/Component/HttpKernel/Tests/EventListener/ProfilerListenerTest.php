@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -60,9 +61,7 @@ class ProfilerListenerTest extends TestCase
         $listener->onKernelTerminate(new TerminateEvent($kernel, $mainRequest, $response));
     }
 
-    /**
-     * @dataProvider collectRequestProvider
-     */
+    #[DataProvider('collectRequestProvider')]
     public function testCollectParameter(Request $request, ?bool $enable)
     {
         $profile = new Profile('token');

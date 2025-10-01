@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\NativeRequestHandler;
 use Symfony\Component\Form\RequestHandlerInterface;
@@ -21,9 +23,9 @@ use Symfony\Component\Translation\IdentityTranslator;
 
 class FileTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
+    public const TESTED_TYPE = FileType::class;
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, new IdentityTranslator())]);
     }
@@ -40,9 +42,7 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertSame($data, $form->getData());
     }
 
-    /**
-     * @dataProvider requestHandlerProvider
-     */
+    #[DataProvider('requestHandlerProvider')]
     public function testSubmit(RequestHandlerInterface $requestHandler)
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->setRequestHandler($requestHandler)->getForm();
@@ -53,9 +53,7 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertSame($data, $form->getData());
     }
 
-    /**
-     * @dataProvider requestHandlerProvider
-     */
+    #[DataProvider('requestHandlerProvider')]
     public function testSetDataMultiple(RequestHandlerInterface $requestHandler)
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE, null, [
@@ -71,9 +69,7 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertSame($data, $form->getData());
     }
 
-    /**
-     * @dataProvider requestHandlerProvider
-     */
+    #[DataProvider('requestHandlerProvider')]
     public function testSubmitMultiple(RequestHandlerInterface $requestHandler)
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE, null, [
@@ -93,9 +89,7 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertArrayHasKey('multiple', $view->vars['attr']);
     }
 
-    /**
-     * @dataProvider requestHandlerProvider
-     */
+    #[DataProvider('requestHandlerProvider')]
     public function testDontPassValueToView(RequestHandlerInterface $requestHandler)
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->setRequestHandler($requestHandler)->getForm();
@@ -132,9 +126,7 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertSame([], $form->getViewData());
     }
 
-    /**
-     * @dataProvider requestHandlerProvider
-     */
+    #[DataProvider('requestHandlerProvider')]
     public function testSubmittedFilePathsAreDropped(RequestHandlerInterface $requestHandler)
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->setRequestHandler($requestHandler)->getForm();
@@ -145,9 +137,7 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertSame('', $form->getViewData());
     }
 
-    /**
-     * @dataProvider requestHandlerProvider
-     */
+    #[DataProvider('requestHandlerProvider')]
     public function testMultipleSubmittedFilePathsAreDropped(RequestHandlerInterface $requestHandler)
     {
         $form = $this->factory
@@ -165,9 +155,7 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertCount(1, $form->getData());
     }
 
-    /**
-     * @dataProvider requestHandlerProvider
-     */
+    #[DataProvider('requestHandlerProvider')]
     public function testSubmitNonArrayValueWhenMultiple(RequestHandlerInterface $requestHandler)
     {
         $form = $this->factory
@@ -191,9 +179,7 @@ class FileTypeTest extends BaseTypeTestCase
         ];
     }
 
-    /**
-     * @dataProvider uploadFileErrorCodes
-     */
+    #[DataProvider('uploadFileErrorCodes')]
     public function testFailedFileUploadIsTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage)
     {
         $requestHandler = new HttpFoundationRequestHandler();
@@ -211,9 +197,7 @@ class FileTypeTest extends BaseTypeTestCase
         }
     }
 
-    /**
-     * @dataProvider uploadFileErrorCodes
-     */
+    #[DataProvider('uploadFileErrorCodes')]
     public function testFailedFileUploadIsTurnedIntoFormErrorUsingNativeRequestHandler($errorCode, $expectedErrorMessage)
     {
         $form = $this->factory
@@ -236,9 +220,7 @@ class FileTypeTest extends BaseTypeTestCase
         }
     }
 
-    /**
-     * @dataProvider uploadFileErrorCodes
-     */
+    #[DataProvider('uploadFileErrorCodes')]
     public function testMultipleSubmittedFailedFileUploadsAreTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage)
     {
         $requestHandler = new HttpFoundationRequestHandler();
@@ -263,9 +245,7 @@ class FileTypeTest extends BaseTypeTestCase
         }
     }
 
-    /**
-     * @dataProvider uploadFileErrorCodes
-     */
+    #[DataProvider('uploadFileErrorCodes')]
     public function testMultipleSubmittedFailedFileUploadsAreTurnedIntoFormErrorUsingNativeRequestHandler($errorCode, $expectedErrorMessage)
     {
         $form = $this->factory

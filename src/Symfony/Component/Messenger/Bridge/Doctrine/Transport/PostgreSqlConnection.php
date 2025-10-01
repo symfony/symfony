@@ -64,17 +64,10 @@ final class PostgreSqlConnection extends Connection
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
         $this->executeStatement(\sprintf('LISTEN "%s"', $this->configuration['table_name']));
 
-        // The condition should be removed once support for DBAL <3.3 is dropped
-        if (method_exists($this->driverConnection, 'getNativeConnection')) {
-            $wrappedConnection = $this->driverConnection->getNativeConnection();
-        } else {
-            $wrappedConnection = $this->driverConnection;
-            while (method_exists($wrappedConnection, 'getWrappedConnection')) {
-                $wrappedConnection = $wrappedConnection->getWrappedConnection();
-            }
-        }
+        /** @var \PDO $nativeConnection */
+        $nativeConnection = $this->driverConnection->getNativeConnection();
 
-        $notification = $wrappedConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
+        $notification = $nativeConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
         if (
             // no notifications, or for another table or queue
             (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name'])
@@ -119,14 +112,16 @@ final class PostgreSqlConnection extends Connection
         return [
             // create trigger function
             \sprintf(<<<'SQL'
-CREATE OR REPLACE FUNCTION %1$s() RETURNS TRIGGER AS $$
-    BEGIN
-        PERFORM pg_notify('%2$s', NEW.queue_name::text);
-        RETURN NEW;
-    END;
-$$ LANGUAGE plpgsql;
-SQL
-                , $functionName, $this->configuration['table_name']),
+                CREATE OR REPLACE FUNCTION %1$s() RETURNS TRIGGER AS $$
+                    BEGIN
+                        PERFORM pg_notify('%2$s', NEW.queue_name::text);
+                        RETURN NEW;
+                    END;
+                $$ LANGUAGE plpgsql;
+                SQL,
+                $functionName,
+                $this->configuration['table_name']
+            ),
             // register trigger
             \sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
             \sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE %2$s();', $this->configuration['table_name'], $functionName),

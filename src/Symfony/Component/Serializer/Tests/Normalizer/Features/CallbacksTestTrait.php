@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -26,9 +27,7 @@ trait CallbacksTestTrait
 
     abstract protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): NormalizerInterface;
 
-    /**
-     * @dataProvider provideNormalizeCallbacks
-     */
+    #[DataProvider('provideNormalizeCallbacks')]
     public function testNormalizeCallbacks($callbacks, $valueBar, $result)
     {
         $normalizer = $this->getNormalizerForCallbacks();
@@ -39,9 +38,7 @@ trait CallbacksTestTrait
         $this->assertSame($result, $normalizer->normalize($obj, 'any', ['callbacks' => $callbacks]));
     }
 
-    /**
-     * @dataProvider provideNormalizeCallbacks
-     */
+    #[DataProvider('provideNormalizeCallbacks')]
     public function testNormalizeCallbacksWithTypedProperty($callbacks, $valueBar, $result)
     {
         $normalizer = $this->getNormalizerForCallbacksWithPropertyTypeExtractor();
@@ -52,9 +49,7 @@ trait CallbacksTestTrait
         $this->assertSame($result, $normalizer->normalize($obj, 'any', ['callbacks' => $callbacks]));
     }
 
-    /**
-     * @dataProvider provideNormalizeCallbacks
-     */
+    #[DataProvider('provideNormalizeCallbacks')]
     public function testNormalizeCallbacksWithNoConstructorArgument($callbacks, $valueBar, $result)
     {
         $normalizer = $this->getNormalizerForCallbacksWithPropertyTypeExtractor();
@@ -70,9 +65,7 @@ trait CallbacksTestTrait
         $this->assertSame($result, $normalizer->normalize($obj, 'any', ['callbacks' => $callbacks]));
     }
 
-    /**
-     * @dataProvider provideDenormalizeCallbacks
-     */
+    #[DataProvider('provideDenormalizeCallbacks')]
     public function testDenormalizeCallbacks($callbacks, $valueBar, $result)
     {
         $normalizer = $this->getNormalizerForCallbacks();
@@ -82,9 +75,7 @@ trait CallbacksTestTrait
         $this->assertEquals($result, $obj);
     }
 
-    /**
-     * @dataProvider providerDenormalizeCallbacksWithTypedProperty
-     */
+    #[DataProvider('providerDenormalizeCallbacksWithTypedProperty')]
     public function testDenormalizeCallbacksWithTypedProperty($callbacks, $valueBar, $result)
     {
         $normalizer = $this->getNormalizerForCallbacksWithPropertyTypeExtractor();
@@ -94,9 +85,7 @@ trait CallbacksTestTrait
         $this->assertEquals($result, $obj);
     }
 
-    /**
-     * @dataProvider providerDenormalizeCallbacksWithTypedProperty
-     */
+    #[DataProvider('providerDenormalizeCallbacksWithTypedProperty')]
     public function testDenormalizeCallbacksWithNoConstructorArgument($callbacks, $valueBar, $result)
     {
         $normalizer = $this->getNormalizerForCallbacksWithPropertyTypeExtractor();
@@ -112,9 +101,7 @@ trait CallbacksTestTrait
         $this->assertEquals($result->getBar(), $obj->getBar());
     }
 
-    /**
-     * @dataProvider provideInvalidCallbacks
-     */
+    #[DataProvider('provideInvalidCallbacks')]
     public function testUncallableCallbacks($callbacks)
     {
         $normalizer = $this->getNormalizerForCallbacks();

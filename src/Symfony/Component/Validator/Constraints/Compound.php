@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -22,9 +23,10 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 abstract class Compound extends Composite
 {
     /** @var Constraint[] */
-    public $constraints = [];
+    public array $constraints = [];
 
-    public function __construct(mixed $options = null)
+    #[HasNamedArguments]
+    public function __construct(mixed $options = null, ?array $groups = null, mixed $payload = null)
     {
         if (isset($options[$this->getCompositeOption()])) {
             throw new ConstraintDefinitionException(\sprintf('You can\'t redefine the "%s" option. Use the "%s::getConstraints()" method instead.', $this->getCompositeOption(), __CLASS__));
@@ -32,7 +34,7 @@ abstract class Compound extends Composite
 
         $this->constraints = $this->getConstraints($this->normalizeOptions($options));
 
-        parent::__construct($options);
+        parent::__construct($options, $groups, $payload);
     }
 
     final protected function getCompositeOption(): string
@@ -46,6 +48,8 @@ abstract class Compound extends Composite
     }
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @return Constraint[]
      */
     abstract protected function getConstraints(array $options): array;

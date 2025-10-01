@@ -1,0 +1,5 @@
+imports:
+    - { resource: ../config/default.yml }
+
+parameters:
+    foo: '%env(BAR)%'

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -25,10 +27,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ImageValidator extends FileValidator
 {
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Image) {
             throw new UnexpectedTypeException($constraint, Image::class);
@@ -53,9 +52,15 @@ class ImageValidator extends FileValidator
             return;
         }
 
-        $size = @getimagesize($value);
+        $isSvg = $this->isSvg($value);
 
-        if (empty($size) || (0 === $size[0]) || (0 === $size[1])) {
+        if ($isSvg) {
+            $size = $this->getSvgSize($value);
+        } else {
+            $size = @getimagesize($value);
+        }
+
+        if (!$size || (0 === $size[0]) || (0 === $size[1])) {
             $this->context->buildViolation($constraint->sizeNotDetectedMessage)
                 ->setCode(Image::SIZE_NOT_DETECTED_ERROR)
                 ->addViolation();
@@ -66,7 +71,7 @@ class ImageValidator extends FileValidator
         $width = $size[0];
         $height = $size[1];
 
-        if ($constraint->minWidth) {
+        if (!$isSvg && $constraint->minWidth) {
             if (!ctype_digit((string) $constraint->minWidth)) {
                 throw new ConstraintDefinitionException(\sprintf('"%s" is not a valid minimum width.', $constraint->minWidth));
             }
@@ -82,7 +87,7 @@ class ImageValidator extends FileValidator
             }
         }
 
-        if ($constraint->maxWidth) {
+        if (!$isSvg && $constraint->maxWidth) {
             if (!ctype_digit((string) $constraint->maxWidth)) {
                 throw new ConstraintDefinitionException(\sprintf('"%s" is not a valid maximum width.', $constraint->maxWidth));
             }
@@ -98,7 +103,7 @@ class ImageValidator extends FileValidator
             }
         }
 
-        if ($constraint->minHeight) {
+        if (!$isSvg && $constraint->minHeight) {
             if (!ctype_digit((string) $constraint->minHeight)) {
                 throw new ConstraintDefinitionException(\sprintf('"%s" is not a valid minimum height.', $constraint->minHeight));
             }
@@ -114,7 +119,7 @@ class ImageValidator extends FileValidator
             }
         }
 
-        if ($constraint->maxHeight) {
+        if (!$isSvg && $constraint->maxHeight) {
             if (!ctype_digit((string) $constraint->maxHeight)) {
                 throw new ConstraintDefinitionException(\sprintf('"%s" is not a valid maximum height.', $constraint->maxHeight));
             }
@@ -130,7 +135,7 @@ class ImageValidator extends FileValidator
 
         $pixels = $width * $height;
 
-        if (null !== $constraint->minPixels) {
+        if (!$isSvg && null !== $constraint->minPixels) {
             if (!ctype_digit((string) $constraint->minPixels)) {
                 throw new ConstraintDefinitionException(\sprintf('"%s" is not a valid minimum amount of pixels.', $constraint->minPixels));
             }
@@ -146,7 +151,7 @@ class ImageValidator extends FileValidator
             }
         }
 
-        if (null !== $constraint->maxPixels) {
+        if (!$isSvg && null !== $constraint->maxPixels) {
             if (!ctype_digit((string) $constraint->maxPixels)) {
                 throw new ConstraintDefinitionException(\sprintf('"%s" is not a valid maximum amount of pixels.', $constraint->maxPixels));
             }
@@ -231,5 +236,53 @@ class ImageValidator extends FileValidator
                 return;
             }
         }
+    }
+
+    private function isSvg(mixed $value): bool
+    {
+        if ($value instanceof File) {
+            $mime = $value->getMimeType();
+        } elseif (class_exists(MimeTypes::class)) {
+            $mime = MimeTypes::getDefault()->guessMimeType($value);
+        } elseif (!class_exists(File::class)) {
+            return false;
+        } else {
+            $mime = (new File($value))->getMimeType();
+        }
+
+        return 'image/svg+xml' === $mime;
+    }
+
+    /**
+     * @return array{int, int}|null index 0 and 1 contains respectively the width and the height of the image, null if size can't be found
+     */
+    private function getSvgSize(mixed $value): ?array
+    {
+        if ($value instanceof File) {
+            $content = $value->getContent();
+        } elseif (!class_exists(File::class)) {
+            return null;
+        } else {
+            $content = (new File($value))->getContent();
+        }
+
+        if (1 === preg_match('/<svg[^<>]+width="(?<width>[0-9]+)"[^<>]*>/', $content, $widthMatches)) {
+            $width = (int) $widthMatches['width'];
+        }
+
+        if (1 === preg_match('/<svg[^<>]+height="(?<height>[0-9]+)"[^<>]*>/', $content, $heightMatches)) {
+            $height = (int) $heightMatches['height'];
+        }
+
+        if (1 === preg_match('/<svg[^<>]+viewBox="-?[0-9]+ -?[0-9]+ (?<width>-?[0-9]+) (?<height>-?[0-9]+)"[^<>]*>/', $content, $viewBoxMatches)) {
+            $width ??= (int) $viewBoxMatches['width'];
+            $height ??= (int) $viewBoxMatches['height'];
+        }
+
+        if (isset($width) && isset($height)) {
+            return [$width, $height];
+        }
+
+        return null;
     }
 }

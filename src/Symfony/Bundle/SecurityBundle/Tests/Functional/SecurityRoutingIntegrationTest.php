@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider provideConfigs
-     */
+    #[DataProvider('provideConfigs')]
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous(array $options)
     {
         $client = $this->createClient($options);
@@ -24,9 +24,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertRedirect($client->getResponse(), '/login');
     }
 
-    /**
-     * @dataProvider provideConfigs
-     */
+    #[DataProvider('provideConfigs')]
     public function testRoutingErrorIsExposedWhenNotProtected(array $options)
     {
         $client = $this->createClient($options);
@@ -35,9 +33,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
     }
 
-    /**
-     * @dataProvider provideConfigs
-     */
+    #[DataProvider('provideConfigs')]
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights(array $options)
     {
         $client = $this->createClient($options);
@@ -52,9 +48,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertNotEquals(404, $client->getResponse()->getStatusCode());
     }
 
-    /**
-     * @dataProvider provideConfigs
-     */
+    #[DataProvider('provideConfigs')]
     public function testSecurityConfigurationForSingleIPAddress(array $options)
     {
         $allowedClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.10.10']);
@@ -67,9 +61,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertRestricted($barredClient, '/secured-by-one-ip');
     }
 
-    /**
-     * @dataProvider provideConfigs
-     */
+    #[DataProvider('provideConfigs')]
     public function testSecurityConfigurationForMultipleIPAddresses(array $options)
     {
         $allowedClientA = $this->createClient($options, ['REMOTE_ADDR' => '1.1.1.1']);
@@ -96,9 +88,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertRestricted($barredClient, '/secured-by-two-ips');
     }
 
-    /**
-     * @dataProvider provideConfigs
-     */
+    #[DataProvider('provideConfigs')]
     public function testSecurityConfigurationForExpression(array $options)
     {
         $allowedClient = $this->createClient($options, ['HTTP_USER_AGENT' => 'Firefox 1.0']);

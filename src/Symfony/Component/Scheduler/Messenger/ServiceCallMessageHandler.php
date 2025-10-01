@@ -24,8 +24,8 @@ class ServiceCallMessageHandler
     {
     }
 
-    public function __invoke(ServiceCallMessage $message): void
+    public function __invoke(ServiceCallMessage $message): mixed
     {
-        $this->serviceLocator->get($message->getServiceId())->{$message->getMethod()}(...$message->getArguments());
+        return $this->serviceLocator->get($message->getServiceId())->{$message->getMethod()}(...$message->getArguments());
     }
 }

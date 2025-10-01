@@ -23,11 +23,12 @@ class BundlePathsTest extends AbstractWebTestCase
     public function testBundlePublicDir()
     {
         $kernel = static::bootKernel(['test_case' => 'BundlePaths']);
-        $projectDir = sys_get_temp_dir().'/'.uniqid('sf_bundle_paths', true);
+        $projectDir = tempnam(sys_get_temp_dir(), 'sf_bundle_paths_');
 
         $fs = new Filesystem();
+        $fs->remove($projectDir);
         $fs->mkdir($projectDir.'/public');
-        $command = (new Application($kernel))->add(new AssetsInstallCommand($fs, $projectDir));
+        $command = (new Application($kernel))->addCommand(new AssetsInstallCommand($fs, $projectDir));
         $exitCode = (new CommandTester($command))->execute(['target' => $projectDir.'/public']);
 
         $this->assertSame(0, $exitCode);

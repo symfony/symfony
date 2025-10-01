@@ -31,18 +31,12 @@ class XmlReferenceDumper
 {
     private ?string $reference = null;
 
-    /**
-     * @return string
-     */
-    public function dump(ConfigurationInterface $configuration, ?string $namespace = null)
+    public function dump(ConfigurationInterface $configuration, ?string $namespace = null): string
     {
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree(), $namespace);
     }
 
-    /**
-     * @return string
-     */
-    public function dumpNode(NodeInterface $node, ?string $namespace = null)
+    public function dumpNode(NodeInterface $node, ?string $namespace = null): string
     {
         $this->reference = '';
         $this->writeNode($node, 0, true, $namespace);
@@ -150,8 +144,7 @@ class XmlReferenceDumper
                 }
 
                 if ($child instanceof BaseNode && $child->isDeprecated()) {
-                    $deprecation = $child->getDeprecation($child->getName(), $node->getPath());
-                    $comments[] = \sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
+                    $comments[] = \sprintf('Deprecated (%s)', $child->getDeprecationMessage($node));
                 }
 
                 if ($child instanceof EnumNode) {
@@ -286,7 +279,7 @@ class XmlReferenceDumper
             return 'null';
         }
 
-        if (empty($value)) {
+        if (!$value) {
             return '';
         }
 

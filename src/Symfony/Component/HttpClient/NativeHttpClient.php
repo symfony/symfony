@@ -332,25 +332,38 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     {
         $flag = '' !== $host && '[' === $host[0] && ']' === $host[-1] && str_contains($host, ':') ? \FILTER_FLAG_IPV6 : \FILTER_FLAG_IPV4;
         $ip = \FILTER_FLAG_IPV6 === $flag ? substr($host, 1, -1) : $host;
+        $now = microtime(true);
 
         if (filter_var($ip, \FILTER_VALIDATE_IP, $flag)) {
             // The host is already an IP address
         } elseif (null === $ip = $multi->dnsCache[$host] ?? null) {
             $info['debug'] .= "* Hostname was NOT found in DNS cache\n";
-            $now = microtime(true);
 
-            if (!$ip = gethostbynamel($host)) {
+            if ($ip = gethostbynamel($host)) {
+                $ip = $ip[0];
+            } elseif (!\defined('STREAM_PF_INET6')) {
+                throw new TransportException(\sprintf('Could not resolve host "%s".', $host));
+            } elseif ($ip = dns_get_record($host, \DNS_AAAA)) {
+                $ip = $ip[0]['ipv6'];
+            } elseif (\extension_loaded('sockets')) {
+                if (!$addrInfo = socket_addrinfo_lookup($host, 0, ['ai_socktype' => \SOCK_STREAM, 'ai_family' => \AF_INET6])) {
+                    throw new TransportException(\sprintf('Could not resolve host "%s".', $host));
+                }
+
+                $ip = socket_addrinfo_explain($addrInfo[0])['ai_addr']['sin6_addr'];
+            } elseif ('localhost' === $host || 'localhost.' === $host) {
+                $ip = '::1';
+            } else {
                 throw new TransportException(\sprintf('Could not resolve host "%s".', $host));
             }
 
-            $multi->dnsCache[$host] = $ip = $ip[0];
+            $multi->dnsCache[$host] = $ip;
             $info['debug'] .= "* Added {$host}:0:{$ip} to DNS cache\n";
-            $host = $ip;
         } else {
             $info['debug'] .= "* Hostname was found in DNS cache\n";
-            $host = str_contains($ip, ':') ? "[$ip]" : $ip;
         }
 
+        $host = str_contains($ip, ':') ? "[$ip]" : $ip;
         $info['namelookup_time'] = microtime(true) - ($info['start_time'] ?: $now);
         $info['primary_ip'] = $ip;
 

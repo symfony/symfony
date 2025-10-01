@@ -18,13 +18,12 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!\array_key_exists('testPrune', $this->skippedTests) && !$this->createCachePool() instanceof PruneableInterface) {
             $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
         }
@@ -368,6 +367,33 @@ abstract class AdapterTestCase extends CachePoolTest
         $item->set(static fn () => null);
         $this->assertFalse($cache->save($item));
         $this->assertSame('bar', $cache->getItem('foo')->get());
+    }
+
+    public function testNamespaces()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $this->assertInstanceOf(NamespacedPoolInterface::class, $cache);
+
+        $derived = $cache->withSubNamespace('derived');
+
+        $item = $derived->getItem('foo');
+        $derived->save($item->set('Foo'));
+
+        $this->assertFalse($cache->getItem('foo')->isHit());
+
+        $item = $cache->getItem('bar');
+        $cache->save($item->set('Bar'));
+
+        $this->assertFalse($derived->getItem('bar')->isHit());
+        $this->assertTrue($cache->getItem('bar')->isHit());
+
+        $derived = $cache->withSubNamespace('derived');
+        $this->assertTrue($derived->getItem('foo')->isHit());
     }
 }
 

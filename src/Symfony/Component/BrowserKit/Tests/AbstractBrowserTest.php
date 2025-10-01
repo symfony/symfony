@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\BrowserKit\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
+use Symfony\Component\BrowserKit\Exception\LogicException;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\BrowserKit\Response;
@@ -641,17 +644,15 @@ class AbstractBrowserTest extends TestCase
             $client->request('POST', 'http://www.example.com/foo/foobar', $parameters, $files, $server, $content);
 
             $this->assertSame('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect with POST method on response code: '.$code.'.');
-            $this->assertEmpty($client->getRequest()->getParameters(), '->followRedirect() drops parameters with POST method on response code: '.$code.'.');
-            $this->assertEmpty($client->getRequest()->getFiles(), '->followRedirect() drops files with POST method on response code: '.$code.'.');
+            $this->assertSame([], $client->getRequest()->getParameters(), '->followRedirect() drops parameters with POST method on response code: '.$code.'.');
+            $this->assertSame([], $client->getRequest()->getFiles(), '->followRedirect() drops files with POST method on response code: '.$code.'.');
             $this->assertArrayHasKey('X_TEST_FOO', $client->getRequest()->getServer(), '->followRedirect() keeps $_SERVER with POST method on response code: '.$code.'.');
-            $this->assertEmpty($client->getRequest()->getContent(), '->followRedirect() drops content with POST method on response code: '.$code.'.');
+            $this->assertNull($client->getRequest()->getContent(), '->followRedirect() drops content with POST method on response code: '.$code.'.');
             $this->assertSame('GET', $client->getRequest()->getMethod(), '->followRedirect() drops request method to GET on response code: '.$code.'.');
         }
     }
 
-    /**
-     * @dataProvider getTestsForMetaRefresh
-     */
+    #[DataProvider('getTestsForMetaRefresh')]
     public function testFollowMetaRefresh(string $content, string $expectedEndingUrl, bool $followMetaRefresh = true)
     {
         $client = $this->getBrowser();
@@ -700,6 +701,8 @@ class AbstractBrowserTest extends TestCase
         $this->assertArrayHasKey('myfile.foo', $client->getRequest()->getFiles(), '->back() keeps files');
         $this->assertArrayHasKey('X_TEST_FOO', $client->getRequest()->getServer(), '->back() keeps $_SERVER');
         $this->assertSame($content, $client->getRequest()->getContent(), '->back() keeps content');
+        $this->assertTrue($client->getHistory()->isFirstPage());
+        $this->assertFalse($client->getHistory()->isLastPage());
     }
 
     public function testForward()
@@ -740,6 +743,8 @@ class AbstractBrowserTest extends TestCase
         $client->forward();
 
         $this->assertSame('http://www.example.com/redirected', $client->getRequest()->getUri(), '->forward() goes forward in the history skipping redirects');
+        $this->assertTrue($client->getHistory()->isLastPage());
+        $this->assertFalse($client->getHistory()->isFirstPage());
     }
 
     public function testReload()
@@ -771,9 +776,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame([], $client->getCookieJar()->all(), '->restart() clears the cookies');
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testInsulatedRequests()
     {
         $client = $this->getBrowser();
@@ -888,5 +891,15 @@ class AbstractBrowserTest extends TestCase
         $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalRequest()".');
 
         $client->getInternalRequest();
+    }
+
+    public function testFollowRedirectWithoutRequest()
+    {
+        $browser = $this->getBrowser();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The request was not redirected.');
+
+        $browser->followRedirect();
     }
 }

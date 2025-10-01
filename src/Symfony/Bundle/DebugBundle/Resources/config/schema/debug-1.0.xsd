@@ -11,5 +11,13 @@
         <xsd:attribute name="min-depth" type="xsd:integer" />
         <xsd:attribute name="max-string-length" type="xsd:integer" />
         <xsd:attribute name="dump-destination" type="xsd:string" />
+        <xsd:attribute name="theme" type="debug_theme" />
     </xsd:complexType>
+
+    <xsd:simpleType name="debug_theme">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="dark" />
+            <xsd:enumeration value="light" />
+        </xsd:restriction>
+    </xsd:simpleType>
 </xsd:schema>

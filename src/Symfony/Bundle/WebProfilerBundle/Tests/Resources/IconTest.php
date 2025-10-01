@@ -11,13 +11,12 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Resources;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class IconTest extends TestCase
 {
-    /**
-     * @dataProvider provideIconFilePaths
-     */
+    #[DataProvider('provideIconFilePaths')]
     public function testIconFileContents($iconFilePath)
     {
         $iconFilePath = realpath($iconFilePath);

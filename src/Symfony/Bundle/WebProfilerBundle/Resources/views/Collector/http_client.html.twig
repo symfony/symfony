@@ -35,7 +35,6 @@
     </style>
 {% endblock %}
 
-
 {% block toolbar %}
     {% if collector.requestCount %}
         {% set icon %}
@@ -55,7 +54,7 @@
             </div>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: status_color}) }}
     {% endif %}
 {% endblock %}
 
@@ -106,10 +105,10 @@
                                 {% if trace.info.response_headers is defined %}
                                     {% for header in trace.info.response_headers %}
                                         {% if header matches '/^x-debug-token: .*$/i' %}
-                                            {% set profiler_token = (header.getValue | slice('x-debug-token: ' | length)) %}
+                                            {% set profiler_token = (header.getValue|slice('x-debug-token: '|length)) %}
                                         {% endif %}
                                         {% if header matches '/^x-debug-token-link: .*$/i' %}
-                                            {% set profiler_link = (header.getValue | slice('x-debug-token-link: ' | length)) %}
+                                            {% set profiler_link = (header.getValue|slice('x-debug-token-link: '|length)) %}
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
@@ -138,7 +137,7 @@
                                     {% if trace.options is not empty %}
                                         <tr>
                                             <th class="font-normal">Request options</th>
-                                            <td>{{ profiler_dump(trace.options, maxDepth=1) }}</td>
+                                            <td>{{ profiler_dump(trace.options, maxDepth: 1) }}</td>
                                         </tr>
                                     {% endif %}
                                     <tr>
@@ -155,7 +154,7 @@
                                                 {{ trace.http_code }}
                                             </span>
 
-                                            {{ profiler_dump(trace.info, maxDepth=1) }}
+                                            {{ profiler_dump(trace.info, maxDepth: 1) }}
                                         </td>
                                         {% if profiler_token and profiler_link %}
                                             <td>

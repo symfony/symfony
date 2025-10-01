@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\NameConverter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
@@ -35,9 +36,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertInstanceOf(NameConverterInterface::class, $nameConverter);
     }
 
-    /**
-     * @dataProvider attributeProvider
-     */
+    #[DataProvider('attributeProvider')]
     public function testNormalize(string|int $propertyName, string|int $expected)
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -47,9 +46,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->normalize($propertyName, SerializedNameDummy::class));
     }
 
-    /**
-     * @dataProvider fallbackAttributeProvider
-     */
+    #[DataProvider('fallbackAttributeProvider')]
     public function testNormalizeWithFallback(string|int $propertyName, string|int $expected)
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -65,9 +62,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->normalize($propertyName, SerializedNameDummy::class));
     }
 
-    /**
-     * @dataProvider attributeProvider
-     */
+    #[DataProvider('attributeProvider')]
     public function testDenormalize(string|int $expected, string|int $propertyName)
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -77,9 +72,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->denormalize($propertyName, SerializedNameDummy::class));
     }
 
-    /**
-     * @dataProvider fallbackAttributeProvider
-     */
+    #[DataProvider('fallbackAttributeProvider')]
     public function testDenormalizeWithFallback(string|int $expected, string|int $propertyName)
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -115,9 +108,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider attributeAndContextProvider
-     */
+    #[DataProvider('attributeAndContextProvider')]
     public function testNormalizeWithGroups(string $propertyName, string $expected, array $context = [])
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -127,9 +118,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->normalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
-    /**
-     * @dataProvider attributeAndContextProvider
-     */
+    #[DataProvider('attributeAndContextProvider')]
     public function testDenormalizeWithGroups(string $expected, string $propertyName, array $context = [])
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());

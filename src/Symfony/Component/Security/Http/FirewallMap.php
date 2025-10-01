@@ -32,10 +32,8 @@ class FirewallMap implements FirewallMapInterface
 
     /**
      * @param list<callable|FirewallListenerInterface> $listeners
-     *
-     * @return void
      */
-    public function add(?RequestMatcherInterface $requestMatcher = null, array $listeners = [], ?ExceptionListener $exceptionListener = null, ?LogoutListener $logoutListener = null)
+    public function add(?RequestMatcherInterface $requestMatcher = null, array $listeners = [], ?ExceptionListener $exceptionListener = null, ?LogoutListener $logoutListener = null): void
     {
         $this->map[] = [$requestMatcher, $listeners, $exceptionListener, $logoutListener];
     }

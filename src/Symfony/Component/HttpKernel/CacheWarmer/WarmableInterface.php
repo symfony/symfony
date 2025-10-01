@@ -24,7 +24,7 @@ interface WarmableInterface
      * @param string      $cacheDir Where warm-up artifacts should be stored
      * @param string|null $buildDir Where read-only artifacts should go; null when called after compile-time
      *
-     * @return string[] A list of classes or files to preload on PHP 7.4+
+     * @return string[] A list of classes or files to preload
      */
-    public function warmUp(string $cacheDir /* , string $buildDir = null */);
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array;
 }

@@ -95,6 +95,7 @@ class SendmailTransportTest extends TestCase
 
         $streamProperty = new \ReflectionProperty(SendmailTransport::class, 'stream');
         $stream = $streamProperty->getValue($sendmailTransport);
+
         $this->assertNull($stream->stream);
     }
 
@@ -113,6 +114,7 @@ class SendmailTransportTest extends TestCase
         $streamProperty = new \ReflectionProperty(SendmailTransport::class, 'stream');
         $stream = $streamProperty->getValue($sendmailTransport);
         $innerStreamProperty = new \ReflectionProperty(ProcessStream::class, 'stream');
+
         $this->assertNull($innerStreamProperty->getValue($stream));
     }
 

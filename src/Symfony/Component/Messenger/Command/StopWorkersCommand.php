@@ -26,12 +26,9 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 #[AsCommand(name: 'messenger:stop-workers', description: 'Stop workers after their current message')]
 class StopWorkersCommand extends Command
 {
-    private CacheItemPoolInterface $restartSignalCachePool;
-
-    public function __construct(CacheItemPoolInterface $restartSignalCachePool)
-    {
-        $this->restartSignalCachePool = $restartSignalCachePool;
-
+    public function __construct(
+        private CacheItemPoolInterface $restartSignalCachePool,
+    ) {
         parent::__construct();
     }
 
@@ -40,14 +37,14 @@ class StopWorkersCommand extends Command
         $this
             ->setDefinition([])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
+                The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
 
-    <info>php %command.full_name%</info>
+                    <info>php %command.full_name%</info>
 
-Each worker command will finish the message they are currently processing
-and then exit. Worker commands are *not* automatically restarted: that
-should be handled by a process control system.
-EOF
+                Each worker command will finish the message they are currently processing
+                and then exit. Worker commands are *not* automatically restarted: that
+                should be handled by a process control system.
+                EOF
             )
         ;
     }

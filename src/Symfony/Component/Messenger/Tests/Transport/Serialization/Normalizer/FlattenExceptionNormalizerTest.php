@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Serialization\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
@@ -35,9 +36,7 @@ class FlattenExceptionNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    /**
-     * @dataProvider provideFlattenException
-     */
+    #[DataProvider('provideFlattenException')]
     public function testNormalize(FlattenException $exception)
     {
         $normalized = $this->normalizer->normalize($exception, null, $this->getMessengerContext());

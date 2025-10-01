@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `Dsn::getBooleanOption()`
+ * Add `info` property in `SentMessage`
+
+7.2
+---
+
+ * Deprecate `TransportFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead
+
+   The `testIncompleteDsnException()` and `testMissingRequiredOptionException()` tests are no longer provided by default. If you make use of them (i.e. by implementing the
+   `incompleteDsnProvider()` or `missingRequiredOptionProvider()` data providers), you now need to use the `IncompleteDsnTestTrait` or `MissingRequiredOptionTestTrait` respectively.
+
+ * Make `TransportFactoryTestCase` and `TransportTestCase` compatible with PHPUnit 10+
+ * Add `Desktop` channel
+
 6.3
 ---
 
@@ -54,7 +71,7 @@ CHANGELOG
  * The `EmailRecipientInterface` and `SmsRecipientInterface` now extend the `RecipientInterface`.
  * The `EmailRecipient` and `SmsRecipient` were introduced.
  * [BC BREAK] Changed the type-hint of the `$recipient` argument in `NotifierInterface::send()`,
-   `Notifier::getChannels()`, `ChannelInterface::notifiy()` and `ChannelInterface::supports()` to
+   `Notifier::getChannels()`, `ChannelInterface::notify()` and `ChannelInterface::supports()` to
    `RecipientInterface`.
  * Changed `EmailChannel` to only support recipients which implement the `EmailRecipientInterface`.
  * Changed `SmsChannel` to only support recipients which implement the `SmsRecipientInterface`.

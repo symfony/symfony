@@ -24,9 +24,6 @@ class ApplicationDescription
 {
     public const GLOBAL_NAMESPACE = '_global';
 
-    private Application $application;
-    private ?string $namespace;
-    private bool $showHidden;
     private array $namespaces;
 
     /**
@@ -39,11 +36,11 @@ class ApplicationDescription
      */
     private array $aliases = [];
 
-    public function __construct(Application $application, ?string $namespace = null, bool $showHidden = false)
-    {
-        $this->application = $application;
-        $this->namespace = $namespace;
-        $this->showHidden = $showHidden;
+    public function __construct(
+        private Application $application,
+        private ?string $namespace = null,
+        private bool $showHidden = false,
+    ) {
     }
 
     public function getNamespaces(): array
@@ -88,7 +85,6 @@ class ApplicationDescription
         foreach ($this->sortCommands($all) as $namespace => $commands) {
             $names = [];
 
-            /** @var Command $command */
             foreach ($commands as $name => $command) {
                 if (!$command->getName() || (!$this->showHidden && $command->isHidden())) {
                     continue;
@@ -107,6 +103,9 @@ class ApplicationDescription
         }
     }
 
+    /**
+     * @return array<string, array<string, Command>>
+     */
     private function sortCommands(array $commands): array
     {
         $namespacedCommands = [];

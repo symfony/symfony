@@ -75,7 +75,7 @@
                         <p>No arguments were set</p>
                     </div>
                 {% else %}
-                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.arguments, labels: ['Argument', 'Value'], maxDepth: 2 }, with_context=false) }}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', {data: collector.arguments, labels: ['Argument', 'Value'], maxDepth: 2}, with_context: false) }}
                 {% endif %}
 
                 <h3>Options</h3>
@@ -85,7 +85,7 @@
                         <p>No options were set</p>
                     </div>
                 {% else %}
-                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.options, labels: ['Option', 'Value'], maxDepth: 2 }, with_context=false) }}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', {data: collector.options, labels: ['Option', 'Value'], maxDepth: 2}, with_context: false) }}
                 {% endif %}
 
                 {% if collector.interactive %}
@@ -100,7 +100,7 @@
                             <p>No inputs were set</p>
                         </div>
                     {% else %}
-                        {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.interactiveInputs, labels: ['Input', 'Value'], maxDepth: 2 }, with_context=false) }}
+                        {{ include('@WebProfiler/Profiler/table.html.twig', {data: collector.interactiveInputs, labels: ['Input', 'Value'], maxDepth: 2}, with_context: false) }}
                     {% endif %}
                 {% endif %}
 
@@ -111,7 +111,7 @@
                         <p>No application inputs are set</p>
                     </div>
                 {% else %}
-                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.applicationInputs, labels: ['Input', 'Value'], maxDepth: 2 }, with_context=false) }}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', {data: collector.applicationInputs, labels: ['Input', 'Value'], maxDepth: 2}, with_context: false) }}
                 {% endif %}
             </div>
         </div>
@@ -166,14 +166,14 @@
             <div class="tab-content">
                 <h3>Server Parameters</h3>
                 <h4>Defined in .env</h4>
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: request_collector.dotenvvars }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', {bag: request_collector.dotenvvars}, with_context: false) }}
 
                 <h4>Defined as regular env variables</h4>
                 {% set requestserver = [] %}
                 {% for key, value in request_collector.requestserver|filter((_, key) => key not in request_collector.dotenvvars.keys) %}
                     {% set requestserver = requestserver|merge({(key): value}) %}
                 {% endfor %}
-                {{ include('@WebProfiler/Profiler/table.html.twig', { data: requestserver }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/table.html.twig', {data: requestserver}, with_context: false) }}
             </div>
         </div>
 
@@ -222,7 +222,7 @@
 
                 <div class="tab-content">
                     <h3>
-                        <a href="{{ path('_profiler', { token: profile.parent.token }) }}">Return to parent command</a>
+                        <a href="{{ path('_profiler', {token: profile.parent.token}) }}">Return to parent command</a>
                         <small>(token = {{ profile.parent.token }})</small>
                     </h3>
 
@@ -239,7 +239,7 @@
                     {% for child in profile.children %}
                         <h3>
                             {{ child.url }}
-                            <small>(token = <a href="{{ path('_profiler', { token: child.token }) }}">{{ child.token }}</a>)</small>
+                            <small>(token = <a href="{{ path('_profiler', {token: child.token}) }}">{{ child.token }}</a>)</small>
                         </h3>
                     {% endfor %}
                 </div>

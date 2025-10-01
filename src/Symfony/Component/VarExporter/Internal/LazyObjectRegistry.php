@@ -74,26 +74,14 @@ class LazyObjectRegistry
 
         $resetters = [];
         foreach ($classProperties as $scope => $properties) {
-            $resetters[] = \Closure::bind(static function ($instance, $skippedProperties, $onlyProperties = null) use ($properties) {
+            $resetters[] = \Closure::bind(static function ($instance, $skippedProperties) use ($properties) {
                 foreach ($properties as $name => $key) {
-                    if (!\array_key_exists($key, $skippedProperties) && (null === $onlyProperties || \array_key_exists($key, $onlyProperties))) {
+                    if (!\array_key_exists($key, $skippedProperties)) {
                         unset($instance->$name);
                     }
                 }
             }, null, $scope);
         }
-
-        $resetters[] = static function ($instance, $skippedProperties, $onlyProperties = null) use ($hookedProperties) {
-            foreach ((array) $instance as $name => $value) {
-                if ("\0" !== ($name[0] ?? '')
-                    && !\array_key_exists($name, $skippedProperties)
-                    && (null === $onlyProperties || \array_key_exists($name, $onlyProperties))
-                    && !isset($hookedProperties[$name])
-                ) {
-                    unset($instance->$name);
-                }
-            }
-        };
 
         return $resetters;
     }

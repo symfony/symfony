@@ -26,22 +26,25 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 final class TraceableHttpClient implements HttpClientInterface, ResetInterface, LoggerAwareInterface
 {
-    private HttpClientInterface $client;
-    private ?Stopwatch $stopwatch;
     private \ArrayObject $tracedRequests;
 
-    public function __construct(HttpClientInterface $client, ?Stopwatch $stopwatch = null)
-    {
-        $this->client = $client;
-        $this->stopwatch = $stopwatch;
+    public function __construct(
+        private HttpClientInterface $client,
+        private ?Stopwatch $stopwatch = null,
+        private ?\Closure $disabled = null,
+    ) {
         $this->tracedRequests = new \ArrayObject();
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        if ($this->disabled?->__invoke()) {
+            return new TraceableResponse($this->client, $this->client->request($method, $url, $options));
+        }
+
         $content = null;
         $traceInfo = [];
-        $this->tracedRequests[] = [
+        $tracedRequest = [
             'method' => $method,
             'url' => $url,
             'options' => $options,
@@ -53,7 +56,9 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         if (false === ($options['extra']['trace_content'] ?? true)) {
             unset($content);
             $content = false;
+            unset($tracedRequest['options']['body'], $tracedRequest['options']['json']);
         }
+        $this->tracedRequests[] = $tracedRequest;
 
         $options['on_progress'] = function (int $dlNow, int $dlSize, array $info) use (&$traceInfo, $onProgress) {
             $traceInfo = $info;
@@ -89,8 +94,13 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         $this->tracedRequests->exchangeArray([]);
     }
 
+    /**
+     * @deprecated since Symfony 7.1, configure the logger on the wrapped HTTP client directly instead
+     */
     public function setLogger(LoggerInterface $logger): void
     {
+        trigger_deprecation('symfony/http-client', '7.1', 'Configure the logger on the wrapped HTTP client directly instead.');
+
         if ($this->client instanceof LoggerAwareInterface) {
             $this->client->setLogger($logger);
         }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Event;
 
+use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\FormEvent;
 
 /**
@@ -21,13 +22,8 @@ use Symfony\Component\Form\FormEvent;
  */
 final class PostSetDataEvent extends FormEvent
 {
-    /**
-     * @deprecated since Symfony 6.4, it will throw an exception in 7.0.
-     */
-    public function setData(mixed $data): void
+    public function setData(mixed $data): never
     {
-        trigger_deprecation('symfony/form', '6.4', 'Calling "%s()" will throw an exception as of 7.0, listen to "form.pre_set_data" instead.', __METHOD__);
-        // throw new BadMethodCallException('Form data cannot be changed during "form.post_set_data", you should use "form.pre_set_data" instead.');
-        parent::setData($data);
+        throw new BadMethodCallException('Form data cannot be changed during "form.post_set_data", you should use "form.pre_set_data" instead.');
     }
 }

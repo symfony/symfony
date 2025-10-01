@@ -35,10 +35,10 @@ class XliffLintCommandTest extends TestCase
     {
         $command = new XliffLintCommand();
         $expected = <<<EOF
-Or find all files in a bundle:
+            Or find all files in a bundle:
 
-  <info>php %command.full_name% @AcmeDemoBundle</info>
-EOF;
+              <info>php %command.full_name% @AcmeDemoBundle</info>
+            EOF;
 
         $this->assertStringContainsString($expected, $command->getHelp());
     }
@@ -59,14 +59,17 @@ EOF;
     {
         if (!$application) {
             $application = new BaseApplication();
-            $application->add(new XliffLintCommand());
+            $command = new XliffLintCommand();
+            if (method_exists($application, 'addCommand')) {
+                $application->addCommand($command);
+            } else {
+                $application->add($command);
+            }
         }
 
         $command = $application->find('lint:xliff');
 
-        if ($application) {
-            $command->setApplication($application);
-        }
+        $command->setApplication($application);
 
         return new CommandTester($command);
     }

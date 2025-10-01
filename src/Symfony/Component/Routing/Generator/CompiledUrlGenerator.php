@@ -21,14 +21,16 @@ use Symfony\Component\Routing\RequestContext;
 class CompiledUrlGenerator extends UrlGenerator
 {
     private array $compiledRoutes = [];
-    private ?string $defaultLocale;
 
-    public function __construct(array $compiledRoutes, RequestContext $context, ?LoggerInterface $logger = null, ?string $defaultLocale = null)
-    {
+    public function __construct(
+        array $compiledRoutes,
+        RequestContext $context,
+        ?LoggerInterface $logger = null,
+        private ?string $defaultLocale = null,
+    ) {
         $this->compiledRoutes = $compiledRoutes;
         $this->context = $context;
         $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
     }
 
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string

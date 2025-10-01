@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
@@ -18,9 +20,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class ProgressBarTest extends TestCase
 {
     private string|false $colSize;
@@ -1033,7 +1033,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             " \033[44;37m Starting the demo... fingers crossed  \033[0m\n".
             '  0/15 '.$progress.str_repeat($empty, 26)."   0%\n".
-            " \xf0\x9f\x8f\x81  < 1 sec                        \033[44;37m 0 B \033[0m",
+            " \xf0\x9f\x8f\x81  < 1 ms                         \033[44;37m 0 B \033[0m",
             stream_get_contents($output->getStream())
         );
         ftruncate($output->getStream(), 0);
@@ -1047,7 +1047,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput(
                 " \033[44;37m Looks good to me...                   \033[0m\n".
                 '  4/15 '.str_repeat($done, 7).$progress.str_repeat($empty, 19)."  26%\n".
-                " \xf0\x9f\x8f\x81  < 1 sec                     \033[41;37m 97 KiB \033[0m"
+                " \xf0\x9f\x8f\x81  < 1 ms                      \033[41;37m 97 KiB \033[0m"
             ),
             stream_get_contents($output->getStream())
         );
@@ -1062,7 +1062,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput(
                 " \033[44;37m Thanks, bye                           \033[0m\n".
                 ' 15/15 '.str_repeat($done, 28)." 100%\n".
-                " \xf0\x9f\x8f\x81  < 1 sec                    \033[41;37m 195 KiB \033[0m"
+                " \xf0\x9f\x8f\x81  < 1 ms                     \033[41;37m 195 KiB \033[0m"
             ),
             stream_get_contents($output->getStream())
         );
@@ -1097,7 +1097,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $bar->start();
         rewind($output->getStream());
         $this->assertEquals(
-            ' 0/15 [>---------------------------]   0% < 1 sec/< 1 sec/< 1 sec',
+            ' 0/15 [>---------------------------]   0% < 1 ms/< 1 ms/< 1 ms',
             stream_get_contents($output->getStream())
         );
     }
@@ -1117,9 +1117,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $bar->finish();
     }
 
-    /**
-     * @dataProvider provideFormat
-     */
+    #[DataProvider('provideFormat')]
     public function testFormatsWithoutMax($format)
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
@@ -1173,6 +1171,20 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput('    1 [->--------------------------]').
             $this->generateOutput('    2 [-->-------------------------]').
             $this->generateOutput('    2 [============================]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testEmptyInputWithDebugFormat()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setFormat('%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+
+        $this->assertEquals([], iterator_to_array($bar->iterate([])));
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 0/0 [============================] 100% < 1 ms/< 1 ms',
             stream_get_contents($output->getStream())
         );
     }
@@ -1348,7 +1360,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             'Foo!'.\PHP_EOL.
             $this->generateOutput('[--->------------------------]').
             "\nProcessing \"foobar\"...".
-            $this->generateOutput("[----->----------------------]\nProcessing \"foobar\"..."),
+            $this->generateOutput("[============================]\nProcessing \"foobar\"..."),
             stream_get_contents($output->getStream())
         );
     }

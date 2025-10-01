@@ -10,7 +10,7 @@ return function (ContainerConfigurator $c) {
     $di->load(Prototype::class.'\\', '../Prototype')
         ->public()
         ->autoconfigure()
-        ->exclude(['../Prototype/OtherDir', '../Prototype/BadClasses', '../Prototype/SinglyImplementedInterface', '../Prototype/StaticConstructor'])
+        ->exclude(['../Prototype/OtherDir', '../Prototype/BadClasses', '../Prototype/BadAttributes', '../Prototype/SinglyImplementedInterface', '../Prototype/StaticConstructor'])
         ->factory('f')
         ->deprecate('vendor/package', '1.1', '%service_id%')
         ->args([0])

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
+use Symfony\Component\Form\EnumFormTypeGuesser;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -74,6 +75,9 @@ return static function (ContainerConfigurator $container) {
 
         ->set('form.type_guesser.validator', ValidatorTypeGuesser::class)
             ->args([service('validator.mapping.class_metadata_factory')])
+            ->tag('form.type_guesser')
+
+        ->set('form.type_guesser.enum_type', EnumFormTypeGuesser::class)
             ->tag('form.type_guesser')
 
         ->alias('form.property_accessor', 'property_accessor')

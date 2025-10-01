@@ -1,0 +1,13 @@
+namespaces:
+  custom: Symfony\Component\Validator\Tests\Fixtures\
+
+Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+  constraints:
+    - Callback: validateMeStatic
+    - Callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+  properties:
+    firstName:
+      # Constraint with single value
+      - Type: string
+      # Constraint with multiple values
+      - Choice: [A, B]

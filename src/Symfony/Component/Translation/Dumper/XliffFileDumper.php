@@ -93,7 +93,7 @@ class XliffFileDumper extends FileDumper
         foreach ($messages->all($domain) as $source => $target) {
             $translation = $dom->createElement('trans-unit');
 
-            $translation->setAttribute('id', strtr(substr(base64_encode(hash('sha256', $source, true)), 0, 7), '/+', '._'));
+            $translation->setAttribute('id', strtr(substr(base64_encode(hash('xxh128', $source, true)), 0, 7), '/+', '._'));
             $translation->setAttribute('resname', $source);
 
             $s = $translation->appendChild($dom->createElement('source'));
@@ -167,7 +167,7 @@ class XliffFileDumper extends FileDumper
 
         foreach ($messages->all($domain) as $source => $target) {
             $translation = $dom->createElement('unit');
-            $translation->setAttribute('id', strtr(substr(base64_encode(hash('sha256', $source, true)), 0, 7), '/+', '._'));
+            $translation->setAttribute('id', strtr(substr(base64_encode(hash('xxh128', $source, true)), 0, 7), '/+', '._'));
 
             if (\strlen($source) <= 80) {
                 $translation->setAttribute('name', $source);
@@ -192,6 +192,12 @@ class XliffFileDumper extends FileDumper
             }
 
             $segment = $translation->appendChild($dom->createElement('segment'));
+
+            if ($this->hasMetadataArrayInfo('segment-attributes', $metadata)) {
+                foreach ($metadata['segment-attributes'] as $name => $value) {
+                    $segment->setAttribute($name, $value);
+                }
+            }
 
             $s = $segment->appendChild($dom->createElement('source'));
             $s->appendChild($dom->createTextNode($source));

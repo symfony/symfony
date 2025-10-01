@@ -38,7 +38,7 @@ class MessengerTransportDoctrineSchemaListenerTest extends TestCase
         $doctrineTransport = $this->createMock(DoctrineTransport::class);
         $doctrineTransport->expects($this->once())
             ->method('configureSchema')
-            ->with($schema, $dbalConnection, fn () => true);
+            ->with($schema, $dbalConnection, $this->callback(fn () => true));
         $otherTransport = $this->createMock(TransportInterface::class);
         $otherTransport->expects($this->never())
             ->method($this->anything());

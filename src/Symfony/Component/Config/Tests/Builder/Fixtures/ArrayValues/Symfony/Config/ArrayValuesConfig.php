@@ -42,11 +42,22 @@ class ArrayValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuild
     }
 
     /**
+     * @template TValue of array|bool
+     * @param TValue $value
      * @default {"enabled":false}
-    */
-    public function errorPages(array $value = []): \Symfony\Config\ArrayValues\ErrorPagesConfig
+     * @return \Symfony\Config\ArrayValues\ErrorPagesConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ArrayValues\ErrorPagesConfig : static)
+     */
+    public function errorPages(array|bool $value = []): \Symfony\Config\ArrayValues\ErrorPagesConfig|static
     {
-        if (null === $this->errorPages) {
+        if (!\is_array($value)) {
+            $this->_usedProperties['errorPages'] = true;
+            $this->errorPages = $value;
+
+            return $this;
+        }
+
+        if (!$this->errorPages instanceof \Symfony\Config\ArrayValues\ErrorPagesConfig) {
             $this->_usedProperties['errorPages'] = true;
             $this->errorPages = new \Symfony\Config\ArrayValues\ErrorPagesConfig($value);
         } elseif (0 < \func_num_args()) {
@@ -61,22 +72,33 @@ class ArrayValuesConfig implements \Symfony\Component\Config\Builder\ConfigBuild
         return 'array_values';
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     transports?: array<string, array{
+     *         dsn?: scalar|null,
+     *     }>,
+     *     error_pages?: array{ // Default: {"enabled":false}
+     *         enabled?: bool, // Default: false
+     *         with_trace?: bool,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('transports', $value)) {
+        if (array_key_exists('transports', $config)) {
             $this->_usedProperties['transports'] = true;
-            $this->transports = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ArrayValues\TransportsConfig($v) : $v, $value['transports']);
-            unset($value['transports']);
+            $this->transports = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ArrayValues\TransportsConfig($v) : $v, $config['transports']);
+            unset($config['transports']);
         }
 
-        if (array_key_exists('error_pages', $value)) {
+        if (array_key_exists('error_pages', $config)) {
             $this->_usedProperties['errorPages'] = true;
-            $this->errorPages = \is_array($value['error_pages']) ? new \Symfony\Config\ArrayValues\ErrorPagesConfig($value['error_pages']) : $value['error_pages'];
-            unset($value['error_pages']);
+            $this->errorPages = \is_array($config['error_pages']) ? new \Symfony\Config\ArrayValues\ErrorPagesConfig($config['error_pages']) : $config['error_pages'];
+            unset($config['error_pages']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

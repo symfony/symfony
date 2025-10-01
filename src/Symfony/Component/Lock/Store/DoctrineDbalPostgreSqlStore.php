@@ -33,7 +33,6 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
 class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {
     private Connection $conn;
-    private static array $storeRegistry = [];
 
     /**
      * You can either pass an existing database connection a Doctrine DBAL Connection
@@ -52,35 +51,26 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException('Failed to parse DSN. Try running "composer require doctrine/dbal".');
             }
-            if (class_exists(DsnParser::class)) {
-                $params = (new DsnParser([
-                    'db2' => 'ibm_db2',
-                    'mssql' => 'pdo_sqlsrv',
-                    'mysql' => 'pdo_mysql',
-                    'mysql2' => 'pdo_mysql',
-                    'postgres' => 'pdo_pgsql',
-                    'postgresql' => 'pdo_pgsql',
-                    'pgsql' => 'pdo_pgsql',
-                    'sqlite' => 'pdo_sqlite',
-                    'sqlite3' => 'pdo_sqlite',
-                ]))->parse($this->filterDsn($connOrUrl));
-            } else {
-                $params = ['url' => $this->filterDsn($connOrUrl)];
-            }
+            $params = (new DsnParser([
+                'db2' => 'ibm_db2',
+                'mssql' => 'pdo_sqlsrv',
+                'mysql' => 'pdo_mysql',
+                'mysql2' => 'pdo_mysql',
+                'postgres' => 'pdo_pgsql',
+                'postgresql' => 'pdo_pgsql',
+                'pgsql' => 'pdo_pgsql',
+                'sqlite' => 'pdo_sqlite',
+                'sqlite3' => 'pdo_sqlite',
+            ]))->parse($this->filterDsn($connOrUrl));
 
             $config = new Configuration();
-            if (class_exists(DefaultSchemaManagerFactory::class)) {
-                $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-            }
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
             $this->conn = DriverManager::getConnection($params, $config);
         }
     }
 
-    /**
-     * @return void
-     */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         // prevent concurrency within the same connection
         $this->getInternalStore()->save($key);
@@ -112,10 +102,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         throw new LockConflictedException();
     }
 
-    /**
-     * @return void
-     */
-    public function saveRead(Key $key)
+    public function saveRead(Key $key): void
     {
         // prevent concurrency within the same connection
         $this->getInternalStore()->saveRead($key);
@@ -147,10 +134,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         throw new LockConflictedException();
     }
 
-    /**
-     * @return void
-     */
-    public function putOffExpiration(Key $key, float $ttl)
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         // postgresql locks forever.
         // check if lock still exists
@@ -159,10 +143,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         }
     }
 
-    /**
-     * @return void
-     */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         // Prevent deleting locks own by an other key in the same connection
         if (!$this->exists($key)) {
@@ -199,10 +180,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         return false;
     }
 
-    /**
-     * @return void
-     */
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         // prevent concurrency within the same connection
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
@@ -225,10 +203,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         $this->unlockShared($key);
     }
 
-    /**
-     * @return void
-     */
-    public function waitAndSaveRead(Key $key)
+    public function waitAndSaveRead(Key $key): void
     {
         // prevent concurrency within the same connection
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
@@ -292,8 +267,8 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         }
 
         [$scheme, $rest] = explode(':', $dsn, 2);
-        $driver = strtok($scheme, '+');
-        if (!\in_array($driver, ['pgsql', 'postgres', 'postgresql'])) {
+        $driver = substr($scheme, 0, strpos($scheme, '+') ?: null);
+        if (!\in_array($driver, ['pgsql', 'postgres', 'postgresql'], true)) {
             throw new InvalidArgumentException(\sprintf('The adapter "%s" does not support the "%s" driver.', __CLASS__, $driver));
         }
 
@@ -302,8 +277,8 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
 
     private function getInternalStore(): SharedLockStoreInterface
     {
-        $namespace = spl_object_hash($this->conn);
+        static $storeRegistry = new \WeakMap();
 
-        return self::$storeRegistry[$namespace] ??= new InMemoryStore();
+        return $storeRegistry[$this->conn] ??= new InMemoryStore();
     }
 }

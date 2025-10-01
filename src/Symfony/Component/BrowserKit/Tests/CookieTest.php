@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\BrowserKit\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
@@ -36,9 +37,7 @@ class CookieTest extends TestCase
         $this->assertEquals('foo=bar; expires=Thu, 01 Jan 1970 00:00:02 GMT; path=/; secure; httponly; samesite=lax', (string) $cookie);
     }
 
-    /**
-     * @dataProvider getTestsForToFromString
-     */
+    #[DataProvider('getTestsForToFromString')]
     public function testToFromString($cookie, $url = null)
     {
         $this->assertEquals($cookie, (string) Cookie::fromString($cookie, $url));
@@ -65,9 +64,7 @@ class CookieTest extends TestCase
         $this->assertFalse(Cookie::fromString('foo=bar; secure', 'http://example.com/')->isSecure());
     }
 
-    /**
-     * @dataProvider getExpireCookieStrings
-     */
+    #[DataProvider('getExpireCookieStrings')]
     public function testFromStringAcceptsSeveralExpiresDateFormats($cookie)
     {
         $this->assertEquals(1596185377, Cookie::fromString($cookie)->getExpiresTime());

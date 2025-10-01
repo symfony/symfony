@@ -23,23 +23,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
-    private Entry $entry;
-    private string $identifier;
-    private ?string $password;
-    private array $roles;
-    private array $extraFields;
-
-    public function __construct(Entry $entry, string $identifier, #[\SensitiveParameter] ?string $password, array $roles = [], array $extraFields = [])
-    {
+    public function __construct(
+        private Entry $entry,
+        private string $identifier,
+        #[\SensitiveParameter] private ?string $password,
+        private array $roles = [],
+        private array $extraFields = [],
+    ) {
         if (!$identifier) {
             throw new \InvalidArgumentException('The username cannot be empty.');
         }
-
-        $this->entry = $entry;
-        $this->identifier = $identifier;
-        $this->password = $password;
-        $this->roles = $roles;
-        $this->extraFields = $extraFields;
     }
 
     public function getEntry(): Entry
@@ -54,7 +47,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
 
     public function getPassword(): ?string
     {
-        return $this->password;
+        return $this->password ?? null;
     }
 
     public function getSalt(): ?string
@@ -62,21 +55,21 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return null;
     }
 
-    /**
-     * @internal for compatibility with Symfony 5.4
-     */
-    public function getUsername(): string
-    {
-        return $this->getUserIdentifier();
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->identifier;
     }
 
+    /**
+     * @deprecated since Symfony 7.3
+     */
+    #[\Deprecated(since: 'symfony/ldap 7.3')]
     public function eraseCredentials(): void
     {
+        if (\PHP_VERSION_ID < 80400) {
+            @trigger_error(\sprintf('Method %s::eraseCredentials() is deprecated since symfony/ldap 7.3', self::class), \E_USER_DEPRECATED);
+        }
+
         $this->password = null;
     }
 
@@ -85,7 +78,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->extraFields;
     }
 
-    public function setPassword(#[\SensitiveParameter] string $password): void
+    public function setPassword(#[\SensitiveParameter] ?string $password): void
     {
         $this->password = $password;
     }
@@ -96,7 +89,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
             return false;
         }
 
-        if ($this->getPassword() !== $user->getPassword()) {
+        if (($this->getPassword() ?? $user->getPassword()) !== $user->getPassword()) {
             return false;
         }
 
@@ -109,5 +102,13 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         }
 
         return true;
+    }
+
+    public function __serialize(): array
+    {
+        $data = (array) $this;
+        unset($data[\sprintf("\0%s\0password", self::class)]);
+
+        return $data;
     }
 }

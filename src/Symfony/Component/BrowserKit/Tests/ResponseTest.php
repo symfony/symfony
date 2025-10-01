@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\BrowserKit\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\Exception\JsonException;
 use Symfony\Component\BrowserKit\Response;
@@ -90,9 +91,7 @@ class ResponseTest extends TestCase
         ], $response->toArray(), '->toArray returns an array representation of json content');
     }
 
-    /**
-     * @dataProvider provideInvalidJson
-     */
+    #[DataProvider('provideInvalidJson')]
     public function testToArrayThrowsErrorOnInvalidJson(string $data)
     {
         $response = new Response($data);

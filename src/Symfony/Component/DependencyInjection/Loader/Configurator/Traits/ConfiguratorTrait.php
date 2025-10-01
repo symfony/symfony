@@ -20,8 +20,14 @@ trait ConfiguratorTrait
      *
      * @return $this
      */
-    final public function configurator(string|array|ReferenceConfigurator $configurator): static
+    final public function configurator(string|array|\Closure|ReferenceConfigurator $configurator): static
     {
+        if ($configurator instanceof \Closure) {
+            $this->definition->setConfigurator(static::processClosure($configurator));
+
+            return $this;
+        }
+
         $this->definition->setConfigurator(static::processValue($configurator, true));
 
         return $this;

@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Doctrine\Common\Annotations\AnnotationException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
@@ -22,28 +22,30 @@ use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\ValidatorBuilder;
 
 /**
- * Warms up XML and YAML validator metadata.
+ * Warms up validator metadata.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
+ *
+ * @final since Symfony 7.1
  */
 class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {
-    private ValidatorBuilder $validatorBuilder;
-
     /**
      * @param string $phpArrayFile The PHP file where metadata are cached
      */
-    public function __construct(ValidatorBuilder $validatorBuilder, string $phpArrayFile)
-    {
+    public function __construct(
+        private ValidatorBuilder $validatorBuilder,
+        string $phpArrayFile,
+    ) {
         parent::__construct($phpArrayFile);
-        $this->validatorBuilder = $validatorBuilder;
     }
 
-    /**
-     * @param string|null $buildDir
-     */
-    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter /* , string $buildDir = null */): bool
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool
     {
+        if (!$buildDir) {
+            return false;
+        }
+
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), $arrayAdapter);
 
@@ -53,8 +55,6 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
                     if ($metadataFactory->hasMetadataFor($mappedClass)) {
                         $metadataFactory->getMetadataFor($mappedClass);
                     }
-                } catch (AnnotationException) {
-                    // ignore failing annotations
                 } catch (\Exception $e) {
                     $this->ignoreAutoloadException($mappedClass, $e);
                 }
@@ -78,14 +78,14 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * @param LoaderInterface[] $loaders
      *
-     * @return XmlFileLoader[]|YamlFileLoader[]
+     * @return list<XmlFileLoader|YamlFileLoader|AttributeLoader>
      */
     private function extractSupportedLoaders(array $loaders): array
     {
         $supportedLoaders = [];
 
         foreach ($loaders as $loader) {
-            if ($loader instanceof XmlFileLoader || $loader instanceof YamlFileLoader) {
+            if (method_exists($loader, 'getMappedClasses')) {
                 $supportedLoaders[] = $loader;
             } elseif ($loader instanceof LoaderChain) {
                 $supportedLoaders = array_merge($supportedLoaders, $this->extractSupportedLoaders($loader->getLoaders()));

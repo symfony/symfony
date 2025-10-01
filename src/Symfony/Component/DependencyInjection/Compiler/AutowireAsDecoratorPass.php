@@ -23,9 +23,9 @@ final class AutowireAsDecoratorPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        foreach ($container->getDefinitions() as $definition) {
+        foreach ($container->getDefinitions() as $id => $definition) {
             if ($this->accept($definition) && $reflectionClass = $container->getReflectionClass($definition->getClass(), false)) {
-                $this->processClass($definition, $reflectionClass);
+                $this->processClass($id, $container, $definition, $reflectionClass);
             }
         }
     }
@@ -35,12 +35,27 @@ final class AutowireAsDecoratorPass implements CompilerPassInterface
         return !$definition->hasTag('container.ignore_attributes') && $definition->isAutowired();
     }
 
-    private function processClass(Definition $definition, \ReflectionClass $reflectionClass): void
+    private function processClass(string $id, ContainerBuilder $container, Definition $definition, \ReflectionClass $reflectionClass): void
     {
-        foreach ($reflectionClass->getAttributes(AsDecorator::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+        if (!$attributes = $reflectionClass->getAttributes(AsDecorator::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+            return;
+        }
+
+        if (1 === \count($attributes)) {
+            $attribute = $attributes[0]->newInstance();
+            $definition->setDecoratedService($attribute->decorates, null, $attribute->priority, $attribute->onInvalid);
+
+            return;
+        }
+
+        foreach ($attributes as $attribute) {
             $attribute = $attribute->newInstance();
 
+            $definition = clone $definition;
             $definition->setDecoratedService($attribute->decorates, null, $attribute->priority, $attribute->onInvalid);
+            $container->setDefinition(\sprintf('.decorator.%s.%s', $attribute->decorates, $id), $definition);
         }
+
+        $container->removeDefinition($id);
     }
 }

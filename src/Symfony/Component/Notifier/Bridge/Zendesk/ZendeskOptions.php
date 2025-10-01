@@ -18,11 +18,9 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class ZendeskOptions implements MessageOptionsInterface
 {
-    private ?string $priority;
-
-    public function __construct(?string $priority = null)
-    {
-        $this->priority = $priority;
+    public function __construct(
+        private ?string $priority = null,
+    ) {
     }
 
     public function toArray(): array

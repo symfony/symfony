@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Infobip\Tests;
 
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class InfobipTransportFactoryTest extends TransportFactoryTestCase
+final class InfobipTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): InfobipTransportFactory
     {
         return new InfobipTransportFactory();
@@ -44,5 +49,10 @@ final class InfobipTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://authtoken@default?from=FROM'];
         yield ['somethingElse://authtoken@default']; // missing "from" option
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['infobip://default?from=0611223344'];
     }
 }

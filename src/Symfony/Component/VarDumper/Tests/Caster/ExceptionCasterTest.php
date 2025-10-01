@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
@@ -58,21 +59,21 @@ class ExceptionCasterTest extends TestCase
         $e = $this->getTestException('foo', $ref);
 
         $expectedDump = <<<'EODUMP'
-Exception {
-  #message: "foo"
-  #code: 0
-  #file: "%sExceptionCasterTest.php"
-  #line: %d
-  trace: {
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d {
-      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
-      › {
-      ›     return new \Exception(''.$msg);
-      › }
-    }
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
-%A
-EODUMP;
+            Exception {
+              #message: "foo"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+              trace: {
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d {
+                  Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
+                  › {
+                  ›     return new \Exception(''.$msg);
+                  › }
+                }
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
+            %A
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
         $this->assertSame(['foo'], $ref);
@@ -83,21 +84,21 @@ EODUMP;
         $e = $this->getTestError('foo');
 
         $expectedDump = <<<'EODUMP'
-Error {
-  #message: "foo"
-  #code: 0
-  #file: "%sExceptionCasterTest.php"
-  #line: %d
-  trace: {
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d {
-      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestError($msg): Error
-      › {
-      ›     return new \Error(''.$msg);
-      › }
-    }
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
-%A
-EODUMP;
+            Error {
+              #message: "foo"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+              trace: {
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d {
+                  Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestError($msg): Error
+                  › {
+                  ›     return new \Error(''.$msg);
+                  › }
+                }
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
+            %A
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
@@ -107,46 +108,44 @@ EODUMP;
         $e = $this->getTestErrorException('foo');
 
         $expectedDump = <<<'EODUMP'
-ErrorException {
-  #message: "foo"
-  #code: 0
-  #file: "%sExceptionCasterTest.php"
-  #line: %d
-  #severity: E_ERROR
-  trace: {
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d {
-      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestErrorException($msg): ErrorException
-      › {
-      ›     return new \ErrorException(''.$msg);
-      › }
-    }
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
-%A
-EODUMP;
+            ErrorException {
+              #message: "foo"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+              #severity: E_ERROR
+              trace: {
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d {
+                  Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestErrorException($msg): ErrorException
+                  › {
+                  ›     return new \ErrorException(''.$msg);
+                  › }
+                }
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
+            %A
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
-    /**
-     * @requires function \Symfony\Component\ErrorHandler\Exception\SilencedErrorContext::__construct
-     */
+    #[RequiresMethod(SilencedErrorContext::class, '__construct')]
     public function testCastSilencedErrorContext()
     {
         $e = $this->getTestSilencedErrorContext();
 
         $expectedDump = <<<'EODUMP'
-Symfony\Component\ErrorHandler\Exception\SilencedErrorContext {
-  +count: 1
-  -severity: E_ERROR
-  trace: {
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d {
-      › {
-      ›     return new SilencedErrorContext(\E_ERROR, __FILE__, __LINE__);
-      › }
-    }
-  }
-}
-EODUMP;
+            Symfony\Component\ErrorHandler\Exception\SilencedErrorContext {
+              +count: 1
+              -severity: E_ERROR
+              trace: {
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d {
+                  › {
+                  ›     return new SilencedErrorContext(\E_ERROR, __FILE__, __LINE__);
+                  › }
+                }
+              }
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
@@ -156,16 +155,16 @@ EODUMP;
         $e = $this->getTestException(2);
 
         $expectedDump = <<<'EODUMP'
-{
-  %s%eTests%eCaster%eExceptionCasterTest.php:%d {
-    Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
-    › {
-    ›     return new \Exception(''.$msg);
-    › }
-  }
-  %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
-%A
-EODUMP;
+            {
+              %s%eTests%eCaster%eExceptionCasterTest.php:%d {
+                Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
+                › {
+                ›     return new \Exception(''.$msg);
+                › }
+              }
+              %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
+            %A
+            EODUMP;
 
         $this->assertStringMatchesFormat($expectedDump, $this->getDump($e, 'trace'));
     }
@@ -176,21 +175,21 @@ EODUMP;
         ExceptionCaster::$traceArgs = false;
 
         $expectedDump = <<<'EODUMP'
-Exception {
-  #message: "1"
-  #code: 0
-  #file: "%sExceptionCasterTest.php"
-  #line: %d
-  trace: {
-    %sExceptionCasterTest.php:%d {
-      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
-      › {
-      ›     return new \Exception(''.$msg);
-      › }
-    }
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
-%A
-EODUMP;
+            Exception {
+              #message: "1"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+              trace: {
+                %sExceptionCasterTest.php:%d {
+                  Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
+                  › {
+                  ›     return new \Exception(''.$msg);
+                  › }
+                }
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
+            %A
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
@@ -201,16 +200,16 @@ EODUMP;
         ExceptionCaster::$srcContext = -1;
 
         $expectedDump = <<<'EODUMP'
-Exception {
-  #message: "1"
-  #code: 0
-  #file: "%sExceptionCasterTest.php"
-  #line: %d
-  trace: {
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d
-    %s%eTests%eCaster%eExceptionCasterTest.php:%d
-%A
-EODUMP;
+            Exception {
+              #message: "1"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+              trace: {
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d
+            %A
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
@@ -224,17 +223,17 @@ EODUMP;
         $nestingWrapper->trace = new TraceStub($innerExc->getTrace());
 
         $expectedDump = <<<'EODUMP'
-{
-  +"trace": {
-    %sTwig.php:%d {
-      AbstractTwigTemplate->provideError()
-      › {
-      ›     return $this->createError();
-      › }
-    }
-    %sExceptionCasterTest.php:%d { …}
-%A
-EODUMP;
+            {
+              +"trace": {
+                %sTwig.php:%d {
+                  AbstractTwigTemplate->provideError()
+                  › {
+                  ›     return $this->createError();
+                  › }
+                }
+                %sExceptionCasterTest.php:%d { …}
+            %A
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $nestingWrapper);
     }
@@ -256,20 +255,20 @@ EODUMP;
         $dump = $dumper->dump($cloner->cloneVar($e)->withRefHandles(false), true);
 
         $expectedDump = <<<'EODUMP'
-<foo></foo><bar><span class=sf-dump-note>Exception</span> {<samp data-depth=1 class=sf-dump-expanded>
-  #<span class=sf-dump-protected title="Protected property">message</span>: "<span class=sf-dump-str>1</span>"
-  #<span class=sf-dump-protected title="Protected property">code</span>: <span class=sf-dump-num>0</span>
-  #<span class=sf-dump-protected title="Protected property">file</span>: "<span class="sf-dump-str sf-dump-ellipsization" title="%sExceptionCasterTest.php
-%d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span><span class="sf-dump-ellipsis-tail">Tests%eCaster%eExceptionCasterTest.php</span></span>"
-  #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>%d</span>
-  <span class=sf-dump-meta>trace</span>: {<samp data-depth=2 class=sf-dump-compact>
-    <span class="sf-dump-meta sf-dump-ellipsization" title="%sExceptionCasterTest.php
-Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span><span class="sf-dump-ellipsis-tail">Tests%eCaster%eExceptionCasterTest.php</span></span>:<span class=sf-dump-num>%d</span>
-     &#8230;%d
-  </samp>}
-</samp>}
-</bar>
-EODUMP;
+            <foo></foo><bar><span class=sf-dump-note>Exception</span> {<samp data-depth=1 class=sf-dump-expanded>
+              #<span class=sf-dump-protected title="Protected property">message</span>: "<span class=sf-dump-str>1</span>"
+              #<span class=sf-dump-protected title="Protected property">code</span>: <span class=sf-dump-num>0</span>
+              #<span class=sf-dump-protected title="Protected property">file</span>: "<span class="sf-dump-str sf-dump-ellipsization" title="%sExceptionCasterTest.php
+            %d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span><span class="sf-dump-ellipsis-tail">Tests%eCaster%eExceptionCasterTest.php</span></span>"
+              #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>%d</span>
+              <span class=sf-dump-meta>trace</span>: {<samp data-depth=2 class=sf-dump-compact>
+                <span class="sf-dump-meta sf-dump-ellipsization" title="%sExceptionCasterTest.php
+            Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span><span class="sf-dump-ellipsis-tail">Tests%eCaster%eExceptionCasterTest.php</span></span>:<span class=sf-dump-num>%d</span>
+                 &#8230;%d
+              </samp>}
+            </samp>}
+            </bar>
+            EODUMP;
 
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
@@ -293,32 +292,32 @@ EODUMP;
         ];
 
         $expectedDump = <<<'EODUMP'
-array:2 [
-  0 => {
-    class: "__TwigTemplate_VarDumperFixture_u75a09"
-    src: {
-      %sTwig.php:1 {
-        ›%s
-        › foo bar
-        ›   twig source
-      }
-    }
-  }
-  1 => {
-    class: "__TwigTemplate_VarDumperFixture_u75a09"
-    object: __TwigTemplate_VarDumperFixture_u75a09 {
-    %A
-    }
-    src: {
-      %sExceptionCasterTest.php:2 {
-        › foo bar
-        ›   twig source
-        ›%s
-      }
-    }
-  }
-]
-EODUMP;
+            array:2 [
+              0 => {
+                class: "__TwigTemplate_VarDumperFixture_u75a09"
+                src: {
+                  %sTwig.php:1 {
+                    ›%s
+                    › foo bar
+                    ›   twig source
+                  }
+                }
+              }
+              1 => {
+                class: "__TwigTemplate_VarDumperFixture_u75a09"
+                object: __TwigTemplate_VarDumperFixture_u75a09 {
+                %A
+                }
+                src: {
+                  %sExceptionCasterTest.php:2 {
+                    › foo bar
+                    ›   twig source
+                    ›%s
+                  }
+                }
+              }
+            ]
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $f);
     }
@@ -328,13 +327,13 @@ EODUMP;
         $e = $this->getTestException('foo');
 
         $expectedDump = <<<'EODUMP'
-Exception {
-  #message: "foo"
-  #code: 0
-  #file: "%sExceptionCasterTest.php"
-  #line: %d
-}
-EODUMP;
+            Exception {
+              #message: "foo"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e, Caster::EXCLUDE_VERBOSE);
     }
@@ -345,43 +344,41 @@ EODUMP;
         })::class));
 
         $expectedDump = <<<'EODUMP'
-Exception {
-  #message: "Boo "Exception@anonymous" ba."
-  #code: 0
-  #file: "%sExceptionCasterTest.php"
-  #line: %d
-}
-EODUMP;
+            Exception {
+              #message: "Boo "Exception@anonymous" ba."
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e, Caster::EXCLUDE_VERBOSE);
     }
 
-    /**
-     * @requires function \Symfony\Component\ErrorHandler\Exception\FlattenException::create
-     */
+    #[RequiresMethod(FlattenException::class, 'create')]
     public function testFlattenException()
     {
         $f = FlattenException::createFromThrowable(new \Exception('Hello'));
 
         $expectedDump = <<<'EODUMP'
-array:1 [
-  0 => Symfony\Component\ErrorHandler\Exception\FlattenException {
-    -message: "Hello"
-    -code: 0
-    -previous: null
-    -trace: array:%d %a
-    -traceAsString: ""…%d
-    -class: "Exception"
-    -statusCode: 500
-    -statusText: "Internal Server Error"
-    -headers: []
-    -file: "%sExceptionCasterTest.php"
-    -line: %d
-    -asString: null
-    -dataRepresentation: ? Symfony\Component\VarDumper\Cloner\Data
-  }
-]
-EODUMP;
+            array:1 [
+              0 => Symfony\Component\ErrorHandler\Exception\FlattenException {
+                -message: "Hello"
+                -code: 0
+                -previous: null
+                -trace: array:%d %a
+                -traceAsString: ""…%d
+                -class: "Exception"
+                -statusCode: 500
+                -statusText: "Internal Server Error"
+                -headers: []
+                -file: "%sExceptionCasterTest.php"
+                -line: %d
+                -asString: null
+                -dataRepresentation: ? Symfony\Component\VarDumper\Cloner\Data
+              }
+            ]
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, [$f], Caster::EXCLUDE_VERBOSE);
     }

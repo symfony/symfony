@@ -32,18 +32,14 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 #[AsCommand(name: 'cache:pool:clear', description: 'Clear cache pools')]
 final class CachePoolClearCommand extends Command
 {
-    private Psr6CacheClearer $poolClearer;
-    private ?array $poolNames;
-
     /**
      * @param string[]|null $poolNames
      */
-    public function __construct(Psr6CacheClearer $poolClearer, ?array $poolNames = null)
-    {
+    public function __construct(
+        private Psr6CacheClearer $poolClearer,
+        private ?array $poolNames = null,
+    ) {
         parent::__construct();
-
-        $this->poolClearer = $poolClearer;
-        $this->poolNames = $poolNames;
     }
 
     protected function configure(): void
@@ -55,10 +51,10 @@ final class CachePoolClearCommand extends Command
             ->addOption('all', null, InputOption::VALUE_NONE, 'Clear all cache pools')
             ->addOption('exclude', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'A list of cache pools or cache pool clearers to exclude')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
+                The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
 
-    %command.full_name% <cache pool or clearer 1> [...<cache pool or clearer N>]
-EOF
+                    %command.full_name% <cache pool or clearer 1> [...<cache pool or clearer N>]
+                EOF
             )
         ;
     }

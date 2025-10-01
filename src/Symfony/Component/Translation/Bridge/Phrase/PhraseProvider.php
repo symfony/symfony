@@ -32,7 +32,7 @@ class PhraseProvider implements ProviderInterface
     private array $phraseLocales = [];
 
     public function __construct(
-        private readonly HttpClientInterface $httpClient,
+        private readonly HttpClientInterface $client,
         private readonly LoggerInterface $logger,
         private readonly LoaderInterface $loader,
         private readonly XliffFileDumper $xliffFileDumper,
@@ -71,7 +71,7 @@ class PhraseProvider implements ProviderInterface
 
                 $formData = new FormDataPart($fields);
 
-                $response = $this->httpClient->request('POST', 'uploads', [
+                $response = $this->client->request('POST', 'uploads', [
                     'body' => $formData->bodyToIterable(),
                     'headers' => $formData->getPreparedHeaders()->toArray(),
                 ]);
@@ -109,7 +109,7 @@ class PhraseProvider implements ProviderInterface
                     $headers = ['If-None-Match' => $cachedResponse['etag']];
                 }
 
-                $response = $this->httpClient->request('GET', 'locales/'.$phraseLocale.'/download', [
+                $response = $this->client->request('GET', 'locales/'.$phraseLocale.'/download', [
                     'query' => $this->readConfig,
                     'headers' => $headers,
                 ]);
@@ -149,7 +149,7 @@ class PhraseProvider implements ProviderInterface
         $names = array_map(static fn ($v): ?string => preg_replace('/([\s:,])/', '\\\\\\\\$1', $v), $keys);
 
         foreach ($names as $name) {
-            $response = $this->httpClient->request('DELETE', 'keys', [
+            $response = $this->client->request('DELETE', 'keys', [
                 'query' => [
                     'q' => 'name:'.$name,
                 ],
@@ -194,7 +194,7 @@ class PhraseProvider implements ProviderInterface
 
     private function createLocale(string $locale): void
     {
-        $response = $this->httpClient->request('POST', 'locales', [
+        $response = $this->client->request('POST', 'locales', [
             'body' => [
                 'name' => $locale,
                 'code' => $locale,
@@ -221,7 +221,7 @@ class PhraseProvider implements ProviderInterface
         $page = 1;
 
         do {
-            $response = $this->httpClient->request('GET', 'locales', [
+            $response = $this->client->request('GET', 'locales', [
                 'query' => [
                     'per_page' => 100,
                     'page' => $page,

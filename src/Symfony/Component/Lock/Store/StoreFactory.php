@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use AsyncAws\DynamoDb\DynamoDbClient;
 use Doctrine\DBAL\Connection;
 use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Lock\Bridge\DynamoDb\Store\DynamoDbStore;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
@@ -27,6 +29,11 @@ class StoreFactory
     public static function createStore(#[\SensitiveParameter] object|string $connection): PersistingStoreInterface
     {
         switch (true) {
+            case $connection instanceof DynamoDbClient:
+                self::requireBridgeClass(DynamoDbStore::class, 'symfony/amazon-dynamo-db-lock');
+
+                return new DynamoDbStore($connection);
+
             case $connection instanceof \Redis:
             case $connection instanceof Relay:
             case $connection instanceof \RedisArray:
@@ -60,8 +67,15 @@ class StoreFactory
             case 'semaphore' === $connection:
                 return new SemaphoreStore();
 
+            case str_starts_with($connection, 'dynamodb://'):
+                self::requireBridgeClass(DynamoDbStore::class, 'symfony/amazon-dynamo-db-lock');
+
+                return new DynamoDbStore($connection);
+
             case str_starts_with($connection, 'redis:'):
             case str_starts_with($connection, 'rediss:'):
+            case str_starts_with($connection, 'valkey:'):
+            case str_starts_with($connection, 'valkeys:'):
             case str_starts_with($connection, 'memcached:'):
                 if (!class_exists(AbstractAdapter::class)) {
                     throw new InvalidArgumentException('Unsupported Redis or Memcached DSN. Try running "composer require symfony/cache".');
@@ -106,8 +120,18 @@ class StoreFactory
 
             case 'in-memory' === $connection:
                 return new InMemoryStore();
+
+            case 'null' === $connection:
+                return new NullStore();
         }
 
         throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
+    }
+
+    private static function requireBridgeClass(string $class, string $package): void
+    {
+        if (!class_exists($class)) {
+            throw new \LogicException(\sprintf('Class "%s" is missing. Try running "composer require %s" to install the lock store package.', $class, $package));
+        }
     }
 }

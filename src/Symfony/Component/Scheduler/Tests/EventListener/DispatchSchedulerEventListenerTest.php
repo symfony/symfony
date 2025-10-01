@@ -12,12 +12,13 @@
 namespace Symfony\Component\Scheduler\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Scheduler\Event\FailureEvent;
 use Symfony\Component\Scheduler\Event\PostRunEvent;
 use Symfony\Component\Scheduler\Event\PreRunEvent;
@@ -36,18 +37,16 @@ class DispatchSchedulerEventListenerTest extends TestCase
         $defaultRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'default']);
 
         $schedulerProvider = new SomeScheduleProvider([$defaultRecurringMessage]);
-        $scheduleProviderLocator = $this->createMock(ContainerInterface::class);
-        $scheduleProviderLocator->expects($this->any())->method('has')->willReturn(true);
-        $scheduleProviderLocator->expects($this->any())->method('get')->willReturn($schedulerProvider);
+        $scheduleProviderLocator = new Container();
+        $scheduleProviderLocator->set('default', $schedulerProvider);
 
         $context = new MessageContext('default', 'default', $trigger, $this->createMock(\DateTimeImmutable::class));
         $envelope = (new Envelope(new \stdClass()))->with(new ScheduledStamp($context));
 
-        /** @var ContainerInterface $scheduleProviderLocator */
         $listener = new DispatchSchedulerEventListener($scheduleProviderLocator, $eventDispatcher = new EventDispatcher());
         $workerReceivedEvent = new WorkerMessageReceivedEvent($envelope, 'default');
-        $workerHandledEvent = new WorkerMessageHandledEvent($envelope, 'default');
-        $workerFailedEvent = new WorkerMessageFailedEvent($envelope, 'default', new \Exception());
+        $workerHandledEvent = new WorkerMessageHandledEvent($envelope->with(new HandledStamp('result', 'handlerName')), 'default');
+        $workerFailedEvent = new WorkerMessageFailedEvent($envelope, 'default', new \Exception('failed'));
         $secondListener = new TestEventListener();
 
         $eventDispatcher->addListener(PreRunEvent::class, [$secondListener, 'preRun']);
@@ -57,33 +56,34 @@ class DispatchSchedulerEventListenerTest extends TestCase
         $listener->onMessageHandled($workerHandledEvent);
         $listener->onMessageFailed($workerFailedEvent);
 
-        $this->assertTrue($secondListener->preInvoked);
-        $this->assertTrue($secondListener->postInvoked);
-        $this->assertTrue($secondListener->failureInvoked);
+        $this->assertInstanceOf(PreRunEvent::class, $secondListener->preRunEvent);
+        $this->assertInstanceOf(PostRunEvent::class, $secondListener->postRunEvent);
+        $this->assertSame('result', $secondListener->postRunEvent->getResult());
+        $this->assertInstanceOf(FailureEvent::class, $secondListener->failureEvent);
+        $this->assertEquals(new \Exception('failed'), $secondListener->failureEvent->getError());
     }
 }
 
 class TestEventListener
 {
-    public string $name;
-    public bool $preInvoked = false;
-    public bool $postInvoked = false;
-    public bool $failureInvoked = false;
+    public ?PreRunEvent $preRunEvent = null;
+    public ?PostRunEvent $postRunEvent = null;
+    public ?FailureEvent $failureEvent = null;
 
     /* Listener methods */
 
     public function preRun($e)
     {
-        $this->preInvoked = true;
+        $this->preRunEvent = $e;
     }
 
     public function postRun($e)
     {
-        $this->postInvoked = true;
+        $this->postRunEvent = $e;
     }
 
     public function onFailure($e)
     {
-        $this->failureInvoked = true;
+        $this->failureEvent = $e;
     }
 }

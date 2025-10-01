@@ -11,11 +11,14 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV7;
 
+#[RequiresPhpunit('<10')]
 class DeprecationTest extends TestCase
 {
     private static $vendorDir;
@@ -28,7 +31,7 @@ class DeprecationTest extends TestCase
         }
 
         foreach (get_declared_classes() as $class) {
-            if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+            if ('C' === $class[0] && str_starts_with($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
                 $vendorDir = \dirname($r->getFileName(), 2);
                 if (file_exists($vendorDir.'/composer/installed.json') && @mkdir($vendorDir.'/myfakevendor/myfakepackage1', 0777, true)) {
@@ -88,6 +91,7 @@ class DeprecationTest extends TestCase
     /**
      * @dataProvider mutedProvider
      */
+    #[DataProvider('mutedProvider')]
     public function testItMutesOnlySpecificErrorMessagesWhenTheCallingCodeIsInPhpunit($muted, $callingClass, $message)
     {
         $trace = $this->debugBacktrace();
@@ -170,6 +174,7 @@ class DeprecationTest extends TestCase
     /**
      * @dataProvider providerGetTypeDetectsSelf
      */
+    #[DataProvider('providerGetTypeDetectsSelf')]
     public function testGetTypeDetectsSelf(string $expectedType, string $message, string $traceClass, string $file)
     {
         $trace = [
@@ -233,6 +238,7 @@ class DeprecationTest extends TestCase
     /**
      * @dataProvider providerGetTypeUsesRightTrace
      */
+    #[DataProvider('providerGetTypeUsesRightTrace')]
     public function testGetTypeUsesRightTrace(string $expectedType, string $message, array $trace)
     {
         $deprecation = new Deprecation(
@@ -268,16 +274,13 @@ class DeprecationTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         foreach (get_declared_classes() as $class) {
-            if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+            if ('C' === $class[0] && str_starts_with($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
                 $v = \dirname($r->getFileName(), 2);
                 if (file_exists($v.'/composer/installed.json')) {
                     $loader = require $v.'/autoload.php';
                     $reflection = new \ReflectionClass($loader);
                     $prop = $reflection->getProperty('prefixDirsPsr4');
-                    if (\PHP_VERSION_ID < 80100) {
-                        $prop->setAccessible(true);
-                    }
                     $currentValue = $prop->getValue($loader);
                     self::$prefixDirsPsr4[] = [$prop, $loader, $currentValue];
                     $currentValue['Symfony\\Bridge\\PhpUnit\\'] = [realpath(__DIR__.'/../..')];

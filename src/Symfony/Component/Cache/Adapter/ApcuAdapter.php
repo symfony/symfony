@@ -20,13 +20,15 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 class ApcuAdapter extends AbstractAdapter
 {
-    private ?MarshallerInterface $marshaller;
-
     /**
      * @throws CacheException if APCu is not enabled
      */
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, ?string $version = null, ?MarshallerInterface $marshaller = null)
-    {
+    public function __construct(
+        string $namespace = '',
+        int $defaultLifetime = 0,
+        ?string $version = null,
+        private ?MarshallerInterface $marshaller = null,
+    ) {
         if (!static::isSupported()) {
             throw new CacheException('APCu is not enabled.');
         }
@@ -43,14 +45,9 @@ class ApcuAdapter extends AbstractAdapter
                 apcu_add($version.'@'.$namespace, null);
             }
         }
-
-        $this->marshaller = $marshaller;
     }
 
-    /**
-     * @return bool
-     */
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         return \function_exists('apcu_fetch') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL);
     }

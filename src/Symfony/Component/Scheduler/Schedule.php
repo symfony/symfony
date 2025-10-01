@@ -21,16 +21,17 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 final class Schedule implements ScheduleProviderInterface
 {
-    public function __construct(
-        private readonly ?EventDispatcherInterface $dispatcher = null,
-    ) {
-    }
-
     /** @var array<string,RecurringMessage> */
     private array $messages = [];
     private ?LockInterface $lock = null;
     private ?CacheInterface $state = null;
     private bool $shouldRestart = false;
+    private bool $onlyLastMissed = false;
+
+    public function __construct(
+        private readonly ?EventDispatcherInterface $dispatcher = null,
+    ) {
+    }
 
     public function with(RecurringMessage $message, RecurringMessage ...$messages): static
     {
@@ -121,6 +122,21 @@ final class Schedule implements ScheduleProviderInterface
     public function getState(): ?CacheInterface
     {
         return $this->state;
+    }
+
+    /**
+     * @return $this
+     */
+    public function processOnlyLastMissedRun(bool $onlyLastMissed): static
+    {
+        $this->onlyLastMissed = $onlyLastMissed;
+
+        return $this;
+    }
+
+    public function shouldProcessOnlyLastMissedRun(): bool
+    {
+        return $this->onlyLastMissed;
     }
 
     /**

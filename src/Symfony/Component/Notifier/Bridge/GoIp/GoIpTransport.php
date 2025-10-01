@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\GoIp;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Exception\UnsupportedOptionsException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -32,8 +33,7 @@ final class GoIpTransport extends AbstractTransport
 {
     public function __construct(
         private readonly string $username,
-        #[\SensitiveParameter]
-        private readonly string $password,
+        #[\SensitiveParameter] private readonly string $password,
         private readonly int $simSlot,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
@@ -64,7 +64,7 @@ final class GoIpTransport extends AbstractTransport
         }
 
         if (($options = $message->getOptions()) && !$options instanceof GoIpOptions) {
-            throw new LogicException(\sprintf('The "%s" transport only supports an instance of the "%s" as an option class.', __CLASS__, GoIpOptions::class));
+            throw new UnsupportedOptionsException(__CLASS__, GoIpOptions::class, $options);
         }
 
         if ('' !== $message->getFrom()) {

@@ -11,25 +11,25 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\StopwatchExtension;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Twig\Environment;
 use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use Twig\Loader\ArrayLoader;
 
 class StopwatchExtensionTest extends TestCase
 {
     public function testFailIfStoppingWrongEvent()
     {
-        $this->expectException(\Twig\Error\SyntaxError::class);
+        $this->expectException(SyntaxError::class);
         $this->testTiming('{% stopwatch "foo" %}{% endstopwatch "bar" %}', []);
     }
 
-    /**
-     * @dataProvider getTimingTemplates
-     */
+    #[DataProvider('getTimingTemplates')]
     public function testTiming($template, $events)
     {
         $twig = new Environment(new ArrayLoader(['template' => $template]), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);

@@ -84,6 +84,24 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertSame('first_place', (string) $subject->getMarking());
     }
 
+    public function testGetMarkingWithBackedEnum()
+    {
+        $subject = new SubjectWithEnum(TestEnum::Foo);
+
+        $markingStore = new MethodMarkingStore(true);
+
+        $marking = $markingStore->getMarking($subject);
+
+        $this->assertCount(1, $marking->getPlaces());
+        $this->assertSame(['foo' => 1], $marking->getPlaces());
+
+        $marking->mark('bar');
+        $marking->unmark('foo');
+        $markingStore->setMarking($subject, $marking);
+
+        $this->assertSame(TestEnum::Bar, $subject->getMarking());
+    }
+
     public function testGetMarkingWithUninitializedProperty()
     {
         $subject = new SubjectWithType();

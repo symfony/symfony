@@ -11,25 +11,23 @@
 
 namespace Symfony\Component\Intl\Tests\Util;
 
+use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\Before;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Exception\RuntimeException;
 use Symfony\Component\Intl\Util\GitRepository;
 
-/**
- * @group intl-data
- */
+#[Group('intl-data')]
 class GitRepositoryTest extends TestCase
 {
     private ?string $targetDir = null;
 
     private const REPO_URL = 'https://github.com/symfony/intl.git';
 
-    /**
-     * @before
-     *
-     * @after
-     */
+    #[Before]
+    #[After]
     protected function cleanup()
     {
         $this->targetDir = sys_get_temp_dir().'/GitRepositoryTest/source';
@@ -42,7 +40,7 @@ class GitRepositoryTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-        @mkdir($this->targetDir, 0777, true);
+        @mkdir($this->targetDir, 0o777, true);
 
         new GitRepository($this->targetDir);
     }

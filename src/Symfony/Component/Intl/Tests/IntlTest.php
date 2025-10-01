@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Intl;
 
@@ -20,21 +21,15 @@ class IntlTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->defaultLocale = \Locale::getDefault();
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         \Locale::setDefault($this->defaultLocale);
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testIsExtensionLoadedChecksIfIntlExtensionIsLoaded()
     {
         $this->assertTrue(Intl::isExtensionLoaded());

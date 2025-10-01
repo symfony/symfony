@@ -12,13 +12,16 @@
 namespace Symfony\Component\Notifier\Bridge\Mobyt\Tests;
 
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class MobytTransportFactoryTest extends TransportFactoryTestCase
+final class MobytTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): MobytTransportFactory
     {
         return new MobytTransportFactory();

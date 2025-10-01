@@ -115,7 +115,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_PROTOCOLS => \CURLPROTO_HTTP | \CURLPROTO_HTTPS,
             \CURLOPT_REDIR_PROTOCOLS => \CURLPROTO_HTTP | \CURLPROTO_HTTPS,
             \CURLOPT_FOLLOWLOCATION => true,
-            \CURLOPT_MAXREDIRS => 0 < $options['max_redirects'] ? $options['max_redirects'] : 0,
+            \CURLOPT_MAXREDIRS => max(0, $options['max_redirects']),
             \CURLOPT_COOKIEFILE => '', // Keep track of cookies during redirects
             \CURLOPT_TIMEOUT => 0,
             \CURLOPT_PROXY => $proxy,
@@ -143,6 +143,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_1;
         } elseif (\defined('CURL_VERSION_HTTP2') && (\CURL_VERSION_HTTP2 & CurlClientState::$curlVersion['features']) && ('https:' === $scheme || 2.0 === (float) $options['http_version'])) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_2_0;
+        } elseif (\defined('CURL_VERSION_HTTP3') && (\CURL_VERSION_HTTP3 & CurlClientState::$curlVersion['features']) && 3.0 === (float) $options['http_version']) {
+            $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_3;
         }
 
         if (isset($options['auth_ntlm'])) {
@@ -236,6 +238,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         if (!\is_string($body)) {
+            if (isset($options['auth_ntlm'])) {
+                $curlopts[\CURLOPT_FORBID_REUSE] = true; // Reusing NTLM connections requires seeking capability, which only string bodies support
+            }
+
             if (\is_resource($body)) {
                 $curlopts[\CURLOPT_READDATA] = $body;
             } else {
@@ -540,25 +546,17 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curloptsToCheck[] = \CURLOPT_HEADEROPT;
         }
 
-        $methodOpts = [
-            \CURLOPT_POST,
-            \CURLOPT_PUT,
-            \CURLOPT_CUSTOMREQUEST,
-            \CURLOPT_HTTPGET,
-            \CURLOPT_NOBODY,
-        ];
-
         foreach ($options as $opt => $optValue) {
             if (isset($curloptsToConfig[$opt])) {
                 $constName = $this->findConstantName($opt) ?? $opt;
                 throw new InvalidArgumentException(\sprintf('Cannot set "%s" with "extra.curl", use option "%s" instead.', $constName, $curloptsToConfig[$opt]));
             }
 
-            if (\in_array($opt, $methodOpts)) {
+            if (\in_array($opt, [\CURLOPT_POST, \CURLOPT_PUT, \CURLOPT_CUSTOMREQUEST, \CURLOPT_HTTPGET, \CURLOPT_NOBODY], true)) {
                 throw new InvalidArgumentException('The HTTP method cannot be overridden using "extra.curl".');
             }
 
-            if (\in_array($opt, $curloptsToCheck)) {
+            if (\in_array($opt, $curloptsToCheck, true)) {
                 $constName = $this->findConstantName($opt) ?? $opt;
                 throw new InvalidArgumentException(\sprintf('Cannot set "%s" with "extra.curl".', $constName));
             }

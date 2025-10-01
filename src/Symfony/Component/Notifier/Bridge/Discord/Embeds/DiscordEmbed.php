@@ -11,26 +11,16 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
-use Symfony\Component\Notifier\Exception\LengthException;
-
 /**
  * @author Karoly Gossler <connor@connor.hu>
  */
 final class DiscordEmbed extends AbstractDiscordEmbed
 {
-    private const TITLE_LIMIT = 256;
-    private const DESCRIPTION_LIMIT = 4096;
-    private const FIELDS_LIMIT = 25;
-
     /**
      * @return $this
      */
     public function title(string $title): static
     {
-        if (mb_strlen($title, 'UTF-8') > self::TITLE_LIMIT) {
-            throw new LengthException(\sprintf('Maximum length for the title is %d characters.', self::TITLE_LIMIT));
-        }
-
         $this->options['title'] = $title;
 
         return $this;
@@ -41,10 +31,6 @@ final class DiscordEmbed extends AbstractDiscordEmbed
      */
     public function description(string $description): static
     {
-        if (mb_strlen($description, 'UTF-8') > self::DESCRIPTION_LIMIT) {
-            throw new LengthException(\sprintf('Maximum length for the description is %d characters.', self::DESCRIPTION_LIMIT));
-        }
-
         $this->options['description'] = $description;
 
         return $this;
@@ -125,10 +111,6 @@ final class DiscordEmbed extends AbstractDiscordEmbed
      */
     public function addField(DiscordFieldEmbedObject $field): static
     {
-        if (self::FIELDS_LIMIT === \count($this->options['fields'] ?? [])) {
-            throw new LengthException(\sprintf('Maximum number of fields should not exceed %d.', self::FIELDS_LIMIT));
-        }
-
         if (!isset($this->options['fields'])) {
             $this->options['fields'] = [];
         }

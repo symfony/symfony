@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -19,9 +20,7 @@ use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 
 class PropertyInfoPassTest extends TestCase
 {
-    /**
-     * @dataProvider provideTags
-     */
+    #[DataProvider('provideTags')]
     public function testServicesAreOrderedAccordingToPriority($index, $tag)
     {
         $container = new ContainerBuilder();

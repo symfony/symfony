@@ -1,0 +1,37 @@
+{
+    "name": "symfony/sweego-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony Sweego Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathieu Santostefano",
+            "homepage": "https://github.com/welcoMattic"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/mailer": "^7.2|^8.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^6.4|^7.0|^8.0",
+        "symfony/http-foundation": "^7.1|^8.0",
+        "symfony/webhook": "^6.4|^7.0|^8.0"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<7.1"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Sweego\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

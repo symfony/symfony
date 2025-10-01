@@ -24,10 +24,14 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class Voter implements VoterInterface, CacheableVoterInterface
 {
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    /**
+     * @param Vote|null $vote Should be used to explain the vote
+     */
+    public function vote(TokenInterface $token, mixed $subject, array $attributes/* , ?Vote $vote = null */): int
     {
+        $vote = 3 < \func_num_args() ? func_get_arg(3) : null;
         // abstain vote by default in case none of the attributes are supported
-        $vote = self::ACCESS_ABSTAIN;
+        $voteResult = self::ACCESS_ABSTAIN;
 
         foreach ($attributes as $attribute) {
             try {
@@ -43,15 +47,27 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
             }
 
             // as soon as at least one attribute is supported, default is to deny access
-            $vote = self::ACCESS_DENIED;
+            $voteResult = self::ACCESS_DENIED;
 
-            if ($this->voteOnAttribute($attribute, $subject, $token)) {
+            if (null !== $vote) {
+                $vote->result = $voteResult;
+            }
+
+            if ($this->voteOnAttribute($attribute, $subject, $token, $vote)) {
                 // grant access as soon as at least one attribute returns a positive response
+                if (null !== $vote) {
+                    $vote->result = self::ACCESS_GRANTED;
+                }
+
                 return self::ACCESS_GRANTED;
             }
         }
 
-        return $vote;
+        if (null !== $vote) {
+            $vote->result = $voteResult;
+        }
+
+        return $voteResult;
     }
 
     /**
@@ -90,6 +106,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
      *
      * @param TAttribute $attribute
      * @param TSubject   $subject
+     * @param Vote|null  $vote      Should be used to explain the vote
      */
-    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool;
+    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token/* , ?Vote $vote = null */): bool;
 }

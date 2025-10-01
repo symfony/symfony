@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataMapper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
@@ -317,9 +318,7 @@ class DataMapperTest extends TestCase
         self::assertSame('BMW', $car->engine);
     }
 
-    /**
-     * @dataProvider provideDate
-     */
+    #[DataProvider('provideDate')]
     public function testMapFormsToDataDoesNotChangeEqualDateTimeInstance($date)
     {
         $article = [];

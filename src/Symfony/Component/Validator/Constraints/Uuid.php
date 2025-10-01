@@ -11,11 +11,15 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
- * @Annotation
+ * Validates that a value is a valid Universally unique identifier (UUID).
+ *
+ * @see https://en.wikipedia.org/wiki/Universally_unique_identifier
+ * @see https://datatracker.ietf.org/doc/html/rfc4122
  *
  * @author Colin O'Dell <colinodell@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -39,11 +43,6 @@ class Uuid extends Constraint
         self::INVALID_VERSION_ERROR => 'INVALID_VERSION_ERROR',
         self::INVALID_VARIANT_ERROR => 'INVALID_VARIANT_ERROR',
     ];
-
-    /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
-     */
-    protected static $errorNames = self::ERROR_NAMES;
 
     // Possible versions defined by RFC 9562/4122
     public const V1_MAC = 1;
@@ -74,19 +73,15 @@ class Uuid extends Constraint
 
     /**
      * Message to display when validation fails.
-     *
-     * @var string
      */
-    public $message = 'This is not a valid UUID.';
+    public string $message = 'This is not a valid UUID.';
 
     /**
      * Strict mode only allows UUIDs that meet the formal definition and formatting per RFC 9562/4122.
      *
      * Set this to `false` to allow legacy formats with different dash positioning or wrapping characters
-     *
-     * @var bool
      */
-    public $strict = true;
+    public bool $strict = true;
 
     /**
      * Array of allowed versions (see version constants above).
@@ -95,14 +90,17 @@ class Uuid extends Constraint
      *
      * @var int[]
      */
-    public $versions = self::ALL_VERSIONS;
+    public array $versions = self::ALL_VERSIONS;
 
     /** @var callable|null */
     public $normalizer;
 
     /**
-     * @param int[]|int|null $versions
+     * @param self::V*[]|self::V*|null $versions Specific UUID versions (defaults to {@see Uuid::ALL_VERSIONS})
+     * @param bool|null                $strict   Whether to force the value to follow the RFC's input format rules; pass false to allow alternate formats (defaults to true)
+     * @param string[]|null            $groups
      */
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
@@ -112,6 +110,10 @@ class Uuid extends Constraint
         ?array $groups = null,
         mixed $payload = null,
     ) {
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;

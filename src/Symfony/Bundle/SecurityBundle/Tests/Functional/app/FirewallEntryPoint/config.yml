@@ -1,5 +1,4 @@
 framework:
-    annotations: false
     http_method_override: false
     handle_all_throwables: true
     secret: test
@@ -17,7 +16,9 @@ framework:
         cookie_samesite: lax
     php_errors:
         log: true
-    profiler: { only_exceptions: false }
+    profiler:
+        only_exceptions: false
+        collect_serializer_data: true
 
 services:
     logger: { class: Psr\Log\NullLogger }

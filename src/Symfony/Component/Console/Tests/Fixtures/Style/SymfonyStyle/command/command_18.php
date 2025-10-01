@@ -5,7 +5,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-return function (InputInterface $input, OutputInterface $output) {
+return function (InputInterface $input, OutputInterface $output): int {
     $output = new SymfonyStyle($input, $output);
 
     $output->definitionList(
@@ -15,4 +15,6 @@ return function (InputInterface $input, OutputInterface $output) {
         new TableSeparator(),
         ['foo2' => 'bar2']
     );
+
+    return 0;
 };

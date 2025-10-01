@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Authentication;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
@@ -46,37 +47,45 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {
-    private iterable $authenticators;
-    private TokenStorageInterface $tokenStorage;
-    private EventDispatcherInterface $eventDispatcher;
-    private bool $eraseCredentials;
-    private ?LoggerInterface $logger;
-    private string $firewallName;
-    private bool $hideUserNotFoundExceptions;
-    private array $requiredBadges;
+    private ExposeSecurityLevel $exposeSecurityErrors;
 
     /**
      * @param iterable<mixed, AuthenticatorInterface> $authenticators
      */
-    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true, bool $hideUserNotFoundExceptions = true, array $requiredBadges = [])
-    {
-        $this->authenticators = $authenticators;
-        $this->tokenStorage = $tokenStorage;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->firewallName = $firewallName;
-        $this->logger = $logger;
-        $this->eraseCredentials = $eraseCredentials;
-        $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
-        $this->requiredBadges = $requiredBadges;
+    public function __construct(
+        private iterable $authenticators,
+        private TokenStorageInterface $tokenStorage,
+        private EventDispatcherInterface $eventDispatcher,
+        private string $firewallName,
+        private ?LoggerInterface $logger = null,
+        private bool $eraseCredentials = true,
+        ExposeSecurityLevel|bool $exposeSecurityErrors = ExposeSecurityLevel::None,
+        private array $requiredBadges = [],
+    ) {
+        if (\is_bool($exposeSecurityErrors)) {
+            trigger_deprecation('symfony/security-http', '7.3', 'Passing a boolean as "exposeSecurityErrors" parameter is deprecated, use %s value instead.', ExposeSecurityLevel::class);
+
+            // The old parameter had an inverted meaning ($hideUserNotFoundExceptions), for that reason the current name does not reflect the behavior
+            $exposeSecurityErrors = $exposeSecurityErrors ? ExposeSecurityLevel::None : ExposeSecurityLevel::All;
+        }
+
+        $this->exposeSecurityErrors = $exposeSecurityErrors;
     }
 
     /**
-     * @param BadgeInterface[] $badges Optionally, pass some Passport badges to use for the manual login
+     * @param BadgeInterface[]     $badges     Optionally, pass some Passport badges to use for the manual login
+     * @param array<string, mixed> $attributes Optionally, pass some Passport attributes to use for the manual login
      */
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = [] /* , array $attributes = [] */): ?Response
     {
+        $attributes = 4 < \func_num_args() ? func_get_arg(4) : [];
+
         // create an authentication token for the User
         $passport = new SelfValidatingPassport(new UserBadge($user->getUserIdentifier(), fn () => $user), $badges);
+        foreach ($attributes as $k => $v) {
+            $passport->setAttribute($k, $v);
+        }
+
         $token = $authenticator->createToken($passport, $this->firewallName);
 
         // announce the authentication token
@@ -117,12 +126,12 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             }
         }
 
+        $request->attributes->set('_security_skipped_authenticators', $skippedAuthenticators);
+        $request->attributes->set('_security_authenticators', $authenticators);
+
         if (!$authenticators) {
             return false;
         }
-
-        $request->attributes->set('_security_authenticators', $authenticators);
-        $request->attributes->set('_security_skipped_authenticators', $skippedAuthenticators);
 
         return $lazy ? null : true;
     }
@@ -200,8 +209,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             // announce the authentication token
             $authenticatedToken = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($authenticatedToken, $passport))->getAuthenticatedToken();
 
-            if (true === $this->eraseCredentials) {
-                $authenticatedToken->eraseCredentials();
+            if ($this->eraseCredentials) {
+                self::checkEraseCredentials($authenticatedToken)?->eraseCredentials();
             }
 
             $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);
@@ -252,7 +261,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
         // Avoid leaking error details in case of invalid user (e.g. user not found or invalid account status)
         // to prevent user enumeration via response content comparison
-        if ($this->hideUserNotFoundExceptions && ($authenticationException instanceof UserNotFoundException || ($authenticationException instanceof AccountStatusException && !$authenticationException instanceof CustomUserMessageAccountStatusException))) {
+        if ($this->isSensitiveException($authenticationException)) {
             $authenticationException = new BadCredentialsException('Bad credentials.', 0, $authenticationException);
         }
 
@@ -265,5 +274,55 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
         // returning null is ok, it means they want the request to continue
         return $loginFailureEvent->getResponse();
+    }
+
+    private function isSensitiveException(AuthenticationException $exception): bool
+    {
+        if (ExposeSecurityLevel::All !== $this->exposeSecurityErrors && $exception instanceof UserNotFoundException) {
+            return true;
+        }
+
+        if (ExposeSecurityLevel::None === $this->exposeSecurityErrors && $exception instanceof AccountStatusException && !$exception instanceof CustomUserMessageAccountStatusException) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @deprecated since Symfony 7.3
+     */
+    private static function checkEraseCredentials(TokenInterface|UserInterface|null $token): TokenInterface|UserInterface|null
+    {
+        if (!$token || !method_exists($token, 'eraseCredentials')) {
+            return null;
+        }
+
+        static $genericImplementations = [];
+        $m = null;
+
+        if (!isset($genericImplementations[$token::class])) {
+            $m = new \ReflectionMethod($token, 'eraseCredentials');
+            $genericImplementations[$token::class] = AbstractToken::class === $m->class;
+        }
+
+        if ($genericImplementations[$token::class]) {
+            return self::checkEraseCredentials($token->getUser());
+        }
+
+        static $deprecatedImplementations = [];
+
+        if (!isset($deprecatedImplementations[$token::class])) {
+            $m ??= new \ReflectionMethod($token, 'eraseCredentials');
+            $deprecatedImplementations[$token::class] = !$m->getAttributes(\Deprecated::class);
+        }
+
+        if ($deprecatedImplementations[$token::class]) {
+            trigger_deprecation('symfony/security-http', '7.3', 'Implementing "%s::eraseCredentials()" is deprecated since Symfony 7.3; add the #[\Deprecated] attribute on the method to signal its either empty or that you moved the logic elsewhere, typically to the "__serialize()" method.', get_debug_type($token));
+
+            return $token;
+        }
+
+        return null;
     }
 }

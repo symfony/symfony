@@ -129,9 +129,9 @@ trait WorkflowBuilderTrait
         $transitionsMetadata = new \SplObjectStorage();
         // PHP 7.2 doesn't allow this heredoc syntax in an array, use a dedicated variable instead
         $label = <<<'EOTXT'
-My custom transition
-label 3
-EOTXT;
+            My custom transition
+            label 3
+            EOTXT;
         $transitionsMetadata[$transitionWithMetadataDumpStyle] = [
             'label' => $label,
             'color' => 'Grey',
@@ -157,5 +157,44 @@ EOTXT;
         //             +-----+              |
         //             |  d  | -------------+
         //             +-----+
+    }
+
+    private static function createWorkflowWithSameNameBackTransition(): Definition
+    {
+        $places = range('a', 'c');
+
+        $transitions = [];
+        $transitions[] = new Transition('a_to_bc', 'a', ['b', 'c']);
+        $transitions[] = new Transition('back1', 'b', 'a');
+        $transitions[] = new Transition('back1', 'c', 'b');
+        $transitions[] = new Transition('back2', 'c', 'b');
+        $transitions[] = new Transition('back2', 'b', 'a');
+        $transitions[] = new Transition('c_to_cb', 'c', ['b', 'c']);
+
+        return new Definition($places, $transitions);
+
+        // The graph looks like:
+        //   +-----------------------------------------------------------------+
+        //   |                                                                 |
+        //   |                                                                 |
+        //   |         +---------------------------------------------+         |
+        //   v         |                                             v         |
+        // +---+     +---------+     +-------+     +---------+     +---+     +-------+
+        // | a | --> | a_to_bc | --> |       | --> |  back2  | --> |   | --> | back2 |
+        // +---+     +---------+     |       |     +---------+     |   |     +-------+
+        //   ^                       |       |                     |   |
+        //   |                       |   c   | <-----+             | b |
+        //   |                       |       |       |             |   |
+        //   |                       |       |     +---------+     |   |     +-------+
+        //   |                       |       | --> | c_to_cb | --> |   | --> | back1 |
+        //   |                       +-------+     +---------+     +---+     +-------+
+        //   |                         |                             ^         |
+        //   |                         |                             |         |
+        //   |                         v                             |         |
+        //   |                       +-------+                       |         |
+        //   |                       | back1 | ----------------------+         |
+        //   |                       +-------+                                 |
+        //   |                                                                 |
+        //   +-----------------------------------------------------------------+
     }
 }

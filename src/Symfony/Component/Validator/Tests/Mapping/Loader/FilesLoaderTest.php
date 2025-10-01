@@ -36,6 +36,13 @@ class FilesLoaderTest extends TestCase
 
     public function getFilesLoader(LoaderInterface $loader)
     {
-        return new class([__DIR__.'/constraint-mapping.xml', __DIR__.'/constraint-mapping.yaml', __DIR__.'/constraint-mapping.test', __DIR__.'/constraint-mapping.txt'], $loader) extends FilesLoader {};
+        $files = [
+            __DIR__.'/constraint-mapping.xml',
+            __DIR__.'/constraint-mapping.yaml',
+            __DIR__.'/constraint-mapping.test',
+            __DIR__.'/constraint-mapping.txt',
+        ];
+
+        return new class($files, $loader) extends FilesLoader {};
     }
 }

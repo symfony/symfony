@@ -5,4 +5,6 @@ framework:
     serializer:
         enabled: true
     validation: true
-    property_info: { enabled: true }
+    property_info:
+        enabled: true
+        with_constructor_extractor: true

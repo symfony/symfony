@@ -41,21 +41,17 @@ interface UserProviderInterface
      * object can just be merged into some internal array of users / identity
      * map.
      *
-     * @return UserInterface
-     *
      * @psalm-return TUser
      *
      * @throws UnsupportedUserException if the user is not supported
      * @throws UserNotFoundException    if the user is not found
      */
-    public function refreshUser(UserInterface $user);
+    public function refreshUser(UserInterface $user): UserInterface;
 
     /**
      * Whether this provider supports the given user class.
-     *
-     * @return bool
      */
-    public function supportsClass(string $class);
+    public function supportsClass(string $class): bool;
 
     /**
      * Loads the user for the given user identifier (e.g. username or email).

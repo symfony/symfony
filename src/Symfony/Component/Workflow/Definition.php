@@ -76,11 +76,8 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlaces(string|array|null $places = null): void
+    private function setInitialPlaces(string|array|null $places): void
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/workflow', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if (!$places) {
             return;
         }
@@ -107,17 +104,15 @@ final class Definition
 
     private function addTransition(Transition $transition): void
     {
-        $name = $transition->getName();
-
-        foreach ($transition->getFroms() as $from) {
-            if (!isset($this->places[$from])) {
-                throw new LogicException(\sprintf('Place "%s" referenced in transition "%s" does not exist.', $from, $name));
+        foreach ($transition->getFroms(true) as $arc) {
+            if (!\array_key_exists($arc->place, $this->places)) {
+                $this->addPlace($arc->place);
             }
         }
 
-        foreach ($transition->getTos() as $to) {
-            if (!isset($this->places[$to])) {
-                throw new LogicException(\sprintf('Place "%s" referenced in transition "%s" does not exist.', $to, $name));
+        foreach ($transition->getTos(true) as $arc) {
+            if (!\array_key_exists($arc->place, $this->places)) {
+                $this->addPlace($arc->place);
             }
         }
 

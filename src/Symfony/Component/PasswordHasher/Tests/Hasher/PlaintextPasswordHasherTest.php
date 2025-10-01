@@ -53,4 +53,12 @@ class PlaintextPasswordHasherTest extends TestCase
 
         $this->assertFalse($hasher->verify('encoded', str_repeat('a', 5000), 'salt'));
     }
+
+    public function testUsingBracketInSaltThrows()
+    {
+        $hasher = new PlaintextPasswordHasher();
+
+        $this->expectException(\LogicException::class);
+        $hasher->hash('password', '{');
+    }
 }

@@ -25,10 +25,7 @@ class PartialDenormalizationException extends UnexpectedValueException
     ) {
     }
 
-    /**
-     * @return mixed
-     */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
     }

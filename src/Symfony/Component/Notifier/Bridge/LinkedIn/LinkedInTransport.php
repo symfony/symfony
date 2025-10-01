@@ -12,9 +12,9 @@
 namespace Symfony\Component\Notifier\Bridge\LinkedIn;
 
 use Symfony\Component\Notifier\Bridge\LinkedIn\Share\AuthorShare;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Exception\UnsupportedOptionsException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -32,14 +32,12 @@ final class LinkedInTransport extends AbstractTransport
 {
     protected const HOST = 'api.linkedin.com';
 
-    private string $authToken;
-    private string $accountId;
-
-    public function __construct(#[\SensitiveParameter] string $authToken, string $accountId, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->authToken = $authToken;
-        $this->accountId = $accountId;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $accountId,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -63,7 +61,7 @@ final class LinkedInTransport extends AbstractTransport
         }
 
         if (($options = $message->getOptions()) && !$options instanceof LinkedInOptions) {
-            throw new LogicException(\sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, LinkedInOptions::class));
+            throw new UnsupportedOptionsException(__CLASS__, LinkedInOptions::class, $options);
         }
 
         if (!$options && $notification = $message->getNotification()) {

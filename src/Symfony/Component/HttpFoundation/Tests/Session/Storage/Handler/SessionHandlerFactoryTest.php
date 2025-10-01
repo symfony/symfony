@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionHandlerFactory;
@@ -20,16 +24,12 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandle
  * Test class for SessionHandlerFactory.
  *
  * @author Simon <simon.chrzanowski@quentic.com>
- *
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
  */
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
 class SessionHandlerFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider provideConnectionDSN
-     */
+    #[DataProvider('provideConnectionDSN')]
     public function testCreateFileHandler(string $connectionDSN, string $expectedPath, string $expectedHandlerType)
     {
         $handler = SessionHandlerFactory::createHandler($connectionDSN);
@@ -48,18 +48,14 @@ class SessionHandlerFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @requires extension redis
-     */
+    #[RequiresPhpExtension('redis')]
     public function testCreateRedisHandlerFromConnectionObject()
     {
         $handler = SessionHandlerFactory::createHandler($this->createMock(\Redis::class));
         $this->assertInstanceOf(RedisSessionHandler::class, $handler);
     }
 
-    /**
-     * @requires extension redis
-     */
+    #[RequiresPhpExtension('redis')]
     public function testCreateRedisHandlerFromDsn()
     {
         $handler = SessionHandlerFactory::createHandler('redis://localhost?prefix=foo&ttl=3600&ignored=bar');

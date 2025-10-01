@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -18,9 +19,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 
 class NormalizationTest extends TestCase
 {
-    /**
-     * @dataProvider getEncoderTests
-     */
+    #[DataProvider('getEncoderTests')]
     public function testNormalizeEncoders($denormalized)
     {
         $tb = new TreeBuilder('root_name', 'array');
@@ -91,9 +90,7 @@ class NormalizationTest extends TestCase
         return array_map(fn ($v) => [$v], $configs);
     }
 
-    /**
-     * @dataProvider getAnonymousKeysTests
-     */
+    #[DataProvider('getAnonymousKeysTests')]
     public function testAnonymousKeysArray($denormalized)
     {
         $tb = new TreeBuilder('root', 'array');
@@ -137,9 +134,7 @@ class NormalizationTest extends TestCase
         return array_map(fn ($v) => [$v], $configs);
     }
 
-    /**
-     * @dataProvider getNumericKeysTests
-     */
+    #[DataProvider('getNumericKeysTests')]
     public function testNumericKeysAsAttributes($denormalized)
     {
         $normalized = [

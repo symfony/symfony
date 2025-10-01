@@ -24,13 +24,19 @@ interface RequestParserInterface
     /**
      * Parses an HTTP Request and converts it into a RemoteEvent.
      *
-     * @return ?RemoteEvent Returns null if the webhook must be ignored
+     * @return RemoteEvent|RemoteEvent[]|null Returns null if the webhook must be ignored
      *
      * @throws RejectWebhookException When the payload is rejected (signature issue, parse issue, ...)
      */
-    public function parse(Request $request, #[\SensitiveParameter] string $secret): ?RemoteEvent;
+    public function parse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent|array|null;
 
-    public function createSuccessfulResponse(): Response;
+    /**
+     * @param Request|null $request The original request that was received by the webhook controller
+     */
+    public function createSuccessfulResponse(/* ?Request $request = null */): Response;
 
-    public function createRejectedResponse(string $reason): Response;
+    /**
+     * @param Request|null $request The original request that was received by the webhook controller
+     */
+    public function createRejectedResponse(string $reason/* , ?Request $request = null */): Response;
 }

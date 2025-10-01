@@ -39,6 +39,7 @@ class ConsoleEventsTest extends TestCase
             pcntl_signal(\SIGTERM, \SIG_DFL);
             pcntl_signal(\SIGUSR1, \SIG_DFL);
             pcntl_signal(\SIGUSR2, \SIG_DFL);
+            pcntl_signal(\SIGALRM, \SIG_DFL);
         }
     }
 
@@ -57,7 +58,7 @@ class ConsoleEventsTest extends TestCase
             ->setPublic(true)
             ->addMethodCall('setAutoExit', [false])
             ->addMethodCall('setDispatcher', [new Reference('event_dispatcher')])
-            ->addMethodCall('add', [new Reference('failing_command')])
+            ->addMethodCall('addCommand', [new Reference('failing_command')])
         ;
 
         $container->compile();

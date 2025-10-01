@@ -26,7 +26,7 @@ class ControllerArgumentsEventTest extends TestCase
     public function testControllerArgumentsEvent()
     {
         $event = new ControllerArgumentsEvent(new TestHttpKernel(), function () {}, ['test'], new Request(), HttpKernelInterface::MAIN_REQUEST);
-        $this->assertEquals($event->getArguments(), ['test']);
+        $this->assertSame(['test'], $event->getArguments());
     }
 
     public function testSetAttributes()

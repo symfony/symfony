@@ -16,6 +16,9 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyTaskWithCustomReceiver:
         autoconfigure: true
 
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyCommand:
+        autoconfigure: true
+
     clock:
         synthetic: true
 

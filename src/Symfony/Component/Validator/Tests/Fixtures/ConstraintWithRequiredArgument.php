@@ -22,7 +22,7 @@ final class ConstraintWithRequiredArgument extends Constraint
     #[HasNamedArguments]
     public function __construct(string $requiredArg, ?array $groups = null, mixed $payload = null)
     {
-        parent::__construct([], $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->requiredArg = $requiredArg;
     }

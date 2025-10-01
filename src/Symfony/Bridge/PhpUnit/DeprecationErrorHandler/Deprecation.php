@@ -55,12 +55,7 @@ class Deprecation
 
     private $originalFilesStack;
 
-    /**
-     * @param string $message
-     * @param string $file
-     * @param bool   $languageDeprecation
-     */
-    public function __construct($message, array $trace, $file, $languageDeprecation = false)
+    public function __construct(string $message, array $trace, string $file, bool $languageDeprecation = false)
     {
         if (DebugClassLoader::class === ($trace[2]['class'] ?? '')) {
             $this->triggeringClass = $trace[2]['args'][0];
@@ -104,7 +99,7 @@ class Deprecation
                     $this->getOriginalFilesStack();
                     array_splice($this->originalFilesStack, 0, $j, [$this->triggeringFile]);
 
-                    if (preg_match('/(?|"([^"]++)" that is deprecated|should implement method "(?:static )?([^:]++))/', $message, $m) || (false === strpos($message, '()" will return') && false === strpos($message, 'native return type declaration') && preg_match('/^(?:The|Method) "([^":]++)/', $message, $m))) {
+                    if (preg_match('/(?|"([^"]++)" that is deprecated|should implement method "(?:static )?([^:]++))/', $message, $m) || (!str_contains($message, '()" will return') && !str_contains($message, 'native return type declaration') && preg_match('/^(?:The|Method) "([^":]++)/', $message, $m))) {
                         $this->triggeringFile = (new \ReflectionClass($m[1]))->getFileName();
                         array_unshift($this->originalFilesStack, $this->triggeringFile);
                     }
@@ -142,7 +137,7 @@ class Deprecation
             return;
         }
 
-        if (!isset($line['class'], $trace[$i - 2]['function']) || 0 !== strpos($line['class'], SymfonyTestsListenerFor::class)) {
+        if (!isset($line['class'], $trace[$i - 2]['function']) || !str_starts_with($line['class'], SymfonyTestsListenerFor::class)) {
             $this->originClass = isset($line['object']) ? \get_class($line['object']) : $line['class'];
             $this->originMethod = $line['function'];
 
@@ -152,38 +147,27 @@ class Deprecation
         $test = $line['args'][0] ?? null;
 
         if (($test instanceof TestCase || $test instanceof TestSuite) && ('trigger_error' !== $trace[$i - 2]['function'] || isset($trace[$i - 2]['class']))) {
-            $this->originClass = \get_class($test);
+            $this->originClass = $test::class;
             $this->originMethod = $test->getName();
-
-            return;
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function lineShouldBeSkipped(array $line)
+    private function lineShouldBeSkipped(array $line): bool
     {
         if (!isset($line['class'])) {
             return true;
         }
         $class = $line['class'];
 
-        return 'ReflectionMethod' === $class || 0 === strpos($class, 'PHPUnit\\');
+        return 'ReflectionMethod' === $class || str_starts_with($class, 'PHPUnit\\');
     }
 
-    /**
-     * @return bool
-     */
-    public function originatesFromDebugClassLoader()
+    public function originatesFromDebugClassLoader(): bool
     {
         return isset($this->triggeringClass);
     }
 
-    /**
-     * @return string
-     */
-    public function triggeringClass()
+    public function triggeringClass(): string
     {
         if (null === $this->triggeringClass) {
             throw new \LogicException('Check with originatesFromDebugClassLoader() before calling this method.');
@@ -192,18 +176,12 @@ class Deprecation
         return $this->triggeringClass;
     }
 
-    /**
-     * @return bool
-     */
-    public function originatesFromAnObject()
+    public function originatesFromAnObject(): bool
     {
         return isset($this->originClass);
     }
 
-    /**
-     * @return string
-     */
-    public function originatingClass()
+    public function originatingClass(): string
     {
         if (null === $this->originClass) {
             throw new \LogicException('Check with originatesFromAnObject() before calling this method.');
@@ -211,13 +189,10 @@ class Deprecation
 
         $class = $this->originClass;
 
-        return false !== strpos($class, "@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class').'@anonymous' : $class;
+        return str_contains($class, "@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class').'@anonymous' : $class;
     }
 
-    /**
-     * @return string
-     */
-    public function originatingMethod()
+    public function originatingMethod(): string
     {
         if (null === $this->originMethod) {
             throw new \LogicException('Check with originatesFromAnObject() before calling this method.');
@@ -226,18 +201,12 @@ class Deprecation
         return $this->originMethod;
     }
 
-    /**
-     * @return string
-     */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * @return bool
-     */
-    public function isLegacy()
+    public function isLegacy(): bool
     {
         if (!$this->originClass || (new \ReflectionClass($this->originClass))->isInternal()) {
             return false;
@@ -246,35 +215,30 @@ class Deprecation
         $method = $this->originatingMethod();
         $groups = class_exists(Groups::class, false) ? [new Groups(), 'groups'] : [Test::class, 'getGroups'];
 
-        return 0 === strpos($method, 'testLegacy')
-            || 0 === strpos($method, 'provideLegacy')
-            || 0 === strpos($method, 'getLegacy')
+        return str_starts_with($method, 'testLegacy')
+            || str_starts_with($method, 'provideLegacy')
+            || str_starts_with($method, 'getLegacy')
             || strpos($this->originClass, '\Legacy')
             || \in_array('legacy', $groups($this->originClass, $method), true);
     }
 
-    /**
-     * @return bool
-     */
-    public function isMuted()
+    public function isMuted(): bool
     {
         if ('Function ReflectionType::__toString() is deprecated' !== $this->message) {
             return false;
         }
         if (isset($this->trace[1]['class'])) {
-            return 0 === strpos($this->trace[1]['class'], 'PHPUnit\\');
+            return str_starts_with($this->trace[1]['class'], 'PHPUnit\\');
         }
 
-        return false !== strpos($this->triggeringFile, \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'phpunit'.\DIRECTORY_SEPARATOR);
+        return str_contains($this->triggeringFile, \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'phpunit'.\DIRECTORY_SEPARATOR);
     }
 
     /**
      * Tells whether both the calling package and the called package are vendor
      * packages.
-     *
-     * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         $pathType = $this->getPathType($this->triggeringFile);
         if ($this->languageDeprecation && self::PATH_TYPE_VENDOR === $pathType) {
@@ -331,16 +295,12 @@ class Deprecation
 
     /**
      * getPathType() should always be called prior to calling this method.
-     *
-     * @param string $path
-     *
-     * @return string
      */
-    private function getPackage($path)
+    private function getPackage(string $path): string
     {
         $path = realpath($path) ?: $path;
         foreach (self::getVendors() as $vendorRoot) {
-            if (0 === strpos($path, $vendorRoot)) {
+            if (str_starts_with($path, $vendorRoot)) {
                 $relativePath = substr($path, \strlen($vendorRoot) + 1);
                 $vendor = strstr($relativePath, \DIRECTORY_SEPARATOR, true);
                 if (false === $vendor) {
@@ -357,7 +317,7 @@ class Deprecation
     /**
      * @return string[]
      */
-    private static function getVendors()
+    private static function getVendors(): array
     {
         if (null === self::$vendors) {
             self::$vendors = $paths = [];
@@ -366,7 +326,7 @@ class Deprecation
                 self::$vendors[] = \dirname((new \ReflectionClass(DebugClassLoader::class))->getFileName());
             }
             foreach (get_declared_classes() as $class) {
-                if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+                if ('C' === $class[0] && str_starts_with($class, 'ComposerAutoloaderInit')) {
                     $r = new \ReflectionClass($class);
                     $v = \dirname($r->getFileName(), 2);
                     if (file_exists($v.'/composer/installed.json')) {
@@ -381,7 +341,7 @@ class Deprecation
             }
             foreach ($paths as $path) {
                 foreach (self::$vendors as $vendor) {
-                    if (0 !== strpos($path, $vendor)) {
+                    if (!str_starts_with($path, $vendor)) {
                         self::$internalPaths[] = $path;
                     }
                 }
@@ -404,25 +364,20 @@ class Deprecation
         return $paths;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    private function getPathType($path)
+    private function getPathType(string $path): string
     {
         $realPath = realpath($path);
         if (false === $realPath && '-' !== $path && 'Standard input code' !== $path) {
             return self::PATH_TYPE_UNDETERMINED;
         }
         foreach (self::getVendors() as $vendor) {
-            if (0 === strpos($realPath, $vendor) && false !== strpbrk(substr($realPath, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
+            if (str_starts_with($realPath, $vendor) && false !== strpbrk(substr($realPath, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                 return self::PATH_TYPE_VENDOR;
             }
         }
 
         foreach (self::$internalPaths as $internalPath) {
-            if (0 === strpos($realPath, $internalPath)) {
+            if (str_starts_with($realPath, $internalPath)) {
                 return self::PATH_TYPE_SELF;
             }
         }
@@ -430,16 +385,10 @@ class Deprecation
         return self::PATH_TYPE_UNDETERMINED;
     }
 
-    /**
-     * @return string
-     */
-    public function toString()
+    public function toString(): string
     {
         $exception = new \Exception($this->message);
         $reflection = new \ReflectionProperty($exception, 'trace');
-        if (\PHP_VERSION_ID < 80100) {
-            $reflection->setAccessible(true);
-        }
         $reflection->setValue($exception, $this->trace);
 
         return ($this->originatesFromAnObject() ? 'deprecation triggered by '.$this->originatingClass().'::'.$this->originatingMethod().":\n" : '')

@@ -35,23 +35,23 @@ $argv = $_SERVER['argv'];
 
 if ($argc > 3 || 2 === $argc && '-h' === $argv[1]) {
     bailout(<<<'MESSAGE'
-Usage: php update-data.php <path/to/icu/source> <path/to/icu/build>
+        Usage: php update-data.php <path/to/icu/source> <path/to/icu/build>
 
-Updates the ICU data for Symfony to the latest version of ICU.
+        Updates the ICU data for Symfony to the latest version of ICU.
 
-If you downloaded the git repository before, you can pass the path to the
-repository source in the first optional argument.
+        If you downloaded the git repository before, you can pass the path to the
+        repository source in the first optional argument.
 
-If you also built the repository before, you can pass the directory where that
-build is stored in the second parameter. The build directory needs to contain
-the subdirectories bin/ and lib/.
+        If you also built the repository before, you can pass the directory where that
+        build is stored in the second parameter. The build directory needs to contain
+        the subdirectories bin/ and lib/.
 
-For running this script, the intl extension must be loaded and all vendors
-must have been installed through composer:
+        For running this script, the intl extension must be loaded and all vendors
+        must have been installed through composer:
 
-composer install
+        composer install
 
-MESSAGE
+        MESSAGE
     );
 }
 
@@ -214,15 +214,15 @@ $generator->generateData($config);
 echo "Resource bundle compilation complete.\n";
 
 $gitInfo = <<<GIT_INFO
-Git information
-===============
+    Git information
+    ===============
 
-URL: {$git->getUrl()}
-Revision: {$git->getLastCommitHash()}
-Author: {$git->getLastAuthor()}
-Date: {$git->getLastAuthoredDate()->format('c')}
+    URL: {$git->getUrl()}
+    Revision: {$git->getLastCommitHash()}
+    Author: {$git->getLastAuthor()}
+    Date: {$git->getLastAuthoredDate()->format('c')}
 
-GIT_INFO;
+    GIT_INFO;
 
 $gitInfoFile = $dataDir.'/git-info.txt';
 

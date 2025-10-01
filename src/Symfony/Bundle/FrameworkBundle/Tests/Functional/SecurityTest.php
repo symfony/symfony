@@ -11,13 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class SecurityTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider getUsers
-     */
+    #[DataProvider('getUsers')]
     public function testLoginUser(string $username, array $roles, ?string $firewallContext)
     {
         $user = new InMemoryUser($username, 'the-password', $roles);

@@ -35,13 +35,11 @@ final class DumpTokenParser extends AbstractTokenParser
     {
         $values = null;
         if (!$this->parser->getStream()->test(Token::BLOCK_END_TYPE)) {
-            $values = method_exists($this->parser, 'parseExpression') ?
-                $this->parseMultitargetExpression() :
-                $this->parser->getExpressionParser()->parseMultitargetExpression();
+            $values = $this->parseMultitargetExpression();
         }
         $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
 
-        return new DumpNode(class_exists(LocalVariable::class) ? new LocalVariable(null, $token->getLine()) : $this->parser->getVarName(), $values, $token->getLine(), $this->getTag());
+        return new DumpNode(new LocalVariable(null, $token->getLine()), $values, $token->getLine());
     }
 
     private function parseMultitargetExpression(): Node

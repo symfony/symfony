@@ -20,7 +20,7 @@ use Psr\Link\LinkInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class HttpHeaderSerializer
+class HttpHeaderSerializer
 {
     /**
      * Builds the value of the "Link" HTTP header.

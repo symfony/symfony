@@ -22,13 +22,14 @@ $container->loadFromExtension('framework', [
                 'approved_by_spellchecker',
                 'published',
             ],
+            // We also test different configuration formats here
             'transitions' => [
                 'request_review' => [
                     'from' => 'draft',
                     'to' => ['wait_for_journalist', 'wait_for_spellchecker'],
                 ],
                 'journalist_approval' => [
-                    'from' => 'wait_for_journalist',
+                    'from' => ['wait_for_journalist'],
                     'to' => 'approved_by_journalist',
                 ],
                 'spellchecker_approval' => [
@@ -36,13 +37,13 @@ $container->loadFromExtension('framework', [
                     'to' => 'approved_by_spellchecker',
                 ],
                 'publish' => [
-                    'from' => ['approved_by_journalist', 'approved_by_spellchecker'],
+                    'from' => [['place' => 'approved_by_journalist', 'weight' => 1], 'approved_by_spellchecker'],
                     'to' => 'published',
                 ],
                 'publish_editor_in_chief' => [
                     'name' => 'publish',
                     'from' => 'draft',
-                    'to' => 'published',
+                    'to' => [['place' => 'published', 'weight' => 2]],
                 ],
             ],
         ],

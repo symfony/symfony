@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Writer;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\PhpBundleWriter;
@@ -56,9 +57,7 @@ class PhpBundleWriterTest extends TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en.php', $this->directory.'/en.php');
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testWriteResourceBundle()
     {
         $bundle = new \ResourceBundle('rb', __DIR__.'/Fixtures', false);

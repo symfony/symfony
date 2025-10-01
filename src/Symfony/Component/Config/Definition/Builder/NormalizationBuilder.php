@@ -14,18 +14,25 @@ namespace Symfony\Component\Config\Definition\Builder;
 /**
  * This class builds normalization conditions.
  *
+ * @template T of NodeDefinition
+ *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class NormalizationBuilder
 {
-    protected $node;
-    public $before = [];
-    public $declaredTypes = [];
-    public $remappings = [];
+    /**
+     * @var (ExprBuilder<T>|\Closure)[]
+     */
+    public array $before = [];
+    public array $declaredTypes = [];
+    public array $remappings = [];
 
-    public function __construct(NodeDefinition $node)
-    {
-        $this->node = $node;
+    /**
+     * @param T $node
+     */
+    public function __construct(
+        protected NodeDefinition $node,
+    ) {
     }
 
     /**
@@ -46,11 +53,11 @@ class NormalizationBuilder
     /**
      * Registers a closure to run before the normalization or an expression builder to build it if null is provided.
      *
-     * @return ExprBuilder|$this
+     * @return ($closure is \Closure ? $this : ExprBuilder<T>)
      */
     public function before(?\Closure $closure = null): ExprBuilder|static
     {
-        if (null !== $closure) {
+        if ($closure) {
             $this->before[] = $closure;
 
             return $this;

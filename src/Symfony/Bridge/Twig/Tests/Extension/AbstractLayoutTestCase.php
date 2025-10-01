@@ -11,12 +11,14 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Twig\Test\FormLayoutTestCase;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -44,7 +46,10 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         parent::setUp();
     }
 
-    protected function getExtensions()
+    /**
+     * @return FormExtensionInterface[]
+     */
+    protected function getExtensions(): array
     {
         return [
             new CsrfExtension($this->csrfTokenManager),
@@ -53,9 +58,9 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     protected function tearDown(): void
     {
-        \Locale::setDefault($this->defaultLocale);
-
-        parent::tearDown();
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
     protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath)
@@ -1590,7 +1595,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $form->get('date')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
-        $this->assertEmpty($this->renderErrors($view));
+        $this->assertSame('', $this->renderErrors($view));
         $this->assertNotEmpty($this->renderErrors($view['date']));
     }
 
@@ -2211,7 +2216,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $form->get('time')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
-        $this->assertEmpty($this->renderErrors($view));
+        $this->assertSame('', $this->renderErrors($view));
         $this->assertNotEmpty($this->renderErrors($view['time']));
     }
 
@@ -2709,9 +2714,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    /**
-     * @dataProvider submitFormNoValidateProvider
-     */
+    #[DataProvider('submitFormNoValidateProvider')]
     public function testSubmitFormNoValidate(bool $validate)
     {
         $form = $this->factory->create(SubmitType::class, null, [

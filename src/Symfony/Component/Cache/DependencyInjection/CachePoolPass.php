@@ -30,10 +30,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CachePoolPass implements CompilerPassInterface
 {
-    /**
-     * @return void
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if ($container->hasParameter('cache.prefix.seed')) {
             $seed = $container->getParameterBag()->resolveValue($container->getParameter('cache.prefix.seed'));
@@ -219,7 +216,7 @@ class CachePoolPass implements CompilerPassInterface
 
     private function getNamespace(string $seed, string $id): string
     {
-        return substr(str_replace('/', '-', base64_encode(hash('sha256', $id.$seed, true))), 0, 10);
+        return substr(str_replace('/', '-', base64_encode(hash('xxh128', $id.$seed, true))), 0, 10);
     }
 
     /**

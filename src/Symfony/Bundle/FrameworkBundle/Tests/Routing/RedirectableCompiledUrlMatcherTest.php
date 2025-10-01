@@ -27,15 +27,16 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
 
         $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
-        $this->assertEquals([
-            '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
-            'path' => '/foo/',
-            'permanent' => true,
-            'scheme' => null,
-            'httpPort' => $context->getHttpPort(),
-            'httpsPort' => $context->getHttpsPort(),
-            '_route' => 'foo',
-        ],
+        $this->assertEquals(
+            [
+                '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
+                'path' => '/foo/',
+                'permanent' => true,
+                'scheme' => null,
+                'httpPort' => $context->getHttpPort(),
+                'httpsPort' => $context->getHttpsPort(),
+                '_route' => 'foo',
+            ],
             $matcher->match('/foo')
         );
     }
@@ -47,15 +48,16 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
 
         $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
-        $this->assertEquals([
-            '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
-            'path' => '/foo',
-            'permanent' => true,
-            'scheme' => 'https',
-            'httpPort' => $context->getHttpPort(),
-            'httpsPort' => $context->getHttpsPort(),
-            '_route' => 'foo',
-        ],
+        $this->assertEquals(
+            [
+                '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
+                'path' => '/foo',
+                'permanent' => true,
+                'scheme' => 'https',
+                'httpPort' => $context->getHttpPort(),
+                'httpsPort' => $context->getHttpsPort(),
+                '_route' => 'foo',
+            ],
             $matcher->match('/foo')
         );
     }

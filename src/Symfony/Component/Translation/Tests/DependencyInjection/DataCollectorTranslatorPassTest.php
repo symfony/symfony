@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -43,9 +44,7 @@ class DataCollectorTranslatorPassTest extends TestCase
         ;
     }
 
-    /**
-     * @dataProvider getImplementingTranslatorBagInterfaceTranslatorClassNames
-     */
+    #[DataProvider('getImplementingTranslatorBagInterfaceTranslatorClassNames')]
     public function testProcessKeepsDataCollectorTranslatorIfItImplementsTranslatorBagInterface($class)
     {
         $this->container->register('translator', $class);
@@ -55,9 +54,7 @@ class DataCollectorTranslatorPassTest extends TestCase
         $this->assertTrue($this->container->hasDefinition('translator.data_collector'));
     }
 
-    /**
-     * @dataProvider getImplementingTranslatorBagInterfaceTranslatorClassNames
-     */
+    #[DataProvider('getImplementingTranslatorBagInterfaceTranslatorClassNames')]
     public function testProcessKeepsDataCollectorIfTranslatorImplementsTranslatorBagInterface($class)
     {
         $this->container->register('translator', $class);
@@ -75,9 +72,7 @@ class DataCollectorTranslatorPassTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getNotImplementingTranslatorBagInterfaceTranslatorClassNames
-     */
+    #[DataProvider('getNotImplementingTranslatorBagInterfaceTranslatorClassNames')]
     public function testProcessRemovesDataCollectorTranslatorIfItDoesNotImplementTranslatorBagInterface($class)
     {
         $this->container->register('translator', $class);
@@ -87,9 +82,7 @@ class DataCollectorTranslatorPassTest extends TestCase
         $this->assertFalse($this->container->hasDefinition('translator.data_collector'));
     }
 
-    /**
-     * @dataProvider getNotImplementingTranslatorBagInterfaceTranslatorClassNames
-     */
+    #[DataProvider('getNotImplementingTranslatorBagInterfaceTranslatorClassNames')]
     public function testProcessRemovesDataCollectorIfTranslatorDoesNotImplementTranslatorBagInterface($class)
     {
         $this->container->register('translator', $class);

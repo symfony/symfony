@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\GlobResource;
 
@@ -25,11 +26,9 @@ class GlobResourceTest extends TestCase
         touch($dir.'/Resource/.hiddenFile');
     }
 
-    /**
-     * @testWith ["/Resource"]
-     *           ["/**\/Resource"]
-     *           ["/**\/Resource/"]
-     */
+    #[TestWith(['/Resource'])]
+    #[TestWith(['/**/Resource'])]
+    #[TestWith(['/**/Resource/'])]
     public function testIterator(string $pattern)
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';

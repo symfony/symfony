@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Tests\Action\Input;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input\MultiChoiceInput;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Test\Action\Input\AbstractInputTestCase;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -51,9 +52,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
         $this->assertFalse($input->toArray()['isMultiSelect']);
     }
 
-    /**
-     * @dataProvider styles
-     */
+    #[DataProvider('styles')]
     public function testStyle(string $value)
     {
         $input = $this->createInput()
@@ -71,10 +70,8 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
         yield 'style-normal' => ['normal'];
     }
 
-    /**
-     * @dataProvider styles
-     */
-    public function testStyleThrowsWithUnknownStyle()
+    #[DataProvider('styles')]
+    public function testStyleThrowsWithUnknownStyle(string $value)
     {
         $this->expectException(InvalidArgumentException::class);
 

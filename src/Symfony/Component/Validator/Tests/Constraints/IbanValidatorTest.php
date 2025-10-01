@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Iban;
 use Symfony\Component\Validator\Constraints\IbanValidator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -38,9 +39,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidIbans
-     */
+    #[DataProvider('getValidIbans')]
     public function testValidIbans($iban)
     {
         $this->validator->validate($iban, new Iban());
@@ -48,9 +47,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidIbans
-     */
+    #[DataProvider('getValidIbans')]
     public function testValidIbansWithNewLine(string $iban)
     {
         $this->validator->validate($iban."\n", new Iban());
@@ -66,6 +63,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         return [
             ['CH9300762011623852957'], // Switzerland without spaces
             ['CH93  0076 2011 6238 5295 7'], // Switzerland with multiple spaces
+            ['ch93 0076 2011 6238 5295 7'], // Switzerland lower case
 
             // Country list
             // http://www.rbs.co.uk/corporate/international/g0/guide-to-international-business/regulatory-information/iban/iban-example.ashx
@@ -90,6 +88,8 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['FO97 5432 0388 8999 44'], // Faroe Islands
             ['FI21 1234 5600 0007 85'], // Finland
             ['FR14 2004 1010 0505 0001 3M02 606'], // France
+            ["FR14\xc2\xa02004\xc2\xa01010\xc2\xa00505\xc2\xa00001\xc2\xa03M02\xc2\xa0606"], // France with non-breaking spaces
+            ["FR14\xe2\x80\xaf2004\xe2\x80\xaf1010\xe2\x80\xaf0505\xe2\x80\xaf0001\xe2\x80\xaf3M02\xe2\x80\xaf606"], // France with narrow non-breaking spaces
             ['GE29 NB00 0000 0101 9049 17'], // Georgia
             ['DE89 3704 0044 0532 0130 00'], // Germany
             ['GI75 NWBK 0000 0000 7099 453'], // Gibraltar
@@ -190,9 +190,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getIbansWithInvalidFormat
-     */
+    #[DataProvider('getIbansWithInvalidFormat')]
     public function testIbansWithInvalidFormat($iban)
     {
         $this->assertViolationRaised($iban, Iban::INVALID_FORMAT_ERROR);
@@ -309,9 +307,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getIbansWithValidFormatButIncorrectChecksum
-     */
+    #[DataProvider('getIbansWithValidFormatButIncorrectChecksum')]
     public function testIbansWithValidFormatButIncorrectChecksum($iban)
     {
         $this->assertViolationRaised($iban, Iban::CHECKSUM_FAILED_ERROR);
@@ -427,9 +423,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getUnsupportedCountryCodes
-     */
+    #[DataProvider('getUnsupportedCountryCodes')]
     public function testIbansWithUnsupportedCountryCode($countryCode)
     {
         $this->assertViolationRaised($countryCode.'260211000000230064016', Iban::NOT_SUPPORTED_COUNTRY_CODE_ERROR);
@@ -451,9 +445,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised('CH930076201162385295]', Iban::INVALID_CHARACTERS_ERROR);
     }
 
-    /**
-     * @dataProvider getIbansWithInvalidCountryCode
-     */
+    #[DataProvider('getIbansWithInvalidCountryCode')]
     public function testIbansWithInvalidCountryCode($iban)
     {
         $this->assertViolationRaised($iban, Iban::INVALID_COUNTRY_CODE_ERROR);
@@ -464,7 +456,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $classMetadata = new ClassMetadata(IbanDummy::class);
         (new AttributeLoader())->loadClassMetadata($classMetadata);
 
-        [$constraint] = $classMetadata->properties['iban']->constraints;
+        [$constraint] = $classMetadata->getPropertyMetadata('iban')[0]->getConstraints();
 
         $this->validator->validate('DE89 3704 0044 0532 0130 01', $constraint);
 
@@ -485,9 +477,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
 
     private function assertViolationRaised($iban, $code)
     {
-        $constraint = new Iban([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Iban(message: 'myMessage');
 
         $this->validator->validate($iban, $constraint);
 

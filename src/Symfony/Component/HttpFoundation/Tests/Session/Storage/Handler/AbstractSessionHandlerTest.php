@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class AbstractSessionHandlerTest extends TestCase
@@ -38,9 +39,7 @@ class AbstractSessionHandlerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideSession
-     */
+    #[DataProvider('provideSession')]
     public function testSession($fixture)
     {
         $context = ['http' => ['header' => "Cookie: sid=123abc\r\n"]];

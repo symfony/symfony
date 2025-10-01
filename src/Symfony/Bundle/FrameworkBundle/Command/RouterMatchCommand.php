@@ -33,18 +33,14 @@ use Symfony\Component\Routing\RouterInterface;
 #[AsCommand(name: 'router:match', description: 'Help debug routes by simulating a path info match')]
 class RouterMatchCommand extends Command
 {
-    private RouterInterface $router;
-    private iterable $expressionLanguageProviders;
-
     /**
      * @param iterable<mixed, ExpressionFunctionProviderInterface> $expressionLanguageProviders
      */
-    public function __construct(RouterInterface $router, iterable $expressionLanguageProviders = [])
-    {
+    public function __construct(
+        private RouterInterface $router,
+        private iterable $expressionLanguageProviders = [],
+    ) {
         parent::__construct();
-
-        $this->router = $router;
-        $this->expressionLanguageProviders = $expressionLanguageProviders;
     }
 
     protected function configure(): void
@@ -57,15 +53,15 @@ class RouterMatchCommand extends Command
                 new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Set the URI host'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
+                The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
 
-  <info>php %command.full_name% /foo</info>
+                  <info>php %command.full_name% /foo</info>
 
-or
+                or
 
-  <info>php %command.full_name% /foo --method POST --scheme https --host symfony.com --verbose</info>
+                  <info>php %command.full_name% /foo --method POST --scheme https --host symfony.com --verbose</info>
 
-EOF
+                EOF
             )
         ;
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Scaleway\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -23,9 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ScalewayApiTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(ScalewayApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);

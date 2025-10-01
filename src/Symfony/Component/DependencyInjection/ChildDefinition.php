@@ -21,14 +21,12 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  */
 class ChildDefinition extends Definition
 {
-    private string $parent;
-
     /**
      * @param string $parent The id of Definition instance to decorate
      */
-    public function __construct(string $parent)
-    {
-        $this->parent = $parent;
+    public function __construct(
+        private string $parent,
+    ) {
     }
 
     /**

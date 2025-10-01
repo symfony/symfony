@@ -22,16 +22,24 @@ use Symfony\Component\Ldap\Exception\DriverNotFoundException;
  */
 final class Ldap implements LdapInterface
 {
-    private AdapterInterface $adapter;
-
-    public function __construct(AdapterInterface $adapter)
-    {
-        $this->adapter = $adapter;
+    public function __construct(
+        private AdapterInterface $adapter,
+    ) {
     }
 
     public function bind(?string $dn = null, #[\SensitiveParameter] ?string $password = null): void
     {
         $this->adapter->getConnection()->bind($dn, $password);
+    }
+
+    public function saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props = null): void
+    {
+        $this->adapter->getConnection()->saslBind($dn, $password, $mech, $realm, $authcId, $authzId, $props);
+    }
+
+    public function whoami(): string
+    {
+        return $this->adapter->getConnection()->whoami();
     }
 
     public function query(string $dn, string $query, array $options = []): QueryInterface

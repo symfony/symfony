@@ -12,13 +12,12 @@
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
 use AsyncAws\Sqs\SqsClient;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class AmazonSqsIntegrationTest extends TestCase
 {
     public function testConnectionSendToFifoQueueAndGet()
@@ -41,11 +40,12 @@ class AmazonSqsIntegrationTest extends TestCase
 
     private function execute(string $dsn): void
     {
-        $connection = Connection::fromDsn($dsn, []);
+        $connection = Connection::fromDsn($dsn, ['visibility_timeout' => 1]);
         $connection->setup();
         $this->clearSqs($dsn);
 
         $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class, DummyMessage::class => 'special']);
+        $messageSentAt = microtime(true);
         $this->assertSame(1, $connection->getMessageCount());
 
         $wait = 0;
@@ -55,6 +55,20 @@ class AmazonSqsIntegrationTest extends TestCase
 
         $this->assertEquals('{"message": "Hi"}', $encoded['body']);
         $this->assertEquals(['type' => DummyMessage::class, DummyMessage::class => 'special'], $encoded['headers']);
+
+        $this->waitUntilElapsed(seconds: 1.0, since: $messageSentAt);
+        $connection->keepalive($encoded['id']);
+        $this->waitUntilElapsed(seconds: 2.0, since: $messageSentAt);
+        $this->assertSame(0, $connection->getMessageCount(), 'The queue should be empty since visibility timeout was extended');
+        $connection->delete($encoded['id']);
+    }
+
+    private function waitUntilElapsed(float $seconds, float $since): void
+    {
+        $waitTime = $seconds - (microtime(true) - $since);
+        if ($waitTime > 0) {
+            usleep((int) ($waitTime * 1e6));
+        }
     }
 
     private function clearSqs(string $dsn): void

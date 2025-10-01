@@ -27,7 +27,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
     private FormExtension $translatorExtension;
     private FormView $view;
 
-    protected function getTypes()
+    protected function getTypes(): array
     {
         return [new TextType(), new ChoiceType()];
     }
@@ -117,6 +117,12 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->assertFalse($this->view->children['username']->isRendered());
         $this->assertSame('register[username]', $this->rawExtension->getFieldName($this->view->children['username']));
         $this->assertTrue($this->view->children['username']->isRendered());
+    }
+
+    public function testFieldId()
+    {
+        $this->assertSame('register_username', $this->rawExtension->getFieldId($this->view->children['username']));
+        $this->assertSame('register_choice_multiple', $this->rawExtension->getFieldId($this->view->children['choice_multiple']));
     }
 
     public function testFieldValue()

@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\Credentia
  */
 class Passport
 {
-    protected $user;
+    protected UserInterface $user;
 
     private array $badges = [];
     private array $attributes = [];
@@ -72,15 +72,9 @@ class Passport
      *
      * @return $this
      */
-    public function addBadge(BadgeInterface $badge/* , string $badgeFqcn = null */): static
+    public function addBadge(BadgeInterface $badge, ?string $badgeFqcn = null): static
     {
-        $badgeFqcn = $badge::class;
-        if (2 === \func_num_args()) {
-            $badgeFqcn = func_get_arg(1);
-            if (!\is_string($badgeFqcn)) {
-                throw new \LogicException(\sprintf('Second argument of "%s" must be a string.', __METHOD__));
-            }
-        }
+        $badgeFqcn ??= $badge::class;
 
         $this->badges[$badgeFqcn] = $badge;
 

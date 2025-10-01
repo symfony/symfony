@@ -11,6 +11,7 @@
 
 namespace Authenticator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -38,9 +39,6 @@ class AccessTokenAuthenticatorTest extends TestCase
 
     public function testAuthenticateWithoutAccessToken()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
         $request = Request::create('/test');
 
         $this->accessTokenExtractor
@@ -53,6 +51,9 @@ class AccessTokenAuthenticatorTest extends TestCase
             $this->accessTokenHandler,
             $this->accessTokenExtractor,
         );
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
 
         $authenticator->authenticate($request);
     }
@@ -161,9 +162,7 @@ class AccessTokenAuthenticatorTest extends TestCase
         $this->assertEquals('test', $passport->getUser()->getUserIdentifier());
     }
 
-    /**
-     * @dataProvider provideAccessTokenHeaderRegex
-     */
+    #[DataProvider('provideAccessTokenHeaderRegex')]
     public function testAccessTokenHeaderRegex(string $input, ?string $expectedToken)
     {
         // Given

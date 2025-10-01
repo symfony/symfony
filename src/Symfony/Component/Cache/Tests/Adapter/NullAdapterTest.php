@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class NullAdapterTest extends TestCase
 {
     public function createCachePool()
@@ -137,5 +136,12 @@ class NullAdapterTest extends TestCase
 
         $this->assertTrue($adapter->saveDeferred($item));
         $this->assertTrue($this->createCachePool()->commit());
+    }
+
+    public function testInvalidateTags()
+    {
+        $adapter = $this->createCachePool();
+
+        self::assertTrue($adapter->invalidateTags(['foo']));
     }
 }

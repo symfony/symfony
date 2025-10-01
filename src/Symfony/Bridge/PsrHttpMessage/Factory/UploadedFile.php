@@ -62,7 +62,7 @@ class UploadedFile extends BaseUploadedFile
             throw new FileException(\sprintf('Could not move the file "%s" to "%s" (%s).', $this->getPathname(), $target, $e->getMessage()), 0, $e);
         }
 
-        @chmod($target, 0666 & ~umask());
+        @chmod($target, 0o666 & ~umask());
 
         return $target;
     }

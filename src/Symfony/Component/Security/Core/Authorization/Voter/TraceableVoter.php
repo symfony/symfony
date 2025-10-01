@@ -24,20 +24,17 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class TraceableVoter implements CacheableVoterInterface
 {
-    private VoterInterface $voter;
-    private EventDispatcherInterface $eventDispatcher;
-
-    public function __construct(VoterInterface $voter, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->voter = $voter;
-        $this->eventDispatcher = $eventDispatcher;
+    public function __construct(
+        private VoterInterface $voter,
+        private EventDispatcherInterface $eventDispatcher,
+    ) {
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {
-        $result = $this->voter->vote($token, $subject, $attributes);
+        $result = $this->voter->vote($token, $subject, $attributes, $vote);
 
-        $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $result), 'debug.security.authorization.vote');
+        $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $result, $vote->reasons ?? []), 'debug.security.authorization.vote');
 
         return $result;
     }

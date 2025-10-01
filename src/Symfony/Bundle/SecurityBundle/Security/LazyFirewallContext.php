@@ -11,9 +11,11 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
@@ -23,15 +25,16 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class LazyFirewallContext extends FirewallContext
+class LazyFirewallContext extends FirewallContext implements FirewallListenerInterface
 {
-    private TokenStorage $tokenStorage;
-
-    public function __construct(iterable $listeners, ?ExceptionListener $exceptionListener, ?LogoutListener $logoutListener, ?FirewallConfig $config, TokenStorage $tokenStorage)
-    {
+    public function __construct(
+        iterable $listeners,
+        ?ExceptionListener $exceptionListener,
+        ?LogoutListener $logoutListener,
+        ?FirewallConfig $config,
+        private TokenStorage $tokenStorage,
+    ) {
         parent::__construct($listeners, $exceptionListener, $logoutListener, $config);
-
-        $this->tokenStorage = $tokenStorage;
     }
 
     public function getListeners(): iterable
@@ -39,19 +42,26 @@ class LazyFirewallContext extends FirewallContext
         return [$this];
     }
 
-    public function __invoke(RequestEvent $event): void
+    public function supports(Request $request): ?bool
+    {
+        return true;
+    }
+
+    public function authenticate(RequestEvent $event): void
     {
         $listeners = [];
         $request = $event->getRequest();
         $lazy = $request->isMethodCacheable();
 
         foreach (parent::getListeners() as $listener) {
-            if (!$lazy || !$listener instanceof FirewallListenerInterface) {
+            if (!$listener instanceof FirewallListenerInterface) {
+                trigger_deprecation('symfony/security-http', '7.4', 'Using a callable as firewall listener is deprecated, extend "%s" or implement "%s" instead.', AbstractListener::class, FirewallListenerInterface::class);
+
                 $listeners[] = $listener;
-                $lazy = $lazy && $listener instanceof FirewallListenerInterface;
+                $lazy = false;
             } elseif (false !== $supports = $listener->supports($request)) {
                 $listeners[] = [$listener, 'authenticate'];
-                $lazy = null === $supports;
+                $lazy = $lazy && null === $supports;
             }
         }
 
@@ -73,5 +83,20 @@ class LazyFirewallContext extends FirewallContext
                 $listener($event);
             }
         });
+    }
+
+    public static function getPriority(): int
+    {
+        return 0;
+    }
+
+    /**
+     * @deprecated since Symfony 7.4, to be removed in 8.0
+     */
+    public function __invoke(RequestEvent $event): void
+    {
+        trigger_deprecation('symfony/security-bundle', '7.4', 'The "%s()" method is deprecated since Symfony 7.4 and will be removed in 8.0.', __METHOD__);
+
+        $this->authenticate($event);
     }
 }

@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Transport\Dsn;
 
 class DsnTest extends TestCase
 {
-    /**
-     * @dataProvider fromStringProvider
-     */
+    #[DataProvider('fromStringProvider')]
     public function testFromString(string $string, Dsn $dsn)
     {
         $this->assertEquals($dsn, Dsn::fromString($string));
@@ -35,9 +34,7 @@ class DsnTest extends TestCase
         $this->assertSame('default', $dsn->getOption('not_existent_property', 'default'));
     }
 
-    /**
-     * @dataProvider invalidDsnProvider
-     */
+    #[DataProvider('invalidDsnProvider')]
     public function testInvalidDsn(string $dsn, string $exceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -104,5 +101,28 @@ class DsnTest extends TestCase
             'file:///some/path',
             'The mailer DSN must contain a host (use "default" by default).',
         ];
+    }
+
+    #[DataProvider('getBooleanOptionProvider')]
+    public function testGetBooleanOption(bool $expected, string $dsnString, string $option, bool $default)
+    {
+        $dsn = Dsn::fromString($dsnString);
+
+        $this->assertSame($expected, $dsn->getBooleanOption($option, $default));
+    }
+
+    public static function getBooleanOptionProvider(): iterable
+    {
+        yield [true, 'scheme://localhost?enabled=1', 'enabled', false];
+        yield [true, 'scheme://localhost?enabled=true', 'enabled', false];
+        yield [true, 'scheme://localhost?enabled=on', 'enabled', false];
+        yield [true, 'scheme://localhost?enabled=yes', 'enabled', false];
+        yield [false, 'scheme://localhost?enabled=0', 'enabled', false];
+        yield [false, 'scheme://localhost?enabled=false', 'enabled', false];
+        yield [false, 'scheme://localhost?enabled=off', 'enabled', false];
+        yield [false, 'scheme://localhost?enabled=no', 'enabled', false];
+
+        yield [false, 'scheme://localhost', 'not_existant', false];
+        yield [true, 'scheme://localhost', 'not_existant', true];
     }
 }

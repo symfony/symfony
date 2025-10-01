@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -23,16 +24,8 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     {
         $service = new ControllerTestService('foo');
 
-        $container = $this->createMockContainer();
-        $container->expects($this->once())
-            ->method('has')
-            ->with('foo')
-            ->willReturn(true);
-        $container->expects($this->once())
-            ->method('get')
-            ->with('foo')
-            ->willReturn($service)
-        ;
+        $container = new Container();
+        $container->set('foo', $service);
 
         $resolver = $this->createControllerResolver(null, $container);
         $request = Request::create('/');
@@ -48,17 +41,8 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     {
         $service = new InvokableControllerService('bar');
 
-        $container = $this->createMockContainer();
-        $container->expects($this->once())
-            ->method('has')
-            ->with('foo')
-            ->willReturn(true)
-        ;
-        $container->expects($this->once())
-            ->method('get')
-            ->with('foo')
-            ->willReturn($service)
-        ;
+        $container = new Container();
+        $container->set('foo', $service);
 
         $resolver = $this->createControllerResolver(null, $container);
         $request = Request::create('/');
@@ -73,17 +57,8 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     {
         $service = new InvokableControllerService('bar');
 
-        $container = $this->createMockContainer();
-        $container->expects($this->once())
-            ->method('has')
-            ->with(InvokableControllerService::class)
-            ->willReturn(true)
-        ;
-        $container->expects($this->once())
-            ->method('get')
-            ->with(InvokableControllerService::class)
-            ->willReturn($service)
-        ;
+        $container = new Container();
+        $container->set(InvokableControllerService::class, $service);
 
         $resolver = $this->createControllerResolver(null, $container);
         $request = Request::create('/');
@@ -94,17 +69,14 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame($service, $controller);
     }
 
-    /**
-     * @dataProvider getControllers
-     */
+    #[DataProvider('getControllers')]
     public function testInstantiateControllerWhenControllerStartsWithABackslash($controller)
     {
         $service = new ControllerTestService('foo');
         $class = ControllerTestService::class;
 
-        $container = $this->createMockContainer();
-        $container->expects($this->once())->method('has')->with($class)->willReturn(true);
-        $container->expects($this->once())->method('get')->with($class)->willReturn($service);
+        $container = new Container();
+        $container->set($class, $service);
 
         $resolver = $this->createControllerResolver(null, $container);
         $request = Request::create('/');
@@ -198,15 +170,10 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     protected function createControllerResolver(?LoggerInterface $logger = null, ?ContainerInterface $container = null)
     {
         if (!$container) {
-            $container = $this->createMockContainer();
+            $container = new Container();
         }
 
         return new ContainerControllerResolver($container, $logger);
-    }
-
-    protected function createMockContainer()
-    {
-        return $this->createMock(ContainerInterface::class);
     }
 }
 

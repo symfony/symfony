@@ -20,17 +20,20 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class RoleVoter implements CacheableVoterInterface
 {
-    private string $prefix;
-
-    public function __construct(string $prefix = 'ROLE_')
-    {
-        $this->prefix = $prefix;
+    public function __construct(
+        private string $prefix = 'ROLE_',
+    ) {
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    /**
+     * @param Vote|null $vote Should be used to explain the vote
+     */
+    public function vote(TokenInterface $token, mixed $subject, array $attributes/* , ?Vote $vote = null */): int
     {
+        $vote = 3 < \func_num_args() ? func_get_arg(3) : null;
         $result = VoterInterface::ACCESS_ABSTAIN;
         $roles = $this->extractRoles($token);
+        $missingRoles = [];
 
         foreach ($attributes as $attribute) {
             if (!\is_string($attribute) || !str_starts_with($attribute, $this->prefix)) {
@@ -38,11 +41,18 @@ class RoleVoter implements CacheableVoterInterface
             }
 
             $result = VoterInterface::ACCESS_DENIED;
-            foreach ($roles as $role) {
-                if ($attribute === $role) {
-                    return VoterInterface::ACCESS_GRANTED;
-                }
+
+            if (\in_array($attribute, $roles, true)) {
+                $vote?->addReason(\sprintf('The user has %s.', $attribute));
+
+                return VoterInterface::ACCESS_GRANTED;
             }
+
+            $missingRoles[] = $attribute;
+        }
+
+        if (VoterInterface::ACCESS_DENIED === $result) {
+            $vote?->addReason(\sprintf('The user doesn\'t have%s %s.', 1 < \count($missingRoles) ? ' any of' : '', implode(', ', $missingRoles)));
         }
 
         return $result;
@@ -58,10 +68,7 @@ class RoleVoter implements CacheableVoterInterface
         return true;
     }
 
-    /**
-     * @return array
-     */
-    protected function extractRoles(TokenInterface $token)
+    protected function extractRoles(TokenInterface $token): array
     {
         return $token->getRoleNames();
     }

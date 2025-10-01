@@ -19,24 +19,45 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
 /**
  * This class provides a fluent interface for defining an array node.
  *
+ * @template TParent of NodeParentInterface|null
+ *
+ * @extends NodeDefinition<TParent>
+ *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinitionInterface
 {
-    protected $performDeepMerging = true;
-    protected $ignoreExtraKeys = false;
-    protected $removeExtraKeys = true;
-    protected $children = [];
-    protected $prototype;
-    protected $atLeastOne = false;
-    protected $allowNewKeys = true;
-    protected $key;
-    protected $removeKeyItem;
-    protected $addDefaults = false;
-    protected $addDefaultChildren = false;
-    protected $nodeBuilder;
-    protected $normalizeKeys = true;
+    protected bool $performDeepMerging = true;
+    protected bool $ignoreExtraKeys = false;
+    protected bool $removeExtraKeys = true;
+    /**
+     * @var NodeDefinition<$this>[]
+     */
+    protected array $children = [];
+    /**
+     * @var NodeDefinition<$this>
+     */
+    protected NodeDefinition $prototype;
+    protected bool $atLeastOne = false;
+    protected bool $allowNewKeys = true;
+    protected ?string $key = null;
+    protected bool $removeKeyItem = false;
+    protected bool $addDefaults = false;
+    protected int|string|array|false|null $addDefaultChildren = false;
+    /**
+     * @var NodeBuilder<static>
+     */
+    protected NodeBuilder $nodeBuilder;
+    protected bool $normalizeKeys = true;
 
+    /**
+     * @var list<ExprBuilder::TYPE_*>|null
+     */
+    protected ?array $allowedTypes = null;
+
+    /**
+     * @param TParent $parent
+     */
     public function __construct(?string $name, ?NodeParentInterface $parent = null)
     {
         parent::__construct($name, $parent);
@@ -46,13 +67,51 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * @return void
+     * @return $this
      */
-    public function setBuilder(NodeBuilder $builder)
+    public function defaultValue(mixed $value): static
+    {
+        $this->nullEquivalent = null === $value ? null : [];
+
+        return parent::defaultValue($value);
+    }
+
+    /**
+     * @param NodeBuilder<static> $builder
+     */
+    public function setBuilder(NodeBuilder $builder): void
     {
         $this->nodeBuilder = $builder;
     }
 
+    /**
+     * Allows alternative types and wraps them into arrays.
+     *
+     * @param list<ExprBuilder::TYPE_INT|ExprBuilder::TYPE_STRING|ExprBuilder::TYPE_BOOL|ExprBuilder::TYPE_NULL|ExprBuilder::TYPE_BACKED_ENUM> $allowedTypes
+     * @param string|null                                                                                                                      $key          The key to wrap the value in
+     *
+     * @return $this
+     */
+    public function acceptAndWrap(array $allowedTypes, ?string $key = null): static
+    {
+        $this->allowedTypes = $allowedTypes;
+
+        foreach ($allowedTypes as $type) {
+            $this->beforeNormalization()->ifTrue(match ($type) {
+                ExprBuilder::TYPE_INT => is_int(...),
+                ExprBuilder::TYPE_STRING => is_string(...),
+                ExprBuilder::TYPE_BOOL => is_bool(...),
+                ExprBuilder::TYPE_NULL => is_null(...),
+                ExprBuilder::TYPE_BACKED_ENUM => static fn ($v) => $v instanceof \BackedEnum,
+            })->then(static fn ($v) => [$key ?? 0 => $v]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return NodeBuilder<static>
+     */
     public function children(): NodeBuilder
     {
         return $this->getNodeBuilder();
@@ -60,42 +119,87 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Sets a prototype for child nodes.
+     *
+     * @template T of 'array'|'variable'|'scalar'|'string'|'boolean'|'integer'|'float'|'enum'
+     *
+     * @param T $type
+     *
+     * @return (
+     *    T is 'array' ? ArrayNodeDefinition<$this>
+     *    : (T is 'variable' ? VariableNodeDefinition<$this>
+     *    : (T is 'scalar' ? ScalarNodeDefinition<$this>
+     *    : (T is 'string' ? StringNodeDefinition<$this>
+     *    : (T is 'boolean' ? BooleanNodeDefinition<$this>
+     *    : (T is 'integer' ? IntegerNodeDefinition<$this>
+     *    : (T is 'float' ? FloatNodeDefinition<$this>
+     *    : (T is 'enum' ? EnumNodeDefinition<$this>
+     *    : NodeDefinition<$this>)))))))
+     * )
      */
     public function prototype(string $type): NodeDefinition
     {
         return $this->prototype = $this->getNodeBuilder()->node(null, $type)->setParent($this);
     }
 
+    /**
+     * @return VariableNodeDefinition<$this>
+     */
     public function variablePrototype(): VariableNodeDefinition
     {
         return $this->prototype('variable');
     }
 
+    /**
+     * @return ScalarNodeDefinition<$this>
+     */
     public function scalarPrototype(): ScalarNodeDefinition
     {
         return $this->prototype('scalar');
     }
 
+    /**
+     * @return StringNodeDefinition<$this>
+     */
+    public function stringPrototype(): StringNodeDefinition
+    {
+        return $this->prototype('string');
+    }
+
+    /**
+     * @return BooleanNodeDefinition<$this>
+     */
     public function booleanPrototype(): BooleanNodeDefinition
     {
         return $this->prototype('boolean');
     }
 
+    /**
+     * @return IntegerNodeDefinition<$this>
+     */
     public function integerPrototype(): IntegerNodeDefinition
     {
         return $this->prototype('integer');
     }
 
+    /**
+     * @return FloatNodeDefinition<$this>
+     */
     public function floatPrototype(): FloatNodeDefinition
     {
         return $this->prototype('float');
     }
 
+    /**
+     * @return self<$this>
+     */
     public function arrayPrototype(): self
     {
         return $this->prototype('array');
     }
 
+    /**
+     * @return EnumNodeDefinition<$this>
+     */
     public function enumPrototype(): EnumNodeDefinition
     {
         return $this->prototype('enum');
@@ -237,18 +341,20 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * enableableArrayNode: {enabled: false, ...}  # The config is disabled
      * enableableArrayNode: false                  # The config is disabled
      *
+     * @param string|null $info A description of what happens when the node is enabled or disabled
+     *
      * @return $this
      */
-    public function canBeEnabled(): static
+    public function canBeEnabled(/* ?string $info = null */): static
     {
-        $this
+        $disabledNode = $this
             ->addDefaultsIfNotSet()
             ->treatFalseLike(['enabled' => false])
             ->treatTrueLike(['enabled' => true])
             ->treatNullLike(['enabled' => true])
             ->beforeNormalization()
                 ->ifArray()
-                ->then(function (array $v) {
+                ->then(static function ($v) {
                     $v['enabled'] ??= true;
 
                     return $v;
@@ -259,6 +365,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                     ->defaultFalse()
         ;
 
+        $info = 1 <= \func_num_args() ? func_get_arg(0) : null;
+        if ($info) {
+            $disabledNode->info($info);
+        }
+
         return $this;
     }
 
@@ -267,11 +378,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * By default, the section is enabled.
      *
+     * @param string|null $info A description of what happens when the node is enabled or disabled
+     *
      * @return $this
      */
-    public function canBeDisabled(): static
+    public function canBeDisabled(/* ?string $info = null */): static
     {
-        $this
+        $enabledNode = $this
             ->addDefaultsIfNotSet()
             ->treatFalseLike(['enabled' => false])
             ->treatTrueLike(['enabled' => true])
@@ -280,6 +393,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 ->booleanNode('enabled')
                     ->defaultTrue()
         ;
+
+        $info = 1 <= \func_num_args() ? func_get_arg(0) : null;
+        if ($info) {
+            $enabledNode->info($info);
+        }
 
         return $this;
     }
@@ -338,6 +456,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Returns a node builder to be used to add children and prototype.
+     *
+     * @return NodeBuilder<static>
      */
     protected function getNodeBuilder(): NodeBuilder
     {
@@ -373,16 +493,18 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             }
 
             if ($this->default) {
-                if (!\is_array($this->defaultValue)) {
-                    throw new \InvalidArgumentException(\sprintf('%s: the default value of an array node has to be an array.', $node->getPath()));
+                if (null === $this->defaultValue) {
+                    $node->setNullAsDefault();
+                } elseif (!\is_array($this->defaultValue)) {
+                    throw new \InvalidArgumentException(\sprintf('%s: the default value of an array node has to be an array or null.', $node->getPath()));
+                } else {
+                    $node->setDefaultValue($this->defaultValue);
                 }
-
-                $node->setDefaultValue($this->defaultValue);
             }
 
             if (false !== $this->addDefaultChildren) {
                 $node->setAddChildrenIfNoneSet($this->addDefaultChildren);
-                if ($this->prototype instanceof static && !isset($this->prototype->prototype)) {
+                if ($this->prototype instanceof self && !isset($this->prototype->prototype)) {
                     $this->prototype->addDefaultsIfNotSet();
                 }
             }
@@ -405,8 +527,14 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         }
 
         if (isset($this->normalization)) {
+            $allowedTypes = $this->allowedTypes ?? $this->normalization->declaredTypes;
+            foreach ([$this->trueEquivalent, $this->falseEquivalent] as $equivalent) {
+                if (\is_array($equivalent) && $equivalent) {
+                    $allowedTypes[] = ExprBuilder::TYPE_BOOL;
+                }
+            }
             $node->setNormalizationClosures($this->normalization->before);
-            $node->setNormalizedTypes($this->normalization->declaredTypes);
+            $node->setNormalizedTypes($allowedTypes ?: [ExprBuilder::TYPE_ARRAY]);
             $node->setXmlRemappings($this->normalization->remappings);
         }
 
@@ -425,11 +553,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a concrete node.
      *
-     * @return void
-     *
      * @throws InvalidDefinitionException
      */
-    protected function validateConcreteNode(ArrayNode $node)
+    protected function validateConcreteNode(ArrayNode $node): void
     {
         $path = $node->getPath();
 
@@ -457,11 +583,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a prototype node.
      *
-     * @return void
-     *
      * @throws InvalidDefinitionException
      */
-    protected function validatePrototypeNode(PrototypedArrayNode $node)
+    protected function validatePrototypeNode(PrototypedArrayNode $node): void
     {
         $path = $node->getPath();
 
@@ -485,7 +609,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * @return NodeDefinition[]
+     * @return NodeDefinition<$this>[]
      */
     public function getChildNodeDefinitions(): array
     {

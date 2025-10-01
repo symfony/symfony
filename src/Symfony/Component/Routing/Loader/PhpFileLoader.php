@@ -13,6 +13,10 @@ namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Loader\Configurator\AliasConfigurator;
+use Symfony\Component\Routing\Loader\Configurator\CollectionConfigurator;
+use Symfony\Component\Routing\Loader\Configurator\ImportConfigurator;
+use Symfony\Component\Routing\Loader\Configurator\RouteConfigurator;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -39,14 +43,29 @@ class PhpFileLoader extends FileLoader
         $loader = $this;
         $load = \Closure::bind(static function ($file) use ($loader) {
             return include $file;
-        }, null, ProtectedPhpFileLoader::class);
+        }, null, null);
 
-        $result = $load($path);
+        try {
+            if (1 === $result = $load($path)) {
+                $result = null;
+            }
+        } catch (\Error $e) {
+            $load = \Closure::bind(static function ($file) use ($loader) {
+                return include $file;
+            }, null, ProtectedPhpFileLoader::class);
+
+            if (1 === $result = $load($path)) {
+                $result = null;
+            }
+
+            trigger_deprecation('symfony/routing', '7.4', 'Accessing the internal scope of the loader in config files is deprecated, use only its public API instead in "%s" on line %d.', $e->getFile(), $e->getLine());
+        }
 
         if (\is_object($result) && \is_callable($result)) {
             $collection = $this->callConfigurator($result, $path, $file);
         } else {
-            $collection = $result;
+            $collection = new RouteCollection();
+            $this->loadRoutes($collection, $result, $path, $file);
         }
 
         $collection->addResource(new FileResource($path));
@@ -59,13 +78,68 @@ class PhpFileLoader extends FileLoader
         return \is_string($resource) && 'php' === pathinfo($resource, \PATHINFO_EXTENSION) && (!$type || 'php' === $type);
     }
 
-    protected function callConfigurator(callable $result, string $path, string $file): RouteCollection
+    protected function callConfigurator(callable $callback, string $path, string $file): RouteCollection
     {
         $collection = new RouteCollection();
 
-        $result(new RoutingConfigurator($collection, $this, $path, $file, $this->env));
+        $result = $callback(new RoutingConfigurator($collection, $this, $path, $file, $this->env));
+        $this->loadRoutes($collection, $result, $path, $file);
 
         return $collection;
+    }
+
+    private function loadRoutes(RouteCollection $collection, mixed $routes, string $path, string $file): void
+    {
+        if (null === $routes
+            || $routes instanceof RouteCollection
+            || $routes instanceof AliasConfigurator
+            || $routes instanceof CollectionConfigurator
+            || $routes instanceof ImportConfigurator
+            || $routes instanceof RouteConfigurator
+            || $routes instanceof RoutingConfigurator
+        ) {
+            if ($routes instanceof RouteCollection && $collection !== $routes) {
+                $collection->addCollection($routes);
+            }
+
+            return;
+        }
+
+        if (!is_iterable($routes)) {
+            throw new \InvalidArgumentException(\sprintf('The return value in config file "%s" is invalid: "%s" given.', $path, get_debug_type($routes)));
+        }
+
+        $loader = new YamlFileLoader($this->locator, $this->env);
+
+        \Closure::bind(function () use ($collection, $routes, $path, $file) {
+            foreach ($routes as $name => $config) {
+                if (str_starts_with($name, 'when@')) {
+                    if (!$this->env || 'when@'.$this->env !== $name) {
+                        continue;
+                    }
+
+                    foreach ($config as $name => $config) {
+                        $this->validate($config, $name.'" when "@'.$this->env, $path);
+
+                        if (isset($config['resource'])) {
+                            $this->parseImport($collection, $config, $path, $file);
+                        } else {
+                            $this->parseRoute($collection, $name, $config, $path);
+                        }
+                    }
+
+                    continue;
+                }
+
+                $this->validate($config, $name, $path);
+
+                if (isset($config['resource'])) {
+                    $this->parseImport($collection, $config, $path, $file);
+                } else {
+                    $this->parseRoute($collection, $name, $config, $path);
+                }
+            }
+        }, $loader, $loader::class)();
     }
 }
 

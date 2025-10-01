@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CheckDefinitionValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -89,9 +90,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @dataProvider provideInvalidTags
-     */
+    #[DataProvider('provideInvalidTags')]
     public function testInvalidTags(string $name, array $attributes, string $message)
     {
         $this->expectExceptionMessage($message);

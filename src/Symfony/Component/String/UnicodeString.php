@@ -106,11 +106,13 @@ class UnicodeString extends AbstractUnicodeString
             return false;
         }
 
+        $grapheme = grapheme_extract($this->string, \strlen($suffix), \GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix)) ?: '';
+
         if ($this->ignoreCase) {
-            return 0 === mb_stripos(grapheme_extract($this->string, \strlen($suffix), \GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix)), $suffix, 0, 'UTF-8');
+            return 0 === mb_stripos($grapheme, $suffix, 0, 'UTF-8');
         }
 
-        return $suffix === grapheme_extract($this->string, \strlen($suffix), \GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix));
+        return $suffix === $grapheme;
     }
 
     public function equalsTo(string|iterable|AbstractString $string): bool
@@ -286,7 +288,7 @@ class UnicodeString extends AbstractUnicodeString
         $str = clone $this;
 
         $start = $start ? \strlen(grapheme_substr($this->string, 0, $start)) : 0;
-        $length = $length ? \strlen(grapheme_substr($this->string, $start, $length ?? 2147483647)) : $length;
+        $length = $length ? \strlen(grapheme_substr($this->string, $start, $length)) : $length;
         $str->string = substr_replace($this->string, $replacement, $start, $length ?? 2147483647);
 
         if (normalizer_is_normalized($str->string)) {
@@ -355,18 +357,61 @@ class UnicodeString extends AbstractUnicodeString
             return false;
         }
 
+        $grapheme = grapheme_extract($this->string, \strlen($prefix), \GRAPHEME_EXTR_MAXBYTES) ?: '';
+
         if ($this->ignoreCase) {
-            return 0 === mb_stripos(grapheme_extract($this->string, \strlen($prefix), \GRAPHEME_EXTR_MAXBYTES), $prefix, 0, 'UTF-8');
+            return 0 === mb_stripos($grapheme, $prefix, 0, 'UTF-8');
         }
 
-        return $prefix === grapheme_extract($this->string, \strlen($prefix), \GRAPHEME_EXTR_MAXBYTES);
+        return $prefix === $grapheme;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        if ($wakeup = self::class !== (new \ReflectionMethod($this, '__wakeup'))->class && self::class === (new \ReflectionMethod($this, '__unserialize'))->class) {
+            trigger_deprecation('symfony/string', '7.4', 'Implementing "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
+        }
+
+        try {
+            if (\in_array(array_keys($data), [['string'], ["\0*\0string"]], true)) {
+                $this->string = $data['string'] ?? $data["\0*\0string"];
+
+                if ($wakeup) {
+                    $this->__wakeup();
+                }
+
+                return;
+            }
+
+            trigger_deprecation('symfony/string', '7.4', 'Passing more than just key "string" to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
+
+            \Closure::bind(function ($data) use ($wakeup) {
+                foreach ($data as $key => $value) {
+                    $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
+                }
+
+                if ($wakeup) {
+                    $this->__wakeup();
+                }
+            }, $this, static::class)($data);
+        } finally {
+            if (!$wakeup) {
+                if (!\is_string($this->string)) {
+                    throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+                }
+
+                normalizer_is_normalized($this->string) ?: $this->string = normalizer_normalize($this->string);
+            }
+        }
     }
 
     /**
-     * @return void
+     * @deprecated since Symfony 7.4, will be replaced by `__unserialize()` in 8.0
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
+        trigger_deprecation('symfony/string', '7.4', 'Calling "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
+
         if (!\is_string($this->string)) {
             throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
         }

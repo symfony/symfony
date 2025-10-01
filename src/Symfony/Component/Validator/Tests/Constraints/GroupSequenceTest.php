@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
@@ -26,8 +28,12 @@ class GroupSequenceTest extends TestCase
         $this->assertSame(['Group 1', 'Group 2'], $sequence->groups);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testCreateDoctrineStyle()
     {
+        $this->expectUserDeprecationMessage('Since symfony/validator 7.4: Support for passing an array of options to "Symfony\Component\Validator\Constraints\GroupSequence::__construct()" is deprecated.');
+
         $sequence = new GroupSequence(['value' => ['Group 1', 'Group 2']]);
 
         $this->assertSame(['Group 1', 'Group 2'], $sequence->groups);

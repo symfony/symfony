@@ -32,6 +32,7 @@ $options = (new GatewayApiOptions())
     ->class('standard')
     ->callbackUrl('https://my-callback-url')
     ->userRef('user_ref')
+    ->label('label')
     // ...
     ;
 

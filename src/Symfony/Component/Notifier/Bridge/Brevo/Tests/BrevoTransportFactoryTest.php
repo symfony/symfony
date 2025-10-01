@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Brevo\Tests;
 
 use Symfony\Component\Notifier\Bridge\Brevo\BrevoTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class BrevoTransportFactoryTest extends TransportFactoryTestCase
+final class BrevoTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): BrevoTransportFactory
     {
         return new BrevoTransportFactory();

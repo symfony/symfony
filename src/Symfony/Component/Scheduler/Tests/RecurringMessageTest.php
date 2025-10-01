@@ -12,7 +12,6 @@
 namespace Symfony\Component\Scheduler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Random\Randomizer;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\RecurringMessage;
 
@@ -22,13 +21,8 @@ class RecurringMessageTest extends TestCase
     {
         $object = new DummyStringableMessage();
 
-        if (class_exists(Randomizer::class)) {
-            $this->assertSame('30 0 * * *', (string) RecurringMessage::cron('#midnight', $object)->getTrigger());
-            $this->assertSame('30 0 * * 3', (string) RecurringMessage::cron('#weekly', $object)->getTrigger());
-        } else {
-            $this->assertSame('36 0 * * *', (string) RecurringMessage::cron('#midnight', $object)->getTrigger());
-            $this->assertSame('36 0 * * 6', (string) RecurringMessage::cron('#weekly', $object)->getTrigger());
-        }
+        $this->assertSame('30 0 * * *', (string) RecurringMessage::cron('#midnight', $object)->getTrigger());
+        $this->assertSame('30 0 * * 3', (string) RecurringMessage::cron('#weekly', $object)->getTrigger());
     }
 
     public function testHashedCronContextIsRequiredIfMessageIsNotStringable()

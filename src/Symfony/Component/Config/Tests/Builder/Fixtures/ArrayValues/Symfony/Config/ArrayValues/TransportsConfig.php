@@ -26,16 +26,27 @@ class TransportsConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     transports?: array<string, array{
+     *         dsn?: scalar|null,
+     *     }>,
+     *     error_pages?: array{ // Default: {"enabled":false}
+     *         enabled?: bool, // Default: false
+     *         with_trace?: bool,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('dsn', $value)) {
+        if (array_key_exists('dsn', $config)) {
             $this->_usedProperties['dsn'] = true;
-            $this->dsn = $value['dsn'];
-            unset($value['dsn']);
+            $this->dsn = $config['dsn'];
+            unset($config['dsn']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

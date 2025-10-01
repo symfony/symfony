@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\CssSelector\\": "" },

@@ -62,7 +62,7 @@
             {% endfor %}
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: 'messenger', status: status_color }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: 'messenger', status: status_color}) }}
     {% endif %}
 {% endblock %}
 
@@ -163,7 +163,7 @@
                                 '#DD0000': 'var(--highlight-string)',
                                 '#007700': 'var(--highlight-keyword)',
                                 '#0000BB': 'var(--highlight-default)',
-                                '#FF8000': 'var(--highlight-comment)'
+                                '#FF8000': 'var(--highlight-comment)',
                             })|raw }}
                         </div>
                     </div>
@@ -177,7 +177,7 @@
             {% endif %}
             <tr>
                 <th scope="row" class="font-normal">Message</th>
-                <td>{{ profiler_dump(dispatchCall.message.value, maxDepth=2) }}</td>
+                <td>{{ profiler_dump(dispatchCall.message.value, maxDepth: 2) }}</td>
             </tr>
             <tr>
                 <th scope="row" class="font-normal">Envelope stamps <span class="block text-muted">when dispatching</span></th>
@@ -205,7 +205,7 @@
                 <tr>
                     <td class="text-bold">Exception</td>
                     <td>
-                        {{ profiler_dump(dispatchCall.exception.value, maxDepth=1) }}
+                        {{ profiler_dump(dispatchCall.exception.value, maxDepth: 1) }}
                     </td>
                 </tr>
             {% endif %}

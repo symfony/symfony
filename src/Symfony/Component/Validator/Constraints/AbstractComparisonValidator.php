@@ -28,17 +28,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 abstract class AbstractComparisonValidator extends ConstraintValidator
 {
-    private ?PropertyAccessorInterface $propertyAccessor;
-
-    public function __construct(?PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(private ?PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof AbstractComparison) {
             throw new UnexpectedTypeException($constraint, AbstractComparison::class);

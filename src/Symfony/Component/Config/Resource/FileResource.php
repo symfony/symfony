@@ -57,4 +57,11 @@ class FileResource implements SelfCheckingResourceInterface
     {
         return false !== ($filemtime = @filemtime($this->resource)) && $filemtime <= $timestamp;
     }
+
+    public function __serialize(): array
+    {
+        return [
+            'resource' => $this->resource,
+        ];
+    }
 }

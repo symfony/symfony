@@ -39,8 +39,8 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public const PREG_SPLIT_DELIM_CAPTURE = \PREG_SPLIT_DELIM_CAPTURE;
     public const PREG_SPLIT_OFFSET_CAPTURE = \PREG_SPLIT_OFFSET_CAPTURE;
 
-    protected $string = '';
-    protected $ignoreCase = false;
+    protected string $string = '';
+    protected ?bool $ignoreCase = false;
 
     abstract public function __construct(string $string = '');
 
@@ -433,6 +433,16 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     abstract public function snake(): static;
 
+    public function kebab(): static
+    {
+        return $this->snake()->replace('_', '-');
+    }
+
+    public function pascal(): static
+    {
+        return $this->camel()->title();
+    }
+
     abstract public function splice(string $replacement, int $start = 0, ?int $length = null): static;
 
     /**
@@ -605,7 +615,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return $str;
     }
 
-    public function truncate(int $length, string $ellipsis = '', bool $cut = true): static
+    public function truncate(int $length, string $ellipsis = '', bool|TruncateMode $cut = TruncateMode::Char): static
     {
         $stringLength = $this->length();
 
@@ -619,15 +629,26 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
             $ellipsisLength = 0;
         }
 
-        if (!$cut) {
+        $desiredLength = $length;
+        if (TruncateMode::WordAfter === $cut || !$cut) {
             if (null === $length = $this->indexOf([' ', "\r", "\n", "\t"], ($length ?: 1) - 1)) {
                 return clone $this;
             }
 
             $length += $ellipsisLength;
+        } elseif (TruncateMode::WordBefore === $cut && null !== $this->indexOf([' ', "\r", "\n", "\t"], ($length ?: 1) - 1)) {
+            $length += $ellipsisLength;
         }
 
         $str = $this->slice(0, $length - $ellipsisLength);
+
+        if (TruncateMode::WordBefore === $cut) {
+            if (0 === $ellipsisLength && $desiredLength === $this->indexOf([' ', "\r", "\n", "\t"], $length)) {
+                return $str;
+            }
+
+            $str = $str->beforeLast([' ', "\r", "\n", "\t"]);
+        }
 
         return $ellipsisLength ? $str->trimEnd()->append($ellipsis) : $str;
     }
@@ -685,8 +706,35 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return $str;
     }
 
+    public function __serialize(): array
+    {
+        if (self::class === (new \ReflectionMethod($this, '__sleep'))->class || self::class !== (new \ReflectionMethod($this, '__serialize'))->class) {
+            return ['string' => $this->string];
+        }
+
+        trigger_deprecation('symfony/string', '7.4', 'Implementing "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
+
+        $data = [];
+        foreach ($this->__sleep() as $key) {
+            try {
+                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
+                    $data[$key] = $r->getValue($this);
+                }
+            } catch (\ReflectionException) {
+                $data[$key] = $this->$key;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @deprecated since Symfony 7.4, will be replaced by `__unserialize()` in 8.0
+     */
     public function __sleep(): array
     {
+        trigger_deprecation('symfony/string', '7.4', 'Calling "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
+
         return ['string'];
     }
 

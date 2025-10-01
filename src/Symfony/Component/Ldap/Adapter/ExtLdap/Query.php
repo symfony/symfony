@@ -175,7 +175,7 @@ class Query extends AbstractQuery
         // This is not supported in PHP < 7.2, so these versions will remain broken.
         $ctl = [];
         ldap_get_option($con, \LDAP_OPT_SERVER_CONTROLS, $ctl);
-        if (!empty($ctl)) {
+        if ($ctl) {
             foreach ($ctl as $idx => $info) {
                 if (static::PAGINATION_OID == $info['oid']) {
                     unset($ctl[$idx]);

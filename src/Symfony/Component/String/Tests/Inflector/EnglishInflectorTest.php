@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\String\Tests\Inflector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\Inflector\EnglishInflector;
 
@@ -340,17 +341,13 @@ class EnglishInflectorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider singularizeProvider
-     */
+    #[DataProvider('singularizeProvider')]
     public function testSingularize(string $plural, $singular)
     {
         $this->assertSame(\is_array($singular) ? $singular : [$singular], (new EnglishInflector())->singularize($plural));
     }
 
-    /**
-     * @dataProvider pluralizeProvider
-     */
+    #[DataProvider('pluralizeProvider')]
     public function testPluralize(string $singular, $plural)
     {
         $this->assertSame(\is_array($plural) ? $plural : [$plural], (new EnglishInflector())->pluralize($singular));

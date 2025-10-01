@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Relay\Cluster as RelayCluster;
 use Relay\Relay;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\RedisStore;
+use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -30,7 +32,7 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
         return 250000;
     }
 
-    abstract protected function getRedisConnection(): \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface;
+    abstract protected function getRedisConnection(): \Redis|Relay|RelayCluster|\RedisArray|\RedisCluster|\Predis\ClientInterface;
 
     public function getStore(): PersistingStoreInterface
     {
@@ -39,9 +41,8 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
 
     public function testBackwardCompatibility()
     {
-        $resource = uniqid(__METHOD__, true);
-        $key1 = new Key($resource);
-        $key2 = new Key($resource);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         $oldStore = new Symfony51Store($this->getRedisConnection());
         $newStore = $this->getStore();
@@ -56,7 +57,7 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
 
 class Symfony51Store
 {
-    private \Redis|Relay|\RedisCluster|\RedisArray|\Predis\ClientInterface $redis;
+    private \Redis|Relay|RelayCluster|\RedisCluster|\RedisArray|\Predis\ClientInterface $redis;
 
     public function __construct($redis)
     {
@@ -86,7 +87,7 @@ class Symfony51Store
 
     private function evaluate(string $script, string $resource, array $args)
     {
-        if ($this->redis instanceof \Redis || $this->redis instanceof Relay || $this->redis instanceof \RedisCluster) {
+        if ($this->redis instanceof \Redis || $this->redis instanceof Relay || $this->redis instanceof RelayCluster || $this->redis instanceof \RedisCluster) {
             return $this->redis->eval($script, array_merge([$resource], $args), 1);
         }
 

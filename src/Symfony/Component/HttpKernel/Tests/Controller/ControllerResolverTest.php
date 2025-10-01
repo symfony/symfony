@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -127,9 +128,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame('test', $controller());
     }
 
-    /**
-     * @dataProvider getStaticControllers
-     */
+    #[DataProvider('getStaticControllers')]
     public function testGetControllerWithStaticController($staticController, $returnValue)
     {
         $resolver = $this->createControllerResolver();
@@ -151,9 +150,7 @@ class ControllerResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getUndefinedControllers
-     */
+    #[DataProvider('getUndefinedControllers')]
     public function testGetControllerWithUndefinedController($controller, $exceptionName = null, $exceptionMessage = null)
     {
         $resolver = $this->createControllerResolver();

@@ -24,12 +24,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Store implements StoreInterface
 {
-    protected $root;
     /** @var \SplObjectStorage<Request, string> */
     private \SplObjectStorage $keyCache;
     /** @var array<string, resource> */
     private array $locks = [];
-    private array $options;
 
     /**
      * Constructor.
@@ -41,24 +39,21 @@ class Store implements StoreInterface
      *
      * @throws \RuntimeException
      */
-    public function __construct(string $root, array $options = [])
-    {
-        $this->root = $root;
-        if (!is_dir($this->root) && !@mkdir($this->root, 0777, true) && !is_dir($this->root)) {
+    public function __construct(
+        protected string $root,
+        private array $options = [],
+    ) {
+        if (!is_dir($this->root) && !@mkdir($this->root, 0o777, true) && !is_dir($this->root)) {
             throw new \RuntimeException(\sprintf('Unable to create the store directory (%s).', $this->root));
         }
         $this->keyCache = new \SplObjectStorage();
-        $this->options = array_merge([
-            'private_headers' => ['Set-Cookie'],
-        ], $options);
+        $this->options['private_headers'] ??= ['Set-Cookie'];
     }
 
     /**
      * Cleanups storage.
-     *
-     * @return void
      */
-    public function cleanup()
+    public function cleanup(): void
     {
         // unlock everything
         foreach ($this->locks as $lock) {
@@ -80,7 +75,7 @@ class Store implements StoreInterface
 
         if (!isset($this->locks[$key])) {
             $path = $this->getPath($key);
-            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0o777, true) && !is_dir(\dirname($path))) {
                 return $path;
             }
             $h = fopen($path, 'c');
@@ -245,11 +240,9 @@ class Store implements StoreInterface
     /**
      * Invalidates all cache entries that match the request.
      *
-     * @return void
-     *
      * @throws \RuntimeException
      */
-    public function invalidate(Request $request)
+    public function invalidate(Request $request): void
     {
         $modified = false;
         $key = $this->getCacheKey($request);
@@ -382,7 +375,7 @@ class Store implements StoreInterface
                 return false;
             }
         } else {
-            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0o777, true) && !is_dir(\dirname($path))) {
                 return false;
             }
 
@@ -408,15 +401,12 @@ class Store implements StoreInterface
             }
         }
 
-        @chmod($path, 0666 & ~umask());
+        @chmod($path, 0o666 & ~umask());
 
         return true;
     }
 
-    /**
-     * @return string
-     */
-    public function getPath(string $key)
+    public function getPath(string $key): string
     {
         return $this->root.\DIRECTORY_SEPARATOR.substr($key, 0, 2).\DIRECTORY_SEPARATOR.substr($key, 2, 2).\DIRECTORY_SEPARATOR.substr($key, 4, 2).\DIRECTORY_SEPARATOR.substr($key, 6);
     }
@@ -433,7 +423,15 @@ class Store implements StoreInterface
      */
     protected function generateCacheKey(Request $request): string
     {
-        return 'md'.hash('sha256', $request->getUri());
+        $key = $request->getUri();
+
+        if ('QUERY' === $request->getMethod()) {
+            // add null byte to separate the URI from the body and avoid boundary collisions
+            // which could lead to cache poisoning
+            $key .= "\0".$request->getContent();
+        }
+
+        return 'md'.hash('sha256', $key);
     }
 
     /**

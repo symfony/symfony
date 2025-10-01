@@ -20,6 +20,7 @@ return static function (ContainerConfigurator $container) {
             ->decorate('validator', null, 255)
             ->args([
                 service('debug.validator.inner'),
+                service('profiler.is_disabled_state_checker')->nullOnInvalid(),
             ])
             ->tag('kernel.reset', [
                 'method' => 'reset',

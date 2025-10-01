@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -43,9 +44,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Date());
     }
 
-    /**
-     * @dataProvider getValidDates
-     */
+    #[DataProvider('getValidDates')]
     public function testValidDates($date)
     {
         $this->validator->validate($date, new Date());
@@ -53,12 +52,10 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidDates
-     */
+    #[DataProvider('getValidDates')]
     public function testValidDatesWithNewLine(string $date)
     {
-        $this->validator->validate($date."\n", new Date(['message' => 'myMessage']));
+        $this->validator->validate($date."\n", new Date(message: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$date."\n\"")
@@ -75,14 +72,10 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidDates
-     */
+    #[DataProvider('getInvalidDates')]
     public function testInvalidDates($date, $code)
     {
-        $constraint = new Date([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Date(message: 'myMessage');
 
         $this->validator->validate($date, $constraint);
 

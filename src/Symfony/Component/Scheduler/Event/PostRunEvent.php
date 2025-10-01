@@ -20,6 +20,7 @@ class PostRunEvent
         private readonly ScheduleProviderInterface $schedule,
         private readonly MessageContext $messageContext,
         private readonly object $message,
+        private readonly mixed $result = null,
     ) {
     }
 
@@ -36,5 +37,10 @@ class PostRunEvent
     public function getMessage(): object
     {
         return $this->message;
+    }
+
+    public function getResult(): mixed
+    {
+        return $this->result;
     }
 }

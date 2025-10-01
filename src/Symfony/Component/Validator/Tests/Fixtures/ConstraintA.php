@@ -13,16 +13,17 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 
 use Symfony\Component\Validator\Constraint;
 
-/** @Annotation */
 #[\Attribute]
 class ConstraintA extends Constraint
 {
     public $property1;
     public $property2;
 
-    public function getDefaultOption(): ?string
+    public function __construct($property1 = null, $property2 = null, $groups = null)
     {
-        return 'property2';
+        parent::__construct(null, $groups);
+        $this->property1 = $property1;
+        $this->property2 = $property2;
     }
 
     public function getTargets(): string|array

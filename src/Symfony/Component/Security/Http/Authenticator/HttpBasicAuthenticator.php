@@ -33,15 +33,11 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  */
 class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {
-    private string $realmName;
-    private UserProviderInterface $userProvider;
-    private ?LoggerInterface $logger;
-
-    public function __construct(string $realmName, UserProviderInterface $userProvider, ?LoggerInterface $logger = null)
-    {
-        $this->realmName = $realmName;
-        $this->userProvider = $userProvider;
-        $this->logger = $logger;
+    public function __construct(
+        private string $realmName,
+        private UserProviderInterface $userProvider,
+        private ?LoggerInterface $logger = null,
+    ) {
     }
 
     public function start(Request $request, ?AuthenticationException $authException = null): Response

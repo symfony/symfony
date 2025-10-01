@@ -54,36 +54,39 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             $value->setClass(ServiceLocator::class);
         }
 
-        $services = $value->getArguments()[0] ?? null;
+        $values = $value->getArguments()[0] ?? null;
+        $services = [];
 
-        if ($services instanceof TaggedIteratorArgument) {
-            $services = $this->findAndSortTaggedServices($services, $this->container);
-        }
-
-        if (!\is_array($services)) {
+        if ($values instanceof TaggedIteratorArgument) {
+            foreach ($this->findAndSortTaggedServices($values, $this->container) as $k => $v) {
+                $services[$k] = new ServiceClosureArgument($v);
+            }
+        } elseif (!\is_array($values)) {
             throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set.', $this->currentId));
-        }
+        } else {
+            $i = 0;
 
-        $i = 0;
-
-        foreach ($services as $k => $v) {
-            if ($v instanceof ServiceClosureArgument) {
-                continue;
-            }
-
-            if ($i === $k) {
-                if ($v instanceof Reference) {
-                    unset($services[$k]);
-                    $k = (string) $v;
+            foreach ($values as $k => $v) {
+                if ($v instanceof ServiceClosureArgument) {
+                    $services[$k] = $v;
+                    continue;
                 }
-                ++$i;
-            } elseif (\is_int($k)) {
-                $i = null;
-            }
 
-            $services[$k] = new ServiceClosureArgument($v);
+                if ($i === $k) {
+                    if ($v instanceof Reference) {
+                        $k = (string) $v;
+                    }
+                    ++$i;
+                } elseif (\is_int($k)) {
+                    $i = null;
+                }
+
+                $services[$k] = new ServiceClosureArgument($v);
+            }
+            if (\count($services) === $i) {
+                ksort($services);
+            }
         }
-        ksort($services);
 
         $value->setArgument(0, $services);
 

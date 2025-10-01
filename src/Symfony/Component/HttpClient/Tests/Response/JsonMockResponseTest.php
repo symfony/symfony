@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests\Response;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -75,9 +76,7 @@ final class JsonMockResponseTest extends TestCase
         ], $response->toArray());
     }
 
-    /**
-     * @dataProvider responseHeadersProvider
-     */
+    #[DataProvider('responseHeadersProvider')]
     public function testResponseHeaders(string $expectedContentType, array $responseHeaders)
     {
         $client = new MockHttpClient(new JsonMockResponse([
@@ -100,5 +99,26 @@ final class JsonMockResponseTest extends TestCase
             ['application/problem+json', ['content-type' => 'application/problem+json']],
             ['application/problem+json', ['x-foo' => 'ccc', 'content-type' => 'application/problem+json']],
         ];
+    }
+
+    public function testFromFile()
+    {
+        $client = new MockHttpClient(JsonMockResponse::fromFile(__DIR__.'/Fixtures/response.json'));
+        $response = $client->request('GET', 'https://symfony.com');
+
+        $this->assertSame([
+            'foo' => 'bar',
+        ], $response->toArray());
+        $this->assertSame('application/json', $response->getHeaders()['content-type'][0]);
+    }
+
+    public function testFromFileWithInvalidJson()
+    {
+        $path = __DIR__.'/Fixtures/invalid_json.json';
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('File "%s" does not contain valid JSON.', $path));
+
+        JsonMockResponse::fromFile($path);
     }
 }

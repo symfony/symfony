@@ -25,6 +25,7 @@ return static function (ContainerConfigurator $container) {
                 service('debug.stopwatch'),
                 service('logger')->nullOnInvalid(),
                 service('.virtual_request_stack')->nullOnInvalid(),
+                service('profiler.is_disabled_state_checker')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'event'])
             ->tag('kernel.reset', ['method' => 'reset'])

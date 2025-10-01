@@ -1,6 +1,56 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add support for the `QUERY` HTTP method in the profiler
+ * Add support for Server-Sent Events / `EventSource` requests in the debug toolbar
+ * Add support for displaying the application runner class
+
+7.3
+---
+
+ * Add `profiler.php` and `wdt.php` routing configuration files (use them instead of their XML equivalent)
+
+   Before:
+
+   ```yaml
+   when@dev:
+       web_profiler_wdt:
+           resource: '@WebProfilerBundle/Resources/config/routing/wdt.xml'
+           prefix: /_wdt
+
+      web_profiler_profiler:
+          resource: '@WebProfilerBundle/Resources/config/routing/profiler.xml'
+          prefix: /_profiler
+   ```
+
+   After:
+
+   ```yaml
+   when@dev:
+       web_profiler_wdt:
+           resource: '@WebProfilerBundle/Resources/config/routing/wdt.php'
+           prefix: /_wdt
+
+       web_profiler_profiler:
+           resource: '@WebProfilerBundle/Resources/config/routing/profiler.php
+           prefix: /_profiler
+   ```
+
+ * Add `ajax_replace` option for replacing toolbar on AJAX requests
+
+7.2
+---
+
+ * Add support for displaying profiles of multiple serializer instances
+
+7.1
+---
+
+ * Set `XDEBUG_IGNORE` query parameter when sending toolbar XHR
+
 6.4
 ---
 
@@ -55,7 +105,7 @@ CHANGELOG
 -----
 
  * added information about orphaned events
- * made the toolbar auto-update with info from ajax reponses when they set the
+ * made the toolbar auto-update with info from ajax responses when they set the
    `Symfony-Debug-Toolbar-Replace header` to `1`
 
 4.0.0

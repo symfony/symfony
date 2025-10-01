@@ -76,7 +76,7 @@ final class UrlSanitizer
     /**
      * Parses a given URL and returns an array of its components.
      *
-     * @return null|array{
+     * @return array{
      *     scheme:?string,
      *     user:?string,
      *     pass:?string,
@@ -85,7 +85,7 @@ final class UrlSanitizer
      *     path:string,
      *     query:?string,
      *     fragment:?string
-     * }
+     * }|null
      */
     public static function parse(string $url): ?array
     {

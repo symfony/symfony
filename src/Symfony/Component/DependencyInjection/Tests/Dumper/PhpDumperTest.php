@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
+use Bar\FooLazyClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -24,6 +28,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -47,13 +52,13 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
-use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable;
+use Symfony\Component\DependencyInjection\Tests\Compiler\MyFactory;
+use Symfony\Component\DependencyInjection\Tests\Compiler\MyInlineService;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
-use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainerInterface;
@@ -68,18 +73,16 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\VarExporter\Internal\LazyDecoratorTrait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 require_once __DIR__.'/../Fixtures/includes/classes.php';
 require_once __DIR__.'/../Fixtures/includes/foo.php';
 require_once __DIR__.'/../Fixtures/includes/foo_lazy.php';
+require_once __DIR__.'/../Fixtures/includes/fixture_app_services.php';
 
 class PhpDumperTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     protected static string $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -327,7 +330,7 @@ class PhpDumperTest extends TestCase
         $container->setParameter('container.dumper.inline_class_loader', true);
 
         $container->register('lazy_foo', \Bar\FooClass::class)
-            ->addArgument(new Definition(\Bar\FooLazyClass::class))
+            ->addArgument(new Definition(FooLazyClass::class))
             ->setPublic(true)
             ->setLazy(true);
 
@@ -340,7 +343,7 @@ class PhpDumperTest extends TestCase
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_lazy_inlined_factories.txt', $dump);
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services9_lazy_inlined_factories.txt', $dump);
     }
 
     public function testServicesWithAnonymousFactories()
@@ -403,9 +406,7 @@ class PhpDumperTest extends TestCase
         $this->assertTrue(method_exists($class, 'getFoobar2Service'));
     }
 
-    /**
-     * @dataProvider provideInvalidFactories
-     */
+    #[DataProvider('provideInvalidFactories')]
     public function testInvalidFactories($factory)
     {
         $this->expectException(RuntimeException::class);
@@ -479,15 +480,15 @@ class PhpDumperTest extends TestCase
     }
 
     /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
+     * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testDeprecatedParameters()
     {
         $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -496,21 +497,42 @@ class PhpDumperTest extends TestCase
     }
 
     /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
+     * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testDeprecatedParametersAsFiles()
     {
         $container = include self::$fixturesPath.'/containers/container_deprecated_parameters.php';
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo_class" is deprecated.');
         $container->compile();
 
         $dumper = new PhpDumper($container);
         $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
 
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_deprecated_parameters_as_files.txt', $dump);
+    }
+
+    public function testNonEmptyParameters()
+    {
+        $container = include self::$fixturesPath.'/containers/container_nonempty_parameters.php';
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_nonempty_parameters.php', $dumper->dump());
+    }
+
+    public function testNonEmptyParametersAsFiles()
+    {
+        $container = include self::$fixturesPath.'/containers/container_nonempty_parameters.php';
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services_nonempty_parameters_as_files.txt', $dump);
     }
 
     public function testEnvInId()
@@ -758,7 +780,7 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
 
         $container
-            ->register('foo', \Bar\FooLazyClass::class)
+            ->register('foo', FooLazyClass::class)
             ->setFile(realpath(self::$fixturesPath.'/includes/foo_lazy.php'))
             ->setShared(false)
             ->setLazy(true)
@@ -773,7 +795,7 @@ class PhpDumperTest extends TestCase
             'inline_class_loader' => false,
         ]);
         $this->assertStringEqualsFile(
-            self::$fixturesPath.'/php/services_non_shared_lazy_public.php',
+            self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_non_shared_lazy_public.php',
             '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump) : $dump
         );
         eval('?>'.$dump);
@@ -781,10 +803,18 @@ class PhpDumperTest extends TestCase
         $container = new \Symfony_DI_PhpDumper_Service_Non_Shared_Lazy();
 
         $foo1 = $container->get('foo');
-        $this->assertTrue($foo1->resetLazyObject());
+        if (\PHP_VERSION_ID >= 80400) {
+            $this->assertTrue((new \ReflectionClass($foo1))->isUninitializedLazyObject($foo1));
+        } else {
+            $this->assertTrue($foo1->resetLazyObject());
+        }
 
         $foo2 = $container->get('foo');
-        $this->assertTrue($foo2->resetLazyObject());
+        if (\PHP_VERSION_ID >= 80400) {
+            $this->assertTrue((new \ReflectionClass($foo2))->isUninitializedLazyObject($foo2));
+        } else {
+            $this->assertTrue($foo2->resetLazyObject());
+        }
 
         $this->assertNotSame($foo1, $foo2);
     }
@@ -794,7 +824,7 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
 
         $container
-            ->register('non_shared_foo', \Bar\FooLazyClass::class)
+            ->register('non_shared_foo', FooLazyClass::class)
             ->setFile(realpath(self::$fixturesPath.'/includes/foo_lazy.php'))
             ->setShared(false)
             ->setLazy(true)
@@ -811,7 +841,7 @@ class PhpDumperTest extends TestCase
 
         $stringDump = print_r($dumps, true);
         $this->assertStringMatchesFormatFile(
-            self::$fixturesPath.'/php/services_non_shared_lazy_as_files.txt',
+            self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_non_shared_lazy_as_files.txt',
             '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $stringDump) : $stringDump
         );
 
@@ -823,18 +853,24 @@ class PhpDumperTest extends TestCase
         $container = eval('?>'.$lastDump);
 
         $foo1 = $container->get('non_shared_foo');
-        $this->assertTrue($foo1->resetLazyObject());
+        if (\PHP_VERSION_ID >= 80400) {
+            $this->assertTrue((new \ReflectionClass($foo1))->isUninitializedLazyObject($foo1));
+        } else {
+            $this->assertTrue($foo1->resetLazyObject());
+        }
 
         $foo2 = $container->get('non_shared_foo');
-        $this->assertTrue($foo2->resetLazyObject());
+        if (\PHP_VERSION_ID >= 80400) {
+            $this->assertTrue((new \ReflectionClass($foo2))->isUninitializedLazyObject($foo2));
+        } else {
+            $this->assertTrue($foo2->resetLazyObject());
+        }
 
         $this->assertNotSame($foo1, $foo2);
     }
 
-    /**
-     * @testWith [false]
-     *           [true]
-     */
+    #[TestWith([false])]
+    #[TestWith([true])]
     public function testNonSharedLazyDefinitionReferences(bool $asGhostObject)
     {
         $container = new ContainerBuilder();
@@ -848,7 +884,7 @@ class PhpDumperTest extends TestCase
             $dumper->setProxyDumper(new \DummyProxyDumper());
         }
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_lazy'.($asGhostObject ? '_ghost' : '').'.php', $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_non_shared_lazy'.($asGhostObject ? '_ghost' : '').'.php', $dumper->dump());
     }
 
     public function testNonSharedDuplicates()
@@ -921,9 +957,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        
-        $legacy = \PHP_VERSION_ID < 80400 || !trait_exists(LazyDecoratorTrait::class) ? 'legacy_' : '';
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.$legacy.'services_dedup_lazy.php', $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_dedup_lazy.php', $dumper->dump());
     }
 
     public function testLazyArgumentProvideGenerator()
@@ -967,7 +1001,7 @@ class PhpDumperTest extends TestCase
             }
         }
 
-        $this->assertEmpty(iterator_to_array($lazyContext->lazyEmptyValues));
+        $this->assertSame([], iterator_to_array($lazyContext->lazyEmptyValues));
     }
 
     public function testNormalizedId()
@@ -1184,9 +1218,7 @@ class PhpDumperTest extends TestCase
         $this->assertEquals(['foo1' => new \stdClass(), 'foo3' => new \stdClass()], iterator_to_array($bar->iter));
     }
 
-    /**
-     * @dataProvider provideAlmostCircular
-     */
+    #[DataProvider('provideAlmostCircular')]
     public function testAlmostCircular($visibility)
     {
         $container = include self::$fixturesPath.'/containers/container_almost_circular.php';
@@ -1282,7 +1314,7 @@ class PhpDumperTest extends TestCase
             ->setProperty('bar', $bar)
             ->addArgument($bar);
 
-        $container->register('App\Foo')
+        $container->register('App\Foo', 'App\Foo')
             ->setPublic(true)
             ->addArgument($baz);
 
@@ -1389,26 +1421,26 @@ class PhpDumperTest extends TestCase
         $this->assertSame(FooUnitEnum::BAR, $container->getParameter('unit_enum'));
         $this->assertSame([FooUnitEnum::BAR, FooUnitEnum::FOO], $container->getParameter('enum_array'));
         $this->assertStringMatchesFormat(<<<'PHP'
-%A
-    protected static function getBarService($container)
-    {
-        return $container->services['bar'] = new \stdClass(\Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR, $container->getParameter('enum_array'));
-    }
-%A
-    private function getDynamicParameter(string $name)
-    {
-        $container = $this;
-        $value = match ($name) {
-            'unit_enum' => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
-            'enum_array' => [
-                0 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
-                1 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::FOO,
-            ],
-            default => throw new ParameterNotFoundException($name),
-        };
-%A
-PHP
-            , $dumpedContainer
+            %A
+                protected static function getBarService($container)
+                {
+                    return $container->services['bar'] = new \stdClass(\Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR, $container->getParameter('enum_array'));
+                }
+            %A
+                private function getDynamicParameter(string $name)
+                {
+                    $container = $this;
+                    $value = match ($name) {
+                        'unit_enum' => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
+                        'enum_array' => [
+                            0 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
+                            1 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::FOO,
+                        ],
+                        default => throw new ParameterNotFoundException($name),
+                    };
+            %A
+            PHP,
+            $dumpedContainer
         );
     }
 
@@ -1551,37 +1583,6 @@ PHP
         $this->assertContains('bar', $service_ids);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testWitherAnnotation()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation::cloneFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::setFoo()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo1()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Relying on the "@required" annotation on method "Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation::withFoo2()" is deprecated, use the "Symfony\Contracts\Service\Attribute\Required" attribute instead.');
-
-        $container = new ContainerBuilder();
-        $container->register(FooAnnotation::class)
-            ->setAutowired(true);
-
-        $container
-            ->register('wither', WitherAnnotation::class)
-            ->setPublic(true)
-            ->setAutowired(true);
-
-        $container->compile();
-        $dumper = new PhpDumper($container);
-        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Annotation']);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_annotation.php', $dump);
-        eval('?>'.$dump);
-
-        $container = new \Symfony_DI_PhpDumper_Service_Wither_Annotation();
-
-        $wither = $container->get('wither');
-        $this->assertInstanceOf(FooAnnotation::class, $wither->foo);
-    }
-
     public function testWitherAttribute()
     {
         $container = new ContainerBuilder();
@@ -1619,15 +1620,18 @@ PHP
         $container->compile();
         $dumper = new PhpDumper($container);
         $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Lazy']);
-        $legacy = \PHP_VERSION_ID < 80400 || !trait_exists(LazyDecoratorTrait::class) ? 'legacy_' : '';
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.$legacy.'services_wither_lazy.php', $dump);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_wither_lazy.php', $dump);
         eval('?>'.$dump);
 
         $container = new \Symfony_DI_PhpDumper_Service_Wither_Lazy();
 
         $wither = $container->get('wither');
+        if (\PHP_VERSION_ID >= 80400) {
+            $this->assertTrue((new \ReflectionClass($wither))->isUninitializedLazyObject($wither));
+        } else {
+            $this->assertTrue($wither->resetLazyObject());
+        }
         $this->assertInstanceOf(Foo::class, $wither->foo);
-        $this->assertTrue($wither->resetLazyObject());
     }
 
     public function testLazyWitherNonShared()
@@ -1645,19 +1649,26 @@ PHP
         $container->compile();
         $dumper = new PhpDumper($container);
         $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Lazy_Non_Shared']);
-        $legacy = \PHP_VERSION_ID < 80400 || !trait_exists(LazyDecoratorTrait::class) ? 'legacy_' : '';
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.$legacy.'services_wither_lazy_non_shared.php', $dump);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_wither_lazy_non_shared.php', $dump);
         eval('?>'.$dump);
 
         $container = new \Symfony_DI_PhpDumper_Service_Wither_Lazy_Non_Shared();
 
         $wither1 = $container->get('wither');
+        if (\PHP_VERSION_ID >= 80400) {
+            $this->assertTrue((new \ReflectionClass($wither1))->isUninitializedLazyObject($wither1));
+        } else {
+            $this->assertTrue($wither1->resetLazyObject());
+        }
         $this->assertInstanceOf(Foo::class, $wither1->foo);
-        $this->assertTrue($wither1->resetLazyObject());
 
         $wither2 = $container->get('wither');
+        if (\PHP_VERSION_ID >= 80400) {
+            $this->assertTrue((new \ReflectionClass($wither2))->isUninitializedLazyObject($wither2));
+        } else {
+            $this->assertTrue($wither2->resetLazyObject());
+        }
         $this->assertInstanceOf(Foo::class, $wither2->foo);
-        $this->assertTrue($wither2->resetLazyObject());
 
         $this->assertNotSame($wither1, $wither2);
     }
@@ -1786,11 +1797,13 @@ PHP
     }
 
     /**
-     * @group legacy
+     * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testDirectlyAccessingDeprecatedPublicService()
     {
-        $this->expectDeprecation('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
+        $this->expectUserDeprecationMessage('Since foo/bar 3.8: Accessing the "bar" service directly from the container is deprecated, use dependency injection instead.');
 
         $container = new ContainerBuilder();
         $container
@@ -1983,16 +1996,21 @@ PHP
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $legacy = \PHP_VERSION_ID < 80400 || !trait_exists(LazyDecoratorTrait::class) ? 'legacy_' : '';
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.$legacy.'lazy_autowire_attribute.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute']));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'lazy_autowire_attribute.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute']));
 
-        require self::$fixturesPath.'/php/'.$legacy.'lazy_autowire_attribute.php';
+        require self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'lazy_autowire_attribute.php';
 
         $container = new \Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute();
 
         $this->assertInstanceOf(Foo::class, $container->get('bar')->foo);
-        $this->assertInstanceOf(LazyObjectInterface::class, $container->get('bar')->foo);
-        $this->assertSame($container->get('foo'), $container->get('bar')->foo->initializeLazyObject());
+        if (\PHP_VERSION_ID >= 80400) {
+            $r = new \ReflectionClass(Foo::class);
+            $this->assertTrue($r->isUninitializedLazyObject($container->get('bar')->foo));
+            $this->assertSame($container->get('foo'), $r->initializeLazyObject($container->get('bar')->foo));
+        } else {
+            $this->assertInstanceOf(LazyObjectInterface::class, $container->get('bar')->foo);
+            $this->assertSame($container->get('foo'), $container->get('bar')->foo->initializeLazyObject());
+        }
     }
 
     public function testLazyAutowireAttributeWithIntersection()
@@ -2015,8 +2033,11 @@ PHP
 
         $dumper = new PhpDumper($container);
 
-        $legacy = \PHP_VERSION_ID < 80400 || !trait_exists(LazyDecoratorTrait::class) ? 'legacy_' : '';
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.$legacy.'lazy_autowire_attribute_with_intersection.php', $dumper->dump());
+        if (\PHP_VERSION_ID >= 80400) {
+            $this->assertStringEqualsFile(self::$fixturesPath.'/php/lazy_autowire_attribute_with_intersection.php', $dumper->dump());
+        } else {
+            $this->assertStringEqualsFile(self::$fixturesPath.'/php/legacy_lazy_autowire_attribute_with_intersection.php', $dumper->dump());
+        }
     }
 
     public function testCallableAdapterConsumer()
@@ -2039,9 +2060,57 @@ PHP
         $this->assertInstanceOf(Foo::class, $container->get('bar')->foo->theMethod());
     }
 
-    /**
-     * @dataProvider getStripCommentsCodes
-     */
+    public function testInlineAdapterConsumer()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('someParam', 123);
+        $container->register('factory', MyFactory::class)
+            ->setAutowired(true);
+        $container->register('inlineService', MyInlineService::class)
+            ->setAutowired(true);
+        $container->register(InlineAdapterConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $container->register('foo', InlineAdapterConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $container->register('bar', InlineAdapterConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/inline_adapter_consumer.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Inline_Adapter_Consumer']));
+
+        require self::$fixturesPath.'/php/inline_adapter_consumer.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Inline_Adapter_Consumer();
+
+        $this->assertInstanceOf(InlineAdapterConsumer::class, $container->get(InlineAdapterConsumer::class));
+        $fooService = $container->get('foo');
+        $barService = $container->get('bar');
+        $this->assertInstanceOf(InlineAdapterConsumer::class, $fooService);
+        $this->assertInstanceOf(InlineAdapterConsumer::class, $barService);
+        $this->assertNotSame($fooService, $barService);
+        foreach ([$fooService, $barService] as $service) {
+            $this->assertNotSame($service->inlined, $service->inlinedWithParams);
+            $this->assertNotSame($service->inlinedWithParams, $service->factoredFromClass);
+            $this->assertNotSame($service->factoredFromClass, $service->factoredFromClassWithParams);
+            $this->assertNotSame($service->factoredFromClassWithParams, $service->factoredFromService);
+            $this->assertNotSame($service->factoredFromService, $service->factoredFromClass);
+            $this->assertNotSame($service->factoredFromService, $service->factoredFromServiceWithParam);
+            $this->assertNotSame($service->factoredFromServiceWithParam, $service->inlined);
+        }
+        $this->assertNotSame($fooService->inlined, $barService->inlined);
+        $this->assertNotSame($fooService->inlinedWithParams, $barService->inlinedWithParams);
+        $this->assertNotSame($fooService->factoredFromClass, $barService->factoredFromClass);
+        $this->assertNotSame($fooService->factoredFromClassWithParams, $barService->factoredFromClassWithParams);
+        $this->assertNotSame($fooService->factoredFromService, $barService->factoredFromService);
+        $this->assertNotSame($fooService->factoredFromService, $barService->factoredFromService);
+        $this->assertNotSame($fooService->factoredFromServiceWithParam, $barService->factoredFromServiceWithParam);
+    }
+
+    #[DataProvider('getStripCommentsCodes')]
     public function testStripComments(string $source, string $expected)
     {
         $reflection = new \ReflectionClass(PhpDumper::class);
@@ -2070,75 +2139,76 @@ PHP
             ['<?php echo/**/\foo();', '<?php echo \foo();'],
             ['<?php echo/** bar */\foo();', '<?php echo \foo();'],
             ['<?php /**/echo \foo();', '<?php echo \foo();'],
-            [<<<'EOF'
-<?php
-include_once \dirname(__DIR__).'/foo.php';
+            [
+                <<<'EOF'
+                    <?php
+                    include_once \dirname(__DIR__).'/foo.php';
 
-$string = 'string should not be   modified';
+                    $string = 'string should not be   modified';
 
-$string = 'string should not be
+                    $string = 'string should not be
 
-modified';
-
-
-$heredoc = <<<HD
+                    modified';
 
 
-Heredoc should not be   modified {$a[1+$b]}
+                    $heredoc = <<<HD
 
 
-HD;
-
-$nowdoc = <<<'ND'
+                    Heredoc should not be   modified {$a[1+$b]}
 
 
-Nowdoc should not be   modified
+                    HD;
+
+                    $nowdoc = <<<'ND'
 
 
-ND;
-
-/**
- * some class comments to strip
- */
-class TestClass
-{
-    /**
-     * some method comments to strip
-     */
-    public function doStuff()
-    {
-        // inline comment
-    }
-}
-EOF
-                , <<<'EOF'
-<?php
-include_once \dirname(__DIR__).'/foo.php';
-$string = 'string should not be   modified';
-$string = 'string should not be
-
-modified';
-$heredoc = <<<HD
+                    Nowdoc should not be   modified
 
 
-Heredoc should not be   modified {$a[1+$b]}
+                    ND;
+
+                    /**
+                     * some class comments to strip
+                     */
+                    class TestClass
+                    {
+                        /**
+                         * some method comments to strip
+                         */
+                        public function doStuff()
+                        {
+                            // inline comment
+                        }
+                    }
+                    EOF,
+                <<<'EOF'
+                    <?php
+                    include_once \dirname(__DIR__).'/foo.php';
+                    $string = 'string should not be   modified';
+                    $string = 'string should not be
+
+                    modified';
+                    $heredoc = <<<HD
 
 
-HD;
-$nowdoc = <<<'ND'
+                    Heredoc should not be   modified {$a[1+$b]}
 
 
-Nowdoc should not be   modified
+                    HD;
+                    $nowdoc = <<<'ND'
 
 
-ND;
-class TestClass
-{
-    public function doStuff()
-    {
-        }
-}
-EOF
+                    Nowdoc should not be   modified
+
+
+                    ND;
+                    class TestClass
+                    {
+                        public function doStuff()
+                        {
+                            }
+                    }
+                    EOF,
             ],
         ];
     }
@@ -2197,6 +2267,51 @@ class CallableAdapterConsumer
     public function __construct(
         #[AutowireCallable(service: 'foo', method: 'cloneFoo')]
         public SingleMethodInterface $foo,
+    ) {
+    }
+}
+
+class InlineAdapterConsumer
+{
+    public function __construct(
+        #[AutowireInline(MyInlineService::class)]
+        public MyInlineService $inlined,
+
+        #[AutowireInline(MyInlineService::class, ['bar'])]
+        public MyInlineService $inlinedWithParams,
+
+        #[AutowireInline([MyFactory::class, 'staticCreateFoo'])]
+        public MyInlineService $factoredFromClass,
+
+        #[AutowireInline([MyFactory::class, 'staticCreateFooWithParam'], ['someParam'])]
+        public MyInlineService $factoredFromClassWithParams,
+
+        #[AutowireInline([new Reference('factory'), 'createFoo'])]
+        public MyInlineService $factoredFromService,
+
+        #[AutowireInline([new Reference('factory'), 'createFooWithParam'], ['someParam'])]
+        public MyInlineService $factoredFromServiceWithParam,
+
+        #[AutowireInline([new Reference('factory')])]
+        public MyInlineService $factoredFromClassWithoutMethod,
+
+        #[AutowireInline([new Reference('factory')], ['someParam'])]
+        public MyInlineService $factoredFromClassWithoutMethodWithParams,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod', []]])]
+        public MyInlineService $inlinedWithCall,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod1', []], ['someMethod2', []]])]
+        public MyInlineService $inlinedWithCalls,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod1', ['someArg']], ['someMethod2', []]])]
+        public MyInlineService $inlinedWithCallsWithArgument,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod1', [new Reference('factory')]], ['someMethod2', []]])]
+        public MyInlineService $inlinedWithCallsWithReferenceArgument,
+
+        #[AutowireInline(MyInlineService::class, calls: [['someMethod1', ['%someParam%']], ['someMethod2', []]])]
+        public MyInlineService $inlinedWithCallsWithParamArgument,
     ) {
     }
 }

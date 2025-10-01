@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Uuid;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -24,11 +26,13 @@ class UuidTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $uuid = new Uuid(['normalizer' => 'trim']);
+        $uuid = new Uuid(normalizer: 'trim');
 
         $this->assertEquals('trim', $uuid->normalizer);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -36,6 +40,8 @@ class UuidTest extends TestCase
         new Uuid(['normalizer' => 'Unknown Callable']);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -48,19 +54,19 @@ class UuidTest extends TestCase
         $metadata = new ClassMetadata(UuidDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame(Uuid::ALL_VERSIONS, $aConstraint->versions);
         self::assertTrue($aConstraint->strict);
         self::assertNull($aConstraint->normalizer);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame([Uuid::V4_RANDOM, Uuid::V6_SORTABLE], $bConstraint->versions);
         self::assertFalse($bConstraint->strict);
         self::assertSame('trim', $bConstraint->normalizer);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'UuidDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

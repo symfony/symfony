@@ -24,7 +24,6 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class SerializerErrorRenderer implements ErrorRendererInterface
 {
-    private SerializerInterface $serializer;
     private string|\Closure $format;
     private ErrorRendererInterface $fallbackErrorRenderer;
     private bool|\Closure $debug;
@@ -34,9 +33,12 @@ class SerializerErrorRenderer implements ErrorRendererInterface
      *                                                  formats not supported by Request::getMimeTypes() should be given as mime types
      * @param bool|callable                     $debug  The debugging mode as a boolean or a callable that should return it
      */
-    public function __construct(SerializerInterface $serializer, string|callable $format, ?ErrorRendererInterface $fallbackErrorRenderer = null, bool|callable $debug = false)
-    {
-        $this->serializer = $serializer;
+    public function __construct(
+        private SerializerInterface $serializer,
+        string|callable $format,
+        ?ErrorRendererInterface $fallbackErrorRenderer = null,
+        bool|callable $debug = false,
+    ) {
         $this->format = \is_string($format) ? $format : $format(...);
         $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();
         $this->debug = \is_bool($debug) ? $debug : $debug(...);

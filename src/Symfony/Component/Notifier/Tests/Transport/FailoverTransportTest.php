@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
@@ -19,9 +20,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\FailoverTransport;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class FailoverTransportTest extends TestCase
 {
     public function testSendNoTransports()
@@ -122,11 +121,12 @@ class FailoverTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->method('supports')->with($message)->willReturn(true);
 
-        $matcher = $this->exactly(3);
-        $t2->expects($matcher)
+        $t2->expects($this->exactly(3))
             ->method('send')
-            ->willReturnCallback(function () use ($matcher, $message) {
-                if (3 === $matcher->getInvocationCount()) {
+            ->willReturnCallback(function () use ($message) {
+                static $call = 0;
+
+                if (3 === ++$call) {
                     throw $this->createMock(TransportExceptionInterface::class);
                 }
 
@@ -151,10 +151,11 @@ class FailoverTransportTest extends TestCase
         $t1 = $this->createMock(TransportInterface::class);
         $t1->method('supports')->with($message)->willReturn(true);
 
-        $t1Matcher = $this->exactly(2);
-        $t1->expects($t1Matcher)->method('send')
-            ->willReturnCallback(function () use ($t1Matcher, $message) {
-                if (1 === $t1Matcher->getInvocationCount()) {
+        $t1->expects($this->exactly(2))->method('send')
+            ->willReturnCallback(function () use ($message) {
+                static $call = 0;
+
+                if (1 === ++$call) {
                     throw $this->createMock(TransportExceptionInterface::class);
                 }
 
@@ -163,9 +164,10 @@ class FailoverTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->method('supports')->with($message)->willReturn(true);
 
-        $t2Matcher = $this->exactly(2);
-        $t2->expects($t2Matcher)->method('send')->willReturnCallback(function () use ($t2Matcher, $message) {
-            if (1 === $t2Matcher->getInvocationCount()) {
+        $t2->expects($this->exactly(2))->method('send')->willReturnCallback(function () use ($message) {
+            static $call = 0;
+
+            if (1 === ++$call) {
                 return new SentMessage($message, 't1');
             }
 

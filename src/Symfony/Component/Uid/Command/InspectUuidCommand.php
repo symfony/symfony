@@ -34,12 +34,12 @@ class InspectUuidCommand extends Command
                 new InputArgument('uuid', InputArgument::REQUIRED, 'The UUID to inspect'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> displays information about a UUID.
+                The <info>%command.name%</info> displays information about a UUID.
 
-    <info>php %command.full_name% a7613e0a-5986-11eb-a861-2bf05af69e52</info>
-    <info>php %command.full_name% MfnmaUvvQ1h8B14vTwt6dX</info>
-    <info>php %command.full_name% 57C4Z0MPC627NTGR9BY1DFD7JJ</info>
-EOF
+                    <info>php %command.full_name% a7613e0a-5986-11eb-a861-2bf05af69e52</info>
+                    <info>php %command.full_name% MfnmaUvvQ1h8B14vTwt6dX</info>
+                    <info>php %command.full_name% 57C4Z0MPC627NTGR9BY1DFD7JJ</info>
+                EOF
             )
         ;
     }
@@ -49,7 +49,6 @@ EOF
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         try {
-            /** @var Uuid $uuid */
             $uuid = Uuid::fromString($input->getArgument('uuid'));
         } catch (\InvalidArgumentException $e) {
             $io->error($e->getMessage());
@@ -62,7 +61,7 @@ EOF
         } elseif (new MaxUuid() == $uuid) {
             $version = 'max';
         } else {
-            $version = uuid_type($uuid);
+            $version = hexdec($uuid->toRfc4122()[14]);
         }
 
         $rows = [

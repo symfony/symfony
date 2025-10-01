@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -82,7 +83,8 @@ class TranslationDebugCommandTest extends TestCase
     {
         $this->fs->remove($this->translationDir);
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationDir);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
 
@@ -150,7 +152,8 @@ class TranslationDebugCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
+        $this->translationDir = tempnam(sys_get_temp_dir(), 'sf_translation_');
+        $this->fs->remove($this->translationDir);
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
     }
@@ -221,7 +224,7 @@ class TranslationDebugCommandTest extends TestCase
         $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths, $enabledLocales);
 
         $application = new Application($kernel);
-        $application->add($command);
+        $application->addCommand($command);
 
         return $application->find('debug:translation');
     }
@@ -238,9 +241,7 @@ class TranslationDebugCommandTest extends TestCase
         return $bundle;
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $extractedMessagesWithDomains = [

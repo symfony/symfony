@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Tests\Embeds;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordFieldEmbedObject;
-use Symfony\Component\Notifier\Exception\LengthException;
 
 final class DiscordFieldEmbedObjectTest extends TestCase
 {
@@ -29,21 +28,5 @@ final class DiscordFieldEmbedObjectTest extends TestCase
             'value' => 'bar',
             'inline' => true,
         ], $field->toArray());
-    }
-
-    public function testThrowsWhenNameExceedsCharacterLimit()
-    {
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('Maximum length for the name is 256 characters.');
-
-        (new DiscordFieldEmbedObject())->name(str_repeat('š', 257));
-    }
-
-    public function testThrowsWhenValueExceedsCharacterLimit()
-    {
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('Maximum length for the value is 1024 characters.');
-
-        (new DiscordFieldEmbedObject())->value(str_repeat('š', 1025));
     }
 }

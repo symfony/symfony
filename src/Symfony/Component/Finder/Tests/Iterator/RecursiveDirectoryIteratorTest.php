@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
 class RecursiveDirectoryIteratorTest extends IteratorTestCase
@@ -22,10 +23,8 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
         }
     }
 
-    /**
-     * @group network
-     * @group integration
-     */
+    #[Group('network')]
+    #[Group('integration')]
     public function testRewindOnFtp()
     {
         if (!getenv('INTEGRATION_FTP_URL')) {
@@ -39,10 +38,8 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
         $this->expectNotToPerformAssertions();
     }
 
-    /**
-     * @group network
-     * @group integration
-     */
+    #[Group('network')]
+    #[Group('integration')]
     public function testSeekOnFtp()
     {
         if (!getenv('INTEGRATION_FTP_URL')) {

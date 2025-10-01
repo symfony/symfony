@@ -171,7 +171,7 @@ abstract class HttpCacheTestCase extends TestCase
 
         $fp = opendir($directory);
         while (false !== $file = readdir($fp)) {
-            if (!\in_array($file, ['.', '..'])) {
+            if (!\in_array($file, ['.', '..'], true)) {
                 if (is_link($directory.'/'.$file)) {
                     unlink($directory.'/'.$file);
                 } elseif (is_dir($directory.'/'.$file)) {

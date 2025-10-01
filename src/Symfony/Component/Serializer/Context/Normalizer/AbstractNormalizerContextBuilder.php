@@ -104,6 +104,18 @@ abstract class AbstractNormalizerContextBuilder implements ContextBuilderInterfa
     }
 
     /**
+     * @deprecated since Symfony 7.1, use withDefaultConstructorArguments(?array $defaultConstructorArguments)" instead
+     *
+     * @param array<class-string, array<string, mixed>>|null $defaultContructorArguments
+     */
+    public function withDefaultContructorArguments(?array $defaultContructorArguments): static
+    {
+        trigger_deprecation('symfony/serializer', '7.1', 'The "%s()" method is deprecated, use "withDefaultConstructorArguments(?array $defaultConstructorArguments)" instead.', __METHOD__);
+
+        return self::withDefaultConstructorArguments($defaultContructorArguments);
+    }
+
+    /**
      * Configures a hashmap of classes containing hashmaps of constructor argument => default value.
      *
      * The names need to match the parameter names in the constructor arguments.
@@ -115,14 +127,6 @@ abstract class AbstractNormalizerContextBuilder implements ContextBuilderInterfa
     public function withDefaultConstructorArguments(?array $defaultConstructorArguments): static
     {
         return $this->with(AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS, $defaultConstructorArguments);
-    }
-
-    /**
-     * Deprecated in Symfony 7.1, use withDefaultConstructorArguments() instead.
-     */
-    public function withDefaultContructorArguments(?array $defaultContructorArguments): static
-    {
-        return self::withDefaultConstructorArguments($defaultContructorArguments);
     }
 
     /**

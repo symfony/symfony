@@ -11,41 +11,44 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransport;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
- * @requires extension redis
- */
+#[RequiresPhpExtension('redis')]
 class RedisTransportFactoryTest extends TestCase
 {
+    use VarDumperTestTrait;
+
     public function testSupportsOnlyRedisTransports()
     {
         $factory = new RedisTransportFactory();
 
         $this->assertTrue($factory->supports('redis://localhost', []));
         $this->assertTrue($factory->supports('rediss://localhost', []));
-        $this->assertTrue($factory->supports('redis:?host[host1:5000]&host[host2:5000]&host[host3:5000]&sentinel_master=test&dbindex=0', []));
+        $this->assertTrue($factory->supports('valkey://localhost', []));
+        $this->assertTrue($factory->supports('valkeys://localhost', []));
+        $this->assertTrue($factory->supports('redis:?host[host1:5000]&host[host2:5000]&host[host3:5000]&sentinel=test&dbindex=0', []));
         $this->assertFalse($factory->supports('sqs://localhost', []));
         $this->assertFalse($factory->supports('invalid-dsn', []));
     }
 
-    /**
-     * @group integration
-     *
-     * @dataProvider createTransportProvider
-     */
+    #[DataProvider('createTransportProvider')]
+    #[Group('integration')]
     public function testCreateTransport(string $dsn, array $options = [])
     {
         $this->skipIfRedisUnavailable();
 
         $factory = new RedisTransportFactory();
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = new PhpSerializer();
 
-        $this->assertEquals(
+        $this->assertDumpEquals(
             new RedisTransport(Connection::fromDsn($dsn, $options), $serializer),
             $factory->createTransport($dsn, $options, $serializer)
         );
@@ -69,7 +72,7 @@ class RedisTransportFactoryTest extends TestCase
         if (false !== getenv('REDIS_SENTINEL_HOSTS') && false !== getenv('REDIS_SENTINEL_SERVICE')) {
             yield 'redis_sentinel' => [
                 'redis:?host['.str_replace(' ', ']&host[', getenv('REDIS_SENTINEL_HOSTS')).']',
-                ['sentinel_master' => getenv('REDIS_SENTINEL_SERVICE')],
+                ['sentinel' => getenv('REDIS_SENTINEL_SERVICE')],
             ];
         }
     }

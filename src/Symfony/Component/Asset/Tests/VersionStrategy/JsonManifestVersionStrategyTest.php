@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset\Tests\VersionStrategy;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\Exception\RuntimeException;
@@ -20,33 +21,25 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class JsonManifestVersionStrategyTest extends TestCase
 {
-    /**
-     * @dataProvider provideValidStrategies
-     */
+    #[DataProvider('provideValidStrategies')]
     public function testGetVersion(JsonManifestVersionStrategy $strategy)
     {
         $this->assertSame('main.123abc.js', $strategy->getVersion('main.js'));
     }
 
-    /**
-     * @dataProvider provideValidStrategies
-     */
+    #[DataProvider('provideValidStrategies')]
     public function testApplyVersion(JsonManifestVersionStrategy $strategy)
     {
         $this->assertSame('css/styles.555def.css', $strategy->applyVersion('css/styles.css'));
     }
 
-    /**
-     * @dataProvider provideValidStrategies
-     */
+    #[DataProvider('provideValidStrategies')]
     public function testApplyVersionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy)
     {
         $this->assertSame('css/other.css', $strategy->applyVersion('css/other.css'));
     }
 
-    /**
-     * @dataProvider provideStrictStrategies
-     */
+    #[DataProvider('provideStrictStrategies')]
     public function testStrictExceptionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy, $path, $message)
     {
         $this->expectException(AssetNotFoundException::class);
@@ -55,18 +48,14 @@ class JsonManifestVersionStrategyTest extends TestCase
         $strategy->getVersion($path);
     }
 
-    /**
-     * @dataProvider provideMissingStrategies
-     */
+    #[DataProvider('provideMissingStrategies')]
     public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy)
     {
         $this->expectException(RuntimeException::class);
         $strategy->getVersion('main.js');
     }
 
-    /**
-     * @dataProvider provideInvalidStrategies
-     */
+    #[DataProvider('provideInvalidStrategies')]
     public function testManifestFileWithBadJSONThrowsException(JsonManifestVersionStrategy $strategy)
     {
         $this->expectException(RuntimeException::class);

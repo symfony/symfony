@@ -151,6 +151,7 @@
       <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="resource-tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
@@ -197,6 +198,7 @@
       <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="resource-tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="exclude" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
@@ -270,6 +272,7 @@
       <xsd:element name="property" type="property" maxOccurs="unbounded" />
       <xsd:element name="service" type="service" />
     </xsd:choice>
+    <xsd:attribute name="key-type" type="key_type" />
     <xsd:attribute name="type" type="argument_type" />
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="key" type="xsd:string" />
@@ -315,6 +318,7 @@
       <xsd:element name="service" type="service" />
       <xsd:element name="exclude" type="xsd:string" maxOccurs="unbounded" />
     </xsd:choice>
+    <xsd:attribute name="key-type" type="key_type" />
     <xsd:attribute name="type" type="argument_type" />
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="key" type="xsd:string" />
@@ -362,6 +366,13 @@
       <xsd:enumeration value="tagged" />
       <xsd:enumeration value="tagged_iterator" />
       <xsd:enumeration value="tagged_locator" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="key_type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="binary" />
+      <xsd:enumeration value="constant" />
     </xsd:restriction>
   </xsd:simpleType>
 

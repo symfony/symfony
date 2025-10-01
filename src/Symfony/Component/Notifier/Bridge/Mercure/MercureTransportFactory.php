@@ -25,13 +25,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransportFactory extends AbstractTransportFactory
 {
-    private HubRegistry $registry;
-
-    public function __construct(HubRegistry $registry, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
-    {
+    public function __construct(
+        private HubRegistry $registry,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?HttpClientInterface $client = null,
+    ) {
         parent::__construct($dispatcher, $client);
-
-        $this->registry = $registry;
     }
 
     public function create(Dsn $dsn): MercureTransport

@@ -333,9 +333,12 @@ class Process implements \IteratorAggregate
 
             if (\is_array($commandline)) {
 
+
                 // exec is mandatory to deal with sending a signal to the process
 
                 7f80f7730f ([Process] Avoid EPIPE when child process closed STDIN (close STDIN early))
+
+                // exec is mandatory to deal with sending a signal to the process
                 $commandline = 'exec '.$this->buildShellCommandline($commandline);
             }
 

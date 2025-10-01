@@ -51,6 +51,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'enum' => [\BackedEnum::class],
             'shuffle' => ['array'],
             'defined' => ['bool'],
+            'urlencode' => ['string'],
         ];
 
         $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());

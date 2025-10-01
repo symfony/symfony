@@ -28,6 +28,7 @@ use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Messenger\EarlyExpirationHandler;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -52,11 +53,6 @@ return static function (ContainerConfigurator $container) {
             ->tag('cache.pool')
 
         ->set('cache.serializer')
-            ->parent('cache.system')
-            ->private()
-            ->tag('cache.pool')
-
-        ->set('cache.annotations')
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
@@ -145,6 +141,7 @@ return static function (ContainerConfigurator $container) {
                 'reset' => 'reset',
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
+        ->alias('cache.adapter.valkey', 'cache.adapter.redis')
 
         ->set('cache.adapter.redis_tag_aware', RedisTagAwareAdapter::class)
             ->abstract()
@@ -161,6 +158,7 @@ return static function (ContainerConfigurator $container) {
                 'reset' => 'reset',
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
+        ->alias('cache.adapter.valkey_tag_aware', 'cache.adapter.redis_tag_aware')
 
         ->set('cache.adapter.memcached', MemcachedAdapter::class)
             ->abstract()
@@ -252,6 +250,8 @@ return static function (ContainerConfigurator $container) {
         ->alias(CacheItemPoolInterface::class, 'cache.app')
 
         ->alias(CacheInterface::class, 'cache.app')
+
+        ->alias(NamespacedPoolInterface::class, 'cache.app')
 
         ->alias(TagAwareCacheInterface::class, 'cache.app.taggable')
     ;

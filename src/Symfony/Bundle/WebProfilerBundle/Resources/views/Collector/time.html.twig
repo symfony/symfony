@@ -61,7 +61,7 @@
         </div>
     {% endset %}
 
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: status_color}) }}
 {% endblock %}
 
 {% block menu %}
@@ -146,7 +146,7 @@
             Sub-{{ profile_type|title }} {{ profiler_dump(profile.getcollector('request').requestattributes.get('_controller')) }}
             <small>
                 {{ collector.events.__section__.duration }} ms
-                <a class="newline" href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent {{ profile_type }}</a>
+                <a class="newline" href="{{ path('_profiler', {token: profile.parent.token, panel: 'time'}) }}">Return to parent {{ profile_type }}</a>
             </small>
         </h3>
     {% elseif profile.children|length > 0 %}
@@ -165,7 +165,7 @@
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
             <h4>
-                <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.getcollector('request').identifier }}</a>
+                <a href="{{ path('_profiler', {token: child.token, panel: 'time'}) }}">{{ child.getcollector('request').identifier }}</a>
                 <small>{{ events.__section__.duration }} ms</small>
             </h4>
 
@@ -192,7 +192,7 @@
 {% autoescape 'js' %}
 {
     id: "{{ token }}",
-    left: {{ "%F"|format(events.__section__.origin - origin) }},
+    left: {{ '%F'|format(events.__section__.origin - origin) }},
     end: "{{ '%F'|format(events.__section__.endtime) }}",
     events: [ {{ _self.dump_events(events) }} ],
 }
@@ -206,18 +206,18 @@
 {
     name: "{{ name }}",
     category: "{{ event.category }}",
-    origin: {{ "%F"|format(event.origin) }},
-    starttime: {{ "%F"|format(event.starttime) }},
-    endtime: {{ "%F"|format(event.endtime) }},
-    duration: {{ "%F"|format(event.duration) }},
-    memory: {{ "%.1F"|format(event.memory / 1024 / 1024) }},
+    origin: {{ '%F'|format(event.origin) }},
+    starttime: {{ '%F'|format(event.starttime) }},
+    endtime: {{ '%F'|format(event.endtime) }},
+    duration: {{ '%F'|format(event.duration) }},
+    memory: {{ '%.1F'|format(event.memory / 1024 / 1024) }},
     elements: {},
     periods: [
         {%- for period in event.periods -%}
         {
-            start: {{ "%F"|format(period.starttime) }},
-            end: {{ "%F"|format(period.endtime) }},
-            duration: {{ "%F"|format(period.duration) }},
+            start: {{ '%F'|format(period.starttime) }},
+            end: {{ '%F'|format(period.endtime) }},
+            duration: {{ '%F'|format(period.duration) }},
             elements: {}
         },
         {%- endfor -%}

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Debug;
 
 use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
@@ -27,39 +26,32 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @final
  */
-class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, NormalizerAwareInterface, DenormalizerAwareInterface, CacheableSupportsMethodInterface
+class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, NormalizerAwareInterface, DenormalizerAwareInterface
 {
     public function __construct(
         private NormalizerInterface|DenormalizerInterface $normalizer,
         private SerializerDataCollector $dataCollector,
+        private readonly string $serializerName = 'default',
     ) {
-        if (!method_exists($normalizer, 'getSupportedTypes')) {
-            trigger_deprecation('symfony/serializer', '6.3', 'Not implementing the "NormalizerInterface::getSupportedTypes()" in "%s" is deprecated.', get_debug_type($normalizer));
-        }
     }
 
     public function getSupportedTypes(?string $format): array
     {
-        // @deprecated remove condition in 7.0
-        if (!method_exists($this->normalizer, 'getSupportedTypes')) {
-            return ['*' => $this->normalizer instanceof CacheableSupportsMethodInterface && $this->normalizer->hasCacheableSupportsMethod()];
-        }
-
         return $this->normalizer->getSupportedTypes($format);
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!$this->normalizer instanceof NormalizerInterface) {
             throw new \BadMethodCallException(\sprintf('The "%s()" method cannot be called as nested normalizer doesn\'t implements "%s".', __METHOD__, NormalizerInterface::class));
         }
 
         $startTime = microtime(true);
-        $normalized = $this->normalizer->normalize($object, $format, $context);
+        $normalized = $this->normalizer->normalize($data, $format, $context);
         $time = microtime(true) - $startTime;
 
         if ($traceId = ($context[TraceableSerializer::DEBUG_TRACE_ID] ?? null)) {
-            $this->dataCollector->collectNormalization($traceId, $this->normalizer::class, $time);
+            $this->dataCollector->collectNormalization($traceId, $this->normalizer::class, $time, $this->serializerName);
         }
 
         return $normalized;
@@ -85,7 +77,7 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $time = microtime(true) - $startTime;
 
         if ($traceId = ($context[TraceableSerializer::DEBUG_TRACE_ID] ?? null)) {
-            $this->dataCollector->collectDenormalization($traceId, $this->normalizer::class, $time);
+            $this->dataCollector->collectDenormalization($traceId, $this->normalizer::class, $time, $this->serializerName);
         }
 
         return $denormalized;
@@ -125,16 +117,6 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         }
 
         $this->normalizer->setDenormalizer($denormalizer);
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this->normalizer));
-
-        return $this->normalizer instanceof CacheableSupportsMethodInterface && $this->normalizer->hasCacheableSupportsMethod();
     }
 
     /**

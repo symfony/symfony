@@ -24,17 +24,12 @@ use Symfony\Component\Notifier\Notifier;
  */
 class SendFailedMessageToNotifierListener implements EventSubscriberInterface
 {
-    private Notifier $notifier;
-
-    public function __construct(Notifier $notifier)
-    {
-        $this->notifier = $notifier;
+    public function __construct(
+        private Notifier $notifier,
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function onMessageFailed(WorkerMessageFailedEvent $event)
+    public function onMessageFailed(WorkerMessageFailedEvent $event): void
     {
         if ($event->willRetry()) {
             return;

@@ -24,6 +24,8 @@
 /src/Symfony/Component/Form/ @xabbuh @yceruto
 # HttpKernel
 /src/Symfony/Component/HttpKernel/Log/Logger.php @dunglas
+# JsonPath
+/src/Symfony/Component/JsonPath/ @alexandre-daubois
 # Lock
 /src/Symfony/Component/Lock/ @jderusse
 # Notifer

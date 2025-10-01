@@ -19,7 +19,7 @@ class ConstraintWithoutValueWithNamedArguments extends Constraint
     #[HasNamedArguments]
     public function __construct(?array $groups = null)
     {
-        parent::__construct([], $groups);
+        parent::__construct(null, $groups);
     }
 
     public function getTargets(): string

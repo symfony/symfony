@@ -46,7 +46,7 @@ class SchedulerTransportTest extends TestCase
             $this->assertSame('id'.$i + 1, $stamp->messageContext->id);
         }
 
-        $this->assertEmpty($messages);
+        $this->assertSame([], $messages);
     }
 
     public function testAddsStampToInnerRedispatchMessageEnvelope()

@@ -31,7 +31,7 @@ class LoginLinkFactory extends AbstractFactory
     public function addConfiguration(NodeDefinition $node): void
     {
         /** @var NodeBuilder $builder */
-        $builder = $node->fixXmlConfig('signature_property', 'signature_properties')->children();
+        $builder = $node->children();
 
         $builder
             ->scalarNode('check_route')
@@ -42,7 +42,7 @@ class LoginLinkFactory extends AbstractFactory
                 ->defaultFalse()
                 ->info('If true, only HTTP POST requests to "check_route" will be handled by the authenticator.')
             ->end()
-            ->arrayNode('signature_properties')
+            ->arrayNode('signature_properties', 'signature_property')
                 ->isRequired()
                 ->prototype('scalar')->end()
                 ->requiresAtLeastOneElement()
@@ -68,6 +68,10 @@ class LoginLinkFactory extends AbstractFactory
             ->end()
             ->scalarNode('provider')
                 ->info('The user provider to load users from.')
+            ->end()
+            ->scalarNode('secret')
+                ->cannotBeEmpty()
+                ->defaultValue('%kernel.secret%')
             ->end()
         ;
 
@@ -113,6 +117,7 @@ class LoginLinkFactory extends AbstractFactory
         $container
             ->setDefinition($signatureHasherId, new ChildDefinition('security.authenticator.abstract_login_link_signature_hasher'))
             ->replaceArgument(1, $config['signature_properties'])
+            ->replaceArgument(2, $config['secret'])
             ->replaceArgument(3, $expiredStorageId ? new Reference($expiredStorageId) : null)
             ->replaceArgument(4, $config['max_uses'] ?? null)
         ;

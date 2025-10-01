@@ -14,38 +14,52 @@ namespace Symfony\Component\Serializer\Attribute;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
- * Annotation class for @DiscriminatorMap().
- *
- * @Annotation
- * @NamedArgumentConstructor
- * @Target({"CLASS"})
- *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DiscriminatorMap
 {
+    /**
+     * @param string                      $typeProperty The property holding the type discriminator
+     * @param array<string, class-string> $mapping      The mapping between types and classes (i.e. ['admin_user' => AdminUser::class])
+     * @param ?string                     $defaultType  The fallback value if nothing specified by $typeProperty
+     *
+     * @throws InvalidArgumentException
+     */
     public function __construct(
-        private readonly string $typeProperty,
-        private readonly array $mapping,
+        public readonly string $typeProperty,
+        public readonly array $mapping,
+        public readonly ?string $defaultType = null,
     ) {
-        if (empty($typeProperty)) {
+        if (!$typeProperty) {
             throw new InvalidArgumentException(\sprintf('Parameter "typeProperty" given to "%s" cannot be empty.', static::class));
         }
 
-        if (empty($mapping)) {
+        if (!$mapping) {
             throw new InvalidArgumentException(\sprintf('Parameter "mapping" given to "%s" cannot be empty.', static::class));
+        }
+
+        if (null !== $this->defaultType && !\array_key_exists($this->defaultType, $this->mapping)) {
+            throw new InvalidArgumentException(\sprintf('Default type "%s" given to "%s" must be present in "mapping" types.', $this->defaultType, static::class));
         }
     }
 
+    #[\Deprecated('Use the "typeProperty" property instead', 'symfony/serializer:7.4')]
     public function getTypeProperty(): string
     {
         return $this->typeProperty;
     }
 
+    #[\Deprecated('Use the "mapping" property instead', 'symfony/serializer:7.4')]
     public function getMapping(): array
     {
         return $this->mapping;
+    }
+
+    #[\Deprecated('Use the "defaultType" property instead', 'symfony/serializer:7.4')]
+    public function getDefaultType(): ?string
+    {
+        return $this->defaultType;
     }
 }
 

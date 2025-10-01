@@ -33,7 +33,7 @@ class ChoiceFormField extends FormField
     public function hasValue(): bool
     {
         // don't send a value for unchecked checkboxes
-        if (\in_array($this->type, ['checkbox', 'radio']) && null === $this->value) {
+        if (\in_array($this->type, ['checkbox', 'radio'], true) && null === $this->value) {
             return false;
         }
 
@@ -64,10 +64,8 @@ class ChoiceFormField extends FormField
 
     /**
      * Sets the value of the field.
-     *
-     * @return void
      */
-    public function select(string|array|bool $value)
+    public function select(string|array|bool $value): void
     {
         $this->setValue($value);
     }
@@ -75,11 +73,9 @@ class ChoiceFormField extends FormField
     /**
      * Ticks a checkbox.
      *
-     * @return void
-     *
      * @throws \LogicException When the type provided is not correct
      */
-    public function tick()
+    public function tick(): void
     {
         if ('checkbox' !== $this->type) {
             throw new \LogicException(\sprintf('You cannot tick "%s" as it is not a checkbox (%s).', $this->name, $this->type));
@@ -91,11 +87,9 @@ class ChoiceFormField extends FormField
     /**
      * Unticks a checkbox.
      *
-     * @return void
-     *
      * @throws \LogicException When the type provided is not correct
      */
-    public function untick()
+    public function untick(): void
     {
         if ('checkbox' !== $this->type) {
             throw new \LogicException(\sprintf('You cannot untick "%s" as it is not a checkbox (%s).', $this->name, $this->type));
@@ -107,11 +101,9 @@ class ChoiceFormField extends FormField
     /**
      * Sets the value of the field.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException When value type provided is not correct
      */
-    public function setValue(string|array|bool|null $value)
+    public function setValue(string|array|bool|null $value): void
     {
         if ('checkbox' === $this->type && false === $value) {
             // uncheck
@@ -186,11 +178,9 @@ class ChoiceFormField extends FormField
     /**
      * Initializes the form field.
      *
-     * @return void
-     *
      * @throws \LogicException When node type is incorrect
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         if ('input' !== $this->node->nodeName && 'select' !== $this->node->nodeName) {
             throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input or select tag (%s given).', $this->node->nodeName));
@@ -250,7 +240,7 @@ class ChoiceFormField extends FormField
         $option = [];
 
         $defaultDefaultValue = 'select' === $this->node->nodeName ? '' : 'on';
-        $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : $defaultDefaultValue;
+        $defaultValue = (isset($node->nodeValue) && $node->nodeValue) ? $node->nodeValue : $defaultDefaultValue;
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
         $option['disabled'] = $node->hasAttribute('disabled');
 

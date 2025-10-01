@@ -100,7 +100,7 @@ class Inline
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump(mixed $value, int $flags = 0): string
+    public static function dump(mixed $value, int $flags = 0, bool $rootLevel = false): string
     {
         switch (true) {
             case \is_resource($value):
@@ -116,7 +116,7 @@ class Inline
                     default => 'Y-m-d\TH:i:s.uP',
                 });
             case $value instanceof \UnitEnum:
-                return \sprintf('!php/const %s::%s', $value::class, $value->name);
+                return \sprintf('!php/enum %s::%s', $value::class, $value->name);
             case \is_object($value):
                 if ($value instanceof TaggedValue) {
                     return '!'.$value->getTag().' '.self::dump($value->getValue(), $flags);
@@ -138,7 +138,7 @@ class Inline
             case \is_array($value):
                 return self::dumpArray($value, $flags);
             case null === $value:
-                return self::dumpNull($flags);
+                return self::dumpNull($flags, $rootLevel);
             case true === $value:
                 return 'true';
             case false === $value:
@@ -173,6 +173,7 @@ class Inline
             case self::isBinaryString($value):
                 return '!!binary '.base64_encode($value);
             case Escaper::requiresDoubleQuoting($value):
+            case Yaml::DUMP_FORCE_DOUBLE_QUOTES_ON_VALUES & $flags:
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):
                 $singleQuoted = Escaper::escapeWithSingleQuotes($value);
@@ -242,21 +243,26 @@ class Inline
     private static function dumpHashArray(array|\ArrayObject|\stdClass $value, int $flags): string
     {
         $output = [];
+        $keyFlags = $flags & ~Yaml::DUMP_FORCE_DOUBLE_QUOTES_ON_VALUES;
         foreach ($value as $key => $val) {
             if (\is_int($key) && Yaml::DUMP_NUMERIC_KEY_AS_STRING & $flags) {
                 $key = (string) $key;
             }
 
-            $output[] = \sprintf('%s: %s', self::dump($key, $flags), self::dump($val, $flags));
+            $output[] = \sprintf('%s: %s', self::dump($key, $keyFlags), self::dump($val, $flags));
         }
 
         return \sprintf('{ %s }', implode(', ', $output));
     }
 
-    private static function dumpNull(int $flags): string
+    private static function dumpNull(int $flags, bool $rootLevel = false): string
     {
         if (Yaml::DUMP_NULL_AS_TILDE & $flags) {
             return '~';
+        }
+
+        if (Yaml::DUMP_NULL_AS_EMPTY & $flags && !$rootLevel) {
+            return '';
         }
 
         return 'null';
@@ -577,7 +583,7 @@ class Inline
             }
 
             // an unquoted *
-            if (false === $value || '' === $value) {
+            if ('' === $value) {
                 throw new ParseException('A reference must contain at least one character.', self::$parsedLineNumber + 1, $value, self::$parsedFilename);
             }
 
@@ -602,7 +608,7 @@ class Inline
             case '!' === $scalar[0]:
                 switch (true) {
                     case str_starts_with($scalar, '!!str '):
-                        $s = (string) substr($scalar, 6);
+                        $s = substr($scalar, 6);
 
                         if (\in_array($s[0] ?? '', ['"', "'"], true)) {
                             $isQuotedString = true;
@@ -651,24 +657,31 @@ class Inline
                             }
 
                             $i = 0;
-                            $enum = self::parseScalar(substr($scalar, 10), 0, null, $i, false);
-                            if ($useValue = str_ends_with($enum, '->value')) {
-                                $enum = substr($enum, 0, -7);
-                            }
-                            if (!\defined($enum)) {
+                            $enumName = self::parseScalar(substr($scalar, 10), 0, null, $i, false);
+                            $useName = str_contains($enumName, '::');
+                            $enum = $useName ? strstr($enumName, '::', true) : $enumName;
+
+                            if (!enum_exists($enum)) {
                                 throw new ParseException(\sprintf('The enum "%s" is not defined.', $enum), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                             }
-
-                            $value = \constant($enum);
-
-                            if (!$value instanceof \UnitEnum) {
-                                throw new ParseException(\sprintf('The string "%s" is not the name of a valid enum.', $enum), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                            if (!$useName) {
+                                return $enum::cases();
                             }
+                            if ($useValue = str_ends_with($enumName, '->value')) {
+                                $enumName = substr($enumName, 0, -7);
+                            }
+
+                            if (!\defined($enumName)) {
+                                throw new ParseException(\sprintf('The string "%s" is not the name of a valid enum.', $enumName), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                            }
+
+                            $value = \constant($enumName);
+
                             if (!$useValue) {
                                 return $value;
                             }
                             if (!$value instanceof \BackedEnum) {
-                                throw new ParseException(\sprintf('The enum "%s" defines no value next to its name.', $enum), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                                throw new ParseException(\sprintf('The enum "%s" defines no value next to its name.', $enumName), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                             }
 
                             return $value->value;
@@ -820,19 +833,19 @@ class Inline
     private static function getTimestampRegex(): string
     {
         return <<<EOF
-        ~^
-        (?P<year>[0-9][0-9][0-9][0-9])
-        -(?P<month>[0-9][0-9]?)
-        -(?P<day>[0-9][0-9]?)
-        (?:(?:[Tt]|[ \t]+)
-        (?P<hour>[0-9][0-9]?)
-        :(?P<minute>[0-9][0-9])
-        :(?P<second>[0-9][0-9])
-        (?:\.(?P<fraction>[0-9]*))?
-        (?:[ \t]*(?P<tz>Z|(?P<tz_sign>[-+])(?P<tz_hour>[0-9][0-9]?)
-        (?::(?P<tz_minute>[0-9][0-9]))?))?)?
-        $~x
-EOF;
+                    ~^
+                    (?P<year>[0-9][0-9][0-9][0-9])
+                    -(?P<month>[0-9][0-9]?)
+                    -(?P<day>[0-9][0-9]?)
+                    (?:(?:[Tt]|[ \t]+)
+                    (?P<hour>[0-9][0-9]?)
+                    :(?P<minute>[0-9][0-9])
+                    :(?P<second>[0-9][0-9])
+                    (?:\.(?P<fraction>[0-9]*))?
+                    (?:[ \t]*(?P<tz>Z|(?P<tz_sign>[-+])(?P<tz_hour>[0-9][0-9]?)
+                    (?::(?P<tz_minute>[0-9][0-9]))?))?)?
+                    $~x
+            EOF;
     }
 
     /**

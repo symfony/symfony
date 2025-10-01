@@ -31,35 +31,29 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LocoProvider implements ProviderInterface
 {
-    private HttpClientInterface $client;
-    private LoaderInterface $loader;
-    private LoggerInterface $logger;
-    private string $defaultLocale;
-    private string $endpoint;
-    private ?TranslatorBagInterface $translatorBag = null;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
-        $this->translatorBag = $translatorBag;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private string $endpoint,
+        private ?TranslatorBagInterface $translatorBag = null,
+        private ?string $restrictToStatus = null,
+    ) {
     }
 
     public function __toString(): string
     {
+        if ($this->restrictToStatus) {
+            return \sprintf('loco://%s?status=%s', $this->endpoint, $this->restrictToStatus);
+        }
+
         return \sprintf('loco://%s', $this->endpoint);
     }
 
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
 
         foreach ($catalogue->all() as $domain => $messages) {
             $createdIds = $this->createAssets(array_keys($messages), $domain);
@@ -71,7 +65,7 @@ final class LocoProvider implements ProviderInterface
         foreach ($translatorBag->getCatalogues() as $catalogue) {
             $locale = $catalogue->getLocale();
 
-            if (!\in_array($locale, $this->getLocales())) {
+            if (!\in_array($locale, $this->getLocales(), true)) {
                 $this->createLocale($locale);
             }
 
@@ -107,7 +101,7 @@ final class LocoProvider implements ProviderInterface
                 $response = $this->client->request('GET', \sprintf('export/locale/%s.xlf', rawurlencode($locale)), [
                     'query' => [
                         'filter' => $domain,
-                        'status' => 'translated,blank-translation',
+                        'status' => $this->restrictToStatus ?? 'translated,blank-translation',
                     ],
                     'headers' => [
                         'If-Modified-Since' => $previousCatalogue instanceof CatalogueMetadataAwareInterface ? $previousCatalogue->getCatalogueMetadata('last-modified', $domain) : null,
@@ -174,10 +168,6 @@ final class LocoProvider implements ProviderInterface
     public function delete(TranslatorBagInterface $translatorBag): void
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
 
         $responses = [];
 

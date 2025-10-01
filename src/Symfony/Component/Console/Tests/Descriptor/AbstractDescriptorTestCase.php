@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Descriptor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -21,31 +22,31 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 abstract class AbstractDescriptorTestCase extends TestCase
 {
-    /** @dataProvider getDescribeInputArgumentTestData */
+    #[DataProvider('getDescribeInputArgumentTestData')]
     public function testDescribeInputArgument(InputArgument $argument, $expectedDescription)
     {
         $this->assertDescription($expectedDescription, $argument);
     }
 
-    /** @dataProvider getDescribeInputOptionTestData */
+    #[DataProvider('getDescribeInputOptionTestData')]
     public function testDescribeInputOption(InputOption $option, $expectedDescription)
     {
         $this->assertDescription($expectedDescription, $option);
     }
 
-    /** @dataProvider getDescribeInputDefinitionTestData */
+    #[DataProvider('getDescribeInputDefinitionTestData')]
     public function testDescribeInputDefinition(InputDefinition $definition, $expectedDescription)
     {
         $this->assertDescription($expectedDescription, $definition);
     }
 
-    /** @dataProvider getDescribeCommandTestData */
+    #[DataProvider('getDescribeCommandTestData')]
     public function testDescribeCommand(Command $command, $expectedDescription)
     {
         $this->assertDescription($expectedDescription, $command);
     }
 
-    /** @dataProvider getDescribeApplicationTestData */
+    #[DataProvider('getDescribeApplicationTestData')]
     public function testDescribeApplication(Application $application, $expectedDescription)
     {
         // the "completion" command has dynamic help information depending on the shell

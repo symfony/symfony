@@ -71,7 +71,7 @@ class UriResolver
 
         // relative path
         $path = parse_url(substr($baseUri, \strlen($baseUriCleaned)), \PHP_URL_PATH) ?? '';
-        $path = self::canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
+        $path = self::canonicalizePath((str_contains($path, '/') ? substr($path, 0, strrpos($path, '/')) : '').'/'.$uri);
 
         return $baseUriCleaned.('' === $path || '/' !== $path[0] ? '/' : '').$path;
     }

@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Pierrick Vignand <pierrick.vignand@gmail.com>
+ *
+ * @deprecated since Symfony 7.4, use {@see HttpCodeActivationStrategy} instead
  */
 final class NotFoundActivationStrategy implements ActivationStrategyInterface
 {
@@ -32,18 +34,20 @@ final class NotFoundActivationStrategy implements ActivationStrategyInterface
         array $excludedUrls,
         private ActivationStrategyInterface $inner,
     ) {
+        trigger_deprecation('symfony/monolog-bridge', '7.4', 'The "%s" class is deprecated, use "%s" instead.', __CLASS__, HttpCodeActivationStrategy::class);
+
         $this->exclude = '{('.implode('|', $excludedUrls).')}i';
     }
 
-    public function isHandlerActivated(array|LogRecord $record): bool
+    public function isHandlerActivated(LogRecord $record): bool
     {
         $isActivated = $this->inner->isHandlerActivated($record);
 
         if (
             $isActivated
-            && isset($record['context']['exception'])
-            && $record['context']['exception'] instanceof HttpException
-            && 404 == $record['context']['exception']->getStatusCode()
+            && isset($record->context['exception'])
+            && $record->context['exception'] instanceof HttpException
+            && 404 == $record->context['exception']->getStatusCode()
             && ($request = $this->requestStack->getMainRequest())
         ) {
             return !preg_match($this->exclude, $request->getPathInfo());

@@ -25,8 +25,8 @@ final class IsendproTransportFactory extends AbstractTransportFactory
 
         $keyid = $this->getUser($dsn);
         $from = $dsn->getOption('from', null);
-        $noStop = filter_var($dsn->getOption('no_stop', false), \FILTER_VALIDATE_BOOLEAN);
-        $sandbox = filter_var($dsn->getOption('sandbox', false), \FILTER_VALIDATE_BOOLEAN);
+        $noStop = $dsn->getBooleanOption('no_stop');
+        $sandbox = $dsn->getBooleanOption('sandbox');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

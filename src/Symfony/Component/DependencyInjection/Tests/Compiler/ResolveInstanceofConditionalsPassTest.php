@@ -39,7 +39,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         $parent = '.instanceof.'.parent::class.'.0.foo';
         $def = $container->getDefinition('foo');
-        $this->assertEmpty($def->getInstanceofConditionals());
+        $this->assertSame([], $def->getInstanceofConditionals());
         $this->assertInstanceOf(ChildDefinition::class, $def);
         $this->assertTrue($def->isAutowired());
         $this->assertSame($parent, $def->getParent());
@@ -266,10 +266,10 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         $abstract = $container->getDefinition('.abstract.instanceof.bar');
 
-        $this->assertEmpty($abstract->getArguments());
-        $this->assertEmpty($abstract->getMethodCalls());
+        $this->assertSame([], $abstract->getArguments());
+        $this->assertSame([], $abstract->getMethodCalls());
         $this->assertNull($abstract->getDecoratedService());
-        $this->assertEmpty($abstract->getTags());
+        $this->assertSame([], $abstract->getTags());
         $this->assertTrue($abstract->isAbstract());
     }
 
@@ -375,6 +375,21 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
             ],
         ], $container->getDefinition('decorator')->getTags());
         $this->assertFalse($container->hasParameter('container.behavior_describing_tags'));
+    }
+
+    public function testSyntheticService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('kernel', \stdClass::class)
+            ->setInstanceofConditionals([
+                \stdClass::class => (new ChildDefinition(''))
+                    ->addTag('container.excluded'),
+            ])
+            ->setSynthetic(true);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame([], $container->getDefinition('kernel')->getTags());
     }
 }
 

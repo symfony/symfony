@@ -7,8 +7,9 @@ $container->loadFromExtension('framework', [
     'php_errors' => ['log' => true],
     'profiler' => [
         'enabled' => true,
+        'collect_serializer_data' => true,
     ],
     'serializer' => [
-        'enabled' => true
+        'enabled' => true,
     ],
 ]);

@@ -31,7 +31,7 @@ final class TraceableAttributeClassLoader extends AttributeClassLoader
         return parent::load($class, $type);
     }
 
-    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
     {
     }
 }

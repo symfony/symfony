@@ -26,11 +26,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 abstract class AbstractRecursivePass implements CompilerPassInterface
 {
-    /**
-     * @var ContainerBuilder
-     */
-    protected $container;
-    protected $currentId;
+    protected ?ContainerBuilder $container;
+    protected ?string $currentId = null;
     protected bool $skipScalars = false;
 
     private bool $processExpressions = false;
@@ -51,10 +48,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    protected function enableExpressionProcessing()
+    protected function enableExpressionProcessing(): void
     {
         $this->processExpressions = true;
     }
@@ -187,7 +181,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
                 throw new RuntimeException(\sprintf('Invalid service "%s": class%s has no constructor.', $this->currentId, \sprintf($class !== $this->currentId ? ' "%s"' : '', $class)));
             }
         } elseif (!$r->isPublic()) {
-            throw new RuntimeException(\sprintf('Invalid service "%s": ', $this->currentId).\sprintf($class !== $this->currentId ? 'constructor of class "%s"' : 'its constructor', $class).' must be public.');
+            throw new RuntimeException(\sprintf('Invalid service "%s": ', $this->currentId).\sprintf($class !== $this->currentId ? 'constructor of class "%s"' : 'its constructor', $class).' must be public. Did you miss configuring a factory or a static constructor? Try using the "#[Autoconfigure(constructor: ...)]" attribute for the latter.');
         }
 
         return $r;

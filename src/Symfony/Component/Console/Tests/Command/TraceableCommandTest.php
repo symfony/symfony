@@ -25,7 +25,7 @@ class TraceableCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->application = new Application();
-        $this->application->add(new LoopExampleCommand());
+        $this->application->addCommand(new LoopExampleCommand());
     }
 
     public function testRunIsOverriddenWithoutProfile()
@@ -47,7 +47,7 @@ class TraceableCommandTest extends TestCase
         $command = new LoopExampleCommand();
         $traceableCommand = new TraceableCommand($command, new Stopwatch());
 
-        $this->application->add($traceableCommand);
+        $this->application->addCommand($traceableCommand);
 
         $commandTester = new CommandTester($traceableCommand);
         $commandTester->execute([]);

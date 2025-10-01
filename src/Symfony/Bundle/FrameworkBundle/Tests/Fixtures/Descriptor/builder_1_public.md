@@ -15,6 +15,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: yes
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
 - Usages: none
@@ -30,6 +31,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - Usages: none
 
 ### service_container
@@ -44,6 +46,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - Usages: none
 
 

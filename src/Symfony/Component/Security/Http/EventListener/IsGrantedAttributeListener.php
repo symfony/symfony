@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\RuntimeException;
@@ -36,13 +37,16 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
     ) {
     }
 
-    /**
-     * @return void
-     */
-    public function onKernelControllerArguments(ControllerArgumentsEvent $event)
+    public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
     {
-        /** @var IsGranted[] $attributes */
-        if (!\is_array($attributes = $event->getAttributes()[IsGranted::class] ?? null)) {
+        $attributes = [];
+        foreach ($event->getAttributes() as $class => $attributes[]) {
+            if (!is_a($class, IsGranted::class, true)) {
+                array_pop($attributes);
+            }
+        }
+
+        if (!$attributes = array_merge(...$attributes)) {
             return;
         }
 
@@ -50,6 +54,10 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
         $arguments = $event->getNamedArguments();
 
         foreach ($attributes as $attribute) {
+            if ($attribute->methods && !\in_array($request->getMethod(), array_map('strtoupper', $attribute->methods), true)) {
+                continue;
+            }
+
             $subject = null;
 
             if ($subjectRef = $attribute->subject) {
@@ -61,19 +69,21 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
                     $subject = $this->getIsGrantedSubject($subjectRef, $request, $arguments);
                 }
             }
+            $accessDecision = new AccessDecision();
 
-            if (!$this->authChecker->isGranted($attribute->attribute, $subject)) {
-                $message = $attribute->message ?: \sprintf('Access Denied by #[IsGranted(%s)] on controller', $this->getIsGrantedString($attribute));
+            if (!$accessDecision->isGranted = $this->authChecker->isGranted($attribute->attribute, $subject, $accessDecision)) {
+                $message = $attribute->message ?: $accessDecision->getMessage();
 
                 if ($statusCode = $attribute->statusCode) {
                     throw new HttpException($statusCode, $message, code: $attribute->exceptionCode ?? 0);
                 }
 
-                $accessDeniedException = new AccessDeniedException($message, code: $attribute->exceptionCode ?? 403);
-                $accessDeniedException->setAttributes($attribute->attribute);
-                $accessDeniedException->setSubject($subject);
+                $e = new AccessDeniedException($message, code: $attribute->exceptionCode ?? 403);
+                $e->setAttributes([$attribute->attribute]);
+                $e->setSubject($subject);
+                $e->setAccessDecision($accessDecision);
 
-                throw $accessDeniedException;
+                throw $e;
             }
         }
     }
@@ -83,8 +93,12 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
         return [KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', 20]];
     }
 
-    private function getIsGrantedSubject(string|Expression $subjectRef, Request $request, array $arguments): mixed
+    private function getIsGrantedSubject(string|Expression|\Closure $subjectRef, Request $request, array $arguments): mixed
     {
+        if ($subjectRef instanceof \Closure) {
+            return $subjectRef($arguments, $request);
+        }
+
         if ($subjectRef instanceof Expression) {
             $this->expressionLanguage ??= new ExpressionLanguage();
 
@@ -99,24 +113,5 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
         }
 
         return $arguments[$subjectRef];
-    }
-
-    private function getIsGrantedString(IsGranted $isGranted): string
-    {
-        $processValue = fn ($value) => \sprintf($value instanceof Expression ? 'new Expression("%s")' : '"%s"', $value);
-
-        $argsString = $processValue($isGranted->attribute);
-
-        if (null !== $subject = $isGranted->subject) {
-            $subject = !\is_array($subject) ? $processValue($subject) : array_map(function ($key, $value) use ($processValue) {
-                $value = $processValue($value);
-
-                return \is_string($key) ? \sprintf('"%s" => %s', $key, $value) : $value;
-            }, array_keys($subject), $subject);
-
-            $argsString .= ', '.(!\is_array($subject) ? $subject : '['.implode(', ', $subject).']');
-        }
-
-        return $argsString;
     }
 }

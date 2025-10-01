@@ -29,9 +29,8 @@ class LogoutUrlGeneratorTest extends TestCase
 
     protected function setUp(): void
     {
-        $requestStack = $this->createMock(RequestStack::class);
-        $request = $this->createMock(Request::class);
-        $requestStack->method('getCurrentRequest')->willReturn($request);
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
 
         $this->tokenStorage = new TokenStorage();
         $this->generator = new LogoutUrlGenerator($requestStack, null, $this->tokenStorage);
@@ -46,9 +45,10 @@ class LogoutUrlGeneratorTest extends TestCase
 
     public function testGetLogoutPathWithoutLogoutListenerRegisteredForKeyThrowsException()
     {
+        $this->generator->registerListener('secured_area', '/logout', null, null, null);
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('No LogoutListener found for firewall key "unregistered_key".');
-        $this->generator->registerListener('secured_area', '/logout', null, null, null);
 
         $this->generator->getLogoutPath('unregistered_key');
     }
@@ -88,19 +88,21 @@ class LogoutUrlGeneratorTest extends TestCase
 
     public function testUnableToGuessWithoutCurrentFirewallThrowsException()
     {
+        $this->generator->registerListener('secured_area', '/logout', null, null);
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('This request is not behind a firewall, pass the firewall name manually to generate a logout URL.');
-        $this->generator->registerListener('secured_area', '/logout', null, null);
 
         $this->generator->getLogoutPath();
     }
 
     public function testUnableToGuessWithCurrentFirewallThrowsException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to find logout in the current firewall, pass the firewall name manually to generate a logout URL.');
         $this->generator->registerListener('secured_area', '/logout', null, null);
         $this->generator->setCurrentFirewall('admin');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to find logout in the current firewall, pass the firewall name manually to generate a logout URL.');
 
         $this->generator->getLogoutPath();
     }

@@ -20,15 +20,14 @@ use Symfony\Component\Serializer\Exception\MappingException;
  */
 abstract class FileLoader implements LoaderInterface
 {
-    protected $file;
-
     /**
      * @param string $file The mapping file to load
      *
      * @throws MappingException if the mapping file does not exist or is not readable
      */
-    public function __construct(string $file)
-    {
+    public function __construct(
+        protected string $file,
+    ) {
         if (!is_file($file)) {
             throw new MappingException(\sprintf('The mapping file "%s" does not exist.', $file));
         }
@@ -36,7 +35,5 @@ abstract class FileLoader implements LoaderInterface
         if (!is_readable($file)) {
             throw new MappingException(\sprintf('The mapping file "%s" is not readable.', $file));
         }
-
-        $this->file = $file;
     }
 }

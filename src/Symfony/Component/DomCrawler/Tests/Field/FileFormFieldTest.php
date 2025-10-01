@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Field;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Field\FileFormField;
 
 class FileFormFieldTest extends FormFieldTestCase
@@ -39,9 +40,7 @@ class FileFormFieldTest extends FormFieldTestCase
         }
     }
 
-    /**
-     * @dataProvider getSetValueMethods
-     */
+    #[DataProvider('getSetValueMethods')]
     public function testSetValue($method)
     {
         $node = $this->createNode('input', '', ['type' => 'file']);
@@ -71,9 +70,16 @@ class FileFormFieldTest extends FormFieldTestCase
         $field->$method(__DIR__.'/../Fixtures/no-extension');
         $value = $field->getValue();
 
+        $tmpName = $value['tmp_name'];
+
+        // Windows creates temporary files with a .tmp extension
+        if ('\\' === \DIRECTORY_SEPARATOR && str_ends_with($tmpName, '.tmp')) {
+            $tmpName = substr($tmpName, 0, -4);
+        }
+
         $this->assertArrayNotHasKey(
             'extension',
-            pathinfo($value['tmp_name']),
+            pathinfo($tmpName),
             "->$method() does not add a file extension in the tmp_name copy"
         );
     }

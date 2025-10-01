@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Proxy;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
@@ -21,11 +24,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  * Tests for SessionHandlerProxy class.
  *
  * @author Drak <drak@zikula.org>
- *
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
  */
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
 class SessionHandlerProxyTest extends TestCase
 {
     private MockObject&\SessionHandlerInterface $mock;
@@ -152,9 +153,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->proxy->updateTimestamp('id', 'data');
     }
 
-    /**
-     * @dataProvider provideNativeSessionStorageHandler
-     */
+    #[DataProvider('provideNativeSessionStorageHandler')]
     public function testNativeSessionStorageSaveHandlerName($handler)
     {
         $this->assertSame('files', (new NativeSessionStorage([], $handler))->getSaveHandler()->getSaveHandlerName());

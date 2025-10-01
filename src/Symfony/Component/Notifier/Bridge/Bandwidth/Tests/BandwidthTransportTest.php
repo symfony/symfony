@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Bandwidth\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthOptions;
 use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransport;
@@ -41,9 +42,7 @@ final class BandwidthTransportTest extends TransportTestCase
         yield [new SmsMessage('0611223344', 'Hello!', 'from', new BandwidthOptions(['from' => 'from']))];
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
     {
         $transport = $this->createTransport(null, $from);
@@ -54,9 +53,7 @@ final class BandwidthTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
-    /**
-     * @dataProvider validFromProvider
-     */
+    #[DataProvider('validFromProvider')]
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');

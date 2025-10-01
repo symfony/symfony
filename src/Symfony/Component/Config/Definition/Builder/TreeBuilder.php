@@ -16,20 +16,21 @@ use Symfony\Component\Config\Definition\NodeInterface;
 /**
  * This is the entry class for building a config tree.
  *
+ * @template T of 'array'|'variable'|'scalar'|'string'|'boolean'|'integer'|'float'|'enum'
+ *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class TreeBuilder implements NodeParentInterface
 {
+    protected ?NodeInterface $tree = null;
     /**
-     * @var NodeInterface|null
+     * @var NodeDefinition<$this>|null
      */
-    protected $tree;
+    protected ?NodeDefinition $root = null;
 
     /**
-     * @var NodeDefinition
+     * @param T $type
      */
-    protected $root;
-
     public function __construct(string $name, string $type = 'array', ?NodeBuilder $builder = null)
     {
         $builder ??= new NodeBuilder();
@@ -37,27 +38,29 @@ class TreeBuilder implements NodeParentInterface
     }
 
     /**
-     * @return NodeDefinition|ArrayNodeDefinition The root node (as an ArrayNodeDefinition when the type is 'array')
+     * @return (
+     *    T is 'array' ? ArrayNodeDefinition<$this>
+     *    : (T is 'variable' ? VariableNodeDefinition<$this>
+     *    : (T is 'scalar' ? ScalarNodeDefinition<$this>
+     *    : (T is 'string' ? StringNodeDefinition<$this>
+     *    : (T is 'boolean' ? BooleanNodeDefinition<$this>
+     *    : (T is 'integer' ? IntegerNodeDefinition<$this>
+     *    : (T is 'float' ? FloatNodeDefinition<$this>
+     *    : (T is 'enum' ? EnumNodeDefinition<$this>
+     *    : NodeDefinition<$this>)))))))
+     * )
      */
-    public function getRootNode(): NodeDefinition|ArrayNodeDefinition
+    public function getRootNode(): NodeDefinition
     {
         return $this->root;
     }
 
-    /**
-     * Builds the tree.
-     *
-     * @throws \RuntimeException
-     */
     public function buildTree(): NodeInterface
     {
         return $this->tree ??= $this->root->getNode(true);
     }
 
-    /**
-     * @return void
-     */
-    public function setPathSeparator(string $separator)
+    public function setPathSeparator(string $separator): void
     {
         // unset last built as changing path separator changes all nodes
         $this->tree = null;

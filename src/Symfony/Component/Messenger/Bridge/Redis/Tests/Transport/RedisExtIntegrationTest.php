@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Relay\Relay;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
@@ -20,12 +23,9 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 
-/**
- * @requires extension redis
- *
- * @group time-sensitive
- * @group integration
- */
+#[RequiresPhpExtension('redis')]
+#[Group('time-sensitive')]
+#[Group('integration')]
 class RedisExtIntegrationTest extends TestCase
 {
     private \Redis|Relay|null $redis = null;
@@ -220,7 +220,8 @@ class RedisExtIntegrationTest extends TestCase
         $connection->ack($message['id']);
     }
 
-    public function testSentinel()
+    #[DataProvider('sentinelOptionNames')]
+    public function testSentinel(string $sentinelOptionName)
     {
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
             $this->markTestSkipped('REDIS_SENTINEL_HOSTS env var is not defined.');
@@ -234,7 +235,7 @@ class RedisExtIntegrationTest extends TestCase
 
         $connection = Connection::fromDsn($dsn,
             ['delete_after_ack' => true,
-                'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+                $sentinelOptionName => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
             ], $this->redis);
 
         $connection->add('1', []);
@@ -247,6 +248,13 @@ class RedisExtIntegrationTest extends TestCase
         ], $message['data']);
         $connection->reject($message['id']);
         $connection->cleanup();
+    }
+
+    public static function sentinelOptionNames(): \Generator
+    {
+        yield ['sentinel'];
+        yield ['redis_sentinel'];
+        yield ['sentinel_master'];
     }
 
     public function testLazySentinel()
@@ -264,7 +272,7 @@ class RedisExtIntegrationTest extends TestCase
         $connection = Connection::fromDsn($dsn,
             ['lazy' => true,
                 'delete_after_ack' => true,
-                'sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
+                'sentinel' => getenv('MESSENGER_REDIS_SENTINEL_MASTER') ?: null,
             ], $this->redis);
 
         $connection->add('1', []);
@@ -354,14 +362,12 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testGetNonBlocking()
     {
         $redis = $this->createRedisClient();
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['sentinel_master' => null], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['sentinel' => null], $redis);
 
         try {
             $this->assertNull($connection->get()); // no message, should return null immediately
@@ -373,13 +379,11 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testGetAfterReject()
     {
         $redis = $this->createRedisClient();
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel' => null], $redis);
 
         try {
             $connection->add('1', []);
@@ -388,16 +392,14 @@ class RedisExtIntegrationTest extends TestCase
             $failing = $connection->get();
             $connection->reject($failing['id']);
 
-            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel_master' => null], $redis);
+            $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel' => null], $redis);
             $this->assertNotNull($connection->get());
         } finally {
             $redis->unlink('messenger-rejectthenget');
         }
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testItProperlyHandlesEmptyMessages()
     {
         $redisReceiver = new RedisReceiver($this->connection, new Serializer());

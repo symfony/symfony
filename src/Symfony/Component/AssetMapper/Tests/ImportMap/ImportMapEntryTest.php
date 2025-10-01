@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
@@ -39,9 +40,7 @@ class ImportMapEntryTest extends TestCase
         $this->assertSame('foo/bar', $entry->packageModuleSpecifier);
     }
 
-    /**
-     * @dataProvider getSplitPackageNameTests
-     */
+    #[DataProvider('getSplitPackageNameTests')]
     public function testSplitPackageNameAndFilePath(string $packageModuleSpecifier, string $expectedPackage, string $expectedPath)
     {
         [$actualPackage, $actualPath] = ImportMapEntry::splitPackageNameAndFilePath($packageModuleSpecifier);

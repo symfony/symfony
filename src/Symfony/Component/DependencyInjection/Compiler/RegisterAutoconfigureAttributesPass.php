@@ -12,8 +12,10 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\AutoconfigureFailedException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
@@ -42,7 +44,16 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 
     public function processClass(ContainerBuilder $container, \ReflectionClass $class): void
     {
-        foreach ($class->getAttributes(Autoconfigure::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+        $autoconfigure = $class->getAttributes(Autoconfigure::class, \ReflectionAttribute::IS_INSTANCEOF);
+        $lazy = $class->getAttributes(Lazy::class, \ReflectionAttribute::IS_INSTANCEOF);
+
+        if ($autoconfigure && $lazy) {
+            throw new AutoconfigureFailedException($class->name, 'Using both attributes #[Lazy] and #[Autoconfigure] on an argument is not allowed; use the "lazy" parameter of #[Autoconfigure] instead.');
+        }
+
+        $attributes = array_merge($autoconfigure, $lazy);
+
+        foreach ($attributes as $attribute) {
             self::registerForAutoconfiguration($container, $class, $attribute);
         }
     }
@@ -61,11 +72,17 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
         self::$registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
             $attribute = (array) $attribute->newInstance();
 
-            foreach ($attribute['tags'] ?? [] as $i => $tag) {
-                if (\is_array($tag) && [0] === array_keys($tag)) {
-                    $attribute['tags'][$i] = [$class->name => $tag[0]];
+            foreach (['tags', 'resourceTags'] as $type) {
+                foreach ($attribute[$type] ?? [] as $i => $tag) {
+                    if (\is_array($tag) && [0] === array_keys($tag)) {
+                        $attribute[$type][$i] = [$class->name => $tag[0]];
+                    }
                 }
             }
+            if (isset($attribute['resourceTags'])) {
+                $attribute['resource_tags'] = $attribute['resourceTags'];
+            }
+            unset($attribute['resourceTags']);
 
             $parseDefinitions->invoke(
                 $yamlLoader,

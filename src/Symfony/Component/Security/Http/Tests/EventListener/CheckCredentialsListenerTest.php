@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -40,10 +41,8 @@ class CheckCredentialsListenerTest extends TestCase
         $this->user = new InMemoryUser('wouter', 'password-hash');
     }
 
-    /**
-     * @dataProvider providePasswords
-     */
-    public function testPasswordAuthenticated($password, $passwordValid, $result)
+    #[DataProvider('providePasswords')]
+    public function testPasswordAuthenticated(string $password, bool $passwordValid, bool $result)
     {
         $hasher = $this->createMock(PasswordHasherInterface::class);
         $hasher->expects($this->any())->method('verify')->with('password-hash', $password)->willReturn($passwordValid);
@@ -71,19 +70,20 @@ class CheckCredentialsListenerTest extends TestCase
 
     public function testEmptyPassword()
     {
+        $this->hasherFactory
+            ->expects($this->never())
+            ->method('getPasswordHasher');
+
+        $event = $this->createEvent(new Passport(new UserBadge('wouter', fn () => $this->user), new PasswordCredentials('')));
+
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password cannot be empty.');
 
-        $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
-
-        $event = $this->createEvent(new Passport(new UserBadge('wouter', fn () => $this->user), new PasswordCredentials('')));
         $this->listener->checkPassport($event);
     }
 
-    /**
-     * @dataProvider provideCustomAuthenticatedResults
-     */
-    public function testCustomAuthenticated($result)
+    #[DataProvider('provideCustomAuthenticatedResults')]
+    public function testCustomAuthenticated(bool $result)
     {
         $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
 

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
@@ -26,14 +29,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class CollectionTest extends TestCase
 {
-    public function testRejectInvalidFieldsOption()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        new Collection([
-            'fields' => 'foo',
-        ]);
-    }
-
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testRejectNonConstraints()
     {
         $this->expectException(InvalidOptionsException::class);
@@ -68,18 +65,14 @@ class CollectionTest extends TestCase
 
     public function testAcceptOptionalConstraintAsOneElementArray()
     {
-        $collection1 = new Collection([
-            'fields' => [
-                'alternate_email' => [
-                    new Optional(new Email()),
-                ],
+        $collection1 = new Collection(fields: [
+            'alternate_email' => [
+                new Optional(new Email()),
             ],
         ]);
 
-        $collection2 = new Collection([
-            'fields' => [
-                'alternate_email' => new Optional(new Email()),
-            ],
+        $collection2 = new Collection(fields: [
+            'alternate_email' => new Optional(new Email()),
         ]);
 
         $this->assertEquals($collection1, $collection2);
@@ -87,18 +80,14 @@ class CollectionTest extends TestCase
 
     public function testAcceptRequiredConstraintAsOneElementArray()
     {
-        $collection1 = new Collection([
-            'fields' => [
-                'alternate_email' => [
-                    new Required(new Email()),
-                ],
+        $collection1 = new Collection(fields: [
+            'alternate_email' => [
+                new Required(new Email()),
             ],
         ]);
 
-        $collection2 = new Collection([
-            'fields' => [
-                'alternate_email' => new Required(new Email()),
-            ],
+        $collection2 = new Collection(fields: [
+            'alternate_email' => new Required(new Email()),
         ]);
 
         $this->assertEquals($collection1, $collection2);
@@ -116,6 +105,8 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Default'], $constraint->fields['bar']->groups);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testOnlySomeKeysAreKnowOptions()
     {
         $constraint = new Collection([
@@ -134,15 +125,15 @@ class CollectionTest extends TestCase
 
     public function testAllKeysAreKnowOptions()
     {
-        $constraint = new Collection([
-            'fields' => [
+        $constraint = new Collection(
+            fields: [
                 'fields' => [new Required()],
                 'properties' => [new Required()],
                 'catalog' => [new Optional()],
             ],
-            'allowExtraFields' => true,
-            'extraFieldsMessage' => 'foo bar baz',
-        ]);
+            allowExtraFields: true,
+            extraFieldsMessage: 'foo bar baz',
+        );
 
         $this->assertArrayHasKey('fields', $constraint->fields);
         $this->assertInstanceOf(Required::class, $constraint->fields['fields']);
@@ -165,21 +156,19 @@ class CollectionTest extends TestCase
 
     public function testEmptyFieldsInOptions()
     {
-        $constraint = new Collection([
-            'fields' => [],
-            'allowExtraFields' => true,
-            'extraFieldsMessage' => 'foo bar baz',
-        ]);
+        $constraint = new Collection(
+            fields: [],
+            allowExtraFields: true,
+            extraFieldsMessage: 'foo bar baz',
+        );
 
         $this->assertSame([], $constraint->fields);
         $this->assertTrue($constraint->allowExtraFields);
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 
-    /**
-     * @testWith [[]]
-     *           [null]
-     */
+    #[TestWith([[]])]
+    #[TestWith([null])]
     public function testEmptyConstraintListForField(?array $fieldConstraint)
     {
         $constraint = new Collection(
@@ -199,19 +188,17 @@ class CollectionTest extends TestCase
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 
-    /**
-     * @testWith [[]]
-     *           [null]
-     */
+    #[TestWith([[]])]
+    #[TestWith([null])]
     public function testEmptyConstraintListForFieldInOptions(?array $fieldConstraint)
     {
-        $constraint = new Collection([
-            'fields' => [
+        $constraint = new Collection(
+            fields: [
                 'foo' => $fieldConstraint,
             ],
-            'allowExtraFields' => true,
-            'extraFieldsMessage' => 'foo bar baz',
-        ]);
+            allowExtraFields: true,
+            extraFieldsMessage: 'foo bar baz',
+        );
 
         $this->assertArrayHasKey('foo', $constraint->fields);
         $this->assertInstanceOf(Required::class, $constraint->fields['foo']);

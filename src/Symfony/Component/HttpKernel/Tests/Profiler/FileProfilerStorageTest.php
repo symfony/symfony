@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
@@ -292,7 +293,7 @@ class FileProfilerStorageTest extends TestCase
 
         $this->storage->purge();
 
-        $this->assertEmpty($this->storage->read('token'), '->purge() removes all data stored by profiler');
+        $this->assertNull($this->storage->read('token'), '->purge() removes all data stored by profiler');
         $this->assertCount(0, $this->storage->find('127.0.0.1', '', 10, 'GET'), '->purge() removes all items from index');
     }
 
@@ -351,9 +352,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertFalse(fgetcsv($handle, null, ',', '"', '\\'));
     }
 
-    /**
-     * @dataProvider provideExpiredProfiles
-     */
+    #[DataProvider('provideExpiredProfiles')]
     public function testRemoveExpiredProfiles(string $index, string $expectedOffset)
     {
         $file = $this->tmpDir.'/index.csv';
@@ -371,17 +370,17 @@ class FileProfilerStorageTest extends TestCase
 
         yield 'One unexpired profile' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,
+                token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,
 
-            CSV,
+                CSV,
             '0',
         ];
 
         yield 'One unexpired profile with virtual type' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,virtual
+                token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,virtual
 
-            CSV,
+                CSV,
             '0',
         ];
 
@@ -389,17 +388,17 @@ class FileProfilerStorageTest extends TestCase
 
         yield 'One expired profile' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,
+                token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,
 
-            CSV,
+                CSV,
             '48',
         ];
 
         yield 'One expired profile with virtual type' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,virtual
+                token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,virtual
 
-            CSV,
+                CSV,
             '55',
         ];
 
@@ -409,21 +408,21 @@ class FileProfilerStorageTest extends TestCase
 
         yield 'Multiple expired profiles' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,
-            token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,
-            token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,
+                token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,
+                token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,
+                token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,
 
-            CSV,
+                CSV,
             '96',
         ];
 
         yield 'Multiple expired profiles with virtual type' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,virtual
-            token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,virtual
-            token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,virtual
+                token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,virtual
+                token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,virtual
+                token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,virtual
 
-            CSV,
+                CSV,
             '110',
         ];
     }

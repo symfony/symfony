@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -25,9 +26,7 @@ class PhpSubprocessTest extends TestCase
         self::$phpBin = getenv('SYMFONY_PROCESS_PHP_TEST_BINARY') ?: ('phpdbg' === \PHP_SAPI ? 'php' : $phpBin->find());
     }
 
-    /**
-     * @dataProvider subprocessProvider
-     */
+    #[DataProvider('subprocessProvider')]
     public function testSubprocess(string $processClass, string $memoryLimit, string $expectedMemoryLimit)
     {
         $process = new Process([self::$phpBin,

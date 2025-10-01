@@ -54,23 +54,23 @@ class MessengerDataCollectorTest extends TestCase
 
         $file = __FILE__;
         $expected = <<<DUMP
-array:5 [
-  "bus" => "default"
-  "stamps" => []
-  "stamps_after_dispatch" => []
-  "message" => array:2 [
-    "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
-    "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
-      -message: "dummy message"
-    }
-  ]
-  "caller" => array:3 [
-    "name" => "MessengerDataCollectorTest.php"
-    "file" => "$file"
-    "line" => %d
-  ]
-]
-DUMP;
+            array:5 [
+              "bus" => "default"
+              "stamps" => []
+              "stamps_after_dispatch" => []
+              "message" => array:2 [
+                "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
+                "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
+                  -message: "dummy message"
+                }
+              ]
+              "caller" => array:3 [
+                "name" => "MessengerDataCollectorTest.php"
+                "file" => "$file"
+                "line" => %d
+              ]
+            ]
+            DUMP;
 
         $this->assertStringMatchesFormat($expected, $this->getDataAsString($messages[0]));
     }
@@ -100,28 +100,29 @@ DUMP;
 
         $file = __FILE__;
         $this->assertStringMatchesFormat(<<<DUMP
-array:6 [
-  "bus" => "default"
-  "stamps" => []
-  "stamps_after_dispatch" => []
-  "message" => array:2 [
-    "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
-    "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
-      -message: "dummy message"
-    }
-  ]
-  "caller" => array:3 [
-    "name" => "MessengerDataCollectorTest.php"
-    "file" => "$file"
-    "line" => $line
-  ]
-  "exception" => array:2 [
-    "type" => "RuntimeException"
-    "value" => RuntimeException %A
-  ]
-]
-DUMP
-            , $this->getDataAsString($messages[0]));
+            array:6 [
+              "bus" => "default"
+              "stamps" => []
+              "stamps_after_dispatch" => []
+              "message" => array:2 [
+                "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
+                "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
+                  -message: "dummy message"
+                }
+              ]
+              "caller" => array:3 [
+                "name" => "MessengerDataCollectorTest.php"
+                "file" => "$file"
+                "line" => $line
+              ]
+              "exception" => array:2 [
+                "type" => "RuntimeException"
+                "value" => RuntimeException %A
+              ]
+            ]
+            DUMP,
+            $this->getDataAsString($messages[0])
+        );
     }
 
     public function testKeepsOrderedDispatchCalls()

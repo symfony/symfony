@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add "keepalive" support
+
+7.1
+---
+
+ * Use `SKIP LOCKED` in the doctrine transport for MySQL, PostgreSQL and MSSQL
+
 5.1.0
 -----
 

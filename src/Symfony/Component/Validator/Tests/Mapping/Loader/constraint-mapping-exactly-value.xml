@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping
+                        https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+    <class name="Symfony\Component\Validator\Tests\Fixtures\Entity_81">
+        <property name="title">
+            <constraint name="Length">
+                <option name="value">6</option>
+                <option name="groups">
+                    <value>Foo</value>
+                </option>
+            </constraint>
+        </property>
+    </class>
+</constraint-mapping>

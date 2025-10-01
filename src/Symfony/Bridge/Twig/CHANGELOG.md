@@ -1,6 +1,37 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `access_decision()` and `access_decision_for_user()` Twig functions
+ * Call `form_label_content` inside `button_widget` block to render button label
+ * Add `aria-invalid` and `aria-describedby` attributes to form fields when validation errors are present
+
+7.3
+---
+
+ * Add `is_granted_for_user()` Twig function
+ * Add `field_id()` Twig form helper function
+ * Add a `Twig` constraint that validates Twig templates
+ * Make `lint:twig` collect all deprecations instead of stopping at the first one
+ * Add `name` argument to `email.image` to override the attachment file name being set as the file path
+
+7.2
+---
+
+ * Deprecate passing a tag to the constructor of `FormThemeNode`
+
+7.1
+---
+
+ * Add `emojify` Twig filter
+
+7.0
+---
+
+ * Drop support for Twig 2
+
 6.4
 ---
 

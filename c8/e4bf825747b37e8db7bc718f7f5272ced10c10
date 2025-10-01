@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-09-24T21:12:09Z
+
+Is it necessary to add more tests given that the filtering method `isValidInAnyCountry` has already been tested in the Intl component ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-09-25T12:25:50Z
+
+should we force the new defaults in a deprecated manner?
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-09-25T12:29:13Z
+
+> should we force the new defaults in a deprecated manner?
+
+@ro0NL
+We could using an additional option that the developer had to toggle to explicitely specify to disable the deprecation but IMHO, I'm not even sure that most people use obsolete currencies nowadays. This BC will affect 1% or less. The choice is yours...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-26T09:22:23Z
+
+I don't understand why we need active and active_or_not_at? That's to cover the need of listing only non-active currencies at a given date? Is that a common enough usecase?
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-09-26T09:44:07Z
+
+> I don't understand why we need active and active_or_not_at? That's to cover the need of listing only non-active currencies at a given date? Is that a common enough usecase?
+
+IMHO yes it could be a common use case to list only the non-active currencies for a given date, for the following reasons:
+1. For example, if your app needs to search invoices that were issued with the wrong currencies and show a dropdown of those invalid currencies, you would still need two parameters (`active = false` and `active_or_not_at = the previous year`).
+2. We have no guarantee that certains symfony applications will be updated within 4 years (the duration of an LTS version). Therefore, the CLDR registry will not necessarily be updated during this period if symfony is not updated. Over this time, currency validity may change, and interfaces (with form using `CurrencyType`) may be created to retroactively correct ‘incorrect’ currencies.
+
+WDYT @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-09-26T14:46:58Z
+
+@nicolas-grekas A part from that I think I forgot to process the eventual `tz` and `to-tz` attributes from the CLDR. I don't know if it'll change the generated data though but I'll try to fix this point ASAP. see https://github.com/unicode-org/cldr/blob/2cac2a547276f5253e0556dc3fb0b8c77e46ab40/common/supplemental/supplementalData.xml#L369-L370
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-26T15:05:19Z
+
+If we want to account for the TZ, maybe we should put timestamps in the metadata instead of date strings? (if that's what we have right now)
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-09-26T15:08:52Z
+
+> If we want to account for the TZ, maybe we should put timestamps in the metadata instead of date strings? (if that's what we have right now)
+
+Yes, or we could convert the `from` and `to` directly into UTC during the processing to see if the `Y-m-d` date changes. However, we would lose the time at which the change took place... This is a very specific case. Which solution do you prefer?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-26T15:12:47Z
+
+it might be more readable to have Y-m-d H:i:s UTC strings indeed
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-09-26T15:30:22Z
+
+> it might be more readable to have Y-m-d H:i:s UTC strings indeed
+
+Ok 👍🏻 Do I create another PR for this or can I do the required changes in the current one ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-26T15:32:22Z
+
+It should be a separate PR targetting branch 6.4
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-09-26T16:50:14Z
+
+~I will change the format to retrieve time once #61859  is merged. 👍🏻~ Done, the tests will pass once #61859 will be merged.

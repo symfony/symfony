@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-04-12T05:36:16Z
+
+@bkosun Thanks for the review. I addressed your comments
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-06-04T10:00:55Z
+
+Thanks for the review, I addressed your comments, and also rebased.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-06-04T11:56:47Z
+
+I don't get why the tests are broken:
+```
+4) Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\YamlFrameworkExtensionTest::testWorkflowAreValidated
+Failed asserting that exception of type "ReflectionException" matches expected exception "Symfony\Component\Workflow\Exception\InvalidDefinitionException". Message was: "Class "Symfony\Component\Workflow\Arc" does not exist" at
+```
+
+since I put
+```json
+  "require-dev": {
+      "symfony/workflow": "^7.4|^8.0",
+```
+in `src/Symfony/Bundle/FrameworkBundle/composer.json`
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-10-01T10:22:36Z
+
+Comment addressed, an PR rebased

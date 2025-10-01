@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-05-28T10:32:32Z
+
+Let's wait on the discussion on the issue to know what should actually be deprecated. This PR deprecates a lot more than what was mentioned in the issue it fixes.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-07-31T09:48:01Z
+
+I am not really sure we need to go thus far. At least for the Validator component I can tell that there has been nearly zero maintenance work during the last years for the `XmlFileLoader` while deprecating it would mean that bundles/applications using it would have to make the switch (I have no idea how widespread that's used though).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-07-31T11:58:12Z
+
+Let's split Validator and Serializer in a separate PR?
+
+---------------------------------------------------------------------------
+
+by mbabker at 2025-07-31T13:12:17Z
+
+> At least for the Validator component I can tell that there has been nearly zero maintenance work during the last years for the `XmlFileLoader` while deprecating it would mean that bundles/applications using it would have to make the switch (I have no idea how widespread that's used though).
+
+Sylius uses XML files for its validator config, as one visible OSS example.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-08-02T20:29:00Z
+
+I'm with @xabbuh on this one. I understand that we don't want to require ext-dom anymore and that's great. But if someone likes using XML config files, why shouldn't we allow it optionally if the maintenance overhead is barely measurable?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-03T12:01:24Z
+
+Validator and Serializer have been split out, so this PR is now only about routing and DI. From them, deprecating makes sense to me: maintenance is still difficult because of XSD, but the most important is the overhead on the doc and for bundles. When there was no PHP format, XML was OK. But now that we have it, there's no point for writing XML for that anymore.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-08-03T12:12:02Z
+
+(https://github.com/symfony/symfony/labels/Serializer and https://github.com/symfony/symfony/labels/Validator can be removed from this PR.)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2025-08-03T20:35:20Z
+
+I have a hard time following this initiative to be honest. Given the impact on the ecosystem can be quite significant, I think it's a good idea to make a clear high level plan grounded by clear issues with the current system.
+
+#60200 has a very clear problem statement: **maintaining the FrameworkBundle's XSD file has proofed to be a burden**, often forgotten when adding new config options.
+
+I very much agree with [@stof's comment](https://github.com/symfony/symfony/issues/60200#issuecomment-2915804592) that this is different for maintaining bundle configuration than maintaining XML loaders for routing, validation, serializer, etc. These formats have proofed to be quite static over the time, requiring less changes to their XSD files and thus less burden from this problem.
+I fail to see why we split out serializer and validation from this PR, but keep routing and service definitions in. That seems highly inconsistent to me and makes it pretty unpredictable for users to know where XML can be used, and where it can't.
+
+---
+
+Further on in the discussion, other problems have been mentioned like XML being a documentation burden and XML special treatment like `fixXmlConfig()` is a burden. Do we have validation of these problem statements, are they indeed causing unreasonable busy work for maintainers/documentors to outweigh the deprecation impact for the ecosystem?
+_Note that `fixXmlConfig()`, despite its name, is also used by the other loaders (allowing you to type `role: ROLE_ADMIN` instead of `roles: [ROLE_ADMIN]` in Yaml for instance). I believe the new PHP object format even requires it. This partially invalidates that problem statement's relevance (it's also not deprecated in this PR, so irrelevant in the discussion altogether)._
+
+---
+
+Last but not least, the alternatives are quite the moving target at the moment. Work on the JSON schema for Yaml has been stalled for some time (#59620). And the PHP config objects might be replaced with array shapes (#58771) some time in the future. I'm not sure it's great to force the ecosystem (mostly talking about the open source bundles and projects like drupal and sulu) to such new and moving formats, instead of relying on the very mature and stable XML format.
+This is apart from all these alternatives relying on auto generating code in the project. Despite the formats being very cool, this has proofed to be a problem point in many occasions (it's hard to discover and many users try to find the classes in `vendor/`, static analysis tool can't find the code in `var/`, it requires booting up the Symfony kernel to generate them, etc.).
+
+All in all, I think the timing is a bit off and we must first guarantee the new formats are stable and remove some of the troublesome points before deprecating older formats.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-04T15:22:14Z
+
+Thanks for chiming in @wouterj
+
+The goal is improved consistency and DX. Maintenance is a second level aspect, let's not focus on this.
+
+When I open the doc and I see multiple tabs everywhere documenting Attribute/PHP/Yaml/XML, that makes me wonder about the complexity we're showing there.
+
+For validation and serialization, we're not ready yet, but once #61545 and #61563 will be made available and adopted, we might deprecate both Yaml and XML. That's a going to be a big win!
+
+For DI and routing, we already have the PHP-DSL. It's proved and stable since many versions now. We use it internally and it provides a nice experience. There's no reasons to keep support for XML at all. That's one less format to tell about, one step in the direction of simplification.
+
+For semantic configuration, we have to keep YAML, because we don't have a better format yet to work with flex.
+We added JSON schema for the services, parameters and routes trees, and that improves the DX, but don't be confused: bundles don't need this. Bundles don't do semantic configs. Or if they do, it's via plain PHP arrays in a prepending DI extension, not in XML.
+
+Deprecating XML is mostly for bundle authors. To make the ecosystem settle around one format - the PHP-DSL.
+For apps, we can still brainstorm about yaml vs php-dsl vs shapes vs etc. This deprecation doesn't apply to them. (If it does, it's for apps that did decide to use XML for their own config. Bad idea.)
+
+Still strong :+1: here for me.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-09-04T16:25:32Z
+
+From my experience, writing the XSD for complex bundle configuration is the worse part of my job.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-15T15:28:49Z
+
+@fabpot I think we need your advice here now to move forward ;) :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-18T16:01:05Z
+
+@wouterj I'd be happy to have your +1 of course! Can you please check my last comment? I think it does address your previous one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-30T17:13:47Z
+
+Quick rebase needed @MatTheCat please.
+
+Without further activity, I plan to merge this PR by the end of the week.
+/cc @symfony/mergers votes still pending, even if the required 2 are gathered ;)
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-09-30T17:21:13Z
+
+Note that I just resolved conflicts on markdown files for some time; so I may have missed additional XML-related tests to mark as legacy.

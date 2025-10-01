@@ -26,9 +26,10 @@ class CommandTester
 
     private Command $command;
 
-    public function __construct(Command $command)
-    {
-        $this->command = $command;
+    public function __construct(
+        callable|Command $command,
+    ) {
+        $this->command = $command instanceof Command ? $command : new Command(null, $command);
     }
 
     /**

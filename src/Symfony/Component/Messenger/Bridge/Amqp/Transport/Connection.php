@@ -79,11 +79,9 @@ class Connection
         'default_publish_routing_key',
         'flags',
         'arguments',
+        'bindings',
     ];
 
-    private array $connectionOptions;
-    private array $exchangeOptions;
-    private array $queuesOptions;
     private AmqpFactory $amqpFactory;
     private mixed $autoSetupExchange;
     private mixed $autoSetupDelayExchange;
@@ -98,8 +96,12 @@ class Connection
     private \AMQPExchange $amqpDelayExchange;
     private int $lastActivityTime = 0;
 
-    public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, ?AmqpFactory $amqpFactory = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] private array $connectionOptions,
+        private array $exchangeOptions,
+        private array $queuesOptions,
+        ?AmqpFactory $amqpFactory = null,
+    ) {
         if (!\extension_loaded('amqp')) {
             throw new LogicException(\sprintf('You cannot use the "%s" as the "amqp" extension is not installed.', __CLASS__));
         }
@@ -111,8 +113,6 @@ class Connection
             ],
         ], $connectionOptions);
         $this->autoSetupExchange = $this->autoSetupDelayExchange = $connectionOptions['auto_setup'] ?? true;
-        $this->exchangeOptions = $exchangeOptions;
-        $this->queuesOptions = $queuesOptions;
         $this->amqpFactory = $amqpFactory ?? new AmqpFactory();
     }
 
@@ -136,14 +136,18 @@ class Connection
      *     * flags: Queue flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
      *   * exchange:
-     *     * name: Name of the exchange
+     *     * name: Name of the exchange. An empty string (name: '') can be used to use the default exchange
      *     * type: Type of exchange (Default: fanout)
      *     * default_publish_routing_key: Routing key to use when publishing, if none is specified on the message
      *     * flags: Exchange flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
+     *     * bindings[name]: An array of the source exchanges to bind this exchange to, keyed by the name. Binding direction: source exchange -> this exchange
+     *       * binding_keys: The binding/routing keys to be used for the binding
+     *       * binding_arguments: Additional binding arguments
      *   * delay:
      *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_%exchange_name%_%routing_key%_%delay%")
      *     * exchange_name: Name of the exchange to be used for the delayed/retried messages (Default: "delays")
+     *     * arguments: array of extra delay queue arguments (for example:  ['x-queue-type' => 'classic', 'x-message-deduplication' => true,])
      *   * auto_setup: Enable or not the auto-setup of queues and exchanges (Default: true)
      *
      *   * Connection tuning options (see http://www.rabbitmq.com/amqp-0-9-1-reference.html#connection.tune for details):
@@ -166,7 +170,7 @@ class Connection
     {
         if (false === $params = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
-            if (!\in_array($dsn, ['amqp://', 'amqps://'])) {
+            if (!\in_array($dsn, ['amqp://', 'amqps://'], true)) {
                 throw new InvalidArgumentException('The given AMQP DSN is invalid.');
             }
 
@@ -319,7 +323,7 @@ class Connection
     private function publishWithDelay(string $body, array $headers, int $delay, ?AmqpStamp $amqpStamp = null): void
     {
         $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
-        $isRetryAttempt = $amqpStamp ? $amqpStamp->isRetryAttempt() : false;
+        $isRetryAttempt = $amqpStamp && $amqpStamp->isRetryAttempt();
 
         $this->setupDelay($delay, $routingKey, $isRetryAttempt);
 
@@ -390,7 +394,7 @@ class Connection
         $queue = $this->amqpFactory->createQueue($this->channel());
         $queue->setName($this->getRoutingKeyForDelay($delay, $routingKey, $isRetryAttempt));
         $queue->setFlags(\AMQP_DURABLE);
-        $queue->setArguments([
+        $queue->setArguments(array_merge([
             'x-message-ttl' => $delay,
             // delete the delay queue 10 seconds after the message expires
             // publishing another message redeclares the queue which renews the lease
@@ -401,7 +405,7 @@ class Connection
             // after being released from to DLX, make sure the original routing key will be used
             // we must use an empty string instead of null for the argument to be picked up
             'x-dead-letter-routing-key' => $routingKey ?? '',
-        ]);
+        ], $this->connectionOptions['delay']['arguments'] ?? []));
 
         return $queue;
     }
@@ -455,12 +459,26 @@ class Connection
 
     private function setupExchangeAndQueues(): void
     {
-        $this->exchange()->declareExchange();
+        $exchange = $this->exchange();
+        if ('' !== $this->exchangeOptions['name']) {
+            $exchange->declareExchange();
+        }
+
+        foreach ($this->exchangeOptions['bindings'] ?? [] as $exchangeName => $exchangeConfig) {
+            if (!\is_array($exchangeConfig['binding_keys'] ?? false) || !$exchangeConfig['binding_keys']) {
+                throw new InvalidArgumentException(\sprintf('The "binding_keys" option must be set to a non-empty array for exchange "%s".', $exchangeName));
+            }
+            foreach ($exchangeConfig['binding_keys'] as $bindingKey) {
+                $this->exchange()->bind($exchangeName, $bindingKey, $exchangeConfig['binding_arguments'] ?? []);
+            }
+        }
 
         foreach ($this->queuesOptions as $queueName => $queueConfig) {
             $this->queue($queueName)->declareQueue();
-            foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
-                $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey, $queueConfig['binding_arguments'] ?? []);
+            if ('' !== $this->exchangeOptions['name']) {
+                foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
+                    $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey, $queueConfig['binding_arguments'] ?? []);
+                }
             }
         }
         $this->autoSetupExchange = false;
@@ -534,11 +552,14 @@ class Connection
         if (!isset($this->amqpExchange)) {
             $this->amqpExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpExchange->setName($this->exchangeOptions['name']);
-            $this->amqpExchange->setType($this->exchangeOptions['type'] ?? \AMQP_EX_TYPE_FANOUT);
-            $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? \AMQP_DURABLE);
+            $defaultExchangeType = '' !== $this->exchangeOptions['name'] ? \AMQP_EX_TYPE_FANOUT : \AMQP_EX_TYPE_DIRECT;
+            $this->amqpExchange->setType($this->exchangeOptions['type'] ?? $defaultExchangeType);
+            if ('' !== $this->exchangeOptions['name']) {
+                $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? \AMQP_DURABLE);
 
-            if (isset($this->exchangeOptions['arguments'])) {
-                $this->amqpExchange->setArguments($this->exchangeOptions['arguments']);
+                if (isset($this->exchangeOptions['arguments'])) {
+                    $this->amqpExchange->setArguments($this->exchangeOptions['arguments']);
+                }
             }
         }
 
@@ -552,7 +573,7 @@ class Connection
         }
     }
 
-    private function clear(): void
+    public function clear(): void
     {
         unset($this->amqpChannel, $this->amqpExchange, $this->amqpDelayExchange);
         $this->amqpQueues = [];

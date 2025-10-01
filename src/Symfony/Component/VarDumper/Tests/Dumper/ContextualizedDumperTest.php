@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
@@ -19,9 +20,8 @@ use Symfony\Component\VarDumper\Dumper\ContextualizedDumper;
 
 /**
  * @author Kévin Thérage <therage.kevin@gmail.com>
- *
- * @backupGlobals
  */
+#[BackupGlobals(true)]
 class ContextualizedDumperTest extends TestCase
 {
     public function testContextualizedCliDumper()

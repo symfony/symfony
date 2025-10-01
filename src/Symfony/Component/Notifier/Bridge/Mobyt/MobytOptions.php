@@ -24,15 +24,12 @@ final class MobytOptions implements MessageOptionsInterface
     public const MESSAGE_TYPE_QUALITY_MEDIUM = 'L';
     public const MESSAGE_TYPE_QUALITY_LOW = 'LL';
 
-    private array $options;
-
-    public function __construct(array $options = [])
-    {
+    public function __construct(
+        private array $options = [],
+    ) {
         if (isset($options['message_type'])) {
             self::validateMessageType($options['message_type']);
         }
-
-        $this->options = $options;
     }
 
     public static function fromNotification(Notification $notification): self

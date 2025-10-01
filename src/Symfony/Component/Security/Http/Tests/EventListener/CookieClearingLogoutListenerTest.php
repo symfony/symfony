@@ -43,7 +43,7 @@ class CookieClearingLogoutListenerTest extends TestCase
         $this->assertEquals('foo.foo', $cookie->getDomain());
         $this->assertEquals(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
         $this->assertTrue($cookie->isSecure());
-        if (method_exists(Cookie::class, 'isPartitioned')) {
+        if (self::doesResponseHeaderBagClearChipsCookies()) {
             $this->assertTrue($cookie->isPartitioned());
         }
         $this->assertTrue($cookie->isCleared());
@@ -54,9 +54,20 @@ class CookieClearingLogoutListenerTest extends TestCase
         $this->assertNull($cookie->getDomain());
         $this->assertNull($cookie->getSameSite());
         $this->assertFalse($cookie->isSecure());
-        if (method_exists(Cookie::class, 'isPartitioned')) {
+        if (self::doesResponseHeaderBagClearChipsCookies()) {
             $this->assertFalse($cookie->isPartitioned());
         }
         $this->assertTrue($cookie->isCleared());
+    }
+
+    /**
+     * Checks if the patch from https://github.com/symfony/symfony/pull/53703 is available.
+     */
+    private static function doesResponseHeaderBagClearChipsCookies(): bool
+    {
+        $bag = new ResponseHeaderBag();
+        $bag->clearCookie('foo', '/', null, false, true, null, true);
+
+        return $bag->getCookies()[0]->isPartitioned();
     }
 }

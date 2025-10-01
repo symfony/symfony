@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Redlink\Tests;
 
 use Symfony\Component\Notifier\Bridge\Redlink\RedlinkTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class RedlinkTransportFactoryTest extends TransportFactoryTestCase
+final class RedlinkTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): RedlinkTransportFactory
     {
         return new RedlinkTransportFactory();
@@ -46,5 +51,11 @@ final class RedlinkTransportFactoryTest extends TransportFactoryTestCase
         yield ['somethingElse://apiToken:appToken@default?from=FROM&version=FROM'];
         yield ['somethingElse://apiToken:appToken@default?from=FROM'];
         yield ['somethingElse://apiToken:appToken@default'];
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['redlink://aaaaa@default?from=TEST'];
+        yield ['redlink://:bbbbbb@default?from=TEST'];
     }
 }

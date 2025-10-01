@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints\Fixtures;
 
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\When;
@@ -35,6 +36,9 @@ class WhenTestWithAttributes
 
     #[When(expression: 'true', constraints: new NotNull(), groups: ['foo'])]
     private $qux;
+
+    #[When(expression: 'true', constraints: new NotNull(), otherwise: new Length(exactly: 10), groups: ['foo'])]
+    private $quux;
 
     #[When(expression: 'true', constraints: [
         new NotNull(),

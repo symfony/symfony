@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class IntegerTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\IntegerType';
+    public const TESTED_TYPE = IntegerType::class;
 
     private string $previousLocale;
 
@@ -28,12 +30,12 @@ class IntegerTypeTest extends BaseTypeTestCase
 
     protected function tearDown(): void
     {
-        \Locale::setDefault($this->previousLocale);
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testArabicLocale()
     {
         \Locale::setDefault('ar');
@@ -45,9 +47,7 @@ class IntegerTypeTest extends BaseTypeTestCase
         $this->assertSame('123456', $form->getViewData());
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testArabicLocaleNonHtml5()
     {
         \Locale::setDefault('ar');

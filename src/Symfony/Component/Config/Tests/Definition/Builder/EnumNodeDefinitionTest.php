@@ -13,6 +13,8 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\EnumNodeDefinition;
+use Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum;
+use Symfony\Component\Config\Tests\Fixtures\TestEnum;
 
 class EnumNodeDefinitionTest extends TestCase
 {
@@ -25,11 +27,31 @@ class EnumNodeDefinitionTest extends TestCase
         $this->assertEquals(['foo'], $node->getValues());
     }
 
+    public function testWithUnitEnumFqcn()
+    {
+        $def = new EnumNodeDefinition('foo');
+        $def->enumFqcn(TestEnum::class);
+
+        $node = $def->getNode();
+        $this->assertEquals(TestEnum::class, $node->getEnumFqcn());
+    }
+
     public function testNoValuesPassed()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('You must call ->values() on enum nodes.');
+        $this->expectExceptionMessage('You must call either ->values() or ->enumFqcn() on enum nodes.');
         $def = new EnumNodeDefinition('foo');
+        $def->getNode();
+    }
+
+    public function testBothValuesAndEnumFqcnPassed()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('You must call either ->values() or ->enumFqcn() on enum nodes but not both.');
+        $def = new EnumNodeDefinition('foo');
+        $def->values([123])
+            ->enumFqcn(StringBackedTestEnum::class);
+
         $def->getNode();
     }
 
@@ -59,10 +81,11 @@ class EnumNodeDefinitionTest extends TestCase
         $node = $def->getNode();
 
         $this->assertTrue($node->isDeprecated());
-        $deprecation = $def->getNode()->getDeprecation($node->getName(), $node->getPath());
+        $deprecation = $node->getDeprecation($node->getName(), $node->getPath());
         $this->assertSame('The "foo" node is deprecated.', $deprecation['message']);
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
+        $this->assertSame('Since vendor/package 1.1: The "foo" node is deprecated.', $node->getDeprecationMessage());
     }
 
     public function testSameStringCoercedValuesAreDifferent()

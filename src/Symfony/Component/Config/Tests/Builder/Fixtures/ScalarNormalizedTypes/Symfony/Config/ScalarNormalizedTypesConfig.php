@@ -133,46 +133,73 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
         return 'scalar_normalized_types';
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     simple_array?: list<scalar|null>,
+     *     keyed_array?: array<string, list<scalar|null>>,
+     *     object?: array{ // Default: {"enabled":null}
+     *         enabled?: bool|null, // Default: null
+     *         date_format?: scalar|null,
+     *         remove_used_context_fields?: bool,
+     *     },
+     *     list_object: list<array{
+     *         name: scalar|null,
+     *         data?: list<mixed>,
+     *     }>,
+     *     keyed_list_object?: array<string, array{
+     *         enabled?: bool, // Default: true
+     *         settings?: list<scalar|null>,
+     *     }>,
+     *     nested?: array{
+     *         nested_object?: array{ // Default: {"enabled":null}
+     *             enabled?: bool|null, // Default: null
+     *         },
+     *         nested_list_object?: list<array{
+     *             name: scalar|null,
+     *         }>,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('simple_array', $value)) {
+        if (array_key_exists('simple_array', $config)) {
             $this->_usedProperties['simpleArray'] = true;
-            $this->simpleArray = $value['simple_array'];
-            unset($value['simple_array']);
+            $this->simpleArray = $config['simple_array'];
+            unset($config['simple_array']);
         }
 
-        if (array_key_exists('keyed_array', $value)) {
+        if (array_key_exists('keyed_array', $config)) {
             $this->_usedProperties['keyedArray'] = true;
-            $this->keyedArray = $value['keyed_array'];
-            unset($value['keyed_array']);
+            $this->keyedArray = $config['keyed_array'];
+            unset($config['keyed_array']);
         }
 
-        if (array_key_exists('object', $value)) {
+        if (array_key_exists('object', $config)) {
             $this->_usedProperties['object'] = true;
-            $this->object = \is_array($value['object']) ? new \Symfony\Config\ScalarNormalizedTypes\ObjectConfig($value['object']) : $value['object'];
-            unset($value['object']);
+            $this->object = \is_array($config['object']) ? new \Symfony\Config\ScalarNormalizedTypes\ObjectConfig($config['object']) : $config['object'];
+            unset($config['object']);
         }
 
-        if (array_key_exists('list_object', $value)) {
+        if (array_key_exists('list_object', $config)) {
             $this->_usedProperties['listObject'] = true;
-            $this->listObject = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig($v) : $v, $value['list_object']);
-            unset($value['list_object']);
+            $this->listObject = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig($v) : $v, $config['list_object']);
+            unset($config['list_object']);
         }
 
-        if (array_key_exists('keyed_list_object', $value)) {
+        if (array_key_exists('keyed_list_object', $config)) {
             $this->_usedProperties['keyedListObject'] = true;
-            $this->keyedListObject = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig($v) : $v, $value['keyed_list_object']);
-            unset($value['keyed_list_object']);
+            $this->keyedListObject = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig($v) : $v, $config['keyed_list_object']);
+            unset($config['keyed_list_object']);
         }
 
-        if (array_key_exists('nested', $value)) {
+        if (array_key_exists('nested', $config)) {
             $this->_usedProperties['nested'] = true;
-            $this->nested = new \Symfony\Config\ScalarNormalizedTypes\NestedConfig($value['nested']);
-            unset($value['nested']);
+            $this->nested = new \Symfony\Config\ScalarNormalizedTypes\NestedConfig($config['nested']);
+            unset($config['nested']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
@@ -170,9 +171,7 @@ class YamlDumperTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideDefaultClasses
-     */
+    #[DataProvider('provideDefaultClasses')]
     public function testDumpHandlesDefaultAttribute($class, $expectedFile)
     {
         $container = new ContainerBuilder();

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Fixtures;
 
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;

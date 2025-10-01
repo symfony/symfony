@@ -18,16 +18,14 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class StrictSessionHandler extends AbstractSessionHandler
 {
-    private \SessionHandlerInterface $handler;
     private bool $doDestroy;
 
-    public function __construct(\SessionHandlerInterface $handler)
-    {
+    public function __construct(
+        private \SessionHandlerInterface $handler,
+    ) {
         if ($handler instanceof \SessionUpdateTimestampHandlerInterface) {
             throw new \LogicException(\sprintf('"%s" is already an instance of "SessionUpdateTimestampHandlerInterface", you cannot wrap it with "%s".', get_debug_type($handler), self::class));
         }
-
-        $this->handler = $handler;
     }
 
     /**

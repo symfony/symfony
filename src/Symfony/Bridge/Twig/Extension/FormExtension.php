@@ -34,11 +34,9 @@ use Twig\TwigTest;
  */
 final class FormExtension extends AbstractExtension
 {
-    private ?TranslatorInterface $translator;
-
-    public function __construct(?TranslatorInterface $translator = null)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
     public function getTokenParsers(): array
@@ -64,6 +62,7 @@ final class FormExtension extends AbstractExtension
             new TwigFunction('csrf_token', [FormRenderer::class, 'renderCsrfToken']),
             new TwigFunction('form_parent', 'Symfony\Bridge\Twig\Extension\twig_get_form_parent'),
             new TwigFunction('field_name', $this->getFieldName(...)),
+            new TwigFunction('field_id', $this->getFieldId(...)),
             new TwigFunction('field_value', $this->getFieldValue(...)),
             new TwigFunction('field_label', $this->getFieldLabel(...)),
             new TwigFunction('field_help', $this->getFieldHelp(...)),
@@ -93,6 +92,11 @@ final class FormExtension extends AbstractExtension
         $view->setRendered();
 
         return $view->vars['full_name'];
+    }
+
+    public function getFieldId(FormView $view): string
+    {
+        return $view->vars['id'];
     }
 
     public function getFieldValue(FormView $view): string|array

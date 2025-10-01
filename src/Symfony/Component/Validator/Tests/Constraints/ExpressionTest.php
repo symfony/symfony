@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
@@ -24,18 +26,18 @@ class ExpressionTest extends TestCase
         $metadata = new ClassMetadata(ExpressionDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame('value == "1"', $aConstraint->expression);
         self::assertSame([], $aConstraint->values);
         self::assertTrue($aConstraint->negate);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame('value == "1"', $bConstraint->expression);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'ExpressionDummy'], $bConstraint->groups);
         self::assertTrue($bConstraint->negate);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame('value == someVariable', $cConstraint->expression);
         self::assertSame(['someVariable' => 42], $cConstraint->values);
         self::assertSame(['foo'], $cConstraint->groups);
@@ -51,12 +53,34 @@ class ExpressionTest extends TestCase
         new Expression(null);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testMissingPatternDoctrineStyle()
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "expression" must be set for constraint "%s".', Expression::class));
 
         new Expression([]);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testInitializeWithOptionsArray()
+    {
+        $constraint = new Expression([
+            'expression' => '!this.getParent().get("field2").getData()',
+        ]);
+
+        $this->assertSame('!this.getParent().get("field2").getData()', $constraint->expression);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testExpressionInOptionsArray()
+    {
+        $constraint = new Expression(null, options: ['expression' => '!this.getParent().get("field2").getData()']);
+
+        $this->assertSame('!this.getParent().get("field2").getData()', $constraint->expression);
     }
 }
 

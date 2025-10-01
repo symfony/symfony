@@ -52,25 +52,31 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(NotFoundResourceException::class);
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../Fixtures/non-existing.yml';
+
+        $this->expectException(NotFoundResourceException::class);
+
         $loader->load($resource, 'en', 'domain1');
     }
 
     public function testLoadThrowsAnExceptionIfFileNotLocal()
     {
-        $this->expectException(InvalidResourceException::class);
         $loader = new YamlFileLoader();
         $resource = 'http://example.com/resources.yml';
+
+        $this->expectException(InvalidResourceException::class);
+
         $loader->load($resource, 'en', 'domain1');
     }
 
     public function testLoadThrowsAnExceptionIfNotAnArray()
     {
-        $this->expectException(InvalidResourceException::class);
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../Fixtures/non-valid.yml';
+
+        $this->expectException(InvalidResourceException::class);
+
         $loader->load($resource, 'en', 'domain1');
     }
 }

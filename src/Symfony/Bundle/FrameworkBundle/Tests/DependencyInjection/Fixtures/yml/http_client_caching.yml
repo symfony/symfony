@@ -1,0 +1,19 @@
+framework:
+  annotations: false
+  http_method_override: false
+  handle_all_throwables: true
+  php_errors:
+    log: true
+  http_client:
+    default_options:
+      headers:
+        X-powered: PHP
+      caching:
+        cache_pool: foo
+        shared: false
+        max_ttl: 2
+    scoped_clients:
+      bar:
+        base_uri: http://example.com
+        caching:
+          cache_pool: baz

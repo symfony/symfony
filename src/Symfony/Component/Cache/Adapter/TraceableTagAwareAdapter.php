@@ -18,13 +18,16 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  */
 class TraceableTagAwareAdapter extends TraceableAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface
 {
-    public function __construct(TagAwareAdapterInterface $pool)
+    public function __construct(TagAwareAdapterInterface $pool, ?\Closure $disabled = null)
     {
-        parent::__construct($pool);
+        parent::__construct($pool, $disabled);
     }
 
     public function invalidateTags(array $tags): bool
     {
+        if ($this->disabled?->__invoke()) {
+            return $this->pool->invalidateTags($tags);
+        }
         $event = $this->start(__FUNCTION__);
         try {
             return $event->result = $this->pool->invalidateTags($tags);

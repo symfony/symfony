@@ -345,7 +345,7 @@
             </div>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: status_color}) }}
     {% endif %}
 {% endblock %}
 
@@ -568,13 +568,13 @@
 
         {% if has_context %}
             <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
-                {{ profiler_dump(log.context, maxDepth=1) }}
+                {{ profiler_dump(log.context, maxDepth: 1) }}
             </div>
         {% endif %}
 
         {% if has_trace %}
             <div id="{{ trace_id }}" class="context sf-toggle-content sf-toggle-hidden">
-                {{ profiler_dump(log.context.exception.trace, maxDepth=1) }}
+                {{ profiler_dump(log.context.exception.trace, maxDepth: 1) }}
             </div>
         {% endif %}
     </div>

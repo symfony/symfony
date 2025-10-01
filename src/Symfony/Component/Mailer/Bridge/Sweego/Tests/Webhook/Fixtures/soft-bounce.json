@@ -1,0 +1,27 @@
+{
+  "event_type": "soft-bounce",
+  "timestamp": "2024-08-20T08:38:27+00:00",
+  "swg_uid": "01-4f5qsdqsd3-b5e1-4012-a350-2e3d0d176ef1",
+  "event_id": "82ebfgbfgb-0fgbfg-4190-967c-2e8484212f1c0f",
+  "channel": "email",
+  "transaction_id": "861aad97-e4e8-4aaf-9322-1b64835760b9",
+  "headers": {
+    "x-campaign-type": "default",
+    "x-swg-uid": "01-4f5e28484-b515-4848-1956-2e3d0d176ef1",
+    "x-mailer": "Sweego",
+    "x-client-id": "MypersonnalId",
+    "x-originating-ip": "XXX.XXX.XXX.XXX",
+    "x-campaign-ref": "895000N",
+    "x-campaign-pool": "default",
+    "x-campaign-id": "b20dsfsdfds6-9595b5-9595a7-565b9-5e2b826595053",
+    "x-campaign-canal": "mycanal",
+    "x-transaction-id": "f11f4fe2-fb05-4882-8303-a20956d47931"
+  },
+  "campaign_tags": null,
+  "campaign_type": "default",
+  "campaign_id": "default",
+  "recipient": "recipient@example.com",
+  "domain_from": "example.org",
+  "response_code": 452,
+  "status": null
+}

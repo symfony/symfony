@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +23,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class DefaultAuthenticationSuccessHandlerTest extends TestCase
 {
-    /**
-     * @dataProvider getRequestRedirections
-     */
+    #[DataProvider('getRequestRedirections')]
     public function testRequestRedirections(Request $request, $options, $redirectedUrl)
     {
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);

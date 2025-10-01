@@ -28,13 +28,12 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  */
 class LoginLinkNotification extends Notification implements EmailNotificationInterface, SmsNotificationInterface
 {
-    private LoginLinkDetails $loginLinkDetails;
-
-    public function __construct(LoginLinkDetails $loginLinkDetails, string $subject, array $channels = [])
-    {
+    public function __construct(
+        private LoginLinkDetails $loginLinkDetails,
+        string $subject,
+        array $channels = [],
+    ) {
         parent::__construct($subject, $channels);
-
-        $this->loginLinkDetails = $loginLinkDetails;
     }
 
     public function asEmailMessage(EmailRecipientInterface $recipient, ?string $transport = null): ?EmailMessage

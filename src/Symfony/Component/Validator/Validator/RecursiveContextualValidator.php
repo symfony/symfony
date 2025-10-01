@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Exception\UnsupportedMetadataException;
 use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\GroupSequenceProviderInterface;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
@@ -45,28 +46,23 @@ use Symfony\Component\Validator\Util\PropertyPath;
  */
 class RecursiveContextualValidator implements ContextualValidatorInterface
 {
-    private ExecutionContextInterface $context;
     private string $defaultPropertyPath;
     private array $defaultGroups;
-    private MetadataFactoryInterface $metadataFactory;
-    private ConstraintValidatorFactoryInterface $validatorFactory;
-    private array $objectInitializers;
-    private ?ContainerInterface $groupProviderLocator;
 
     /**
      * Creates a validator for the given context.
      *
      * @param ObjectInitializerInterface[] $objectInitializers The object initializers
      */
-    public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], ?ContainerInterface $groupProviderLocator = null)
-    {
-        $this->context = $context;
+    public function __construct(
+        private ExecutionContextInterface $context,
+        private MetadataFactoryInterface $metadataFactory,
+        private ConstraintValidatorFactoryInterface $validatorFactory,
+        private array $objectInitializers = [],
+        private ?ContainerInterface $groupProviderLocator = null,
+    ) {
         $this->defaultPropertyPath = $context->getPropertyPath();
         $this->defaultGroups = [$context->getGroup() ?: Constraint::DEFAULT_GROUP];
-        $this->metadataFactory = $metadataFactory;
-        $this->validatorFactory = $validatorFactory;
-        $this->objectInitializers = $objectInitializers;
-        $this->groupProviderLocator = $groupProviderLocator;
     }
 
     public function atPath(string $path): static
@@ -448,7 +444,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     } else {
                         // The group sequence is dynamically obtained from the validated
                         // object
-                        /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $object */
+                        /** @var GroupSequenceProviderInterface $object */
                         $group = $object->getGroupSequence();
                     }
                     $defaultOverridden = true;

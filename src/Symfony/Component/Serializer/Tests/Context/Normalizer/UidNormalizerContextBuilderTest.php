@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Context\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Context\Normalizer\UidNormalizerContextBuilder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -29,10 +30,9 @@ class UidNormalizerContextBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider withersDataProvider
-     *
      * @param array<string, mixed> $values
      */
+    #[DataProvider('withersDataProvider')]
     public function testWithers(array $values)
     {
         $context = $this->contextBuilder

@@ -30,11 +30,10 @@ class UserBadge implements BadgeInterface
 {
     public const MAX_USERNAME_LENGTH = 4096;
 
-    private string $userIdentifier;
     /** @var callable|null */
     private $userLoader;
     private UserInterface $user;
-    private ?array $attributes;
+    private ?\Closure $identifierNormalizer = null;
 
     /**
      * Initializes the user badge.
@@ -49,19 +48,34 @@ class UserBadge implements BadgeInterface
      * is thrown). If this is not set, the default user provider will be used with
      * $userIdentifier as username.
      */
-    public function __construct(string $userIdentifier, ?callable $userLoader = null, ?array $attributes = null)
-    {
+    public function __construct(
+        private string $userIdentifier,
+        ?callable $userLoader = null,
+        private ?array $attributes = null,
+        ?\Closure $identifierNormalizer = null,
+    ) {
+        if ('' === $userIdentifier) {
+            trigger_deprecation('symfony/security-http', '7.2', 'Using an empty string as user identifier is deprecated and will throw an exception in Symfony 8.0.');
+            // throw new BadCredentialsException('Empty user identifier.');
+        }
+
         if (\strlen($userIdentifier) > self::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Username too long.');
         }
+        if ($identifierNormalizer) {
+            $this->identifierNormalizer = static fn () => $identifierNormalizer($userIdentifier);
+        }
 
-        $this->userIdentifier = $userIdentifier;
         $this->userLoader = $userLoader;
-        $this->attributes = $attributes;
     }
 
     public function getUserIdentifier(): string
     {
+        if (isset($this->identifierNormalizer)) {
+            $this->userIdentifier = ($this->identifierNormalizer)();
+            $this->identifierNormalizer = null;
+        }
+
         return $this->userIdentifier;
     }
 
@@ -84,15 +98,15 @@ class UserBadge implements BadgeInterface
         }
 
         if (null === $this->getAttributes()) {
-            $user = ($this->userLoader)($this->userIdentifier);
+            $user = ($this->userLoader)($this->getUserIdentifier());
         } else {
-            $user = ($this->userLoader)($this->userIdentifier, $this->getAttributes());
+            $user = ($this->userLoader)($this->getUserIdentifier(), $this->getAttributes());
         }
 
         // No user has been found via the $this->userLoader callback
         if (null === $user) {
             $exception = new UserNotFoundException();
-            $exception->setUserIdentifier($this->userIdentifier);
+            $exception->setUserIdentifier($this->getUserIdentifier());
 
             throw $exception;
         }

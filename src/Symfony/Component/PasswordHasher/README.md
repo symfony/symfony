@@ -6,8 +6,8 @@ The PasswordHasher component provides secure password hashing utilities.
 Getting Started
 ---------------
 
-```
-$ composer require symfony/password-hasher
+```bash
+composer require symfony/password-hasher
 ```
 
 ```php

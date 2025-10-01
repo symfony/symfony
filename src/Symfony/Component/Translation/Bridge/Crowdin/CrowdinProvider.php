@@ -31,21 +31,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class CrowdinProvider implements ProviderInterface
 {
-    private HttpClientInterface $client;
-    private LoaderInterface $loader;
-    private LoggerInterface $logger;
-    private XliffFileDumper $xliffFileDumper;
-    private string $defaultLocale;
-    private string $endpoint;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, XliffFileDumper $xliffFileDumper, string $defaultLocale, string $endpoint)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->xliffFileDumper = $xliffFileDumper;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private XliffFileDumper $xliffFileDumper,
+        private string $defaultLocale,
+        private string $endpoint,
+    ) {
     }
 
     public function __toString(): string
@@ -177,10 +170,6 @@ final class CrowdinProvider implements ProviderInterface
         $responses = [];
 
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$defaultCatalogue) {
-            $defaultCatalogue = $translatorBag->getCatalogues()[0];
-        }
 
         foreach ($defaultCatalogue->all() as $domain => $messages) {
             $fileId = $this->getFileIdByDomain($fileList, $domain);

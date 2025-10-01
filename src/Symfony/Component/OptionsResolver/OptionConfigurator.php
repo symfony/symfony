@@ -15,13 +15,10 @@ use Symfony\Component\OptionsResolver\Exception\AccessException;
 
 final class OptionConfigurator
 {
-    private string $name;
-    private OptionsResolver $resolver;
-
-    public function __construct(string $name, OptionsResolver $resolver)
-    {
-        $this->name = $name;
-        $this->resolver = $resolver;
+    public function __construct(
+        private string $name,
+        private OptionsResolver $resolver,
+    ) {
         $this->resolver->setDefined($name);
     }
 
@@ -143,6 +140,20 @@ final class OptionConfigurator
     public function ignoreUndefined(bool $ignore = true): static
     {
         $this->resolver->setIgnoreUndefined($ignore);
+
+        return $this;
+    }
+
+    /**
+     * Defines nested options.
+     *
+     * @param \Closure(OptionsResolver $resolver, Options $parent): void $nested
+     *
+     * @return $this
+     */
+    public function options(\Closure $nested): static
+    {
+        $this->resolver->setOptions($this->name, $nested);
 
         return $this;
     }

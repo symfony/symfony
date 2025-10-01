@@ -42,8 +42,13 @@ if (!class_exists(Application::class)) {
     exit(1);
 }
 
-(new Application())->add($command = new LintCommand())
-    ->getApplication()
+$command = new LintCommand();
+if (method_exists($app = new Application(), 'addCommand')) {
+    $app->addCommand($command);
+} else {
+    $app->add($command);
+}
+$app
     ->setDefaultCommand($command->getName(), true)
     ->run()
 ;

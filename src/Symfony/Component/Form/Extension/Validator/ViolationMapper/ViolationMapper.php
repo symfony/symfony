@@ -28,20 +28,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ViolationMapper implements ViolationMapperInterface
 {
-    private ?FormRendererInterface $formRenderer;
-    private ?TranslatorInterface $translator;
     private bool $allowNonSynchronized = false;
 
-    public function __construct(?FormRendererInterface $formRenderer = null, ?TranslatorInterface $translator = null)
-    {
-        $this->formRenderer = $formRenderer;
-        $this->translator = $translator;
+    public function __construct(
+        private ?FormRendererInterface $formRenderer = null,
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false)
+    public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false): void
     {
         $this->allowNonSynchronized = $allowNonSynchronized;
 
@@ -233,6 +228,7 @@ class ViolationMapper implements ViolationMapperInterface
         $foundAtIndex = null;
 
         // Construct mapping rules for the given form
+        /** @var MappingRule[] $rules */
         $rules = [];
 
         foreach ($form->getConfig()->getOption('error_mapping') as $propertyPath => $targetPath) {
@@ -242,6 +238,7 @@ class ViolationMapper implements ViolationMapperInterface
             }
         }
 
+        /** @var FormInterface[] $children */
         $children = iterator_to_array(new \RecursiveIteratorIterator(new InheritDataAwareIterator($form)), false);
 
         while ($it->valid()) {
@@ -253,8 +250,6 @@ class ViolationMapper implements ViolationMapperInterface
 
             // Test mapping rules as long as we have any
             foreach ($rules as $key => $rule) {
-                /** @var MappingRule $rule */
-
                 // Mapping rule matches completely, terminate.
                 if (null !== ($form = $rule->match($chunk))) {
                     return $form;
@@ -266,7 +261,6 @@ class ViolationMapper implements ViolationMapperInterface
                 }
             }
 
-            /** @var FormInterface $child */
             foreach ($children as $i => $child) {
                 $childPath = (string) $child->getPropertyPath();
                 if ($childPath === $chunk) {
@@ -317,7 +311,6 @@ class ViolationMapper implements ViolationMapperInterface
                 // Cut the piece out of the property path and proceed
                 $propertyPathBuilder->remove($i);
             } else {
-                /** @var \Symfony\Component\PropertyAccess\PropertyPathInterface $propertyPath */
                 $propertyPath = $scope->getPropertyPath();
 
                 if (null === $propertyPath) {

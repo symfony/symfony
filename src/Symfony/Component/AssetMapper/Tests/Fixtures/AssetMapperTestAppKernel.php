@@ -36,7 +36,6 @@ class AssetMapperTestAppKernel extends Kernel
     {
         $loader->load(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => true],
@@ -44,7 +43,7 @@ class AssetMapperTestAppKernel extends Kernel
                 'assets' => null,
                 'asset_mapper' => [
                     'paths' => ['dir1', 'dir2', 'non_ascii', 'assets'],
-                    'public_prefix' => 'assets'
+                    'public_prefix' => 'assets',
                 ],
                 'test' => true,
             ]);

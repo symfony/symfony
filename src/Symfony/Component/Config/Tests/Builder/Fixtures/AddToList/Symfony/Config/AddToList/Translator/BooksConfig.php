@@ -25,16 +25,39 @@ class BooksConfig
         return $this->page[] = new \Symfony\Config\AddToList\Translator\Books\PageConfig($value);
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     translator?: array{
+     *         fallbacks?: list<scalar|null>,
+     *         sources?: array<string, scalar|null>,
+     *         books?: array{ // Deprecated: The child node "books" at path "add_to_list.translator.books" is deprecated. // looks for translation in old fashion way
+     *             page?: list<array{
+     *                 number?: int<min, max>,
+     *                 content?: scalar|null,
+     *             }>,
+     *         },
+     *     },
+     *     messenger?: array{
+     *         routing?: array<string, array{
+     *             senders?: list<scalar|null>,
+     *         }>,
+     *         receiving?: list<array{
+     *             priority?: int<min, max>,
+     *             color?: scalar|null,
+     *         }>,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('page', $value)) {
+        if (array_key_exists('page', $config)) {
             $this->_usedProperties['page'] = true;
-            $this->page = array_map(fn ($v) => new \Symfony\Config\AddToList\Translator\Books\PageConfig($v), $value['page']);
-            unset($value['page']);
+            $this->page = array_map(fn ($v) => new \Symfony\Config\AddToList\Translator\Books\PageConfig($v), $config['page']);
+            unset($config['page']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

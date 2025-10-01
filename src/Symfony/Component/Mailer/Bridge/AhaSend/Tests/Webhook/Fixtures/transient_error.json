@@ -1,0 +1,15 @@
+{
+  "type": "message.transient_error",
+  "timestamp": "2024-10-27T19:37:30.929792119Z",
+  "data": {
+    "account_id": "4cdd7bdd-294e-4762-892f-83d40abf5a87",
+    "event": "on_transient_error",
+    "from": "info@example.com",
+    "recipient": "someone@example.com",
+    "subject": "Sample email for testing webhooks",
+    "message_id_header": "message-id-header",
+    "user_agent": "",
+    "is_bot": "",
+    "id": "ahasend-message-id"
+  }
+}

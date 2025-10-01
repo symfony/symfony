@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class CardSchemeValidator extends ConstraintValidator
 {
-    protected $schemes = [
+    protected array $schemes = [
         // American Express card numbers start with 34 or 37 and have 15 digits.
         CardScheme::AMEX => [
             '/^3[47][0-9]{13}$/D',
@@ -93,10 +93,8 @@ class CardSchemeValidator extends ConstraintValidator
 
     /**
      * Validates a creditcard belongs to a specified scheme.
-     *
-     * @return void
      */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof CardScheme) {
             throw new UnexpectedTypeException($constraint, CardScheme::class);

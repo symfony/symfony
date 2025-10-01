@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Notifier\Bridge\Ntfy;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Exception\UnsupportedOptionsException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -31,8 +31,12 @@ final class NtfyTransport extends AbstractTransport
     private ?string $user = null;
     private ?string $password = null;
 
-    public function __construct(private string $topic, private bool $secureHttp = true, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
+    public function __construct(
+        private string $topic,
+        private bool $secureHttp = true,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -41,7 +45,7 @@ final class NtfyTransport extends AbstractTransport
         return $this->topic;
     }
 
-    public function setPassword(?string $password): self
+    public function setPassword(#[\SensitiveParameter] ?string $password): self
     {
         $this->password = $password;
 
@@ -61,8 +65,8 @@ final class NtfyTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);
         }
 
-        if ($message->getOptions() && !$message->getOptions() instanceof NtfyOptions) {
-            throw new LogicException(\sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, NtfyOptions::class));
+        if (($options = $message->getOptions()) && !$message->getOptions() instanceof NtfyOptions) {
+            throw new UnsupportedOptionsException(__CLASS__, NtfyOptions::class, $options);
         }
 
         if (!($opts = $message->getOptions()) && $notification = $message->getNotification()) {

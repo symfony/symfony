@@ -1,6 +1,300 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Deprecate handling associative arrays in `GroupSequence`
+
+   Before:
+
+   ```php
+   $groupSequence = GroupSequence(['value' => ['group 1', 'group 2']]);
+   ```
+
+   After:
+
+   ```php
+   $groupSequence = GroupSequence(['group 1', 'group 2']);
+   ```
+ * Deprecate configuring constraint options implicitly with the XML format
+
+   Before:
+
+   ```xml
+   <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity">
+    <constraint name="Callback">
+      <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+      <value>callback</value>
+    </constraint>
+   </class>
+   ```
+
+   After:
+
+   ```xml
+   <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity">
+     <constraint name="Callback">
+       <option name="callback">
+         <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+         <value>callback</value>
+       </option>
+     </constraint>
+   </class>
+   ```
+ * Deprecate configuring constraint options implicitly with the YAML format
+
+   Before:
+
+   ```yaml
+   Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+     constraints:
+       - Callback: validateMeStatic
+       - Callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+   ```
+
+   After:
+
+   ```yaml
+   Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+     constraints:
+       - Callback:
+           callback: validateMeStatic
+       - Callback:
+           callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+   ```
+ * Add `#[ExtendsValidationFor]` to declare new constraints for a class
+ * Add `ValidatorBuilder::addAttributeMappings()` and `AttributeMetadataPass` to declare compile-time constraint metadata using attributes
+ * Add the `Video` constraint for validating video files
+ * Deprecate implementing `__sleep/wakeup()` on `GenericMetadata` implementations; use `__(un)serialize()` instead
+ * Deprecate passing a list of choices to the first argument of the `Choice` constraint. Use the `choices` option instead
+ * Add the `min` and `max` parameter to the `Length` constraint violation
+ * Deprecate `getRequiredOptions()` and `getDefaultOption()` methods of the `All`, `AtLeastOneOf`, `CardScheme`, `Collection`,
+   `CssColor`, `Expression`, `Regex`, `Sequentially`, `Type`, and `When` constraints
+ * Deprecate evaluating options in the base `Constraint` class. Initialize properties in the constructor of the concrete constraint
+   class instead.
+
+   Before:
+
+   ```php
+   class CustomConstraint extends Constraint
+   {
+       public $option1;
+       public $option2;
+
+       public function __construct(?array $options = null)
+       {
+           parent::__construct($options);
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Attribute\HasNamedArguments;
+
+   class CustomConstraint extends Constraint
+   {
+       #[HasNamedArguments]
+       public function __construct(
+           public $option1 = null,
+           public $option2 = null,
+           ?array $groups = null,
+           mixed $payload = null,
+       ) {
+           parent::__construct(null, $groups, $payload);
+       }
+   }
+   ```
+ * Deprecate the `getRequiredOptions()` method of the base `Constraint` class. Use mandatory constructor arguments instead.
+
+   Before:
+
+   ```php
+   class CustomConstraint extends Constraint
+   {
+       public $option1;
+       public $option2;
+
+       public function __construct(?array $options = null)
+       {
+           parent::__construct($options);
+       }
+
+       public function getRequiredOptions()
+       {
+           return ['option1'];
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Attribute\HasNamedArguments;
+
+   class CustomConstraint extends Constraint
+   {
+       #[HasNamedArguments]
+       public function __construct(
+           public $option1,
+           public $option2 = null,
+           ?array $groups = null,
+           mixed $payload = null,
+       ) {
+           parent::__construct(null, $groups, $payload);
+       }
+   }
+   ```
+ * Deprecate the `normalizeOptions()` and `getDefaultOption()` methods of the base `Constraint` class without replacements.
+   Overriding them in child constraint will not have any effects starting with Symfony 8.0.
+ * Deprecate passing an array of options to the `Composite` constraint class. Initialize the properties referenced with `getNestedConstraints()`
+   in child classes before calling the constructor of `Composite`.
+
+   Before:
+
+   ```php
+   class CustomCompositeConstraint extends Composite
+   {
+       public array $constraints = [];
+
+       public function __construct(?array $options = null)
+       {
+           parent::__construct($options);
+       }
+
+       protected function getCompositeOption(): string
+       {
+           return 'constraints';
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Attribute\HasNamedArguments;
+
+   class CustomCompositeConstraint extends Composite
+   {
+       #[HasNamedArguments]
+       public function __construct(
+           public array $constraints,
+           ?array $groups = null,
+           mixed $payload = null)
+       {
+           parent::__construct(null, $groups, $payload);
+       }
+   }
+   ```
+
+7.3
+---
+
+ * Add the `filenameCharset` and `filenameCountUnit` options to the `File` constraint
+ * Deprecate defining custom constraints not supporting named arguments
+
+   Before:
+
+   ```php
+   use Symfony\Component\Validator\Constraint;
+
+   class CustomConstraint extends Constraint
+   {
+       public function __construct(array $options)
+       {
+           // ...
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Attribute\HasNamedArguments;
+   use Symfony\Component\Validator\Constraint;
+
+   class CustomConstraint extends Constraint
+   {
+       #[HasNamedArguments]
+       public function __construct($option1, $option2, $groups, $payload)
+       {
+           // ...
+       }
+   }
+   ```
+ * Deprecate passing an array of options to the constructors of the constraint classes, pass each option as a dedicated argument instead
+
+   Before:
+
+   ```php
+   new NotNull([
+       'groups' => ['foo', 'bar'],
+       'message' => 'a custom constraint violation message',
+   ])
+   ```
+
+   After:
+
+   ```php
+   new NotNull(
+       groups: ['foo', 'bar'],
+       message: 'a custom constraint violation message',
+   )
+   ```
+ * Add support for ratio checks for SVG files to the `Image` constraint
+ * Add support for the `otherwise` option in the `When` constraint
+ * Add support for multiple fields containing nested constraints in `Composite` constraints
+ * Add the `stopOnFirstError` option to the `Unique` constraint to validate all elements
+ * Add support for closures in the `When` constraint
+
+7.2
+---
+
+ * `IbanValidator` accepts IBANs containing non-breaking and narrow non-breaking spaces
+ * Make `PasswordStrengthValidator::estimateStrength()` public
+ * Add the `Yaml` constraint for validating YAML content
+ * Add `errorPath` to Unique constraint
+ * Add the `format` option to the `Ulid` constraint to allow accepting different ULID formats
+ * Add the `WordCount` constraint
+ * Add the `Week` constraint
+ * Add `CompoundConstraintTestCase` to ease testing Compound Constraints
+ * Add context variable to `WhenValidator`
+ * Add `format` parameter to `DateTime` constraint violation message
+
+7.1
+---
+
+ * Deprecate not passing a value for the `requireTld` option to the `Url` constraint (the default value will become `true` in 8.0)
+ * Add the calculated strength to violations in `PasswordStrengthValidator`
+ * Add support for `Stringable` values when using the `Cidr`, `CssColor`, `ExpressionSyntax` and `PasswordStrength` constraints
+ * Add `MacAddress` constraint
+ * Add `*_NO_PUBLIC`, `*_ONLY_PRIVATE` and `*_ONLY_RESERVED` versions to `Ip` constraint
+ * Possibility to use all `Ip` constraint versions for `Cidr` constraint
+ * Add `list` and `associative_array` types to `Type` constraint
+ * Add the `Charset` constraint
+ * Add the `requireTld` option to the `Url` constraint
+ * Deprecate `Bic::INVALID_BANK_CODE_ERROR`
+
+7.0
+---
+
+ * Add methods `getConstraint()`, `getCause()` and `__toString()` to `ConstraintViolationInterface`
+ * Add method `__toString()` to `ConstraintViolationListInterface`
+ * Add method `disableTranslation()` to `ConstraintViolationBuilderInterface`
+ * Remove static property `$errorNames` from all constraints, use const `ERROR_NAMES` instead
+ * Remove static property `$versions` from the `Ip` constraint, use the `VERSIONS` constant instead
+ * Remove `VALIDATION_MODE_LOOSE` from `Email` constraint, use `VALIDATION_MODE_HTML5` instead
+ * Remove constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Remove Doctrine annotations support in favor of native attributes
+ * Remove the annotation reader parameter from the constructor signature of `AnnotationLoader`
+ * Remove `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Remove `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
+ * Remove `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
+ * Remove `AnnotationLoader`, use `AttributeLoader` instead
+
 6.4
 ---
 

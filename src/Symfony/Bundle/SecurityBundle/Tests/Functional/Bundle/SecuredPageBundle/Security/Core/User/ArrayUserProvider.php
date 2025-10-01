@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\UserWithoutEquatable;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -59,10 +58,6 @@ class ArrayUserProvider implements UserProviderInterface
 
     public function refreshUser(UserInterface $user): UserInterface
     {
-        if (!$user instanceof UserInterface) {
-            throw new UnsupportedUserException(\sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
-        }
-
         $storedUser = $this->getUser($user->getUserIdentifier());
         $class = $storedUser::class;
 

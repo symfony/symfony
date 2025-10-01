@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                               http://symfony.com/schema/dic/security http://symfony.com/schema/dic/security/security-1.0.xsd">
+
+    <config xmlns="http://symfony.com/schema/dic/security">
+        <provider name="default">
+            <memory>
+                <user identifier="u" password="p" roles="ROLE_USER" />
+            </memory>
+        </provider>
+        <firewall name="firewall1" provider="default">
+            <access-token>
+                <token-handler>
+                    <oidc-user-info base-uri="https://www.example.com/realms/demo/protocol/openid-connect/userinfo" />
+                    <token-handler>
+                        <oidc-user-info>
+                            <discovery>
+                                <cache id="oidc_cache" />
+                            </discovery>
+                        </oidc-user-info>
+                    </token-handler>
+                </token-handler>
+            </access-token>
+        </firewall>
+    </config>
+</container>
+

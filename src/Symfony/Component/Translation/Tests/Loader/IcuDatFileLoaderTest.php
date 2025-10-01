@@ -11,21 +11,20 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
 
-/**
- * @requires extension intl
- */
+#[RequiresPhpExtension('intl')]
 class IcuDatFileLoaderTest extends LocalizedTestCase
 {
     public function testLoadInvalidResource()
     {
         $this->expectException(InvalidResourceException::class);
-        $loader = new IcuDatFileLoader();
-        $loader->load(__DIR__.'/../Fixtures/resourcebundle/corrupted/resources', 'es', 'domain2');
+
+        (new IcuDatFileLoader())->load(__DIR__.'/../Fixtures/resourcebundle/corrupted/resources', 'es', 'domain2');
     }
 
     public function testDatEnglishLoad()
@@ -56,7 +55,7 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);
-        $loader = new IcuDatFileLoader();
-        $loader->load(__DIR__.'/../Fixtures/non-existing.txt', 'en', 'domain1');
+
+        (new IcuDatFileLoader())->load(__DIR__.'/../Fixtures/non-existing.txt', 'en', 'domain1');
     }
 }

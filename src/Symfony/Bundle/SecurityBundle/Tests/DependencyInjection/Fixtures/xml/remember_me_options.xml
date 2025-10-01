@@ -9,9 +9,7 @@
     https://symfony.com/schema/dic/security/security-1.0.xsd">
 
     <sec:config>
-        <sec:providers>
-            <sec:provider name="default" id="foo"/>
-        </sec:providers>
+        <sec:provider name="default" id="foo"/>
         <sec:firewall name="main">
             <sec:form-login/>
             <sec:remember-me secret="TheSecret" catch-exceptions="false" token-provider="token_provider_id" />

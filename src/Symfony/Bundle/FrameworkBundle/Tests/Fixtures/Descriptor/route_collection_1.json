@@ -37,3 +37,4 @@
         "condition": "context.getMethod() in ['GET', 'HEAD', 'POST']"
     }
 }
+

@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\CacheItem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
 {
     protected $skippedTests = [

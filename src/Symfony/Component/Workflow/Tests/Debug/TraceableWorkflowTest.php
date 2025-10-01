@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests\Debug;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -21,7 +22,7 @@ use Symfony\Component\Workflow\Workflow;
 
 class TraceableWorkflowTest extends TestCase
 {
-    private MockObject|Workflow $innerWorkflow;
+    private MockObject&Workflow $innerWorkflow;
 
     private Stopwatch $stopwatch;
 
@@ -38,9 +39,7 @@ class TraceableWorkflowTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideFunctionNames
-     */
+    #[DataProvider('provideFunctionNames')]
     public function testCallsInner(string $function, array $args, mixed $returnValue)
     {
         $this->innerWorkflow->expects($this->once())

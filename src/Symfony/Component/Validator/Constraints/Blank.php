@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value is blank, i.e. an empty string or null.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -28,16 +28,19 @@ class Blank extends Constraint
         self::NOT_BLANK_ERROR => 'NOT_BLANK_ERROR',
     ];
 
+    public string $message = 'This value should be blank.';
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param string[]|null $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value should be blank.';
-
+    #[HasNamedArguments]
     public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
-        parent::__construct($options ?? [], $groups, $payload);
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
+        parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
     }

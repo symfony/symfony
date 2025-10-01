@@ -36,13 +36,13 @@ final class ImportMapRemoveCommand extends Command
         $this
             ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to remove')
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command removes packages from the <comment>importmap.php</comment>.
-If a package was downloaded into your app, the downloaded file will also be removed.
+                The <info>%command.name%</info> command removes packages from the <comment>importmap.php</comment>.
+                If a package was downloaded into your app, the downloaded file will also be removed.
 
-For example:
+                For example:
 
-    <info>php %command.full_name% lodash</info>
-EOT
+                    <info>php %command.full_name% lodash</info>
+                EOT
             )
         ;
     }

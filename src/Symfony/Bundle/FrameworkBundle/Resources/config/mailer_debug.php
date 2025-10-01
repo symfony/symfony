@@ -12,9 +12,17 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Mailer\DataCollector\MessageDataCollector;
+use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->set('mailer.message_logger_listener', MessageLoggerListener::class)
+            ->args([
+                service('profiler.is_disabled_state_checker')->nullOnInvalid(),
+            ])
+            ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => 'reset'])
+
         ->set('mailer.data_collector', MessageDataCollector::class)
             ->args([
                 service('mailer.message_logger_listener'),

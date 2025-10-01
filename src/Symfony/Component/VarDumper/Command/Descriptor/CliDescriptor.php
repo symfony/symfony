@@ -26,12 +26,11 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 class CliDescriptor implements DumpDescriptorInterface
 {
-    private CliDumper $dumper;
     private mixed $lastIdentifier = null;
 
-    public function __construct(CliDumper $dumper)
-    {
-        $this->dumper = $dumper;
+    public function __construct(
+        private CliDumper $dumper,
+    ) {
     }
 
     public function describe(OutputInterface $output, Data $data, array $context, int $clientId): void

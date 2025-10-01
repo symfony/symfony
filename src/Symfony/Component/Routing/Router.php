@@ -37,50 +37,11 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
  */
 class Router implements RouterInterface, RequestMatcherInterface
 {
-    /**
-     * @var UrlMatcherInterface|null
-     */
-    protected $matcher;
-
-    /**
-     * @var UrlGeneratorInterface|null
-     */
-    protected $generator;
-
-    /**
-     * @var RequestContext
-     */
-    protected $context;
-
-    /**
-     * @var LoaderInterface
-     */
-    protected $loader;
-
-    /**
-     * @var RouteCollection|null
-     */
-    protected $collection;
-
-    /**
-     * @var mixed
-     */
-    protected $resource;
-
-    /**
-     * @var array
-     */
-    protected $options = [];
-
-    /**
-     * @var LoggerInterface|null
-     */
-    protected $logger;
-
-    /**
-     * @var string|null
-     */
-    protected $defaultLocale;
+    protected UrlMatcherInterface|RequestMatcherInterface $matcher;
+    protected UrlGeneratorInterface $generator;
+    protected RequestContext $context;
+    protected RouteCollection $collection;
+    protected array $options = [];
 
     private ConfigCacheFactoryInterface $configCacheFactory;
 
@@ -91,14 +52,16 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     private static ?array $cache = [];
 
-    public function __construct(LoaderInterface $loader, mixed $resource, array $options = [], ?RequestContext $context = null, ?LoggerInterface $logger = null, ?string $defaultLocale = null)
-    {
-        $this->loader = $loader;
-        $this->resource = $resource;
-        $this->logger = $logger;
+    public function __construct(
+        protected LoaderInterface $loader,
+        protected mixed $resource,
+        array $options = [],
+        ?RequestContext $context = null,
+        protected ?LoggerInterface $logger = null,
+        protected ?string $defaultLocale = null,
+    ) {
         $this->context = $context ?? new RequestContext();
         $this->setOptions($options);
-        $this->defaultLocale = $defaultLocale;
     }
 
     /**
@@ -116,11 +79,9 @@ class Router implements RouterInterface, RequestMatcherInterface
      *   * strict_requirements:    Configure strict requirement checking for generators
      *                             implementing ConfigurableRequirementsInterface (default is true)
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException When unsupported option is provided
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = [
             'cache_dir' => null,
@@ -151,11 +112,9 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Sets an option.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException
      */
-    public function setOption(string $key, mixed $value)
+    public function setOption(string $key, mixed $value): void
     {
         if (!\array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(\sprintf('The Router does not support the "%s" option.', $key));
@@ -178,18 +137,12 @@ class Router implements RouterInterface, RequestMatcherInterface
         return $this->options[$key];
     }
 
-    /**
-     * @return RouteCollection
-     */
-    public function getRouteCollection()
+    public function getRouteCollection(): RouteCollection
     {
         return $this->collection ??= $this->loader->load($this->resource, $this->options['resource_type']);
     }
 
-    /**
-     * @return void
-     */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->context = $context;
 
@@ -208,10 +161,8 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     /**
      * Sets the ConfigCache factory to use.
-     *
-     * @return void
      */
-    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
+    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory): void
     {
         $this->configCacheFactory = $configCacheFactory;
     }
@@ -316,10 +267,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         return $this->generator;
     }
 
-    /**
-     * @return void
-     */
-    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
     {
         $this->expressionLanguageProviders[] = $provider;
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -28,9 +29,7 @@ class Psr18ClientTest extends TestCase
         TestHttpServer::start();
     }
 
-    /**
-     * @requires function ob_gzhandler
-     */
+    #[RequiresFunction('ob_gzhandler')]
     public function testSendRequest()
     {
         $factory = new Psr17Factory();

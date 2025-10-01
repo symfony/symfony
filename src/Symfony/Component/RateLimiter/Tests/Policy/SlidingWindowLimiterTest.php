@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\RateLimiter\Tests\Policy;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class SlidingWindowLimiterTest extends TestCase
 {
     private InMemoryStorage $storage;

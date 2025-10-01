@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\OutputWrapper;
 
 class OutputWrapperTest extends TestCase
 {
-    /**
-     * @dataProvider textProvider
-     */
+    #[DataProvider('textProvider')]
     public function testBasicWrap(string $text, int $width, bool $allowCutUrls, string $expected)
     {
         $wrapper = new OutputWrapper($allowCutUrls);
@@ -35,18 +34,18 @@ class OutputWrapperTest extends TestCase
             20,
             false,
             <<<'EOS'
-            Árvíztűrőtükörfúrógé
-            p https://github.com/symfony/symfony Lorem ipsum
-            <comment>dolor</comment> sit amet,
-            consectetur
-            adipiscing elit.
-            Praesent vestibulum
-            nulla quis urna
-            maximus porttitor.
-            Donec ullamcorper
-            risus at <error>libero
-            ornare</error> efficitur.
-            EOS,
+                Árvíztűrőtükörfúrógé
+                p https://github.com/symfony/symfony Lorem ipsum
+                <comment>dolor</comment> sit amet,
+                consectetur
+                adipiscing elit.
+                Praesent vestibulum
+                nulla quis urna
+                maximus porttitor.
+                Donec ullamcorper
+                risus at <error>libero
+                ornare</error> efficitur.
+                EOS,
         ];
 
         yield 'Allow URL cut' => [
@@ -54,20 +53,20 @@ class OutputWrapperTest extends TestCase
             20,
             true,
             <<<'EOS'
-            Árvíztűrőtükörfúrógé
-            p
-            https://github.com/s
-            ymfony/symfony Lorem
-            ipsum <comment>dolor</comment> sit
-            amet, consectetur
-            adipiscing elit.
-            Praesent vestibulum
-            nulla quis urna
-            maximus porttitor.
-            Donec ullamcorper
-            risus at <error>libero
-            ornare</error> efficitur.
-            EOS,
+                Árvíztűrőtükörfúrógé
+                p
+                https://github.com/s
+                ymfony/symfony Lorem
+                ipsum <comment>dolor</comment> sit
+                amet, consectetur
+                adipiscing elit.
+                Praesent vestibulum
+                nulla quis urna
+                maximus porttitor.
+                Donec ullamcorper
+                risus at <error>libero
+                ornare</error> efficitur.
+                EOS,
         ];
     }
 }

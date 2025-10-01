@@ -12,18 +12,20 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Test;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\History;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Cookie as HttpFoundationCookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Test\Constraint\ResponseHeaderLocationSame;
 
 class WebTestCaseTest extends TestCase
 {
@@ -62,10 +64,6 @@ class WebTestCaseTest extends TestCase
 
     public function testAssertResponseRedirectsWithLocationWithoutHost()
     {
-        if (!class_exists(ResponseHeaderLocationSame::class)) {
-            $this->markTestSkipped('Requires symfony/http-foundation 6.3 or higher.');
-        }
-
         $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('/');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('is redirected and has header "Location" matching "/".');
@@ -74,10 +72,6 @@ class WebTestCaseTest extends TestCase
 
     public function testAssertResponseRedirectsWithLocationWithoutScheme()
     {
-        if (!class_exists(ResponseHeaderLocationSame::class)) {
-            $this->markTestSkipped('Requires symfony/http-foundation 6.3 or higher.');
-        }
-
         $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('//example.com/');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('is redirected and has header "Location" matching "//example.com/".');
@@ -197,6 +191,42 @@ class WebTestCaseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('has cookie "foo" with path "/path" and has cookie "foo" with path "/path" with value "babar".');
         $this->getClientTester()->assertBrowserCookieValueSame('foo', 'babar', false, '/path');
+    }
+
+    #[RequiresMethod(History::class, 'isFirstPage')]
+    public function testAssertBrowserHistoryIsOnFirstPage()
+    {
+        $this->createHistoryTester('isFirstPage', true)->assertBrowserHistoryIsOnFirstPage();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser history is on the first page.');
+        $this->createHistoryTester('isFirstPage', false)->assertBrowserHistoryIsOnFirstPage();
+    }
+
+    #[RequiresMethod(History::class, 'isFirstPage')]
+    public function testAssertBrowserHistoryIsNotOnFirstPage()
+    {
+        $this->createHistoryTester('isFirstPage', false)->assertBrowserHistoryIsNotOnFirstPage();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser history is not on the first page.');
+        $this->createHistoryTester('isFirstPage', true)->assertBrowserHistoryIsNotOnFirstPage();
+    }
+
+    #[RequiresMethod(History::class, 'isLastPage')]
+    public function testAssertBrowserHistoryIsOnLastPage()
+    {
+        $this->createHistoryTester('isLastPage', true)->assertBrowserHistoryIsOnLastPage();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser history is on the last page.');
+        $this->createHistoryTester('isLastPage', false)->assertBrowserHistoryIsOnLastPage();
+    }
+
+    #[RequiresMethod(History::class, 'isLastPage')]
+    public function testAssertBrowserHistoryIsNotOnLastPage()
+    {
+        $this->createHistoryTester('isLastPage', false)->assertBrowserHistoryIsNotOnLastPage();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser history is not on the last page.');
+        $this->createHistoryTester('isLastPage', true)->assertBrowserHistoryIsNotOnLastPage();
     }
 
     public function testAssertSelectorExists()
@@ -391,6 +421,19 @@ class WebTestCaseTest extends TestCase
         $request->attributes->set('foo', 'bar');
         $request->attributes->set('_route', 'homepage');
         $client->expects($this->any())->method('getRequest')->willReturn($request);
+
+        return $this->getTester($client);
+    }
+
+    private function createHistoryTester(string $method, bool $returnValue): WebTestCase
+    {
+        /** @var KernelBrowser&MockObject $client */
+        $client = $this->createMock(KernelBrowser::class);
+        /** @var History&MockObject $history */
+        $history = $this->createMock(History::class);
+
+        $history->method($method)->willReturn($returnValue);
+        $client->method('getHistory')->willReturn($history);
 
         return $this->getTester($client);
     }

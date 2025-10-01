@@ -23,8 +23,10 @@ use Twig\TwigFunction;
 class UndefinedCallableHandler
 {
     private const FILTER_COMPONENTS = [
+        'emojify' => 'emoji',
         'humanize' => 'form',
         'form_encode_currency' => 'form',
+        'serialize' => 'serializer',
         'trans' => 'translation',
         'sanitize_html' => 'html-sanitizer',
         'yaml_encode' => 'yaml',
@@ -59,6 +61,12 @@ class UndefinedCallableHandler
         'logout_url' => 'security-http',
         'logout_path' => 'security-http',
         'is_granted' => 'security-core',
+        'is_granted_for_user' => 'security-core',
+        'impersonation_path' => 'security-http',
+        'impersonation_url' => 'security-http',
+        'impersonation_exit_path' => 'security-http',
+        'impersonation_exit_url' => 'security-http',
+        't' => 'translation',
         'link' => 'web-link',
         'preload' => 'web-link',
         'dns_prefetch' => 'web-link',

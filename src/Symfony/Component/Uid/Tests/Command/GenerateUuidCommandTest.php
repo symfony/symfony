@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Uid\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -22,7 +23,7 @@ use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
-use Symfony\Component\Uid\UuidV6;
+use Symfony\Component\Uid\UuidV7;
 
 final class GenerateUuidCommandTest extends TestCase
 {
@@ -30,7 +31,7 @@ final class GenerateUuidCommandTest extends TestCase
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
         $this->assertSame(0, $commandTester->execute([]));
-        $this->assertInstanceOf(UuidV6::class, Uuid::fromRfc4122(trim($commandTester->getDisplay())));
+        $this->assertInstanceOf(UuidV7::class, Uuid::fromRfc4122(trim($commandTester->getDisplay())));
 
         $commandTester = new CommandTester(new GenerateUuidCommand(new UuidFactory(UuidV4::class)));
         $this->assertSame(0, $commandTester->execute([]));
@@ -58,17 +59,17 @@ final class GenerateUuidCommandTest extends TestCase
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
         $this->assertSame(1, $commandTester->execute(['--time-based' => '@-16807797990']));
-        $this->assertStringContainsString('The given UUID date cannot be earlier than 1582-10-15.', $commandTester->getDisplay());
+        $this->assertStringContainsString('The timestamp must be positive.', $commandTester->getDisplay());
     }
 
     public function testTimeBased()
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
         $this->assertSame(0, $commandTester->execute(['--time-based' => 'now']));
-        $this->assertInstanceOf(UuidV6::class, Uuid::fromRfc4122(trim($commandTester->getDisplay())));
+        $this->assertInstanceOf(UuidV7::class, Uuid::fromRfc4122(trim($commandTester->getDisplay())));
 
         $commandTester = new CommandTester(new GenerateUuidCommand(new UuidFactory(
-            UuidV6::class,
+            UuidV7::class,
             UuidV1::class,
             UuidV5::class,
             UuidV4::class,
@@ -103,7 +104,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertInstanceOf(UuidV5::class, Uuid::fromRfc4122(trim($commandTester->getDisplay())));
 
         $commandTester = new CommandTester(new GenerateUuidCommand(new UuidFactory(
-            UuidV6::class,
+            UuidV7::class,
             UuidV1::class,
             UuidV3::class,
             UuidV4::class,
@@ -121,9 +122,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertInstanceOf(UuidV4::class, Uuid::fromRfc4122(trim($commandTester->getDisplay())));
     }
 
-    /**
-     * @dataProvider provideInvalidCombinationOfBasedOptions
-     */
+    #[DataProvider('provideInvalidCombinationOfBasedOptions')]
     public function testInvalidCombinationOfBasedOptions(array $input)
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
@@ -142,9 +141,7 @@ final class GenerateUuidCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideExtraNodeOption
-     */
+    #[DataProvider('provideExtraNodeOption')]
     public function testExtraNodeOption(array $input)
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
@@ -162,9 +159,7 @@ final class GenerateUuidCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideExtraNamespaceOption
-     */
+    #[DataProvider('provideExtraNamespaceOption')]
     public function testExtraNamespaceOption(array $input)
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
@@ -232,13 +227,16 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertSame('9c7d0eda-982d-5708-b4bd-79b3b179725d', (string) Uuid::fromRfc4122(trim($commandTester->getDisplay())));
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $application = new Application();
-        $application->add(new GenerateUuidCommand());
+        $command = new GenerateUuidCommand();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
         $tester = new CommandCompletionTester($application->get('uuid:generate'));
         $suggestions = $tester->complete($input, 2);
         $this->assertSame($expectedSuggestions, $suggestions);

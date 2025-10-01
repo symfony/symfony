@@ -74,11 +74,17 @@ class PhpExecutableFinder
             $dirs[] = 'C:\xampp\php\\';
         }
 
+        if ($herdPath = getenv('HERD_HOME')) {
+            $dirs[] = $herdPath.\DIRECTORY_SEPARATOR.'bin';
+        }
+
         return $this->executableFinder->find('php', false, $dirs);
     }
 
     /**
      * Finds the PHP executable arguments.
+     *
+     * @return list<non-empty-string>
      */
     public function findArguments(): array
     {

@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
     'first' => AbstractDummyFirstChild::class,
     'second' => AbstractDummySecondChild::class,
     'third' => AbstractDummyThirdChild::class,
-])]
+], defaultType: 'third')]
 abstract class AbstractDummy
 {
     public $foo;

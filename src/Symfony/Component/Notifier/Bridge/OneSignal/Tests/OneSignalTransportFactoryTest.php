@@ -12,13 +12,16 @@
 namespace Symfony\Component\Notifier\Bridge\OneSignal\Tests;
 
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
 /**
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>
  */
-final class OneSignalTransportFactoryTest extends TransportFactoryTestCase
+final class OneSignalTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): OneSignalTransportFactory
     {
         return new OneSignalTransportFactory();

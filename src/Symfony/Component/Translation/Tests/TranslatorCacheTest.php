@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
@@ -54,9 +55,7 @@ class TranslatorCacheTest extends TestCase
         rmdir($this->tmpDir);
     }
 
-    /**
-     * @dataProvider runForDebugAndProduction
-     */
+    #[DataProvider('runForDebugAndProduction')]
     public function testThatACacheIsUsed($debug)
     {
         if (!class_exists(\MessageFormatter::class)) {
@@ -125,9 +124,7 @@ class TranslatorCacheTest extends TestCase
         $translator->trans($msgid);
     }
 
-    /**
-     * @dataProvider runForDebugAndProduction
-     */
+    #[DataProvider('runForDebugAndProduction')]
     public function testDifferentTranslatorsForSameLocaleDoNotOverwriteEachOthersCache($debug)
     {
         /*

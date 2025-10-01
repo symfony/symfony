@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\LightSms\Tests;
 
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class LightSmsTransportFactoryTest extends TransportFactoryTestCase
+final class LightSmsTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): LightSmsTransportFactory
     {
         return new LightSmsTransportFactory();
@@ -39,5 +42,11 @@ final class LightSmsTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://login:token@default?from=37061234567'];
         yield ['somethingElse://login:token@default']; // missing "from" option
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['lightsms://login@default?from=37061234567'];
+        yield ['lightsms://:token@default?from=37061234567'];
     }
 }

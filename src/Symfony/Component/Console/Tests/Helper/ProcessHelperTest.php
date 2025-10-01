@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -20,9 +21,7 @@ use Symfony\Component\Process\Process;
 
 class ProcessHelperTest extends TestCase
 {
-    /**
-     * @dataProvider provideCommandsAndOutput
-     */
+    #[DataProvider('provideCommandsAndOutput')]
     public function testVariousProcessRuns(array $expectedOutputLines, bool $successful, Process|string|array $cmd, int $verbosity, ?string $error)
     {
         if (\is_string($cmd)) {

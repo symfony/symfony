@@ -13,7 +13,9 @@ namespace Symfony\Component\Mailer;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\AhaSend\Transport\AhaSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
@@ -21,12 +23,15 @@ use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailomat\Transport\MailomatTransportFactory;
 use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
-use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailtrap\Transport\MailtrapTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postal\Transport\PostalTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
-use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sweego\Transport\SweegoTransportFactory;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -48,23 +53,26 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class Transport
 {
     private const FACTORY_CLASSES = [
+        AhaSendTransportFactory::class,
+        AzureTransportFactory::class,
         BrevoTransportFactory::class,
         GmailTransportFactory::class,
         InfobipTransportFactory::class,
         MailerSendTransportFactory::class,
         MailgunTransportFactory::class,
         MailjetTransportFactory::class,
+        MailomatTransportFactory::class,
         MailPaceTransportFactory::class,
         MandrillTransportFactory::class,
-        OhMySmtpTransportFactory::class,
+        PostalTransportFactory::class,
         PostmarkTransportFactory::class,
+        MailtrapTransportFactory::class,
+        ResendTransportFactory::class,
         ScalewayTransportFactory::class,
         SendgridTransportFactory::class,
-        SendinblueTransportFactory::class,
         SesTransportFactory::class,
+        SweegoTransportFactory::class,
     ];
-
-    private iterable $factories;
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null, ?LoggerInterface $logger = null): TransportInterface
     {
@@ -83,9 +91,9 @@ final class Transport
     /**
      * @param TransportFactoryInterface[] $factories
      */
-    public function __construct(iterable $factories)
-    {
-        $this->factories = $factories;
+    public function __construct(
+        private iterable $factories,
+    ) {
     }
 
     public function fromStrings(#[\SensitiveParameter] array $dsns): Transports
@@ -137,6 +145,11 @@ final class Transport
                         if (')' === $dsn[$offset - 1]) {
                             break;
                         }
+                    }
+
+                    parse_str(substr($dsn, $offset + 1), $query);
+                    if ($period = $query['retry_period'] ?? 0) {
+                        return [new $class($args, (int) $period), $offset + \strlen('retry_period='.$period) + 1];
                     }
 
                     return [new $class($args), $offset];

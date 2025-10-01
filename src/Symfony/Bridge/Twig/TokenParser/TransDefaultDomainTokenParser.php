@@ -25,13 +25,11 @@ final class TransDefaultDomainTokenParser extends AbstractTokenParser
 {
     public function parse(Token $token): Node
     {
-        $expr = method_exists($this->parser, 'parseExpression') ?
-            $this->parser->parseExpression() :
-            $this->parser->getExpressionParser()->parseExpression();
+        $expr = $this->parser->parseExpression();
 
         $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
 
-        return new TransDefaultDomainNode($expr, $token->getLine(), $this->getTag());
+        return new TransDefaultDomainNode($expr, $token->getLine());
     }
 
     public function getTag(): string

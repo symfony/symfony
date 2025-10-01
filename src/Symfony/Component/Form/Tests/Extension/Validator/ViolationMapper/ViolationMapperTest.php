@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\CallbackTransformer;
@@ -786,9 +787,7 @@ class ViolationMapperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideDefaultTests
-     */
+    #[DataProvider('provideDefaultTests')]
     public function testDefaultErrorMapping($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
     {
         $violation = $this->getConstraintViolation($violationPath);
@@ -1241,9 +1240,7 @@ class ViolationMapperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideCustomDataErrorTests
-     */
+    #[DataProvider('provideCustomDataErrorTests')]
     public function testCustomDataErrorMapping($target, $mapFrom, $mapTo, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
     {
         $violation = $this->getConstraintViolation($violationPath);
@@ -1441,9 +1438,7 @@ class ViolationMapperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideCustomFormErrorTests
-     */
+    #[DataProvider('provideCustomFormErrorTests')]
     public function testCustomFormErrorMapping($target, $mapFrom, $mapTo, $errorName, $errorPath, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
     {
         $violation = $this->getConstraintViolation($violationPath);
@@ -1508,9 +1503,7 @@ class ViolationMapperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideErrorTestsForFormInheritingParentData
-     */
+    #[DataProvider('provideErrorTestsForFormInheritingParentData')]
     public function testErrorMappingForFormInheritingParentData($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
     {
         $violation = $this->getConstraintViolation($violationPath);

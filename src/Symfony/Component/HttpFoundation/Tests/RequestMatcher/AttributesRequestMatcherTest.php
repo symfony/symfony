@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\RequestMatcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
@@ -18,9 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AttributesRequestMatcherTest extends TestCase
 {
-    /**
-     * @dataProvider getData
-     */
+    #[DataProvider('getData')]
     public function test(string $key, string $regexp, bool $expected)
     {
         $matcher = new AttributesRequestMatcher([$key => $regexp]);

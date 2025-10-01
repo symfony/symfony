@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBus;
@@ -151,7 +152,7 @@ class MessageBusTest extends TestCase
         })()];
     }
 
-    /** @dataProvider provideConstructorDataStucture */
+    #[DataProvider('provideConstructorDataStucture')]
     public function testConstructDataStructure(iterable $dataStructure)
     {
         $bus = new MessageBus($dataStructure);

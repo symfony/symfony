@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Mailer\Bridge\Postmark\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
+use Symfony\Component\Mailer\Bridge\Postmark\Event\PostmarkDeliveryEvent;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\MessageStreamHeader;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkApiTransport;
 use Symfony\Component\Mailer\Envelope;
@@ -27,9 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class PostmarkApiTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(PostmarkApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
@@ -128,6 +129,37 @@ class PostmarkApiTransportTest extends TestCase
 
         $this->expectException(HttpTransportException::class);
         $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        $transport->send($mail);
+    }
+
+    public function testSendDeliveryEventIsDispatched()
+    {
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['Message' => 'Inactive recipient', 'ErrorCode' => 406], [
+            'http_code' => 422,
+        ]));
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $expectedEvent = (new PostmarkDeliveryEvent('Inactive recipient', 406, $mail->getHeaders()));
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher
+            ->method('dispatch')
+            ->willReturnCallback(function ($event) use ($expectedEvent) {
+                if ($event instanceof PostmarkDeliveryEvent) {
+                    $this->assertEquals($event, $expectedEvent);
+                }
+
+                return $event;
+            });
+
+        $transport = new PostmarkApiTransport('KEY', $client, $dispatcher);
+        $transport->setPort(8984);
+
         $transport->send($mail);
     }
 

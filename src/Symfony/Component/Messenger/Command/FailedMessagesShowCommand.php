@@ -40,14 +40,14 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
                 new InputOption('class-filter', null, InputOption::VALUE_REQUIRED, 'Filter by a specific class name'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> shows message that are pending in the failure transport.
+                The <info>%command.name%</info> shows message that are pending in the failure transport.
 
-    <info>php %command.full_name%</info>
+                    <info>php %command.full_name%</info>
 
-Or look at a specific message by its id:
+                Or look at a specific message by its id:
 
-    <info>php %command.full_name% {id}</info>
-EOF
+                    <info>php %command.full_name% {id}</info>
+                EOF
             )
         ;
     }

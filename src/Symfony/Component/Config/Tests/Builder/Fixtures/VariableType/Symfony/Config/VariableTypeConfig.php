@@ -32,16 +32,21 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         return 'variable_type';
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     any_value?: mixed,
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('any_value', $value)) {
+        if (array_key_exists('any_value', $config)) {
             $this->_usedProperties['anyValue'] = true;
-            $this->anyValue = $value['any_value'];
-            unset($value['any_value']);
+            $this->anyValue = $config['any_value'];
+            unset($config['any_value']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

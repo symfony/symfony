@@ -29,7 +29,7 @@ class MessengerTransportListenerTest extends TestCase
         $message = new Message(new Headers());
         $event = new MessageEvent($message, $envelope, 'smtp', true);
         $l->onMessage($event);
-        $this->assertEmpty($event->getStamps());
+        $this->assertSame([], $event->getStamps());
     }
 
     public function testMessengerTransportStampViaHeader()

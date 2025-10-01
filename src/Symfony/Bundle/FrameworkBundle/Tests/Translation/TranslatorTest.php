@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
@@ -100,16 +101,6 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
-    public function testTransWithCachingWithInvalidLocale()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "invalid locale" locale.');
-        $loader = $this->createMock(LoaderInterface::class);
-        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', TranslatorWithInvalidLocale::class);
-
-        $translator->trans('foo');
-    }
-
     public function testLoadResourcesWithoutCaching()
     {
         $loader = new YamlFileLoader();
@@ -127,8 +118,7 @@ class TranslatorTest extends TestCase
 
     public function testGetDefaultLocale()
     {
-        $container = $this->createMock(\Psr\Container\ContainerInterface::class);
-        $translator = new Translator($container, new MessageFormatter(), 'en');
+        $translator = new Translator(new Container(), new MessageFormatter(), 'en');
 
         $this->assertSame('en', $translator->getLocale());
     }
@@ -137,12 +127,11 @@ class TranslatorTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Translator does not support the following options: \'foo\'');
-        $container = $this->createMock(ContainerInterface::class);
 
-        new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']);
+        new Translator(new Container(), new MessageFormatter(), 'en', [], ['foo' => 'bar']);
     }
 
-    /** @dataProvider getDebugModeAndCacheDirCombinations */
+    #[DataProvider('getDebugModeAndCacheDirCombinations')]
     public function testResourceFilesOptionLoadsBeforeOtherAddedResources($debug, $enableCache)
     {
         $someCatalogue = $this->getCatalogue('some_locale', []);
@@ -304,12 +293,9 @@ class TranslatorTest extends TestCase
 
     protected function getContainer($loader)
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->any())
-            ->method('get')
-            ->willReturn($loader)
-        ;
+        $container = new Container();
+        $container->set('loader', $loader);
+        $container->set('yml', $loader);
 
         return $container;
     }
@@ -416,13 +402,5 @@ class TranslatorTest extends TestCase
             $options,
             $enabledLocales
         );
-    }
-}
-
-class TranslatorWithInvalidLocale extends Translator
-{
-    public function getLocale(): string
-    {
-        return 'invalid locale';
     }
 }

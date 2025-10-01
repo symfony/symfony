@@ -5,6 +5,7 @@ $container->loadFromExtension('framework', [
     'http_method_override' => false,
     'handle_all_throwables' => true,
     'php_errors' => ['log' => true],
+    'lock' => false,
     'messenger' => [
         'default_bus' => 'messenger.bus.commands',
         'buses' => [

@@ -1,10 +1,23 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Allow Kosovo as a component region, controlled by the `SYMFONY_INTL_WITH_USER_ASSIGNED` env var
+ * Generate legal and validity metadata for currencies
+ * Add `isValidInAnyCountry`, `isValidInCountry`, `forCountry` methods in `Symfony\Component\Intl\Currencies`
+
+7.1
+---
+
+ * Move all emoji code & data to a new `symfony/emoji` component
+ * Deprecate `EmojiTransliterator` in favor of `Symfony\Component\Emoji\EmojiTransliterator`
+
 6.4
 ---
 
- * Add support for ISO-3166-1 numeric codes with `Countries::getNumericCode()`, `Countries::getNumericCodes()`, 
+ * Add support for ISO-3166-1 numeric codes with `Countries::getNumericCode()`, `Countries::getNumericCodes()`,
    `Countries::numericCodeExists()` and `Countries::getAlpha2FromNumeric()`
 
 6.3

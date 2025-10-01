@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Wraps errors in forms.
@@ -20,12 +21,7 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  */
 class FormError
 {
-    protected $messageTemplate;
-    protected $messageParameters;
-    protected $messagePluralization;
-
-    private string $message;
-    private mixed $cause;
+    protected string $messageTemplate;
 
     /**
      * The form that spawned this error.
@@ -43,15 +39,16 @@ class FormError
      * @param int|null    $messagePluralization The value for error message pluralization
      * @param mixed       $cause                The cause of the error
      *
-     * @see \Symfony\Component\Translation\Translator
+     * @see Translator
      */
-    public function __construct(string $message, ?string $messageTemplate = null, array $messageParameters = [], ?int $messagePluralization = null, mixed $cause = null)
-    {
-        $this->message = $message;
+    public function __construct(
+        private string $message,
+        ?string $messageTemplate = null,
+        protected array $messageParameters = [],
+        protected ?int $messagePluralization = null,
+        private mixed $cause = null,
+    ) {
         $this->messageTemplate = $messageTemplate ?: $message;
-        $this->messageParameters = $messageParameters;
-        $this->messagePluralization = $messagePluralization;
-        $this->cause = $cause;
     }
 
     /**
@@ -99,11 +96,9 @@ class FormError
      *
      * This method must only be called once.
      *
-     * @return void
-     *
      * @throws BadMethodCallException If the method is called more than once
      */
-    public function setOrigin(FormInterface $origin)
+    public function setOrigin(FormInterface $origin): void
     {
         if (null !== $this->origin) {
             throw new BadMethodCallException('setOrigin() must only be called once.');

@@ -42,7 +42,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 }
             }
             if (!preg_match('/^(?:[-.\w\\\\]*+:)*+\w*+$/', $env)) {
-                throw new InvalidArgumentException(\sprintf('Invalid %s name: only "word" characters are allowed.', $name));
+                throw new InvalidArgumentException(\sprintf('The given env var name "%s" contains invalid characters (allowed characters: letters, digits, hyphens, backslashes and colons).', $name));
             }
             if ($this->has($name) && null !== ($defaultValue = parent::get($name)) && !\is_string($defaultValue)) {
                 throw new RuntimeException(\sprintf('The default value of an env() parameter must be a string or null, but "%s" given to "%s".', get_debug_type($defaultValue), $name));
@@ -87,20 +87,15 @@ class EnvPlaceholderParameterBag extends ParameterBag
         return $this->unusedEnvPlaceholders;
     }
 
-    /**
-     * @return void
-     */
-    public function clearUnusedEnvPlaceholders()
+    public function clearUnusedEnvPlaceholders(): void
     {
         $this->unusedEnvPlaceholders = [];
     }
 
     /**
      * Merges the env placeholders of another EnvPlaceholderParameterBag.
-     *
-     * @return void
      */
-    public function mergeEnvPlaceholders(self $bag)
+    public function mergeEnvPlaceholders(self $bag): void
     {
         if ($newPlaceholders = $bag->getEnvPlaceholders()) {
             $this->envPlaceholders += $newPlaceholders;
@@ -121,10 +116,8 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
     /**
      * Maps env prefixes to their corresponding PHP types.
-     *
-     * @return void
      */
-    public function setProvidedTypes(array $providedTypes)
+    public function setProvidedTypes(array $providedTypes): void
     {
         $this->providedTypes = $providedTypes;
     }
@@ -139,10 +132,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
         return $this->providedTypes;
     }
 
-    /**
-     * @return void
-     */
-    public function resolve()
+    public function resolve(): void
     {
         if ($this->resolved) {
             return;

@@ -37,8 +37,9 @@ abstract class AbstractStream
     public function write(string $bytes, bool $debug = true): void
     {
         if ($debug) {
+            $timestamp = (new \DateTimeImmutable())->format('Y-m-d\TH:i:s.up');
             foreach (explode("\n", trim($bytes)) as $line) {
-                $this->debug .= \sprintf("> %s\n", $line);
+                $this->debug .= \sprintf("[%s] > %s\n", $timestamp, $line);
             }
         }
 
@@ -91,7 +92,7 @@ abstract class AbstractStream
             }
         }
 
-        $this->debug .= \sprintf('< %s', $line);
+        $this->debug .= \sprintf('[%s] < %s', (new \DateTimeImmutable())->format('Y-m-d\TH:i:s.up'), $line);
 
         return $line;
     }

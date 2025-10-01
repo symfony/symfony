@@ -92,7 +92,7 @@ class HeaderBagTest extends TestCase
     {
         $bag = new HeaderBag(['foo' => 'bar', 'fuzz' => 'bizz']);
         $this->assertEquals('bar', $bag->get('foo'), '->get return current value');
-        $this->assertEquals('bar', $bag->get('FoO'), '->get key in case insensitive');
+        $this->assertEquals('bar', $bag->get('FoO'), '->get key in case-insensitive');
         $this->assertEquals(['bar'], $bag->all('foo'), '->get return the value as array');
 
         // defaults

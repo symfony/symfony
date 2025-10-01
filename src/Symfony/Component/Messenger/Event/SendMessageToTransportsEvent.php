@@ -27,14 +27,13 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
  */
 final class SendMessageToTransportsEvent
 {
-    private Envelope $envelope;
-
-    private array $senders;
-
-    public function __construct(Envelope $envelope, array $senders)
-    {
-        $this->envelope = $envelope;
-        $this->senders = $senders;
+    /**
+     * @param array<string, SenderInterface> $senders
+     */
+    public function __construct(
+        private Envelope $envelope,
+        private array $senders,
+    ) {
     }
 
     public function getEnvelope(): Envelope

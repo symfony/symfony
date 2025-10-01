@@ -20,15 +20,13 @@ use Symfony\Component\BrowserKit\Exception\LogicException;
  */
 class History
 {
-    protected $stack = [];
-    protected $position = -1;
+    protected array $stack = [];
+    protected int $position = -1;
 
     /**
      * Clears the history.
-     *
-     * @return void
      */
-    public function clear()
+    public function clear(): void
     {
         $this->stack = [];
         $this->position = -1;
@@ -36,10 +34,8 @@ class History
 
     /**
      * Adds a Request to the history.
-     *
-     * @return void
      */
-    public function add(Request $request)
+    public function add(Request $request): void
     {
         $this->stack = \array_slice($this->stack, 0, $this->position + 1);
         $this->stack[] = clone $request;
@@ -55,13 +51,29 @@ class History
     }
 
     /**
+     * Returns true if the stack is on the first page.
+     */
+    public function isFirstPage(): bool
+    {
+        return $this->position < 1;
+    }
+
+    /**
+     * Returns true if the stack is on the last page.
+     */
+    public function isLastPage(): bool
+    {
+        return $this->position > \count($this->stack) - 2;
+    }
+
+    /**
      * Goes back in the history.
      *
      * @throws LogicException if the stack is already on the first page
      */
     public function back(): Request
     {
-        if ($this->position < 1) {
+        if ($this->isFirstPage()) {
             throw new LogicException('You are already on the first page.');
         }
 
@@ -75,7 +87,7 @@ class History
      */
     public function forward(): Request
     {
-        if ($this->position > \count($this->stack) - 2) {
+        if ($this->isLastPage()) {
             throw new LogicException('You are already on the last page.');
         }
 

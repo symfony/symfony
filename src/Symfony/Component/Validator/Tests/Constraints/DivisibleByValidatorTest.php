@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
 use Symfony\Component\Validator\Constraints\DivisibleByValidator;
@@ -21,6 +22,10 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
 {
+    use InvalidComparisonToValueTestTrait;
+    use ThrowsOnInvalidStringDatesTestTrait;
+    use ValidComparisonToValueTrait;
+
     protected function createValidator(): DivisibleByValidator
     {
         return new DivisibleByValidator();
@@ -28,7 +33,11 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
 
     protected static function createConstraint(?array $options = null): Constraint
     {
-        return new DivisibleBy($options);
+        if (null !== $options) {
+            return new DivisibleBy(...$options);
+        }
+
+        return new DivisibleBy();
     }
 
     protected function getErrorCode(): ?string
@@ -82,9 +91,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider throwsOnNonNumericValuesProvider
-     */
+    #[DataProvider('throwsOnNonNumericValuesProvider')]
     public function testThrowsOnNonNumericValues(string $expectedGivenType, $value, $comparedValue)
     {
         $this->expectException(UnexpectedValueException::class);
@@ -101,10 +108,5 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
             [\stdClass::class, 2, new \stdClass()],
             [\ArrayIterator::class, new \ArrayIterator(), 12],
         ];
-    }
-
-    public static function provideComparisonsToNullValueAtPropertyPath()
-    {
-        self::markTestSkipped('DivisibleByValidator rejects null values.');
     }
 }

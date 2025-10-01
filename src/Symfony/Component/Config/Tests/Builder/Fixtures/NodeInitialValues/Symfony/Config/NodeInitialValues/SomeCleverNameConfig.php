@@ -54,28 +54,44 @@ class SomeCleverNameConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     some_clever_name?: array{
+     *         first?: scalar|null,
+     *         second?: scalar|null,
+     *         third?: scalar|null,
+     *     },
+     *     messenger?: array{
+     *         transports?: array<string, array{
+     *             dsn?: scalar|null, // The DSN to use. This is a required option. The info is used to describe the DSN, it can be multi-line.
+     *             serializer?: scalar|null, // Default: null
+     *             options?: list<mixed>,
+     *         }>,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('first', $value)) {
+        if (array_key_exists('first', $config)) {
             $this->_usedProperties['first'] = true;
-            $this->first = $value['first'];
-            unset($value['first']);
+            $this->first = $config['first'];
+            unset($config['first']);
         }
 
-        if (array_key_exists('second', $value)) {
+        if (array_key_exists('second', $config)) {
             $this->_usedProperties['second'] = true;
-            $this->second = $value['second'];
-            unset($value['second']);
+            $this->second = $config['second'];
+            unset($config['second']);
         }
 
-        if (array_key_exists('third', $value)) {
+        if (array_key_exists('third', $config)) {
             $this->_usedProperties['third'] = true;
-            $this->third = $value['third'];
-            unset($value['third']);
+            $this->third = $config['third'];
+            unset($config['third']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

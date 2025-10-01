@@ -35,38 +35,27 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private LdapInterface $ldap;
-    private string $baseDn;
-    private ?string $searchDn;
-    private ?string $searchPassword;
-    private array $defaultRoles;
-    private ?string $uidKey;
+    private string $uidKey;
     private string $defaultSearch;
-    private ?string $passwordAttribute;
-    private array $extraFields;
+    private RoleFetcherInterface $roleFetcher;
 
-    public function __construct(LdapInterface $ldap, string $baseDn, ?string $searchDn = null, #[\SensitiveParameter] ?string $searchPassword = null, array $defaultRoles = [], ?string $uidKey = null, ?string $filter = null, ?string $passwordAttribute = null, array $extraFields = [])
-    {
+    public function __construct(
+        private LdapInterface $ldap,
+        private string $baseDn,
+        private ?string $searchDn = null,
+        #[\SensitiveParameter] private ?string $searchPassword = null,
+        array|RoleFetcherInterface $defaultRoles = [],
+        ?string $uidKey = null,
+        ?string $filter = null,
+        private ?string $passwordAttribute = null,
+        private array $extraFields = [],
+    ) {
         $uidKey ??= 'sAMAccountName';
         $filter ??= '({uid_key}={user_identifier})';
 
-        $this->ldap = $ldap;
-        $this->baseDn = $baseDn;
-        $this->searchDn = $searchDn;
-        $this->searchPassword = $searchPassword;
-        $this->defaultRoles = $defaultRoles;
         $this->uidKey = $uidKey;
         $this->defaultSearch = str_replace('{uid_key}', $uidKey, $filter);
-        $this->passwordAttribute = $passwordAttribute;
-        $this->extraFields = $extraFields;
-    }
-
-    /**
-     * @internal for compatibility with Symfony 5.4
-     */
-    public function loadUserByUsername(string $username): UserInterface
-    {
-        return $this->loadUserByIdentifier($username);
+        $this->roleFetcher = \is_array($defaultRoles) ? new AssignDefaultRoles($defaultRoles) : $defaultRoles;
     }
 
     public function loadUserByIdentifier(string $identifier): UserInterface
@@ -78,11 +67,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
 
         $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
-        $query = str_replace('{username}', '{user_identifier}', $this->defaultSearch, $replaceCount);
-        if ($replaceCount > 0) {
-            trigger_deprecation('symfony/ldap', '6.2', 'Using "{username}" parameter in LDAP configuration is deprecated, consider using "{user_identifier}" instead.');
-        }
-        $query = str_replace('{user_identifier}', $identifier, $query);
+        $query = str_replace('{user_identifier}', $identifier, $this->defaultSearch);
         $search = $this->ldap->query($this->baseDn, $query, ['filter' => 0 == \count($this->extraFields) ? '*' : $this->extraFields]);
 
         $entries = $search->execute();
@@ -105,9 +90,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         $entry = $entries[0];
 
         try {
-            if (null !== $this->uidKey) {
-                $identifier = $this->getAttributeValue($entry, $this->uidKey);
-            }
+            $identifier = $this->getAttributeValue($entry, $this->uidKey);
         } catch (InvalidArgumentException) {
         }
 
@@ -166,7 +149,9 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             $extraFields[$field] = $this->getAttributeValue($entry, $field);
         }
 
-        return new LdapUser($entry, $identifier, $password, $this->defaultRoles, $extraFields);
+        $roles = $this->roleFetcher->fetchRoles($entry);
+
+        return new LdapUser($entry, $identifier, $password, $roles, $extraFields);
     }
 
     private function getAttributeValue(Entry $entry, string $attribute): mixed

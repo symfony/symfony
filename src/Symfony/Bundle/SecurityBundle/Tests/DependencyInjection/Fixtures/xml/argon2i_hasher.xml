@@ -13,7 +13,7 @@
     </imports>
 
     <sec:config>
-        <sec:password_hasher class="JMS\FooBundle\Entity\User7" algorithm="argon2i" memory-cost="256" time-cost="1" />
+        <sec:password-hasher class="JMS\FooBundle\Entity\User7" algorithm="argon2i" memory-cost="256" time-cost="1" />
     </sec:config>
 
 </container>

@@ -42,17 +42,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%2A' => '*',
     ];
 
-    protected $routes;
-    protected $context;
-
-    /**
-     * @var bool|null
-     */
-    protected $strictRequirements = true;
-
-    protected $logger;
-
-    private ?string $defaultLocale;
+    protected ?bool $strictRequirements = true;
 
     /**
      * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the path segment of the generated URL.
@@ -62,7 +52,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * "?" and "#" (would be interpreted wrongly as query and fragment identifier),
      * "'" and """ (are used as delimiters in HTML).
      */
-    protected $decodedChars = [
+    protected array $decodedChars = [
         // the slash can be used to designate a hierarchical structure and we want allow using it with this meaning
         // some webservers don't allow the slash in encoded form in the path for security reasons anyway
         // see http://stackoverflow.com/questions/4069002/http-400-if-2f-part-of-get-url-in-jboss
@@ -83,18 +73,15 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%7C' => '|',
     ];
 
-    public function __construct(RouteCollection $routes, RequestContext $context, ?LoggerInterface $logger = null, ?string $defaultLocale = null)
-    {
-        $this->routes = $routes;
-        $this->context = $context;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
+    public function __construct(
+        protected RouteCollection $routes,
+        protected RequestContext $context,
+        protected ?LoggerInterface $logger = null,
+        private ?string $defaultLocale = null,
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->context = $context;
     }
@@ -104,10 +91,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         return $this->context;
     }
 
-    /**
-     * @return void
-     */
-    public function setStrictRequirements(?bool $enabled)
+    public function setStrictRequirements(?bool $enabled): void
     {
         $this->strictRequirements = $enabled;
     }
@@ -158,6 +142,18 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     protected function doGenerate(array $variables, array $defaults, array $requirements, array $tokens, array $parameters, string $name, int $referenceType, array $hostTokens, array $requiredSchemes = []): string
     {
+        $queryParameters = [];
+
+        if (isset($parameters['_query'])) {
+            if (\is_array($parameters['_query'])) {
+                $queryParameters = $parameters['_query'];
+                unset($parameters['_query']);
+            } else {
+                trigger_deprecation('symfony/routing', '7.4', 'Parameter "_query" is reserved for passing an array of query parameters. Passing a scalar value is deprecated and will throw an exception in Symfony 8.0.');
+                // throw new InvalidParameterException('Parameter "_query" must be an array of query parameters.');
+            }
+        }
+
         $variables = array_flip($variables);
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
@@ -276,13 +272,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
         // add a query string if needed
         $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, fn ($a, $b) => $a == $b ? 0 : 1);
+        $extra = array_merge($extra, $queryParameters);
 
         array_walk_recursive($extra, $caster = static function (&$v) use (&$caster) {
             if (\is_object($v)) {
                 if ($vars = get_object_vars($v)) {
                     array_walk_recursive($vars, $caster);
                     $v = $vars;
-                } elseif (method_exists($v, '__toString')) {
+                } elseif ($v instanceof \Stringable) {
                     $v = (string) $v;
                 }
             }

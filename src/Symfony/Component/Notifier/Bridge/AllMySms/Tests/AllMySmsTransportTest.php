@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\AllMySms\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsOptions;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -43,5 +44,32 @@ final class AllMySmsTransportTest extends TransportTestCase
     {
         yield [new ChatMessage('Hello!')];
         yield [new DummyMessage()];
+    }
+
+    public function testSentMessageInfo()
+    {
+        $smsMessage = new SmsMessage('0611223344', 'lorem ipsum');
+
+        $data = json_encode([
+            'code' => 100,
+            'description' => 'Your messages have been sent',
+            'smsId' => 'de4d766d-4faf-11e9-a8ef-0025907cf72e',
+            'invalidNumbers' => '',
+            'nbContacts' => 1,
+            'nbSms' => 1,
+            'balance' => 2.81,
+            'cost' => 0.19,
+        ]);
+
+        $responses = [
+            new MockResponse($data, ['http_code' => 201]),
+        ];
+
+        $transport = self::createTransport(new MockHttpClient($responses));
+        $sentMessage = $transport->send($smsMessage);
+
+        $this->assertSame(1, $sentMessage->getInfo('nbSms'));
+        $this->assertSame(2.81, $sentMessage->getInfo('balance'));
+        $this->assertSame(0.19, $sentMessage->getInfo('cost'));
     }
 }

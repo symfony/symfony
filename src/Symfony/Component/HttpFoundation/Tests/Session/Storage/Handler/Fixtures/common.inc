@@ -28,7 +28,6 @@ ini_set('session.cookie_domain', '');
 ini_set('session.cookie_secure', '');
 ini_set('session.cookie_httponly', '');
 ini_set('session.use_cookies', 1);
-ini_set('session.use_only_cookies', 1);
 ini_set('session.cache_expire', 180);
 ini_set('session.cookie_path', '/');
 ini_set('session.cookie_domain', '');

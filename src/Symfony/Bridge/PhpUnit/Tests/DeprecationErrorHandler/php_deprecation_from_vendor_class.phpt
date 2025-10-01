@@ -1,7 +1,5 @@
 --TEST--
 Test that a PHP deprecation from a vendor class autoload is considered indirect.
---SKIPIF--
-<?php if (\PHP_VERSION_ID < 80100) echo 'skip'; ?>
 --FILE--
 <?php
 

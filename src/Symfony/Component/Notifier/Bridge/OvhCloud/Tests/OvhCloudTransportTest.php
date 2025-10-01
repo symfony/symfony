@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\OvhCloud\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransport;
@@ -52,11 +54,8 @@ final class OvhCloudTransportTest extends TransportTestCase
         yield 'including a slash' => ['hel/lo'];
     }
 
-    /**
-     * @group time-sensitive
-     *
-     * @dataProvider validMessagesProvider
-     */
+    #[Group('time-sensitive')]
+    #[DataProvider('validMessagesProvider')]
     public function testValidSignature(string $message)
     {
         $smsMessage = new SmsMessage('0611223344', $message);
@@ -64,10 +63,10 @@ final class OvhCloudTransportTest extends TransportTestCase
         $time = time();
 
         $data = json_encode([
-            'totalCreditsRemoved' => '1',
+            'totalCreditsRemoved' => 1,
             'invalidReceivers' => [],
             'ids' => [
-                '26929925',
+                26929925,
             ],
             'validReceivers' => [
                 '0611223344',
@@ -96,7 +95,7 @@ final class OvhCloudTransportTest extends TransportTestCase
         $smsMessage = new SmsMessage('invalid_receiver', 'lorem ipsum');
 
         $data = json_encode([
-            'totalCreditsRemoved' => '1',
+            'totalCreditsRemoved' => 0,
             'invalidReceivers' => ['invalid_receiver'],
             'ids' => [],
             'validReceivers' => [],
@@ -111,5 +110,30 @@ final class OvhCloudTransportTest extends TransportTestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Attempt to send the SMS to invalid receivers: "invalid_receiver"');
         $transport->send($smsMessage);
+    }
+
+    public function testSentMessageInfo()
+    {
+        $smsMessage = new SmsMessage('0611223344', 'lorem ipsum');
+
+        $data = json_encode([
+            'totalCreditsRemoved' => 1,
+            'invalidReceivers' => [],
+            'ids' => [
+                26929925,
+            ],
+            'validReceivers' => [
+                '0611223344',
+            ],
+        ]);
+        $responses = [
+            new MockResponse(time()),
+            new MockResponse($data),
+        ];
+
+        $transport = self::createTransport(new MockHttpClient($responses));
+        $sentMessage = $transport->send($smsMessage);
+
+        $this->assertSame(1, $sentMessage->getInfo('totalCreditsRemoved'));
     }
 }

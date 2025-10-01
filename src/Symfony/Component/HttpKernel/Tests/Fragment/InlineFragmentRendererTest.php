@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,9 +27,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class InlineFragmentRendererTest extends TestCase
 {
     public function testRender()
@@ -97,7 +96,7 @@ class InlineFragmentRendererTest extends TestCase
 
         $strategy = new InlineFragmentRenderer($kernel, $dispatcher);
 
-        $this->assertEmpty($strategy->render('/', $request, ['ignore_errors' => true])->getContent());
+        $this->assertSame('', $strategy->render('/', $request, ['ignore_errors' => true])->getContent());
     }
 
     public function testRenderExceptionIgnoreErrorsWithAlt()

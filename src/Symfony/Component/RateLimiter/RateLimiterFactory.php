@@ -24,17 +24,15 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-final class RateLimiterFactory
+final class RateLimiterFactory implements RateLimiterFactoryInterface
 {
     private array $config;
-    private StorageInterface $storage;
-    private ?LockFactory $lockFactory;
 
-    public function __construct(array $config, StorageInterface $storage, ?LockFactory $lockFactory = null)
-    {
-        $this->storage = $storage;
-        $this->lockFactory = $lockFactory;
-
+    public function __construct(
+        array $config,
+        private StorageInterface $storage,
+        private ?LockFactory $lockFactory = null,
+    ) {
         $options = new OptionsResolver();
         self::configureOptions($options);
 
@@ -55,7 +53,7 @@ final class RateLimiterFactory
         };
     }
 
-    protected static function configureOptions(OptionsResolver $options): void
+    private static function configureOptions(OptionsResolver $options): void
     {
         $intervalNormalizer = static function (Options $options, string $interval): \DateInterval {
             // Create DateTimeImmutable from unix timesatmp, so the default timezone is ignored and we don't need to
@@ -84,7 +82,7 @@ final class RateLimiterFactory
             ->define('limit')->allowedTypes('int')
             ->define('interval')->allowedTypes('string')->normalize($intervalNormalizer)
             ->define('rate')
-                ->default(function (OptionsResolver $rate) use ($intervalNormalizer) {
+                ->options(function (OptionsResolver $rate) use ($intervalNormalizer) {
                     $rate
                         ->define('amount')->allowedTypes('int')->default(1)
                         ->define('interval')->allowedTypes('string')->normalize($intervalNormalizer)

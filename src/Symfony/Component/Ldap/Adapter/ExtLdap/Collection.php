@@ -20,15 +20,13 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Collection implements CollectionInterface
 {
-    private Connection $connection;
-    private Query $search;
     /** @var list<Entry> */
     private array $entries;
 
-    public function __construct(Connection $connection, Query $search)
-    {
-        $this->connection = $connection;
-        $this->search = $search;
+    public function __construct(
+        private Connection $connection,
+        private Query $search,
+    ) {
     }
 
     public function toArray(): array

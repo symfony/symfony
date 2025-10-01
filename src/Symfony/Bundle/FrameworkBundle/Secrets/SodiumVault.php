@@ -31,8 +31,11 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
      * @param $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault
      *                       or null to store generated keys in the provided $secretsDir
      */
-    public function __construct(string $secretsDir, #[\SensitiveParameter] string|\Stringable|null $decryptionKey = null)
-    {
+    public function __construct(
+        string $secretsDir,
+        #[\SensitiveParameter] string|\Stringable|null $decryptionKey = null,
+        private ?string $derivedSecretEnvVar = null,
+    ) {
         $this->pathPrefix = rtrim(strtr($secretsDir, '/', \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR.basename($secretsDir).'.';
         $this->decryptionKey = $decryptionKey;
         $this->secretsDir = $secretsDir;
@@ -111,7 +114,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
         $this->loadKeys();
 
-        if ('' === $this->decryptionKey) {
+        if ('' === $this->decryptionKey = (string) $this->decryptionKey) {
             $this->lastMessage = \sprintf('Secret "%s" cannot be revealed as no decryption key was found in "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return null;
@@ -177,6 +180,11 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
             $envs[$name] = LazyString::fromCallable($reveal, $name);
         }
 
+        if ($this->derivedSecretEnvVar && !\array_key_exists($this->derivedSecretEnvVar, $envs)) {
+            $k = $this->decryptionKey;
+            $envs[$this->derivedSecretEnvVar] = LazyString::fromCallable(static fn () => '' !== ($k = (string) $k) ? base64_encode(hash('sha256', $k, true)) : '');
+        }
+
         return $envs;
     }
 
@@ -220,7 +228,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
     private function createSecretsDir(): void
     {
-        if ($this->secretsDir && !is_dir($this->secretsDir) && !@mkdir($this->secretsDir, 0777, true) && !is_dir($this->secretsDir)) {
+        if ($this->secretsDir && !is_dir($this->secretsDir) && !@mkdir($this->secretsDir, 0o777, true) && !is_dir($this->secretsDir)) {
             throw new \RuntimeException(\sprintf('Unable to create the secrets directory (%s).', $this->secretsDir));
         }
 

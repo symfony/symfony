@@ -35,22 +35,45 @@ class MessengerConfig
         return $this->receiving[] = new \Symfony\Config\AddToList\Messenger\ReceivingConfig($value);
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     translator?: array{
+     *         fallbacks?: list<scalar|null>,
+     *         sources?: array<string, scalar|null>,
+     *         books?: array{ // Deprecated: The child node "books" at path "add_to_list.translator.books" is deprecated. // looks for translation in old fashion way
+     *             page?: list<array{
+     *                 number?: int<min, max>,
+     *                 content?: scalar|null,
+     *             }>,
+     *         },
+     *     },
+     *     messenger?: array{
+     *         routing?: array<string, array{
+     *             senders?: list<scalar|null>,
+     *         }>,
+     *         receiving?: list<array{
+     *             priority?: int<min, max>,
+     *             color?: scalar|null,
+     *         }>,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('routing', $value)) {
+        if (array_key_exists('routing', $config)) {
             $this->_usedProperties['routing'] = true;
-            $this->routing = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\RoutingConfig($v), $value['routing']);
-            unset($value['routing']);
+            $this->routing = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\RoutingConfig($v), $config['routing']);
+            unset($config['routing']);
         }
 
-        if (array_key_exists('receiving', $value)) {
+        if (array_key_exists('receiving', $config)) {
             $this->_usedProperties['receiving'] = true;
-            $this->receiving = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\ReceivingConfig($v), $value['receiving']);
-            unset($value['receiving']);
+            $this->receiving = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\ReceivingConfig($v), $config['receiving']);
+            unset($config['receiving']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

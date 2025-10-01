@@ -30,17 +30,16 @@ interface ContainerInterface extends PsrContainerInterface
     public const IGNORE_ON_INVALID_REFERENCE = 3;
     public const IGNORE_ON_UNINITIALIZED_REFERENCE = 4;
 
-    /**
-     * @return void
-     */
-    public function set(string $id, ?object $service);
+    public function set(string $id, ?object $service): void;
 
     /**
+     * @template C of object
      * @template B of self::*_REFERENCE
      *
-     * @param B $invalidBehavior
+     * @param string|class-string<C> $id
+     * @param B                      $invalidBehavior
      *
-     * @psalm-return (B is self::EXCEPTION_ON_INVALID_REFERENCE|self::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE ? object : object|null)
+     * @return ($id is class-string<C> ? (B is 0|1 ? C|object : C|object|null) : (B is 0|1 ? object : object|null))
      *
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined
@@ -57,16 +56,11 @@ interface ContainerInterface extends PsrContainerInterface
     public function initialized(string $id): bool;
 
     /**
-     * @return array|bool|string|int|float|\UnitEnum|null
-     *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
-    public function getParameter(string $name);
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null;
 
     public function hasParameter(string $name): bool;
 
-    /**
-     * @return void
-     */
-    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value);
+    public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void;
 }

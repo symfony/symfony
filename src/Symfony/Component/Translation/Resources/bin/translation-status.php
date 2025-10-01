@@ -15,27 +15,27 @@ if ('cli' !== \PHP_SAPI) {
 
 $usageInstructions = <<<END
 
-  Usage instructions
-  -------------------------------------------------------------------------------
+      Usage instructions
+      -------------------------------------------------------------------------------
 
-  $ cd symfony-code-root-directory/
+      $ cd symfony-code-root-directory/
 
-  # show the translation status of all locales
-  $ php translation-status.php
+      # show the translation status of all locales
+      $ php translation-status.php
 
-  # only show the translation status of incomplete or erroneous locales
-  $ php translation-status.php --incomplete
+      # only show the translation status of incomplete or erroneous locales
+      $ php translation-status.php --incomplete
 
-  # show the translation status of all locales, all their missing translations and mismatches between trans-unit id and source
-  $ php translation-status.php -v
+      # show the translation status of all locales, all their missing translations and mismatches between trans-unit id and source
+      $ php translation-status.php -v
 
-  # show the status of a single locale
-  $ php translation-status.php fr
+      # show the status of a single locale
+      $ php translation-status.php fr
 
-  # show the status of a single locale, missing translations and mismatches between trans-unit id and source
-  $ php translation-status.php fr -v
+      # show the status of a single locale, missing translations and mismatches between trans-unit id and source
+      $ php translation-status.php fr -v
 
-END;
+    END;
 
 $config = [
     // if TRUE, the full list of missing translations is displayed

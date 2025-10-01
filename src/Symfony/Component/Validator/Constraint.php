@@ -52,23 +52,16 @@ abstract class Constraint
     protected const ERROR_NAMES = [];
 
     /**
-     * @deprecated since Symfony 6.1, use protected const ERROR_NAMES instead
-     */
-    protected static $errorNames = [];
-
-    /**
      * Domain-specific data attached to a constraint.
-     *
-     * @var mixed
      */
-    public $payload;
+    public mixed $payload;
 
     /**
      * The groups that the constraint belongs to.
      *
      * @var string[]
      */
-    public $groups;
+    public ?array $groups = null;
 
     /**
      * Returns the name of the given error code.
@@ -81,13 +74,7 @@ abstract class Constraint
             return static::ERROR_NAMES[$errorCode];
         }
 
-        if (!isset(static::$errorNames[$errorCode])) {
-            throw new InvalidArgumentException(\sprintf('The error code "%s" does not exist for constraint of type "%s".', $errorCode, static::class));
-        }
-
-        trigger_deprecation('symfony/validator', '6.1', 'The "%s::$errorNames" property is deprecated, use protected const ERROR_NAMES instead.', static::class);
-
-        return static::$errorNames[$errorCode];
+        throw new InvalidArgumentException(\sprintf('The error code "%s" does not exist for constraint of type "%s".', $errorCode, static::class));
     }
 
     /**
@@ -123,6 +110,17 @@ abstract class Constraint
     {
         unset($this->groups); // enable lazy initialization
 
+        if (null === $options && (\func_num_args() > 0 || self::class === (new \ReflectionMethod($this, 'getRequiredOptions'))->getDeclaringClass()->getName())) {
+            if (null !== $groups) {
+                $this->groups = $groups;
+            }
+            $this->payload = $payload;
+
+            return;
+        }
+
+        trigger_deprecation('symfony/validator', '7.4', 'Support for evaluating options in the base Constraint class is deprecated. Initialize properties in the constructor of %s instead.', static::class);
+
         $options = $this->normalizeOptions($options);
         if (null !== $groups) {
             $options['groups'] = $groups;
@@ -134,12 +132,17 @@ abstract class Constraint
         }
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     *
+     * @return array<string, mixed>
+     */
     protected function normalizeOptions(mixed $options): array
     {
         $normalizedOptions = [];
-        $defaultOption = $this->getDefaultOption();
+        $defaultOption = $this->getDefaultOption(false);
         $invalidOptions = [];
-        $missingOptions = array_flip((array) $this->getRequiredOptions());
+        $missingOptions = array_flip($this->getRequiredOptions(false));
         $knownOptions = get_class_vars(static::class);
 
         if (\is_array($options) && isset($options['value']) && !property_exists($this, 'value')) {
@@ -194,11 +197,9 @@ abstract class Constraint
      * this method will be called at most once per constraint instance and
      * option name.
      *
-     * @return void
-     *
      * @throws InvalidOptionsException If an invalid option name is given
      */
-    public function __set(string $option, mixed $value)
+    public function __set(string $option, mixed $value): void
     {
         if ('groups' === $option) {
             $this->groups = (array) $value;
@@ -236,16 +237,14 @@ abstract class Constraint
 
     /**
      * Adds the given group if this constraint is in the Default group.
-     *
-     * @return void
      */
-    public function addImplicitGroupName(string $group)
+    public function addImplicitGroupName(string $group): void
     {
         if (null === $this->groups && \array_key_exists('groups', (array) $this)) {
             throw new \LogicException(\sprintf('"%s::$groups" is set to null. Did you forget to call "%s::__construct()"?', static::class, self::class));
         }
 
-        if (\in_array(self::DEFAULT_GROUP, $this->groups) && !\in_array($group, $this->groups)) {
+        if (\in_array(self::DEFAULT_GROUP, $this->groups) && !\in_array($group, $this->groups, true)) {
             $this->groups[] = $group;
         }
     }
@@ -255,12 +254,15 @@ abstract class Constraint
      *
      * Override this method to define a default option.
      *
-     * @return string|null
-     *
+     * @deprecated since Symfony 7.4
      * @see __construct()
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return null;
     }
 
@@ -271,10 +273,15 @@ abstract class Constraint
      *
      * @return string[]
      *
+     * @deprecated since Symfony 7.4
      * @see __construct()
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return [];
     }
 
@@ -284,10 +291,8 @@ abstract class Constraint
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
      * behavior.
-     *
-     * @return string
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return static::class.'Validator';
     }
@@ -296,26 +301,32 @@ abstract class Constraint
      * Returns whether the constraint can be put onto classes, properties or
      * both.
      *
-     * This method should return one or more of the constants
-     * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
-     *
-     * @return string|string[] One or more constant values
+     * @return self::CLASS_CONSTRAINT|self::PROPERTY_CONSTRAINT|array<self::CLASS_CONSTRAINT|self::PROPERTY_CONSTRAINT>
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }
 
     /**
      * Optimizes the serialized value to minimize storage space.
-     *
-     * @internal
      */
-    public function __sleep(): array
+    public function __serialize(): array
     {
         // Initialize "groups" option if it is not set
         $this->groups;
 
-        return array_keys(get_object_vars($this));
+        $data = [];
+        $class = $this::class;
+        foreach ((array) $this as $k => $v) {
+            $data[match (true) {
+                '' === $k || "\0" !== $k[0] => $k,
+                str_starts_with($k, "\0*\0") => substr($k, 3),
+                str_starts_with($k, "\0{$class}\0") => substr($k, 2 + \strlen($class)),
+                default => $k,
+            }] = $v;
+        }
+
+        return $data;
     }
 }

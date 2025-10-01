@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\CI;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -31,9 +32,7 @@ class GithubActionReporterTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider annotationsFormatProvider
-     */
+    #[DataProvider('annotationsFormatProvider')]
     public function testAnnotationsFormat(string $type, string $message, ?string $file, ?int $line, ?int $col, string $expected)
     {
         $reporter = new GithubActionReporter($buffer = new BufferedOutput());

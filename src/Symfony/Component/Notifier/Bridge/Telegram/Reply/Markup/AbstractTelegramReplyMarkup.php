@@ -16,7 +16,7 @@ namespace Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup;
  */
 abstract class AbstractTelegramReplyMarkup
 {
-    protected $options = [];
+    protected array $options = [];
 
     public function toArray(): array
     {

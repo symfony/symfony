@@ -29,7 +29,7 @@ class CoverageListener implements TestListener
     public function __construct(?callable $sutFqcnResolver = null, bool $warningOnSutNotFound = false)
     {
         $this->sutFqcnResolver = $sutFqcnResolver ?? static function (Test $test): ?string {
-            $class = \get_class($test);
+            $class = $test::class;
 
             $sutFqcn = str_replace('\\Tests\\', '\\', $class);
             $sutFqcn = preg_replace('{Test$}', '', $sutFqcn);
@@ -46,7 +46,7 @@ class CoverageListener implements TestListener
             return;
         }
 
-        $annotations = TestUtil::parseTestMethodAnnotations(\get_class($test), $test->getName(false));
+        $annotations = TestUtil::parseTestMethodAnnotations($test::class, $test->getName(false));
 
         $ignoredAnnotations = ['covers', 'coversDefaultClass', 'coversNothing'];
 
@@ -86,13 +86,10 @@ class CoverageListener implements TestListener
     private function addCoversForClassToAnnotationCache(Test $test, array $covers): void
     {
         $r = new \ReflectionProperty(TestUtil::class, 'annotationCache');
-        if (\PHP_VERSION_ID < 80100) {
-            $r->setAccessible(true);
-        }
 
         $cache = $r->getValue();
         $cache = array_replace_recursive($cache, [
-            \get_class($test) => [
+            $test::class => [
                 'covers' => $covers,
             ],
         ]);
@@ -102,12 +99,9 @@ class CoverageListener implements TestListener
 
     private function addCoversForDocBlockInsideRegistry(Test $test, array $covers): void
     {
-        $docBlock = Registry::getInstance()->forClassName(\get_class($test));
+        $docBlock = Registry::getInstance()->forClassName($test::class);
 
         $symbolAnnotations = new \ReflectionProperty($docBlock, 'symbolAnnotations');
-        if (\PHP_VERSION_ID < 80100) {
-            $symbolAnnotations->setAccessible(true);
-        }
 
         // Exclude internal classes; PHPUnit 9.1+ is picky about tests covering, say, a \RuntimeException
         $covers = array_filter($covers, function (string $class) {

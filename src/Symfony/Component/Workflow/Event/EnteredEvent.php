@@ -11,6 +11,21 @@
 
 namespace Symfony\Component\Workflow\Event;
 
+use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\Transition;
+use Symfony\Component\Workflow\WorkflowInterface;
+
 final class EnteredEvent extends Event
 {
+    use EventNameTrait {
+        getNameForPlace as public getName;
+    }
+    use HasContextTrait;
+
+    public function __construct(object $subject, Marking $marking, ?Transition $transition = null, ?WorkflowInterface $workflow = null, array $context = [])
+    {
+        parent::__construct($subject, $marking, $transition, $workflow);
+
+        $this->context = $context;
+    }
 }

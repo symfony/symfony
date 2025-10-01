@@ -26,14 +26,12 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  */
 class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private iterable $providers;
-
     /**
      * @param iterable<array-key, UserProviderInterface> $providers
      */
-    public function __construct(iterable $providers)
-    {
-        $this->providers = $providers;
+    public function __construct(
+        private iterable $providers,
+    ) {
     }
 
     /**
@@ -46,14 +44,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         }
 
         return $this->providers;
-    }
-
-    /**
-     * @internal for compatibility with Symfony 5.4
-     */
-    public function loadUserByUsername(string $username): UserInterface
-    {
-        return $this->loadUserByIdentifier($username);
     }
 
     /**
@@ -103,9 +93,9 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
             $e = new UserNotFoundException(\sprintf('There is no user with name "%s".', $username));
             $e->setUserIdentifier($username);
             throw $e;
-        } else {
-            throw new UnsupportedUserException(\sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', get_debug_type($user)));
         }
+
+        throw new UnsupportedUserException(\sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', get_debug_type($user)));
     }
 
     public function supportsClass(string $class): bool

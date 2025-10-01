@@ -35,4 +35,35 @@ class NodeDefinitionTest extends TestCase
 
         $parentNode->setPathSeparator('/');
     }
+
+    public function testDocUrl()
+    {
+        $node = new ArrayNodeDefinition('node');
+        $node->docUrl('https://example.com/doc/{package}/{version:major}.{version:minor}', 'phpunit/phpunit');
+
+        $r = new \ReflectionObject($node);
+        $p = $r->getProperty('attributes');
+
+        $this->assertMatchesRegularExpression('~^https://example.com/doc/phpunit/phpunit/\d+\.\d+$~', $p->getValue($node)['docUrl']);
+    }
+
+    public function testDocUrlWithoutPackage()
+    {
+        $node = new ArrayNodeDefinition('node');
+        $node->docUrl('https://example.com/doc/empty{version:major}.empty{version:minor}');
+
+        $r = new \ReflectionObject($node);
+        $p = $r->getProperty('attributes');
+
+        $this->assertSame('https://example.com/doc/empty.empty', $p->getValue($node)['docUrl']);
+    }
+
+    public function testUnknownPackageThrowsException()
+    {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('Package "phpunit/invalid" is not installed');
+
+        $node = new ArrayNodeDefinition('node');
+        $node->docUrl('https://example.com/doc/{package}/{version:major}.{version:minor}', 'phpunit/invalid');
+    }
 }

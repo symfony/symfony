@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -32,18 +33,15 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class Firewall implements EventSubscriberInterface
 {
-    private FirewallMapInterface $map;
-    private EventDispatcherInterface $dispatcher;
-
     /**
      * @var \SplObjectStorage<Request, ExceptionListener>
      */
     private \SplObjectStorage $exceptionListeners;
 
-    public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
-    {
-        $this->map = $map;
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private FirewallMapInterface $map,
+        private EventDispatcherInterface $dispatcher,
+    ) {
         $this->exceptionListeners = new \SplObjectStorage();
     }
 
@@ -126,6 +124,8 @@ class Firewall implements EventSubscriberInterface
     {
         foreach ($listeners as $listener) {
             if (!$listener instanceof FirewallListenerInterface) {
+                trigger_deprecation('symfony/security-http', '7.4', 'Using a callable as firewall listener is deprecated, extend "%s" or implement "%s" instead.', AbstractListener::class, FirewallListenerInterface::class);
+
                 $listener($event);
             } elseif (false !== $listener->supports($event->getRequest())) {
                 $listener->authenticate($event);
@@ -137,8 +137,8 @@ class Firewall implements EventSubscriberInterface
         }
     }
 
-    private function getListenerPriority(object $logoutListener): int
+    private function getListenerPriority(object $listener): int
     {
-        return $logoutListener instanceof FirewallListenerInterface ? $logoutListener->getPriority() : 0;
+        return $listener instanceof FirewallListenerInterface ? $listener->getPriority() : 0;
     }
 }

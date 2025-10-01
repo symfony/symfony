@@ -105,35 +105,13 @@ class Response
         'etag' => true,
     ];
 
-    /**
-     * @var ResponseHeaderBag
-     */
-    public $headers;
+    public ResponseHeaderBag $headers;
 
-    /**
-     * @var string
-     */
-    protected $content;
-
-    /**
-     * @var string
-     */
-    protected $version;
-
-    /**
-     * @var int
-     */
-    protected $statusCode;
-
-    /**
-     * @var string
-     */
-    protected $statusText;
-
-    /**
-     * @var string
-     */
-    protected $charset;
+    protected string $content;
+    protected string $version;
+    protected int $statusCode;
+    protected string $statusText;
+    protected ?string $charset = null;
 
     /**
      * Status codes translation table.
@@ -144,9 +122,9 @@ class Response
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
      *
-     * @var array
+     * @var array<int, string>
      */
-    public static $statusTexts = [
+    public static array $statusTexts = [
         100 => 'Continue',
         101 => 'Switching Protocols',
         102 => 'Processing',            // RFC2518
@@ -283,7 +261,7 @@ class Response
             }
 
             // Fix Content-Type
-            $charset = $this->charset ?: 'UTF-8';
+            $charset = $this->charset ?: 'utf-8';
             if (!$headers->has('Content-Type')) {
                 $headers->set('Content-Type', 'text/html; charset='.$charset);
             } elseif (0 === stripos($headers->get('Content-Type') ?? '', 'text/') && false === stripos($headers->get('Content-Type') ?? '', 'charset')) {
@@ -335,14 +313,19 @@ class Response
      *
      * @return $this
      */
-    public function sendHeaders(/* int $statusCode = null */): static
+    public function sendHeaders(?int $statusCode = null): static
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
+            if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+                $statusCode ??= $this->statusCode;
+                trigger_deprecation('symfony/http-foundation', '7.4', 'Trying to use "%s::sendHeaders()" after headers have already been sent is deprecated and will throw a PHP warning in 8.0. Use a "StreamedResponse" instead.', static::class);
+                // header(\sprintf('HTTP/%s %s %s', $this->version, $statusCode, $this->statusText), true, $statusCode);
+            }
+
             return $this;
         }
 
-        $statusCode = \func_num_args() > 0 ? func_get_arg(0) : null;
         $informationalResponse = $statusCode >= 100 && $statusCode < 200;
         if ($informationalResponse && !\function_exists('headers_send')) {
             // skip informational responses if not supported by the SAPI
@@ -351,9 +334,6 @@ class Response
 
         // headers
         foreach ($this->headers->allPreserveCaseWithoutCookies() as $name => $values) {
-            $newValues = $values;
-            $replace = false;
-
             // As recommended by RFC 8297, PHP automatically copies headers from previous 103 responses, we need to deal with that if headers changed
             $previousValues = $this->sentHeaders[$name] ?? null;
             if ($previousValues === $values) {
@@ -417,12 +397,11 @@ class Response
      *
      * @return $this
      */
-    public function send(/* bool $flush = true */): static
+    public function send(bool $flush = true): static
     {
         $this->sendHeaders();
         $this->sendContent();
 
-        $flush = 1 <= \func_num_args() ? func_get_arg(0) : true;
         if (!$flush) {
             return $this;
         }
@@ -566,7 +545,7 @@ class Response
      */
     public function isCacheable(): bool
     {
-        if (!\in_array($this->statusCode, [200, 203, 300, 301, 302, 404, 410])) {
+        if (!\in_array($this->statusCode, [200, 203, 300, 301, 302, 404, 410], true)) {
             return false;
         }
 
@@ -760,11 +739,8 @@ class Response
      *
      * @final
      */
-    public function setExpires(?\DateTimeInterface $date = null): static
+    public function setExpires(?\DateTimeInterface $date): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if (null === $date) {
             $this->headers->remove('Expires');
 
@@ -809,7 +785,7 @@ class Response
     /**
      * Sets the number of seconds after which the response should no longer be considered fresh.
      *
-     * This methods sets the Cache-Control max-age directive.
+     * This method sets the Cache-Control max-age directive.
      *
      * @return $this
      *
@@ -857,7 +833,7 @@ class Response
     /**
      * Sets the number of seconds after which the response should no longer be considered fresh by shared caches.
      *
-     * This methods sets the Cache-Control s-maxage directive.
+     * This method sets the Cache-Control s-maxage directive.
      *
      * @return $this
      *
@@ -941,11 +917,8 @@ class Response
      *
      * @final
      */
-    public function setLastModified(?\DateTimeInterface $date = null): static
+    public function setLastModified(?\DateTimeInterface $date): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if (null === $date) {
             $this->headers->remove('Last-Modified');
 
@@ -979,11 +952,8 @@ class Response
      *
      * @final
      */
-    public function setEtag(?string $etag = null, bool $weak = false): static
+    public function setEtag(?string $etag, bool $weak = false): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         if (null === $etag) {
             $this->headers->remove('Etag');
         } else {
@@ -1284,7 +1254,7 @@ class Response
      */
     public function isRedirect(?string $location = null): bool
     {
-        return \in_array($this->statusCode, [201, 301, 302, 303, 307, 308]) && (null === $location ?: $location == $this->headers->get('Location'));
+        return \in_array($this->statusCode, [201, 301, 302, 303, 307, 308], true) && (null === $location ?: $location == $this->headers->get('Location'));
     }
 
     /**
@@ -1294,7 +1264,7 @@ class Response
      */
     public function isEmpty(): bool
     {
-        return \in_array($this->statusCode, [204, 304]);
+        return \in_array($this->statusCode, [204, 304], true);
     }
 
     /**

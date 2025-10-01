@@ -13,9 +13,6 @@ namespace Symfony\Component\Messenger\Exception;
 
 use Symfony\Component\Messenger\Envelope;
 
-/**
- * @internal
- */
 interface EnvelopeAwareExceptionInterface
 {
     public function getEnvelope(): ?Envelope;

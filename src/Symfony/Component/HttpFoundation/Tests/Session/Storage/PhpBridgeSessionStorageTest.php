@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
@@ -21,11 +23,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
  * @author Drak <drak@zikula.org>
  *
  * These tests require separate processes.
- *
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
  */
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
 class PhpBridgeSessionStorageTest extends TestCase
 {
     private string $savePath;

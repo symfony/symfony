@@ -33,10 +33,7 @@ class DateValidator extends ConstraintValidator
         return checkdate($month, $day, $year);
     }
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Date) {
             throw new UnexpectedTypeException($constraint, Date::class);

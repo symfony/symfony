@@ -22,13 +22,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class ResponseFormatSame extends Constraint
 {
-    private Request $request;
-    private ?string $format;
-
-    public function __construct(Request $request, ?string $format)
-    {
-        $this->request = $request;
-        $this->format = $format;
+    public function __construct(
+        private Request $request,
+        private ?string $format,
+        private readonly bool $verbose = true,
+    ) {
     }
 
     public function toString(): string
@@ -57,6 +55,6 @@ final class ResponseFormatSame extends Constraint
      */
     protected function additionalFailureDescription($response): string
     {
-        return (string) $response;
+        return $this->verbose ? (string) $response : explode("\r\n\r\n", (string) $response)[0];
     }
 }

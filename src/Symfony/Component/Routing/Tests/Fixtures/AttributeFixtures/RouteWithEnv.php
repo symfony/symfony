@@ -16,4 +16,19 @@ class RouteWithEnv
     public function action2()
     {
     }
+
+    #[Route(path: '/path3', name: 'action3', env: ['some-other-env', 'some-other-env-two'])]
+    public function action3()
+    {
+    }
+
+    #[Route(path: '/path4', name: 'action4', env: null)]
+    public function action4()
+    {
+    }
+
+    #[Route(path: '/path5', name: 'action5', env: ['some-other-env', 'some-env'])]
+    public function action5()
+    {
+    }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Dotenv\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\FormatException;
@@ -18,9 +19,7 @@ use Symfony\Component\Dotenv\Exception\PathException;
 
 class DotenvTest extends TestCase
 {
-    /**
-     * @dataProvider getEnvDataWithFormatErrors
-     */
+    #[DataProvider('getEnvDataWithFormatErrors')]
     public function testParseWithFormatError($data, $error)
     {
         $dotenv = new Dotenv();
@@ -63,9 +62,7 @@ class DotenvTest extends TestCase
         return $tests;
     }
 
-    /**
-     * @dataProvider getEnvData
-     */
+    #[DataProvider('getEnvData')]
     public function testParse($data, $expected)
     {
         $dotenv = new Dotenv();

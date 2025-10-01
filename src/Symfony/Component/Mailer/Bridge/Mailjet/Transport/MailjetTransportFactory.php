@@ -24,13 +24,13 @@ class MailjetTransportFactory extends AbstractTransportFactory
         $user = $this->getUser($dsn);
         $password = $this->getPassword($dsn);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
-        $sandbox = filter_var($dsn->getOption('sandbox', false), \FILTER_VALIDATE_BOOL);
+        $sandbox = $dsn->getBooleanOption('sandbox');
 
         if ('mailjet+api' === $scheme) {
             return (new MailjetApiTransport($user, $password, $this->client, $this->dispatcher, $this->logger, $sandbox))->setHost($host);
         }
 
-        if (\in_array($scheme, ['mailjet+smtp', 'mailjet+smtps', 'mailjet'])) {
+        if (\in_array($scheme, ['mailjet+smtp', 'mailjet+smtps', 'mailjet'], true)) {
             return new MailjetSmtpTransport($user, $password, $this->dispatcher, $this->logger);
         }
 

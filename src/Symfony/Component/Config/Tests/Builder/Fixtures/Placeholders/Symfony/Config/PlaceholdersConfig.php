@@ -59,28 +59,35 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         return 'placeholders';
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     enabled?: bool, // Default: false
+     *     favorite_float?: float,
+     *     good_integers?: list<int<min, max>>,
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('enabled', $value)) {
+        if (array_key_exists('enabled', $config)) {
             $this->_usedProperties['enabled'] = true;
-            $this->enabled = $value['enabled'];
-            unset($value['enabled']);
+            $this->enabled = $config['enabled'];
+            unset($config['enabled']);
         }
 
-        if (array_key_exists('favorite_float', $value)) {
+        if (array_key_exists('favorite_float', $config)) {
             $this->_usedProperties['favoriteFloat'] = true;
-            $this->favoriteFloat = $value['favorite_float'];
-            unset($value['favorite_float']);
+            $this->favoriteFloat = $config['favorite_float'];
+            unset($config['favorite_float']);
         }
 
-        if (array_key_exists('good_integers', $value)) {
+        if (array_key_exists('good_integers', $config)) {
             $this->_usedProperties['goodIntegers'] = true;
-            $this->goodIntegers = $value['good_integers'];
-            unset($value['good_integers']);
+            $this->goodIntegers = $config['good_integers'];
+            unset($config['good_integers']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

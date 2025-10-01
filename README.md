@@ -17,19 +17,15 @@ Installation
 Sponsor
 -------
 
-Symfony 6.4 is [backed][27] by
-- [SensioLabs][28]
-- [packagist.com][29]
+Symfony 7.3 is [backed][27] by
+- [Les-Tilleuls.coop][29]
 
-As the creator of Symfony, **SensioLabs** supports companies using Symfony,
-with an offering encompassing consultancy, expertise, services, training, and
-technical assistance to ensure the success of web application development projects.
+**Les-Tilleuls.coop** is a team of 70+ Symfony experts who can help you design, develop and
+fix your projects. They provide a wide range of professional services including development,
+consulting, coaching, training and audits. They also are highly skilled in JS, Go and DevOps.
+They are a worker cooperative!
 
-Private **Packagist.com** is a fast, reliable, and secure Composer repository for
-your private packages. It mirrors all your open-source dependencies for better
-availability and monitors them for security vulnerabilities.
-
-Help Symfony by [sponsoring][30] its development!
+Help Symfony by [sponsoring][28] its development!
 
 Documentation
 -------------
@@ -92,6 +88,5 @@ and supported by [Symfony contributors][19].
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
-[28]: https://sensiolabs.com
-[29]: https://packagist.com
-[30]: https://symfony.com/sponsor
+[28]: https://symfony.com/sponsor
+[29]: https://les-tilleuls.coop

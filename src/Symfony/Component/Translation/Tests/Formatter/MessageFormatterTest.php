@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Translation\Tests\Formatter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 
 class MessageFormatterTest extends TestCase
 {
-    /**
-     * @dataProvider getTransMessages
-     */
+    #[DataProvider('getTransMessages')]
     public function testFormat($expected, $message, $parameters = [])
     {
         $this->assertEquals($expected, $this->getMessageFormatter()->format($message, 'en', $parameters));

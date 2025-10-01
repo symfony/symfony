@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Constraints\CountryValidator;
@@ -60,9 +61,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Country());
     }
 
-    /**
-     * @dataProvider getValidCountries
-     */
+    #[DataProvider('getValidCountries')]
     public function testValidCountries($country)
     {
         $this->validator->validate($country, new Country());
@@ -79,14 +78,10 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidCountries
-     */
+    #[DataProvider('getInvalidCountries')]
     public function testInvalidCountries($country)
     {
-        $constraint = new Country([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Country(message: 'myMessage');
 
         $this->validator->validate($country, $constraint);
 
@@ -104,14 +99,10 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getValidAlpha3Countries
-     */
+    #[DataProvider('getValidAlpha3Countries')]
     public function testValidAlpha3Countries($country)
     {
-        $this->validator->validate($country, new Country([
-            'alpha3' => true,
-        ]));
+        $this->validator->validate($country, new Country(alpha3: true));
 
         $this->assertNoViolation();
     }
@@ -125,15 +116,13 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidAlpha3Countries
-     */
+    #[DataProvider('getInvalidAlpha3Countries')]
     public function testInvalidAlpha3Countries($country)
     {
-        $constraint = new Country([
-            'alpha3' => true,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Country(
+            alpha3: true,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($country, $constraint);
 

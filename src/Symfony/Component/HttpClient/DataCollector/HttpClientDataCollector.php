@@ -45,8 +45,8 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
     public function lateCollect(): void
     {
-        $this->data['request_count'] = $this->data['request_count'] ?? 0;
-        $this->data['error_count'] = $this->data['error_count'] ?? 0;
+        $this->data['request_count'] ??= 0;
+        $this->data['error_count'] ??= 0;
         $this->data += ['clients' => []];
 
         foreach ($this->clients as $name => $client) {
@@ -213,7 +213,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             }
         }
 
-        $dataArg = empty($dataArg) ? null : implode(' ', $dataArg);
+        $dataArg = $dataArg ? implode(' ', $dataArg) : null;
 
         foreach (explode("\n", $trace['info']['debug']) as $line) {
             $line = substr($line, 0, -1);

@@ -37,9 +37,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private bool|\Closure $debug;
     private string $charset;
     private FileLinkFormatter $fileLinkFormat;
-    private ?string $projectDir;
     private string|\Closure $outputBuffer;
-    private ?LoggerInterface $logger;
 
     private static string $template = 'views/error.html.php';
 
@@ -47,14 +45,18 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      * @param bool|callable   $debug        The debugging mode as a boolean or a callable that should return it
      * @param string|callable $outputBuffer The output buffer as a string or a callable that should return it
      */
-    public function __construct(bool|callable $debug = false, ?string $charset = null, string|FileLinkFormatter|null $fileLinkFormat = null, ?string $projectDir = null, string|callable $outputBuffer = '', ?LoggerInterface $logger = null)
-    {
+    public function __construct(
+        bool|callable $debug = false,
+        ?string $charset = null,
+        string|FileLinkFormatter|null $fileLinkFormat = null,
+        private ?string $projectDir = null,
+        string|callable $outputBuffer = '',
+        private ?LoggerInterface $logger = null,
+    ) {
         $this->debug = \is_bool($debug) ? $debug : $debug(...);
         $this->charset = $charset ?: (\ini_get('default_charset') ?: 'UTF-8');
         $this->fileLinkFormat = $fileLinkFormat instanceof FileLinkFormatter ? $fileLinkFormat : new FileLinkFormatter($fileLinkFormat);
-        $this->projectDir = $projectDir;
         $this->outputBuffer = \is_string($outputBuffer) ? $outputBuffer : $outputBuffer(...);
-        $this->logger = $logger;
     }
 
     public function render(\Throwable $exception): FlattenException

@@ -66,10 +66,8 @@ interface ExecutionContextInterface
      *
      * @param string|\Stringable $message The error message as a string or a stringable object
      * @param array              $params  The parameters substituted in the error message
-     *
-     * @return void
      */
-    public function addViolation(string $message, array $params = []);
+    public function addViolation(string $message, array $params = []): void;
 
     /**
      * Returns a builder for adding a violation with extended information.
@@ -97,7 +95,7 @@ interface ExecutionContextInterface
      *     {
      *         $validator = $this->context->getValidator();
      *
-     *         $violations = $validator->validate($value, new Length(['min' => 3]));
+     *         $violations = $validator->validate($value, new Length(min: 3));
      *
      *         if (count($violations) > 0) {
      *             // ...
@@ -123,26 +121,20 @@ interface ExecutionContextInterface
      *
      * @param object|null $object       The currently validated object
      * @param string      $propertyPath The property path to the current value
-     *
-     * @return void
      */
-    public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata, string $propertyPath);
+    public function setNode(mixed $value, ?object $object, ?MetadataInterface $metadata, string $propertyPath): void;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
      *
      * @param string|null $group The validated group
-     *
-     * @return void
      */
-    public function setGroup(?string $group);
+    public function setGroup(?string $group): void;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
-     *
-     * @return void
      */
-    public function setConstraint(Constraint $constraint);
+    public function setConstraint(Constraint $constraint): void;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
@@ -150,10 +142,8 @@ interface ExecutionContextInterface
      * @param string $cacheKey  The hash of the object
      * @param string $groupHash The group's name or hash, if it is group
      *                          sequence
-     *
-     * @return void
      */
-    public function markGroupAsValidated(string $cacheKey, string $groupHash);
+    public function markGroupAsValidated(string $cacheKey, string $groupHash): void;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.
@@ -169,10 +159,8 @@ interface ExecutionContextInterface
      *
      * @param string $cacheKey       The hash of the object
      * @param string $constraintHash The hash of the constraint
-     *
-     * @return void
      */
-    public function markConstraintAsValidated(string $cacheKey, string $constraintHash);
+    public function markConstraintAsValidated(string $cacheKey, string $constraintHash): void;
 
     /**
      * Warning: Should not be called by user code, to be used by the validator engine only.

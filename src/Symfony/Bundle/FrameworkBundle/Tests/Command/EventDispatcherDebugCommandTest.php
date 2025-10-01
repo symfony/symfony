@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -20,9 +21,7 @@ use Symfony\Component\Mailer\Event\MessageEvent;
 
 class EventDispatcherDebugCommandTest extends TestCase
 {
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $tester = $this->createCommandCompletionTester();

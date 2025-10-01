@@ -8,6 +8,7 @@
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
+        <framework:lock enabled="false" />
         <framework:messenger default-bus="messenger.bus.commands">
             <framework:bus name="messenger.bus.commands" default-middleware="false">
                 <framework:middleware id="add_bus_name_stamp_middleware" />

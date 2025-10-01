@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests\Comparator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Comparator\DateComparator;
 
@@ -33,9 +34,7 @@ class DateComparatorTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider getTestData
-     */
+    #[DataProvider('getTestData')]
     public function testTest($test, $match, $noMatch)
     {
         $c = new DateComparator($test);

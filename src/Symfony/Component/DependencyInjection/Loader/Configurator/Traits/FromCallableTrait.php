@@ -19,7 +19,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 trait FromCallableTrait
 {
-    final public function fromCallable(string|array|ReferenceConfigurator|Expression $callable): FromCallableConfigurator
+    final public function fromCallable(string|array|\Closure|ReferenceConfigurator|Expression $callable): FromCallableConfigurator
     {
         if ($this->definition instanceof ChildDefinition) {
             throw new InvalidArgumentException('The configuration key "parent" is unsupported when using "fromCallable()".');
@@ -40,6 +40,10 @@ trait FromCallableTrait
         }
 
         $this->definition->setFactory(['Closure', 'fromCallable']);
+
+        if ($callable instanceof \Closure) {
+            $callable = static::processClosure($callable);
+        }
 
         if (\is_string($callable) && 1 === substr_count($callable, ':')) {
             $parts = explode(':', $callable);

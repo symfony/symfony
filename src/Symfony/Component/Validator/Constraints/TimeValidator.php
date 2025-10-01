@@ -34,10 +34,7 @@ class TimeValidator extends ConstraintValidator
         return $hour >= 0 && $hour < 24 && $minute >= 0 && $minute < 60 && $second >= 0 && $second < 60;
     }
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Time) {
             throw new UnexpectedTypeException($constraint, Time::class);

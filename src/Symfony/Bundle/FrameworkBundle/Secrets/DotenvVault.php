@@ -16,10 +16,9 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
  */
 class DotenvVault extends AbstractVault
 {
-    private string $dotenvFile;
-
-    public function __construct(string $dotenvFile)
-    {
+    public function __construct(
+        private string $dotenvFile,
+    ) {
         $this->dotenvFile = strtr($dotenvFile, '/', \DIRECTORY_SEPARATOR);
     }
 
@@ -90,13 +89,13 @@ class DotenvVault extends AbstractVault
 
         foreach ($_ENV as $k => $v) {
             if ('' !== ($v ?? '') && preg_match('/^\w+$/D', $k)) {
-                $secrets[$k] = $reveal ? $v : null;
+                $secrets[$k] = \is_string($v) && $reveal ? $v : null;
             }
         }
 
         foreach ($_SERVER as $k => $v) {
             if ('' !== ($v ?? '') && preg_match('/^\w+$/D', $k)) {
-                $secrets[$k] = $reveal ? $v : null;
+                $secrets[$k] = \is_string($v) && $reveal ? $v : null;
             }
         }
 

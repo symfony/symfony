@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Semaphore\Store\RedisStore;
 use Symfony\Component\Semaphore\Store\StoreFactory;
@@ -20,9 +21,7 @@ use Symfony\Component\Semaphore\Store\StoreFactory;
  */
 class StoreFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider validConnections
-     */
+    #[DataProvider('validConnections')]
     public function testCreateStore($connection, string $expectedStoreClass)
     {
         $store = StoreFactory::createStore($connection);

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
-/**
- * @group integration
- */
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('integration')]
 class RedisClusterSessionHandlerTest extends AbstractRedisSessionHandlerTestCase
 {
     public static function setUpBeforeClass(): void

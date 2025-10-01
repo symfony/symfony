@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\WebLink\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\WebLink\Link;
 
@@ -27,10 +28,10 @@ class LinkTest extends TestCase
             ->withAttribute('me', 'you')
         ;
 
-        $this->assertEquals('http://www.google.com', $link->getHref());
+        $this->assertSame('http://www.google.com', $link->getHref());
         $this->assertContains('next', $link->getRels());
         $this->assertArrayHasKey('me', $link->getAttributes());
-        $this->assertEquals('you', $link->getAttributes()['me']);
+        $this->assertSame('you', $link->getAttributes()['me']);
     }
 
     public function testCanRemoveValues()
@@ -44,8 +45,8 @@ class LinkTest extends TestCase
         $link = $link->withoutAttribute('me')
             ->withoutRel('next');
 
-        $this->assertEquals('http://www.google.com', $link->getHref());
-        $this->assertFalse(\in_array('next', $link->getRels()));
+        $this->assertSame('http://www.google.com', $link->getHref());
+        $this->assertFalse(\in_array('next', $link->getRels(), true));
         $this->assertArrayNotHasKey('me', $link->getAttributes());
     }
 
@@ -65,13 +66,11 @@ class LinkTest extends TestCase
     {
         $link = new Link('next', 'http://www.google.com');
 
-        $this->assertEquals('http://www.google.com', $link->getHref());
+        $this->assertSame('http://www.google.com', $link->getHref());
         $this->assertContains('next', $link->getRels());
     }
 
-    /**
-     * @dataProvider templatedHrefProvider
-     */
+    #[DataProvider('templatedHrefProvider')]
     public function testTemplated(string $href)
     {
         $link = (new Link())
@@ -80,9 +79,7 @@ class LinkTest extends TestCase
         $this->assertTrue($link->isTemplated());
     }
 
-    /**
-     * @dataProvider notTemplatedHrefProvider
-     */
+    #[DataProvider('notTemplatedHrefProvider')]
     public function testNotTemplated(string $href)
     {
         $link = (new Link())

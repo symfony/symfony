@@ -26,27 +26,9 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
  */
 final class UserValueResolver implements ValueResolverInterface
 {
-    private TokenStorageInterface $tokenStorage;
-
-    public function __construct(TokenStorageInterface $tokenStorage)
-    {
-        $this->tokenStorage = $tokenStorage;
-    }
-
-    /**
-     * @deprecated since Symfony 6.2, use resolve() instead
-     */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
-    {
-        @trigger_deprecation('symfony/http-kernel', '6.2', 'The "%s()" method is deprecated, use "resolve()" instead.', __METHOD__);
-
-        // with the attribute, the type can be any UserInterface implementation
-        // otherwise, the type must be UserInterface
-        if (UserInterface::class !== $argument->getType() && !$argument->getAttributesOfType(CurrentUser::class, ArgumentMetadata::IS_INSTANCEOF)) {
-            return false;
-        }
-
-        return true;
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+    ) {
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): array
@@ -73,6 +55,13 @@ final class UserValueResolver implements ValueResolverInterface
 
         if (null === $argument->getType() || $user instanceof ($argument->getType())) {
             return [$user];
+        }
+
+        $types = explode('|', $argument->getType());
+        foreach ($types as $type) {
+            if ($user instanceof $type) {
+                return [$user];
+            }
         }
 
         throw new AccessDeniedException(\sprintf('The logged-in user is an instance of "%s" but a user of type "%s" is expected.', $user::class, $argument->getType()));

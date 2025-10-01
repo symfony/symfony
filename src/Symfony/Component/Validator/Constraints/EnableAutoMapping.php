@@ -11,29 +11,33 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * Enables auto mapping.
  *
- * Using the annotations on a property has higher precedence than using it on a class,
+ * Using the attribute on a property has higher precedence than using it on a class,
  * which has higher precedence than any configuration that might be defined outside the class.
- *
- * @Annotation
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS)]
 class EnableAutoMapping extends Constraint
 {
-    public function __construct(?array $options = null)
+    #[HasNamedArguments]
+    public function __construct(?array $options = null, mixed $payload = null)
     {
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         if (\is_array($options) && \array_key_exists('groups', $options)) {
             throw new ConstraintDefinitionException(\sprintf('The option "groups" is not supported by the constraint "%s".', __CLASS__));
         }
 
-        parent::__construct($options);
+        parent::__construct($options, null, $payload);
     }
 
     public function getTargets(): string|array

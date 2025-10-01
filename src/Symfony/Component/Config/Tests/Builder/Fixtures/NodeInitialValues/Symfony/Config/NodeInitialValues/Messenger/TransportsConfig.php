@@ -57,28 +57,44 @@ class TransportsConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     some_clever_name?: array{
+     *         first?: scalar|null,
+     *         second?: scalar|null,
+     *         third?: scalar|null,
+     *     },
+     *     messenger?: array{
+     *         transports?: array<string, array{
+     *             dsn?: scalar|null, // The DSN to use. This is a required option. The info is used to describe the DSN, it can be multi-line.
+     *             serializer?: scalar|null, // Default: null
+     *             options?: list<mixed>,
+     *         }>,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('dsn', $value)) {
+        if (array_key_exists('dsn', $config)) {
             $this->_usedProperties['dsn'] = true;
-            $this->dsn = $value['dsn'];
-            unset($value['dsn']);
+            $this->dsn = $config['dsn'];
+            unset($config['dsn']);
         }
 
-        if (array_key_exists('serializer', $value)) {
+        if (array_key_exists('serializer', $config)) {
             $this->_usedProperties['serializer'] = true;
-            $this->serializer = $value['serializer'];
-            unset($value['serializer']);
+            $this->serializer = $config['serializer'];
+            unset($config['serializer']);
         }
 
-        if (array_key_exists('options', $value)) {
+        if (array_key_exists('options', $config)) {
             $this->_usedProperties['options'] = true;
-            $this->options = $value['options'];
-            unset($value['options']);
+            $this->options = $config['options'];
+            unset($config['options']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

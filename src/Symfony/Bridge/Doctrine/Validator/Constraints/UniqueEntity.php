@@ -11,13 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
  * Constraint for the Unique Entity validator.
- *
- * @Annotation
- * @Target({"CLASS", "ANNOTATION"})
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
@@ -30,26 +28,28 @@ class UniqueEntity extends Constraint
         self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
     ];
 
-    public $message = 'This value is already used.';
-    public $service = 'doctrine.orm.validator.unique';
-    public $em;
-    public $entityClass;
-    public $repositoryMethod = 'findBy';
-    public $fields = [];
-    public $errorPath;
-    public $ignoreNull = true;
+    public string $message = 'This value is already used.';
+    public string $service = 'doctrine.orm.validator.unique';
+    public ?string $em = null;
+    public ?string $entityClass = null;
+    public string $repositoryMethod = 'findBy';
+    public array|string $fields = [];
+    public ?string $errorPath = null;
+    public bool|array|string $ignoreNull = true;
+    public array $identifierFieldNames = [];
 
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param array|string         $fields           The combination of fields that must contain unique values or a set of options
+     * @param bool|string[]|string $ignoreNull       The combination of fields that ignore null values
+     * @param string|null          $em               The entity manager used to query for uniqueness instead of the manager of this class
+     * @param string|null          $entityClass      The entity class to enforce uniqueness on instead of the current class
+     * @param string|null          $repositoryMethod The repository method to check uniqueness instead of findBy. The method will receive as its argument
+     *                                               a fieldName => value associative array according to the fields option configuration
+     * @param string|null          $errorPath        Bind the constraint violation to this field instead of the first one in the fields option configuration
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    /**
-     * @param array|string      $fields     The combination of fields that must contain unique values or a set of options
-     * @param bool|array|string $ignoreNull The combination of fields that ignore null values
-     */
+    #[HasNamedArguments]
     public function __construct(
-        $fields,
+        array|string $fields,
         ?string $message = null,
         ?string $service = null,
         ?string $em = null,
@@ -57,18 +57,30 @@ class UniqueEntity extends Constraint
         ?string $repositoryMethod = null,
         ?string $errorPath = null,
         bool|string|array|null $ignoreNull = null,
+        ?array $identifierFieldNames = null,
         ?array $groups = null,
         $payload = null,
-        array $options = [],
+        ?array $options = null,
     ) {
-        if (\is_array($fields) && \is_string(key($fields))) {
-            $options = array_merge($fields, $options);
-        } elseif (null !== $fields) {
-            $options['fields'] = $fields;
+        if (\is_array($fields) && \is_string(key($fields)) && [] === array_diff(array_keys($fields), array_merge(array_keys(get_class_vars(static::class)), ['value']))) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($fields, $options ?? []);
+            $fields = null;
+        } else {
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+                $options['fields'] = $fields;
+                $fields = null;
+            } else {
+                $options = null;
+            }
         }
 
         parent::__construct($options, $groups, $payload);
 
+        $this->fields = $fields ?? $this->fields;
         $this->message = $message ?? $this->message;
         $this->service = $service ?? $this->service;
         $this->em = $em ?? $this->em;
@@ -76,10 +88,18 @@ class UniqueEntity extends Constraint
         $this->repositoryMethod = $repositoryMethod ?? $this->repositoryMethod;
         $this->errorPath = $errorPath ?? $this->errorPath;
         $this->ignoreNull = $ignoreNull ?? $this->ignoreNull;
+        $this->identifierFieldNames = $identifierFieldNames ?? $this->identifierFieldNames;
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getRequiredOptions(): array
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/doctrine-bridge', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return ['fields'];
     }
 
@@ -96,8 +116,15 @@ class UniqueEntity extends Constraint
         return self::CLASS_CONSTRAINT;
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getDefaultOption(): ?string
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/doctrine-bridge', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return 'fields';
     }
 }

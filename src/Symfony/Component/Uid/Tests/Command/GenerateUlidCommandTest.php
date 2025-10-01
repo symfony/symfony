@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Uid\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -20,9 +22,7 @@ use Symfony\Component\Uid\Ulid;
 
 final class GenerateUlidCommandTest extends TestCase
 {
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testDefaults()
     {
         $time = microtime(false);
@@ -103,13 +103,16 @@ final class GenerateUlidCommandTest extends TestCase
         $this->assertNotSame($ulids[0], $ulids[1]);
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $application = new Application();
-        $application->add(new GenerateUlidCommand());
+        $command = new GenerateUlidCommand();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
         $tester = new CommandCompletionTester($application->get('ulid:generate'));
         $suggestions = $tester->complete($input, 2);
         $this->assertSame($expectedSuggestions, $suggestions);

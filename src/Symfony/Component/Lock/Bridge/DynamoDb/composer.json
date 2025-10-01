@@ -1,0 +1,34 @@
+{
+    "name": "symfony/amazon-dynamo-db-lock",
+    "type": "symfony-lock-bridge",
+    "description": "Symfony Amazon DynamoDb extension Lock Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "async-aws/core": "^1.7",
+        "async-aws/dynamo-db": "^3.0",
+        "symfony/lock": "^7.4"
+    },
+    "conflict": {
+        "symfony/polyfill-uuid": "<1.15"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Lock\\Bridge\\DynamoDb\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

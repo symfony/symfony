@@ -25,11 +25,9 @@ use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
  */
 final class ReceivedStamp implements NonSendableStampInterface
 {
-    private string $transportName;
-
-    public function __construct(string $transportName)
-    {
-        $this->transportName = $transportName;
+    public function __construct(
+        private string $transportName,
+    ) {
     }
 
     public function getTransportName(): string

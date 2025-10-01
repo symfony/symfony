@@ -9,15 +9,11 @@
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
     <sec:config>
-        <sec:providers>
-            <sec:provider name="with-dash" id="foo" />
-        </sec:providers>
+        <sec:provider name="with-dash" id="foo" />
 
-        <sec:firewalls>
-            <sec:firewall name="main" provider="with-dash">
-                <sec:form-login />
-            </sec:firewall>
-        </sec:firewalls>
+        <sec:firewall name="main" provider="with-dash">
+            <sec:form-login />
+        </sec:firewall>
     </sec:config>
 
 </container>

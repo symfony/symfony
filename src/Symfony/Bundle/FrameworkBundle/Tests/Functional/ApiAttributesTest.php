@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,33 +22,34 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ApiAttributesTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider mapQueryStringProvider
-     */
-    public function testMapQueryString(array $query, string $expectedResponse, int $expectedStatusCode)
+    #[DataProvider('mapQueryStringProvider')]
+    public function testMapQueryString(string $uri, array $query, string $expectedResponse, int $expectedStatusCode)
     {
         $client = self::createClient(['test_case' => 'ApiAttributesTest']);
 
-        $client->request('GET', '/map-query-string.json', $query);
+        $client->request('GET', $uri, $query);
 
         $response = $client->getResponse();
+
         if ($expectedResponse) {
             self::assertJsonStringEqualsJsonString($expectedResponse, $response->getContent());
         } else {
-            self::assertEmpty($response->getContent());
+            self::assertSame('', $response->getContent());
         }
         self::assertSame($expectedStatusCode, $response->getStatusCode());
     }
 
     public static function mapQueryStringProvider(): iterable
     {
-        yield 'empty' => [
+        yield 'empty query string mapping nullable attribute' => [
+            'uri' => '/map-query-string-to-nullable-attribute.json',
             'query' => [],
             'expectedResponse' => '',
             'expectedStatusCode' => 204,
         ];
 
-        yield 'valid' => [
+        yield 'valid query string mapping nullable attribute' => [
+            'uri' => '/map-query-string-to-nullable-attribute.json',
             'query' => ['filter' => ['status' => 'approved', 'quantity' => '4']],
             'expectedResponse' => <<<'JSON'
                 {
@@ -60,7 +62,8 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 200,
         ];
 
-        yield 'invalid' => [
+        yield 'invalid query string mapping nullable attribute' => [
+            'uri' => '/map-query-string-to-nullable-attribute.json',
             'query' => ['filter' => ['status' => 'approved', 'quantity' => '200']],
             'expectedResponse' => <<<'JSON'
                 {
@@ -85,12 +88,133 @@ class ApiAttributesTest extends AbstractWebTestCase
                 JSON,
             'expectedStatusCode' => 404,
         ];
+
+        yield 'empty query string mapping attribute with default value' => [
+            'uri' => '/map-query-string-to-attribute-with-default-value.json',
+            'query' => [],
+            'expectedResponse' => <<<'JSON'
+                {
+                    "filter": {
+                        "status": "approved",
+                        "quantity": 5
+                    }
+                }
+                JSON,
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'valid query string mapping attribute with default value' => [
+            'uri' => '/map-query-string-to-attribute-with-default-value.json',
+            'query' => ['filter' => ['status' => 'approved', 'quantity' => '4']],
+            'expectedResponse' => <<<'JSON'
+                {
+                    "filter": {
+                        "status": "approved",
+                        "quantity": 4
+                    }
+                }
+                JSON,
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'invalid query string mapping attribute with default value' => [
+            'uri' => '/map-query-string-to-attribute-with-default-value.json',
+            'query' => ['filter' => ['status' => 'approved', 'quantity' => '200']],
+            'expectedResponse' => <<<'JSON'
+                {
+                    "type": "https:\/\/symfony.com\/errors\/validation",
+                    "title": "Validation Failed",
+                    "status": 404,
+                    "detail": "filter.quantity: This value should be less than 10.",
+                    "violations": [
+                        {
+                            "propertyPath": "filter.quantity",
+                            "title": "This value should be less than 10.",
+                            "template": "This value should be less than {{ compared_value }}.",
+                            "parameters": {
+                                "{{ value }}": "200",
+                                "{{ compared_value }}": "10",
+                                "{{ compared_value_type }}": "int"
+                            },
+                            "type": "urn:uuid:079d7420-2d13-460c-8756-de810eeb37d2"
+                        }
+                    ]
+                }
+                JSON,
+            'expectedStatusCode' => 404,
+        ];
+
+        $expectedResponse = <<<'JSON'
+            {
+                "type": "https:\/\/symfony.com\/errors\/validation",
+                "title": "Validation Failed",
+                "status": 404,
+                "detail": "filter: This value should be of type Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter.",
+                "violations": [
+                    {
+                        "parameters": {
+                            "hint": "Failed to create object because the class misses the \"filter\" property.",
+                            "{{ type }}": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter"
+                        },
+                        "propertyPath": "filter",
+                        "template": "This value should be of type {{ type }}.",
+                        "title": "This value should be of type Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter."
+                    }
+                ]
+            }
+            JSON;
+
+        yield 'empty query string mapping non-nullable attribute without default value' => [
+            'uri' => '/map-query-string-to-non-nullable-attribute-without-default-value.json',
+            'query' => [],
+            'expectedResponse' => $expectedResponse,
+            'expectedStatusCode' => 404,
+        ];
+
+        yield 'valid query string mapping non-nullable attribute without default value' => [
+            'uri' => '/map-query-string-to-non-nullable-attribute-without-default-value.json',
+            'query' => ['filter' => ['status' => 'approved', 'quantity' => '4']],
+            'expectedResponse' => <<<'JSON'
+                {
+                    "filter": {
+                        "status": "approved",
+                        "quantity": 4
+                    }
+                }
+                JSON,
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'invalid query string mapping non-nullable attribute without default value' => [
+            'uri' => '/map-query-string-to-non-nullable-attribute-without-default-value.json',
+            'query' => ['filter' => ['status' => 'approved', 'quantity' => '11']],
+            'expectedResponse' => <<<'JSON'
+                {
+                    "type": "https:\/\/symfony.com\/errors\/validation",
+                    "title": "Validation Failed",
+                    "status": 404,
+                    "detail": "filter.quantity: This value should be less than 10.",
+                    "violations": [
+                        {
+                            "propertyPath": "filter.quantity",
+                            "title": "This value should be less than 10.",
+                            "template": "This value should be less than {{ compared_value }}.",
+                            "parameters": {
+                                "{{ value }}": "11",
+                                "{{ compared_value }}": "10",
+                                "{{ compared_value_type }}": "int"
+                            },
+                            "type": "urn:uuid:079d7420-2d13-460c-8756-de810eeb37d2"
+                        }
+                    ]
+                }
+                JSON,
+            'expectedStatusCode' => 404,
+        ];
     }
 
-    /**
-     * @dataProvider mapRequestPayloadProvider
-     */
-    public function testMapRequestPayload(string $format, array $parameters, ?string $content, callable $responseAssertion, int $expectedStatusCode)
+    #[DataProvider('mapRequestPayloadProvider')]
+    public function testMapRequestPayload(string $uri, string $format, array $parameters, ?string $content, callable $responseAssertion, int $expectedStatusCode)
     {
         $client = self::createClient(['test_case' => 'ApiAttributesTest']);
 
@@ -102,7 +226,7 @@ class ApiAttributesTest extends AbstractWebTestCase
 
         $client->request(
             'POST',
-            '/map-request-body.'.$format,
+            $uri,
             $parameters,
             [],
             ['HTTP_ACCEPT' => $acceptHeader, 'CONTENT_TYPE' => $acceptHeader],
@@ -118,7 +242,8 @@ class ApiAttributesTest extends AbstractWebTestCase
 
     public static function mapRequestPayloadProvider(): iterable
     {
-        yield 'empty' => [
+        yield 'empty request mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
             'parameters' => [],
             'content' => '',
@@ -128,7 +253,8 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 204,
         ];
 
-        yield 'valid json' => [
+        yield 'valid request with json content mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
             'parameters' => [],
             'content' => <<<'JSON'
@@ -150,7 +276,49 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 200,
         ];
 
-        yield 'malformed json' => [
+        yield 'valid request with xml content mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.xml',
+            'format' => 'xml',
+            'parameters' => [],
+            'content' => <<<'XML'
+                <request>
+                    <comment>Hello everyone!</comment>
+                    <approved>true</approved>
+                </request>
+                XML,
+            'responseAssertion' => static function (string $response) {
+                self::assertXmlStringEqualsXmlString(<<<'XML'
+                    <response>
+                        <comment>Hello everyone!</comment>
+                        <approved>1</approved>
+                    </response>
+                    XML,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'valid request mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.json',
+            'format' => 'json',
+            'parameters' => ['comment' => 'Hello everyone!', 'approved' => '0'],
+            'content' => null,
+            'responseAssertion' => static function (string $response) {
+                self::assertJsonStringEqualsJsonString(<<<'JSON'
+                    {
+                        "comment": "Hello everyone!",
+                        "approved": false
+                    }
+                    JSON,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'malformed json request mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
             'parameters' => [],
             'content' => <<<'JSON'
@@ -174,7 +342,8 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 400,
         ];
 
-        yield 'unsupported format' => [
+        yield 'request with unsupported format mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.dummy',
             'format' => 'dummy',
             'parameters' => [],
             'content' => 'Hello',
@@ -184,29 +353,8 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 415,
         ];
 
-        yield 'valid xml' => [
-            'format' => 'xml',
-            'parameters' => [],
-            'content' => <<<'XML'
-                <request>
-                    <comment>Hello everyone!</comment>
-                    <approved>true</approved>
-                </request>
-                XML,
-            'responseAssertion' => static function (string $response) {
-                self::assertXmlStringEqualsXmlString(<<<'XML'
-                    <response>
-                        <comment>Hello everyone!</comment>
-                        <approved>1</approved>
-                    </response>
-                    XML,
-                    $response
-                );
-            },
-            'expectedStatusCode' => 200,
-        ];
-
-        yield 'invalid type' => [
+        yield 'request with invalid type mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
             'parameters' => [],
             'content' => <<<'JSON'
@@ -240,7 +388,8 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 422,
         ];
 
-        yield 'validation error json' => [
+        yield 'invalid request with json content mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
             'parameters' => [],
             'content' => <<<'JSON'
@@ -266,7 +415,8 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 422,
         ];
 
-        yield 'validation error xml' => [
+        yield 'invalid request with xml content mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.xml',
             'format' => 'xml',
             'parameters' => [],
             'content' => <<<'XML'
@@ -288,9 +438,96 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 422,
         ];
 
-        yield 'valid input' => [
+        yield 'invalid request mapping nullable attribute' => [
+            'uri' => '/map-request-to-nullable-attribute.json',
             'format' => 'json',
-            'input' => ['comment' => 'Hello everyone!', 'approved' => '0'],
+            'parameters' => ['comment' => '', 'approved' => '1'],
+            'content' => null,
+            'responseAssertion' => static function (string $response) {
+                self::assertJson($response);
+
+                $json = json_decode($response, true);
+
+                self::assertSame('https://symfony.com/errors/validation', $json['type'] ?? null);
+                self::assertSame('Validation Failed', $json['title'] ?? null);
+                self::assertSame(422, $json['status'] ?? null);
+                self::assertSame("comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.", $json['detail'] ?? null);
+                self::assertIsArray($json['violations'] ?? null);
+                self::assertCount(2, $json['violations']);
+                self::assertSame('urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3', $json['violations'][0]['type'] ?? null);
+                self::assertSame('urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45', $json['violations'][1]['type'] ?? null);
+            },
+            'expectedStatusCode' => 422,
+        ];
+
+        yield 'empty request mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.json',
+            'format' => 'json',
+            'parameters' => [],
+            'content' => '',
+            'responseAssertion' => static function (string $response) {
+                self::assertJsonStringEqualsJsonString(<<<'JSON'
+                    {
+                        "comment": "Hello everyone!",
+                        "approved": false
+                    }
+                    JSON,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'valid request with json content mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.json',
+            'format' => 'json',
+            'parameters' => [],
+            'content' => <<<'JSON'
+                {
+                    "comment": "Hello everyone!",
+                    "approved": false
+                }
+                JSON,
+            'responseAssertion' => static function (string $response) {
+                self::assertJsonStringEqualsJsonString(<<<'JSON'
+                    {
+                        "comment": "Hello everyone!",
+                        "approved": false
+                    }
+                    JSON,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'valid request with xml content mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.xml',
+            'format' => 'xml',
+            'parameters' => [],
+            'content' => <<<'XML'
+                <request>
+                    <comment>Hello everyone!</comment>
+                    <approved>true</approved>
+                </request>
+                XML,
+            'responseAssertion' => static function (string $response) {
+                self::assertXmlStringEqualsXmlString(<<<'XML'
+                    <response>
+                        <comment>Hello everyone!</comment>
+                        <approved>1</approved>
+                    </response>
+                    XML,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'valid request mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.json',
+            'format' => 'json',
+            'parameters' => ['comment' => 'Hello everyone!', 'approved' => '0'],
             'content' => null,
             'responseAssertion' => static function (string $response) {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
@@ -305,9 +542,340 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 200,
         ];
 
-        yield 'validation error input' => [
+        yield 'malformed json request mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.json',
             'format' => 'json',
-            'input' => ['comment' => '', 'approved' => '1'],
+            'parameters' => [],
+            'content' => <<<'JSON'
+                {
+                    "comment": "Hello everyone!",
+                    "approved": false,
+                }
+                JSON,
+            'responseAssertion' => static function (string $response) {
+                self::assertJsonStringEqualsJsonString(<<<'JSON'
+                    {
+                        "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
+                        "title": "An error occurred",
+                        "status": 400,
+                        "detail": "Bad Request"
+                    }
+                    JSON,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 400,
+        ];
+
+        yield 'request with unsupported format mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.dummy',
+            'format' => 'dummy',
+            'parameters' => [],
+            'content' => 'Hello',
+            'responseAssertion' => static function (string $response) {
+                self::assertStringContainsString('415 Unsupported Media Type', $response);
+            },
+            'expectedStatusCode' => 415,
+        ];
+
+        yield 'request with invalid type mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.json',
+            'format' => 'json',
+            'parameters' => [],
+            'content' => <<<'JSON'
+                {
+                    "comment": "Hello everyone!",
+                    "approved": "string instead of bool"
+                }
+                JSON,
+            'responseAssertion' => static function (string $response) {
+                self::assertJson($response);
+
+                $json = json_decode($response, true);
+
+                self::assertSame('https://symfony.com/errors/validation', $json['type'] ?? null);
+                self::assertSame('Validation Failed', $json['title'] ?? null);
+                self::assertSame(422, $json['status'] ?? null);
+                self::assertSame('approved: This value should be of type bool.', $json['detail'] ?? null);
+                self::assertIsArray($json['violations'] ?? null);
+                self::assertCount(1, $json['violations']);
+                self::assertSame('approved', $json['violations'][0]['propertyPath'] ?? null);
+            },
+            'expectedStatusCode' => 422,
+        ];
+
+        yield 'invalid request with json content mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.json',
+            'format' => 'json',
+            'parameters' => [],
+            'content' => <<<'JSON'
+                {
+                    "comment": "",
+                    "approved": true
+                }
+                JSON,
+            'responseAssertion' => static function (string $response) {
+                self::assertJson($response);
+
+                $json = json_decode($response, true);
+
+                self::assertSame('https://symfony.com/errors/validation', $json['type'] ?? null);
+                self::assertSame('Validation Failed', $json['title'] ?? null);
+                self::assertSame(422, $json['status'] ?? null);
+                self::assertSame("comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.", $json['detail'] ?? null);
+                self::assertIsArray($json['violations'] ?? null);
+                self::assertCount(2, $json['violations']);
+                self::assertSame('urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3', $json['violations'][0]['type'] ?? null);
+                self::assertSame('urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45', $json['violations'][1]['type'] ?? null);
+            },
+            'expectedStatusCode' => 422,
+        ];
+
+        yield 'invalid request with xml content mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.xml',
+            'format' => 'xml',
+            'parameters' => [],
+            'content' => <<<'XML'
+                <request>
+                    <comment>H</comment>
+                    <approved>false</approved>
+                </request>
+                XML,
+            'responseAssertion' => static function (string $response) {
+                $crawler = new Crawler($response);
+
+                self::assertSame('https://symfony.com/errors/validation', $crawler->filterXPath('response/type')->text());
+                self::assertSame('Validation Failed', $crawler->filterXPath('response/title')->text());
+                self::assertSame('422', $crawler->filterXPath('response/status')->text());
+                self::assertSame('comment: This value is too short. It should have 10 characters or more.', $crawler->filterXPath('response/detail')->text());
+                self::assertCount(1, $crawler->filterXPath('response/violations'));
+                self::assertSame('urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45', $crawler->filterXPath('response/violations/type')->text());
+            },
+            'expectedStatusCode' => 422,
+        ];
+
+        yield 'invalid request mapping attribute with default value' => [
+            'uri' => '/map-request-to-attribute-with-default-value.json',
+            'format' => 'json',
+            'parameters' => ['comment' => '', 'approved' => '1'],
+            'content' => null,
+            'responseAssertion' => static function (string $response) {
+                self::assertJson($response);
+
+                $json = json_decode($response, true);
+
+                self::assertSame('https://symfony.com/errors/validation', $json['type'] ?? null);
+                self::assertSame('Validation Failed', $json['title'] ?? null);
+                self::assertSame(422, $json['status'] ?? null);
+                self::assertSame("comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.", $json['detail'] ?? null);
+                self::assertIsArray($json['violations'] ?? null);
+                self::assertCount(2, $json['violations']);
+                self::assertSame('urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3', $json['violations'][0]['type'] ?? null);
+                self::assertSame('urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45', $json['violations'][1]['type'] ?? null);
+            },
+            'expectedStatusCode' => 422,
+        ];
+
+        yield 'empty request mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
+            'format' => 'json',
+            'parameters' => [],
+            'content' => '',
+            'responseAssertion' => static function (string $response) {
+                self::assertJsonStringEqualsJsonString(<<<'JSON'
+                    {
+                      "type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
+                      "title":"An error occurred",
+                      "status":400,
+                      "detail":"Bad Request"
+                    }
+                    JSON,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 400,
+        ];
+
+        yield 'valid request with json content mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
+            'format' => 'json',
+            'parameters' => [],
+            'content' => <<<'JSON'
+                {
+                    "comment": "Hello everyone!",
+                    "approved": false
+                }
+                JSON,
+            'responseAssertion' => static function (string $response) {
+                self::assertJsonStringEqualsJsonString(<<<'JSON'
+                    {
+                        "comment": "Hello everyone!",
+                        "approved": false
+                    }
+                    JSON,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'valid request with xml content mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.xml',
+            'format' => 'xml',
+            'parameters' => [],
+            'content' => <<<'XML'
+                <request>
+                    <comment>Hello everyone!</comment>
+                    <approved>true</approved>
+                </request>
+                XML,
+            'responseAssertion' => static function (string $response) {
+                self::assertXmlStringEqualsXmlString(<<<'XML'
+                    <response>
+                        <comment>Hello everyone!</comment>
+                        <approved>1</approved>
+                    </response>
+                    XML,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'valid request mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
+            'format' => 'json',
+            'parameters' => ['comment' => 'Hello everyone!', 'approved' => '0'],
+            'content' => null,
+            'responseAssertion' => static function (string $response) {
+                self::assertJsonStringEqualsJsonString(<<<'JSON'
+                    {
+                        "comment": "Hello everyone!",
+                        "approved": false
+                    }
+                    JSON,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'malformed json request mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
+            'format' => 'json',
+            'parameters' => [],
+            'content' => <<<'JSON'
+                {
+                    "comment": "Hello everyone!",
+                    "approved": false,
+                }
+                JSON,
+            'responseAssertion' => static function (string $response) {
+                self::assertJsonStringEqualsJsonString(<<<'JSON'
+                    {
+                        "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
+                        "title": "An error occurred",
+                        "status": 400,
+                        "detail": "Bad Request"
+                    }
+                    JSON,
+                    $response
+                );
+            },
+            'expectedStatusCode' => 400,
+        ];
+
+        yield 'request with unsupported format mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.dummy',
+            'format' => 'dummy',
+            'parameters' => [],
+            'content' => 'Hello',
+            'responseAssertion' => static function (string $response) {
+                self::assertStringContainsString('415 Unsupported Media Type', $response);
+            },
+            'expectedStatusCode' => 415,
+        ];
+
+        yield 'request with invalid type mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
+            'format' => 'json',
+            'parameters' => [],
+            'content' => <<<'JSON'
+                {
+                    "comment": "Hello everyone!",
+                    "approved": "string instead of bool"
+                }
+                JSON,
+            'responseAssertion' => static function (string $response) {
+                self::assertJson($response);
+
+                $json = json_decode($response, true);
+
+                self::assertSame('https://symfony.com/errors/validation', $json['type'] ?? null);
+                self::assertSame('Validation Failed', $json['title'] ?? null);
+                self::assertSame(422, $json['status'] ?? null);
+                self::assertSame('approved: This value should be of type bool.', $json['detail'] ?? null);
+                self::assertIsArray($json['violations'] ?? null);
+                self::assertCount(1, $json['violations']);
+                self::assertSame('approved', $json['violations'][0]['propertyPath'] ?? null);
+            },
+            'expectedStatusCode' => 422,
+        ];
+
+        yield 'invalid request with json content mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
+            'format' => 'json',
+            'parameters' => [],
+            'content' => <<<'JSON'
+                {
+                    "comment": "",
+                    "approved": true
+                }
+                JSON,
+            'responseAssertion' => static function (string $response) {
+                self::assertJson($response);
+
+                $json = json_decode($response, true);
+
+                self::assertSame('https://symfony.com/errors/validation', $json['type'] ?? null);
+                self::assertSame('Validation Failed', $json['title'] ?? null);
+                self::assertSame(422, $json['status'] ?? null);
+                self::assertSame("comment: This value should not be blank.\ncomment: This value is too short. It should have 10 characters or more.", $json['detail'] ?? null);
+                self::assertIsArray($json['violations'] ?? null);
+                self::assertCount(2, $json['violations']);
+                self::assertSame('urn:uuid:c1051bb4-d103-4f74-8988-acbcafc7fdc3', $json['violations'][0]['type'] ?? null);
+                self::assertSame('urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45', $json['violations'][1]['type'] ?? null);
+            },
+            'expectedStatusCode' => 422,
+        ];
+
+        yield 'invalid request with xml content mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.xml',
+            'format' => 'xml',
+            'parameters' => [],
+            'content' => <<<'XML'
+                <request>
+                    <comment>H</comment>
+                    <approved>false</approved>
+                </request>
+                XML,
+            'responseAssertion' => static function (string $response) {
+                $crawler = new Crawler($response);
+
+                self::assertSame('https://symfony.com/errors/validation', $crawler->filterXPath('response/type')->text());
+                self::assertSame('Validation Failed', $crawler->filterXPath('response/title')->text());
+                self::assertSame('422', $crawler->filterXPath('response/status')->text());
+                self::assertSame('comment: This value is too short. It should have 10 characters or more.', $crawler->filterXPath('response/detail')->text());
+                self::assertCount(1, $crawler->filterXPath('response/violations'));
+                self::assertSame('urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45', $crawler->filterXPath('response/violations/type')->text());
+            },
+            'expectedStatusCode' => 422,
+        ];
+
+        yield 'invalid request mapping non-nullable attribute without default value' => [
+            'uri' => '/map-request-to-non-nullable-attribute-without-default-value.json',
+            'format' => 'json',
+            'parameters' => ['comment' => '', 'approved' => '1'],
             'content' => null,
             'responseAssertion' => static function (string $response) {
                 self::assertJson($response);
@@ -328,7 +896,7 @@ class ApiAttributesTest extends AbstractWebTestCase
     }
 }
 
-class WithMapQueryStringController
+class WithMapQueryStringToNullableAttributeController
 {
     public function __invoke(#[MapQueryString] ?QueryString $query): Response
     {
@@ -342,7 +910,27 @@ class WithMapQueryStringController
     }
 }
 
-class WithMapRequestPayloadController
+class WithMapQueryStringToAttributeWithDefaultValueController
+{
+    public function __invoke(#[MapQueryString] QueryString $query = new QueryString(new Filter('approved', 5))): Response
+    {
+        return new JsonResponse(
+            ['filter' => ['status' => $query->filter->status, 'quantity' => $query->filter->quantity]],
+        );
+    }
+}
+
+class WithMapQueryStringToNonNullableAttributeWithoutDefaultValueController
+{
+    public function __invoke(#[MapQueryString] QueryString $query): Response
+    {
+        return new JsonResponse(
+            ['filter' => ['status' => $query->filter->status, 'quantity' => $query->filter->quantity]],
+        );
+    }
+}
+
+class WithMapRequestToNullableAttributeController
 {
     public function __invoke(#[MapRequestPayload] ?RequestBody $body, Request $request): Response
     {
@@ -356,11 +944,49 @@ class WithMapRequestPayloadController
 
         return new Response(
             <<<XML
-            <response>
-                <comment>{$body->comment}</comment>
-                <approved>{$body->approved}</approved>
-            </response>
-            XML
+                <response>
+                    <comment>{$body->comment}</comment>
+                    <approved>{$body->approved}</approved>
+                </response>
+                XML
+        );
+    }
+}
+
+class WithMapRequestToAttributeWithDefaultValueController
+{
+    public function __invoke(Request $request, #[MapRequestPayload] RequestBody $body = new RequestBody('Hello everyone!', false)): Response
+    {
+        if ('json' === $request->getPreferredFormat('json')) {
+            return new JsonResponse(['comment' => $body->comment, 'approved' => $body->approved]);
+        }
+
+        return new Response(
+            <<<XML
+                <response>
+                    <comment>{$body->comment}</comment>
+                    <approved>{$body->approved}</approved>
+                </response>
+                XML
+        );
+    }
+}
+
+class WithMapRequestToNonNullableAttributeWithoutDefaultValueController
+{
+    public function __invoke(Request $request, #[MapRequestPayload] RequestBody $body): Response
+    {
+        if ('json' === $request->getPreferredFormat('json')) {
+            return new JsonResponse(['comment' => $body->comment, 'approved' => $body->approved]);
+        }
+
+        return new Response(
+            <<<XML
+                <response>
+                    <comment>{$body->comment}</comment>
+                    <approved>{$body->approved}</approved>
+                </response>
+                XML
         );
     }
 }

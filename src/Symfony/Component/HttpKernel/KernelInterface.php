@@ -113,9 +113,9 @@ interface KernelInterface extends HttpKernelInterface
     /**
      * Gets the cache directory.
      *
-     * Since Symfony 5.2, the cache directory should be used for caches that are written at runtime.
+     * This directory should be used for caches that are written at runtime.
      * For caches and artifacts that can be warmed at compile-time and deployed as read-only,
-     * use the new "build directory" returned by the {@see getBuildDir()} method.
+     * use the "build directory" returned by the {@see getBuildDir()} method.
      */
     public function getCacheDir(): string;
 

@@ -18,12 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Symfony\Contracts\Service\Test\ServiceLocatorTest as LegacyServiceLocatorTestCase;
 use Symfony\Contracts\Service\Test\ServiceLocatorTestCase;
-
-if (!class_exists(ServiceLocatorTestCase::class)) {
-    class_alias(LegacyServiceLocatorTestCase::class, ServiceLocatorTestCase::class);
-}
 
 class ServiceLocatorTest extends ServiceLocatorTestCase
 {
@@ -105,6 +100,17 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
             'bar' => 'string',
             'baz' => '?string',
         ]);
+    }
+
+    public function testIsCountableAndIterable()
+    {
+        $locator = $this->getServiceLocator([
+            'foo' => fn () => 'bar',
+            'bar' => fn () => 'baz',
+        ]);
+
+        $this->assertCount(2, $locator);
+        $this->assertSame(['foo' => 'bar', 'bar' => 'baz'], iterator_to_array($locator));
     }
 }
 

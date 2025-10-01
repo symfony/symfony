@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Console\Helper\Dumper;
@@ -32,9 +33,7 @@ class DumperNativeFallbackTest extends TestCase
         ClassExistsMock::withMockedClasses([]);
     }
 
-    /**
-     * @dataProvider provideVariables
-     */
+    #[DataProvider('provideVariables')]
     public function testInvoke($variable, $primitiveString)
     {
         $dumper = new Dumper($this->createMock(OutputInterface::class));

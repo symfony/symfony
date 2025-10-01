@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\ExternalMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\ExternalMessageSerializer;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -29,9 +31,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class RedisReceiverTest extends TestCase
 {
-    /**
-     * @dataProvider redisEnvelopeProvider
-     */
+    #[DataProvider('redisEnvelopeProvider')]
     public function testItReturnsTheDecodedMessageToTheHandler(array $redisEnvelope, $expectedMessage, SerializerInterface $serializer)
     {
         $connection = $this->createMock(Connection::class);
@@ -50,9 +50,7 @@ class RedisReceiverTest extends TestCase
         $this->assertSame($redisEnvelope['id'], $transportMessageIdStamp->getId());
     }
 
-    /**
-     * @dataProvider rejectedRedisEnvelopeProvider
-     */
+    #[DataProvider('rejectedRedisEnvelopeProvider')]
     public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException(array $redisEnvelope)
     {
         $this->expectException(MessageDecodingFailedException::class);
@@ -134,5 +132,16 @@ class RedisReceiverTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    public function testKeepalive()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('keepalive')->with('redisid-123');
+
+        $receiver = new RedisReceiver($connection, new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        ));
+        $receiver->keepalive(new Envelope(new DummyMessage('foo'), [new RedisReceivedStamp('redisid-123')]));
     }
 }

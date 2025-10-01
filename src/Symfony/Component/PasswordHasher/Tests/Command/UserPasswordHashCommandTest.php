@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PasswordHasher\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -257,13 +258,14 @@ class UserPasswordHashCommandTest extends TestCase
         ], ['decorated' => false]);
 
         $this->assertStringContainsString(<<<EOTXT
- For which user class would you like to hash a password? [Custom\Class\Native\User]:
-  [0] Custom\Class\Native\User
-  [1] Custom\Class\Pbkdf2\User
-  [2] Custom\Class\Test\User
-  [3] Symfony\Component\Security\Core\User\InMemoryUser
-EOTXT
-            , $this->passwordHasherCommandTester->getDisplay(true));
+             For which user class would you like to hash a password? [Custom\Class\Native\User]:
+              [0] Custom\Class\Native\User
+              [1] Custom\Class\Pbkdf2\User
+              [2] Custom\Class\Test\User
+              [3] Symfony\Component\Security\Core\User\InMemoryUser
+            EOTXT,
+            $this->passwordHasherCommandTester->getDisplay(true)
+        );
     }
 
     public function testNonInteractiveEncodePasswordUsesFirstUserClass()
@@ -277,18 +279,17 @@ EOTXT
 
     public function testThrowsExceptionOnNoConfiguredHashers()
     {
+        $tester = new CommandTester(new UserPasswordHashCommand($this->getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('There are no configured password hashers for the "security" extension.');
 
-        $tester = new CommandTester(new UserPasswordHashCommand($this->getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));
         $tester->execute([
             'password' => 'password',
         ], ['interactive' => false]);
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testCompletionSuggestions(array $input, array $expectedSuggestions)
     {
         $command = new UserPasswordHashCommand($this->createMock(PasswordHasherFactoryInterface::class), ['App\Entity\User']);

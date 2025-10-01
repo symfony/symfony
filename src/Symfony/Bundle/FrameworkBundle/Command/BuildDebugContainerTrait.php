@@ -39,7 +39,9 @@ trait BuildDebugContainerTrait
             return $this->container;
         }
 
-        if (!$kernel->isDebug() || !$kernel->getContainer()->getParameter('debug.container.dump') || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
+        $file = $kernel->isDebug() ? $kernel->getContainer()->getParameter('debug.container.dump') : false;
+
+        if (!$file || !(new ConfigCache($file, true))->isFresh()) {
             $buildContainer = \Closure::bind(function () {
                 $this->initializeBundles();
 
@@ -57,13 +59,17 @@ trait BuildDebugContainerTrait
                 return $containerBuilder;
             }, $kernel, $kernel::class);
             $container = $buildContainer();
-            (new XmlFileLoader($container, new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
-            $locatorPass = new ServiceLocatorTagPass();
-            $locatorPass->process($container);
 
-            $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
-            $container->getCompilerPassConfig()->setOptimizationPasses([]);
-            $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
+            if (str_ends_with($file, '.xml') && is_file(substr_replace($file, '.ser', -4))) {
+                $dumpedContainer = unserialize(file_get_contents(substr_replace($file, '.ser', -4)));
+                $container->setDefinitions($dumpedContainer->getDefinitions());
+                $container->setAliases($dumpedContainer->getAliases());
+                $container->__construct($dumpedContainer->getParameterBag());
+            } else {
+                (new XmlFileLoader($container, new FileLocator()))->load($file);
+                $locatorPass = new ServiceLocatorTagPass();
+                $locatorPass->process($container);
+            }
         }
 
         return $this->container = $container;

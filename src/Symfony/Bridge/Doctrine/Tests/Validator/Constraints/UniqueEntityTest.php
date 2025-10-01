@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -61,6 +63,8 @@ class UniqueEntityTest extends TestCase
         self::assertSame(['some_group'], $constraint->groups);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testValueOptionConfiguresFields()
     {
         $constraint = new UniqueEntity(['value' => 'email']);

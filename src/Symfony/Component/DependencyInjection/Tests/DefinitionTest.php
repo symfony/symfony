@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -186,9 +187,7 @@ class DefinitionTest extends TestCase
         $this->assertSame('1.1', $deprecation['version']);
     }
 
-    /**
-     * @dataProvider invalidDeprecationMessageProvider
-     */
+    #[DataProvider('invalidDeprecationMessageProvider')]
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
     {
         $def = new Definition('stdClass');
@@ -205,7 +204,6 @@ class DefinitionTest extends TestCase
             "With \ns" => ["invalid \n message %service_id%"],
             'With */s' => ['invalid */ message %service_id%'],
             'message not containing require %service_id% variable' => ['this is deprecated'],
-            'template not containing require %service_id% variable' => [true],
         ];
     }
 
@@ -258,6 +256,16 @@ class DefinitionTest extends TestCase
         ], $def->getTags(), '->getTags() returns all tags');
     }
 
+    public function testAddResourceTag()
+    {
+        $def = new Definition('stdClass');
+        $def->addResourceTag('foo', ['bar' => true]);
+
+        $this->assertSame([['bar' => true]], $def->getTag('foo'));
+        $this->assertFalse($def->isAbstract());
+        $this->assertSame([['source' => 'by tag "foo"']], $def->getTag('container.excluded'));
+    }
+
     public function testSetArgument()
     {
         $def = new Definition('stdClass');
@@ -292,7 +300,7 @@ class DefinitionTest extends TestCase
         $def->addArgument('foo');
 
         $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('The index "1" is not in the range [0, 0] of the arguments of class "stdClass".');
+        $this->expectExceptionMessage('The argument "1" doesn\'t exist in class "stdClass".');
 
         $def->replaceArgument(1, 'bar');
     }
@@ -305,6 +313,17 @@ class DefinitionTest extends TestCase
         $this->expectExceptionMessage('Cannot replace arguments for class "stdClass" if none have been configured yet.');
 
         $def->replaceArgument(0, 'bar');
+    }
+
+    public function testReplaceArgumentWithNonConsecutiveIntIndex()
+    {
+        $def = new Definition('stdClass');
+
+        $def->setArguments([1 => 'foo']);
+        $this->assertSame([1 => 'foo'], $def->getArguments());
+
+        $def->replaceArgument(1, 'bar');
+        $this->assertSame([1 => 'bar'], $def->getArguments());
     }
 
     public function testSetGetProperties()

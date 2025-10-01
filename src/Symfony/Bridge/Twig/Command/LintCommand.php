@@ -39,6 +39,7 @@ use Twig\Source;
 #[AsCommand(name: 'lint:twig', description: 'Lint a Twig template and outputs encountered errors')]
 class LintCommand extends Command
 {
+    private array $excludes;
     private string $format;
 
     public function __construct(
@@ -48,33 +49,33 @@ class LintCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())))
             ->addOption('show-deprecations', null, InputOption::VALUE_NONE, 'Show deprecations as errors')
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
+            ->addOption('excludes', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Excluded directories', [])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command lints a template and outputs to STDOUT
-the first encountered syntax error.
+                The <info>%command.name%</info> command lints a template and outputs to STDOUT
+                the first encountered syntax error.
 
-You can validate the syntax of contents passed from STDIN:
+                You can validate the syntax of contents passed from STDIN:
 
-  <info>cat filename | php %command.full_name% -</info>
+                  <info>cat filename | php %command.full_name% -</info>
 
-Or the syntax of a file:
+                Or the syntax of a file:
 
-  <info>php %command.full_name% filename</info>
+                  <info>php %command.full_name% filename</info>
 
-Or of a whole directory:
+                Or of a whole directory:
 
-  <info>php %command.full_name% dirname</info>
-  <info>php %command.full_name% dirname --format=json</info>
+                  <info>php %command.full_name% dirname</info>
 
-EOF
+                The <info>--format</info> option specifies the format of the command output:
+
+                  <info>php %command.full_name% dirname --format=json</info>
+                EOF
             )
         ;
     }
@@ -84,10 +85,11 @@ EOF
         $io = new SymfonyStyle($input, $output);
         $filenames = $input->getArgument('filename');
         $showDeprecations = $input->getOption('show-deprecations');
+        $this->excludes = $input->getOption('excludes');
         $this->format = $input->getOption('format') ?? (GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt');
 
         if (['-'] === $filenames) {
-            return $this->display($input, $output, $io, [$this->validate(file_get_contents('php://stdin'), uniqid('sf_', true))]);
+            return $this->display($input, $output, $io, [$this->validate(file_get_contents('php://stdin'), 'Standard Input', $showDeprecations)]);
         }
 
         if (!$filenames) {
@@ -105,38 +107,15 @@ EOF
             }
         }
 
-        if ($showDeprecations) {
-            $prevErrorHandler = set_error_handler(static function ($level, $message, $file, $line) use (&$prevErrorHandler) {
-                if (\E_USER_DEPRECATED === $level) {
-                    $templateLine = 0;
-                    if (preg_match('/ at line (\d+)[ .]/', $message, $matches)) {
-                        $templateLine = $matches[1];
-                    }
-
-                    throw new Error($message, $templateLine);
-                }
-
-                return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
-            });
-        }
-
-        try {
-            $filesInfo = $this->getFilesInfo($filenames);
-        } finally {
-            if ($showDeprecations) {
-                restore_error_handler();
-            }
-        }
-
-        return $this->display($input, $output, $io, $filesInfo);
+        return $this->display($input, $output, $io, $this->getFilesInfo($filenames, $showDeprecations));
     }
 
-    private function getFilesInfo(array $filenames): array
+    private function getFilesInfo(array $filenames, bool $showDeprecations): array
     {
         $filesInfo = [];
         foreach ($filenames as $filename) {
             foreach ($this->findFiles($filename) as $file) {
-                $filesInfo[] = $this->validate(file_get_contents($file), $file);
+                $filesInfo[] = $this->validate(file_get_contents($file), $file, $showDeprecations);
             }
         }
 
@@ -148,14 +127,32 @@ EOF
         if (is_file($filename)) {
             return [$filename];
         } elseif (is_dir($filename)) {
-            return Finder::create()->files()->in($filename)->name($this->namePatterns);
+            return Finder::create()->files()->in($filename)->name($this->namePatterns)->exclude($this->excludes);
         }
 
         throw new RuntimeException(\sprintf('File or directory "%s" is not readable.', $filename));
     }
 
-    private function validate(string $template, string $file): array
+    private function validate(string $template, string $file, bool $collectDeprecation): array
     {
+        $deprecations = [];
+        if ($collectDeprecation) {
+            $prevErrorHandler = set_error_handler(static function ($level, $message, $fileName, $line) use (&$prevErrorHandler, &$deprecations, $file) {
+                if (\E_USER_DEPRECATED === $level) {
+                    $templateLine = 0;
+                    if (preg_match('/ at line (\d+)[ .]/', $message, $matches)) {
+                        $templateLine = $matches[1];
+                    }
+
+                    $deprecations[] = ['message' => $message, 'file' => $file, 'line' => $templateLine];
+
+                    return true;
+                }
+
+                return $prevErrorHandler ? $prevErrorHandler($level, $message, $fileName, $line) : false;
+            });
+        }
+
         $realLoader = $this->twig->getLoader();
         try {
             $temporaryLoader = new ArrayLoader([$file => $template]);
@@ -167,9 +164,13 @@ EOF
             $this->twig->setLoader($realLoader);
 
             return ['template' => $template, 'file' => $file, 'line' => $e->getTemplateLine(), 'valid' => false, 'exception' => $e];
+        } finally {
+            if ($collectDeprecation) {
+                restore_error_handler();
+            }
         }
 
-        return ['template' => $template, 'file' => $file, 'valid' => true];
+        return ['template' => $template, 'file' => $file, 'deprecations' => $deprecations, 'valid' => true];
     }
 
     private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, array $files): int
@@ -186,6 +187,11 @@ EOF
     {
         $errors = 0;
         $githubReporter = $errorAsGithubAnnotations ? new GithubActionReporter($output) : null;
+        $deprecations = array_merge(...array_column($filesInfo, 'deprecations'));
+
+        foreach ($deprecations as $deprecation) {
+            $this->renderDeprecation($io, $deprecation['line'], $deprecation['message'], $deprecation['file'], $githubReporter);
+        }
 
         foreach ($filesInfo as $info) {
             if ($info['valid'] && $output->isVerbose()) {
@@ -202,7 +208,7 @@ EOF
             $io->warning(\sprintf('%d Twig files have valid syntax and %d contain errors.', \count($filesInfo) - $errors, $errors));
         }
 
-        return min($errors, 1);
+        return !$deprecations && !$errors ? 0 : 1;
     }
 
     private function displayJson(OutputInterface $output, array $filesInfo): int
@@ -222,6 +228,19 @@ EOF
         $output->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         return min($errors, 1);
+    }
+
+    private function renderDeprecation(SymfonyStyle $output, int $line, string $message, string $file, ?GithubActionReporter $githubReporter): void
+    {
+        $githubReporter?->error($message, $file, $line <= 0 ? null : $line);
+
+        if ($file) {
+            $output->text(\sprintf('<info> DEPRECATION </info> in %s (line %s)', $file, $line));
+        } else {
+            $output->text(\sprintf('<info> DEPRECATION </info> (line %s)', $line));
+        }
+
+        $output->text(\sprintf('<info> >> %s</info> ', $message));
     }
 
     private function renderException(SymfonyStyle $output, string $template, Error $exception, ?string $file = null, ?GithubActionReporter $githubReporter = null): void
@@ -280,6 +299,7 @@ EOF
         }
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return ['txt', 'json', 'github'];

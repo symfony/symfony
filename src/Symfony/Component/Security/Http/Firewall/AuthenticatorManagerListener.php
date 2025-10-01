@@ -22,11 +22,9 @@ use Symfony\Component\Security\Http\Authentication\AuthenticatorManagerInterface
  */
 class AuthenticatorManagerListener extends AbstractListener
 {
-    private AuthenticatorManagerInterface $authenticatorManager;
-
-    public function __construct(AuthenticatorManagerInterface $authenticationManager)
-    {
-        $this->authenticatorManager = $authenticationManager;
+    public function __construct(
+        private AuthenticatorManagerInterface $authenticatorManager,
+    ) {
     }
 
     public function supports(Request $request): ?bool

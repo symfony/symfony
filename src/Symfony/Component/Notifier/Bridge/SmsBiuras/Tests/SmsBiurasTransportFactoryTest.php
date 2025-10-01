@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\SmsBiuras\Tests;
 
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class SmsBiurasTransportFactoryTest extends TransportFactoryTestCase
+final class SmsBiurasTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): SmsBiurasTransportFactory
     {
         return new SmsBiurasTransportFactory();
@@ -49,5 +54,11 @@ final class SmsBiurasTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://uid:api_key@default?from=0611223344'];
         yield ['somethingElse://uid:api_key@default']; // missing "from" option
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['smsbiuras://uid:@default?from=0611223344'];
+        yield ['smsbiuras://uid@default?from=0611223344'];
     }
 }

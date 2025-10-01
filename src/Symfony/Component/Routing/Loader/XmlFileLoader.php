@@ -24,6 +24,8 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @deprecated since Symfony 7.4, use another loader instead
  */
 class XmlFileLoader extends FileLoader
 {
@@ -40,6 +42,8 @@ class XmlFileLoader extends FileLoader
      */
     public function load(mixed $file, ?string $type = null): RouteCollection
     {
+        trigger_deprecation('symfony/routing', '7.4', 'XML configuration format is deprecated, use YAML, PHP or attributes instead.');
+
         $path = $this->locator->locate($file);
 
         $xml = $this->loadFile($path);
@@ -62,11 +66,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a node from a loaded XML file.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    protected function parseNode(RouteCollection $collection, \DOMElement $node, string $path, string $file)
+    protected function parseNode(RouteCollection $collection, \DOMElement $node, string $path, string $file): void
     {
         if (self::NAMESPACE_URI !== $node->namespaceURI) {
             return;
@@ -102,11 +104,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a route and adds it to the RouteCollection.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    protected function parseRoute(RouteCollection $collection, \DOMElement $node, string $path)
+    protected function parseRoute(RouteCollection $collection, \DOMElement $node, string $path): void
     {
         if ('' === $id = $node->getAttribute('id')) {
             throw new \InvalidArgumentException(\sprintf('The <route> element in file "%s" must have an "id" attribute.', $path));
@@ -153,11 +153,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses an import and adds the routes in the resource to the RouteCollection.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    protected function parseImport(RouteCollection $collection, \DOMElement $node, string $path, string $file)
+    protected function parseImport(RouteCollection $collection, \DOMElement $node, string $path, string $file): void
     {
         /** @var \DOMElement $resourceElement */
         if (!($resource = $node->getAttribute('resource') ?: null) && $resourceElement = $node->getElementsByTagName('resource')[0] ?? null) {

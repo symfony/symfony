@@ -20,6 +20,9 @@ use MongoDB\Driver\Exception\CommandException;
 use MongoDB\Driver\Exception\ConnectionException;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Query;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
 
@@ -27,12 +30,10 @@ require_once __DIR__.'/stubs/mongodb.php';
 
 /**
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
- *
- * @group integration
- * @group time-sensitive
- *
- * @requires extension mongodb
  */
+#[RequiresPhpExtension('mongodb')]
+#[Group('integration')]
+#[Group('time-sensitive')]
 class MongoDbSessionHandlerTest extends TestCase
 {
     private const DABASE_NAME = 'sf-test';
@@ -44,8 +45,6 @@ class MongoDbSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->manager = new Manager('mongodb://'.getenv('MONGODB_HOST'));
 
         try {
@@ -91,7 +90,7 @@ class MongoDbSessionHandlerTest extends TestCase
         }
     }
 
-    /** @dataProvider provideInvalidOptions */
+    #[DataProvider('provideInvalidOptions')]
     public function testConstructorShouldThrowExceptionForMissingOptions(array $options)
     {
         $this->expectException(\InvalidArgumentException::class);

@@ -85,12 +85,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
         }
 
         $body = $this->streamFactory->createStreamFromResource($symfonyRequest->getContent(true));
-
-        if (method_exists(Request::class, 'getContentTypeFormat')) {
-            $format = $symfonyRequest->getContentTypeFormat();
-        } else {
-            $format = $symfonyRequest->getContentType();
-        }
+        $format = $symfonyRequest->getContentTypeFormat();
 
         if ('json' === $format) {
             $parsedBody = json_decode($symfonyRequest->getContent(), true, 512, \JSON_BIGINT_AS_STRING);
@@ -183,7 +178,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
         $headers = $symfonyResponse->headers->all();
         $cookies = $symfonyResponse->headers->getCookies();
-        if (!empty($cookies)) {
+        if ($cookies) {
             $headers['Set-Cookie'] = [];
 
             foreach ($cookies as $cookie) {
@@ -200,8 +195,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
         }
 
         $protocolVersion = $symfonyResponse->getProtocolVersion();
-        $response = $response->withProtocolVersion($protocolVersion);
 
-        return $response;
+        return $response->withProtocolVersion($protocolVersion);
     }
 }

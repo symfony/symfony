@@ -98,8 +98,17 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         if ($header = $email->getHeaders()->get('X-SES-SOURCE-ARN')) {
             $request['FromEmailAddressIdentityArn'] = $header->getBodyAsString();
         }
+        if ($header = $email->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+            if (preg_match('/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix', $header->getBodyAsString(), $listManagementOptions)) {
+                $request['ListManagementOptions'] = array_filter($listManagementOptions, fn ($e) => \in_array($e, ['ContactListName', 'TopicName'], true), \ARRAY_FILTER_USE_KEY);
+            }
+        }
         if ($email->getReturnPath()) {
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
+        }
+
+        if ($customHeaders = $this->getCustomHeaders($email->getHeaders())) {
+            $request['Content']['Simple']['Headers'] = $customHeaders;
         }
 
         foreach ($email->getHeaders()->all() as $header) {
@@ -116,6 +125,29 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         $emailRecipients = array_merge($email->getCc(), $email->getBcc());
 
         return array_filter($envelope->getRecipients(), fn (Address $address) => !\in_array($address, $emailRecipients, true));
+    }
+
+    private function getCustomHeaders(Headers $headers): array
+    {
+        $headersPrepared = [];
+
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'return-path', 'subject', 'reply-to', 'sender', 'content-type', 'x-ses-configuration-set', 'x-ses-source-arn', 'x-ses-list-management-options'];
+        foreach ($headers->all() as $name => $header) {
+            if (\in_array($name, $headersToBypass, true)) {
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                continue;
+            }
+
+            $headersPrepared[] = [
+                'Name' => $header->getName(),
+                'Value' => $header->getBodyAsString(),
+            ];
+        }
+
+        return $headersPrepared;
     }
 
     protected function stringifyAddresses(array $addresses): array

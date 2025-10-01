@@ -90,6 +90,11 @@ trait MailerAssertionsTrait
         self::assertThat($email, new MimeConstraint\EmailAddressContains($headerName, $expectedValue), $message);
     }
 
+    public static function assertEmailAddressNotContains(RawMessage $email, string $headerName, string $expectedValue, string $message = ''): void
+    {
+        self::assertThat($email, new LogicalNot(new MimeConstraint\EmailAddressContains($headerName, $expectedValue)), $message);
+    }
+
     public static function assertEmailSubjectContains(RawMessage $email, string $expectedValue, string $message = ''): void
     {
         self::assertThat($email, new MimeConstraint\EmailSubjectContains($expectedValue), $message);

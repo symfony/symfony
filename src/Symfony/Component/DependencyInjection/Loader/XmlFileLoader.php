@@ -34,15 +34,19 @@ use Symfony\Component\ExpressionLanguage\Expression;
  * XmlFileLoader loads XML files service definitions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 7.4, use another loader instead
  */
 class XmlFileLoader extends FileLoader
 {
     public const NS = 'http://symfony.com/schema/dic/services';
 
-    protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
+    protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
     public function load(mixed $resource, ?string $type = null): mixed
     {
+        trigger_deprecation('symfony/dependency-injection', '7.4', 'XML configuration format is deprecated, use YAML or PHP instead.');
+
         $path = $this->locator->locate($resource);
 
         $xml = $this->parseFileToDOM($path);
@@ -346,28 +350,31 @@ class XmlFileLoader extends FileLoader
             );
         }
 
-        $tags = $this->getChildren($service, 'tag');
-
-        foreach ($tags as $tag) {
-            $tagNameComesFromAttribute = $tag->childElementCount || '' === $tag->nodeValue;
-            if ('' === $tagName = $tagNameComesFromAttribute ? $tag->getAttribute('name') : $tag->nodeValue) {
-                throw new InvalidArgumentException(\sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', (string) $service->getAttribute('id'), $file));
-            }
-
-            $parameters = $this->getTagAttributes($tag, \sprintf('The attribute name of tag "%s" for service "%s" in %s must be a non-empty string.', $tagName, (string) $service->getAttribute('id'), $file));
-            foreach ($tag->attributes as $name => $node) {
-                if ($tagNameComesFromAttribute && 'name' === $name) {
-                    continue;
+        foreach (['tag', 'resource-tag'] as $type) {
+            foreach ($this->getChildren($service, $type) as $tag) {
+                $tagNameComesFromAttribute = $tag->childElementCount || '' === $tag->nodeValue;
+                if ('' === $tagName = $tagNameComesFromAttribute ? $tag->getAttribute('name') : $tag->nodeValue) {
+                    throw new InvalidArgumentException(\sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', $service->getAttribute('id'), $file));
                 }
 
-                if (str_contains($name, '-') && !str_contains($name, '_') && !\array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
-                    $parameters[$normalizedName] = XmlUtils::phpize($node->nodeValue);
-                }
-                // keep not normalized key
-                $parameters[$name] = XmlUtils::phpize($node->nodeValue);
-            }
+                $parameters = $this->getTagAttributes($tag, \sprintf('The attribute name of tag "%s" for service "%s" in %s must be a non-empty string.', $tagName, $service->getAttribute('id'), $file));
+                foreach ($tag->attributes as $name => $node) {
+                    if ($tagNameComesFromAttribute && 'name' === $name) {
+                        continue;
+                    }
 
-            $definition->addTag($tagName, $parameters);
+                    if (str_contains($name, '-') && !str_contains($name, '_') && !\array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
+                        $parameters[$normalizedName] = XmlUtils::phpize($node->nodeValue);
+                    }
+                    // keep not normalized key
+                    $parameters[$name] = XmlUtils::phpize($node->nodeValue);
+                }
+
+                match ($type) {
+                    'tag' => $definition->addTag($tagName, $parameters),
+                    'resource-tag' => $definition->addResourceTag($tagName, $parameters),
+                };
+            }
         }
 
         $definition->setTags(array_merge_recursive($definition->getTags(), $defaults->getTags()));
@@ -405,7 +412,7 @@ class XmlFileLoader extends FileLoader
 
         if ($callable = $this->getChildren($service, 'from-callable')) {
             if ($definition instanceof ChildDefinition) {
-                throw new InvalidArgumentException(\sprintf('Attribute "parent" is unsupported when using "<from-callable>" on service "%s".', (string) $service->getAttribute('id')));
+                throw new InvalidArgumentException(\sprintf('Attribute "parent" is unsupported when using "<from-callable>" on service "%s".', $service->getAttribute('id')));
             }
 
             foreach ([
@@ -418,7 +425,7 @@ class XmlFileLoader extends FileLoader
                 'Tag "<call>"' => 'getMethodCalls',
             ] as $key => $method) {
                 if ($definition->$method()) {
-                    throw new InvalidArgumentException($key.\sprintf(' is unsupported when using "<from-callable>" on service "%s".', (string) $service->getAttribute('id')));
+                    throw new InvalidArgumentException($key.\sprintf(' is unsupported when using "<from-callable>" on service "%s".', $service->getAttribute('id')));
                 }
             }
 
@@ -564,6 +571,21 @@ class XmlFileLoader extends FileLoader
                 $key = $arg->getAttribute('key');
             }
 
+            switch ($arg->getAttribute('key-type')) {
+                case 'binary':
+                    if (false === $key = base64_decode($key, true)) {
+                        throw new InvalidArgumentException(\sprintf('Tag "<%s>" with key-type="binary" does not have a valid base64 encoded key in "%s".', $name, $file));
+                    }
+                    break;
+                case 'constant':
+                    try {
+                        $key = \constant(trim($key));
+                    } catch (\Error) {
+                        throw new InvalidArgumentException(\sprintf('The key "%s" is not a valid constant in "%s".', $key, $file));
+                    }
+                    break;
+            }
+
             $trim = $arg->hasAttribute('trim') && XmlUtils::phpize($arg->getAttribute('trim'));
             $onInvalid = $arg->getAttribute('on-invalid');
             $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
@@ -613,14 +635,11 @@ class XmlFileLoader extends FileLoader
                     break;
                 case 'service_locator':
                     $arg = $this->getArgumentsAsPhp($arg, $name, $file);
-
-                    if (isset($arg[0])) {
-                        trigger_deprecation('symfony/dependency-injection', '6.3', 'Skipping "key" argument or using integers as values in a "service_locator" tag is deprecated. The keys will default to the IDs of the original services in 7.0.');
-                    }
-
                     $arguments[$key] = new ServiceLocatorArgument($arg);
                     break;
                 case 'tagged':
+                    trigger_deprecation('symfony/dependency-injection', '7.2', 'Type "tagged" is deprecated for tag <%s>, use "tagged_iterator" instead in "%s".', $name, $file);
+                    // no break
                 case 'tagged_iterator':
                 case 'tagged_locator':
                     $forLocator = 'tagged_locator' === $type;
@@ -761,16 +780,16 @@ class XmlFileLoader extends FileLoader
         }
 
         $source = <<<EOF
-<?xml version="1.0" encoding="utf-8" ?>
-<xsd:schema xmlns="http://symfony.com/schema"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://symfony.com/schema"
-    elementFormDefault="qualified">
+            <?xml version="1.0" encoding="utf-8" ?>
+            <xsd:schema xmlns="http://symfony.com/schema"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                targetNamespace="http://symfony.com/schema"
+                elementFormDefault="qualified">
 
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-$imports
-</xsd:schema>
-EOF
+                <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+            $imports
+            </xsd:schema>
+            EOF
         ;
 
         if ($this->shouldEnableEntityLoader()) {
@@ -815,7 +834,7 @@ EOF
     private function validateAlias(\DOMElement $alias, string $file): void
     {
         foreach ($alias->attributes as $name => $node) {
-            if (!\in_array($name, ['alias', 'id', 'public'])) {
+            if (!\in_array($name, ['alias', 'id', 'public'], true)) {
                 throw new InvalidArgumentException(\sprintf('Invalid attribute "%s" defined for alias "%s" in "%s".', $name, $alias->getAttribute('id'), $file));
             }
         }
@@ -843,9 +862,9 @@ EOF
             }
 
             // can it be handled by an extension?
-            if (!$this->container->hasExtension($node->namespaceURI)) {
+            if (!$this->prepend && !$this->container->hasExtension($node->namespaceURI)) {
                 $extensionNamespaces = array_filter(array_map(fn (ExtensionInterface $ext) => $ext->getNamespace(), $this->container->getExtensions()));
-                throw new InvalidArgumentException(\sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $node->tagName, $file, $node->namespaceURI, $extensionNamespaces ? implode('", "', $extensionNamespaces) : 'none'));
+                throw new InvalidArgumentException(UndefinedExtensionHandler::getErrorMessage($node->tagName, $file, $node->namespaceURI, $extensionNamespaces));
             }
         }
     }
@@ -865,8 +884,10 @@ EOF
                 $values = [];
             }
 
-            $this->container->loadFromExtension($node->namespaceURI, $values);
+            $this->loadExtensionConfig($node->namespaceURI, $values);
         }
+
+        $this->loadExtensionConfigs();
     }
 
     /**

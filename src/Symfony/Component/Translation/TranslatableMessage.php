@@ -19,19 +19,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TranslatableMessage implements TranslatableInterface
 {
-    private string $message;
-    private array $parameters;
-    private ?string $domain;
-
-    public function __construct(string $message, array $parameters = [], ?string $domain = null)
-    {
-        $this->message = $message;
-        $this->parameters = $parameters;
-        $this->domain = $domain;
+    public function __construct(
+        private string $message,
+        private array $parameters = [],
+        private ?string $domain = null,
+    ) {
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function __toString(): string
     {
+        trigger_deprecation('symfony/translation', '7.4', 'Method "%s()" is deprecated.', __METHOD__);
+
         return $this->getMessage();
     }
 

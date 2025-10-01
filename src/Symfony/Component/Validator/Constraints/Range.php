@@ -12,14 +12,14 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a given number or DateTime object is between some minimum and maximum.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -38,21 +38,26 @@ class Range extends Constraint
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
     ];
 
+    public string $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
+    public string $minMessage = 'This value should be {{ limit }} or more.';
+    public string $maxMessage = 'This value should be {{ limit }} or less.';
+    public string $invalidMessage = 'This value should be a valid number.';
+    public string $invalidDateTimeMessage = 'This value is not a valid datetime.';
+    public mixed $min = null;
+    public ?string $minPropertyPath = null;
+    public mixed $max = null;
+    public ?string $maxPropertyPath = null;
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param string|null                     $invalidMessage         The message if min and max values are numeric but the given value is not
+     * @param string|null                     $invalidDateTimeMessage The message if min and max values are PHP datetimes but the given value is not
+     * @param int|float|non-empty-string|null $min                    The minimum value, either numeric or a datetime string representation
+     * @param non-empty-string|null           $minPropertyPath        Property path to the min value
+     * @param int|float|non-empty-string|null $max                    The maximum value, either numeric or a datetime string representation
+     * @param non-empty-string|null           $maxPropertyPath        Property path to the max value
+     * @param string[]|null                   $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
-    public $minMessage = 'This value should be {{ limit }} or more.';
-    public $maxMessage = 'This value should be {{ limit }} or less.';
-    public $invalidMessage = 'This value should be a valid number.';
-    public $invalidDateTimeMessage = 'This value is not a valid datetime.';
-    public $min;
-    public $minPropertyPath;
-    public $max;
-    public $maxPropertyPath;
-
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $notInRangeMessage = null,
@@ -67,6 +72,10 @@ class Range extends Constraint
         ?array $groups = null,
         mixed $payload = null,
     ) {
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->notInRangeMessage = $notInRangeMessage ?? $this->notInRangeMessage;

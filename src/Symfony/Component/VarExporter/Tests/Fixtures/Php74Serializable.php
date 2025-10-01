@@ -20,7 +20,7 @@ class Php74Serializable implements \Serializable
         return [$this->foo = new \stdClass()];
     }
 
-    public function __unserialize(array $data)
+    public function __unserialize(array $data): void
     {
         [$this->foo] = $data;
     }
@@ -30,7 +30,7 @@ class Php74Serializable implements \Serializable
         throw new \BadMethodCallException();
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException();
     }

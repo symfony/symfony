@@ -57,17 +57,11 @@ class BicValidator extends ConstraintValidator
         'EA' => 'ES', // Ceuta and Melilla
     ];
 
-    private ?PropertyAccessor $propertyAccessor;
-
-    public function __construct(?PropertyAccessor $propertyAccessor = null)
+    public function __construct(private ?PropertyAccessor $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Bic) {
             throw new UnexpectedTypeException($constraint, Bic::class);
@@ -84,7 +78,7 @@ class BicValidator extends ConstraintValidator
         $canonicalize = str_replace(' ', '', $value);
 
         // the bic must be either 8 or 11 characters long
-        if (!\in_array(\strlen($canonicalize), [8, 11])) {
+        if (!\in_array(\strlen($canonicalize), [8, 11], true)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Bic::INVALID_LENGTH_ERROR)
@@ -104,6 +98,9 @@ class BicValidator extends ConstraintValidator
         }
 
         $bicCountryCode = substr($canonicalize, 4, 2);
+        if (Bic::VALIDATION_MODE_CASE_INSENSITIVE === $constraint->mode) {
+            $bicCountryCode = strtoupper($bicCountryCode);
+        }
         if (!isset(self::BIC_COUNTRY_TO_IBAN_COUNTRY_MAP[$bicCountryCode]) && !Countries::exists($bicCountryCode)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
@@ -113,8 +110,8 @@ class BicValidator extends ConstraintValidator
             return;
         }
 
-        // should contain uppercase characters only
-        if (strtoupper($canonicalize) !== $canonicalize) {
+        // should contain uppercase characters only in strict mode
+        if (Bic::VALIDATION_MODE_STRICT === $constraint->mode && strtoupper($canonicalize) !== $canonicalize) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Bic::INVALID_CASE_ERROR)

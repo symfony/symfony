@@ -12,41 +12,37 @@
 namespace Symfony\Component\Security\Http\Attribute;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Checks if user has permission to access to some resource using security roles and voters.
+ *
+ * @see https://symfony.com/doc/current/security.html#roles
+ *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
-final class IsGranted
+class IsGranted
 {
+    /** @var string[] */
+    public readonly array $methods;
+
+    /**
+     * @param string|Expression|\Closure(IsGrantedContext, mixed $subject):bool         $attribute     The attribute that will be checked against a given authentication token and optional subject
+     * @param array|string|Expression|\Closure(array<string,mixed>, Request):mixed|null $subject       An optional subject - e.g. the current object being voted on
+     * @param string|null                                                               $message       A custom message when access is not granted
+     * @param int|null                                                                  $statusCode    If set, will throw HttpKernel's HttpException with the given $statusCode; if null, Security\Core's AccessDeniedException will be used
+     * @param int|null                                                                  $exceptionCode If set, will add the exception code to thrown exception
+     * @param string[]|string                                                           $methods       HTTP methods to apply validation to. Empty array means all methods are allowed
+     */
     public function __construct(
-        /**
-         * Sets the first argument that will be passed to isGranted().
-         */
-        public string|Expression $attribute,
-
-        /**
-         * Sets the second argument passed to isGranted().
-         *
-         * @var array<string|Expression>|string|Expression|null
-         */
-        public array|string|Expression|null $subject = null,
-
-        /**
-         * The message of the exception - has a nice default if not set.
-         */
+        public string|Expression|\Closure $attribute,
+        public array|string|Expression|\Closure|null $subject = null,
         public ?string $message = null,
-
-        /**
-         * If set, will throw HttpKernel's HttpException with the given $statusCode.
-         * If null, Security\Core's AccessDeniedException will be used.
-         */
         public ?int $statusCode = null,
-
-        /**
-         * If set, will add the exception code to thrown exception.
-         */
         public ?int $exceptionCode = null,
+        array|string $methods = [],
     ) {
+        $this->methods = (array) $methods;
     }
 }

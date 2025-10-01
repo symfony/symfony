@@ -31,12 +31,12 @@ final class MailPaceApiTransport extends AbstractApiTransport
 {
     private const HOST = 'app.mailpace.com/api/v1';
 
-    private string $key;
-
-    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
@@ -103,10 +103,8 @@ final class MailPaceApiTransport extends AbstractApiTransport
             'tags' => [],
         ];
 
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to'];
-
         foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to'], true)) {
                 continue;
             }
 

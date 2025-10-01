@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler;
 
-/**
- * @requires extension memcached
- *
- * @group time-sensitive
- */
+#[RequiresPhpExtension('memcached')]
+#[Group('time-sensitive')]
 class MemcachedSessionHandlerTest extends TestCase
 {
     private const PREFIX = 'prefix_';
@@ -30,8 +30,6 @@ class MemcachedSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (version_compare(phpversion('memcached'), '2.2.0', '>=') && version_compare(phpversion('memcached'), '3.0.0b1', '<')) {
             $this->markTestSkipped('Tests can only be run with memcached extension 2.1.0 or lower, or 3.0.0b1 or higher');
         }
@@ -125,9 +123,7 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertIsInt($this->storage->gc(123));
     }
 
-    /**
-     * @dataProvider getOptionFixtures
-     */
+    #[DataProvider('getOptionFixtures')]
     public function testSupportedOptions($options, $supported)
     {
         try {

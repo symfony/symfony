@@ -17,9 +17,11 @@ require $vendor.'/vendor/autoload.php';
 
 (new Application())
     ->register('app')
-    ->setCode(function(InputInterface $input, OutputInterface $output) {
+    ->setCode(function(InputInterface $input, OutputInterface $output): int {
         $output->writeln((new QuestionHelper())->ask($input, $output, new Question('Foo?', 'foo')));
         $output->writeln((new QuestionHelper())->ask($input, $output, new Question('Bar?', 'bar')));
+
+        return 0;
     })
     ->getApplication()
     ->setDefaultCommand('app', true)

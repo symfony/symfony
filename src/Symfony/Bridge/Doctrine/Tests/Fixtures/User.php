@@ -40,16 +40,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
     }
 
-    public function getUsername(): string
-    {
-        return $this->name;
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->name;
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
     }

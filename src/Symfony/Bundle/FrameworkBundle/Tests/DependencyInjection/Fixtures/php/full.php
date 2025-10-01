@@ -43,8 +43,6 @@ $container->loadFromExtension('framework', [
         'gc_maxlifetime' => 90000,
         'gc_divisor' => 108,
         'gc_probability' => 1,
-        'sid_length' => 22,
-        'sid_bits_per_character' => 4,
         'save_path' => '/path/to/sessions',
     ],
     'assets' => [
@@ -68,8 +66,19 @@ $container->loadFromExtension('framework', [
         'circular_reference_handler' => 'my.circular.reference.handler',
         'max_depth_handler' => 'my.max.depth.handler',
         'default_context' => ['enable_max_depth' => true],
+        'named_serializers' => [
+            'api' => [
+                'include_built_in_normalizers' => true,
+                'include_built_in_encoders' => true,
+                'default_context' => ['enable_max_depth' => false],
+            ],
+        ],
     ],
-    'property_info' => true,
+    'property_info' => [
+        'enabled' => true,
+        'with_constructor_extractor' => true,
+    ],
+    'type_info' => true,
     'ide' => 'file%%link%%format',
     'request' => [
         'formats' => [

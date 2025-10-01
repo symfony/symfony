@@ -120,7 +120,7 @@ class ImportMapVersionChecker
     public static function convertNpmConstraint(string $versionConstraint): ?string
     {
         // special npm constraint that don't translate to composer
-        if (\in_array($versionConstraint, ['latest', 'next'])
+        if (\in_array($versionConstraint, ['latest', 'next'], true)
             || preg_match('/^(git|http|file):/', $versionConstraint)
             || str_contains($versionConstraint, '/')
         ) {

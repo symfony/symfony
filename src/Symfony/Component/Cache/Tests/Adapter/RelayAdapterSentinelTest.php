@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Relay\Relay;
 use Relay\Sentinel;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class RelayAdapterSentinelTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void

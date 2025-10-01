@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntlTimeZoneToStringTransformer;
 
-/**
- * @requires extension intl
- */
+#[RequiresPhpExtension('intl')]
 class IntlTimeZoneToStringTransformerTest extends TestCase
 {
     public function testSingle()

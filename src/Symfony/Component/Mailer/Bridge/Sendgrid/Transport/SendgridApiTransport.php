@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Sendgrid\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Header\SuppressionGroupHeader;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -32,14 +33,15 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class SendgridApiTransport extends AbstractApiTransport
 {
-    private const HOST = 'api.sendgrid.com';
+    private const HOST = 'api.%region_dot%sendgrid.com';
 
-    private string $key;
-
-    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+        private ?string $region = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
@@ -117,11 +119,10 @@ class SendgridApiTransport extends AbstractApiTransport
         $customArguments = [];
         $categories = [];
 
-        // these headers can't be overwritten according to Sendgrid docs
-        // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
-        $headersToBypass = ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'];
         foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            // these headers can't be overwritten according to Sendgrid docs
+            // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
+            if (\in_array($name, ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'], true)) {
                 continue;
             }
 
@@ -132,6 +133,13 @@ class SendgridApiTransport extends AbstractApiTransport
                 $categories[] = mb_substr($header->getValue(), 0, 255);
             } elseif ($header instanceof MetadataHeader) {
                 $customArguments[$header->getKey()] = $header->getValue();
+            } elseif ($header instanceof SuppressionGroupHeader) {
+                $payload['asm'] = [
+                    'group_id' => $header->getGroupId(),
+                ];
+                if ($groupsToDisplay = $header->getGroupsToDisplay()) {
+                    $payload['asm']['groups_to_display'] = $groupsToDisplay;
+                }
             } else {
                 $payload['headers'][$header->getName()] = $header->getBodyAsString();
             }
@@ -190,6 +198,11 @@ class SendgridApiTransport extends AbstractApiTransport
 
     private function getEndpoint(): ?string
     {
-        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
+        $host = $this->host ?: str_replace('%region_dot%', '', self::HOST);
+        if (null !== $this->region && 'global' !== $this->region && null === $this->host) {
+            $host = str_replace('%region_dot%', $this->region.'.', self::HOST);
+        }
+
+        return $host.($this->port ? ':'.$this->port : '');
     }
 }

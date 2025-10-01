@@ -34,7 +34,7 @@ class AboutCommandTest extends TestCase
         $this->fs->mkdir($kernel->getProjectDir());
 
         $this->fs->dumpFile($kernel->getCacheDir().'/readable_file', 'The file content.');
-        $this->fs->chmod($kernel->getCacheDir().'/readable_file', 0777);
+        $this->fs->chmod($kernel->getCacheDir().'/readable_file', 0o777);
 
         $tester = $this->createCommandTester($kernel);
         $ret = $tester->execute([]);
@@ -43,7 +43,7 @@ class AboutCommandTest extends TestCase
         $this->assertStringContainsString('Cache directory', $tester->getDisplay());
         $this->assertStringContainsString('Log directory', $tester->getDisplay());
 
-        $this->fs->chmod($kernel->getCacheDir().'/readable_file', 0777);
+        $this->fs->chmod($kernel->getCacheDir().'/readable_file', 0o777);
 
         try {
             $this->fs->remove($kernel->getProjectDir());
@@ -62,7 +62,7 @@ class AboutCommandTest extends TestCase
         }
 
         $this->fs->dumpFile($kernel->getCacheDir().'/unreadable_file', 'The file content.');
-        $this->fs->chmod($kernel->getCacheDir().'/unreadable_file', 0222);
+        $this->fs->chmod($kernel->getCacheDir().'/unreadable_file', 0o222);
 
         $tester = $this->createCommandTester($kernel);
         $ret = $tester->execute([]);
@@ -71,7 +71,7 @@ class AboutCommandTest extends TestCase
         $this->assertStringContainsString('Cache directory', $tester->getDisplay());
         $this->assertStringContainsString('Log directory', $tester->getDisplay());
 
-        $this->fs->chmod($kernel->getCacheDir().'/unreadable_file', 0777);
+        $this->fs->chmod($kernel->getCacheDir().'/unreadable_file', 0o777);
 
         try {
             $this->fs->remove($kernel->getProjectDir());
@@ -82,7 +82,7 @@ class AboutCommandTest extends TestCase
     private function createCommandTester(TestAppKernel $kernel): CommandTester
     {
         $application = new Application($kernel);
-        $application->add(new AboutCommand());
+        $application->addCommand(new AboutCommand());
 
         return new CommandTester($application->find('about'));
     }

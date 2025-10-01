@@ -88,33 +88,44 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
         return $i;
     }
 
+    public function hash(string $string): string
+    {
+        return hash('xxh128', $string);
+    }
+
+    public function buildMermaidLiveLink(string $name): string
+    {
+        $payload = [
+            'code' => $this->data['workflows'][$name]['dump'],
+            'mermaid' => '{"theme": "default"}',
+            'autoSync' => false,
+        ];
+
+        $compressed = zlib_encode(json_encode($payload), \ZLIB_ENCODING_DEFLATE);
+
+        $suffix = rtrim(strtr(base64_encode($compressed), '+/', '-_'), '=');
+
+        return "https://mermaid.live/edit#pako:{$suffix}";
+    }
+
     protected function getCasters(): array
     {
-        $casters = [
+        return [
             ...parent::getCasters(),
-            TransitionBlocker::class => function ($v, array $a, Stub $s, $isNested) {
-                unset(
-                    $a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'code')],
-                    $a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'parameters')],
-                );
+            TransitionBlocker::class => static function ($v, array $a, Stub $s) {
+                unset($a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'code')]);
+                unset($a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'parameters')]);
 
                 $s->cut += 2;
 
                 return $a;
             },
-            Marking::class => function ($v, array $a, Stub $s, $isNested) {
+            Marking::class => static function ($v, array $a) {
                 $a[Caster::PREFIX_VIRTUAL.'.places'] = array_keys($v->getPlaces());
 
                 return $a;
             },
         ];
-
-        return $casters;
-    }
-
-    public function hash(string $string): string
-    {
-        return hash('xxh128', $string);
     }
 
     private function getEventListeners(WorkflowInterface $workflow): array
@@ -171,9 +182,9 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure')) {
+            if ($r->isAnonymous()) {
                 $title = (string) $r;
-            } elseif ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
+            } elseif ($class = $r->getClosureCalledClass()) {
                 $title = $class->name.'::'.$r->name.'()';
             } else {
                 $title = $r->name;

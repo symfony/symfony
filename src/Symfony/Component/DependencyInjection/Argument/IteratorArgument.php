@@ -18,6 +18,8 @@ namespace Symfony\Component\DependencyInjection\Argument;
  */
 class IteratorArgument implements ArgumentInterface
 {
+    use ArgumentTrait;
+
     private array $values;
 
     public function __construct(array $values)
@@ -30,10 +32,7 @@ class IteratorArgument implements ArgumentInterface
         return $this->values;
     }
 
-    /**
-     * @return void
-     */
-    public function setValues(array $values)
+    public function setValues(array $values): void
     {
         $this->values = $values;
     }

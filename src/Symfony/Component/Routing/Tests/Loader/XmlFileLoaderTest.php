@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -23,6 +26,8 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Tests\Fixtures\CustomXmlFileLoader;
 use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
 
+#[IgnoreDeprecations]
+#[Group('legacy')]
 class XmlFileLoaderTest extends TestCase
 {
     public function testSupports()
@@ -79,7 +84,7 @@ class XmlFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         foreach ($routes as $route) {
             $this->assertSame('/{foo}/blog/{slug}', $route->getPath());
@@ -176,7 +181,7 @@ class XmlFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         $this->assertEquals('/route', $routeCollection->get('localized.fr')->getPath());
         $this->assertEquals('/path', $routeCollection->get('localized.en')->getPath());
@@ -189,7 +194,7 @@ class XmlFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         $this->assertEquals('/le-prefix/le-suffix', $routeCollection->get('imported.fr')->getPath());
         $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
@@ -205,7 +210,7 @@ class XmlFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         $this->assertEquals('/le-prefix/suffix', $routeCollection->get('imported.fr')->getPath());
         $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
@@ -214,23 +219,23 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('en', $routeCollection->get('imported.en')->getRequirement('_locale'));
     }
 
-    /**
-     * @dataProvider getPathsToInvalidFiles
-     */
+    #[DataProvider('getPathsToInvalidFiles')]
     public function testLoadThrowsExceptionWithInvalidFile($filePath)
     {
-        $this->expectException(\InvalidArgumentException::class);
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
+        $this->expectException(\InvalidArgumentException::class);
+
         $loader->load($filePath);
     }
 
-    /**
-     * @dataProvider getPathsToInvalidFiles
-     */
-    public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath)
+    #[DataProvider('getPathsToInvalidFiles')]
+    public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation(string $filePath)
     {
-        $this->expectException(\InvalidArgumentException::class);
         $loader = new CustomXmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
+        $this->expectException(\InvalidArgumentException::class);
+
         $loader->load($filePath);
     }
 
@@ -250,9 +255,11 @@ class XmlFileLoaderTest extends TestCase
 
     public function testDocTypeIsNotAllowed()
     {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Document types are not allowed.');
-        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
         $loader->load('withdoctype.xml');
     }
 
@@ -458,16 +465,16 @@ class XmlFileLoaderTest extends TestCase
 
     public function testOverrideControllerInDefaults()
     {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/');
-        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
+
         $loader->load('override_defaults.xml');
     }
 
-    /**
-     * @dataProvider provideFilesImportingRoutesWithControllers
-     */
-    public function testImportRouteWithController($file)
+    #[DataProvider('provideFilesImportingRoutesWithControllers')]
+    public function testImportRouteWithController(string $file)
     {
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $routeCollection = $loader->load($file);
@@ -490,9 +497,11 @@ class XmlFileLoaderTest extends TestCase
 
     public function testImportWithOverriddenController()
     {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/');
-        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
+
         $loader->load('import_override_defaults.xml');
     }
 
@@ -607,9 +616,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('xml'), $routes);
     }
 
-    /**
-     * @dataProvider providePsr4ConfigFiles
-     */
+    #[DataProvider('providePsr4ConfigFiles')]
     public function testImportAttributesWithPsr4Prefix(string $configFile)
     {
         $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
@@ -617,7 +624,7 @@ class XmlFileLoaderTest extends TestCase
             $loader = new XmlFileLoader($locator),
             new Psr4DirectoryLoader($locator),
             new class extends AttributeClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }
@@ -642,7 +649,7 @@ class XmlFileLoaderTest extends TestCase
         new LoaderResolver([
             $loader = new XmlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
             new class extends AttributeClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }

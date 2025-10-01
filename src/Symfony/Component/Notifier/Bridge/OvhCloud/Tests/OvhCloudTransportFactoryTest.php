@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\OvhCloud\Tests;
 
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
+final class OvhCloudTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): OvhCloudTransportFactory
     {
         return new OvhCloudTransportFactory();
@@ -68,5 +73,11 @@ final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
         yield ['somethingElse://key:secret@default?service_name=serviceName'];
         yield ['somethingElse://key:secret@default?consumer_key=consumerKey'];
         yield ['somethingElse://key:secret@default?sender=sender'];
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['ovhcloud://key@default?service_name=serviceName&sender=sender'];
+        yield ['ovhcloud://:secret@default?service_name=serviceName&sender=sender'];
     }
 }

@@ -40,22 +40,33 @@ class ErrorPagesConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     transports?: array<string, array{
+     *         dsn?: scalar|null,
+     *     }>,
+     *     error_pages?: array{ // Default: {"enabled":false}
+     *         enabled?: bool, // Default: false
+     *         with_trace?: bool,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('enabled', $value)) {
+        if (array_key_exists('enabled', $config)) {
             $this->_usedProperties['enabled'] = true;
-            $this->enabled = $value['enabled'];
-            unset($value['enabled']);
+            $this->enabled = $config['enabled'];
+            unset($config['enabled']);
         }
 
-        if (array_key_exists('with_trace', $value)) {
+        if (array_key_exists('with_trace', $config)) {
             $this->_usedProperties['withTrace'] = true;
-            $this->withTrace = $value['with_trace'];
-            unset($value['with_trace']);
+            $this->withTrace = $config['with_trace'];
+            unset($config['with_trace']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

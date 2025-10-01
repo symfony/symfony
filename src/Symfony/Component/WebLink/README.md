@@ -15,8 +15,8 @@ wiki](http://microformats.org/wiki/existing-rel-values#HTML5_link_type_extension
 Getting Started
 ---------------
 
-```
-$ composer require symfony/web-link
+```bash
+composer require symfony/web-link
 ```
 
 ```php

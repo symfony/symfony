@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
- * @requires extension curl
- *
- * @group dns-sensitive
- */
+#[RequiresPhpExtension('curl')]
+#[Group('dns-sensitive')]
 class CurlHttpClientTest extends HttpClientTestCase
 {
     protected function getHttpClient(string $testCase): HttpClientInterface
@@ -127,9 +126,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         $this->assertSame('/302', $response->toArray()['REQUEST_URI'] ?? null);
     }
 
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function testMaxConnections()
     {
         foreach ($ports = [80, 8681, 8682, 8683, 8684] as $port) {

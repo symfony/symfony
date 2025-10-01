@@ -11,6 +11,9 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests\FailTests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
@@ -20,6 +23,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
  * This class is deliberately suffixed with *TestFail.php so that it is ignored
  * by PHPUnit. This test is designed to fail. See ../expectdeprecationfail.phpt.
  */
+#[RequiresPhpunit('<10')]
 final class ExpectDeprecationTraitTestFail extends TestCase
 {
     use ExpectDeprecationTrait;
@@ -29,6 +33,7 @@ final class ExpectDeprecationTraitTestFail extends TestCase
      *
      * @group legacy
      */
+    #[Group('legacy')]
     public function testOne()
     {
         $this->expectDeprecation('foo');
@@ -42,6 +47,8 @@ final class ExpectDeprecationTraitTestFail extends TestCase
      *
      * @runInSeparateProcess
      */
+    #[Group('legacy')]
+    #[RunInSeparateProcess]
     public function testOneInIsolation()
     {
         $this->expectDeprecation('foo');

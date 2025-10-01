@@ -1,4 +1,4 @@
-{% use "bootstrap_base_layout.html.twig" %}
+{% use 'bootstrap_base_layout.html.twig' %}
 
 {# Widgets #}
 
@@ -35,10 +35,10 @@
 {% block checkbox_widget -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
     {% if 'checkbox-inline' in parent_label_class %}
-        {{- form_label(form, null, { widget: parent() }) -}}
+        {{- form_label(form, null, {widget: parent()}) -}}
     {% else -%}
         <div class="checkbox">
-            {{- form_label(form, null, { widget: parent() }) -}}
+            {{- form_label(form, null, {widget: parent()}) -}}
         </div>
     {%- endif -%}
 {%- endblock checkbox_widget %}
@@ -46,10 +46,10 @@
 {% block radio_widget -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
     {%- if 'radio-inline' in parent_label_class -%}
-        {{- form_label(form, null, { widget: parent() }) -}}
+        {{- form_label(form, null, {widget: parent()}) -}}
     {%- else -%}
         <div class="radio">
-            {{- form_label(form, null, { widget: parent() }) -}}
+            {{- form_label(form, null, {widget: parent()}) -}}
         </div>
     {%- endif -%}
 {%- endblock radio_widget %}
@@ -73,13 +73,13 @@
 {% endblock %}
 
 {% block checkbox_label -%}
-    {%- set label_attr = label_attr|merge({'for': id}) -%}
+    {%- set label_attr = label_attr|merge({for: id}) -%}
 
     {{- block('checkbox_radio_label') -}}
 {%- endblock checkbox_label %}
 
 {% block radio_label -%}
-    {%- set label_attr = label_attr|merge({'for': id}) -%}
+    {%- set label_attr = label_attr|merge({for: id}) -%}
 
     {{- block('checkbox_radio_label') -}}
 {%- endblock radio_label %}
@@ -94,7 +94,7 @@
             {% set embed_label_classes = parent_label_class|split(' ')|filter(class => class in ['checkbox-inline', 'radio-inline']) %}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ embed_label_classes|join(' '))|trim}) -%}
         {% endif %}
-        {%- if label is not same as(false) and label is empty -%}
+        {%- if label is not same as(false) and not label -%}
             {%- if label_format is not empty -%}
                 {%- set label = label_format|replace({
                     '%name%': name,
@@ -104,7 +104,7 @@
                 {% set label = name|humanize %}
             {%- endif -%}
         {%- endif -%}
-        <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+        <label{% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}>
             {#- if statement must be kept on the same line, to force the space between widget and label -#}
             {{- widget|raw }} {% if label is not same as(false) -%}
                 {%- if translation_domain is same as(false) -%}
@@ -127,18 +127,14 @@
 
 {# Rows #}
 
-{% block form_row -%}
-    {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-    {%- endif -%}
+{% block form_row_render -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group' ~ ((not compound or force_error|default(false)) and not valid ? ' has-error'))|trim})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) }} {# -#}
         {{ form_widget(form, widget_attr) }} {# -#}
         {{- form_help(form) -}}
         {{ form_errors(form) }} {# -#}
     </div> {# -#}
-{%- endblock form_row %}
+{%- endblock form_row_render -%}
 
 {% block button_row -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group')|trim})} %}{{ block('attributes') }}{% endwith %}>
@@ -189,7 +185,7 @@
     {% if form is not rootform %}<span class="help-block">{% else %}<div class="alert alert-danger">{% endif %}
     <ul class="list-unstyled">
         {%- for error in errors -%}
-            <li><span class="glyphicon glyphicon-exclamation-sign"></span> {{ error.message }}</li>
+            <li id="{{ id ~ '_error' ~ loop.index }}"><span class="glyphicon glyphicon-exclamation-sign"></span> {{ error.message }}</li>
         {%- endfor -%}
     </ul>
     {% if form is not rootform %}</span>{% else %}</div>{% endif %}
@@ -199,9 +195,9 @@
 {# Help #}
 
 {% block form_help -%}
-    {%- if help is not empty -%}
+    {%- if help -%}
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-block')|trim}) -%}
-        <span id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+        <span id="{{ id }}_help"{% with {attr: help_attr} %}{{ block('attributes') }}{% endwith %}>
             {%- if translation_domain is same as(false) -%}
                 {%- if help_html is same as(false) -%}
                     {{- help -}}

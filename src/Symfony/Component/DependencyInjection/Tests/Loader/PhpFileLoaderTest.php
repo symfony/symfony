@@ -12,9 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 require_once __DIR__.'/../Fixtures/includes/AcmeExtension.php';
+require_once __DIR__.'/../Fixtures/includes/fixture_app_services.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -23,6 +26,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
@@ -30,8 +34,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 
 class PhpFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
@@ -48,6 +50,38 @@ class PhpFileLoaderTest extends TestCase
         $loader->load(__DIR__.'/../Fixtures/php/simple.php');
 
         $this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a PHP file resource');
+    }
+
+    public function testPrependExtensionConfigWithLoadMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $container->prependExtensionConfig('acme', ['foo' => 'bar']);
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()), true);
+        $loader->load('config/config_builder.php');
+
+        $expected = [
+            ['color' => 'red'],
+            ['color' => 'blue'],
+            ['foo' => 'bar'],
+        ];
+        $this->assertSame($expected, $container->getExtensionConfig('acme'));
+    }
+
+    public function testPrependExtensionConfigWithImportMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $container->prependExtensionConfig('acme', ['foo' => 'bar']);
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()), true);
+        $loader->import('config/config_builder.php');
+
+        $expected = [
+            ['color' => 'red'],
+            ['color' => 'blue'],
+            ['foo' => 'bar'],
+        ];
+        $this->assertSame($expected, $container->getExtensionConfig('acme'));
     }
 
     public function testConfigServices()
@@ -73,9 +107,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertStringEqualsFile($fixtures.'/php/services_closure_argument_compiled.php', $dumper->dump());
     }
 
-    /**
-     * @dataProvider provideConfig
-     */
+    #[DataProvider('provideConfig')]
     public function testConfig($file)
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
@@ -112,6 +144,22 @@ class PhpFileLoaderTest extends TestCase
         yield ['closure'];
         yield ['from_callable'];
         yield ['env_param'];
+        yield ['array_config'];
+    }
+
+    public function testResourceTags()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/resource_tags.php');
+
+        $def = $container->getDefinition('foo');
+        $this->assertTrue($def->hasTag('container.excluded'));
+        $this->assertTrue($def->hasTag('my.tag'));
+        $this->assertTrue($def->hasTag('another.tag'));
+        $this->assertSame([['foo' => 'bar']], $def->getTag('my.tag'));
+        $this->assertSame([[]], $def->getTag('another.tag'));
+        $this->assertFalse($def->isAbstract());
     }
 
     public function testAutoConfigureAndChildDefinition()
@@ -213,13 +261,31 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/when_env.php');
     }
 
-    /**
-     * @group legacy
-     */
+    public function testNotWhenEnv()
+    {
+        $this->expectNotToPerformAssertions();
+
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $loader->load($fixtures.'/config/not_when_env.php');
+    }
+
+    public function testUsingBothWhenAndNotWhenEnv()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using both #[When] and #[WhenNot] attributes on the same target is not allowed.');
+
+        $loader->load($fixtures.'/config/when_not_when_env.php');
+    }
+
     public function testServiceWithServiceLocatorArgument()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 6.3: Using integers as keys in a "service_locator()" argument is deprecated. The keys will default to the IDs of the original services in 7.0.');
-
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
         $loader->load($fixtures.'/config/services_with_service_locator_argument.php');
@@ -235,5 +301,83 @@ class PhpFileLoaderTest extends TestCase
 
         $values = ['foo' => new Definition(\stdClass::class), 'bar' => new Definition(\stdClass::class)];
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_inline_service')->getArguments());
+    }
+
+    public function testConfigBuilderEnvConfigurator()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()), true);
+        $loader->load('config/config_builder_env_configurator.php');
+
+        $this->assertIsString($container->getExtensionConfig('acme')[0]['color']);
+    }
+
+    public function testNamedClosure()
+    {
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures/config'), 'some-env');
+        $loader->load('named_closure.php');
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile(\dirname(__DIR__).'/Fixtures/php/named_closure_compiled.php', $dumper->dump());
+    }
+
+    public function testReturnsConfigBuilderObject()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures/config'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $loader->load('return_config_builder.php');
+
+        $this->assertSame([['color' => 'red']], $container->getExtensionConfig('acme'));
+    }
+
+    public function testReturnsIterableOfArraysAndBuilders()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures/config'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $loader->load('return_iterable_configs.php');
+
+        $configs = $container->getExtensionConfig('acme');
+        $this->assertCount(2, $configs);
+        $this->assertSame('red', $configs[0]['color']);
+        $this->assertArrayHasKey('color', $configs[1]);
+    }
+
+    public function testThrowsOnInvalidReturnType()
+    {
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures/config'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/The return value in config file/');
+
+        $loader->load('return_invalid_types.php');
+    }
+
+    public function testReturnsGenerator()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures/config'), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $loader->load('return_generator.php');
+        $this->assertSame([['color' => 'red']], $container->getExtensionConfig('acme'));
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testTriggersDeprecationWhenAccessingLoaderInternalScope()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator($fixtures.'/config'));
+
+        $this->expectUserDeprecationMessageMatches('{^Since symfony/dependency-injection 8.1: Using \`\$this\` or its internal scope in config files is deprecated, use the \`\$loader\` variable instead in ".+" on line \d+\.$}');
+
+        $loader->load('legacy_internal_scope.php');
     }
 }

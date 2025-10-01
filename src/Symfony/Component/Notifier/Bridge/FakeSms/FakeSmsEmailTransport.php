@@ -30,16 +30,13 @@ final class FakeSmsEmailTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private MailerInterface $mailer;
-    private string $to;
-    private string $from;
-
-    public function __construct(MailerInterface $mailer, string $to, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->mailer = $mailer;
-        $this->to = $to;
-        $this->from = $from;
-
+    public function __construct(
+        private MailerInterface $mailer,
+        private string $to,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 

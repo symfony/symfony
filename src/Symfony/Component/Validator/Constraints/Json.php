@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates that a value has valid JSON syntax.
  *
  * @author Imad ZAIRIG <imadzairig@gmail.com>
  */
@@ -28,15 +28,18 @@ class Json extends Constraint
         self::INVALID_JSON_ERROR => 'INVALID_JSON_ERROR',
     ];
 
+    public string $message = 'This value should be valid JSON.';
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param string[]|null $groups
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $message = 'This value should be valid JSON.';
-
+    #[HasNamedArguments]
     public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;

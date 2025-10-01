@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -38,9 +39,7 @@ class TableTest extends TestCase
         unset($this->stream);
     }
 
-    /**
-     * @dataProvider renderProvider
-     */
+    #[DataProvider('renderProvider')]
     public function testRender($headers, $rows, $style, $expected, $decorated = false)
     {
         $table = new Table($output = $this->getOutputStream($decorated));
@@ -54,9 +53,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    /**
-     * @dataProvider renderProvider
-     */
+    #[DataProvider('renderProvider')]
     public function testRenderAddRows($headers, $rows, $style, $expected, $decorated = false)
     {
         $table = new Table($output = $this->getOutputStream($decorated));
@@ -70,9 +67,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    /**
-     * @dataProvider renderProvider
-     */
+    #[DataProvider('renderProvider')]
     public function testRenderAddRowsOneByOne($headers, $rows, $style, $expected, $decorated = false)
     {
         $table = new Table($output = $this->getOutputStream($decorated));
@@ -103,16 +98,30 @@ class TableTest extends TestCase
                 $books,
                 'default',
                 <<<'TABLE'
-+---------------+--------------------------+------------------+
-| ISBN          | Title                    | Author           |
-+---------------+--------------------------+------------------+
-| 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
-| 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
-| 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
-| 80-902734-1-6 | And Then There Were None | Agatha Christie  |
-+---------------+--------------------------+------------------+
+                    +---------------+--------------------------+------------------+
+                    | ISBN          | Title                    | Author           |
+                    +---------------+--------------------------+------------------+
+                    | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+                    | 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
+                    | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+                    | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
+                    +---------------+--------------------------+------------------+
 
-TABLE,
+                    TABLE,
+            ],
+            [
+                ['ISBN', 'Title', 'Author'],
+                $books,
+                'markdown',
+                <<<'TABLE'
+                    | ISBN          | Title                    | Author           |
+                    |---------------|--------------------------|------------------|
+                    | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+                    | 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
+                    | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+                    | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
+
+                    TABLE,
             ],
             [
                 ['ISBN', 'Title', 'Author'],
@@ -148,16 +157,16 @@ TABLE,
                 $books,
                 'box',
                 <<<'TABLE'
-┌───────────────┬──────────────────────────┬──────────────────┐
-│ ISBN          │ Title                    │ Author           │
-├───────────────┼──────────────────────────┼──────────────────┤
-│ 99921-58-10-7 │ Divine Comedy            │ Dante Alighieri  │
-│ 9971-5-0210-0 │ A Tale of Two Cities     │ Charles Dickens  │
-│ 960-425-059-0 │ The Lord of the Rings    │ J. R. R. Tolkien │
-│ 80-902734-1-6 │ And Then There Were None │ Agatha Christie  │
-└───────────────┴──────────────────────────┴──────────────────┘
+                    ┌───────────────┬──────────────────────────┬──────────────────┐
+                    │ ISBN          │ Title                    │ Author           │
+                    ├───────────────┼──────────────────────────┼──────────────────┤
+                    │ 99921-58-10-7 │ Divine Comedy            │ Dante Alighieri  │
+                    │ 9971-5-0210-0 │ A Tale of Two Cities     │ Charles Dickens  │
+                    │ 960-425-059-0 │ The Lord of the Rings    │ J. R. R. Tolkien │
+                    │ 80-902734-1-6 │ And Then There Were None │ Agatha Christie  │
+                    └───────────────┴──────────────────────────┴──────────────────┘
 
-TABLE,
+                    TABLE,
             ],
             [
                 ['ISBN', 'Title', 'Author'],
@@ -170,17 +179,17 @@ TABLE,
                 ],
                 'box-double',
                 <<<'TABLE'
-╔═══════════════╤══════════════════════════╤══════════════════╗
-║ ISBN          │ Title                    │ Author           ║
-╠═══════════════╪══════════════════════════╪══════════════════╣
-║ 99921-58-10-7 │ Divine Comedy            │ Dante Alighieri  ║
-║ 9971-5-0210-0 │ A Tale of Two Cities     │ Charles Dickens  ║
-╟───────────────┼──────────────────────────┼──────────────────╢
-║ 960-425-059-0 │ The Lord of the Rings    │ J. R. R. Tolkien ║
-║ 80-902734-1-6 │ And Then There Were None │ Agatha Christie  ║
-╚═══════════════╧══════════════════════════╧══════════════════╝
+                    ╔═══════════════╤══════════════════════════╤══════════════════╗
+                    ║ ISBN          │ Title                    │ Author           ║
+                    ╠═══════════════╪══════════════════════════╪══════════════════╣
+                    ║ 99921-58-10-7 │ Divine Comedy            │ Dante Alighieri  ║
+                    ║ 9971-5-0210-0 │ A Tale of Two Cities     │ Charles Dickens  ║
+                    ╟───────────────┼──────────────────────────┼──────────────────╢
+                    ║ 960-425-059-0 │ The Lord of the Rings    │ J. R. R. Tolkien ║
+                    ║ 80-902734-1-6 │ And Then There Were None │ Agatha Christie  ║
+                    ╚═══════════════╧══════════════════════════╧══════════════════╝
 
-TABLE,
+                    TABLE,
             ],
             [
                 ['ISBN', 'Title'],
@@ -192,16 +201,16 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+---------------+--------------------------+------------------+
-| ISBN          | Title                    |                  |
-+---------------+--------------------------+------------------+
-| 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
-| 9971-5-0210-0 |                          |                  |
-| 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
-| 80-902734-1-6 | And Then There Were None | Agatha Christie  |
-+---------------+--------------------------+------------------+
+                    +---------------+--------------------------+------------------+
+                    | ISBN          | Title                    |                  |
+                    +---------------+--------------------------+------------------+
+                    | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+                    | 9971-5-0210-0 |                          |                  |
+                    | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+                    | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
+                    +---------------+--------------------------+------------------+
 
-TABLE,
+                    TABLE,
             ],
             [
                 [],
@@ -213,14 +222,14 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+---------------+--------------------------+------------------+
-| 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
-| 9971-5-0210-0 |                          |                  |
-| 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
-| 80-902734-1-6 | And Then There Were None | Agatha Christie  |
-+---------------+--------------------------+------------------+
+                    +---------------+--------------------------+------------------+
+                    | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+                    | 9971-5-0210-0 |                          |                  |
+                    | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+                    | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
+                    +---------------+--------------------------+------------------+
 
-TABLE,
+                    TABLE,
             ],
             [
                 ['ISBN', 'Title', 'Author'],
@@ -232,31 +241,31 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+---------------+----------------------------+-----------------+
-| ISBN          | Title                      | Author          |
-+---------------+----------------------------+-----------------+
-| 99921-58-10-7 | Divine                     | Dante Alighieri |
-|               | Comedy                     |                 |
-| 9971-5-0210-2 | Harry Potter               | Rowling         |
-|               | and the Chamber of Secrets | Joanne K.       |
-| 9971-5-0210-2 | Harry Potter               | Rowling         |
-|               | and the Chamber of Secrets | Joanne K.       |
-| 960-425-059-0 | The Lord of the Rings      | J. R. R.        |
-|               |                            | Tolkien         |
-+---------------+----------------------------+-----------------+
+                    +---------------+----------------------------+-----------------+
+                    | ISBN          | Title                      | Author          |
+                    +---------------+----------------------------+-----------------+
+                    | 99921-58-10-7 | Divine                     | Dante Alighieri |
+                    |               | Comedy                     |                 |
+                    | 9971-5-0210-2 | Harry Potter               | Rowling         |
+                    |               | and the Chamber of Secrets | Joanne K.       |
+                    | 9971-5-0210-2 | Harry Potter               | Rowling         |
+                    |               | and the Chamber of Secrets | Joanne K.       |
+                    | 960-425-059-0 | The Lord of the Rings      | J. R. R.        |
+                    |               |                            | Tolkien         |
+                    +---------------+----------------------------+-----------------+
 
-TABLE,
+                    TABLE,
             ],
             [
                 ['ISBN', 'Title'],
                 [],
                 'default',
                 <<<'TABLE'
-+------+-------+
-| ISBN | Title |
-+------+-------+
+                    +------+-------+
+                    | ISBN | Title |
+                    +------+-------+
 
-TABLE,
+                    TABLE,
             ],
             [
                 [],
@@ -272,14 +281,14 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+---------------+----------------------+-----------------+
-| ISBN          | Title                | Author          |
-+---------------+----------------------+-----------------+
-| 99921-58-10-7 | Divine Comedy        | Dante Alighieri |
-| 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens |
-+---------------+----------------------+-----------------+
+                    +---------------+----------------------+-----------------+
+                    | ISBN          | Title                | Author          |
+                    +---------------+----------------------+-----------------+
+                    | 99921-58-10-7 | Divine Comedy        | Dante Alighieri |
+                    | 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens |
+                    +---------------+----------------------+-----------------+
 
-TABLE,
+                    TABLE,
             ],
             'Cell text with tags not used for Output styling' => [
                 ['ISBN', 'Title', 'Author'],
@@ -289,14 +298,14 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+----------------------------------+----------------------+-----------------+
-| ISBN                             | Title                | Author          |
-+----------------------------------+----------------------+-----------------+
-| <strong>99921-58-10-700</strong> | <f>Divine Com</f>    | Dante Alighieri |
-| 9971-5-0210-0                    | A Tale of Two Cities | Charles Dickens |
-+----------------------------------+----------------------+-----------------+
+                    +----------------------------------+----------------------+-----------------+
+                    | ISBN                             | Title                | Author          |
+                    +----------------------------------+----------------------+-----------------+
+                    | <strong>99921-58-10-700</strong> | <f>Divine Com</f>    | Dante Alighieri |
+                    | 9971-5-0210-0                    | A Tale of Two Cities | Charles Dickens |
+                    +----------------------------------+----------------------+-----------------+
 
-TABLE,
+                    TABLE,
             ],
             'Cell with colspan' => [
                 ['ISBN', 'Title', 'Author'],
@@ -321,22 +330,22 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+-------------------------------+-------------------------------+-----------------------------+
-| ISBN                          | Title                         | Author                      |
-+-------------------------------+-------------------------------+-----------------------------+
-| 99921-58-10-7                 | Divine Comedy                 | Dante Alighieri             |
-+-------------------------------+-------------------------------+-----------------------------+
-| Divine Comedy(Dante Alighieri)                                                              |
-+-------------------------------+-------------------------------+-----------------------------+
-| Arduino: A Quick-Start Guide                                  | Mark Schmidt                |
-+-------------------------------+-------------------------------+-----------------------------+
-| 9971-5-0210-0                 | A Tale of                                                   |
-|                               | Two Cities                                                  |
-+-------------------------------+-------------------------------+-----------------------------+
-| Cupìdĭtâte díctá âtquè pôrrò, tèmpórà exercitátìónèm mòdí ânìmí núllà nèmò vèl níhìl!       |
-+-------------------------------+-------------------------------+-----------------------------+
+                    +-------------------------------+-------------------------------+-----------------------------+
+                    | ISBN                          | Title                         | Author                      |
+                    +-------------------------------+-------------------------------+-----------------------------+
+                    | 99921-58-10-7                 | Divine Comedy                 | Dante Alighieri             |
+                    +-------------------------------+-------------------------------+-----------------------------+
+                    | Divine Comedy(Dante Alighieri)                                                              |
+                    +-------------------------------+-------------------------------+-----------------------------+
+                    | Arduino: A Quick-Start Guide                                  | Mark Schmidt                |
+                    +-------------------------------+-------------------------------+-----------------------------+
+                    | 9971-5-0210-0                 | A Tale of                                                   |
+                    |                               | Two Cities                                                  |
+                    +-------------------------------+-------------------------------+-----------------------------+
+                    | Cupìdĭtâte díctá âtquè pôrrò, tèmpórà exercitátìónèm mòdí ânìmí núllà nèmò vèl níhìl!       |
+                    +-------------------------------+-------------------------------+-----------------------------+
 
-TABLE,
+                    TABLE,
             ],
             'Cell after colspan contains new line break' => [
                 ['Foo', 'Bar', 'Baz'],
@@ -348,14 +357,14 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+-----+-----+-----+
-| Foo | Bar | Baz |
-+-----+-----+-----+
-| foo       | baz |
-| bar       | qux |
-+-----+-----+-----+
+                    +-----+-----+-----+
+                    | Foo | Bar | Baz |
+                    +-----+-----+-----+
+                    | foo       | baz |
+                    | bar       | qux |
+                    +-----+-----+-----+
 
-TABLE,
+                    TABLE,
             ],
             'Cell after colspan contains multiple new lines' => [
                 ['Foo', 'Bar', 'Baz'],
@@ -367,15 +376,15 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+-----+-----+------+
-| Foo | Bar | Baz  |
-+-----+-----+------+
-| foo       | baz  |
-| bar       | qux  |
-|           | quux |
-+-----+-----+------+
+                    +-----+-----+------+
+                    | Foo | Bar | Baz  |
+                    +-----+-----+------+
+                    | foo       | baz  |
+                    | bar       | qux  |
+                    |           | quux |
+                    +-----+-----+------+
 
-TABLE,
+                    TABLE,
             ],
             'Cell with rowspan' => [
                 ['ISBN', 'Title', 'Author'],
@@ -393,20 +402,20 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+---------------+---------------+-----------------+
-| ISBN          | Title         | Author          |
-+---------------+---------------+-----------------+
-| 9971-5-0210-0 | Divine Comedy | Dante Alighieri |
-|               |               |                 |
-|               | The Lord of   | J. R.           |
-|               | the Rings     | R. Tolkien      |
-+---------------+---------------+-----------------+
-| 80-902734-1-6 | And Then      | Agatha Christie |
-| 80-902734-1-7 | There         | Test            |
-|               | Were None     |                 |
-+---------------+---------------+-----------------+
+                    +---------------+---------------+-----------------+
+                    | ISBN          | Title         | Author          |
+                    +---------------+---------------+-----------------+
+                    | 9971-5-0210-0 | Divine Comedy | Dante Alighieri |
+                    |               |               |                 |
+                    |               | The Lord of   | J. R.           |
+                    |               | the Rings     | R. Tolkien      |
+                    +---------------+---------------+-----------------+
+                    | 80-902734-1-6 | And Then      | Agatha Christie |
+                    | 80-902734-1-7 | There         | Test            |
+                    |               | Were None     |                 |
+                    +---------------+---------------+-----------------+
 
-TABLE,
+                    TABLE,
             ],
             'Cell with rowspan and colspan' => [
                 ['ISBN', 'Title', 'Author'],
@@ -426,18 +435,18 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+------------------+---------+-----------------+
-| ISBN             | Title   | Author          |
-+------------------+---------+-----------------+
-| 9971-5-0210-0              | Dante Alighieri |
-|                            | Charles Dickens |
-+------------------+---------+-----------------+
-| Dante Alighieri  | 9971-5-0210-0             |
-| J. R. R. Tolkien |                           |
-| J. R. R          |                           |
-+------------------+---------+-----------------+
+                    +------------------+---------+-----------------+
+                    | ISBN             | Title   | Author          |
+                    +------------------+---------+-----------------+
+                    | 9971-5-0210-0              | Dante Alighieri |
+                    |                            | Charles Dickens |
+                    +------------------+---------+-----------------+
+                    | Dante Alighieri  | 9971-5-0210-0             |
+                    | J. R. R. Tolkien |                           |
+                    | J. R. R          |                           |
+                    +------------------+---------+-----------------+
 
-TABLE,
+                    TABLE,
             ],
             'Cell with rowspan and colspan contains new line break' => [
                 ['ISBN', 'Title', 'Author'],
@@ -461,26 +470,26 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+-----------------+-------+-----------------+
-| ISBN            | Title | Author          |
-+-----------------+-------+-----------------+
-| 9971                    | Dante Alighieri |
-| -5-                     | Charles Dickens |
-| 021                     |                 |
-| 0-0                     |                 |
-+-----------------+-------+-----------------+
-| Dante Alighieri | 9971                    |
-| Charles Dickens | -5-                     |
-|                 | 021                     |
-|                 | 0-0                     |
-+-----------------+-------+-----------------+
-| 9971                    | Dante           |
-| -5-                     | Alighieri       |
-| 021                     |                 |
-| 0-0                     |                 |
-+-----------------+-------+-----------------+
+                    +-----------------+-------+-----------------+
+                    | ISBN            | Title | Author          |
+                    +-----------------+-------+-----------------+
+                    | 9971                    | Dante Alighieri |
+                    | -5-                     | Charles Dickens |
+                    | 021                     |                 |
+                    | 0-0                     |                 |
+                    +-----------------+-------+-----------------+
+                    | Dante Alighieri | 9971                    |
+                    | Charles Dickens | -5-                     |
+                    |                 | 021                     |
+                    |                 | 0-0                     |
+                    +-----------------+-------+-----------------+
+                    | 9971                    | Dante           |
+                    | -5-                     | Alighieri       |
+                    | 021                     |                 |
+                    | 0-0                     |                 |
+                    +-----------------+-------+-----------------+
 
-TABLE,
+                    TABLE,
             ],
             'Cell with rowspan and colspan without using TableSeparator' => [
                 ['ISBN', 'Title', 'Author'],
@@ -498,20 +507,20 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+-----------------+-------+-----------------+
-| ISBN            | Title | Author          |
-+-----------------+-------+-----------------+
-| 9971                    | Dante Alighieri |
-| -5-                     | Charles Dickens |
-| 021                     |                 |
-| 0-0                     |                 |
-| Dante Alighieri | 9971                    |
-| Charles Dickens | -5-                     |
-|                 | 021                     |
-|                 | 0-0                     |
-+-----------------+-------+-----------------+
+                    +-----------------+-------+-----------------+
+                    | ISBN            | Title | Author          |
+                    +-----------------+-------+-----------------+
+                    | 9971                    | Dante Alighieri |
+                    | -5-                     | Charles Dickens |
+                    | 021                     |                 |
+                    | 0-0                     |                 |
+                    | Dante Alighieri | 9971                    |
+                    | Charles Dickens | -5-                     |
+                    |                 | 021                     |
+                    |                 | 0-0                     |
+                    +-----------------+-------+-----------------+
 
-TABLE,
+                    TABLE,
             ],
             'Cell with rowspan and colspan with separator inside a rowspan' => [
                 ['ISBN', 'Author'],
@@ -525,15 +534,15 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+---------------+-----------------+
-| ISBN          | Author          |
-+---------------+-----------------+
-| 9971-5-0210-0 | Dante Alighieri |
-|               |-----------------|
-|               | Charles Dickens |
-+---------------+-----------------+
+                    +---------------+-----------------+
+                    | ISBN          | Author          |
+                    +---------------+-----------------+
+                    | 9971-5-0210-0 | Dante Alighieri |
+                    |               |-----------------|
+                    |               | Charles Dickens |
+                    +---------------+-----------------+
 
-TABLE,
+                    TABLE,
             ],
             'Multiple header lines' => [
                 [
@@ -543,13 +552,13 @@ TABLE,
                 [],
                 'default',
                 <<<'TABLE'
-+------+-------+--------+
-| Main title            |
-+------+-------+--------+
-| ISBN | Title | Author |
-+------+-------+--------+
+                    +------+-------+--------+
+                    | Main title            |
+                    +------+-------+--------+
+                    | ISBN | Title | Author |
+                    +------+-------+--------+
 
-TABLE,
+                    TABLE,
             ],
             'Row with multiple cells' => [
                 [],
@@ -563,11 +572,11 @@ TABLE,
                 ],
                 'default',
                 <<<'TABLE'
-+---+--+--+---+--+---+--+---+--+
-| 1       | 2    | 3    | 4    |
-+---+--+--+---+--+---+--+---+--+
+                    +---+--+--+---+--+---+--+---+--+
+                    | 1       | 2    | 3    | 4    |
+                    +---+--+--+---+--+---+--+---+--+
 
-TABLE,
+                    TABLE,
             ],
             'Coslpan and table cells with comment style' => [
                 [
@@ -586,16 +595,15 @@ TABLE,
                 ],
                 'default',
                 <<<TABLE
-+-----------------+------------------+---------+
-|\033[32m \033[39m\033[33mLong Title\033[39m\033[32m                                   \033[39m|
-+-----------------+------------------+---------+
-| 9971-5-0210-0                                |
-+-----------------+------------------+---------+
-| Dante Alighieri | J. R. R. Tolkien | J. R. R |
-+-----------------+------------------+---------+
+                    +-----------------+------------------+---------+
+                    |\033[32m \033[39m\033[33mLong Title\033[39m\033[32m                                   \033[39m|
+                    +-----------------+------------------+---------+
+                    | 9971-5-0210-0                                |
+                    +-----------------+------------------+---------+
+                    | Dante Alighieri | J. R. R. Tolkien | J. R. R |
+                    +-----------------+------------------+---------+
 
-TABLE
-                ,
+                    TABLE,
                 true,
             ],
             'Row with formatted cells containing a newline' => [
@@ -615,16 +623,15 @@ TABLE
                 ],
                 'default',
                 <<<'TABLE'
-+-------+------------+
-[37;41m| [39;49m[37;41mDont break[39;49m[37;41m         |[39;49m
-[37;41m| here[39;49m               |
-+-------+------------+
-[39;49m| foo   | [39;49m[37;41mDont break[39;49m[39;49m |[39;49m
-[39;49m| bar   | [39;49m[37;41mhere[39;49m       |
-+-------+------------+
+                    +-------+------------+
+                    [37;41m| [39;49m[37;41mDont break[39;49m[37;41m         |[39;49m
+                    [37;41m| here[39;49m               |
+                    +-------+------------+
+                    [39;49m| foo   | [39;49m[37;41mDont break[39;49m[39;49m |[39;49m
+                    [39;49m| bar   | [39;49m[37;41mhere[39;49m       |
+                    +-------+------------+
 
-TABLE
-                ,
+                    TABLE,
                 true,
             ],
             'TabeCellStyle with align. Also with rowspan and colspan > 1' => [
@@ -695,18 +702,17 @@ TABLE
                 ],
                 'default',
                 <<<'TABLE'
-+---------------+---------------+-------------------------------------------+
-|          ISBN | Title         |                  Author                   |
-+---------------+---------------+-------------------------------------------+
-|      978      | De Monarchia  |             Dante Alighieri               |
-| 99921-58-10-7 | Divine Comedy | spans multiple rows rows Dante Alighieri  |
-|               |               |         spans multiple rows rows          |
-+---------------+---------------+-------------------------------------------+
-|             test              |                                      tttt |
-+---------------+---------------+-------------------------------------------+
+                    +---------------+---------------+-------------------------------------------+
+                    |          ISBN | Title         |                  Author                   |
+                    +---------------+---------------+-------------------------------------------+
+                    |      978      | De Monarchia  |             Dante Alighieri               |
+                    | 99921-58-10-7 | Divine Comedy | spans multiple rows rows Dante Alighieri  |
+                    |               |               |         spans multiple rows rows          |
+                    +---------------+---------------+-------------------------------------------+
+                    |             test              |                                      tttt |
+                    +---------------+---------------+-------------------------------------------+
 
-TABLE
-                ,
+                    TABLE,
             ],
             'TabeCellStyle with fg,bg. Also with rowspan and colspan > 1' => [
                 [],
@@ -766,16 +772,15 @@ TABLE
                 ],
                 'default',
                 <<<'TABLE'
-+---------------+---------------+-------------------------------------------+
-[39;49m| [39;49m[31m978[39m[39;49m           | De Monarchia  |[39;49m[31;42m             Dante Alighieri               [39;49m[39;49m|[39;49m
-[39;49m| [39;49m[32m99921-58-10-7[39m[39;49m | Divine Comedy |[39;49m[31;42m spans multiple rows rows Dante Alighieri  [39;49m[39;49m|[39;49m
-|               |               |[31;42m         spans multiple rows rows          [39;49m|
-+---------------+---------------+-------------------------------------------+
-|             [37;41mtest[39;49m              |[31;42m                                      tttt [39;49m|
-+---------------+---------------+-------------------------------------------+
+                    +---------------+---------------+-------------------------------------------+
+                    [39;49m| [39;49m[31m978[39m[39;49m           | De Monarchia  |[39;49m[31;42m             Dante Alighieri               [39;49m[39;49m|[39;49m
+                    [39;49m| [39;49m[32m99921-58-10-7[39m[39;49m | Divine Comedy |[39;49m[31;42m spans multiple rows rows Dante Alighieri  [39;49m[39;49m|[39;49m
+                    |               |               |[31;42m         spans multiple rows rows          [39;49m|
+                    +---------------+---------------+-------------------------------------------+
+                    |             [37;41mtest[39;49m              |[31;42m                                      tttt [39;49m|
+                    +---------------+---------------+-------------------------------------------+
 
-TABLE
-                ,
+                    TABLE,
                 true,
             ],
             'TabeCellStyle with cellFormat. Also with rowspan and colspan > 1' => [
@@ -821,16 +826,15 @@ TABLE
                 ],
                 'default',
                 <<<'TABLE'
-+----------------+---------------+---------------------+
-|[30;46m ISBN           [39;49m|[32m Title         [39m|[32m Author              [39m|
-+----------------+---------------+---------------------+
-[39;49m| 978-0521567817 | De Monarchia  |[39;49m[32m Dante Alighieri     [39m[39;49m|[39;49m
-| 978-0804169127 | Divine Comedy |[32m spans multiple rows [39m|
-|[37;41m test                           [39;49m| tttt                |
-+----------------+---------------+---------------------+
+                    +----------------+---------------+---------------------+
+                    |[30;46m ISBN           [39;49m|[32m Title         [39m|[32m Author              [39m|
+                    +----------------+---------------+---------------------+
+                    [39;49m| 978-0521567817 | De Monarchia  |[39;49m[32m Dante Alighieri     [39m[39;49m|[39;49m
+                    | 978-0804169127 | Divine Comedy |[32m spans multiple rows [39m|
+                    |[37;41m test                           [39;49m| tttt                |
+                    +----------------+---------------+---------------------+
 
-TABLE
-                ,
+                    TABLE,
                 true,
             ],
         ];
@@ -848,13 +852,13 @@ TABLE
 
         $expected =
 <<<'TABLE'
-+------+
-| ■■   |
-+------+
-| 1234 |
-+------+
+    +------+
+    | ■■   |
+    +------+
+    | 1234 |
+    +------+
 
-TABLE;
+    TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -868,11 +872,11 @@ TABLE;
 
         $expected =
 <<<'TABLE'
-+-------+
-| 12345 |
-+-------+
+    +-------+
+    | 12345 |
+    +-------+
 
-TABLE;
+    TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -886,11 +890,11 @@ TABLE;
 
         $expected =
 <<<'TABLE'
-+----------+
-| 12345.01 |
-+----------+
+    +----------+
+    | 12345.01 |
+    +----------+
 
-TABLE;
+    TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -914,13 +918,13 @@ TABLE;
 
         $expected =
 <<<'TABLE'
-.......
-. Foo .
-.......
-. Bar .
-.......
+    .......
+    . Foo .
+    .......
+    . Bar .
+    .......
 
-TABLE;
+    TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -941,17 +945,17 @@ TABLE;
 
         $expected =
 <<<'TABLE'
-+------+
-| Foo  |
-+------+
-| Bar1 |
-+------+
-| Bar2 |
-+------+
-| Bar3 |
-+------+
+    +------+
+    | Foo  |
+    +------+
+    | Bar1 |
+    +------+
+    | Bar2 |
+    +------+
+    | Bar3 |
+    +------+
 
-TABLE;
+    TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
 
@@ -970,17 +974,17 @@ TABLE;
 
         $expected =
 <<<TABLE
-+----+---+
-| foo    |
-+----+---+
-+----+---+
-| foo    |
-+----+---+
-+----+---+
-| foo    |
-+----+---+
+    +----+---+
+    | foo    |
+    +----+---+
+    +----+---+
+    | foo    |
+    +----+---+
+    +----+---+
+    | foo    |
+    +----+---+
 
-TABLE;
+    TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1003,14 +1007,14 @@ TABLE;
 
         $expected =
             <<<TABLE
-+---------------+----------------------+-----------------+--------+
-| ISBN          | Title                | Author          |  Price |
-+---------------+----------------------+-----------------+--------+
-| 99921-58-10-7 | Divine Comedy        | Dante Alighieri |   9.95 |
-| 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
-+---------------+----------------------+-----------------+--------+
+                +---------------+----------------------+-----------------+--------+
+                | ISBN          | Title                | Author          |  Price |
+                +---------------+----------------------+-----------------+--------+
+                | 99921-58-10-7 | Divine Comedy        | Dante Alighieri |   9.95 |
+                | 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
+                +---------------+----------------------+-----------------+--------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1049,14 +1053,14 @@ TABLE;
 
         $expected =
             <<<TABLE
-+-----------------+----------------------+-----------------+------------+
-| ISBN            | Title                | Author          |      Price |
-+-----------------+----------------------+-----------------+------------+
-| 99921-58-10-7   | Divine Comedy        | Dante Alighieri |       9.95 |
-| 9971-5-0210-0   | A Tale of Two Cities | Charles Dickens |     139.25 |
-+-----------------+----------------------+-----------------+------------+
+                +-----------------+----------------------+-----------------+------------+
+                | ISBN            | Title                | Author          |      Price |
+                +-----------------+----------------------+-----------------+------------+
+                | 99921-58-10-7   | Divine Comedy        | Dante Alighieri |       9.95 |
+                | 9971-5-0210-0   | A Tale of Two Cities | Charles Dickens |     139.25 |
+                +-----------------+----------------------+-----------------+------------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1080,14 +1084,14 @@ TABLE;
 
         $expected =
             <<<TABLE
-+-----------------+----------------------+-----------------+------------+
-| ISBN            | Title                | Author          |      Price |
-+-----------------+----------------------+-----------------+------------+
-| 99921-58-10-7   | Divine Comedy        | Dante Alighieri |       9.95 |
-| 9971-5-0210-0   | A Tale of Two Cities | Charles Dickens |     139.25 |
-+-----------------+----------------------+-----------------+------------+
+                +-----------------+----------------------+-----------------+------------+
+                | ISBN            | Title                | Author          |      Price |
+                +-----------------+----------------------+-----------------+------------+
+                | 99921-58-10-7   | Divine Comedy        | Dante Alighieri |       9.95 |
+                | 9971-5-0210-0   | A Tale of Two Cities | Charles Dickens |     139.25 |
+                +-----------------+----------------------+-----------------+------------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1110,19 +1114,19 @@ TABLE;
 
         $expected =
             <<<TABLE
-+---------------+---------------+-----------------+-------+
-|\033[32m ISBN          \033[39m|\033[32m Title         \033[39m|\033[32m Author          \033[39m|\033[32m Price \033[39m|
-+---------------+---------------+-----------------+-------+
-| 99921-58-10-7 | Divine Comedy | Dante Alighieri | 9.95  |
-+---------------+---------------+-----------------+-------+
-\x1b[5A\x1b[0J+---------------+----------------------+-----------------+--------+
-|\033[32m ISBN          \033[39m|\033[32m Title                \033[39m|\033[32m Author          \033[39m|\033[32m Price  \033[39m|
-+---------------+----------------------+-----------------+--------+
-| 99921-58-10-7 | Divine Comedy        | Dante Alighieri | 9.95   |
-| 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
-+---------------+----------------------+-----------------+--------+
+                +---------------+---------------+-----------------+-------+
+                |\033[32m ISBN          \033[39m|\033[32m Title         \033[39m|\033[32m Author          \033[39m|\033[32m Price \033[39m|
+                +---------------+---------------+-----------------+-------+
+                | 99921-58-10-7 | Divine Comedy | Dante Alighieri | 9.95  |
+                +---------------+---------------+-----------------+-------+
+                \x1b[5A\x1b[0J+---------------+----------------------+-----------------+--------+
+                |\033[32m ISBN          \033[39m|\033[32m Title                \033[39m|\033[32m Author          \033[39m|\033[32m Price  \033[39m|
+                +---------------+----------------------+-----------------+--------+
+                | 99921-58-10-7 | Divine Comedy        | Dante Alighieri | 9.95   |
+                | 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
+                +---------------+----------------------+-----------------+--------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1143,14 +1147,14 @@ TABLE;
 
         $expected =
             <<<TABLE
-+---------------+----------------------+-----------------+--------+
-|\033[32m ISBN          \033[39m|\033[32m Title                \033[39m|\033[32m Author          \033[39m|\033[32m Price  \033[39m|
-+---------------+----------------------+-----------------+--------+
-| 99921-58-10-7 | Divine Comedy        | Dante Alighieri | 9.95   |
-| 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
-+---------------+----------------------+-----------------+--------+
+                +---------------+----------------------+-----------------+--------+
+                |\033[32m ISBN          \033[39m|\033[32m Title                \033[39m|\033[32m Author          \033[39m|\033[32m Price  \033[39m|
+                +---------------+----------------------+-----------------+--------+
+                | 99921-58-10-7 | Divine Comedy        | Dante Alighieri | 9.95   |
+                | 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
+                +---------------+----------------------+-----------------+--------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1173,19 +1177,19 @@ TABLE;
 
         $expected =
             <<<TABLE
-+---------------+---------------+-----------------+-------+
-| ISBN          | Title         | Author          | Price |
-+---------------+---------------+-----------------+-------+
-| 99921-58-10-7 | Divine Comedy | Dante Alighieri | 9.95  |
-+---------------+---------------+-----------------+-------+
-+---------------+----------------------+-----------------+--------+
-| ISBN          | Title                | Author          | Price  |
-+---------------+----------------------+-----------------+--------+
-| 99921-58-10-7 | Divine Comedy        | Dante Alighieri | 9.95   |
-| 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
-+---------------+----------------------+-----------------+--------+
+                +---------------+---------------+-----------------+-------+
+                | ISBN          | Title         | Author          | Price |
+                +---------------+---------------+-----------------+-------+
+                | 99921-58-10-7 | Divine Comedy | Dante Alighieri | 9.95  |
+                +---------------+---------------+-----------------+-------+
+                +---------------+----------------------+-----------------+--------+
+                | ISBN          | Title                | Author          | Price  |
+                +---------------+----------------------+-----------------+--------+
+                | 99921-58-10-7 | Divine Comedy        | Dante Alighieri | 9.95   |
+                | 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
+                +---------------+----------------------+-----------------+--------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1216,17 +1220,17 @@ TABLE;
 
         $expected =
             <<<TABLE
-My Table
-+------+-------+--------+-------+
-|\033[32m ISBN \033[39m|\033[32m Title \033[39m|\033[32m Author \033[39m|\033[32m Price \033[39m|
-+------+-------+--------+-------+
-\x1b[3A\x1b[0J+---------------+----------------------+-----------------+--------+
-|\033[32m ISBN          \033[39m|\033[32m Title                \033[39m|\033[32m Author          \033[39m|\033[32m Price  \033[39m|
-+---------------+----------------------+-----------------+--------+
-| 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
-+---------------+----------------------+-----------------+--------+
+                My Table
+                +------+-------+--------+-------+
+                |\033[32m ISBN \033[39m|\033[32m Title \033[39m|\033[32m Author \033[39m|\033[32m Price \033[39m|
+                +------+-------+--------+-------+
+                \x1b[3A\x1b[0J+---------------+----------------------+-----------------+--------+
+                |\033[32m ISBN          \033[39m|\033[32m Title                \033[39m|\033[32m Author          \033[39m|\033[32m Price  \033[39m|
+                +---------------+----------------------+-----------------+--------+
+                | 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
+                +---------------+----------------------+-----------------+--------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1246,9 +1250,7 @@ TABLE;
         Table::getStyleDefinition('absent');
     }
 
-    /**
-     * @dataProvider renderSetTitle
-     */
+    #[DataProvider('renderSetTitle')]
     public function testSetTitle($headerTitle, $footerTitle, $style, $expected)
     {
         (new Table($output = $this->getOutputStream()))
@@ -1276,68 +1278,66 @@ TABLE;
                 'Page 1/2',
                 'default',
                 <<<'TABLE'
-+---------------+----------- Books --------+------------------+
-| ISBN          | Title                    | Author           |
-+---------------+--------------------------+------------------+
-| 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
-| 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
-| 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
-| 80-902734-1-6 | And Then There Were None | Agatha Christie  |
-+---------------+--------- Page 1/2 -------+------------------+
+                    +---------------+----------- Books --------+------------------+
+                    | ISBN          | Title                    | Author           |
+                    +---------------+--------------------------+------------------+
+                    | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+                    | 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
+                    | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+                    | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
+                    +---------------+--------- Page 1/2 -------+------------------+
 
-TABLE
-                ,
-                true,
+                    TABLE,
             ],
             'header contains multiple lines' => [
                 'Multiline'."\n".'header'."\n".'here',
                 'footer',
                 'default',
                 <<<'TABLE'
-+---------------+--- Multiline
-header
-here +------------------+
-| ISBN          | Title                    | Author           |
-+---------------+--------------------------+------------------+
-| 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
-| 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
-| 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
-| 80-902734-1-6 | And Then There Were None | Agatha Christie  |
-+---------------+---------- footer --------+------------------+
+                    +---------------+--- Multiline
+                    header
+                    here +------------------+
+                    | ISBN          | Title                    | Author           |
+                    +---------------+--------------------------+------------------+
+                    | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+                    | 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
+                    | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+                    | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
+                    +---------------+---------- footer --------+------------------+
 
-TABLE,
+                    TABLE,
             ],
             [
                 'Books',
                 'Page 1/2',
                 'box',
                 <<<'TABLE'
-┌───────────────┬─────────── Books ────────┬──────────────────┐
-│ ISBN          │ Title                    │ Author           │
-├───────────────┼──────────────────────────┼──────────────────┤
-│ 99921-58-10-7 │ Divine Comedy            │ Dante Alighieri  │
-│ 9971-5-0210-0 │ A Tale of Two Cities     │ Charles Dickens  │
-│ 960-425-059-0 │ The Lord of the Rings    │ J. R. R. Tolkien │
-│ 80-902734-1-6 │ And Then There Were None │ Agatha Christie  │
-└───────────────┴───────── Page 1/2 ───────┴──────────────────┘
+                    ┌───────────────┬─────────── Books ────────┬──────────────────┐
+                    │ ISBN          │ Title                    │ Author           │
+                    ├───────────────┼──────────────────────────┼──────────────────┤
+                    │ 99921-58-10-7 │ Divine Comedy            │ Dante Alighieri  │
+                    │ 9971-5-0210-0 │ A Tale of Two Cities     │ Charles Dickens  │
+                    │ 960-425-059-0 │ The Lord of the Rings    │ J. R. R. Tolkien │
+                    │ 80-902734-1-6 │ And Then There Were None │ Agatha Christie  │
+                    └───────────────┴───────── Page 1/2 ───────┴──────────────────┘
 
-TABLE,
+                    TABLE,
             ],
             [
                 'Boooooooooooooooooooooooooooooooooooooooooooooooooooooooks',
                 'Page 1/999999999999999999999999999999999999999999999999999',
                 'default',
                 <<<'TABLE'
-+- Booooooooooooooooooooooooooooooooooooooooooooooooooooo... -+
-| ISBN          | Title                    | Author           |
-+---------------+--------------------------+------------------+
-| 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
-| 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
-| 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
-| 80-902734-1-6 | And Then There Were None | Agatha Christie  |
-+- Page 1/99999999999999999999999999999999999999999999999... -+
+                    +- Booooooooooooooooooooooooooooooooooooooooooooooooooooo... -+
+                    | ISBN          | Title                    | Author           |
+                    +---------------+--------------------------+------------------+
+                    | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+                    | 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
+                    | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+                    | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
+                    +- Page 1/99999999999999999999999999999999999999999999999... -+
 
-TABLE,
+                    TABLE,
             ],
         ];
     }
@@ -1353,12 +1353,12 @@ TABLE,
             ->render();
 
         $expected = <<<'TABLE'
-+-------- Reproducer --------+
-| Value            | 123-456 |
-| Some other value | 789-0   |
-+------------------+---------+
+            +-------- Reproducer --------+
+            | Value            | 123-456 |
+            | Some other value | 789-0   |
+            +------------------+---------+
 
-TABLE;
+            TABLE;
 
         $this->assertSame($expected, $this->getOutputContent($output));
     }
@@ -1378,16 +1378,16 @@ TABLE;
 
         $expected =
             <<<TABLE
-+---------------+-------+----------+----------------+
-| Divine Comedy | A     | The Lord | And Then There |
-|               | Tale  | of the   | Were None      |
-|               | of    | Rings    |                |
-|               | Two   |          |                |
-|               | Citie |          |                |
-|               | s     |          |                |
-+---------------+-------+----------+----------------+
+                +---------------+-------+----------+----------------+
+                | Divine Comedy | A     | The Lord | And Then There |
+                |               | Tale  | of the   | Were None      |
+                |               | of    | Rings    |                |
+                |               | Two   |          |                |
+                |               | Citie |          |                |
+                |               | s     |          |                |
+                +---------------+-------+----------+----------------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1414,15 +1414,15 @@ TABLE;
 
         $expected =
             <<<TABLE
-+-------------+--------------------------------+
-| Publication | Very long header with a lot of |
-|             | information                    |
-+-------------+--------------------------------+
-| 1954        | The Lord of the Rings, by      |
-|             | J.R.R. Tolkien                 |
-+-------------+--------------------------------+
+                +-------------+--------------------------------+
+                | Publication | Very long header with a lot of |
+                |             | information                    |
+                +-------------+--------------------------------+
+                | 1954        | The Lord of the Rings, by      |
+                |             | J.R.R. Tolkien                 |
+                +-------------+--------------------------------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1437,12 +1437,12 @@ TABLE;
 
         $expected =
             <<<'TABLE'
-+-------+
-| 1234\ |
-| 6     |
-+-------+
+                +-------+
+                | 1234\ |
+                | 6     |
+                +-------+
 
-TABLE;
+                TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
@@ -1470,15 +1470,15 @@ TABLE;
 
         $expected =
             <<<TABLE
-┌───────────────┬───────────────┬─────────────────┐
-│ ISBN          │ Title         │ Author          │
-├───────────────┼───────────────┼─────────────────┤
-│ 99921-58-10-7 │ Divine Comedy │ Dante Alighieri │
-├───────────────┼───────────────┼─────────────────┤
-│ This value spans 3 columns.                     │
-└───────────────┴───────────────┴─────────────────┘
+                ┌───────────────┬───────────────┬─────────────────┐
+                │ ISBN          │ Title         │ Author          │
+                ├───────────────┼───────────────┼─────────────────┤
+                │ 99921-58-10-7 │ Divine Comedy │ Dante Alighieri │
+                ├───────────────┼───────────────┼─────────────────┤
+                │ This value spans 3 columns.                     │
+                └───────────────┴───────────────┴─────────────────┘
 
-TABLE;
+                TABLE;
 
         $this->assertSame($expected, $this->getOutputContent($output));
     }
@@ -1488,43 +1488,41 @@ TABLE;
         $headers = ['foo', 'bar', 'baz'];
         $rows = [['one', 'two', 'tree'], ['1', '2', '3']];
         $expected = <<<EOTXT
-+-----+------+---+
-| foo | one  | 1 |
-| bar | two  | 2 |
-| baz | tree | 3 |
-+-----+------+---+
+            +-----+------+---+
+            | foo | one  | 1 |
+            | bar | two  | 2 |
+            | baz | tree | 3 |
+            +-----+------+---+
 
-EOTXT;
+            EOTXT;
         yield [$headers, $rows, $expected];
 
         $headers = ['foo', 'bar', 'baz'];
         $rows = [['one', 'two'], ['1']];
         $expected = <<<EOTXT
-+-----+-----+---+
-| foo | one | 1 |
-| bar | two |   |
-| baz |     |   |
-+-----+-----+---+
+            +-----+-----+---+
+            | foo | one | 1 |
+            | bar | two |   |
+            | baz |     |   |
+            +-----+-----+---+
 
-EOTXT;
+            EOTXT;
         yield [$headers, $rows, $expected];
 
         $headers = ['foo', 'bar', 'baz'];
         $rows = [['one', 'two', 'tree'], new TableSeparator(), ['1', '2', '3']];
         $expected = <<<EOTXT
-+-----+------+---+
-| foo | one  | 1 |
-| bar | two  | 2 |
-| baz | tree | 3 |
-+-----+------+---+
+            +-----+------+---+
+            | foo | one  | 1 |
+            | bar | two  | 2 |
+            | baz | tree | 3 |
+            +-----+------+---+
 
-EOTXT;
+            EOTXT;
         yield [$headers, $rows, $expected];
     }
 
-    /**
-     * @dataProvider provideRenderHorizontalTests
-     */
+    #[DataProvider('provideRenderHorizontalTests')]
     public function testRenderHorizontal(array $headers, array $rows, string $expected)
     {
         $table = new Table($output = $this->getOutputStream());
@@ -1575,29 +1573,29 @@ EOTXT;
 
         $expected =
             <<<TABLE
-+-----------------+-----------------+-----------------+
-| Lorem ipsum dolor sit amet, consectetur adipiscing  |
-| elit, sed do eiusmod tempor                         |
-+-----------------+-----------------+-----------------+
-| Lorem ipsum dolor sit amet, consectetur adipiscing  |
-| elit, sed do eiusmod tempor                         |
-+-----------------+-----------------+-----------------+
-| Lorem ipsum dolor sit amet, conse | hello world     |
-| ctetur                            |                 |
-+-----------------+-----------------+-----------------+
-| hello world     | Lorem ipsum dolor sit amet, conse |
-|                 | ctetur adipiscing elit            |
-+-----------------+-----------------+-----------------+
-| hello           | world           | Lorem ipsum     |
-|                 |                 | dolor sit amet, |
-|                 |                 | consectetur     |
-+-----------------+-----------------+-----------------+
-| Symfony         | Test            | Lorem ipsum dol |
-|                 |                 | or sit amet,    |
-|                 |                 | consectetur     |
-+-----------------+-----------------+-----------------+
+                +-----------------+-----------------+-----------------+
+                | Lorem ipsum dolor sit amet, consectetur adipiscing  |
+                | elit, sed do eiusmod tempor                         |
+                +-----------------+-----------------+-----------------+
+                | Lorem ipsum dolor sit amet, consectetur adipiscing  |
+                | elit, sed do eiusmod tempor                         |
+                +-----------------+-----------------+-----------------+
+                | Lorem ipsum dolor sit amet, conse | hello world     |
+                | ctetur                            |                 |
+                +-----------------+-----------------+-----------------+
+                | hello world     | Lorem ipsum dolor sit amet, conse |
+                |                 | ctetur adipiscing elit            |
+                +-----------------+-----------------+-----------------+
+                | hello           | world           | Lorem ipsum     |
+                |                 |                 | dolor sit amet, |
+                |                 |                 | consectetur     |
+                +-----------------+-----------------+-----------------+
+                | Symfony         | Test            | Lorem ipsum dol |
+                |                 |                 | or sit amet,    |
+                |                 |                 | consectetur     |
+                +-----------------+-----------------+-----------------+
 
-TABLE;
+                TABLE;
 
         $this->assertSame($expected, $this->getOutputContent($output));
     }
@@ -1611,55 +1609,52 @@ TABLE;
 
         yield 'With header for all' => [
             <<<EOTXT
-+------------------------------+
-|   ISBN: 99921-58-10-7        |
-|  Title: Divine Comedy        |
-| Author: Dante Alighieri      |
-|  Price: 9.95                 |
-|------------------------------|
-|   ISBN: 9971-5-0210-0        |
-|  Title: A Tale of Two Cities |
-| Author: Charles Dickens      |
-|  Price: 139.25               |
-+------------------------------+
+                +------------------------------+
+                |   ISBN: 99921-58-10-7        |
+                |  Title: Divine Comedy        |
+                | Author: Dante Alighieri      |
+                |  Price: 9.95                 |
+                |------------------------------|
+                |   ISBN: 9971-5-0210-0        |
+                |  Title: A Tale of Two Cities |
+                | Author: Charles Dickens      |
+                |  Price: 139.25               |
+                +------------------------------+
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author', 'Price'],
             $books,
         ];
 
         yield 'With header for none' => [
             <<<EOTXT
-+----------------------+
-| 99921-58-10-7        |
-| Divine Comedy        |
-| Dante Alighieri      |
-| 9.95                 |
-|----------------------|
-| 9971-5-0210-0        |
-| A Tale of Two Cities |
-| Charles Dickens      |
-| 139.25               |
-+----------------------+
+                +----------------------+
+                | 99921-58-10-7        |
+                | Divine Comedy        |
+                | Dante Alighieri      |
+                | 9.95                 |
+                |----------------------|
+                | 9971-5-0210-0        |
+                | A Tale of Two Cities |
+                | Charles Dickens      |
+                | 139.25               |
+                +----------------------+
 
-EOTXT
-            ,
+                EOTXT,
             [],
             $books,
         ];
 
         yield 'With multibyte characters in some headers (the "í" in "Títle") and cells (the "í" in "Dívíne")' => [
             <<<EOTXT
-+-------------------------+
-|   ISBN: 99921-58-10-7   |
-|  Títle: Dívíne Comedy   |
-| Author: Dante Alighieri |
-|  Price: 9.95            |
-+-------------------------+
+                +-------------------------+
+                |   ISBN: 99921-58-10-7   |
+                |  Títle: Dívíne Comedy   |
+                | Author: Dante Alighieri |
+                |  Price: 9.95            |
+                +-------------------------+
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Títle', 'Author', 'Price'],
             [
                 [
@@ -1673,38 +1668,36 @@ EOTXT
 
         yield 'With header for some' => [
             <<<EOTXT
-+------------------------------+
-|   ISBN: 99921-58-10-7        |
-|  Title: Divine Comedy        |
-| Author: Dante Alighieri      |
-|       : 9.95                 |
-|------------------------------|
-|   ISBN: 9971-5-0210-0        |
-|  Title: A Tale of Two Cities |
-| Author: Charles Dickens      |
-|       : 139.25               |
-+------------------------------+
+                +------------------------------+
+                |   ISBN: 99921-58-10-7        |
+                |  Title: Divine Comedy        |
+                | Author: Dante Alighieri      |
+                |       : 9.95                 |
+                |------------------------------|
+                |   ISBN: 9971-5-0210-0        |
+                |  Title: A Tale of Two Cities |
+                | Author: Charles Dickens      |
+                |       : 139.25               |
+                +------------------------------+
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author'],
             $books,
         ];
 
         yield 'With row for some headers' => [
             <<<EOTXT
-+----------+
-| foo: one |
-| bar: two |
-| baz:     |
-|----------|
-| foo: 1   |
-| bar:     |
-| baz:     |
-+----------+
+                +----------+
+                | foo: one |
+                | bar: two |
+                | baz:     |
+                |----------|
+                | foo: 1   |
+                | bar:     |
+                | baz:     |
+                +----------+
 
-EOTXT
-            ,
+                EOTXT,
             ['foo', 'bar', 'baz'],
             [
                 ['one', 'two'],
@@ -1714,18 +1707,17 @@ EOTXT
 
         yield 'With TableSeparator' => [
             <<<EOTXT
-+-----------+
-| foo: one  |
-| bar: two  |
-| baz: tree |
-|-----------|
-| foo: 1    |
-| bar: 2    |
-| baz: 3    |
-+-----------+
+                +-----------+
+                | foo: one  |
+                | bar: two  |
+                | baz: tree |
+                |-----------|
+                | foo: 1    |
+                | bar: 2    |
+                | baz: 3    |
+                +-----------+
 
-EOTXT
-            ,
+                EOTXT,
             ['foo', 'bar', 'baz'],
             [
                 ['one', 'two', 'tree'],
@@ -1736,21 +1728,20 @@ EOTXT
 
         yield 'With breaking line' => [
             <<<EOTXT
-+-------------------------+
-|   ISBN: 99921-58-10-7   |
-|  Title: Divine Comedy   |
-| Author: Dante Alighieri |
-|  Price: 9.95            |
-|-------------------------|
-|   ISBN: 9971-5-0210-0   |
-|  Title: A Tale          |
-|         of Two Cities   |
-| Author: Charles Dickens |
-|  Price: 139.25          |
-+-------------------------+
+                +-------------------------+
+                |   ISBN: 99921-58-10-7   |
+                |  Title: Divine Comedy   |
+                | Author: Dante Alighieri |
+                |  Price: 9.95            |
+                |-------------------------|
+                |   ISBN: 9971-5-0210-0   |
+                |  Title: A Tale          |
+                |         of Two Cities   |
+                | Author: Charles Dickens |
+                |  Price: 139.25          |
+                +-------------------------+
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author', 'Price'],
             [
                 ['99921-58-10-7', 'Divine Comedy', 'Dante Alighieri', '9.95'],
@@ -1760,18 +1751,17 @@ EOTXT
 
         yield 'With text tag' => [
             <<<EOTXT
-+------------------------------+
-|   ISBN: 99921-58-10-7        |
-|  Title: Divine Comedy        |
-| Author: Dante Alighieri      |
-|------------------------------|
-|   ISBN: 9971-5-0210-0        |
-|  Title: A Tale of Two Cities |
-| Author: Charles Dickens      |
-+------------------------------+
+                +------------------------------+
+                |   ISBN: 99921-58-10-7        |
+                |  Title: Divine Comedy        |
+                | Author: Dante Alighieri      |
+                |------------------------------|
+                |   ISBN: 9971-5-0210-0        |
+                |  Title: A Tale of Two Cities |
+                | Author: Charles Dickens      |
+                +------------------------------+
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author'],
             [
                 ['<info>99921-58-10-7</info>', '<error>Divine Comedy</error>', '<fg=blue;bg=white>Dante Alighieri</fg=blue;bg=white>'],
@@ -1781,20 +1771,19 @@ EOTXT
 
         yield 'With colspan' => [
             <<<EOTXT
-+---------------------------------------------------------------------------------------+
-|   ISBN: 99921-58-10-7                                                                 |
-|  Title: Divine Comedy                                                                 |
-| Author: Dante Alighieri                                                               |
-|---------------------------------------------------------------------------------------|
-| Cupiditate dicta atque porro, tempora exercitationem modi animi nulla nemo vel nihil! |
-|---------------------------------------------------------------------------------------|
-|   ISBN: 9971-5-0210-0                                                                 |
-|  Title: A Tale of Two Cities                                                          |
-| Author: Charles Dickens                                                               |
-+---------------------------------------------------------------------------------------+
+                +---------------------------------------------------------------------------------------+
+                |   ISBN: 99921-58-10-7                                                                 |
+                |  Title: Divine Comedy                                                                 |
+                | Author: Dante Alighieri                                                               |
+                |---------------------------------------------------------------------------------------|
+                | Cupiditate dicta atque porro, tempora exercitationem modi animi nulla nemo vel nihil! |
+                |---------------------------------------------------------------------------------------|
+                |   ISBN: 9971-5-0210-0                                                                 |
+                |  Title: A Tale of Two Cities                                                          |
+                | Author: Charles Dickens                                                               |
+                +---------------------------------------------------------------------------------------+
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author'],
             [
                 ['99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'],
@@ -1805,28 +1794,27 @@ EOTXT
 
         yield 'With colspans but no header' => [
             <<<EOTXT
-+--------------------------------------------------------------------------------+
-| Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor |
-|--------------------------------------------------------------------------------|
-| Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor |
-|--------------------------------------------------------------------------------|
-| Lorem ipsum dolor sit amet, consectetur                                        |
-| hello world                                                                    |
-|--------------------------------------------------------------------------------|
-| hello world                                                                    |
-| Lorem ipsum dolor sit amet, consectetur adipiscing elit                        |
-|--------------------------------------------------------------------------------|
-| hello                                                                          |
-| world                                                                          |
-| Lorem ipsum dolor sit amet, consectetur                                        |
-|--------------------------------------------------------------------------------|
-| Symfony                                                                        |
-| Test                                                                           |
-| Lorem ipsum dolor sit amet, consectetur                                        |
-+--------------------------------------------------------------------------------+
+                +--------------------------------------------------------------------------------+
+                | Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor |
+                |--------------------------------------------------------------------------------|
+                | Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor |
+                |--------------------------------------------------------------------------------|
+                | Lorem ipsum dolor sit amet, consectetur                                        |
+                | hello world                                                                    |
+                |--------------------------------------------------------------------------------|
+                | hello world                                                                    |
+                | Lorem ipsum dolor sit amet, consectetur adipiscing elit                        |
+                |--------------------------------------------------------------------------------|
+                | hello                                                                          |
+                | world                                                                          |
+                | Lorem ipsum dolor sit amet, consectetur                                        |
+                |--------------------------------------------------------------------------------|
+                | Symfony                                                                        |
+                | Test                                                                           |
+                | Lorem ipsum dolor sit amet, consectetur                                        |
+                +--------------------------------------------------------------------------------+
 
-EOTXT
-            ,
+                EOTXT,
             [],
             [
                 [new TableCell('Lorem ipsum dolor sit amet, <fg=white;bg=green>consectetur</> adipiscing elit, <fg=white;bg=red>sed</> do <fg=white;bg=red>eiusmod</> tempor', ['colspan' => 3])],
@@ -1845,20 +1833,19 @@ EOTXT
 
         yield 'Borderless style' => [
             <<<EOTXT
- ============================== 
-    ISBN: 99921-58-10-7         
-   Title: Divine Comedy         
-  Author: Dante Alighieri       
-   Price: 9.95                  
- ============================== 
-    ISBN: 9971-5-0210-0         
-   Title: A Tale of Two Cities  
-  Author: Charles Dickens       
-   Price: 139.25                
- ============================== 
+                 ============================== 
+                    ISBN: 99921-58-10-7         
+                   Title: Divine Comedy         
+                  Author: Dante Alighieri       
+                   Price: 9.95                  
+                 ============================== 
+                    ISBN: 9971-5-0210-0         
+                   Title: A Tale of Two Cities  
+                  Author: Charles Dickens       
+                   Price: 139.25                
+                 ============================== 
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author', 'Price'],
             $books,
             'borderless',
@@ -1866,18 +1853,17 @@ EOTXT
 
         yield 'Compact style' => [
             <<<EOTXT
-  ISBN: 99921-58-10-7        
- Title: Divine Comedy        
-Author: Dante Alighieri      
- Price: 9.95                 
+                  ISBN: 99921-58-10-7        
+                 Title: Divine Comedy        
+                Author: Dante Alighieri      
+                 Price: 9.95                 
 
-  ISBN: 9971-5-0210-0        
- Title: A Tale of Two Cities 
-Author: Charles Dickens      
- Price: 139.25               
+                  ISBN: 9971-5-0210-0        
+                 Title: A Tale of Two Cities 
+                Author: Charles Dickens      
+                 Price: 139.25               
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author', 'Price'],
             $books,
             'compact',
@@ -1885,20 +1871,19 @@ EOTXT
 
         yield 'symfony-style-guide style' => [
             <<<EOTXT
- ------------------------------ 
-    ISBN: 99921-58-10-7         
-   Title: Divine Comedy         
-  Author: Dante Alighieri       
-   Price: 9.95                  
- ------------------------------ 
-    ISBN: 9971-5-0210-0         
-   Title: A Tale of Two Cities  
-  Author: Charles Dickens       
-   Price: 139.25                
- ------------------------------ 
+                 ------------------------------ 
+                    ISBN: 99921-58-10-7         
+                   Title: Divine Comedy         
+                  Author: Dante Alighieri       
+                   Price: 9.95                  
+                 ------------------------------ 
+                    ISBN: 9971-5-0210-0         
+                   Title: A Tale of Two Cities  
+                  Author: Charles Dickens       
+                   Price: 139.25                
+                 ------------------------------ 
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author', 'Price'],
             $books,
             'symfony-style-guide',
@@ -1906,20 +1891,19 @@ EOTXT
 
         yield 'box style' => [
             <<<EOTXT
-┌──────────────────────────────┐
-│   ISBN: 99921-58-10-7        │
-│  Title: Divine Comedy        │
-│ Author: Dante Alighieri      │
-│  Price: 9.95                 │
-│──────────────────────────────│
-│   ISBN: 9971-5-0210-0        │
-│  Title: A Tale of Two Cities │
-│ Author: Charles Dickens      │
-│  Price: 139.25               │
-└──────────────────────────────┘
+                ┌──────────────────────────────┐
+                │   ISBN: 99921-58-10-7        │
+                │  Title: Divine Comedy        │
+                │ Author: Dante Alighieri      │
+                │  Price: 9.95                 │
+                │──────────────────────────────│
+                │   ISBN: 9971-5-0210-0        │
+                │  Title: A Tale of Two Cities │
+                │ Author: Charles Dickens      │
+                │  Price: 139.25               │
+                └──────────────────────────────┘
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author', 'Price'],
             $books,
             'box',
@@ -1927,20 +1911,19 @@ EOTXT
 
         yield 'box-double style' => [
             <<<EOTXT
-╔══════════════════════════════╗
-║   ISBN: 99921-58-10-7        ║
-║  Title: Divine Comedy        ║
-║ Author: Dante Alighieri      ║
-║  Price: 9.95                 ║
-║──────────────────────────────║
-║   ISBN: 9971-5-0210-0        ║
-║  Title: A Tale of Two Cities ║
-║ Author: Charles Dickens      ║
-║  Price: 139.25               ║
-╚══════════════════════════════╝
+                ╔══════════════════════════════╗
+                ║   ISBN: 99921-58-10-7        ║
+                ║  Title: Divine Comedy        ║
+                ║ Author: Dante Alighieri      ║
+                ║  Price: 9.95                 ║
+                ║──────────────────────────────║
+                ║   ISBN: 9971-5-0210-0        ║
+                ║  Title: A Tale of Two Cities ║
+                ║ Author: Charles Dickens      ║
+                ║  Price: 139.25               ║
+                ╚══════════════════════════════╝
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author', 'Price'],
             $books,
             'box-double',
@@ -1948,20 +1931,19 @@ EOTXT
 
         yield 'With titles' => [
             <<<EOTXT
-+----------- Books ------------+
-|   ISBN: 99921-58-10-7        |
-|  Title: Divine Comedy        |
-| Author: Dante Alighieri      |
-|  Price: 9.95                 |
-|------------------------------|
-|   ISBN: 9971-5-0210-0        |
-|  Title: A Tale of Two Cities |
-| Author: Charles Dickens      |
-|  Price: 139.25               |
-+---------- Page 1/2 ----------+
+                +----------- Books ------------+
+                |   ISBN: 99921-58-10-7        |
+                |  Title: Divine Comedy        |
+                | Author: Dante Alighieri      |
+                |  Price: 9.95                 |
+                |------------------------------|
+                |   ISBN: 9971-5-0210-0        |
+                |  Title: A Tale of Two Cities |
+                | Author: Charles Dickens      |
+                |  Price: 139.25               |
+                +---------- Page 1/2 ----------+
 
-EOTXT
-            ,
+                EOTXT,
             ['ISBN', 'Title', 'Author', 'Price'],
             $books,
             'default',
@@ -1970,9 +1952,7 @@ EOTXT
         ];
     }
 
-    /**
-     * @dataProvider provideRenderVerticalTests
-     */
+    #[DataProvider('provideRenderVerticalTests')]
     public function testVerticalRender(string $expectedOutput, array $headers, array $rows, string $style = 'default', string $headerTitle = '', string $footerTitle = '')
     {
         $table = new Table($output = $this->getOutputStream());
@@ -2007,15 +1987,15 @@ EOTXT
 
         $expected =
             <<<TABLE
-+----------------------+
-| \033]8;;Lorem\033\\Lorem ipsum dolor\033]8;;\033\\    |
-| \033]8;;Lorem\033\\sit amet,\033]8;;\033\\            |
-| \033]8;;Lorem\033\\consectetur\033]8;;\033\\          |
-| \033]8;;Lorem\033\\adipiscing elit, sed\033]8;;\033\\ |
-| \033]8;;Lorem\033\\do eiusmod tempor\033]8;;\033\\    |
-+----------------------+
+                +----------------------+
+                | \033]8;;Lorem\033\\Lorem ipsum dolor\033]8;;\033\\    |
+                | \033]8;;Lorem\033\\sit amet,\033]8;;\033\\            |
+                | \033]8;;Lorem\033\\consectetur\033]8;;\033\\          |
+                | \033]8;;Lorem\033\\adipiscing elit, sed\033]8;;\033\\ |
+                | \033]8;;Lorem\033\\do eiusmod tempor\033]8;;\033\\    |
+                +----------------------+
 
-TABLE;
+                TABLE;
 
         $this->assertSame($expected, $this->getOutputContent($output));
     }
@@ -2038,13 +2018,12 @@ TABLE;
         $table->render();
 
         $this->assertSame(<<<TABLE
-┌──── Title ┬───┐
-│ Hello │ 1 │ 3 │
-│ World │ 2 │ 4 │
-└───────┴───┴───┘
+            ┌──── Title ┬───┐
+            │ Hello │ 1 │ 3 │
+            │ World │ 2 │ 4 │
+            └───────┴───┴───┘
 
-TABLE
-            ,
+            TABLE,
             $this->getOutputContent($output)
         );
     }
@@ -2067,14 +2046,14 @@ TABLE
         $table->render();
 
         $this->assertSame(<<<TABLE
-┌──── Title ────┐
-│ Hello │ World │
-├───────┼───────┤
-│ 1     │ 2     │
-│ 3     │ 4     │
-└───────┴───────┘
+            ┌──── Title ────┐
+            │ Hello │ World │
+            ├───────┼───────┤
+            │ 1     │ 2     │
+            │ 3     │ 4     │
+            └───────┴───────┘
 
-TABLE,
+            TABLE,
             $this->getOutputContent($output)
         );
     }
@@ -2096,17 +2075,16 @@ TABLE,
         $table->render();
 
         $this->assertSame(<<<TABLE
-+---------------------------------- Test Title -------------+--------------------+
-| Title                                                     | Author             |
-+-----------------------------------------------------------+--------------------+
-| 🎭 💫 ☯ Divine Comedy                                     | Dante Alighieri    |
-| 👑 ❄️  🗡 Game of Thrones                                   | George R.R. Martin |
-| ❄︎❄︎❄︎ snowflake in text style ❄︎❄︎❄︎                           |                    |
-| And a very long line to show difference in previous lines |                    |
-+-----------------------------------------------------------+--------------------+
+            +---------------------------------- Test Title -------------+--------------------+
+            | Title                                                     | Author             |
+            +-----------------------------------------------------------+--------------------+
+            | 🎭 💫 ☯ Divine Comedy                                     | Dante Alighieri    |
+            | 👑 ❄️  🗡 Game of Thrones                                   | George R.R. Martin |
+            | ❄︎❄︎❄︎ snowflake in text style ❄︎❄︎❄︎                           |                    |
+            | And a very long line to show difference in previous lines |                    |
+            +-----------------------------------------------------------+--------------------+
 
-TABLE
-            ,
+            TABLE,
             $this->getOutputContent($output)
         );
     }

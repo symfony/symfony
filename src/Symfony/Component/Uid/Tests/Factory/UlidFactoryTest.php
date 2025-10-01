@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
 use Symfony\Component\Uid\Factory\UlidFactory;
 
 final class UlidFactoryTest extends TestCase
@@ -36,7 +37,7 @@ final class UlidFactoryTest extends TestCase
 
     public function testCreateWithInvalidTimestamp()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The timestamp must be positive.');
 
         (new UlidFactory())->create(new \DateTimeImmutable('@-1000'));

@@ -1,4 +1,4 @@
-{% use "bootstrap_base_layout.html.twig" %}
+{% use 'bootstrap_base_layout.html.twig' %}
 
 {# Widgets #}
 
@@ -99,9 +99,9 @@
             {% set valid = true %}
         {% endif %}
         <div {{ block('widget_container_attributes') }}>
-            {{- form_widget(form.date, { datetime: true } ) -}}
+            {{- form_widget(form.date, {datetime: true}) -}}
             {{- form_errors(form.date) -}}
-            {{- form_widget(form.time, { datetime: true } ) -}}
+            {{- form_widget(form.time, {datetime: true}) -}}
             {{- form_errors(form.time) -}}
         </div>
     {%- endif -%}
@@ -226,7 +226,7 @@
     {%- if row_class is not empty -%}
         <div class="{{ row_class }}">
     {%- endif -%}
-    {{- form_label(form, null, { widget: parent() }) -}}
+    {{- form_label(form, null, {widget: parent()}) -}}
     {%- if row_class is not empty -%}
         </div>
     {%- endif -%}
@@ -247,7 +247,7 @@
     {%- if row_class is not empty -%}
         <div class="{{ row_class }}">
     {%- endif -%}
-    {{- form_label(form, null, { widget: parent() }) -}}
+    {{- form_label(form, null, {widget: parent()}) -}}
     {%- if row_class is not empty -%}
         </div>
     {%- endif -%}
@@ -278,13 +278,13 @@
         {%- if compound is defined and compound -%}
             {%- set element = 'legend' -%}
             {%- if 'col-form-label' not in parent_label_class -%}
-                {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label' )|trim}) -%}
+                {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
             {%- endif -%}
         {%- else -%}
             {%- set row_class = row_class|default(row_attr.class|default('')) -%}
             {%- set label_attr = label_attr|merge({for: id}) -%}
             {%- if 'col-form-label' not in parent_label_class -%}
-                {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ('input-group' in row_class ? ' input-group-text' : ' form-label') )|trim}) -%}
+                {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ('input-group' in row_class ? ' input-group-text' : ' form-label'))|trim}) -%}
             {%- endif -%}
         {%- endif -%}
     {%- endif -%}
@@ -300,7 +300,7 @@
         {%- endif -%}
         {%- set label_attr = label_attr|merge({class: label_attr_class|trim}) -%}
         {%- if not compound -%}
-            {% set label_attr = label_attr|merge({'for': id}) %}
+            {% set label_attr = label_attr|merge({for: id}) %}
         {%- endif -%}
         {%- if required -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
@@ -310,7 +310,7 @@
         {%- endif -%}
 
         {{ widget|raw }}
-        <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+        <label{% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}>
             {%- if label is not same as(false) -%}
                 {{- block('form_label_content') -}}
             {%- endif -%}
@@ -320,13 +320,9 @@
 
 {# Rows #}
 
-{%- block form_row -%}
+{%- block form_row_render -%}
     {%- if compound is defined and compound -%}
         {%- set element = 'fieldset' -%}
-    {%- endif -%}
-    {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
     {%- set row_class = row_class|default(row_attr.class|default('mb-3')|trim) -%}
     <{{ element|default('div') }}{% with {attr: row_attr|merge({class: row_class})} %}{{ block('attributes') }}{% endwith %}>
@@ -340,7 +336,7 @@
         {{- form_help(form) -}}
         {{- form_errors(form) -}}
     </{{ element|default('div') }}>
-{%- endblock form_row %}
+{%- endblock form_row_render %}
 
 {%- block button_row -%}
     <div{% with {attr: row_attr|merge({class: row_attr.class|default('mb-3')|trim})} %}{{ block('attributes') }}{% endwith %}>
@@ -353,7 +349,7 @@
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
         {%- for error in errors -%}
-            <div class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block">{{ error.message }}</div>
+            <div class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block" id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</div>
         {%- endfor -%}
     {%- endif %}
 {%- endblock form_errors %}
@@ -367,7 +363,7 @@
         {#- Hack to properly display help with input group -#}
         {%- set help_class = ' input-group-text' -%}
     {%- endif -%}
-    {%- if help is not empty -%}
+    {%- if help -%}
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ help_class ~ ' mb-0')|trim}) -%}
     {%- endif -%}
     {{- parent() -}}

@@ -45,20 +45,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 {
     private array $options;
-    private HttpUtils $httpUtils;
-    private UserProviderInterface $userProvider;
     private PropertyAccessorInterface $propertyAccessor;
-    private ?AuthenticationSuccessHandlerInterface $successHandler;
-    private ?AuthenticationFailureHandlerInterface $failureHandler;
     private ?TranslatorInterface $translator = null;
 
-    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, ?AuthenticationSuccessHandlerInterface $successHandler = null, ?AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], ?PropertyAccessorInterface $propertyAccessor = null)
-    {
+    public function __construct(
+        private HttpUtils $httpUtils,
+        private UserProviderInterface $userProvider,
+        private ?AuthenticationSuccessHandlerInterface $successHandler = null,
+        private ?AuthenticationFailureHandlerInterface $failureHandler = null,
+        array $options = [],
+        ?PropertyAccessorInterface $propertyAccessor = null,
+    ) {
         $this->options = array_merge(['username_path' => 'username', 'password_path' => 'password'], $options);
-        $this->httpUtils = $httpUtils;
-        $this->successHandler = $successHandler;
-        $this->failureHandler = $failureHandler;
-        $this->userProvider = $userProvider;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
@@ -148,8 +146,8 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         try {
             $credentials['username'] = $this->propertyAccessor->getValue($data, $this->options['username_path']);
 
-            if (!\is_string($credentials['username'])) {
-                throw new BadRequestHttpException(\sprintf('The key "%s" must be a string.', $this->options['username_path']));
+            if (!\is_string($credentials['username']) || '' === $credentials['username']) {
+                throw new BadRequestHttpException(\sprintf('The key "%s" must be a non-empty string.', $this->options['username_path']));
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be provided.', $this->options['username_path']), $e);
@@ -159,15 +157,11 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
             $credentials['password'] = $this->propertyAccessor->getValue($data, $this->options['password_path']);
             $this->propertyAccessor->setValue($data, $this->options['password_path'], null);
 
-            if (!\is_string($credentials['password'])) {
-                throw new BadRequestHttpException(\sprintf('The key "%s" must be a string.', $this->options['password_path']));
+            if (!\is_string($credentials['password']) || '' === $credentials['password']) {
+                throw new BadRequestHttpException(\sprintf('The key "%s" must be a non-empty string.', $this->options['password_path']));
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);
-        }
-
-        if ('' === $credentials['username'] || '' === $credentials['password']) {
-            trigger_deprecation('symfony/security', '6.2', 'Passing an empty string as username or password parameter is deprecated.');
         }
 
         return $credentials;

@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Factory;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -35,9 +36,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->tmpDir = sys_get_temp_dir();
     }
 
-    /**
-     * @dataProvider provideFactories
-     */
+    #[DataProvider('provideFactories')]
     public function testCreateRequest(PsrHttpFactory $factory)
     {
         $stdClass = new \stdClass();
@@ -131,15 +130,13 @@ class PsrHttpFactoryTest extends TestCase
 
     private function createUploadedFile(string $content, string $originalName, string $mimeType, int $error): UploadedFile
     {
-        $path = tempnam($this->tmpDir, uniqid('', true));
+        $path = $this->createTempFile();
         file_put_contents($path, $content);
 
         return new UploadedFile($path, $originalName, $mimeType, $error, true);
     }
 
-    /**
-     * @dataProvider provideFactories
-     */
+    #[DataProvider('provideFactories')]
     public function testCreateResponse(PsrHttpFactory $factory)
     {
         $response = new Response(
@@ -182,7 +179,7 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testCreateResponseFromBinaryFile()
     {
-        $path = tempnam($this->tmpDir, uniqid('', true));
+        $path = $this->createTempFile();
         file_put_contents($path, 'Binary');
 
         $response = new BinaryFileResponse($path);
@@ -194,7 +191,7 @@ class PsrHttpFactoryTest extends TestCase
 
     public function testCreateResponseFromBinaryFileWithRange()
     {
-        $path = tempnam($this->tmpDir, uniqid('', true));
+        $path = $this->createTempFile();
         file_put_contents($path, 'Binary');
 
         $request = new Request();
@@ -286,5 +283,10 @@ class PsrHttpFactoryTest extends TestCase
         $factory = new Psr17Factory();
 
         return new PsrHttpFactory($factory, $factory, $factory, $factory);
+    }
+
+    private function createTempFile(): string
+    {
+        return tempnam($this->tmpDir, 'sftest');
     }
 }

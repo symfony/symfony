@@ -191,30 +191,36 @@ class MessageCatalogueTest extends TestCase
 
     public function testAddFallbackCatalogueWithParentCircularReference()
     {
-        $this->expectException(LogicException::class);
         $main = new MessageCatalogue('en_US');
         $fallback = new MessageCatalogue('fr_FR');
 
         $fallback->addFallbackCatalogue($main);
+
+        $this->expectException(LogicException::class);
+
         $main->addFallbackCatalogue($fallback);
     }
 
     public function testAddFallbackCatalogueWithFallbackCircularReference()
     {
-        $this->expectException(LogicException::class);
         $fr = new MessageCatalogue('fr');
         $en = new MessageCatalogue('en');
         $es = new MessageCatalogue('es');
 
         $fr->addFallbackCatalogue($en);
         $es->addFallbackCatalogue($en);
+
+        $this->expectException(LogicException::class);
+
         $en->addFallbackCatalogue($fr);
     }
 
     public function testAddCatalogueWhenLocaleIsNotTheSameAsTheCurrentOne()
     {
-        $this->expectException(LogicException::class);
         $catalogue = new MessageCatalogue('en');
+
+        $this->expectException(LogicException::class);
+
         $catalogue->addCatalogue(new MessageCatalogue('fr', []));
     }
 

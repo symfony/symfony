@@ -41,25 +41,15 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
     public const NO_AUTO_CACHE_CONTROL_HEADER = 'Symfony-Session-NoAutoCacheControl';
 
     /**
+     * @param array<string, mixed> $sessionOptions
+     *
      * @internal
      */
-    protected ?ContainerInterface $container;
-
-    private bool $debug;
-
-    /**
-     * @var array<string, mixed>
-     */
-    private array $sessionOptions;
-
-    /**
-     * @internal
-     */
-    public function __construct(?ContainerInterface $container = null, bool $debug = false, array $sessionOptions = [])
-    {
-        $this->container = $container;
-        $this->debug = $debug;
-        $this->sessionOptions = $sessionOptions;
+    public function __construct(
+        private ?ContainerInterface $container = null,
+        private bool $debug = false,
+        private array $sessionOptions = [],
+    ) {
     }
 
     /**
@@ -103,7 +93,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$event->isMainRequest() || (!$this->container->has('initialized_session') && !$event->getRequest()->hasSession())) {
+        if (!$event->isMainRequest()) {
             return;
         }
 

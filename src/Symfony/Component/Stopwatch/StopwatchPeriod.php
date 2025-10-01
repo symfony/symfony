@@ -12,7 +12,7 @@
 namespace Symfony\Component\Stopwatch;
 
 /**
- * Represents an Period for an Event.
+ * Represents a Period for an Event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

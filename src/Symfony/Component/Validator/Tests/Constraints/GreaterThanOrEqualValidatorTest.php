@@ -21,7 +21,11 @@ use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
  */
 class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
 {
+    use CompareWithNullValueAtPropertyAtTestTrait;
     use IcuCompatibilityTrait;
+    use InvalidComparisonToValueTestTrait;
+    use ThrowsOnInvalidStringDatesTestTrait;
+    use ValidComparisonToValueTrait;
 
     protected function createValidator(): GreaterThanOrEqualValidator
     {
@@ -30,7 +34,11 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
 
     protected static function createConstraint(?array $options = null): Constraint
     {
-        return new GreaterThanOrEqual($options);
+        if (null !== $options) {
+            return new GreaterThanOrEqual(...$options);
+        }
+
+        return new GreaterThanOrEqual();
     }
 
     protected function getErrorCode(): ?string
@@ -71,13 +79,6 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
             [new \DateTime('2000/01/01'), self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), '2005/01/01', self::normalizeIcuSpaces("Jan 1, 2005, 12:00\u{202F}AM"), 'DateTime'],
             [new \DateTime('2000/01/01 UTC'), self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), '2005/01/01 UTC', self::normalizeIcuSpaces("Jan 1, 2005, 12:00\u{202F}AM"), 'DateTime'],
             ['b', '"b"', 'c', '"c"', 'string'],
-        ];
-    }
-
-    public static function provideComparisonsToNullValueAtPropertyPath(): array
-    {
-        return [
-            [5, '5', true],
         ];
     }
 }

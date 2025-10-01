@@ -32,12 +32,12 @@ class MandrillApiTransport extends AbstractApiTransport
 {
     private const HOST = 'mandrillapp.com';
 
-    private string $key;
-
-    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
@@ -93,6 +93,10 @@ class MandrillApiTransport extends AbstractApiTransport
             ],
         ];
 
+        if ($email->getHeaders()->get('X-MC-Subaccount')) {
+            $payload['message']['subaccount'] = $email->getHeaders()->get('X-MC-Subaccount')->getBodyAsString();
+        }
+
         if ('' !== $envelope->getSender()->getName()) {
             $payload['message']['from_name'] = $envelope->getSender()->getName();
         }
@@ -117,9 +121,8 @@ class MandrillApiTransport extends AbstractApiTransport
             }
         }
 
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type'];
         foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'x-mc-subaccount'], true)) {
                 continue;
             }
 

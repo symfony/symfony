@@ -25,6 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 
 /**
  * @author Timo Bakx <timobakx@gmail.com>
@@ -32,22 +33,16 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 #[AsCommand(name: 'debug:firewall', description: 'Display information about your security firewall(s)')]
 final class DebugFirewallCommand extends Command
 {
-    private array $firewallNames;
-    private ContainerInterface $contexts;
-    private ContainerInterface $eventDispatchers;
-    private array $authenticators;
-
     /**
      * @param string[]                   $firewallNames
      * @param AuthenticatorInterface[][] $authenticators
      */
-    public function __construct(array $firewallNames, ContainerInterface $contexts, ContainerInterface $eventDispatchers, array $authenticators)
-    {
-        $this->firewallNames = $firewallNames;
-        $this->contexts = $contexts;
-        $this->eventDispatchers = $eventDispatchers;
-        $this->authenticators = $authenticators;
-
+    public function __construct(
+        private array $firewallNames,
+        private ContainerInterface $contexts,
+        private ContainerInterface $eventDispatchers,
+        private array $authenticators,
+    ) {
         parent::__construct();
     }
 
@@ -57,22 +52,22 @@ final class DebugFirewallCommand extends Command
 
         $this
             ->setHelp(<<<EOF
-The <info>%command.name%</info> command displays the firewalls that are configured
-in your application:
+                The <info>%command.name%</info> command displays the firewalls that are configured
+                in your application:
 
-  <info>php %command.full_name%</info>
+                  <info>php %command.full_name%</info>
 
-You can pass a firewall name to display more detailed information about
-a specific firewall:
+                You can pass a firewall name to display more detailed information about
+                a specific firewall:
 
-  <info>php %command.full_name% $exampleName</info>
+                  <info>php %command.full_name% $exampleName</info>
 
-To include all events and event listeners for a specific firewall, use the
-<info>events</info> option:
+                To include all events and event listeners for a specific firewall, use the
+                <info>events</info> option:
 
-  <info>php %command.full_name% --events $exampleName</info>
+                  <info>php %command.full_name% --events $exampleName</info>
 
-EOF
+                EOF
             )
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, \sprintf('A firewall name (for example "%s")', $exampleName)),
@@ -216,7 +211,7 @@ EOF
         $io->table(
             ['Classname'],
             array_map(
-                fn ($authenticator) => [$authenticator::class],
+                fn ($authenticator) => [($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)::class],
                 $authenticators
             )
         );
@@ -238,10 +233,10 @@ EOF
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure')) {
+            if ($r->isAnonymous()) {
                 return 'Closure()';
             }
-            if ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
+            if ($class = $r->getClosureCalledClass()) {
                 return \sprintf('%s::%s()', $class->name, $r->name);
             }
 

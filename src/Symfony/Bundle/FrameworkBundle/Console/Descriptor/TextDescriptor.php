@@ -38,47 +38,81 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class TextDescriptor extends Descriptor
 {
-    private ?FileLinkFormatter $fileLinkFormatter;
+    private const VERB_COLORS = [
+        'ANY' => 'default',
+        'GET' => 'blue',
+        'QUERY' => 'blue',
+        'HEAD' => 'magenta',
+        'OPTIONS' => 'blue',
+        'POST' => 'green',
+        'PUT' => 'yellow',
+        'PATCH' => 'yellow',
+        'DELETE' => 'red',
+    ];
 
-    public function __construct(?FileLinkFormatter $fileLinkFormatter = null)
-    {
-        $this->fileLinkFormatter = $fileLinkFormatter;
+    public function __construct(
+        private ?FileLinkFormatter $fileLinkFormatter = null,
+    ) {
     }
 
     protected function describeRouteCollection(RouteCollection $routes, array $options = []): void
     {
-        $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
+        $showAliases = $options['show_aliases'] ?? false;
+        $showControllers = $options['show_controllers'] ?? false;
 
-        $tableHeaders = ['Name', 'Method', 'Scheme', 'Host', 'Path'];
+        $tableRows = [];
+        $shouldShowScheme = false;
+        $shouldShowHost = false;
+        foreach ($routes->all() as $name => $route) {
+            $controller = $route->getDefault('_controller');
+
+            $scheme = $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY';
+            $shouldShowScheme = $shouldShowScheme || 'ANY' !== $scheme;
+
+            $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
+            $shouldShowHost = $shouldShowHost || 'ANY' !== $host;
+
+            $row = [
+                'Name' => $name,
+                'Methods' => $this->formatMethods($route->getMethods()),
+                'Scheme' => $scheme,
+                'Host' => $host,
+                'Path' => $route->getPath(),
+            ];
+
+            if ($showControllers) {
+                $row['Controller'] = $controller ? $this->formatControllerLink($controller, $this->formatCallable($controller), $options['container'] ?? null) : '';
+            }
+
+            if ($showAliases) {
+                $row['Aliases'] = implode('|', $this->getReverseAliases($routes)[$name] ?? []);
+            }
+
+            $tableRows[] = $row;
+        }
+
+        $tableHeaders = ['Name', 'Method'];
+
+        if ($shouldShowScheme) {
+            $tableHeaders[] = 'Scheme';
+        } else {
+            array_walk($tableRows, function (&$row) { unset($row['Scheme']); });
+        }
+
+        if ($shouldShowHost) {
+            $tableHeaders[] = 'Host';
+        } else {
+            array_walk($tableRows, function (&$row) { unset($row['Host']); });
+        }
+
+        $tableHeaders[] = 'Path';
+
         if ($showControllers) {
             $tableHeaders[] = 'Controller';
         }
 
-        if ($showAliases = $options['show_aliases'] ?? false) {
+        if ($showAliases) {
             $tableHeaders[] = 'Aliases';
-        }
-
-        $tableRows = [];
-        foreach ($routes->all() as $name => $route) {
-            $controller = $route->getDefault('_controller');
-
-            $row = [
-                $name,
-                $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
-                $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
-                '' !== $route->getHost() ? $route->getHost() : 'ANY',
-                $this->formatControllerLink($controller, $route->getPath(), $options['container'] ?? null),
-            ];
-
-            if ($showControllers) {
-                $row[] = $controller ? $this->formatControllerLink($controller, $this->formatCallable($controller), $options['container'] ?? null) : '';
-            }
-
-            if ($showAliases) {
-                $row[] = implode('|', ($reverseAliases ??= $this->getReverseAliases($routes))[$name] ?? []);
-            }
-
-            $tableRows[] = $row;
         }
 
         if (isset($options['output'])) {
@@ -105,7 +139,7 @@ class TextDescriptor extends Descriptor
             ['Host', '' !== $route->getHost() ? $route->getHost() : 'ANY'],
             ['Host Regex', '' !== $route->getHost() ? $route->compile()->getHostRegex() : ''],
             ['Scheme', $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY'],
-            ['Method', $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'],
+            ['Method', $this->formatMethods($route->getMethods())],
             ['Requirements', $route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM'],
             ['Class', $route::class],
             ['Defaults', $this->formatRouterConfig($defaults)],
@@ -174,7 +208,7 @@ class TextDescriptor extends Descriptor
             $options['output']->table(
                 ['Service ID', 'Class'],
                 [
-                    [$options['id'] ?? '-', $service::class],
+                    [$options['id'], $service::class],
                 ]
             );
         }
@@ -326,7 +360,7 @@ class TextDescriptor extends Descriptor
             $tableRows[] = ['Calls', implode(', ', $callInformation)];
         }
 
-        $tableRows[] = ['Public', $definition->isPublic() && !$definition->isPrivate() ? 'yes' : 'no'];
+        $tableRows[] = ['Public', $definition->isPublic() ? 'yes' : 'no'];
         $tableRows[] = ['Synthetic', $definition->isSynthetic() ? 'yes' : 'no'];
         $tableRows[] = ['Lazy', $definition->isLazy() ? 'yes' : 'no'];
         $tableRows[] = ['Shared', $definition->isShared() ? 'yes' : 'no'];
@@ -335,7 +369,7 @@ class TextDescriptor extends Descriptor
         $tableRows[] = ['Autoconfigured', $definition->isAutoconfigured() ? 'yes' : 'no'];
 
         if ($definition->getFile()) {
-            $tableRows[] = ['Required File', $definition->getFile() ?: '-'];
+            $tableRows[] = ['Required File', $definition->getFile()];
         }
 
         if ($factory = $definition->getFactory()) {
@@ -353,9 +387,8 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $argumentsInformation = [];
-        if ($showArguments && ($arguments = $definition->getArguments())) {
+        if ($arguments = $definition->getArguments()) {
             foreach ($arguments as $argument) {
                 if ($argument instanceof ServiceClosureArgument) {
                     $argument = $argument->getValues()[0];
@@ -422,7 +455,7 @@ class TextDescriptor extends Descriptor
 
     protected function describeContainerAlias(Alias $alias, array $options = [], ?ContainerBuilder $container = null): void
     {
-        if ($alias->isPublic() && !$alias->isPrivate()) {
+        if ($alias->isPublic()) {
             $options['output']->comment(\sprintf('This service is a <info>public</info> alias for the service <info>%s</info>', (string) $alias));
         } else {
             $options['output']->comment(\sprintf('This service is a <comment>private</comment> alias for the service <info>%s</info>', (string) $alias));
@@ -579,6 +612,24 @@ class TextDescriptor extends Descriptor
         return trim($configAsString);
     }
 
+    /**
+     * @param array<string> $methods
+     */
+    private function formatMethods(array $methods): string
+    {
+        if ([] === $methods) {
+            $methods = ['ANY'];
+        }
+
+        return implode('|', array_map(
+            fn (string $method): string => \sprintf('<fg=%s>%s</>', self::VERB_COLORS[$method] ?? 'default', $method),
+            $methods
+        ));
+    }
+
+    /**
+     * @param (callable():ContainerBuilder)|null $getContainer
+     */
     private function formatControllerLink(mixed $controller, string $anchorText, ?callable $getContainer = null): string
     {
         if (null === $this->fileLinkFormatter) {
@@ -649,10 +700,10 @@ class TextDescriptor extends Descriptor
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (str_contains($r->name, '{closure')) {
+            if ($r->isAnonymous()) {
                 return 'Closure()';
             }
-            if ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
+            if ($class = $r->getClosureCalledClass()) {
                 return \sprintf('%s::%s()', $class->name, $r->name);
             }
 

@@ -27,7 +27,7 @@ use Symfony\Component\Workflow\Marking;
 class GraphvizDumper implements DumperInterface
 {
     // All values should be strings
-    protected static $defaultOptions = [
+    protected static array $defaultOptions = [
         'graph' => ['ratio' => 'compress', 'rankdir' => 'LR'],
         'node' => ['fontsize' => '9', 'fontname' => 'Arial', 'color' => '#333333', 'fillcolor' => 'lightblue', 'fixedsize' => 'false', 'width' => '1'],
         'edge' => ['fontsize' => '9', 'fontname' => 'Arial', 'color' => '#333333', 'arrowhead' => 'normal', 'arrowsize' => '0.5'],

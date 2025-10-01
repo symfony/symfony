@@ -112,10 +112,8 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Parses a route and adds it to the RouteCollection.
-     *
-     * @return void
      */
-    protected function parseRoute(RouteCollection $collection, string $name, array $config, string $path)
+    protected function parseRoute(RouteCollection $collection, string $name, array $config, string $path): void
     {
         if (isset($config['alias'])) {
             $alias = $collection->addAlias($name, $config['alias']);
@@ -174,10 +172,8 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Parses an import and adds the routes in the resource to the RouteCollection.
-     *
-     * @return void
      */
-    protected function parseImport(RouteCollection $collection, array $config, string $path, string $file)
+    protected function parseImport(RouteCollection $collection, array $config, string $path, string $file): void
     {
         $type = $config['type'] ?? null;
         $prefix = $config['prefix'] ?? '';
@@ -244,15 +240,13 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * @return void
-     *
      * @throws \InvalidArgumentException If one of the provided config keys is not supported,
      *                                   something is missing or the combination is nonsense
      */
-    protected function validate(mixed $config, string $name, string $path)
+    protected function validate(mixed $config, string $name, string $path): void
     {
         if (!\is_array($config)) {
-            throw new \InvalidArgumentException(\sprintf('The definition of "%s" in "%s" must be a YAML array.', $name, $path));
+            throw new \InvalidArgumentException(\sprintf('The definition of "%s" in "%s" must be an array.', $name, $path));
         }
         if (isset($config['alias'])) {
             $this->validateAlias($config, $name, $path);

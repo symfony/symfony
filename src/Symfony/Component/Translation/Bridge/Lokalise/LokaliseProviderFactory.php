@@ -25,17 +25,12 @@ final class LokaliseProviderFactory extends AbstractProviderFactory
 {
     private const HOST = 'api.lokalise.com';
 
-    private HttpClientInterface $client;
-    private LoggerInterface $logger;
-    private string $defaultLocale;
-    private LoaderInterface $loader;
-
-    public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader)
-    {
-        $this->client = $client;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->loader = $loader;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private LoaderInterface $loader,
+    ) {
     }
 
     public function create(Dsn $dsn): LokaliseProvider

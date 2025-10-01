@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,10 +25,7 @@ use Symfony\Component\DependencyInjection\Parameter;
  */
 class InMemoryFactory implements UserProviderFactoryInterface
 {
-    /**
-     * @return void
-     */
-    public function create(ContainerBuilder $container, string $id, array $config)
+    public function create(ContainerBuilder $container, string $id, array $config): void
     {
         $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
         $defaultPassword = new Parameter('container.build_id');
@@ -40,30 +38,26 @@ class InMemoryFactory implements UserProviderFactoryInterface
         $definition->addArgument($users);
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return 'memory';
     }
 
     /**
-     * @return void
+     * @param ArrayNodeDefinition $node
      */
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
-            ->fixXmlConfig('user')
             ->children()
-                ->arrayNode('users')
+                ->arrayNode('users', 'user')
                     ->useAttributeAsKey('identifier')
                     ->normalizeKeys(false)
                     ->prototype('array')
                         ->children()
                             ->scalarNode('password')->defaultNull()->end()
                             ->arrayNode('roles')
-                                ->beforeNormalization()->ifString()->then(fn ($v) => preg_split('/\s*,\s*/', $v))->end()
+                                ->beforeNormalization()->ifString()->then(static fn ($v) => preg_split('/\s*,\s*/', $v))->end()
                                 ->prototype('scalar')->end()
                             ->end()
                         ->end()

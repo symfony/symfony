@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\SmsBiuras\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -43,9 +44,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    /**
-     * @dataProvider provideTestMode()
-     */
+    #[DataProvider('provideTestMode')]
     public function testTestMode(int $expected, bool $testMode)
     {
         $message = new SmsMessage('0037012345678', 'Hello World');

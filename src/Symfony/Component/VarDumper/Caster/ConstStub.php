@@ -30,4 +30,23 @@ class ConstStub extends Stub
     {
         return (string) $this->value;
     }
+
+    /**
+     * @param array<int, string> $values
+     */
+    public static function fromBitfield(int $value, array $values): self
+    {
+        $names = [];
+        foreach ($values as $v => $name) {
+            if ($value & $v) {
+                $names[] = $name;
+            }
+        }
+
+        if (!$names) {
+            $names[] = $values[0] ?? 0;
+        }
+
+        return new self(implode(' | ', $names), $value);
+    }
 }

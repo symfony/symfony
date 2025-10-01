@@ -34,20 +34,16 @@ class OutputFormatterStyleStack implements ResetInterface
 
     /**
      * Resets stack (ie. empty internal arrays).
-     *
-     * @return void
      */
-    public function reset()
+    public function reset(): void
     {
         $this->styles = [];
     }
 
     /**
      * Pushes a style in the stack.
-     *
-     * @return void
      */
-    public function push(OutputFormatterStyleInterface $style)
+    public function push(OutputFormatterStyleInterface $style): void
     {
         $this->styles[] = $style;
     }

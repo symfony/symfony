@@ -75,14 +75,13 @@ class DebugCommand extends Command
             ];
         }
 
+        $io->section($title);
+
         if (!$rows) {
-            $io->section($title);
             $io->text('No Serializer data were found for this class.');
 
             return;
         }
-
-        $io->section($title);
 
         $table = new Table($output);
         $table->setHeaders(['Property', 'Options']);
@@ -97,15 +96,23 @@ class DebugCommand extends Command
     {
         $data = [];
 
+        $mapping = $classMetadata->getClassDiscriminatorMapping();
+        $typeProperty = $mapping?->getTypeProperty();
+
         foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
             $data[$attributeMetadata->getName()] = [
                 'groups' => $attributeMetadata->getGroups(),
                 'maxDepth' => $attributeMetadata->getMaxDepth(),
                 'serializedName' => $attributeMetadata->getSerializedName(),
+                'serializedPath' => $attributeMetadata->getSerializedPath() ? (string) $attributeMetadata->getSerializedPath() : null,
                 'ignore' => $attributeMetadata->isIgnored(),
                 'normalizationContexts' => $attributeMetadata->getNormalizationContexts(),
                 'denormalizationContexts' => $attributeMetadata->getDenormalizationContexts(),
             ];
+
+            if ($mapping && $typeProperty === $attributeMetadata->getName()) {
+                $data[$attributeMetadata->getName()]['discriminatorMap'] = $mapping->getTypesMapping();
+            }
         }
 
         return $data;

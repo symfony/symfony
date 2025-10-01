@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
@@ -18,6 +20,7 @@ use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\Formatter\IntlFormatterInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
@@ -37,18 +40,14 @@ class TranslatorTest extends TestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    /**
-     * @dataProvider getInvalidLocalesTests
-     */
+    #[DataProvider('getInvalidLocalesTests')]
     public function testConstructorInvalidLocale($locale)
     {
         $this->expectException(InvalidArgumentException::class);
         new Translator($locale);
     }
 
-    /**
-     * @dataProvider getValidLocalesTests
-     */
+    #[DataProvider('getValidLocalesTests')]
     public function testConstructorValidLocale($locale)
     {
         $translator = new Translator($locale);
@@ -66,20 +65,18 @@ class TranslatorTest extends TestCase
         $this->assertEquals('fr', $translator->getLocale());
     }
 
-    /**
-     * @dataProvider getInvalidLocalesTests
-     */
-    public function testSetInvalidLocale($locale)
+    #[DataProvider('getInvalidLocalesTests')]
+    public function testSetInvalidLocale(string $locale)
     {
-        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('fr');
+
+        $this->expectException(InvalidArgumentException::class);
+
         $translator->setLocale($locale);
     }
 
-    /**
-     * @dataProvider getValidLocalesTests
-     */
-    public function testSetValidLocale($locale)
+    #[DataProvider('getValidLocalesTests')]
+    public function testSetValidLocale(string $locale)
     {
         $translator = new Translator($locale);
         $translator->setLocale($locale);
@@ -149,9 +146,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('bar (fr)', $translator->trans('bar'));
     }
 
-    /**
-     * @dataProvider getInvalidLocalesTests
-     */
+    #[DataProvider('getInvalidLocalesTests')]
     public function testSetFallbackInvalidLocales($locale)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -159,9 +154,7 @@ class TranslatorTest extends TestCase
         $translator->setFallbackLocales(['fr', $locale]);
     }
 
-    /**
-     * @dataProvider getValidLocalesTests
-     */
+    #[DataProvider('getValidLocalesTests')]
     public function testSetFallbackValidLocales($locale)
     {
         $translator = new Translator($locale);
@@ -181,20 +174,18 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
-    /**
-     * @dataProvider getInvalidLocalesTests
-     */
+    #[DataProvider('getInvalidLocalesTests')]
     public function testAddResourceInvalidLocales($locale)
     {
-        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('fr');
+
+        $this->expectException(InvalidArgumentException::class);
+
         $translator->addResource('array', ['foo' => 'foofoo'], $locale);
     }
 
-    /**
-     * @dataProvider getValidLocalesTests
-     */
-    public function testAddResourceValidLocales($locale)
+    #[DataProvider('getValidLocalesTests')]
+    public function testAddResourceValidLocales(string $locale)
     {
         $translator = new Translator('fr');
         $translator->addResource('array', ['foo' => 'foofoo'], $locale);
@@ -216,26 +207,23 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
-    /**
-     * @dataProvider getTransFileTests
-     */
-    public function testTransWithoutFallbackLocaleFile($format, $loader)
+    #[DataProvider('getTransFileTests')]
+    public function testTransWithoutFallbackLocaleFile(string $format, string $loader)
     {
-        $this->expectException(NotFoundResourceException::class);
         $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
         $translator = new Translator('en');
         $translator->addLoader($format, new $loaderClass());
         $translator->addResource($format, __DIR__.'/Fixtures/non-existing', 'en');
         $translator->addResource($format, __DIR__.'/Fixtures/resources.'.$format, 'en');
 
+        $this->expectException(NotFoundResourceException::class);
+
         // force catalogue loading
         $translator->trans('foo');
     }
 
-    /**
-     * @dataProvider getTransFileTests
-     */
-    public function testTransWithFallbackLocaleFile($format, $loader)
+    #[DataProvider('getTransFileTests')]
+    public function testTransWithFallbackLocaleFile(string $format, string $loader)
     {
         $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
         $translator = new Translator('en_GB');
@@ -288,9 +276,7 @@ class TranslatorTest extends TestCase
         $this->assertSame('bar', $translator->trans('bar'));
     }
 
-    /**
-     * @dataProvider getFallbackLocales
-     */
+    #[DataProvider('getFallbackLocales')]
     public function testTransWithFallbackLocaleBis($expectedLocale, $locale)
     {
         $translator = new Translator($locale);
@@ -343,9 +329,10 @@ class TranslatorTest extends TestCase
 
     public function testWhenAResourceHasNoRegisteredLoader()
     {
-        $this->expectException(RuntimeException::class);
         $translator = new Translator('en');
         $translator->addResource('array', ['foo' => 'foofoo'], 'en');
+
+        $this->expectException(RuntimeException::class);
 
         $translator->trans('foo');
     }
@@ -363,7 +350,7 @@ class TranslatorTest extends TestCase
     public function testFallbackCatalogueResources()
     {
         $translator = new Translator('en_GB');
-        $translator->addLoader('yml', new \Symfony\Component\Translation\Loader\YamlFileLoader());
+        $translator->addLoader('yml', new YamlFileLoader());
         $translator->addResource('yml', __DIR__.'/Fixtures/empty.yml', 'en_GB');
         $translator->addResource('yml', __DIR__.'/Fixtures/resources.yml', 'en');
 
@@ -380,9 +367,7 @@ class TranslatorTest extends TestCase
         $this->assertContainsEquals(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'resources.yml', $resources);
     }
 
-    /**
-     * @dataProvider getTransTests
-     */
+    #[DataProvider('getTransTests')]
     public function testTrans($expected, $id, $translation, $parameters, $locale, $domain)
     {
         $translator = new Translator('en');
@@ -392,9 +377,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals($expected, $translator->trans($id, $parameters, $domain, $locale));
     }
 
-    /**
-     * @dataProvider getTransICUTests
-     */
+    #[DataProvider('getTransICUTests')]
     public function testTransICU(...$args)
     {
         if (!class_exists(\MessageFormatter::class)) {
@@ -404,23 +387,20 @@ class TranslatorTest extends TestCase
         $this->testTrans(...$args);
     }
 
-    /**
-     * @dataProvider getInvalidLocalesTests
-     */
+    #[DataProvider('getInvalidLocalesTests')]
     public function testTransInvalidLocale($locale)
     {
-        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', ['foo' => 'foofoo'], 'en');
 
+        $this->expectException(InvalidArgumentException::class);
+
         $translator->trans('foo', [], '', $locale);
     }
 
-    /**
-     * @dataProvider getValidLocalesTests
-     */
-    public function testTransValidLocale($locale)
+    #[DataProvider('getValidLocalesTests')]
+    public function testTransValidLocale(string $locale)
     {
         $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
@@ -430,10 +410,8 @@ class TranslatorTest extends TestCase
         $this->assertEquals('OK', $translator->trans('test', [], null, $locale));
     }
 
-    /**
-     * @dataProvider getFlattenedTransTests
-     */
-    public function testFlattenedTrans($expected, $messages, $id)
+    #[DataProvider('getFlattenedTransTests')]
+    public function testFlattenedTrans(string $expected, $messages, $id)
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -470,7 +448,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public static function getTransTests(): iterable
+    public static function getTransTests(): array
     {
         $param = new TranslatableMessage('Symfony is %what%!', ['%what%' => 'awesome'], '');
 
@@ -550,9 +528,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testIntlFormattedDomain()
     {
         $translator = new Translator('en');
@@ -587,12 +563,61 @@ class TranslatorTest extends TestCase
 
     public function testMissingLoaderForResourceError()
     {
+        $translator = new Translator('en');
+        $translator->addResource('twig', 'messages.en.twig', 'en');
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No loader is registered for the "twig" format when loading the "messages.en.twig" resource.');
 
-        $translator = new Translator('en');
-        $translator->addResource('twig', 'messages.en.twig', 'en');
         $translator->getCatalogue('en');
+    }
+
+    public function testTransWithGlobalParameters()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['welcome' => 'Welcome {name}!'], 'en');
+        $translator->addResource('array', ['welcome' => 'Bienvenue {name}!'], 'fr');
+        $translator->addGlobalParameter('{name}', 'Global name');
+
+        $this->assertSame('Welcome Global name!', $translator->trans('welcome'));
+        $this->assertSame('Bienvenue Global name!', $translator->trans('welcome', [], null, 'fr'));
+        $this->assertSame('Welcome John!', $translator->trans('welcome', ['{name}' => 'John']));
+        $this->assertSame('Bienvenue Jean!', $translator->trans('welcome', ['{name}' => 'Jean'], null, 'fr'));
+    }
+
+    public function testTransWithGlobalTranslatableParameters()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['welcome' => 'Welcome on {link}!'], 'en');
+        $translator->addResource('array', ['welcome' => 'Bienvenue sur {link}!'], 'fr');
+
+        $translator->addResource('array', ['url' => 'example.com/admin'], 'en', 'globals');
+        $translator->addResource('array', ['url' => 'example.fr/admin'], 'fr', 'globals');
+
+        $translator->addGlobalParameter('{link}', new TranslatableMessage('url', [], 'globals'));
+
+        $this->assertSame('Welcome on example.com/admin!', $translator->trans('welcome'));
+        $this->assertSame('Bienvenue sur example.fr/admin!', $translator->trans('welcome', [], null, 'fr'));
+        $this->assertSame('Welcome on other.com!', $translator->trans('welcome', ['{link}' => 'other.com']));
+        $this->assertSame('Bienvenue sur autre.fr!', $translator->trans('welcome', ['{link}' => 'autre.fr'], null, 'fr'));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testTransICUWithGlobalParameters()
+    {
+        $domain = 'test.'.MessageCatalogue::INTL_DOMAIN_SUFFIX;
+
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', [
+            'apples' => '{apples, plural, =0 {There are no apples} one {There is one apple} other {There are # apples}}',
+        ], 'en', $domain);
+        $translator->addGlobalParameter('{apples}', 42);
+
+        $this->assertSame('There are 42 apples', $translator->trans('apples', [], $domain));
+        $this->assertSame('There is one apple', $translator->trans('apples', ['{apples}' => 1], $domain));
     }
 }
 

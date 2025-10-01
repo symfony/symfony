@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordOptions;
 use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordAuthorEmbedObject;
@@ -27,11 +28,11 @@ final class DiscordOptionsTest extends TestCase
             ->avatarUrl('http://ava.tar/pic.png')
             ->tts(true);
 
-        $this->assertSame($discordOptions->toArray(), [
+        $this->assertSame([
             'username' => 'name of the bot',
             'avatar_url' => 'http://ava.tar/pic.png',
             'tts' => true,
-        ]);
+        ], $discordOptions->toArray());
     }
 
     public function testDiscordEmbedFields()
@@ -52,7 +53,7 @@ final class DiscordOptionsTest extends TestCase
                 ->title('New song added!')
             );
 
-        $this->assertSame($discordOptions->toArray(), [
+        $this->assertSame([
             'embeds' => [
                 [
                     'description' => 'descript.io',
@@ -69,7 +70,7 @@ final class DiscordOptionsTest extends TestCase
                     'title' => 'New song added!',
                 ],
             ],
-        ]);
+        ], $discordOptions->toArray());
 
         $discordOptions = (new DiscordOptions())
             ->addEmbed((new DiscordEmbed())
@@ -107,7 +108,7 @@ final class DiscordOptionsTest extends TestCase
                 )
             );
 
-        $this->assertSame($discordOptions->toArray(), [
+        $this->assertSame([
             'embeds' => [
                 [
                     'description' => 'descript.io',
@@ -140,7 +141,7 @@ final class DiscordOptionsTest extends TestCase
                     ],
                 ],
             ],
-        ]);
+        ], $discordOptions->toArray());
     }
 
     public function testDiscordFooterEmbedFields()
@@ -151,11 +152,11 @@ final class DiscordOptionsTest extends TestCase
             ->proxyIconUrl('proxy icon url')
         ;
 
-        $this->assertSame($footer->toArray(), [
+        $this->assertSame([
             'text' => 'text',
             'icon_url' => 'icon url',
             'proxy_icon_url' => 'proxy icon url',
-        ]);
+        ], $footer->toArray());
     }
 
     public function testDiscordMediaEmbedFields()
@@ -167,12 +168,12 @@ final class DiscordOptionsTest extends TestCase
             ->width(600)
         ;
 
-        $this->assertSame($media->toArray(), [
+        $this->assertSame([
             'url' => 'https://ur.l/',
             'proxy_url' => 'https://proxy.ur.l/',
             'height' => 900,
             'width' => 600,
-        ]);
+        ], $media->toArray());
     }
 
     public function testDiscordAuthorEmbedFields()
@@ -184,11 +185,30 @@ final class DiscordOptionsTest extends TestCase
             ->proxyIconUrl('https://proxy.ic.on/url')
         ;
 
-        $this->assertSame($author->toArray(), [
+        $this->assertSame([
             'name' => 'name field',
             'url' => 'https://ur.l/',
             'icon_url' => 'https://icon.ur.l/',
             'proxy_icon_url' => 'https://proxy.ic.on/url',
-        ]);
+        ], $author->toArray());
+    }
+
+    #[DataProvider('getRecipientIdProvider')]
+    public function testGetRecipientId(?string $expected, DiscordOptions $options)
+    {
+        $this->assertSame($expected, $options->getRecipientId());
+    }
+
+    public static function getRecipientIdProvider(): iterable
+    {
+        yield [null, new DiscordOptions()];
+        yield ['foo', (new DiscordOptions())->recipient('foo')];
+    }
+
+    public function testToArrayUnsetsRecipientId()
+    {
+        $options = (new DiscordOptions())->recipient('foo');
+
+        $this->assertSame([], $options->toArray());
     }
 }

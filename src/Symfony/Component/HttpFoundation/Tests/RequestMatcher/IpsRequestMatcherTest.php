@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\RequestMatcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\IpsRequestMatcher;
 
 class IpsRequestMatcherTest extends TestCase
 {
-    /**
-     * @dataProvider getData
-     */
+    #[DataProvider('getData')]
     public function test($ips, bool $expected)
     {
         $matcher = new IpsRequestMatcher($ips);

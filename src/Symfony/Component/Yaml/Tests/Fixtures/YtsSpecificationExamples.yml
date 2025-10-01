@@ -365,7 +365,7 @@ syck: |
 
 
 ---
-test: Literal perserves newlines
+test: Literal preserves newlines
 todo: true
 spec: 2.13
 yaml: |

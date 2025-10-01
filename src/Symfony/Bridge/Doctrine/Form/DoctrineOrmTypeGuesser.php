@@ -38,13 +38,11 @@ use Symfony\Component\Form\Guess\ValueGuess;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
-    protected $registry;
-
     private array $cache = [];
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        protected ManagerRegistry $registry,
+    ) {
     }
 
     public function guessType(string $class, string $property): ?TypeGuess
@@ -136,7 +134,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
                 return new ValueGuess($length, Guess::HIGH_CONFIDENCE);
             }
 
-            if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT])) {
+            if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT], true)) {
                 return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }
@@ -148,7 +146,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     {
         $ret = $this->getMetadata($class);
         if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
-            if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT])) {
+            if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT], true)) {
                 return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }
@@ -163,7 +161,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      *
      * @return array{0:ClassMetadata<T>, 1:string}|null
      */
-    protected function getMetadata(string $class)
+    protected function getMetadata(string $class): ?array
     {
         // normalize class name
         $class = self::getRealClass(ltrim($class, '\\'));

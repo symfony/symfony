@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Config\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\FileLocator;
 
 class FileLocatorTest extends TestCase
 {
-    /**
-     * @dataProvider getIsAbsolutePathTests
-     */
+    #[DataProvider('getIsAbsolutePathTests')]
     public function testIsAbsolutePath(string $path)
     {
         $loader = new FileLocator([]);

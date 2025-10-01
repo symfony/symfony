@@ -19,6 +19,15 @@ class PhpStanPseudoTypesDummy extends PseudoTypesDummy
     /** @var negative-int */
     public $negativeInt;
 
+    /** @var non-positive-int */
+    public $nonPositiveInt;
+
+    /** @var non-negative-int */
+    public $nonNegativeInt;
+
+    /** @var non-zero-int */
+    public $nonZeroInt;
+
     /** @var non-empty-array */
     public $nonEmptyArray;
 

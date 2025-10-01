@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Telnyx\Tests;
 
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class TelnyxTransportFactoryTest extends TransportFactoryTestCase
+final class TelnyxTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): TelnyxTransportFactory
     {
         return new TelnyxTransportFactory();
@@ -49,5 +54,10 @@ final class TelnyxTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://api_key@default?from=+0611223344'];
         yield ['somethingElse://api_key@default']; // missing "from" option
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['telnyx://default?from=%2B0611223344'];
     }
 }

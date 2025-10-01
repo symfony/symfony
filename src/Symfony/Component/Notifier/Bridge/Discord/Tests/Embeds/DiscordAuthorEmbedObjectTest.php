@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Tests\Embeds;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordAuthorEmbedObject;
-use Symfony\Component\Notifier\Exception\LengthException;
 
 final class DiscordAuthorEmbedObjectTest extends TestCase
 {
@@ -31,13 +30,5 @@ final class DiscordAuthorEmbedObjectTest extends TestCase
             'icon_url' => 'http://icon-ur.l',
             'proxy_icon_url' => 'http://proxy-icon-ur.l',
         ], $author->toArray());
-    }
-
-    public function testThrowsWhenNameExceedsCharacterLimit()
-    {
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('Maximum length for the name is 256 characters.');
-
-        (new DiscordAuthorEmbedObject())->name(str_repeat('š', 257));
     }
 }

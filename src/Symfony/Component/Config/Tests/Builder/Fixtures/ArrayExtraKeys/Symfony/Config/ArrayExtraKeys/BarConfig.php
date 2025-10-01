@@ -40,21 +40,36 @@ class BarConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     foo?: array{
+     *         baz?: scalar|null,
+     *         qux?: scalar|null,
+     *         ...<mixed>
+     *     },
+     *     bar?: list<array{
+     *         corge?: scalar|null,
+     *         grault?: scalar|null,
+     *         ...<mixed>
+     *     }>,
+     *     baz?: array<mixed>,
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('corge', $value)) {
+        if (array_key_exists('corge', $config)) {
             $this->_usedProperties['corge'] = true;
-            $this->corge = $value['corge'];
-            unset($value['corge']);
+            $this->corge = $config['corge'];
+            unset($config['corge']);
         }
 
-        if (array_key_exists('grault', $value)) {
+        if (array_key_exists('grault', $config)) {
             $this->_usedProperties['grault'] = true;
-            $this->grault = $value['grault'];
-            unset($value['grault']);
+            $this->grault = $config['grault'];
+            unset($config['grault']);
         }
 
-        $this->_extraKeys = $value;
+        $this->_extraKeys = $config;
 
     }
 

@@ -22,16 +22,11 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 
 /**
- * DebugExtension.
- *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class DebugExtension extends Extension
 {
-    /**
-     * @return void
-     */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);

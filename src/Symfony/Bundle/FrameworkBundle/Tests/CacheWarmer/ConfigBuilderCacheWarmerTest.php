@@ -37,8 +37,9 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->varDir = sys_get_temp_dir().'/'.uniqid('', true);
         $fs = new Filesystem();
+        $this->varDir = tempnam(sys_get_temp_dir(), 'sf_var_');
+        $fs->remove($this->varDir);
         $fs->mkdir($this->varDir);
     }
 
@@ -411,9 +412,8 @@ class TestSecurityExtension extends Extension implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         $firewallNodeBuilder = $rootNode
-            ->fixXmlConfig('firewall')
             ->children()
-                ->arrayNode('firewalls')
+                ->arrayNode('firewalls', 'firewall')
                     ->isRequired()
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')

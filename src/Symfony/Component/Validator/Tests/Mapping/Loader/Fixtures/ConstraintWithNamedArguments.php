@@ -21,7 +21,7 @@ class ConstraintWithNamedArguments extends Constraint
     #[HasNamedArguments]
     public function __construct(array|string|null $choices = [], ?array $groups = null)
     {
-        parent::__construct([], $groups);
+        parent::__construct(null, $groups);
 
         $this->choices = $choices;
     }

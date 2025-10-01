@@ -24,21 +24,17 @@ use Symfony\Component\HttpKernel\HttpCache\SurrogateInterface;
  */
 abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRenderer
 {
-    private ?SurrogateInterface $surrogate;
-    private FragmentRendererInterface $inlineStrategy;
-    private ?UriSigner $signer;
-
     /**
      * The "fallback" strategy when surrogate is not available should always be an
      * instance of InlineFragmentRenderer.
      *
      * @param FragmentRendererInterface $inlineStrategy The inline strategy to use when the surrogate is not supported
      */
-    public function __construct(?SurrogateInterface $surrogate, FragmentRendererInterface $inlineStrategy, ?UriSigner $signer = null)
-    {
-        $this->surrogate = $surrogate;
-        $this->inlineStrategy = $inlineStrategy;
-        $this->signer = $signer;
+    public function __construct(
+        private ?SurrogateInterface $surrogate,
+        private FragmentRendererInterface $inlineStrategy,
+        private ?UriSigner $signer = null,
+    ) {
     }
 
     /**
@@ -59,7 +55,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     public function render(string|ControllerReference $uri, Request $request, array $options = []): Response
     {
         if (!$this->surrogate || !$this->surrogate->hasSurrogateCapability($request)) {
-            $request->attributes->set('_check_controller_is_allowed', -1); // @deprecated, switch to true in Symfony 7
+            $request->attributes->set('_check_controller_is_allowed', true);
 
             if ($uri instanceof ControllerReference && $this->containsNonScalars($uri->attributes)) {
                 throw new \InvalidArgumentException('Passing non-scalar values as part of URI attributes to the ESI and SSI rendering strategies is not supported. Use a different rendering strategy or pass scalar values.');

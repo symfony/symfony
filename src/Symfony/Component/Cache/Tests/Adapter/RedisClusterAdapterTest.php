@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class RedisClusterAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
@@ -47,9 +47,7 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTestCase
         return $adapter;
     }
 
-    /**
-     * @dataProvider provideFailedCreateConnection
-     */
+    #[DataProvider('provideFailedCreateConnection')]
     public function testFailedCreateConnection(string $dsn)
     {
         $this->expectException(InvalidArgumentException::class);

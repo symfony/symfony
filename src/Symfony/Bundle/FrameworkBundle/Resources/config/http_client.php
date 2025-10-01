@@ -15,6 +15,7 @@ use Http\Client\HttpAsyncClient;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
@@ -25,6 +26,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->set('cache.http_client.pool')
+            ->parent('cache.app')
+            ->tag('cache.pool')
+
+        ->set('cache.http_client', TagAwareAdapter::class)
+            ->args([service('cache.http_client.pool')])
+            ->tag('cache.taggable', ['pool' => 'cache.http_client.pool'])
+
         ->set('http_client.transport', HttpClientInterface::class)
             ->factory([HttpClient::class, 'create'])
             ->args([
@@ -60,8 +69,6 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->alias(HttpAsyncClient::class, 'httplug.http_client')
-        ->alias(\Http\Client\HttpClient::class, 'httplug.http_client')
-            ->deprecate('symfony/framework-bundle', '6.3', 'The "%alias_id%" service is deprecated, use "'.ClientInterface::class.'" instead.')
 
         ->set('http_client.abstract_retry_strategy', GenericRetryStrategy::class)
             ->abstract()

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\UlidToStringTransformer;
@@ -25,9 +26,7 @@ class UlidToStringTransformerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideValidUlid
-     */
+    #[DataProvider('provideValidUlid')]
     public function testTransform($output, $input)
     {
         $transformer = new UlidToStringTransformer();
@@ -53,9 +52,7 @@ class UlidToStringTransformerTest extends TestCase
         $transformer->transform('1234');
     }
 
-    /**
-     * @dataProvider provideValidUlid
-     */
+    #[DataProvider('provideValidUlid')]
     public function testReverseTransform($input, $output)
     {
         $reverseTransformer = new UlidToStringTransformer();

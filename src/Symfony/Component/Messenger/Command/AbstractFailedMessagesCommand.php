@@ -45,17 +45,11 @@ abstract class AbstractFailedMessagesCommand extends Command
 {
     protected const DEFAULT_TRANSPORT_OPTION = 'choose';
 
-    protected ServiceProviderInterface $failureTransports;
-    protected ?PhpSerializer $phpSerializer;
-
-    private ?string $globalFailureReceiverName;
-
-    public function __construct(?string $globalFailureReceiverName, ServiceProviderInterface $failureTransports, ?PhpSerializer $phpSerializer = null)
-    {
-        $this->failureTransports = $failureTransports;
-        $this->globalFailureReceiverName = $globalFailureReceiverName;
-        $this->phpSerializer = $phpSerializer;
-
+    public function __construct(
+        private ?string $globalFailureReceiverName,
+        protected ServiceProviderInterface $failureTransports,
+        protected ?PhpSerializer $phpSerializer = null,
+    ) {
         parent::__construct();
     }
 
@@ -152,9 +146,9 @@ abstract class AbstractFailedMessagesCommand extends Command
     {
         if ($receiver instanceof MessageCountAwareInterface) {
             if (1 === $receiver->getMessageCount()) {
-                $io->writeln('There is <comment>1</comment> message pending in the failure transport.');
+                $io->writeln('There is <info>1</info> message pending in the failure transport.');
             } else {
-                $io->writeln(\sprintf('There are <comment>%d</comment> messages pending in the failure transport.', $receiver->getMessageCount()));
+                $io->writeln(\sprintf('There are <info>%d</info> messages pending in the failure transport.', $receiver->getMessageCount()));
             }
         }
     }
@@ -188,6 +182,7 @@ abstract class AbstractFailedMessagesCommand extends Command
                 Caster::PREFIX_VIRTUAL.'file' => $flattenException->getFile(),
                 Caster::PREFIX_VIRTUAL.'line' => $flattenException->getLine(),
                 Caster::PREFIX_VIRTUAL.'trace' => new TraceStub($flattenException->getTrace()),
+                Caster::PREFIX_VIRTUAL.'previous' => $flattenException->getPrevious(),
             ];
         }]);
 
@@ -200,9 +195,9 @@ abstract class AbstractFailedMessagesCommand extends Command
         $failureTransportsCount = \count($failureTransports);
         if ($failureTransportsCount > 1) {
             $io->writeln([
-                \sprintf('> Loading messages from the <comment>global</comment> failure transport <comment>%s</comment>.', $failureTransportName),
-                '> To use a different failure transport, pass <comment>--transport=</comment>.',
-                \sprintf('> Available failure transports are: <comment>%s</comment>', implode(', ', $failureTransports)),
+                \sprintf('> Loading messages from the <info>global</info> failure transport <info>%s</info>.', $failureTransportName),
+                '> To use a different failure transport, pass <info>--transport=</info>.',
+                \sprintf('> Available failure transports are: <info>%s</info>', implode(', ', $failureTransports)),
                 "\n",
             ]);
         }
@@ -239,8 +234,6 @@ abstract class AbstractFailedMessagesCommand extends Command
                 $ids[] = $this->getMessageId($envelope);
             }
             $suggestions->suggestValues($ids);
-
-            return;
         }
     }
 }

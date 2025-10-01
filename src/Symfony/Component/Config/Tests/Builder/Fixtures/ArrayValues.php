@@ -23,7 +23,6 @@ class ArrayValues implements ConfigurationInterface
                                 return ['dsn' => $dsn];
                             })
                         ->end()
-                        ->fixXmlConfig('option')
                         ->children()
                             ->scalarNode('dsn')->end()
                         ->end()

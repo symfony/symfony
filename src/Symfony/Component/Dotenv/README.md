@@ -7,8 +7,17 @@ accessible via `$_SERVER` or `$_ENV`.
 Getting Started
 ---------------
 
+```bash
+composer require symfony/dotenv
 ```
-$ composer require symfony/dotenv
+
+Usage
+-----
+
+> For an .env file with this format:
+
+```env
+YOUR_VARIABLE_NAME=my-string
 ```
 
 ```php
@@ -25,6 +34,12 @@ $dotenv->overload(__DIR__.'/.env');
 
 // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
 $dotenv->loadEnv(__DIR__.'/.env');
+
+// Usage with $_ENV
+$envVariable = $_ENV['YOUR_VARIABLE_NAME'];
+
+// Usage with $_SERVER
+$envVariable = $_SERVER['YOUR_VARIABLE_NAME'];
 ```
 
 Resources

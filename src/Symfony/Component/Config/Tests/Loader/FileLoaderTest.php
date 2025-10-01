@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
 use Symfony\Component\Config\FileLocator;
@@ -130,9 +131,7 @@ class FileLoaderTest extends TestCase
         $this->assertNotContains('ExcludeFile.txt', $loadedFiles);
     }
 
-    /**
-     * @dataProvider excludeTrailingSlashConsistencyProvider
-     */
+    #[DataProvider('excludeTrailingSlashConsistencyProvider')]
     public function testExcludeTrailingSlashConsistency(string $exclude)
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__.'/../Fixtures'));

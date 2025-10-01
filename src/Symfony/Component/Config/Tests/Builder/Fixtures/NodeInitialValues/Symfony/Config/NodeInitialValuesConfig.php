@@ -45,22 +45,38 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
         return 'node_initial_values';
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     some_clever_name?: array{
+     *         first?: scalar|null,
+     *         second?: scalar|null,
+     *         third?: scalar|null,
+     *     },
+     *     messenger?: array{
+     *         transports?: array<string, array{
+     *             dsn?: scalar|null, // The DSN to use. This is a required option. The info is used to describe the DSN, it can be multi-line.
+     *             serializer?: scalar|null, // Default: null
+     *             options?: list<mixed>,
+     *         }>,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('some_clever_name', $value)) {
+        if (array_key_exists('some_clever_name', $config)) {
             $this->_usedProperties['someCleverName'] = true;
-            $this->someCleverName = new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($value['some_clever_name']);
-            unset($value['some_clever_name']);
+            $this->someCleverName = new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($config['some_clever_name']);
+            unset($config['some_clever_name']);
         }
 
-        if (array_key_exists('messenger', $value)) {
+        if (array_key_exists('messenger', $config)) {
             $this->_usedProperties['messenger'] = true;
-            $this->messenger = new \Symfony\Config\NodeInitialValues\MessengerConfig($value['messenger']);
-            unset($value['messenger']);
+            $this->messenger = new \Symfony\Config\NodeInitialValues\MessengerConfig($config['messenger']);
+            unset($config['messenger']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

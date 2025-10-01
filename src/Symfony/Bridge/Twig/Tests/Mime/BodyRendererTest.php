@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Mime;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -54,13 +55,13 @@ class BodyRendererTest extends TestCase
     public function testRenderMultiLineHtmlOnly()
     {
         $html = <<<HTML
-<head>
-<style type="text/css">
-css
-</style>
-</head>
-<b>HTML</b>
-HTML;
+            <head>
+            <style type="text/css">
+            css
+            </style>
+            </head>
+            <b>HTML</b>
+            HTML;
         $email = $this->prepareEmail(null, $html);
         $body = $email->getBody();
         $this->assertInstanceOf(AlternativePart::class, $body);
@@ -137,9 +138,7 @@ HTML;
         $this->assertEquals('Text', $email->getTextBody());
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testRenderWithLocale()
     {
         $localeSwitcher = new LocaleSwitcher('en', []);

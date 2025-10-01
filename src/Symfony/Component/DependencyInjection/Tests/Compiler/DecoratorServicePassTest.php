@@ -197,7 +197,7 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEmpty($container->getDefinition('baz.inner')->getTags());
+        $this->assertSame([], $container->getDefinition('baz.inner')->getTags());
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
@@ -220,7 +220,7 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEmpty($container->getDefinition('deco1')->getTags());
+        $this->assertSame([], $container->getDefinition('deco1')->getTags());
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'container.decorator' => [['id' => 'foo', 'inner' => 'deco1.inner']]], $container->getDefinition('deco2')->getTags());
     }
 

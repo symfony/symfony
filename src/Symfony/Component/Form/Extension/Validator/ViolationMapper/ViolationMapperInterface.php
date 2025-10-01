@@ -24,8 +24,6 @@ interface ViolationMapperInterface
      * the given form.
      *
      * @param bool $allowNonSynchronized Whether to allow mapping to non-synchronized forms
-     *
-     * @return void
      */
-    public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false);
+    public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false): void;
 }

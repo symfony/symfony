@@ -40,7 +40,6 @@ class Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo' => true,
         ];
     }
@@ -78,32 +77,9 @@ class Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute extends Container
     protected static function getFoo2Service($container, $lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $container->privates['.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo'] = $container->createProxy('FooProxy4048957', static fn () => \FooProxy4048957::createLazyProxy(static fn () => self::getFoo2Service($container, false)));
+            return $container->privates['.lazy.Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo'] = new \ReflectionClass('Symfony\Component\DependencyInjection\Tests\Compiler\Foo')->newLazyProxy(static fn () => self::getFoo2Service($container, false));
         }
 
         return ($container->services['foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo());
     }
 }
-
-class FooProxy4048957 extends \Symfony\Component\DependencyInjection\Tests\Compiler\Foo implements \Symfony\Component\VarExporter\LazyObjectInterface
-{
-    use \Symfony\Component\VarExporter\Internal\LazyDecoratorTrait;
-
-    private const LAZY_OBJECT_PROPERTY_SCOPES = [];
-
-    public function cloneFoo(?\stdClass $bar = null): static
-    {
-        ${0} = $this->lazyObjectState->realInstance;
-        ${1} = ${0}->cloneFoo(...\func_get_args());
-
-        return match (true) {
-            ${1} === ${0} => $this,
-            !${1} instanceof ${0} || !${0} instanceof ${1} => ${1},
-            null !== $this->lazyObjectState->cloneInstance =& ${1} => clone $this,
-        };
-    }
-}
-
-// Help opcache.preload discover always-needed symbols
-class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);

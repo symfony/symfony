@@ -856,9 +856,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testUnionTypePassesWithTrue()
     {
         $container = new ContainerBuilder();

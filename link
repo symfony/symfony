@@ -49,7 +49,11 @@ $directories = array_merge(...array_values(array_map(function ($part) {
 $directories[] = __DIR__.'/src/Symfony/Contracts';
 foreach ($directories as $dir) {
     if ($filesystem->exists($composer = "$dir/composer.json")) {
-        $sfPackages[json_decode($filesystem->readFile($composer), flags: JSON_THROW_ON_ERROR)->name] = $dir;
+        try {
+            $sfPackages[json_decode($filesystem->readFile($composer), flags: JSON_THROW_ON_ERROR)->name] = $dir;
+        } catch (JsonException $e) {
+            throw new RuntimeException(sprintf('Error parsing "%s": %s', $composer, $e->getMessage()), previous: $e);
+        }
     }
 }
 

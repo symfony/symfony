@@ -117,6 +117,7 @@ use Symfony\Component\Webhook\DependencyInjection\RemoveMissingDependenciesPass 
 use Symfony\Component\Webhook\WebhookBundle;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\WebLinkBundle;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowServiceCreatorPass;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Workflow\WorkflowBundle;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
@@ -371,6 +372,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
         $container->registerExtension(new FrameworkExtension());
         $container->registerExtension(new WorkflowBundle()->getContainerExtension());
+        $container->addCompilerPass(new WorkflowServiceCreatorPass());
         $this->loadFromFile($container, 'legacy_workflows');
         $container->compile();
 

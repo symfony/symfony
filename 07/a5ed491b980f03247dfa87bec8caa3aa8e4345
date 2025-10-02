@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-09-28T13:05:04Z
+
+Do you have a use case for using this helper in your own commands whether coming from a Symfony application or a reusable bundle? Elsewhere than in core I mean.
+
+---------------------------------------------------------------------------
+
+by johnstevenson at 2025-09-28T15:55:03Z
+
+> Do you have a use case for using this helper in your own commands...
+
+Not at all. The helper is to fix the issues with Symfony/Console.
+
+---------------------------------------------------------------------------
+
+by johnstevenson at 2025-09-28T16:50:30Z
+
+I've just noticed this issue https://github.com/symfony/symfony/issues/61852 (that has been closed). This PR fixes the problem described, which is having to hit Enter after a Ctrl-C to send the signal (when submitting hidden input).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-09-28T16:53:20Z
+
+Please inline back the logic into Application and QuestionHelper. Helpers in this namespace are part of Console's public API, but I can't think of a use case for this helper in userland either and I looking at it, I don't think it's worth it. Expanding the public API is a feature also while this PR is a bugfix targeting a branch that is in maintenance mode, so please do the minimum changes to fix the bug at hand. Thanks
+
+---------------------------------------------------------------------------
+
+by stof at 2025-09-29T07:14:25Z
+
+Given the need for extra state in this input helper, I'm fine with using a separate class. But it should be `@internal`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-09-29T07:29:57Z
+
+The non-obvious name of that helper annoys me but probably fine if it’s internal. Works for me
+
+---------------------------------------------------------------------------
+
+by johnstevenson at 2025-09-29T14:35:58Z
+
+> The non-obvious name of that helper annoys me ....
+
+I tried several before choosing the least annoying. Feel free to suggest an alternative.
+
+---------------------------------------------------------------------------
+
+by valx76 at 2025-09-29T17:08:36Z
+
+> > The non-obvious name of that helper annoys me ....
+>
+> I tried several before choosing the least annoying. Feel free to suggest an alternative.
+
+I can think of `InputSignalHelper` or `SignalSafeTerminalInputHelper`.
+Don't know if it's any better, what do you think?

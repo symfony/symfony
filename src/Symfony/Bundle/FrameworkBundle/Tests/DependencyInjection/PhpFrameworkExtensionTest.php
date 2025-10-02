@@ -22,6 +22,7 @@ use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowServiceCreatorPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
@@ -102,6 +103,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                     ],
                 ],
             ]);
+            $container->addCompilerPass(new WorkflowServiceCreatorPass(), priority: 2);
             $container->addCompilerPass(new WorkflowValidatorPass());
         });
     }
@@ -198,6 +200,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                     ],
                 ],
             ]);
+
+            $container->addCompilerPass(new WorkflowServiceCreatorPass());
         });
 
         $workflowA = $container->getDefinition('state_machine.workflow_a');

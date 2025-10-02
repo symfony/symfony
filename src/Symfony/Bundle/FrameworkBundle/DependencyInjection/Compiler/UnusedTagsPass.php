@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class UnusedTagsPass implements CompilerPassInterface
 {
     private const KNOWN_TAGS = [
+        '.workflow.attribute',
         'asset_mapper.compiler',
         'assets.package',
         'auto_alias',
@@ -70,6 +71,8 @@ class UnusedTagsPass implements CompilerPassInterface
         'mime.mime_type_guesser',
         'monolog.logger',
         'notifier.channel',
+        'object_mapper.condition_callable',
+        'object_mapper.transform_callable',
         'property_info.access_extractor',
         'property_info.constructor_extractor',
         'property_info.initializable_extractor',
@@ -108,8 +111,6 @@ class UnusedTagsPass implements CompilerPassInterface
         'validator.group_provider',
         'validator.initializer',
         'workflow',
-        'object_mapper.transform_callable',
-        'object_mapper.condition_callable',
     ];
 
     public function process(ContainerBuilder $container): void

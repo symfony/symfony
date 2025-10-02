@@ -38,7 +38,7 @@ class UnusedTagsPassTest extends TestCase
             $this->markTestSkipped('Tests are not run from the root symfony/symfony metapackage.');
         }
 
-        $this->assertSame(UnusedTagsPassUtils::getDefinedTags(), $this->getKnownTags(), 'The src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php file must be updated; run src/Symfony/Bundle/FrameworkBundle/Resources/bin/check-unused-known-tags.php.');
+        $this->assertEquals(UnusedTagsPassUtils::getDefinedTags(), $this->getKnownTags(), 'The src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php file must be updated; run src/Symfony/Bundle/FrameworkBundle/Resources/bin/check-unused-known-tags.php.');
     }
 
     private function getKnownTags(): array

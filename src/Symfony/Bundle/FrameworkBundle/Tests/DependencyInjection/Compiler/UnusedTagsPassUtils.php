@@ -20,6 +20,7 @@ class UnusedTagsPassUtils
         $tags = [
             'proxy' => true,
             'routing.controller' => true,
+            '.workflow.attribute' => true,
         ];
 
         // get all tags used in XML configs

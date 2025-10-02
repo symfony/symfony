@@ -32,7 +32,7 @@ final class ArrayMapper
     public function map(array $source, array $target): void
     {
         if (\array_keys($source) !== \array_keys($target)) {
-            throw new \InvalidArgumentException('Source and target array must have the same keys');
+            throw new \InvalidArgumentException('Source and target array must have the same keys.');
         }
 
         match ($this->throwPolicy) {

@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-10-01T08:42:43Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-01T09:00:34Z
+
+Based on the deprecation message, it seems the change has been done in 7.3, so I doubt 7.4 is the oldest impacted version.
+
+---------------------------------------------------------------------------
+
+by vincent4vx at 2025-10-01T09:09:28Z
+
+This bug has been introduced by this commit : https://github.com/symfony/symfony/commit/ee9112431cc044b9cf92ddb5b5424e0728a69c91
+When the statement `$this->value = $value ?? $this->value;` has been added.
+Before that (in 7.3), the value is only set by the parent constructor, so by extracting the options array.

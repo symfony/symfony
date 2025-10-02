@@ -25,7 +25,7 @@ final class CollectionMapper implements CollectionMapperInterface
 {
     public function __construct(
         private ObjectMapperInterface $mapper,
-        private string $throwPolicy = CollectionMapperThrowPolicy::FAIL_SAFE,
+        private CollectionMapperThrowPolicy $throwPolicy = CollectionMapperThrowPolicy::FAIL_SAFE,
     ) {
     }
 
@@ -34,7 +34,7 @@ final class CollectionMapper implements CollectionMapperInterface
         if (\is_array($target)) {
             yield from $this->mapArray($sourceCollection, $target);
         } else {
-            return match ($this->throwPolicy) {
+            match ($this->throwPolicy) {
                 CollectionMapperThrowPolicy::FAIL_EARLY => yield from $this->mapFailEarly($sourceCollection, $target),
                 CollectionMapperThrowPolicy::FAIL_SAFE => yield from $this->mapFailSafe($sourceCollection, $target),
                 CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS => yield from $this->mapIgnoreMappingErrors($sourceCollection, $target),

@@ -17,7 +17,7 @@ use Symfony\Component\ObjectMapper\Exception\WrappedMappingException;
 /**
  * Map an array of objects into the specified target array using the ObjectMapper.
  *
- * @experimental
+ * @internal
  *
  * @author Martin Komischke <martin.komischke@gmail.com>
  */
@@ -25,30 +25,26 @@ final class ArrayMapper
 {
     public function __construct(
         private ObjectMapperInterface $mapper,
-        private string $throwPolicy = CollectionMapperThrowPolicy::FAIL_SAFE,
+        private CollectionMapperThrowPolicy $throwPolicy = CollectionMapperThrowPolicy::FAIL_SAFE,
     ) {
     }
 
     public function map(array $source, array $target): void
     {
-        \assert(\count($source) === \count($target));
-
-        switch ($this->throwPolicy) {
-            case CollectionMapperThrowPolicy::FAIL_EARLY:
-                $this->mapFailEarly($source, $target);
-                break;
-
-            case CollectionMapperThrowPolicy::FAIL_SAFE:
-                $this->mapFailSafe($source, $target);
-                break;
-
-            case CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS:
-                $this->mapIgnoreMappingErrors($source, $target);
-                break;
-
-            default:
-                throw new \Exception(\sprintf('Throw policy "%s" is not yet supported!', $this->throwPolicy));
+        if (\array_keys($source) !== \array_keys($target)) {
+            throw new \InvalidArgumentException('Source and target array must have the same keys');
         }
+
+        match ($this->throwPolicy) {
+            CollectionMapperThrowPolicy::FAIL_EARLY
+                => $this->mapFailEarly($source, $target),
+            CollectionMapperThrowPolicy::FAIL_SAFE
+                => $this->mapFailSafe($source, $target),
+            CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS
+                => $this->mapIgnoreMappingErrors($source, $target),
+            default
+                => throw new \Exception(\sprintf('Throw policy "%s" is not yet supported!', $this->throwPolicy))
+        };
     }
 
     private function mapFailEarly(array $source, array $target): void

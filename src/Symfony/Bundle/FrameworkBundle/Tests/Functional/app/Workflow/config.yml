@@ -1,0 +1,24 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    workflows:
+        article:
+            type: workflow
+            supports: [Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\Article]
+            places: [draft, published]
+            transitions:
+                publish: { from: draft, to: published }
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\:
+        resource: '../../Bundle/TestBundle/Workflow/'
+        exclude: '../../Bundle/TestBundle/Workflow/{Article,Ticket}.php'
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\WorkflowController:
+        public: true
+        tags: [controller.service_arguments]

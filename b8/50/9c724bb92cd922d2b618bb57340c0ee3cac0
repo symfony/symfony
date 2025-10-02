@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-09-30T08:12:57Z
+
+Don't we also have to patch the `GetSetMethodNormalizer` and the `PropertyNormalizer`?
+
+---------------------------------------------------------------------------
+
+by chris54721 at 2025-09-30T16:00:46Z
+
+@xabbuh you're right, I have patched those as well, thanks.

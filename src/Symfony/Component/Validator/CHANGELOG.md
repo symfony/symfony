@@ -188,6 +188,7 @@ CHANGELOG
        }
    }
    ```
+ * Fix `ValidationFailedException` constructor to properly pass string to parent
 
 7.3
 ---

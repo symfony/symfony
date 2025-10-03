@@ -22,7 +22,7 @@ class ValidationFailedException extends RuntimeException
         private mixed $value,
         private ConstraintViolationListInterface $violations,
     ) {
-        parent::__construct($violations);
+        parent::__construct((string) $violations);
     }
 
     public function getValue(): mixed

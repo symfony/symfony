@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-02T15:25:07Z
+
+PR ready, failures unrelated
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-10-02T15:26:52Z
+
+does this also include the removal of var/cache/env/*Container.xml?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-02T15:36:04Z
+
+It doesn't (see https://github.com/symfony/symfony/pull/61930#discussion_r2399167733)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-10-02T15:42:29Z
+
+so IIUC we preserve XML format on that location for the future?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-02T15:45:06Z
+
+Correct, see https://github.com/symfony/symfony/pull/61280
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-10-02T15:52:20Z
+
+im struggling why we couldnt maintain the format then for every day config, personally i dont mind lack of xsd valition nor requiring ext-dom (in userland)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-02T16:03:13Z
+
+The discussion happened in https://github.com/symfony/symfony/pull/60568
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-10-02T16:07:26Z
+
+> Let's wait on the discussion on the issue to know what should actually be deprecated. This PR deprecates a lot more than what was mentioned in the issue it fixes.
+
+> I am not really sure we need to go thus far.
+
+> But if someone likes using XML config files, why shouldn't we allow it optionally if the maintenance overhead is barely measurable?
+
+> I have a hard time following this initiative to be honest.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-02T16:11:54Z
+
+This is really not helping @ro0NL, please do your part, this is burning my good will.
+The discussion goes on to reduce the scope - that comment you copy/pasted is related to a previous iteration of the PR, you can see that from the rest of the discussion.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-10-02T16:15:31Z
+
+perhaps, but enforcing a full format migration like that, is not what i was waiting for
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-10-02T18:10:42Z
+
+we have 3 years of hoping the migration tool will do it's job, so OK.

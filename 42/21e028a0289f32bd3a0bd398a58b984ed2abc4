@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2025-10-02T14:08:19Z
+
+Works for me :-)
+
+One minor note: If just *one* array element has a key, like this:
+```php
+[
+   'foo' =>  MyEnum::Open,
+    MyEnum::Closed,
+]
+```
+Then the outcome is:
+> * foo
+> * 0
+
+I haven't tried this with `ChoiceType`, and I guess it's the intended behavior anyway - so that's fine for me :-)
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2025-10-02T14:16:13Z
+
+I've created a docs PR: https://github.com/symfony/symfony-docs/pull/21457

@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValue
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\ValidationException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -193,10 +194,14 @@ class UploadedFileValueResolverTest extends TestCase
             HttpKernelInterface::MAIN_REQUEST
         );
 
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessageMatches('/^The file is too large/');
-
-        $resolver->onKernelControllerArguments($event);
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $this->assertSame(422, $e->getStatusCode());
+            $this->assertInstanceOf(ValidationException::class, $e);
+            $this->assertMatchesRegularExpression('/^The file is too large/', $e->getViolations()->get(0)->getMessage());
+        }
     }
 
     #[DataProvider('provideContext')]
@@ -252,10 +257,14 @@ class UploadedFileValueResolverTest extends TestCase
             HttpKernelInterface::MAIN_REQUEST
         );
 
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessageMatches('/^The file is too large/');
-
-        $resolver->onKernelControllerArguments($event);
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $this->assertSame(422, $e->getStatusCode());
+            $this->assertInstanceOf(ValidationException::class, $e);
+            $this->assertMatchesRegularExpression('/^The file is too large/', $e->getViolations()->get(0)->getMessage());
+        }
     }
 
     #[DataProvider('provideContext')]
@@ -311,10 +320,14 @@ class UploadedFileValueResolverTest extends TestCase
             HttpKernelInterface::MAIN_REQUEST
         );
 
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessageMatches('/^The file is too large/');
-
-        $resolver->onKernelControllerArguments($event);
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $this->assertSame(422, $e->getStatusCode());
+            $this->assertInstanceOf(ValidationException::class, $e);
+            $this->assertMatchesRegularExpression('/^The file is too large/', $e->getViolations()->get(0)->getMessage());
+        }
     }
 
     #[DataProvider('provideContext')]

@@ -18,7 +18,6 @@ use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Read\DateTimeTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Read\StreamReaderGenerator;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyEnum;
@@ -27,6 +26,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithOtherDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjectAndUnion;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\DivideStringAndCastToIntValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\StringToBooleanValueTransformer;
@@ -56,14 +56,14 @@ class StreamReaderGeneratorTest extends TestCase
     public function testGeneratedStreamReader(string $fixture, Type $type)
     {
         $propertyMetadataLoader = new GenericTypePropertyMetadataLoader(
-            new DateTimeTypePropertyMetadataLoader(new AttributePropertyMetadataLoader(
+            new AttributePropertyMetadataLoader(
                 new PropertyMetadataLoader(TypeResolver::create()),
                 new ServiceContainer([
                     DivideStringAndCastToIntValueTransformer::class => new DivideStringAndCastToIntValueTransformer(),
                     StringToBooleanValueTransformer::class => new StringToBooleanValueTransformer(),
                 ]),
                 TypeResolver::create(),
-            )),
+            ),
             new TypeContextFactory(new StringTypeResolver()),
         );
 
@@ -110,6 +110,7 @@ class StreamReaderGeneratorTest extends TestCase
 
         yield ['union', Type::union(Type::int(), Type::list(Type::enum(DummyBackedEnum::class)), Type::object(DummyWithNameAttributes::class))];
         yield ['object_with_union', Type::object(DummyWithUnionProperties::class)];
+        yield ['object_with_value_object_and_union', Type::object(DummyWithValueObjectAndUnion::class)];
     }
 
     public function testDoNotSupportIntersectionType()

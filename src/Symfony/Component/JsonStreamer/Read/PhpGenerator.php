@@ -116,7 +116,7 @@ final class PhpGenerator
             $php .= $decodeFromStream ? $this->line('$data = \\'.Decoder::class.'::decodeStream($stream, $offset, $length);', $context) : '';
 
             foreach ($node->getNodes() as $n) {
-                $value = $this->canBeDecodedWithJsonDecode($n, $decodeFromStream) ? $this->generateValueFormat($n, '$data') : '$providers[\''.$n->getIdentifier().'\']($data)';
+                $value = $this->canBeDecodedWithJsonDecode($n, $decodeFromStream) ? $this->generateValueFormat($n, '$data') : "\$providers['{$n->getIdentifier()}']($arguments)";
                 $php .= $this->line('if ('.$this->generateCompositeNodeItemCondition($n, '$data').') {', $context)
                     .$this->line("    return $value;", $context)
                     .$this->line('}', $context);
@@ -178,6 +178,14 @@ final class PhpGenerator
             $php = $this->line("\$providers['".$node->getIdentifier()."'] = static function ($arguments) use (\$options, \$valueTransformers, \$instantiator, &\$providers) {", $context);
 
             ++$context['indentation_level'];
+
+            if ($node->isValueObject()) {
+                $php .= $this->generateValueObjectTransformation($node, $decodeFromStream, $context);
+
+                --$context['indentation_level'];
+
+                return $php.$this->line('};', $context);
+            }
 
             $php .= $decodeFromStream ? $this->line('$data = \\'.Splitter::class.'::splitDict($stream, $offset, $length);', $context) : '';
 
@@ -286,6 +294,10 @@ final class PhpGenerator
             return '\\is_'.$type->getBackingType()->getTypeIdentifier()->value."($accessor)";
         }
 
+        if ($node instanceof ObjectNode && $node->isValueObject()) {
+            return $this->getValueObjectNodeItemCondition($node, $accessor);
+        }
+
         if ($type instanceof ObjectType) {
             return "\\is_array($accessor)";
         }
@@ -341,5 +353,28 @@ final class PhpGenerator
         }
 
         return true;
+    }
+
+    private function getValueObjectNodeItemCondition(DataModelNodeInterface $dataModelNode, string $accessor): string
+    {
+        if ($dataModelNode->getType()->isIdentifiedBy(\DateTimeInterface::class)) {
+            return "\\is_string($accessor)";
+        }
+
+        throw new LogicException(\sprintf('Unhandled "%s" value object.', $dataModelNode->getType()));
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function generateValueObjectTransformation(DataModelNodeInterface $dataModelNode, bool $decodeFromStream, array $context): string
+    {
+        $data = $decodeFromStream ? '\\'.Decoder::class.'::decodeStream($stream, $offset, $length)' : '$data';
+
+        if ($dataModelNode->getType()->isIdentifiedBy(\DateTimeInterface::class)) {
+            return $this->line("return \$valueTransformers->get('json_streamer.value_transformer.string_to_date_time')->transform($data, \$options);", $context);
+        }
+
+        throw new LogicException(\sprintf('Unhandled "%s" value object.', $dataModelNode->getType()));
     }
 }

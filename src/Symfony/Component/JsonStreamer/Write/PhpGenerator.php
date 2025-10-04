@@ -238,6 +238,10 @@ final class PhpGenerator
         }
 
         if ($dataModelNode instanceof ObjectNode) {
+            if ($dataModelNode->isValueObject()) {
+                return $this->generateValueObjectYield($dataModelNode, $context);
+            }
+
             if (isset($context['generated_generators'][$dataModelNode->getIdentifier()]) || $dataModelNode->isMock()) {
                 $depthArgument = ($context['generating_generator'] ?? false) ? '$depth + 1' : (string) $context['depth'];
 
@@ -444,5 +448,19 @@ final class PhpGenerator
         }
 
         return true;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function generateValueObjectYield(DataModelNodeInterface $dataModelNode, array $context): string
+    {
+        if ($dataModelNode->getType()->isIdentifiedBy(\DateTimeInterface::class)) {
+            $rawValue = "\$valueTransformers->get('json_streamer.value_transformer.date_time_to_string')->transform({$dataModelNode->getAccessor()}, \$options)";
+
+            return $this->yield($this->encode($rawValue, $context), $context);
+        }
+
+        throw new LogicException(\sprintf('Unhandled "%s" value object.', $dataModelNode->getType()));
     }
 }

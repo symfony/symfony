@@ -31,10 +31,10 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $valueT
     $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes|int|list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $offset, $length);
         if (\is_array($data) && \array_is_list($data)) {
-            return $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>']($data);
+            return $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>']($stream, $offset, $length);
         }
         if (\is_array($data)) {
-            return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes']($data);
+            return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes']($stream, $offset, $length);
         }
         if (\is_int($data)) {
             return $data;

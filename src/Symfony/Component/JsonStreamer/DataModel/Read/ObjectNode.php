@@ -60,4 +60,9 @@ final class ObjectNode implements DataModelNodeInterface
     {
         return $this->mock;
     }
+
+    public function isValueObject(): bool
+    {
+        return $this->type->isIdentifiedBy(\DateTimeInterface::class);
+    }
 }

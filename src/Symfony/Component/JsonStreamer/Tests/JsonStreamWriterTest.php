@@ -26,6 +26,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedArray;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjectAndUnion;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\BooleanToStringValueTransformer;
@@ -225,6 +226,28 @@ class JsonStreamWriterTest extends TestCase
                 },
                 DoubleIntAndCastToStringValueTransformer::class => new DoubleIntAndCastToStringValueTransformer(),
             ],
+        );
+    }
+
+    public function testWriteObjectWithValueObjectAndUnion()
+    {
+        $dummy = new DummyWithValueObjectAndUnion();
+        $dummy->dateTimeOrInt = new \DateTimeImmutable('2024-11-20');
+
+        $this->assertWritten(
+            '{"dateTimeOrInt":"2024-11-20"}',
+            $dummy,
+            Type::object(DummyWithValueObjectAndUnion::class),
+            options: [DateTimeToStringValueTransformer::FORMAT_KEY => 'Y-m-d'],
+        );
+
+        $dummy = new DummyWithValueObjectAndUnion();
+        $dummy->dateTimeOrInt = 10;
+
+        $this->assertWritten(
+            '{"dateTimeOrInt":10}',
+            $dummy,
+            Type::object(DummyWithValueObjectAndUnion::class),
         );
     }
 

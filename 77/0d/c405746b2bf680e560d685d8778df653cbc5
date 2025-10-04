@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-09-21T11:29:59Z
+
+Updates about `Ask` attribute:
+* Added `default` option. This value cannot be taken from the property/parameter default value as doing that, for the question default purpose, will impact the argument definition concerning required/optional argument.
+* Added `validator` and `maxAttempts` options, and a built-in question validator for properties, allowing input values to be validated through property hooks while repeatedly prompting the user until valid input is provided
+* Added `multiline`, `trimmable`, and `timeout` options.
+
+It's pending to play with autocompleter values (not a blocker)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-09-21T11:34:42Z
+
+Example of question value validation using property set hook:
+
+```php
+class UserDto
+{
+    #[Argument, Ask('Enter the user email')]
+    public string $email {
+        set (?string $email) {
+            if (null === $email || '' === $email) {
+                throw new InvalidArgumentException('Email cannot be empty.');
+            }
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidArgumentException('Email is not valid.');
+            }
+
+            $this->email = strtolower($email);
+        }
+    }
+
+    // ...
+}
+```
+I particularly like this approach because it guarantees that your DTO will never contain an invalid value.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-09-27T09:48:28Z
+
+Minor update regarding future `#[Choice]` (for another PR) with seamless support for `BackedEnum` inputs (including multiple-choice support):
+ * Added `InteractiveAttributeInterface` to define a contract for interactive attributes, what matter here is get the interactive `ReflectionFunction`.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-09-27T09:49:58Z
+
+I believe this is ready for final review, with no remaining tasks on my side.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-09-29T16:58:16Z
+
+Rebased to fix a conflict.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-01T14:51:56Z
+
+Rebased and PR description updated after https://github.com/symfony/symfony/pull/61890
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-03T09:19:16Z
+
+> In earlier approaches, you had to set arguments manually with `$input->setArgument()`. With DTOs, you can now work directly on typed properties, which makes the code more expressive and less error-prone.
+
+how does this interact with the validation of required arguments done when validating the input (after the `interact` state) if they are not set back in the input ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-03T09:23:14Z
+
+>> In earlier approaches, you had to set arguments manually with `$input->setArgument()`. With DTOs, you can now work directly on typed properties, which makes the code more expressive and less error-prone.
+
+>how does this interact with the validation of required arguments done when validating the input (after the `interact` state) if they are not set back in the input ?
+
+the point is, they *are* being set back in the input :)
+
+(see the new `MapInput::setValue()` method)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-03T10:34:10Z
+
+As discussed internally, I renamed the new attribute names:
+ * `Interactive` -> `Interact`
+ * `InteractiveQuestion` -> `Ask`
+
+(failures are unrelated btw)

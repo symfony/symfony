@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-10-03T12:10:19Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "7.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Dean151 at 2025-10-03T13:56:33Z
+
+> Nice catch!
+
+Yeah, the kind of thing you run into when you get a weird problem!
+Depending on the context, my UT were passing … or failing, because the global function was not always available.
+
+Can someone fix the milestone? It was wrongly assigned to 7.4 instead of 7.3, because I messed up the PR opening ^^'
+
+Thanks!

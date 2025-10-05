@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2025-07-28T09:27:19Z
+
+> I'm not sure how to add tests for this — could you advise?
+
+There should be tests for the `AsEventListener` feature already. Have a look at them.
+
+---------------------------------------------------------------------------
+
+by Fan2Shrek at 2025-07-28T09:49:39Z
+
+Hi @derrabus, thanks for the reply!
+
+The only tests I found are in RegisterListenerPassTest. Is that the right place to add mine?

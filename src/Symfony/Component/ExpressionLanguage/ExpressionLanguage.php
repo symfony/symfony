@@ -79,13 +79,17 @@ class ExpressionLanguage
 
         $cacheItem = $this->cache->getItem(rawurlencode($expression.'//'.implode('|', $cacheKeyItems)));
 
-        if (null === $parsedExpression = $cacheItem->get()) {
-            $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names, $flags);
-            $parsedExpression = new ParsedExpression((string) $expression, $nodes);
+        $parsedExpression = $cacheItem->get();
 
-            $cacheItem->set($parsedExpression);
-            $this->cache->save($cacheItem);
+        if ($parsedExpression instanceof ParsedExpression) {
+            return $parsedExpression;
         }
+
+        $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names, $flags);
+        $parsedExpression = new ParsedExpression((string) $expression, $nodes);
+
+        $cacheItem->set($parsedExpression);
+        $this->cache->save($cacheItem);
 
         return $parsedExpression;
     }

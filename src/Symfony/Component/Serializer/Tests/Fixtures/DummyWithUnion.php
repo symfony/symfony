@@ -11,17 +11,13 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Attribute\SerializedName;
-
 /**
  * @author Dmitrii <github.com/d-mitrofanov-v>
  */
 class DummyWithUnion
 {
     public function __construct(
-        #[SerializedName('@value')]
         public int|float $value,
-        #[SerializedName('@value2')]
         public string|int $value2,
     ) {
     }

@@ -812,7 +812,7 @@ class SerializerTest extends TestCase
 
     public function testCollectDenormalizationErrorsWithUnionConstructorTypesInXML()
     {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?><DummyWithUnion value="string" value2="string"/>';
+        $xml = '<?xml version="1.0" encoding="UTF-8"?><DummyWithUnion><value>string</value><value2>string</value2></DummyWithUnion>';
 
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);

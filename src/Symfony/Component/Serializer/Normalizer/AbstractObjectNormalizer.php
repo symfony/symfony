@@ -901,10 +901,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 if (!$type instanceof UnionType) {
                     throw $e;
                 }
-
-                if ($type instanceof UnionType) {
-                    $expectedTypes[TypeIdentifier::OBJECT === $typeIdentifier && $class ? $class : $typeIdentifier->value] = true;
-                }
+                $expectedTypes[TypeIdentifier::OBJECT === $typeIdentifier && $class ? $class : $typeIdentifier->value] = true;
             } catch (ExtraAttributesException $e) {
                 if (!$type instanceof UnionType) {
                     throw $e;

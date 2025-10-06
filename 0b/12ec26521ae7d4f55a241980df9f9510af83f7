@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by AydinHassan at 2025-10-03T13:05:18Z
+
+@nicolas-grekas I guess this test doesn't work because that feature was only added in 7.2, would you like me to do something or are you taking care?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-03T15:04:55Z
+
+I'd be happy if you could have a look. To me, the issue exists on 6.4, even if it might manifest itself differently. That's why I rebased on 6.4. Thanks!
+
+---------------------------------------------------------------------------
+
+by AydinHassan at 2025-10-03T15:40:41Z
+
+@nicolas-grekas we could certainly apply the fix to 6.4, but since the result of `$usedEnvs` is not used anywhere, I don't know how we could test that, effectively there is no change of behaviour with or without the fix in 6.4, at least I can't see.
+
+Only in 7.2 where the new if condition is added can we use my test.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-03T15:44:20Z
+
+OK, let's go with 7.3 then, sorry for the bad push. Can you reset --hard to that previous commit of yours and push+retarget again?
+
+---------------------------------------------------------------------------
+
+by AydinHassan at 2025-10-03T15:50:25Z
+
+no problem! and done :)

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-06-06T09:00:19Z
+
+Good call 👍I would make "token" or "jwt" part of the command name though as I find "oidc:generate" rather confusing  (yup, no better suggestion yet 🙃).
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2025-06-06T09:16:54Z
+
+> Good call 👍I would make "token" or "jwt" part of the command name though as I find "oidc:generate" rather confusing (yup, no better suggestion yet 🙃).
+
+Sure! Not more inspired than you, I renamed it to `oidc-token:generate` :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-06-11T16:45:17Z
+
+Maybe `security:oidc:generate-token` would be more future-proof?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-11T17:11:17Z
+
+I like the `security:oidc:generate-token` name suggested by @chalasr as it makes it possible to add more commands related to `oidc` in the future even for other purposes.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2025-06-16T19:49:13Z
+
+> I like the `security:oidc:generate-token` name suggested by @chalasr as it makes it possible to add more commands related to `oidc` in the future even for other purposes.
+
+OK, let's go with `security:oidc:generate-token` :rocket:

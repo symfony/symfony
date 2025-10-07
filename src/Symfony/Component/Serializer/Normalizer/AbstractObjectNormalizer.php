@@ -611,6 +611,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 if (!$isUnionType && !$isNullable) {
                     throw $e;
                 }
+                $expectedTypes[LegacyType::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
             } catch (ExtraAttributesException $e) {
                 if (!$isUnionType && !$isNullable) {
                     throw $e;

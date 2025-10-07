@@ -43,6 +43,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
@@ -324,6 +325,22 @@ class ObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(DummyWithNullableConstructorObject::class, $obj);
         $this->assertEquals(10, $obj->getId());
         $this->assertNull($obj->getInner());
+    }
+
+    public function testConstructorWithNotMatchingUnionTypes()
+    {
+        $data = [
+            'value' => 'string',
+            'value2' => 'string',
+        ];
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor([], [new ReflectionExtractor()]));
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "float", "int" ("string" given).');
+
+        $normalizer->denormalize($data, DummyWithUnion::class, 'xml', [
+            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        ]);
     }
 
     public function testConstructorWithUnknownObjectTypeHintDenormalize()

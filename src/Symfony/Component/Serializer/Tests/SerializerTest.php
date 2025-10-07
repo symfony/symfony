@@ -810,54 +810,6 @@ class SerializerTest extends TestCase
         $this->assertSame('123', $obj->foo);
     }
 
-    public function testCollectDenormalizationErrorsWithUnionConstructorTypesInXML()
-    {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?><DummyWithUnion><value>string</value><value2>string</value2></DummyWithUnion>';
-
-        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
-        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
-        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
-        $serializer = new Serializer(
-            [new ObjectNormalizer($classMetadataFactory, $nameConverter, null, $extractor)],
-            ['xml' => new XmlEncoder()]
-        );
-
-        try {
-            $serializer->deserialize(
-                $xml,
-                DummyWithUnion::class,
-                'xml',
-                [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]
-            );
-
-            $this->fail();
-        } catch (\Throwable $th) {
-            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
-        }
-
-        $exceptionsAsArray = array_map(fn (NotNormalizableValueException $e): array => [
-            'currentType' => $e->getCurrentType(),
-            'expectedTypes' => $e->getExpectedTypes(),
-            'path' => $e->getPath(),
-            'useMessageForUser' => $e->canUseMessageForUser(),
-            'message' => $e->getMessage(),
-        ], $th->getErrors());
-
-        $expected = [
-            [
-                'currentType' => 'string',
-                'expectedTypes' => [
-                    'float', 'int',
-                ],
-                'path' => 'value',
-                'useMessageForUser' => false,
-                'message' => 'The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "float", "int" ("string" given).',
-            ],
-        ];
-
-        $this->assertSame($expected, $exceptionsAsArray);
-    }
-
     public function testUnionTypeDeserializable()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-07T08:05:20Z
+
+Update: I also added better support for bool arguments: using `ConfirmationQuestion` instead.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-07T09:45:41Z
+
+Other tests skip hidden questions on Windows, so I did the same to make these pass.
+
+Failure: https://github.com/symfony/symfony/actions/runs/18308113247/job/52130086124?pr=61978#step:7:1384
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-08T09:00:58Z
+
+rebased after https://github.com/symfony/symfony/pull/62004

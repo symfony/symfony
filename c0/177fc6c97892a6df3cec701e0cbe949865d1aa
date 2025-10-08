@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-08T08:16:42Z
+
+Hi @xabbuh, I did the same here https://github.com/symfony/symfony/pull/61978 but for the whole test case. Do you think that's okay, or do you still prefer splitting the test case into two?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-10-08T08:29:07Z
+
+I guess it might be good to still test what we can test on Windows too especially given that CLI stuff is always a bit tricky when it comes to different OS.

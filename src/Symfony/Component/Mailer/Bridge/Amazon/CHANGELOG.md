@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+___
+* Add support to change port for ses `ses+smtp`
+* Default remains 465
+
 6.1
 ---
 

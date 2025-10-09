@@ -38,10 +38,10 @@ class SesSmtpTransportTest extends TestCase
         $transport = new SesSmtpTransport('user', 'pass', 'eu-west-1', null, null, 'default');
 
         $stream = $transport->getStream();
-        $this->assertEqual(465, $stream->getPort());
+        $this->assertEquals(465, $stream->getPort());
 
         $transport = new SesSmtpTransport('user', 'pass', 'eu-west-1', null, null, 'default', 2465);
         $stream = $transport->getStream();
-        $this->assertEqual(2465, $stream->getPort());
+        $this->assertEquals(2465, $stream->getPort());
     }
 }

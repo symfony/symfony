@@ -32,4 +32,16 @@ class SesSmtpTransportTest extends TestCase
         $this->assertTrue($email->getHeaders()->has('X-SES-MESSAGE-TAGS'));
         $this->assertSame('X-SES-MESSAGE-TAGS: tagName1=tag Value1, tagName2=tag Value2', $email->getHeaders()->get('X-SES-MESSAGE-TAGS')->toString());
     }
+
+    public function testCustomPortSelection()
+    {
+        $transport = new SesSmtpTransport('user', 'pass', 'eu-west-1', null, null, 'default');
+
+        $stream = $transport->getStream();
+        $this->assertEqual(465, $stream->getPort());
+
+        $transport = new SesSmtpTransport('user', 'pass', 'eu-west-1', null, null, 'default', 2465);
+        $stream = $transport->getStream();
+        $this->assertEqual(2465, $stream->getPort());
+    }
 }

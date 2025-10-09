@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-08-21T14:32:37Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-10-06T14:47:21Z
+
+Great, the new app helpers are cool! I stumbled across 2 things while testing:
+
+- PHPStorm isn't able to find the classes like `ServicesConfig`. It works, the container is compiled, but PHPStorm does no autocompletion and thinks the class doesn't exist. Is something possible to improve discoverability?
+- `../src` is hard-coded in `AppServicesConfig`. When I tried to use it in my config file located in `config/packages/my_config.php`, I have the error `The file "../src" does not exist`. Should we warn, somewhere, that this class must only be used in a file located at the root of configs?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-06T14:53:10Z
+
+Thanks for experimenting with this. I updated to use `'%kernel.project_dir%/src` instead of `../src`.
+For the discovery of the class, I don't have the issue. Not sure how you're testing though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-07T14:42:16Z
+
+I removed AppServicesConfig and AppRoutesConfig: it brings other DX issues. We can add them in a separate PR later.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-10-08T06:50:39Z
+
+For the record, this issue: https://youtrack.jetbrains.com/issue/WI-81098/Comment-added-after-nested-int-range-declaration-in-PhpDocs-array-shape-breaks-parsing is required to have the full autocomplete. Currently, this breaks on FrameworkBundle config for example where highlight stops at workflow's transitions weight.
+
+<img width="912" height="464" alt="Capture d’écran 2025-10-08 à 08 50 29" src="https://github.com/user-attachments/assets/3f5e6fca-2e02-4774-8a02-48a948daef79" />

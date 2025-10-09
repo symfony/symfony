@@ -21,7 +21,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 abstract class AbstractPipes implements PipesInterface
 {
     public array $pipes = [];
-
+    private bool $stdinClosed = false;
     private string $inputBuffer = '';
     /** @var resource|string|\Iterator */
     private $input;
@@ -48,6 +48,31 @@ abstract class AbstractPipes implements PipesInterface
             }
         }
         $this->pipes = [];
+    }
+
+    /**
+     * Closes STDIN idempotently and clears input buffers (does not consume iterators).
+     */
+    public function closeStdin(): void
+    {
+        if ($this->stdinClosed) {
+            return;
+        }
+        $this->stdinClosed = true;
+
+        if (isset($this->pipes[0])) {
+            @fclose($this->pipes[0]);
+            unset($this->pipes[0]);
+        }
+
+        $this->inputBuffer = '';
+
+        if ($this->input instanceof \Symfony\Component\Process\InputStream) {
+            $this->input->close();
+        }
+
+        // Do not consume iterators; just drop the reference
+        $this->input = null;
     }
 
     /**
@@ -135,7 +160,11 @@ abstract class AbstractPipes implements PipesInterface
 
         foreach ($w as $stdin) {
             if (isset($this->inputBuffer[0])) {
-                $written = fwrite($stdin, $this->inputBuffer);
+                $written = @fwrite($stdin, $this->inputBuffer);
+                if (false === $written) {
+                    $this->closeStdin();
+                    return null;
+                }
                 $this->inputBuffer = substr($this->inputBuffer, $written);
                 if (isset($this->inputBuffer[0])) {
                     return [$this->pipes[0]];
@@ -148,11 +177,14 @@ abstract class AbstractPipes implements PipesInterface
                     if (!isset($data[0])) {
                         break;
                     }
-                    $written = fwrite($stdin, $data);
+                    $written = @fwrite($stdin, $data);
+                    if (false === $written) {
+                        $this->closeStdin();
+                        return null;
+                    }
                     $data = substr($data, $written);
                     if (isset($data[0])) {
                         $this->inputBuffer = $data;
-
                         return [$this->pipes[0]];
                     }
                 }
@@ -168,9 +200,7 @@ abstract class AbstractPipes implements PipesInterface
 
         // no input to read on resource, buffer is empty
         if (!isset($this->inputBuffer[0]) && !($this->input instanceof \Iterator ? $this->input->valid() : $this->input)) {
-            $this->input = null;
-            fclose($this->pipes[0]);
-            unset($this->pipes[0]);
+            $this->closeStdin();
         } elseif (!$w) {
             return [$this->pipes[0]];
         }

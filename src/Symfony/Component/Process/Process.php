@@ -1290,6 +1290,9 @@ class Process implements \IteratorAggregate
         }
         $running = $this->processInformation['running'];
 
+        if (!$running && $this->processPipes instanceof Pipes\AbstractPipes) {
+            $this->processPipes->closeStdin();
+        }
         $this->readPipes($running && $blocking, '\\' !== \DIRECTORY_SEPARATOR || !$running);
 
         if ($this->fallbackStatus && $this->isSigchildEnabled()) {

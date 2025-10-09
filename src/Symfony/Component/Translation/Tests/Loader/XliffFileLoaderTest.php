@@ -257,7 +257,7 @@ class XliffFileLoaderTest extends TestCase
         $this->assertContainsOnlyString($catalogue->all('domain1'));
 
         // target attributes
-        $this->assertEquals(['target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));
+        $this->assertEquals(['source' => 'bar', 'target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));
     }
 
     public function testLoadVersion21()
@@ -275,7 +275,7 @@ class XliffFileLoaderTest extends TestCase
         $this->assertContainsOnlyString($catalogue->all('domain1'));
 
         // target attributes
-        $this->assertEquals(['target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));
+        $this->assertEquals(['target-attributes' => ['order' => 1], 'source' => 'bar'], $catalogue->getMetadata('bar', 'domain1'));
     }
 
     public function testLoadVersion22()
@@ -293,7 +293,7 @@ class XliffFileLoaderTest extends TestCase
         $this->assertContainsOnlyString($catalogue->all('domain1'));
 
         // target attributes
-        $this->assertEquals(['target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));
+        $this->assertEquals(['target-attributes' => ['order' => 1], 'source' => 'bar'], $catalogue->getMetadata('bar', 'domain1'));
     }
 
     public function testLoadVersion2WithCatalogMeta()

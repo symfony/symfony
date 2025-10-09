@@ -96,8 +96,11 @@ class XliffFileDumper extends FileDumper
             $translation->setAttribute('id', strtr(substr(base64_encode(hash('xxh128', $source, true)), 0, 7), '/+', '._'));
             $translation->setAttribute('resname', $source);
 
+            $metadata = $messages->getMetadata($source, $domain);
+            $sourceText = $this->getSourceText($metadata, $source);
+
             $s = $translation->appendChild($dom->createElement('source'));
-            $s->appendChild($dom->createTextNode($source));
+            $s->appendChild($dom->createTextNode($sourceText));
 
             // Does the target contain characters requiring a CDATA section?
             $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);
@@ -170,11 +173,15 @@ class XliffFileDumper extends FileDumper
             $translation = $dom->createElement('unit');
             $translation->setAttribute('id', strtr(substr(base64_encode(hash('xxh128', $source, true)), 0, 7), '/+', '._'));
 
-            if (\strlen($source) <= 80) {
+            // the loader falls back to <source> for the key when there is no name attribute,
+            // so the key must stay in <source> for units that cannot carry one
+            $hasName = \strlen($source) <= 80;
+            if ($hasName) {
                 $translation->setAttribute('name', $source);
             }
 
             $metadata = $messages->getMetadata($source, $domain);
+            $sourceText = $hasName ? $this->getSourceText($metadata, $source) : $source;
 
             // Add notes section
             if ($this->hasMetadataArrayInfo('notes', $metadata) && $metadata['notes']) {
@@ -201,7 +208,7 @@ class XliffFileDumper extends FileDumper
             }
 
             $s = $segment->appendChild($dom->createElement('source'));
-            $s->appendChild($dom->createTextNode($source));
+            $s->appendChild($dom->createTextNode($sourceText));
 
             // Does the target contain characters requiring a CDATA section?
             $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);
@@ -219,6 +226,11 @@ class XliffFileDumper extends FileDumper
         }
 
         return $dom->saveXML();
+    }
+
+    private function getSourceText(?array $metadata, string $source): string
+    {
+        return \is_string($metadata['source'] ?? null) ? $metadata['source'] : $source;
     }
 
     private function hasMetadataArrayInfo(string $key, ?array $metadata = null): bool

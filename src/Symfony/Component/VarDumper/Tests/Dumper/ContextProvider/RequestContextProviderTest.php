@@ -11,15 +11,14 @@
 
 namespace Dumper\ContextProvider;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
 
-/**
- * @requires function \Symfony\Component\HttpFoundation\RequestStack::__construct
- */
+#[RequiresMethod(RequestStack::class, '__construct')]
 class RequestContextProviderTest extends TestCase
 {
     public function testGetContextOnNullRequest()

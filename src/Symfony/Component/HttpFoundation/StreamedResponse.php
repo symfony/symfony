@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * StreamedResponse represents a streamed HTTP response.
  *
- * A StreamedResponse uses a callback for its content.
+ * A StreamedResponse uses a callback or an iterable of strings for its content.
  *
  * The callback should use the standard PHP functions like echo
  * to stream the response back to the client. The flush() function
@@ -26,22 +26,42 @@ namespace Symfony\Component\HttpFoundation;
  */
 class StreamedResponse extends Response
 {
-    protected $callback;
-    protected $streamed;
-    private bool $headersSent;
+    protected ?\Closure $callback = null;
+    protected bool $streamed = false;
+
+    private bool $headersSent = false;
 
     /**
-     * @param int $status The HTTP status code (200 "OK" by default)
+     * @param callable|iterable<string>|null $callbackOrChunks
+     * @param int                            $status           The HTTP status code (200 "OK" by default)
      */
-    public function __construct(?callable $callback = null, int $status = 200, array $headers = [])
+    public function __construct(callable|iterable|null $callbackOrChunks = null, int $status = 200, array $headers = [])
     {
         parent::__construct(null, $status, $headers);
 
-        if (null !== $callback) {
-            $this->setCallback($callback);
+        if (\is_callable($callbackOrChunks)) {
+            $this->setCallback($callbackOrChunks);
+        } elseif ($callbackOrChunks) {
+            $this->setChunks($callbackOrChunks);
         }
         $this->streamed = false;
         $this->headersSent = false;
+    }
+
+    /**
+     * @param iterable<string> $chunks
+     */
+    public function setChunks(iterable $chunks): static
+    {
+        $this->callback = static function () use ($chunks): void {
+            foreach ($chunks as $chunk) {
+                echo $chunk;
+                @ob_flush();
+                flush();
+            }
+        };
+
+        return $this;
     }
 
     /**
@@ -72,13 +92,12 @@ class StreamedResponse extends Response
      *
      * @return $this
      */
-    public function sendHeaders(/* int $statusCode = null */): static
+    public function sendHeaders(?int $statusCode = null): static
     {
         if ($this->headersSent) {
             return $this;
         }
 
-        $statusCode = \func_num_args() > 0 ? func_get_arg(0) : null;
         if ($statusCode < 100 || $statusCode >= 200) {
             $this->headersSent = true;
         }

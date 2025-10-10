@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
@@ -22,9 +23,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class ExpressionVoterTest extends TestCase
 {
-    /**
-     * @dataProvider getVoteTests
-     */
+    #[DataProvider('getVoteTests')]
     public function testVoteWithTokenThatReturnsRoleNames($roles, $attributes, $expected, $tokenExpectsGetRoles = true, $expressionLanguageExpectsEvaluate = true)
     {
         $voter = new ExpressionVoter($this->createExpressionLanguage($expressionLanguageExpectsEvaluate), $this->createTrustResolver(), $this->createAuthorizationChecker());

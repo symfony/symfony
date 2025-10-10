@@ -57,11 +57,9 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
-    private MetadataFactoryInterface $metadataFactory;
-
-    public function __construct(MetadataFactoryInterface $metadataFactory)
-    {
-        $this->metadataFactory = $metadataFactory;
+    public function __construct(
+        private MetadataFactoryInterface $metadataFactory,
+    ) {
     }
 
     public function guessType(string $class, string $property): ?TypeGuess
@@ -209,7 +207,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 break;
 
             case Type::class:
-                if (\in_array($constraint->type, ['double', 'float', 'numeric', 'real'])) {
+                if (\in_array($constraint->type, ['double', 'float', 'numeric', 'real'], true)) {
                     return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
                 }
                 break;
@@ -251,7 +249,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 break;
 
             case Type::class:
-                if (\in_array($constraint->type, ['double', 'float', 'numeric', 'real'])) {
+                if (\in_array($constraint->type, ['double', 'float', 'numeric', 'real'], true)) {
                     return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
                 }
                 break;

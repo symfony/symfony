@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -27,8 +27,6 @@ use Symfony\Component\Translation\Translator;
 
 class JsonLoginAuthenticatorTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private InMemoryUserProvider $userProvider;
     private JsonLoginAuthenticator $authenticator;
 
@@ -37,9 +35,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->userProvider = new InMemoryUserProvider();
     }
 
-    /**
-     * @dataProvider provideSupportData
-     */
+    #[DataProvider('provideSupportData')]
     public function testSupport($request)
     {
         $this->setUpAuthenticator();
@@ -56,9 +52,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [$request];
     }
 
-    /**
-     * @dataProvider provideSupportsWithCheckPathData
-     */
+    #[DataProvider('provideSupportsWithCheckPathData')]
     public function testSupportsWithCheckPath($request, $result)
     {
         $this->setUpAuthenticator(['check_path' => '/api/login']);
@@ -93,15 +87,13 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
     }
 
-    /**
-     * @dataProvider provideInvalidAuthenticateData
-     */
-    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
+    #[DataProvider('provideInvalidAuthenticateData')]
+    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType = BadRequestHttpException::class)
     {
+        $this->setUpAuthenticator();
+
         $this->expectException($exceptionType);
         $this->expectExceptionMessage($errorMessage);
-
-        $this->setUpAuthenticator();
 
         $this->authenticator->authenticate($request);
     }
@@ -118,33 +110,20 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [$request, 'The key "password" must be provided'];
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": 1, "password": "foo"}');
-        yield [$request, 'The key "username" must be a string.'];
+        yield [$request, 'The key "username" must be a non-empty string.'];
+
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "", "password": "foo"}');
+        yield [$request, 'The key "username" must be a non-empty string.'];
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": 1}');
-        yield [$request, 'The key "password" must be a string.'];
+        yield [$request, 'The key "password" must be a non-empty string.'];
+
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": ""}');
+        yield [$request, 'The key "password" must be a non-empty string.'];
 
         $username = str_repeat('x', UserBadge::MAX_USERNAME_LENGTH + 1);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], \sprintf('{"username": "%s", "password": "foo"}', $username));
         yield [$request, 'Username too long.', BadCredentialsException::class];
-    }
-
-    /**
-     * @dataProvider provideEmptyAuthenticateData
-     *
-     * @group legacy
-     */
-    public function testAuthenticationForEmptyCredentialDeprecation($request)
-    {
-        $this->expectDeprecation('Since symfony/security 6.2: Passing an empty string as username or password parameter is deprecated.');
-        $this->setUpAuthenticator();
-
-        $this->authenticator->authenticate($request);
-    }
-
-    public static function provideEmptyAuthenticateData()
-    {
-        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "", "password": "notempty"}');
-        yield [$request];
     }
 
     public function testAuthenticationFailureWithoutTranslator()

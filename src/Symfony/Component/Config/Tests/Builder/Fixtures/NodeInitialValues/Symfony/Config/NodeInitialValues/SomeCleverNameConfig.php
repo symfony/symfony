@@ -54,28 +54,35 @@ class SomeCleverNameConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     first?: scalar|null,
+     *     second?: scalar|null,
+     *     third?: scalar|null,
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('first', $value)) {
+        if (array_key_exists('first', $config)) {
             $this->_usedProperties['first'] = true;
-            $this->first = $value['first'];
-            unset($value['first']);
+            $this->first = $config['first'];
+            unset($config['first']);
         }
 
-        if (array_key_exists('second', $value)) {
+        if (array_key_exists('second', $config)) {
             $this->_usedProperties['second'] = true;
-            $this->second = $value['second'];
-            unset($value['second']);
+            $this->second = $config['second'];
+            unset($config['second']);
         }
 
-        if (array_key_exists('third', $value)) {
+        if (array_key_exists('third', $config)) {
             $this->_usedProperties['third'] = true;
-            $this->third = $value['third'];
-            unset($value['third']);
+            $this->third = $config['third'];
+            unset($config['third']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

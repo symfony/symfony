@@ -15,6 +15,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
@@ -40,6 +41,7 @@ Definitions
 - Autowired: no
 - Autoconfigured: no
 - Deprecated: no
+- Arguments: no
 - File: `/path/to/file`
 - Factory Service: inline factory service (`Full\Qualified\FactoryClass`)
 - Factory Method: `get`

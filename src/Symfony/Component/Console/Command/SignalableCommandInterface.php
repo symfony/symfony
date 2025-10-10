@@ -20,15 +20,17 @@ interface SignalableCommandInterface
 {
     /**
      * Returns the list of signals to subscribe.
+     *
+     * @return list<\SIG*>
+     *
+     * @see https://php.net/pcntl.constants for signals
      */
     public function getSubscribedSignals(): array;
 
     /**
      * The method will be called when the application is signaled.
      *
-     * @param int|false $previousExitCode
-     *
      * @return int|false The exit code to return or false to continue the normal execution
      */
-    public function handleSignal(int $signal/* , int|false $previousExitCode = 0 */);
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false;
 }

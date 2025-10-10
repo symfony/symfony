@@ -24,12 +24,11 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  */
 class HtmlDescriptor implements DumpDescriptorInterface
 {
-    private HtmlDumper $dumper;
     private bool $initialized = false;
 
-    public function __construct(HtmlDumper $dumper)
-    {
-        $this->dumper = $dumper;
+    public function __construct(
+        private HtmlDumper $dumper,
+    ) {
     }
 
     public function describe(OutputInterface $output, Data $data, array $context, int $clientId): void
@@ -51,7 +50,7 @@ class HtmlDescriptor implements DumpDescriptorInterface
             $title = '<code>$ </code>'.$context['cli']['command_line'];
             $dedupIdentifier = $context['cli']['identifier'];
         } else {
-            $dedupIdentifier = uniqid('', true);
+            $dedupIdentifier = bin2hex(random_bytes(4));
         }
 
         $sourceDescription = '';
@@ -71,24 +70,24 @@ class HtmlDescriptor implements DumpDescriptorInterface
         ]);
 
         $output->writeln(<<<HTML
-<article data-dedup-id="$dedupIdentifier">
-    <header>
-        <div class="row">
-            <h2 class="col">$title</h2>
-            <time class="col text-small" title="$isoDate" datetime="$isoDate">
-                {$this->extractDate($context)}
-            </time>
-        </div>
-        {$this->renderTags($tags)}
-    </header>
-    <section class="body">
-        <p class="text-small">
-            $sourceDescription
-        </p>
-        {$this->dumper->dump($data, true)}
-    </section>
-</article>
-HTML
+            <article data-dedup-id="$dedupIdentifier">
+                <header>
+                    <div class="row">
+                        <h2 class="col">$title</h2>
+                        <time class="col text-small" title="$isoDate" datetime="$isoDate">
+                            {$this->extractDate($context)}
+                        </time>
+                    </div>
+                    {$this->renderTags($tags)}
+                </header>
+                <section class="body">
+                    <p class="text-small">
+                        $sourceDescription
+                    </p>
+                    {$this->dumper->dump($data, true)}
+                </section>
+            </article>
+            HTML
         );
     }
 
@@ -109,11 +108,11 @@ HTML
         }
 
         return <<<HTML
-<div class="row">
-    <ul class="tags">
-        $renderedTags
-    </ul>
-</div>
-HTML;
+            <div class="row">
+                <ul class="tags">
+                    $renderedTags
+                </ul>
+            </div>
+            HTML;
     }
 }

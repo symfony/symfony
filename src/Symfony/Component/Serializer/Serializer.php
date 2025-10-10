@@ -23,9 +23,6 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
@@ -46,7 +43,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Serializer implements SerializerInterface, ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
+class Serializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
 {
     /**
      * Flag to control whether an empty array should be transformed to an
@@ -61,15 +58,9 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         'string' => true,
     ];
 
-    /**
-     * @var ChainEncoder
-     */
-    protected $encoder;
+    protected ChainEncoder $encoder;
 
-    /**
-     * @var ChainDecoder
-     */
-    protected $decoder;
+    protected ChainDecoder $decoder;
 
     /**
      * @var array<string, array<string, array<bool>>>
@@ -237,7 +228,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                         continue;
                     }
 
-                    $uniqueErrors[$error->getPath()] = $uniqueErrors[$error->getPath()] ?? $error;
+                    $uniqueErrors[$error->getPath()] ??= $error;
                 }
 
                 throw new PartialDenormalizationException($denormalized, array_values($uniqueErrors));
@@ -286,19 +277,6 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 
             foreach ($this->normalizers as $k => $normalizer) {
                 if (!$normalizer instanceof NormalizerInterface) {
-                    continue;
-                }
-
-                if (!method_exists($normalizer, 'getSupportedTypes')) {
-                    trigger_deprecation('symfony/serializer', '6.3', '"%s" should implement "NormalizerInterface::getSupportedTypes(?string $format): array".', $normalizer::class);
-
-                    if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
-                        $this->normalizerCache[$format ?? ''][$type][$k] = false;
-                    } elseif ($normalizer->supportsNormalization($data, $format, $context)) {
-                        $this->normalizerCache[$format ?? ''][$type][$k] = true;
-                        break;
-                    }
-
                     continue;
                 }
 
@@ -356,19 +334,6 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 
             foreach ($this->normalizers as $k => $normalizer) {
                 if (!$normalizer instanceof DenormalizerInterface) {
-                    continue;
-                }
-
-                if (!method_exists($normalizer, 'getSupportedTypes')) {
-                    trigger_deprecation('symfony/serializer', '6.3', '"%s" should implement "DenormalizerInterface::getSupportedTypes(?string $format): array".', $normalizer::class);
-
-                    if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
-                        $this->denormalizerCache[$format ?? ''][$class][$k] = false;
-                    } elseif ($normalizer->supportsDenormalization(null, $class, $format, $context)) {
-                        $this->denormalizerCache[$format ?? ''][$class][$k] = true;
-                        break;
-                    }
-
                     continue;
                 }
 

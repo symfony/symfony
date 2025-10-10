@@ -35,7 +35,6 @@ class InMemoryUserCheckerTest extends TestCase
     public function testCheckPreAuthDisabled()
     {
         $this->expectException(DisabledException::class);
-        $checker = new InMemoryUserChecker();
-        $checker->checkPreAuth(new InMemoryUser('John', 'password', [], false));
+        (new InMemoryUserChecker())->checkPreAuth(new InMemoryUser('John', 'password', [], false));
     }
 }

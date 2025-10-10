@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Bridge\Crowdin\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -68,40 +69,40 @@ class CrowdinProviderTest extends ProviderTestCase
         $this->xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_en_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_en_a</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $expectedValidatorsFileContent = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="post.num_comments">
-        <source>post.num_comments</source>
-        <target>{count, plural, one {# comment} other {# comments}}</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="post.num_comments">
+                    <source>post.num_comments</source>
+                    <target>{count, plural, one {# comment} other {# comments}}</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $responses = [
             'listFiles' => function (string $method, string $url, array $options = []): ResponseInterface {
@@ -170,22 +171,22 @@ XLIFF;
         $this->xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_en_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_en_a</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $responses = [
             'listFiles' => function (string $method, string $url, array $options = []): ResponseInterface {
@@ -241,22 +242,22 @@ XLIFF;
         $this->xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_en_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_en_a</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $responses = [
             'listFiles' => function (string $method, string $url, array $options = []): ResponseInterface {
@@ -319,40 +320,40 @@ XLIFF;
         $this->xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesTranslationsContent = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_fr_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_fr_a</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $expectedMessagesFileContent = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_en_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_en_a</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -432,26 +433,26 @@ XLIFF;
         $this->xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_en_a</target>
-      </trans-unit>
-      <trans-unit id="%s" resname="b">
-        <source>b</source>
-        <target>trans_en_b</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_en_a</target>
+                  </trans-unit>
+                  <trans-unit id="%s" resname="b">
+                    <source>b</source>
+                    <target>trans_en_b</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -504,30 +505,28 @@ XLIFF;
         $provider->write($translatorBag);
     }
 
-    /**
-     * @dataProvider getResponsesForProcessAddFileAndUploadTranslations
-     */
+    #[DataProvider('getResponsesForProcessAddFileAndUploadTranslations')]
     public function testCompleteWriteProcessAddFileAndUploadTranslations(TranslatorBag $translatorBag, string $expectedLocale, string $expectedMessagesTranslationsContent)
     {
         $this->xliffFileDumper = new XliffFileDumper();
 
         $expectedMessagesFileContent = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_en_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_en_a</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -628,22 +627,22 @@ XLIFF;
         ], 'fr'));
 
         yield [$translatorBagFr, 'fr', <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_fr_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_fr_a</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF
+            XLIFF
         ];
 
         $translatorBagPt = new TranslatorBag();
@@ -655,22 +654,22 @@ XLIFF
         ], 'pt'));
 
         yield [$translatorBagPt, 'pt-PT', <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="pt" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_pt_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="pt" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_pt_a</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF
+            XLIFF
         ];
 
         $translatorBagEnGb = new TranslatorBag();
@@ -682,28 +681,26 @@ XLIFF
         ], 'en_GB'));
 
         yield [$translatorBagEnGb, 'en-GB', <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="en-GB" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="a">
-        <source>a</source>
-        <target>trans_en_gb_a</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="en-GB" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="a">
+                    <source>a</source>
+                    <target>trans_en_gb_a</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF
+            XLIFF
         ];
     }
 
-    /**
-     * @dataProvider getResponsesForOneLocaleAndOneDomain
-     */
+    #[DataProvider('getResponsesForOneLocaleAndOneDomain')]
     public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag, string $expectedTargetLanguageId)
     {
         $responses = [
@@ -775,26 +772,25 @@ XLIFF
         ], 'fr'));
 
         yield ['fr', 'messages', <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="fr" datatype="database" tool-id="crowdin">
-    <header>
-      <tool tool-id="crowdin" tool-name="Crowdin" tool-version="1.0.25 20201211-1" tool-company="Crowdin"/>
-    </header>
-    <body>
-      <trans-unit id="crowdin:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
-        <source>index.hello</source>
-        <target state="translated">Bonjour</target>
-      </trans-unit>
-      <trans-unit id="crowdin:5fd89b8542e5aa5cc27457e2" resname="index.greetings" datatype="plaintext" extradata="crowdin:format=icu">
-        <source>index.greetings</source>
-        <target state="translated">Bienvenue, {firstname} !</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-            ,
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="fr" datatype="database" tool-id="crowdin">
+                <header>
+                  <tool tool-id="crowdin" tool-name="Crowdin" tool-version="1.0.25 20201211-1" tool-company="Crowdin"/>
+                </header>
+                <body>
+                  <trans-unit id="crowdin:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+                    <source>index.hello</source>
+                    <target state="translated">Bonjour</target>
+                  </trans-unit>
+                  <trans-unit id="crowdin:5fd89b8542e5aa5cc27457e2" resname="index.greetings" datatype="plaintext" extradata="crowdin:format=icu">
+                    <source>index.greetings</source>
+                    <target state="translated">Bienvenue, {firstname} !</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
+            XLIFF,
             $expectedTranslatorBagFr, 'fr',
         ];
 
@@ -805,33 +801,30 @@ XLIFF
         ], 'en_GB'));
 
         yield ['en_GB', 'messages', <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="en_GB" datatype="database" tool-id="crowdin">
-    <header>
-      <tool tool-id="crowdin" tool-name="Crowdin" tool-version="1.0.25 20201211-1" tool-company="Crowdin"/>
-    </header>
-    <body>
-      <trans-unit id="crowdin:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
-        <source>index.hello</source>
-        <target state="translated">Hello</target>
-      </trans-unit>
-      <trans-unit id="crowdin:5fd89b8542e5aa5cc27457e2" resname="index.greetings" datatype="plaintext" extradata="crowdin:format=icu">
-        <source>index.greetings</source>
-        <target state="translated">Welcome, {firstname}!</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-            ,
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="en_GB" datatype="database" tool-id="crowdin">
+                <header>
+                  <tool tool-id="crowdin" tool-name="Crowdin" tool-version="1.0.25 20201211-1" tool-company="Crowdin"/>
+                </header>
+                <body>
+                  <trans-unit id="crowdin:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+                    <source>index.hello</source>
+                    <target state="translated">Hello</target>
+                  </trans-unit>
+                  <trans-unit id="crowdin:5fd89b8542e5aa5cc27457e2" resname="index.greetings" datatype="plaintext" extradata="crowdin:format=icu">
+                    <source>index.greetings</source>
+                    <target state="translated">Welcome, {firstname}!</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
+            XLIFF,
             $expectedTranslatorBagEnUs, 'en-GB',
         ];
     }
 
-    /**
-     * @dataProvider getResponsesForDefaultLocaleAndOneDomain
-     */
+    #[DataProvider('getResponsesForDefaultLocaleAndOneDomain')]
     public function testReadForDefaultLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
     {
         $responses = [
@@ -902,26 +895,25 @@ XLIFF
         ], 'en', 'messages'));
 
         yield ['en', 'messages', <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" target-language="fr" datatype="plaintext" tool-id="crowdin">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="crowdin:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
-        <source>index.hello</source>
-        <target state="translated">Hello</target>
-      </trans-unit>
-      <trans-unit id="crowdin:5fd89b8542e5aa5cc27457e2" resname="index.greetings" datatype="plaintext" extradata="crowdin:format=icu">
-        <source>index.greetings</source>
-        <target state="translated">Welcome, {firstname} !</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-            ,
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" target-language="fr" datatype="plaintext" tool-id="crowdin">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="crowdin:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+                    <source>index.hello</source>
+                    <target state="translated">Hello</target>
+                  </trans-unit>
+                  <trans-unit id="crowdin:5fd89b8542e5aa5cc27457e2" resname="index.greetings" datatype="plaintext" extradata="crowdin:format=icu">
+                    <source>index.greetings</source>
+                    <target state="translated">Welcome, {firstname} !</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
+            XLIFF,
             $expectedTranslatorBagEn,
         ];
     }

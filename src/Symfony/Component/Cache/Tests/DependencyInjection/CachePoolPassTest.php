@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -52,7 +53,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('z3X945Jbf5', $cachePool->getArgument(0));
+        $this->assertSame('cKLcR15Llk', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsSeededWithAdapterClassName()
@@ -73,7 +74,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('xmOJ8gqF-Y', $cachePool->getArgument(0));
+        $this->assertSame('mVXLns1cYU', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsSeededWithAdapterClassNameWithoutAffectingOtherCachePools()
@@ -100,12 +101,10 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('xmOJ8gqF-Y', $cachePool->getArgument(0));
+        $this->assertSame('mVXLns1cYU', $cachePool->getArgument(0));
     }
 
-    /**
-     * @dataProvider providerAdaptersNotNamespace
-     */
+    #[DataProvider('providerAdaptersNotNamespace')]
     public function testNamespaceArgumentIsNotReplacedIfAdapterWithoutNamespace(string $adapterClass)
     {
         $container = new ContainerBuilder();
@@ -149,7 +148,7 @@ class CachePoolPassTest extends TestCase
 
         $this->assertInstanceOf(Reference::class, $cachePool->getArgument(0));
         $this->assertSame('foobar', (string) $cachePool->getArgument(0));
-        $this->assertSame('6Ridbw4aMn', $cachePool->getArgument(1));
+        $this->assertSame('ZmalVIjCbI', $cachePool->getArgument(1));
         $this->assertSame(3, $cachePool->getArgument(2));
     }
 
@@ -170,7 +169,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('PeXBWSl6ca', $cachePool->getArgument(1));
+        $this->assertSame('5SvqAqqNBH', $cachePool->getArgument(1));
     }
 
     public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes()

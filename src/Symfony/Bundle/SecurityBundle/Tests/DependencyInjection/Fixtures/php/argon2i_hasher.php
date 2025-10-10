@@ -1,6 +1,6 @@
 <?php
 
-$this->load('container1.php');
+$loader->load('container1.php');
 
 $container->loadFromExtension('security', [
     'password_hashers' => [

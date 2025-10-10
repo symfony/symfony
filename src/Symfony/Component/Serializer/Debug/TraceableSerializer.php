@@ -14,7 +14,6 @@ namespace Symfony\Component\Serializer\Debug;
 use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -33,15 +32,13 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     public function __construct(
         private SerializerInterface&NormalizerInterface&DenormalizerInterface&EncoderInterface&DecoderInterface $serializer,
         private SerializerDataCollector $dataCollector,
+        private readonly string $serializerName = 'default',
     ) {
-        if (!method_exists($serializer, 'getSupportedTypes')) {
-            trigger_deprecation('symfony/serializer', '6.3', 'Not implementing the "NormalizerInterface::getSupportedTypes()" in "%s" is deprecated.', get_debug_type($serializer));
-        }
     }
 
     public function serialize(mixed $data, string $format, array $context = []): string
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->serialize($data, $format, $context);
@@ -49,14 +46,14 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, SerializerInterface::class);
 
-        $this->dataCollector->collectSerialize($traceId, $data, $format, $context, $time, $caller);
+        $this->dataCollector->collectSerialize($traceId, $data, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
     public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->deserialize($data, $type, $format, $context);
@@ -64,29 +61,29 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, SerializerInterface::class);
 
-        $this->dataCollector->collectDeserialize($traceId, $data, $type, $format, $context, $time, $caller);
+        $this->dataCollector->collectDeserialize($traceId, $data, $type, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
-        $result = $this->serializer->normalize($object, $format, $context);
+        $result = $this->serializer->normalize($data, $format, $context);
         $time = microtime(true) - $startTime;
 
         $caller = $this->getCaller(__FUNCTION__, NormalizerInterface::class);
 
-        $this->dataCollector->collectNormalize($traceId, $object, $format, $context, $time, $caller);
+        $this->dataCollector->collectNormalize($traceId, $data, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->denormalize($data, $type, $format, $context);
@@ -94,14 +91,14 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, DenormalizerInterface::class);
 
-        $this->dataCollector->collectDenormalize($traceId, $data, $type, $format, $context, $time, $caller);
+        $this->dataCollector->collectDenormalize($traceId, $data, $type, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
     public function encode(mixed $data, string $format, array $context = []): string
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->encode($data, $format, $context);
@@ -109,14 +106,14 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, EncoderInterface::class);
 
-        $this->dataCollector->collectEncode($traceId, $data, $format, $context, $time, $caller);
+        $this->dataCollector->collectEncode($traceId, $data, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
     public function decode(string $data, string $format, array $context = []): mixed
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid('', true);
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->decode($data, $format, $context);
@@ -124,18 +121,13 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, DecoderInterface::class);
 
-        $this->dataCollector->collectDecode($traceId, $data, $format, $context, $time, $caller);
+        $this->dataCollector->collectDecode($traceId, $data, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
     public function getSupportedTypes(?string $format): array
     {
-        // @deprecated remove condition in 7.0
-        if (!method_exists($this->serializer, 'getSupportedTypes')) {
-            return ['*' => $this->serializer instanceof CacheableSupportsMethodInterface && $this->serializer->hasCacheableSupportsMethod()];
-        }
-
         return $this->serializer->getSupportedTypes($format);
     }
 

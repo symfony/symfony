@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -19,15 +20,13 @@ use Symfony\Component\Console\Input\StringInput;
 
 class StringInputTest extends TestCase
 {
-    /**
-     * @dataProvider getTokenizeData
-     */
+    #[DataProvider('getTokenizeData')]
     public function testTokenize($input, $tokens, $message)
     {
         $input = new StringInput($input);
         $r = new \ReflectionClass(ArgvInput::class);
         $p = $r->getProperty('tokens');
-        $this->assertEquals($tokens, $p->getValue($input), $message);
+        $this->assertSame($tokens, $p->getValue($input), $message);
     }
 
     public function testInputOptionWithGivenString()
@@ -39,7 +38,7 @@ class StringInputTest extends TestCase
         // call to bind
         $input = new StringInput('--foo=bar');
         $input->bind($definition);
-        $this->assertEquals('bar', $input->getOption('foo'));
+        $this->assertSame('bar', $input->getOption('foo'));
     }
 
     public static function getTokenizeData()
@@ -77,12 +76,12 @@ class StringInputTest extends TestCase
     public function testToString()
     {
         $input = new StringInput('-f foo');
-        $this->assertEquals('-f foo', (string) $input);
+        $this->assertSame('-f foo', (string) $input);
 
         $input = new StringInput('-f --bar=foo "a b c d"');
-        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d'), (string) $input);
+        $this->assertSame('-f --bar=foo '.escapeshellarg('a b c d'), (string) $input);
 
         $input = new StringInput('-f --bar=foo \'a b c d\' '."'A\nB\\'C'");
-        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d').' '.escapeshellarg("A\nB'C"), (string) $input);
+        $this->assertSame('-f --bar=foo '.escapeshellarg('a b c d').' '.escapeshellarg("A\nB'C"), (string) $input);
     }
 }

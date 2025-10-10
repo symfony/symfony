@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,10 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class LdapFactory implements UserProviderFactoryInterface
 {
-    /**
-     * @return void
-     */
-    public function create(ContainerBuilder $container, string $id, array $config)
+    public function create(ContainerBuilder $container, string $id, array $config): void
     {
         $container
             ->setDefinition($id, new ChildDefinition('security.user.provider.ldap'))
@@ -35,7 +33,7 @@ class LdapFactory implements UserProviderFactoryInterface
             ->replaceArgument(1, $config['base_dn'])
             ->replaceArgument(2, $config['search_dn'])
             ->replaceArgument(3, $config['search_password'])
-            ->replaceArgument(4, $config['default_roles'])
+            ->replaceArgument(4, $config['role_fetcher'] ? new Reference($config['role_fetcher']) : $config['default_roles'])
             ->replaceArgument(5, $config['uid_key'])
             ->replaceArgument(6, $config['filter'])
             ->replaceArgument(7, $config['password_attribute'])
@@ -43,37 +41,33 @@ class LdapFactory implements UserProviderFactoryInterface
         ;
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return 'ldap';
     }
 
     /**
-     * @return void
+     * @param ArrayNodeDefinition $node
      */
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
-            ->fixXmlConfig('extra_field')
-            ->fixXmlConfig('default_role')
             ->children()
                 ->scalarNode('service')->isRequired()->cannotBeEmpty()->defaultValue('ldap')->end()
                 ->scalarNode('base_dn')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('search_dn')->defaultNull()->end()
                 ->scalarNode('search_password')->defaultNull()->end()
-                ->arrayNode('extra_fields')
+                ->arrayNode('extra_fields', 'extra_field')
                     ->prototype('scalar')->end()
                 ->end()
-                ->arrayNode('default_roles')
-                    ->beforeNormalization()->ifString()->then(fn ($v) => preg_split('/\s*,\s*/', $v))->end()
+                ->arrayNode('default_roles', 'default_role')
+                    ->beforeNormalization()->ifString()->then(static fn ($v) => preg_split('/\s*,\s*/', $v))->end()
                     ->requiresAtLeastOneElement()
                     ->prototype('scalar')->end()
                 ->end()
+                ->scalarNode('role_fetcher')->defaultNull()->end()
                 ->scalarNode('uid_key')->defaultValue('sAMAccountName')->end()
-                ->scalarNode('filter')->defaultValue('({uid_key}={username})')->end()
+                ->scalarNode('filter')->defaultValue('({uid_key}={user_identifier})')->end()
                 ->scalarNode('password_attribute')->defaultNull()->end()
             ->end()
         ;

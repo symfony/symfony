@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\RateLimiter\Tests\Policy;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
@@ -20,9 +22,7 @@ use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
 use Symfony\Component\RateLimiter\Util\TimeUtil;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class FixedWindowLimiterTest extends TestCase
 {
     private InMemoryStorage $storage;
@@ -57,9 +57,7 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertEquals($retryAfter, $rateLimit->getRetryAfter());
     }
 
-    /**
-     * @dataProvider provideConsumeOutsideInterval
-     */
+    #[DataProvider('provideConsumeOutsideInterval')]
     public function testConsumeOutsideInterval(string $dateIntervalString)
     {
         $limiter = $this->createLimiter($dateIntervalString);

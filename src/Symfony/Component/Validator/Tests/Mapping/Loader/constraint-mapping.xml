@@ -27,8 +27,10 @@
     <constraint name="Callback">validateMeStatic</constraint>
 
     <constraint name="Callback">
-        <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
-        <value>callback</value>
+        <option name="callback">
+            <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+            <value>callback</value>
+        </option>
     </constraint>
 
     <!-- Traverse with boolean default option -->
@@ -43,8 +45,10 @@
 
     <!-- Constraint with named arguments support with array value -->
     <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments">
-      <value>foo</value>
-      <value>bar</value>
+      <option name="choices">
+        <value>foo</value>
+        <value>bar</value>
+      </option>
     </constraint>
 
     <!-- Constraint with named arguments support with exactly one group -->
@@ -59,24 +63,14 @@
       <!-- Constraint without value -->
       <constraint name="NotNull" />
 
-      <!-- Constraint with single value -->
-      <constraint name="Range">
-         <option name="min">3</option>
-      </constraint>
-
-      <!-- Constraint with multiple values -->
-      <constraint name="Choice">
-        <value>A</value>
-        <value>B</value>
-      </constraint>
-
       <!-- Constraint with child constraints -->
       <constraint name="All">
-        <constraint name="NotNull" />
-        <constraint name="Range">
-           <option name="min">3</option>
-        </constraint>
-
+        <option name="constraints">
+          <constraint name="NotNull" />
+          <constraint name="Range">
+            <option name="min">3</option>
+          </constraint>
+        </option>
       </constraint>
 
       <!-- Option with child constraints -->

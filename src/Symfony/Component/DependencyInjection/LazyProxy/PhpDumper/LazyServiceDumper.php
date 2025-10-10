@@ -56,9 +56,21 @@ final class LazyServiceDumper implements DumperInterface
             }
         }
 
+        if (\PHP_VERSION_ID < 80400) {
+            try {
+                $asGhostObject = (bool) ProxyHelper::generateLazyGhost(new \ReflectionClass($class));
+            } catch (LogicException) {
+            }
+
+            return true;
+        }
+
         try {
-            $asGhostObject = (bool) ProxyHelper::generateLazyGhost(new \ReflectionClass($class));
-        } catch (LogicException) {
+            $asGhostObject = (bool) (new \ReflectionClass($class))->newLazyGhost(static fn () => null);
+        } catch (\Error $e) {
+            if (__FILE__ !== $e->getFile()) {
+                throw $e;
+            }
         }
 
         return true;
@@ -69,31 +81,53 @@ final class LazyServiceDumper implements DumperInterface
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= \sprintf(' $container->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
+            $instantiation .= \sprintf(' $container->%s[%s] =', $definition->isPublic() ? 'services' : 'privates', var_export($id, true));
         }
 
         $asGhostObject = str_contains($factoryCode, '$proxy');
         $proxyClass = $this->getProxyClass($definition, $asGhostObject);
 
         if (!$asGhostObject) {
+            if ($definition->getClass() === $proxyClass) {
+                return <<<EOF
+                            if (true === \$lazyLoad) {
+                                $instantiation new \ReflectionClass('$proxyClass')->newLazyProxy(static fn () => $factoryCode);
+                            }
+
+
+                    EOF;
+            }
+
             return <<<EOF
+                        if (true === \$lazyLoad) {
+                            $instantiation \$container->createProxy('$proxyClass', static fn () => \\$proxyClass::createLazyProxy(static fn () => $factoryCode));
+                        }
+
+
+                EOF;
+        }
+
+        if (\PHP_VERSION_ID < 80400) {
+            $factoryCode = \sprintf('static fn ($proxy) => %s', $factoryCode);
+
+            return <<<EOF
+                        if (true === \$lazyLoad) {
+                            $instantiation \$container->createProxy('$proxyClass', static fn () => \\$proxyClass::createLazyGhost($factoryCode));
+                        }
+
+
+                EOF;
+        }
+
+        $factoryCode = \sprintf('static function ($proxy) use ($container) { %s; }', $factoryCode);
+
+        return <<<EOF
                     if (true === \$lazyLoad) {
-                        $instantiation \$container->createProxy('$proxyClass', static fn () => \\$proxyClass::createLazyProxy(static fn () => $factoryCode));
+                        $instantiation new \ReflectionClass('$proxyClass')->newLazyGhost($factoryCode);
                     }
 
 
             EOF;
-        }
-
-        $factoryCode = \sprintf('static fn ($proxy) => %s', $factoryCode);
-
-        return <<<EOF
-                if (true === \$lazyLoad) {
-                    $instantiation \$container->createProxy('$proxyClass', static fn () => \\$proxyClass::createLazyGhost($factoryCode));
-                }
-
-
-        EOF;
     }
 
     public function getProxyCode(Definition $definition, ?string $id = null): string
@@ -104,12 +138,21 @@ final class LazyServiceDumper implements DumperInterface
         $proxyClass = $this->getProxyClass($definition, $asGhostObject, $class);
 
         if ($asGhostObject) {
+            if (\PHP_VERSION_ID >= 80400) {
+                return '';
+            }
+
             try {
-                return (\PHP_VERSION_ID >= 80200 && $class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
+                return ($class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
             } catch (LogicException $e) {
                 throw new InvalidArgumentException(\sprintf('Cannot generate lazy ghost for service "%s".', $id ?? $definition->getClass()), 0, $e);
             }
         }
+
+        if ($definition->getClass() === $proxyClass) {
+            return '';
+        }
+
         $interfaces = [];
 
         if ($definition->hasTag('proxy')) {
@@ -133,7 +176,7 @@ final class LazyServiceDumper implements DumperInterface
         }
 
         try {
-            return (\PHP_VERSION_ID >= 80200 && $class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyProxy($class, $interfaces);
+            return ($class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyProxy($class, $interfaces);
         } catch (LogicException $e) {
             throw new InvalidArgumentException(\sprintf('Cannot generate lazy proxy for service "%s".', $id ?? $definition->getClass()), 0, $e);
         }
@@ -144,8 +187,28 @@ final class LazyServiceDumper implements DumperInterface
         $class = 'object' !== $definition->getClass() ? $definition->getClass() : 'stdClass';
         $class = new \ReflectionClass($class);
 
-        return preg_replace('/^.*\\\\/', '', $definition->getClass())
-            .($asGhostObject ? 'Ghost' : 'Proxy')
-            .ucfirst(substr(hash('sha256', $this->salt.'+'.$class->name.'+'.serialize($definition->getTag('proxy'))), -7));
+        if (\PHP_VERSION_ID < 80400) {
+            return preg_replace('/^.*\\\\/', '', $definition->getClass())
+                .($asGhostObject ? 'Ghost' : 'Proxy')
+                .ucfirst(substr(hash('xxh128', $this->salt.'+'.$class->name.'+'.serialize($definition->getTag('proxy'))), -7));
+        }
+
+        if ($asGhostObject) {
+            return $class->name;
+        }
+
+        if (!$definition->hasTag('proxy') && !$class->isAbstract()) {
+            $parent = $class;
+            do {
+                $extendsInternalClass = $parent->isInternal();
+            } while (!$extendsInternalClass && $parent = $parent->getParentClass());
+
+            if (!$extendsInternalClass) {
+                return $class->name;
+            }
+        }
+
+        return preg_replace('/^.*\\\\/', '', $definition->getClass()).'Proxy'
+            .ucfirst(substr(hash('xxh128', $this->salt.'+'.$class->name.'+'.serialize($definition->getTag('proxy'))), -7));
     }
 }

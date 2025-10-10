@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Violation;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 /**
  * Builds {@link \Symfony\Component\Validator\ConstraintViolationInterface}
  * objects.
@@ -20,8 +22,6 @@ namespace Symfony\Component\Validator\Violation;
  * execution context.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @method $this disableTranslation()
  */
 interface ConstraintViolationBuilderInterface
 {
@@ -59,6 +59,11 @@ interface ConstraintViolationBuilderInterface
     public function setParameters(array $parameters): static;
 
     /**
+     * @return $this
+     */
+    public function disableTranslation(): static;
+
+    /**
      * Sets the translation domain which should be used for translating the
      * violation message.
      *
@@ -66,7 +71,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      *
-     * @see \Symfony\Contracts\Translation\TranslatorInterface
+     * @see TranslatorInterface
      */
     public function setTranslationDomain(string $translationDomain): static;
 
@@ -109,8 +114,6 @@ interface ConstraintViolationBuilderInterface
 
     /**
      * Adds the violation to the current execution context.
-     *
-     * @return void
      */
-    public function addViolation();
+    public function addViolation(): void;
 }

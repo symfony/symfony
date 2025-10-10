@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
+use Symfony\Component\Security\Core\Authentication\Token\OfflineTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
@@ -43,9 +45,7 @@ class AuthorizationCheckerTest extends TestCase
         $authorizationChecker->isGranted('ROLE_FOO');
     }
 
-    /**
-     * @dataProvider isGrantedProvider
-     */
+    #[DataProvider('isGrantedProvider')]
     public function testIsGranted($decide)
     {
         $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
@@ -76,5 +76,41 @@ class AuthorizationCheckerTest extends TestCase
             ->willReturn(true);
         $this->tokenStorage->setToken($token);
         $this->assertTrue($this->authorizationChecker->isGranted($attribute));
+    }
+
+    #[DataProvider('isGrantedForUserProvider')]
+    public function testIsGrantedForUser(bool $decide, array $roles)
+    {
+        $user = new InMemoryUser('username', 'password', $roles);
+
+        $this->accessDecisionManager
+            ->expects($this->once())
+            ->method('decide')
+            ->with($this->callback(static fn (OfflineTokenInterface $token) => $token->getUser() === $user), ['ROLE_FOO'])
+            ->willReturn($decide);
+
+        $this->assertSame($decide, $this->authorizationChecker->isGrantedForUser($user, 'ROLE_FOO'));
+    }
+
+    public static function isGrantedForUserProvider(): array
+    {
+        return [
+            [false, ['ROLE_USER']],
+            [true, ['ROLE_USER', 'ROLE_FOO']],
+        ];
+    }
+
+    public function testIsGrantedForUserWithObjectAttribute()
+    {
+        $attribute = new \stdClass();
+
+        $user = new InMemoryUser('username', 'password', ['ROLE_USER']);
+
+        $this->accessDecisionManager
+            ->expects($this->once())
+            ->method('decide')
+            ->with($this->isInstanceOf(OfflineTokenInterface::class), [$attribute])
+            ->willReturn(true);
+        $this->assertTrue($this->authorizationChecker->isGrantedForUser($user, $attribute));
     }
 }

@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 
-/**
- * @requires extension amqp
- */
+#[RequiresPhpExtension('amqp')]
 class AmqpStampTest extends TestCase
 {
     public function testRoutingKeyOnly()

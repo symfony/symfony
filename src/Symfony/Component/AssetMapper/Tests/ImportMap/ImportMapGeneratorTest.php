@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -254,9 +255,7 @@ class ImportMapGeneratorTest extends TestCase
         ], array_keys($actualImportMapData));
     }
 
-    /**
-     * @dataProvider getRawImportMapDataTests
-     */
+    #[DataProvider('getRawImportMapDataTests')]
     public function testGetRawImportMapData(array $importMapEntries, array $mappedAssets, array $expectedData)
     {
         $manager = $this->createImportMapGenerator();
@@ -595,9 +594,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($importmapData, $manager->getRawImportMapData());
     }
 
-    /**
-     * @dataProvider getEagerEntrypointImportsTests
-     */
+    #[DataProvider('getEagerEntrypointImportsTests')]
     public function testFindEagerEntrypointImports(MappedAsset $entryAsset, array $expected, array $mappedAssets = [])
     {
         $manager = $this->createImportMapGenerator();
@@ -746,8 +743,8 @@ class ImportMapGeneratorTest extends TestCase
 
     private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
-        $packageSpecifier = $packageSpecifier ?? $importName;
-        $path = $path ?? '/vendor/any-path.js';
+        $packageSpecifier ??= $importName;
+        $path ??= '/vendor/any-path.js';
 
         return ImportMapEntry::createRemote($importName, $type, path: $path, version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
     }

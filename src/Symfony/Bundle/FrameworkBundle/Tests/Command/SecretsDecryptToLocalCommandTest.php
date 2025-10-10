@@ -11,15 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsDecryptToLocalCommand;
 use Symfony\Bundle\FrameworkBundle\Secrets\SodiumVault;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @requires extension sodium
- */
+#[RequiresPhpExtension('sodium')]
 class SecretsDecryptToLocalCommandTest extends TestCase
 {
     private string $mainDir;

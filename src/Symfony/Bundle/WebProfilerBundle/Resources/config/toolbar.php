@@ -25,6 +25,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('paths that should be excluded from the AJAX requests shown in the toolbar'),
                 service('web_profiler.csp.handler'),
                 service('data_collector.dump')->ignoreOnInvalid(),
+                abstract_arg('whether to replace toolbar on AJAX requests or not'),
             ])
             ->tag('kernel.event_subscriber')
     ;

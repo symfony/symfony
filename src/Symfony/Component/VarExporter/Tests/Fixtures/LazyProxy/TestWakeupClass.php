@@ -13,7 +13,7 @@ namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy;
 
 class TestWakeupClass extends TestClass
 {
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->dep->wokeUp = true;
     }

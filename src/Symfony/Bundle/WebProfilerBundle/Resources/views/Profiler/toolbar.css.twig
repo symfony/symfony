@@ -46,43 +46,9 @@
     --sf-toolbar-green-900: #030404;
 }
 
-.sf-minitoolbar {
-    --sf-toolbar-gray-800: #262626;
-
-    background-color: var(--sf-toolbar-gray-800);
-    border-top-left-radius: 4px;
-    bottom: 0;
-    box-sizing: border-box;
-    display: none;
-    height: 36px;
-    padding: 6px;
-    position: fixed;
-    right: 0;
-    z-index: 99999;
-}
-
-.sf-minitoolbar button {
-    background-color: transparent;
-    padding: 0;
-    border: none;
-}
-.sf-minitoolbar svg,
-.sf-minitoolbar img {
-    --sf-toolbar-gray-200: #e5e5e5;
-
-    color: var(--sf-toolbar-gray-200);
-    max-height: 24px;
-    max-width: 24px;
-    display: inline;
-}
-
 .sf-toolbar-clearer {
     clear: both;
     height: 36px;
-}
-
-.sf-display-none {
-    display: none;
 }
 
 .sf-toolbarreset *:not(svg rect) {
@@ -127,27 +93,55 @@
     color: var(--sf-toolbar-gray-700);
 }
 
-.sf-toolbarreset .hide-button {
+.sf-toolbarreset .sf-toolbar-toggle-button {
     background: var(--sf-toolbar-gray-800);
     color: var(--sf-toolbar-gray-300);
     display: block;
     position: absolute;
-    top: 2px;
+    top: 1px;
     right: 0;
     width: 36px;
-    height: 34px;
+    height: 35px;
     cursor: pointer;
     text-align: center;
     border: none;
     margin: 0;
     padding: 0;
+    outline: none;
 }
-.sf-toolbarreset .hide-button:hover {
+.sf-toolbarreset .sf-toolbar-toggle-button:hover {
     background: var(--sf-toolbar-gray-700);
 }
-.sf-toolbarreset .hide-button svg {
-    max-height: 18px;
-    margin-top: 1px;
+
+.sf-toolbar.sf-toolbar-closed .sf-toolbar-clearer {
+    display: none;
+}
+.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-block {
+    display: none;
+}
+.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button {
+    top: -37px;
+}
+
+.sf-toolbar .sf-toolbar-toggle-button i {
+    display: block;
+    height: 35px;
+    place-content: center;
+}
+.sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-closed {
+    display: none;
+}
+.sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-opened {
+    display: block;
+}
+.sf-toolbar.sf-toolbar-closed .sf-toolbar-toggle-button .sf-toolbar-icon-closed {
+    display: block;
+}
+.sf-toolbar.sf-toolbar-closed .sf-toolbar-toggle-button .sf-toolbar-icon-opened {
+    display: none;
+}
+.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button {
+    border-top: 2px solid var(--sf-toolbar-gray-800);
 }
 
 .sf-toolbar-block {
@@ -158,7 +152,7 @@
     margin-right: 0;
     position: relative;
     white-space: nowrap;
-    max-width: 15%;
+    max-width: 25%;
 }
 .sf-toolbar-block > a,
 .sf-toolbar-block > a:hover {
@@ -168,9 +162,6 @@
     color: inherit;
 }
 
-.sf-toolbar-block span {
-    display: inline-block;
-}
 .sf-toolbar-block .sf-toolbar-value {
     color: var(--sf-toolbar-gray-100);
     font-size: 13px;
@@ -223,10 +214,6 @@
     margin-left: 4px;
 }
 
-.sf-toolbar-block .sf-toolbar-info-piece:last-child {
-    margin-bottom: 0;
-}
-
 div.sf-toolbar .sf-toolbar-block .sf-toolbar-info-piece a {
     color: #99CDD8;
     text-decoration: underline;
@@ -276,16 +263,12 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
     color: var(--sf-toolbar-white);
     background-color: var(--sf-toolbar-gray-600);
     padding: 3px 6px;
-    margin: 0 4px;
     min-width: 15px;
-    min-height: 13px;
     text-align: center;
 }
 
-.sf-toolbar-block .sf-toolbar-status.sf-toolbar-status-green,
-.sf-toolbar-block .sf-toolbar-info .sf-toolbar-status.sf-toolbar-status-green {
+.sf-toolbar-block .sf-toolbar-status.sf-toolbar-status-green {
     background-color: #059669;
-    color: var(--white);
 }
 .sf-toolbar-block .sf-toolbar-status.sf-toolbar-status-red,
 .sf-toolbar-block .sf-toolbar-info .sf-toolbar-status.sf-toolbar-status-red {
@@ -323,32 +306,15 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
     display: none;
 }
 
+.sf-toolbar-block.sf-toolbar-block-request .sf-toolbar-icon {
+    padding: 0 4px;
+}
 .sf-toolbar-block-request .sf-toolbar-status {
     border-radius: 6px;
-    color: #fff;
-    display: inline-block;
     flex-shrink: 0;
     font-size: 13px;
     font-weight: 500;
     padding: 4px 8px;
-}
-.sf-toolbar-block-request .sf-toolbar-info-piece a {
-    background-color: transparent;
-    text-decoration: none;
-}
-.sf-toolbar-block-request .sf-toolbar-info-piece a:hover {
-    text-decoration: underline;
-}
-.sf-toolbar-block-request .sf-toolbar-redirection-status {
-    font-weight: normal;
-    padding: 2px 4px;
-    line-height: 18px;
-}
-.sf-toolbar-block.sf-toolbar-block-request .sf-toolbar-redirection-status.sf-toolbar-status-yellow {
-    background-color: var(--sf-toolbar-yellow-300);
-    border-radius: 4px;
-    color: var(--sf-toolbar-yellow-800);
-    padding: 1px 4px;
 }
 .sf-toolbar-block.sf-toolbar-block-request .sf-toolbar-info-piece .sf-toolbar-redirection-method {
     background: transparent;
@@ -396,11 +362,6 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
 }
 .sf-toolbar-block.sf-toolbar-block-right:hover .sf-toolbar-icon {
     box-shadow: -1px 0 0 var(--sf-toolbar-black), inset 0 -1px 0 var(--sf-toolbar-black);
-}
-
-.sf-toolbar-block-request .sf-toolbar-icon {
-    padding-left: 0;
-    padding-right: 0;
 }
 
 .sf-toolbar-block .sf-toolbar-icon img,
@@ -581,18 +542,6 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
     .sf-toolbar-block .sf-toolbar-icon {
         padding: 0 10px;
     }
-    .sf-toolbar-block-time .sf-toolbar-icon {
-        padding-right: 5px;
-    }
-    .sf-toolbar-block-memory .sf-toolbar-icon {
-        padding-left: 5px;
-    }
-    .sf-toolbar-block-request .sf-toolbar-icon {
-        display: flex;
-        align-items: center;
-        padding-left: 0;
-        padding-right: 0;
-    }
     .sf-toolbar-block-request .sf-toolbar-label {
         margin-left: 4px;
         margin-right: 1px;
@@ -603,9 +552,6 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
     }
     .sf-toolbar-block-request .sf-toolbar-icon .sf-toolbar-request-icon + .sf-toolbar-label {
         margin-left: 0;
-     }
-    .sf-toolbar-block-request .sf-toolbar-label + .sf-toolbar-value {
-        margin-right: 5px;
     }
 
     .sf-toolbar-block-request:hover .sf-toolbar-info {

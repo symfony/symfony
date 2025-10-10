@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
@@ -182,10 +183,8 @@ class PropertyPathBuilderTest extends TestCase
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 
-    /**
-     * @dataProvider provideInvalidOffsets
-     */
-    public function testReplaceDoesNotAllowInvalidOffsets($offset)
+    #[DataProvider('provideInvalidOffsets')]
+    public function testReplaceDoesNotAllowInvalidOffsets(int $offset)
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->builder->replace($offset, 1, new PropertyPath('new1[new2].new3'));

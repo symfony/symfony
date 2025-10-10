@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\Store\StoreFactory;
 
-/**
- * @requires extension redis
- */
+#[RequiresPhpExtension('redis')]
 class RedisProxyStoreFactoryTest extends TestCase
 {
     public function testCreateStore()

@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add JSON encoded value support for `APP_RUNTIME_OPTIONS`
+ * Add `FrankenPhpWorkerRunner`
+ * Add automatic detection of FrankenPHP worker mode in `SymfonyRuntime`
+ * Expose the runtime class in `$_SERVER['APP_RUNTIME']`
+ * Expose the runtime options in `$_SERVER['APP_RUNTIME_OPTIONS']`
+
 6.4
 ---
 

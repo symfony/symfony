@@ -12,9 +12,9 @@
 namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 
 use Symfony\Component\HttpClient\Exception\JsonException;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Exception\UnsupportedOptionsException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -30,11 +30,6 @@ final class GoogleChatTransport extends AbstractTransport
 {
     protected const HOST = 'chat.googleapis.com';
 
-    private string $space;
-    private string $accessKey;
-    private string $accessToken;
-    private ?string $threadKey;
-
     /**
      * @param string      $space       The space name of the webhook url "/v1/spaces/<space>/messages"
      * @param string      $accessKey   The "key" parameter of the webhook url
@@ -44,13 +39,14 @@ final class GoogleChatTransport extends AbstractTransport
      *                                 Subsequent messages with the same thread identifier will be posted into the same thread.
      *                                 {@see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters}
      */
-    public function __construct(string $space, string $accessKey, #[\SensitiveParameter] string $accessToken, ?string $threadKey = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->space = $space;
-        $this->accessKey = $accessKey;
-        $this->accessToken = $accessToken;
-        $this->threadKey = $threadKey;
-
+    public function __construct(
+        private string $space,
+        #[\SensitiveParameter] private string $accessKey,
+        #[\SensitiveParameter] private string $accessToken,
+        private ?string $threadKey = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -78,7 +74,7 @@ final class GoogleChatTransport extends AbstractTransport
         }
 
         if (($options = $message->getOptions()) && !$options instanceof GoogleChatOptions) {
-            throw new LogicException(\sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, GoogleChatOptions::class));
+            throw new UnsupportedOptionsException(__CLASS__, GoogleChatOptions::class, $options);
         }
 
         if (!$options) {
@@ -88,8 +84,6 @@ final class GoogleChatTransport extends AbstractTransport
                 $options = GoogleChatOptions::fromMessage($message);
             }
         }
-
-        $threadKey = $options->getThreadKey() ?: $this->threadKey;
 
         $threadKey = $options->getThreadKey() ?: $this->threadKey;
 

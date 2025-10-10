@@ -37,8 +37,9 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->varDir = sys_get_temp_dir().'/'.uniqid('', true);
         $fs = new Filesystem();
+        $this->varDir = tempnam(sys_get_temp_dir(), 'sf_var_');
+        $fs->remove($this->varDir);
         $fs->mkdir($this->varDir);
     }
 
@@ -230,11 +231,17 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             {
             }
 
+            /**
+             * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+             */
             public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }
 
+            /**
+             * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+             */
             public function getNamespace(): string
             {
                 return 'http://www.example.com/schema/acme';
@@ -411,9 +418,8 @@ class TestSecurityExtension extends Extension implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         $firewallNodeBuilder = $rootNode
-            ->fixXmlConfig('firewall')
             ->children()
-                ->arrayNode('firewalls')
+                ->arrayNode('firewalls', 'firewall')
                     ->isRequired()
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')

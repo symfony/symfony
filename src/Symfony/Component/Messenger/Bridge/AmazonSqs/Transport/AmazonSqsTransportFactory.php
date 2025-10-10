@@ -23,18 +23,16 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class AmazonSqsTransportFactory implements TransportFactoryInterface
 {
-    private ?LoggerInterface $logger;
-
-    public function __construct(?LoggerInterface $logger = null)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private ?LoggerInterface $logger = null,
+    ) {
     }
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         unset($options['transport_name']);
 
-        return new AmazonSqsTransport(Connection::fromDsn($dsn, $options, null, $this->logger), $serializer);
+        return new AmazonSqsTransport(Connection::fromDsn($dsn, $options, null, $this->logger), $serializer, null, null, !($options['delete_on_rejection'] ?? false));
     }
 
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool

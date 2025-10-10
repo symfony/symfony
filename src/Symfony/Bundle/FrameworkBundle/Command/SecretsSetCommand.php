@@ -33,14 +33,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'secrets:set', description: 'Set a secret in the vault')]
 final class SecretsSetCommand extends Command
 {
-    private AbstractVault $vault;
-    private ?AbstractVault $localVault;
-
-    public function __construct(AbstractVault $vault, ?AbstractVault $localVault = null)
-    {
-        $this->vault = $vault;
-        $this->localVault = $localVault;
-
+    public function __construct(
+        private AbstractVault $vault,
+        private ?AbstractVault $localVault = null,
+    ) {
         parent::__construct();
     }
 
@@ -52,24 +48,24 @@ final class SecretsSetCommand extends Command
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Update the local vault.')
             ->addOption('random', 'r', InputOption::VALUE_OPTIONAL, 'Generate a random value.', false)
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command stores a secret in the vault.
+                The <info>%command.name%</info> command stores a secret in the vault.
 
-    <info>%command.full_name% <name></info>
+                    <info>%command.full_name% <name></info>
 
-To reference secrets in services.yaml or any other config
-files, use <info>"%env(<name>)%"</info>.
+                To reference secrets in services.yaml or any other config
+                files, use <info>"%env(<name>)%"</info>.
 
-By default, the secret value should be entered interactively.
-Alternatively, provide a file where to read the secret from:
+                By default, the secret value should be entered interactively.
+                Alternatively, provide a file where to read the secret from:
 
-    <info>php %command.full_name% <name> filename</info>
+                    <info>php %command.full_name% <name> filename</info>
 
-Use "-" as a file name to read from STDIN:
+                Use "-" as a file name to read from STDIN:
 
-    <info>cat filename | php %command.full_name% <name> -</info>
+                    <info>cat filename | php %command.full_name% <name> -</info>
 
-Use <info>--local</info> to override secrets for local needs.
-EOF
+                Use <info>--local</info> to override secrets for local needs.
+                EOF
             )
         ;
     }

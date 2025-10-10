@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * Validates a collection's element count.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -35,19 +35,23 @@ class Count extends Constraint
         self::NOT_DIVISIBLE_BY_ERROR => 'NOT_DIVISIBLE_BY_ERROR',
     ];
 
+    public string $minMessage = 'This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.';
+    public string $maxMessage = 'This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.';
+    public string $exactMessage = 'This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.';
+    public string $divisibleByMessage = 'The number of elements in this collection should be a multiple of {{ compared_value }}.';
+    public ?int $min = null;
+    public ?int $max = null;
+    public ?int $divisibleBy = null;
+
     /**
-     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     * @param int<0, max>|null         $exactly     The exact expected number of elements
+     * @param int<0, max>|null         $min         Minimum expected number of elements
+     * @param int<0, max>|null         $max         Maximum expected number of elements
+     * @param positive-int|null        $divisibleBy The number the collection count should be divisible by
+     * @param string[]|null            $groups
+     * @param array<mixed,string>|null $options
      */
-    protected static $errorNames = self::ERROR_NAMES;
-
-    public $minMessage = 'This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.';
-    public $maxMessage = 'This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.';
-    public $exactMessage = 'This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.';
-    public $divisibleByMessage = 'The number of elements in this collection should be a multiple of {{ compared_value }}.';
-    public $min;
-    public $max;
-    public $divisibleBy;
-
+    #[HasNamedArguments]
     public function __construct(
         int|array|null $exactly = null,
         ?int $min = null,
@@ -59,11 +63,15 @@ class Count extends Constraint
         ?string $divisibleByMessage = null,
         ?array $groups = null,
         mixed $payload = null,
-        array $options = [],
+        ?array $options = null,
     ) {
         if (\is_array($exactly)) {
-            $options = array_merge($exactly, $options);
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($exactly, $options ?? []);
             $exactly = $options['value'] ?? null;
+        } elseif (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
         }
 
         $min ??= $options['min'] ?? null;

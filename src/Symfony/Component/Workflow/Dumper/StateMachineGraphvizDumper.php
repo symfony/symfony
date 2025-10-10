@@ -65,14 +65,14 @@ class StateMachineGraphvizDumper extends GraphvizDumper
                 $attributes['color'] = $arrowColor;
             }
 
-            foreach ($transition->getFroms() as $from) {
-                foreach ($transition->getTos() as $to) {
+            foreach ($transition->getFroms(true) as $fromArc) {
+                foreach ($transition->getTos(true) as $toArc) {
                     $edge = [
                         'name' => $transitionName,
-                        'to' => $to,
+                        'to' => $toArc->place,
                         'attributes' => $attributes,
                     ];
-                    $edges[$from][] = $edge;
+                    $edges[$fromArc->place][] = $edge;
                 }
             }
         }

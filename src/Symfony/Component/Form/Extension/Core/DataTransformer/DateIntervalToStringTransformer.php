@@ -24,8 +24,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DateIntervalToStringTransformer implements DataTransformerInterface
 {
-    private string $format;
-
     /**
      * Transforms a \DateInterval instance to a string.
      *
@@ -33,9 +31,9 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param string $format The date format
      */
-    public function __construct(string $format = 'P%yY%mM%dDT%hH%iM%sS')
-    {
-        $this->format = $format;
+    public function __construct(
+        private string $format = 'P%yY%mM%dDT%hH%iM%sS',
+    ) {
     }
 
     /**

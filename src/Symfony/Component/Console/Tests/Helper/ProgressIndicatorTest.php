@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\StreamOutput;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class ProgressIndicatorTest extends TestCase
 {
     public function testDefaultIndicator()
@@ -54,11 +54,11 @@ class ProgressIndicatorTest extends TestCase
             $this->generateOutput(' \\ Starting...').
             $this->generateOutput(' \\ Advancing...').
             $this->generateOutput(' | Advancing...').
-            $this->generateOutput(' | Done...').
+            $this->generateOutput(' ✔ Done...').
             \PHP_EOL.
             $this->generateOutput(' - Starting Again...').
             $this->generateOutput(' \\ Starting Again...').
-            $this->generateOutput(' \\ Done Again...').
+            $this->generateOutput(' ✔ Done Again...').
             \PHP_EOL,
             stream_get_contents($output->getStream())
         );
@@ -109,6 +109,39 @@ class ProgressIndicatorTest extends TestCase
         );
     }
 
+    public function testCustomFinishedIndicatorValue()
+    {
+        $bar = new ProgressIndicator($output = $this->getOutputStream(), null, 100, ['a', 'b'], '✅');
+
+        $bar->start('Starting...');
+        usleep(101000);
+        $bar->finish('Done');
+
+        rewind($output->getStream());
+
+        $this->assertSame(
+            $this->generateOutput(' a Starting...').
+            $this->generateOutput(' ✅ Done').\PHP_EOL,
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testCustomFinishedIndicatorWhenFinishingProcess()
+    {
+        $bar = new ProgressIndicator($output = $this->getOutputStream(), null, 100, ['a', 'b']);
+
+        $bar->start('Starting...');
+        $bar->finish('Process failed', '❌');
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            $this->generateOutput(' a Starting...').
+            $this->generateOutput(' ❌ Process failed').\PHP_EOL,
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testCannotSetInvalidIndicatorCharacters()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -143,9 +176,7 @@ class ProgressIndicatorTest extends TestCase
         $bar->finish('Finished');
     }
 
-    /**
-     * @dataProvider provideFormat
-     */
+    #[DataProvider('provideFormat')]
     public function testFormats($format)
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream(), $format);

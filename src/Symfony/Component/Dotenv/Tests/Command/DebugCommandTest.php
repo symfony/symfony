@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Dotenv\Tests\Command;
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -22,9 +23,7 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class DebugCommandTest extends TestCase
 {
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testErrorOnUninitializedDotenv()
     {
         unset($_SERVER['SYMFONY_DOTENV_VARS']);
@@ -38,9 +37,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('[ERROR] Dotenv component is not initialized', $output);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testEmptyDotEnvVarsList()
     {
         $_SERVER['SYMFONY_DOTENV_VARS'] = '';
@@ -50,17 +47,17 @@ class DebugCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute([]);
         $expectedFormat = <<<'OUTPUT'
-%a
- ---------- ------- ------------ ------%S
-  Variable   Value   .env.local   .env%S
- ---------- ------- ------------ ------%S
-  FOO                baz          bar%S
-  TEST123            n/a          true%S
- ---------- ------- ------------ ------%S
+            %a
+             ---------- ------- ------------ ------%S
+              Variable   Value   .env.local   .env%S
+             ---------- ------- ------------ ------%S
+              FOO                baz          bar%S
+              TEST123            n/a          true%S
+             ---------- ------- ------------ ------%S
 
- // Note that values might be different between web and CLI.%S
-%a
-OUTPUT;
+             // Note that values might be different between web and CLI.%S
+            %a
+            OUTPUT;
 
         $this->assertStringMatchesFormat($expectedFormat, $tester->getDisplay());
     }
@@ -153,6 +150,28 @@ OUTPUT;
         $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
     }
 
+    public function testScenario2WithCustomPath()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures', 'prod', [], __DIR__.'/Fixtures/Scenario2/.env');
+
+        // Scanned Files
+        $this->assertStringContainsString('✓ Scenario2/.env.local.php', $output);
+        $this->assertStringContainsString('⨯ Scenario2/.env.prod.local', $output);
+        $this->assertStringContainsString('✓ Scenario2/.env.prod', $output);
+        $this->assertStringContainsString('⨯ Scenario2/.env.local', $output);
+        $this->assertStringContainsString('✓ Scenario2/.env.dist', $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env'.\PHP_EOL, $output);
+        $this->assertStringNotContainsString('.env.dev', $output);
+        $this->assertStringNotContainsString('.env.test', $output);
+
+        // Variables
+        $this->assertStringContainsString('Variable   Value   Scenario2/.env.local.php   Scenario2/.env.prod   Scenario2/.env.dist', $output);
+        $this->assertStringContainsString('FOO        BaR     BaR                        BaR                   n/a', $output);
+        $this->assertStringContainsString('TEST       1234    1234                       1234                  0000', $output);
+    }
+
     public function testWarningOnEnvAndEnvDistFile()
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario3', 'dev');
@@ -161,12 +180,28 @@ OUTPUT;
         $this->assertStringContainsString('[WARNING] The file .env.dist gets skipped', $output);
     }
 
+    public function testWarningOnEnvAndEnvDistFileWithCustomPath()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures', 'dev', dotenvPath: __DIR__.'/Fixtures/Scenario3/.env');
+
+        // Warning
+        $this->assertStringContainsString('[WARNING] The file Scenario3/.env.dist gets skipped', $output);
+    }
+
     public function testWarningOnPhpEnvFile()
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod');
 
         // Warning
         $this->assertStringContainsString('[WARNING] Due to existing dump file (.env.local.php)', $output);
+    }
+
+    public function testWarningOnPhpEnvFileWithCustomPath()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures', 'prod', dotenvPath: __DIR__.'/Fixtures/Scenario2/.env');
+
+        // Warning
+        $this->assertStringContainsString('[WARNING] Due to existing dump file (Scenario2/.env.local.php)', $output);
     }
 
     public function testScenario1InDevEnvWithNameFilter()
@@ -237,9 +272,7 @@ OUTPUT;
         $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testCompletion()
     {
         $env = 'prod';
@@ -250,15 +283,19 @@ OUTPUT;
 
         $command = new DebugCommand($env, $projectDirectory);
         $application = new Application();
-        $application->add($command);
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
         $tester = new CommandCompletionTester($application->get('debug:dotenv'));
         $this->assertSame(['FOO', 'TEST'], $tester->complete(['']));
     }
 
-    private function executeCommand(string $projectDirectory, string $env, array $input = []): string
+    private function executeCommand(string $projectDirectory, string $env, array $input = [], ?string $dotenvPath = null): string
     {
         $_SERVER['TEST_ENV_KEY'] = $env;
-        (new Dotenv('TEST_ENV_KEY'))->bootEnv($projectDirectory.'/.env');
+        (new Dotenv('TEST_ENV_KEY'))->bootEnv($dotenvPath ?? $projectDirectory.'/.env');
 
         $command = new DebugCommand($env, $projectDirectory);
         $command->setHelperSet(new HelperSet([new FormatterHelper()]));

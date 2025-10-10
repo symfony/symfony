@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
 
 class DateRangeFilterIteratorTest extends RealIteratorTestCase
 {
-    /**
-     * @dataProvider getAcceptData
-     */
+    #[DataProvider('getAcceptData')]
     public function testAccept($size, $expected)
     {
         $files = self::$files;

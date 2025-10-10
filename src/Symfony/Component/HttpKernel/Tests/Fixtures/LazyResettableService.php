@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
-class LazyResettableService
+class LazyResettableService extends \stdClass
 {
     public static $counter = 0;
 

@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add `error:dump` command
+
+7.1
+---
+
+ * Increase log level to "error" at least for all PHP errors
+
 6.4
 ---
 

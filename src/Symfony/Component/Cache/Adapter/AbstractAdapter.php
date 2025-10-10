@@ -19,11 +19,12 @@ use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\AbstractAdapterTrait;
 use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
+abstract class AbstractAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, LoggerAwareInterface, ResettableInterface
 {
     use AbstractAdapterTrait;
     use ContractsTrait;
@@ -37,7 +38,19 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
-        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).static::NS_SEPARATOR;
+        if ('' !== $namespace) {
+            if (str_contains($namespace, static::NS_SEPARATOR)) {
+                if (str_contains($namespace, static::NS_SEPARATOR.static::NS_SEPARATOR)) {
+                    throw new InvalidArgumentException(\sprintf('Cache namespace "%s" contains empty sub-namespace.', $namespace));
+                }
+                CacheItem::validateKey(str_replace(static::NS_SEPARATOR, '', $namespace));
+            } else {
+                CacheItem::validateKey($namespace);
+            }
+            $this->namespace = $namespace.static::NS_SEPARATOR;
+        }
+        $this->rootNamespace = $this->namespace;
+
         $this->defaultLifetime = $defaultLifetime;
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(\sprintf('Namespace must be %d chars max, %d given ("%s").', $this->maxIdLength - 24, \strlen($namespace), $namespace));
@@ -111,21 +124,24 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
     public static function createConnection(#[\SensitiveParameter] string $dsn, array $options = []): mixed
     {
-        if (str_starts_with($dsn, 'redis:') || str_starts_with($dsn, 'rediss:')) {
+        if (str_starts_with($dsn, 'redis:') || str_starts_with($dsn, 'rediss:') || str_starts_with($dsn, 'valkey:') || str_starts_with($dsn, 'valkeys:')) {
             return RedisAdapter::createConnection($dsn, $options);
         }
         if (str_starts_with($dsn, 'memcached:')) {
             return MemcachedAdapter::createConnection($dsn, $options);
         }
         if (str_starts_with($dsn, 'couchbase:')) {
-            if (CouchbaseBucketAdapter::isSupported()) {
+            if (class_exists(\CouchbaseBucket::class) && CouchbaseBucketAdapter::isSupported()) {
                 return CouchbaseBucketAdapter::createConnection($dsn, $options);
             }
 
             return CouchbaseCollectionAdapter::createConnection($dsn, $options);
         }
+        if (preg_match('/^(mysql|oci|pgsql|sqlsrv|sqlite):/', $dsn)) {
+            return PdoAdapter::createConnection($dsn, $options);
+        }
 
-        throw new InvalidArgumentException('Unsupported DSN: it does not start with "redis[s]:", "memcached:" nor "couchbase:".');
+        throw new InvalidArgumentException('Unsupported DSN: it does not start with "redis[s]:", "valkey[s]:", "memcached:", "couchbase:", "mysql:", "oci:", "pgsql:", "sqlsrv:" nor "sqlite:".');
     }
 
     public function commit(): bool
@@ -156,7 +172,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                     $v = $values[$id];
                     $type = get_debug_type($v);
                     $message = \sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
-                    CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null, 'cache-adapter' => get_debug_type($this)]);
+                    CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->rootNamespace)), 'exception' => $e instanceof \Exception ? $e : null, 'cache-adapter' => get_debug_type($this)]);
                 }
             } else {
                 foreach ($values as $id => $v) {
@@ -179,7 +195,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                 $ok = false;
                 $type = get_debug_type($v);
                 $message = \sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
-                CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null, 'cache-adapter' => get_debug_type($this)]);
+                CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->rootNamespace)), 'exception' => $e instanceof \Exception ? $e : null, 'cache-adapter' => get_debug_type($this)]);
             }
         }
 

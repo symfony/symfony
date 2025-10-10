@@ -1,4 +1,4 @@
-{% use "form_div_layout.html.twig" %}
+{% use 'form_div_layout.html.twig' %}
 
 {# Widgets #}
 
@@ -54,8 +54,8 @@
                 {%- if form.time.second is defined %}{{ form_label(form.time.second) }}{% endif -%}
             </div>
 
-            {{- form_widget(form.date, { datetime: true } ) -}}
-            {{- form_widget(form.time, { datetime: true } ) -}}
+            {{- form_widget(form.date, {datetime: true}) -}}
+            {{- form_widget(form.time, {datetime: true}) -}}
         </div>
     {%- endif -%}
 {%- endblock datetime_widget %}

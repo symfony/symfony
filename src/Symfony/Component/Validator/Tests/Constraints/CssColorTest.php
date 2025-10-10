@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\CssColor;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -27,15 +29,15 @@ final class CssColorTest extends TestCase
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame([CssColor::HEX_LONG, CssColor::HEX_SHORT], $aConstraint->formats);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame([CssColor::HEX_LONG], $bConstraint->formats);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'CssColorDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame([CssColor::HEX_SHORT], $cConstraint->formats);
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
@@ -59,6 +61,15 @@ final class CssColorTest extends TestCase
             CssColor::HSL,
             CssColor::HSLA,
         ], $constraint->formats);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testDoctrineStyle()
+    {
+        $constraint = new CssColor(['formats' => CssColor::RGB]);
+
+        $this->assertSame(CssColor::RGB, $constraint->formats);
     }
 }
 

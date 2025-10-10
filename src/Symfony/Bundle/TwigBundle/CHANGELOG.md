@@ -1,6 +1,29 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Enable `#[AsTwigFilter]`, `#[AsTwigFunction]` and `#[AsTwigTest]` attributes
+   to configure extensions on runtime classes
+ * Add support for a `twig` validator
+ * Use `ChainCache` to store warmed-up cache in `kernel.build_dir` and runtime cache in `kernel.cache_dir`
+ * Make `TemplateCacheWarmer` use `kernel.build_dir` instead of `kernel.cache_dir`
+
+7.1
+---
+
+ * Mark class `TemplateCacheWarmer` as `final`
+
+7.0
+---
+
+ * Remove the `Twig_Environment` autowiring alias, use `Twig\Environment` instead
+ * Remove option `twig.autoescape`; create a class that implements your escaping strategy
+   (check `FileExtensionEscapingStrategy::guess()` for inspiration) and reference it using
+   the `twig.autoescape_service` option instead
+ * Drop support for Twig 2
+
 6.4
 ---
 

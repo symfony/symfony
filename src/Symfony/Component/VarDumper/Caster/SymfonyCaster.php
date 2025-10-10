@@ -19,6 +19,8 @@ use Symfony\Component\VarExporter\Internal\LazyObjectState;
 
 /**
  * @final
+ *
+ * @internal since Symfony 7.3
  */
 class SymfonyCaster
 {
@@ -31,10 +33,7 @@ class SymfonyCaster
         'format' => 'getRequestFormat',
     ];
 
-    /**
-     * @return array
-     */
-    public static function castRequest(Request $request, array $a, Stub $stub, bool $isNested)
+    public static function castRequest(Request $request, array $a, Stub $stub, bool $isNested): array
     {
         $clone = null;
 
@@ -49,10 +48,7 @@ class SymfonyCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castHttpClient($client, array $a, Stub $stub, bool $isNested)
+    public static function castHttpClient($client, array $a, Stub $stub, bool $isNested): array
     {
         $multiKey = \sprintf("\0%s\0multi", $client::class);
         if (isset($a[$multiKey])) {
@@ -62,10 +58,7 @@ class SymfonyCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castHttpClientResponse($response, array $a, Stub $stub, bool $isNested)
+    public static function castHttpClientResponse($response, array $a, Stub $stub, bool $isNested): array
     {
         $stub->cut += \count($a);
         $a = [];
@@ -77,10 +70,7 @@ class SymfonyCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castLazyObjectState($state, array $a, Stub $stub, bool $isNested)
+    public static function castLazyObjectState($state, array $a, Stub $stub, bool $isNested): array
     {
         if (!$isNested) {
             return $a;
@@ -107,10 +97,7 @@ class SymfonyCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castUuid(Uuid $uuid, array $a, Stub $stub, bool $isNested)
+    public static function castUuid(Uuid $uuid, array $a, Stub $stub, bool $isNested): array
     {
         $a[Caster::PREFIX_VIRTUAL.'toBase58'] = $uuid->toBase58();
         $a[Caster::PREFIX_VIRTUAL.'toBase32'] = $uuid->toBase32();
@@ -123,10 +110,7 @@ class SymfonyCaster
         return $a;
     }
 
-    /**
-     * @return array
-     */
-    public static function castUlid(Ulid $ulid, array $a, Stub $stub, bool $isNested)
+    public static function castUlid(Ulid $ulid, array $a, Stub $stub, bool $isNested): array
     {
         $a[Caster::PREFIX_VIRTUAL.'toBase58'] = $ulid->toBase58();
         $a[Caster::PREFIX_VIRTUAL.'toRfc4122'] = $ulid->toRfc4122();

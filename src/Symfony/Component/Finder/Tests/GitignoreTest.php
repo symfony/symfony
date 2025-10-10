@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Gitignore;
 
@@ -19,10 +20,8 @@ use Symfony\Component\Finder\Gitignore;
  */
 class GitignoreTest extends TestCase
 {
-    /**
-     * @dataProvider provider
-     * @dataProvider providerExtended
-     */
+    #[DataProvider('provider')]
+    #[DataProvider('providerExtended')]
     public function testToRegex(array $gitignoreLines, array $matchingCases, array $nonMatchingCases)
     {
         $patterns = implode("\n", $gitignoreLines);
@@ -444,9 +443,7 @@ class GitignoreTest extends TestCase
         return $cases;
     }
 
-    /**
-     * @dataProvider provideNegatedPatternsCases
-     */
+    #[DataProvider('provideNegatedPatternsCases')]
     public function testToRegexMatchingNegatedPatterns(array $gitignoreLines, array $matchingCases, array $nonMatchingCases)
     {
         $patterns = implode("\n", $gitignoreLines);

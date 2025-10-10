@@ -27,19 +27,13 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
 {
     private const HOST = 'api.crowdin.com';
 
-    private LoaderInterface $loader;
-    private HttpClientInterface $client;
-    private LoggerInterface $logger;
-    private string $defaultLocale;
-    private XliffFileDumper $xliffFileDumper;
-
-    public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader, XliffFileDumper $xliffFileDumper)
-    {
-        $this->client = $client;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->loader = $loader;
-        $this->xliffFileDumper = $xliffFileDumper;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private LoaderInterface $loader,
+        private XliffFileDumper $xliffFileDumper,
+    ) {
     }
 
     public function create(Dsn $dsn): CrowdinProvider

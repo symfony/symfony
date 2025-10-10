@@ -19,6 +19,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\Process\PhpProcess;
+use Symfony\Component\Process\Process;
 
 /**
  * Simulates a browser.
@@ -29,22 +30,28 @@ use Symfony\Component\Process\PhpProcess;
  * you need to also implement the getScript() method.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @template TRequest of object
+ * @template TResponse of object
  */
 abstract class AbstractBrowser
 {
-    protected $history;
-    protected $cookieJar;
-    protected $server = [];
-    protected $internalRequest;
-    protected $request;
-    protected $internalResponse;
-    protected $response;
-    protected $crawler;
+    protected History $history;
+    protected CookieJar $cookieJar;
+    protected array $server = [];
+    protected Request $internalRequest;
+    /** @psalm-var TRequest */
+    protected object $request;
+    protected Response $internalResponse;
+    /** @psalm-var TResponse */
+    protected object $response;
+    protected Crawler $crawler;
+    /** @deprecated since Symfony 7.4, to be removed in Symfony 8 */
     protected bool $useHtml5Parser = true;
-    protected $insulated = false;
-    protected $redirect;
-    protected $followRedirects = true;
-    protected $followMetaRefresh = false;
+    protected bool $insulated = false;
+    protected ?string $redirect;
+    protected bool $followRedirects = true;
+    protected bool $followMetaRefresh = false;
 
     private int $maxRedirects = -1;
     private int $redirectCount = 0;
@@ -63,20 +70,16 @@ abstract class AbstractBrowser
 
     /**
      * Sets whether to automatically follow redirects or not.
-     *
-     * @return void
      */
-    public function followRedirects(bool $followRedirects = true)
+    public function followRedirects(bool $followRedirects = true): void
     {
         $this->followRedirects = $followRedirects;
     }
 
     /**
      * Sets whether to automatically follow meta refresh redirects or not.
-     *
-     * @return void
      */
-    public function followMetaRefresh(bool $followMetaRefresh = true)
+    public function followMetaRefresh(bool $followMetaRefresh = true): void
     {
         $this->followMetaRefresh = $followMetaRefresh;
     }
@@ -91,10 +94,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets the maximum number of redirects that crawler can follow.
-     *
-     * @return void
      */
-    public function setMaxRedirects(int $maxRedirects)
+    public function setMaxRedirects(int $maxRedirects): void
     {
         $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
         $this->followRedirects = -1 !== $this->maxRedirects;
@@ -111,13 +112,11 @@ abstract class AbstractBrowser
     /**
      * Sets the insulated flag.
      *
-     * @return void
-     *
      * @throws LogicException When Symfony Process Component is not installed
      */
-    public function insulate(bool $insulated = true)
+    public function insulate(bool $insulated = true): void
     {
-        if ($insulated && !class_exists(\Symfony\Component\Process\Process::class)) {
+        if ($insulated && !class_exists(Process::class)) {
             throw new LogicException('Unable to isolate requests as the Symfony Process Component is not installed. Try running "composer require symfony/process".');
         }
 
@@ -126,10 +125,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets server parameters.
-     *
-     * @return void
      */
-    public function setServerParameters(array $server)
+    public function setServerParameters(array $server): void
     {
         $this->server = array_merge([
             'HTTP_USER_AGENT' => 'Symfony BrowserKit',
@@ -138,10 +135,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets single server parameter.
-     *
-     * @return void
      */
-    public function setServerParameter(string $key, string $value)
+    public function setServerParameter(string $key, string $value): void
     {
         $this->server[$key] = $value;
     }
@@ -210,10 +205,16 @@ abstract class AbstractBrowser
     /**
      * Sets whether parsing should be done using "masterminds/html5".
      *
+     * @deprecated since Symfony 7.4, Symfony 8 will unconditionally use the native HTML5 parser
+     *
      * @return $this
      */
     public function useHtml5Parser(bool $useHtml5Parser): static
     {
+        if (\PHP_VERSION_ID >= 80400) {
+            trigger_deprecation('symfony/browser-kit', '7.4', 'Method "%s()" is deprecated. Symfony 8 will unconditionally use the native HTML5 parser.', __METHOD__);
+        }
+
         $this->useHtml5Parser = $useHtml5Parser;
 
         return $this;
@@ -232,6 +233,8 @@ abstract class AbstractBrowser
      *
      * The origin response is the response instance that is returned
      * by the code that handles requests.
+     *
+     * @psalm-return TResponse
      *
      * @see doRequest()
      */
@@ -254,6 +257,8 @@ abstract class AbstractBrowser
      * The origin request is the request instance that is sent
      * to the code that handles requests.
      *
+     * @psalm-return TRequest
+     *
      * @see doRequest()
      */
     public function getRequest(): object
@@ -266,10 +271,8 @@ abstract class AbstractBrowser
      *
      * @param array $serverParameters An array of server parameters
      */
-    public function click(Link $link/* , array $serverParameters = [] */): Crawler
+    public function click(Link $link, array $serverParameters = []): Crawler
     {
-        $serverParameters = 1 < \func_num_args() ? func_get_arg(1) : [];
-
         if ($link instanceof Form) {
             return $this->submit($link, [], $serverParameters);
         }
@@ -283,10 +286,8 @@ abstract class AbstractBrowser
      * @param string $linkText         The text of the link or the alt attribute of the clickable image
      * @param array  $serverParameters An array of server parameters
      */
-    public function clickLink(string $linkText/* , array $serverParameters = [] */): Crawler
+    public function clickLink(string $linkText, array $serverParameters = []): Crawler
     {
-        $serverParameters = 1 < \func_num_args() ? func_get_arg(1) : [];
-
         $crawler = $this->crawler ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
 
         return $this->click($crawler->selectLink($linkText)->link(), $serverParameters);
@@ -418,7 +419,11 @@ abstract class AbstractBrowser
     /**
      * Makes a request in another process.
      *
+     * @psalm-param TRequest $request
+     *
      * @return object
+     *
+     * @psalm-return TResponse
      *
      * @throws \RuntimeException When processing returns exit code
      */
@@ -453,7 +458,11 @@ abstract class AbstractBrowser
     /**
      * Makes a request.
      *
+     * @psalm-param TRequest $request
+     *
      * @return object
+     *
+     * @psalm-return TResponse
      */
     abstract protected function doRequest(object $request);
 
@@ -461,6 +470,8 @@ abstract class AbstractBrowser
      * Returns the script to execute when the request must be insulated.
      *
      * @param object $request An origin request instance
+     *
+     * @psalm-param TRequest $request
      *
      * @return string
      *
@@ -475,6 +486,8 @@ abstract class AbstractBrowser
      * Filters the BrowserKit request to the origin one.
      *
      * @return object
+     *
+     * @psalm-return TRequest
      */
     protected function filterRequest(Request $request)
     {
@@ -483,6 +496,8 @@ abstract class AbstractBrowser
 
     /**
      * Filters the origin response to the BrowserKit one.
+     *
+     * @psalm-param TResponse $response
      *
      * @return Response
      */
@@ -547,7 +562,7 @@ abstract class AbstractBrowser
      */
     public function followRedirect(): Crawler
     {
-        if (empty($this->redirect)) {
+        if (!isset($this->redirect)) {
             throw new LogicException('The request was not redirected.');
         }
 
@@ -560,7 +575,7 @@ abstract class AbstractBrowser
 
         $request = $this->internalRequest;
 
-        if (\in_array($this->internalResponse->getStatusCode(), [301, 302, 303])) {
+        if (\in_array($this->internalResponse->getStatusCode(), [301, 302, 303], true)) {
             $method = 'GET';
             $files = [];
             $content = null;
@@ -608,10 +623,8 @@ abstract class AbstractBrowser
      * Restarts the client.
      *
      * It flushes history and all cookies.
-     *
-     * @return void
      */
-    public function restart()
+    public function restart(): void
     {
         $this->cookieJar->clear();
         $this->history->clear();

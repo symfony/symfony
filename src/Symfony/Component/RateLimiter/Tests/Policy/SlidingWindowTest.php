@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\RateLimiter\Tests\Policy;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 use Symfony\Component\RateLimiter\Policy\SlidingWindow;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class SlidingWindowTest extends TestCase
 {
     public function testGetExpirationTime()

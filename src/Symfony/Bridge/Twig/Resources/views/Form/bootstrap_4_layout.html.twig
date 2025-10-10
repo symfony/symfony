@@ -1,4 +1,4 @@
-{% use "bootstrap_base_layout.html.twig" %}
+{% use 'bootstrap_base_layout.html.twig' %}
 
 {# Widgets #}
 
@@ -123,10 +123,10 @@
         {%- set type = type|default('file') -%}
         {%- set input_lang = 'en' -%}
         {% if app is defined and app.request is defined %}{%- set input_lang = app.request.locale -%}{%- endif -%}
-        {%- set attr = {lang: input_lang} | merge(attr) -%}
+        {%- set attr = {lang: input_lang}|merge(attr) -%}
         {{- block('form_widget_simple') -}}
-        {%- set label_attr = label_attr|merge({ class: (label_attr.class|default('') ~ ' custom-file-label')|trim })|filter((value, key) => key != 'id') -%}
-        <label for="{{ form.vars.id }}" {% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' custom-file-label')|trim})|filter((value, key) => key != 'id') -%}
+        <label for="{{ form.vars.id }}" {% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}>
             {%- if attr.placeholder is defined and attr.placeholder is not none -%}
                 {{- translation_domain is same as(false) ? attr.placeholder : attr.placeholder|trans({}, translation_domain) -}}
             {%- endif -%}
@@ -173,17 +173,17 @@
     {%- if 'checkbox-custom' in parent_label_class -%}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-control-input')|trim}) -%}
         <div class="custom-control custom-checkbox{{ 'checkbox-inline' in parent_label_class ? ' custom-control-inline' }}">
-            {{- form_label(form, null, { widget: parent() }) -}}
+            {{- form_label(form, null, {widget: parent()}) -}}
         </div>
     {%- elseif 'switch-custom' in parent_label_class -%}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-control-input')|trim}) -%}
         <div class="custom-control custom-switch{{ 'switch-inline' in parent_label_class ? ' custom-control-inline' }}">
-            {{- form_label(form, null, { widget: parent() }) -}}
+            {{- form_label(form, null, {widget: parent()}) -}}
         </div>
     {%- else -%}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
         <div class="form-check{{ 'checkbox-inline' in parent_label_class ? ' form-check-inline' }}">
-            {{- form_label(form, null, { widget: parent() }) -}}
+            {{- form_label(form, null, {widget: parent()}) -}}
         </div>
     {%- endif -%}
 {%- endblock checkbox_widget %}
@@ -193,12 +193,12 @@
     {%- if 'radio-custom' in parent_label_class -%}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-control-input')|trim}) -%}
         <div class="custom-control custom-radio{{ 'radio-inline' in parent_label_class ? ' custom-control-inline' }}">
-            {{- form_label(form, null, { widget: parent() }) -}}
+            {{- form_label(form, null, {widget: parent()}) -}}
         </div>
     {%- else -%}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
         <div class="form-check{{ 'radio-inline' in parent_label_class ? ' form-check-inline' }}">
-            {{- form_label(form, null, { widget: parent() }) -}}
+            {{- form_label(form, null, {widget: parent()}) -}}
         </div>
     {%- endif -%}
 {%- endblock radio_widget %}
@@ -233,7 +233,7 @@
         {% if required -%}
             {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
         {%- endif -%}
-        <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>
+        <{{ element|default('label') }}{% if label_attr %}{% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}>
         {{- block('form_label_content') -}}
         {% block form_label_errors %}{{- form_errors(form) -}}{% endblock form_label_errors %}</{{ element|default('label') }}>
     {%- else -%}
@@ -256,7 +256,7 @@
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-check-label')|trim}) -%}
         {%- endif %}
         {%- if not compound -%}
-            {% set label_attr = label_attr|merge({'for': id}) %}
+            {% set label_attr = label_attr|merge({for: id}) %}
         {%- endif -%}
         {%- if required -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
@@ -267,7 +267,7 @@
         {% endif %}
 
         {{ widget|raw }}
-        <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+        <label{% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}>
             {%- if label is not same as(false) -%}
                 {{- block('form_label_content') -}}
             {%- endif -%}
@@ -282,10 +282,14 @@
     {%- if compound is defined and compound -%}
         {%- set element = 'fieldset' -%}
     {%- endif -%}
-    {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- set attr = {} -%}
+    {%- if help -%}
+        {%- set attr = attr|merge({'aria-describedby': id ~ '_help'}) -%}
     {%- endif -%}
+    {%- if errors|length > 0 -%}
+        {%- set attr = attr|merge({'aria-invalid': 'true'}) -%}
+    {%- endif -%}
+    {%- set widget_attr = {attr: attr} -%}
     <{{ element|default('div') }}{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group')|trim})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) -}}
         {{- form_widget(form, widget_attr) -}}
@@ -310,9 +314,9 @@
 {# Help #}
 
 {% block form_help -%}
-    {%- if help is not empty -%}
+    {%- if help -%}
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' form-text text-muted')|trim}) -%}
-        <small id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+        <small id="{{ id }}_help"{% with {attr: help_attr} %}{{ block('attributes') }}{% endwith %}>
             {{- block('form_help_content') -}}
         </small>
     {%- endif -%}

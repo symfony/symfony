@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 
 /**
@@ -20,9 +21,8 @@ class CompoundFormPerformanceTest extends FormPerformanceTestCase
 {
     /**
      * Create a compound form multiple times, as happens in a collection form.
-     *
-     * @group benchmark
      */
+    #[Group('benchmark')]
     public function testArrayBasedForm()
     {
         $this->setMaxRunningTime(1);

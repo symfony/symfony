@@ -25,10 +25,8 @@ class AttributeRouteControllerLoader extends AttributeClassLoader
 {
     /**
      * Configures the _controller default parameter of a given Route instance.
-     *
-     * @return void
      */
-    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot)
+    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
     {
         if ('__invoke' === $method->getName()) {
             $route->setDefault('_controller', $class->getName());
@@ -50,8 +48,4 @@ class AttributeRouteControllerLoader extends AttributeClassLoader
 
         return str_replace('__', '_', $name);
     }
-}
-
-if (!class_exists(AnnotatedRouteControllerLoader::class, false)) {
-    class_alias(AttributeRouteControllerLoader::class, AnnotatedRouteControllerLoader::class);
 }

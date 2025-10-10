@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
@@ -46,18 +47,26 @@ class RemotePackageStorageTest extends TestCase
         $vendorDir = self::$writableRoot.'/assets/acme/vendor';
         $this->filesystem->mkdir($vendorDir.'/module_specifier');
         $this->filesystem->touch($vendorDir.'/module_specifier/module_specifier.index.js');
-        $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0555);
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0o555);
+        } else {
+            $this->filesystem->chmod($vendorDir.'/module_specifier/', 0o555);
+        }
 
         $storage = new RemotePackageStorage($vendorDir);
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('file_put_contents('.$vendorDir.'/module_specifier/module_specifier.index.js): Failed to open stream: Permission denied');
+        $this->expectExceptionMessage('Failed to write file "'.$vendorDir.'/module_specifier/module_specifier.index.js".');
 
         try {
             $storage->save($entry, 'any content');
         } finally {
-            $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0777);
+            if ('\\' === \DIRECTORY_SEPARATOR) {
+                $this->filesystem->chmod($vendorDir.'/module_specifier/module_specifier.index.js', 0o777);
+            } else {
+                $this->filesystem->chmod($vendorDir.'/module_specifier/', 0o777);
+            }
         }
     }
 
@@ -92,7 +101,7 @@ class RemotePackageStorageTest extends TestCase
         $storage->save($entry, 'any content');
         $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/module_specifier.index.js';
         $this->assertFileExists($targetPath);
-        $this->assertEquals('any content', file_get_contents($targetPath));
+        $this->assertEquals('any content', $this->filesystem->readFile($targetPath));
     }
 
     public function testSaveExtraFile()
@@ -102,12 +111,10 @@ class RemotePackageStorageTest extends TestCase
         $storage->saveExtraFile($entry, '/path/to/extra-file.woff2', 'any content');
         $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/path/to/extra-file.woff2';
         $this->assertFileExists($targetPath);
-        $this->assertEquals('any content', file_get_contents($targetPath));
+        $this->assertEquals('any content', $this->filesystem->readFile($targetPath));
     }
 
-    /**
-     * @dataProvider getDownloadPathTests
-     */
+    #[DataProvider('getDownloadPathTests')]
     public function testGetDownloadedPath(string $packageModuleSpecifier, ImportMapType $importMapType, string $expectedPath)
     {
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');

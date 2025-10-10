@@ -54,28 +54,43 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
         return 'array_extra_keys';
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     foo?: array{
+     *         baz?: scalar|null,
+     *         qux?: scalar|null,
+     *         ...<mixed>
+     *     },
+     *     bar?: list<array{
+     *         corge?: scalar|null,
+     *         grault?: scalar|null,
+     *         ...<mixed>
+     *     }>,
+     *     baz?: array<mixed>,
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('foo', $value)) {
+        if (array_key_exists('foo', $config)) {
             $this->_usedProperties['foo'] = true;
-            $this->foo = new \Symfony\Config\ArrayExtraKeys\FooConfig($value['foo']);
-            unset($value['foo']);
+            $this->foo = new \Symfony\Config\ArrayExtraKeys\FooConfig($config['foo']);
+            unset($config['foo']);
         }
 
-        if (array_key_exists('bar', $value)) {
+        if (array_key_exists('bar', $config)) {
             $this->_usedProperties['bar'] = true;
-            $this->bar = array_map(fn ($v) => new \Symfony\Config\ArrayExtraKeys\BarConfig($v), $value['bar']);
-            unset($value['bar']);
+            $this->bar = array_map(fn ($v) => new \Symfony\Config\ArrayExtraKeys\BarConfig($v), $config['bar']);
+            unset($config['bar']);
         }
 
-        if (array_key_exists('baz', $value)) {
+        if (array_key_exists('baz', $config)) {
             $this->_usedProperties['baz'] = true;
-            $this->baz = new \Symfony\Config\ArrayExtraKeys\BazConfig($value['baz']);
-            unset($value['baz']);
+            $this->baz = new \Symfony\Config\ArrayExtraKeys\BazConfig($config['baz']);
+            unset($config['baz']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

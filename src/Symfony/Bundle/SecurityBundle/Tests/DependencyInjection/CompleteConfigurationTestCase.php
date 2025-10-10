@@ -129,7 +129,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
             $configs[] = array_values($configDef->getArguments());
         }
 
-        // the IDs of the services are case sensitive or insensitive depending on
+        // the IDs of the services are case-sensitive or insensitive depending on
         // the Symfony version. Transform them to lowercase to simplify tests.
         $configs[0][2] = strtolower($configs[0][2]);
         $configs[2][2] = strtolower($configs[2][2]);
@@ -724,6 +724,41 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $requestMatcherId = (string) $container->getDefinition($chainRequestMatcherId)->getArgument(0)[0];
 
         $this->assertSame('(?:^/register$|^/documentation$)', $container->getDefinition($requestMatcherId)->getArgument(0));
+    }
+
+    public function testAccessTokenOidc()
+    {
+        $container = $this->getContainer('access_token_oidc');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+
+        $def = $container->getDefinition('security.access_token_handler.firewall1');
+        $this->assertSame('audience', $def->getArgument(2));
+        $this->assertSame(['https://www.example.com'], $def->getArgument(3));
+        $this->assertSame('sub', $def->getArgument(4));
+    }
+
+    public function testAccessTokenOidcWithEncryption()
+    {
+        $container = $this->getContainer('access_token_oidc_encryption');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+
+        $def = $container->getDefinition('security.access_token_handler.firewall1');
+        $this->assertSame(['RS256'], $def->getArgument(0)->getArgument(0));
+    }
+
+    public function testAccessTokenOidcUserInfoWithDiscovery()
+    {
+        if ('xml' === $this->getFileExtension()) {
+            $this->markTestSkipped('OIDC user info discovery is not supported by the XML schema.');
+        }
+        $container = $this->getContainer('access_token_oidc_user_info_discovery');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
     }
 
     protected function getContainer($file)

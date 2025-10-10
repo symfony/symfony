@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\RateLimiter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -18,9 +19,7 @@ use Symfony\Component\RateLimiter\RateLimit;
 
 class AbstractRequestRateLimiterTest extends TestCase
 {
-    /**
-     * @dataProvider provideRateLimits
-     */
+    #[DataProvider('provideRateLimits')]
     public function testConsume(array $rateLimits, ?RateLimit $expected)
     {
         $rateLimiter = new MockAbstractRequestRateLimiter(array_map(function (RateLimit $rateLimit) {

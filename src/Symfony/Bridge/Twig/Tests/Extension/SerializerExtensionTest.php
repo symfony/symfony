@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\SerializerExtension;
 use Symfony\Bridge\Twig\Extension\SerializerRuntime;
@@ -30,9 +31,7 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
  */
 class SerializerExtensionTest extends TestCase
 {
-    /**
-     * @dataProvider serializerDataProvider
-     */
+    #[DataProvider('serializerDataProvider')]
     public function testSerializeFilter(string $template, string $expectedResult)
     {
         $twig = $this->getTwig($template);

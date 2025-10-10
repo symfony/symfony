@@ -45,22 +45,45 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
         return 'add_to_list';
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     translator?: array{
+     *         fallbacks?: list<scalar|null>,
+     *         sources?: array<string, scalar|null>,
+     *         books?: array{ // Deprecated: The child node "books" at path "add_to_list.translator.books" is deprecated. // looks for translation in old fashion way
+     *             page?: list<array{
+     *                 number?: int<min, max>,
+     *                 content?: scalar|null,
+     *             }>,
+     *         },
+     *     },
+     *     messenger?: array{
+     *         routing?: array<string, array{
+     *             senders?: list<scalar|null>,
+     *         }>,
+     *         receiving?: list<array{
+     *             priority?: int<min, max>,
+     *             color?: scalar|null,
+     *         }>,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('translator', $value)) {
+        if (array_key_exists('translator', $config)) {
             $this->_usedProperties['translator'] = true;
-            $this->translator = new \Symfony\Config\AddToList\TranslatorConfig($value['translator']);
-            unset($value['translator']);
+            $this->translator = new \Symfony\Config\AddToList\TranslatorConfig($config['translator']);
+            unset($config['translator']);
         }
 
-        if (array_key_exists('messenger', $value)) {
+        if (array_key_exists('messenger', $config)) {
             $this->_usedProperties['messenger'] = true;
-            $this->messenger = new \Symfony\Config\AddToList\MessengerConfig($value['messenger']);
-            unset($value['messenger']);
+            $this->messenger = new \Symfony\Config\AddToList\MessengerConfig($config['messenger']);
+            unset($config['messenger']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

@@ -26,6 +26,11 @@ class TraceableAuthenticatorTest extends TestCase
         $passport = new SelfValidatingPassport(new UserBadge('robin', function () {}));
 
         $authenticator = $this->createMock(AuthenticatorInterface::class);
+        $authenticator->expects($this->once())
+            ->method('supports')
+            ->with($request)
+            ->willReturn(true);
+
         $authenticator
             ->expects($this->once())
             ->method('authenticate')
@@ -33,15 +38,23 @@ class TraceableAuthenticatorTest extends TestCase
             ->willReturn($passport);
 
         $traceable = new TraceableAuthenticator($authenticator);
+        $this->assertTrue($traceable->supports($request));
         $this->assertSame($passport, $traceable->authenticate($request));
         $this->assertSame($passport, $traceable->getInfo()['passport']);
     }
 
     public function testGetInfoWithoutAuth()
     {
+        $request = new Request();
+
         $authenticator = $this->createMock(AuthenticatorInterface::class);
+        $authenticator->expects($this->once())
+            ->method('supports')
+            ->with($request)
+            ->willReturn(false);
 
         $traceable = new TraceableAuthenticator($authenticator);
+        $this->assertFalse($traceable->supports($request));
         $this->assertNull($traceable->getInfo()['passport']);
         $this->assertIsArray($traceable->getInfo()['badges']);
         $this->assertSame([], $traceable->getInfo()['badges']);

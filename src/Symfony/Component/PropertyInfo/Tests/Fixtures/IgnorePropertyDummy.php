@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Annotation\Groups as GroupsAnnotation;
-use Symfony\Component\Serializer\Annotation\Ignore as IgnoreAnnotation;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
@@ -21,16 +19,9 @@ use Symfony\Component\Serializer\Attribute\Ignore;
  */
 class IgnorePropertyDummy
 {
-    /**
-     * @GroupsAnnotation({"a"})
-     */
     #[Groups(['a'])]
     public $visibleProperty;
 
-    /**
-     * @GroupsAnnotation({"a"})
-     * @IgnoreAnnotation
-     */
     #[Groups(['a']), Ignore]
     private $ignoredProperty;
 }

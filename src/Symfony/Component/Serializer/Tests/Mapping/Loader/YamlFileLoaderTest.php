@@ -65,8 +65,10 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadClassMetadataReturnsThrowsInvalidMapping()
     {
-        $this->expectException(MappingException::class);
         $loader = new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-mapping.yml');
+
+        $this->expectException(MappingException::class);
+
         $loader->loadClassMetadata($this->metadata);
     }
 
@@ -124,7 +126,7 @@ class YamlFileLoaderTest extends TestCase
         $expected = new ClassMetadata(AbstractDummy::class, new ClassDiscriminatorMapping('type', [
             'first' => AbstractDummyFirstChild::class,
             'second' => AbstractDummySecondChild::class,
-        ]));
+        ], 'first'));
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
 

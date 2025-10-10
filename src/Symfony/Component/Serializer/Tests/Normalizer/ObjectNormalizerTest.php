@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
@@ -43,7 +44,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion;
-use Symfony\Component\Serializer\Tests\Fixtures\FormatAndContextAwareNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
@@ -55,6 +55,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ContextMetadataTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\FilterBoolTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\GroupsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\IgnoredAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
@@ -65,6 +66,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipUninitializedValu
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObjectWithGetters;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -77,6 +79,7 @@ class ObjectNormalizerTest extends TestCase
     use CircularReferenceTestTrait;
     use ConstructorArgumentsTestTrait;
     use ContextMetadataTestTrait;
+    use FilterBoolTestTrait;
     use GroupsTestTrait;
     use IgnoredAttributesTestTrait;
     use MaxDepthTestTrait;
@@ -200,8 +203,7 @@ class ObjectNormalizerTest extends TestCase
             'xml'
         );
 
-        $this->assertIsArray($obj->bar);
-        $this->assertEmpty($obj->bar);
+        $this->assertSame([], $obj->bar);
     }
 
     public function testDenormalizeWithObject()
@@ -328,8 +330,6 @@ class ObjectNormalizerTest extends TestCase
 
     public function testConstructorWithUnknownObjectTypeHintDenormalize()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not determine the class of the parameter "unknown".');
         $data = [
             'id' => 10,
             'unknown' => [
@@ -341,6 +341,9 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer();
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not determine the class of the parameter "unknown".');
 
         $normalizer->denormalize($data, DummyWithConstructorInexistingObject::class);
     }
@@ -354,7 +357,12 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor([], [new ReflectionExtractor()]));
 
         $this->expectException(NotNormalizableValueException::class);
-        $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "int", "float" ("string" given).');
+
+        if (class_exists(Type::class) && method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "float", "int" ("string" given).');
+        } else {
+            $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "int", "float" ("string" given).');
+        }
 
         $normalizer->denormalize($data, DummyWithUnion::class, 'xml', [
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
@@ -379,6 +387,11 @@ class ObjectNormalizerTest extends TestCase
         new Serializer([$normalizer]);
 
         return $normalizer;
+    }
+
+    protected function getNormalizerForFilterBool(): ObjectNormalizer
+    {
+        return new ObjectNormalizer();
     }
 
     public function testAttributesContextDenormalizeConstructor()
@@ -660,14 +673,15 @@ class ObjectNormalizerTest extends TestCase
 
     public function testUnableToNormalizeObjectAttribute()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot normalize attribute "object" because the injected serializer is not a normalizer');
         $serializer = $this->createMock(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);
 
         $obj = new ObjectDummy();
         $object = new \stdClass();
         $obj->setObject($object);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "object" because the injected serializer is not a normalizer');
 
         $this->normalizer->normalize($obj, 'any');
     }
@@ -758,23 +772,11 @@ class ObjectNormalizerTest extends TestCase
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 
         $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], (new class {
+            public const TEST = 'me';
+
             /** @var self::*|null */
             public $foo;
         })::class)->foo);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testExtractAttributesRespectsFormat()
-    {
-        $normalizer = new FormatAndContextAwareNormalizer();
-
-        $data = new ObjectDummy();
-        $data->setFoo('bar');
-        $data->bar = 'foo';
-
-        $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $normalizer->normalize($data, 'foo_and_bar_included'));
     }
 
     public function testExtractAttributesRespectsContext()
@@ -887,6 +889,34 @@ class ObjectNormalizerTest extends TestCase
         $o2->baz = 'baz';
 
         $this->assertSame(['baz' => 'baz'], $this->normalizer->normalize($o2));
+    }
+
+    public function testNotNormalizableValueInvalidType()
+    {
+        if (!class_exists(InvalidTypeException::class)) {
+            $this->markTestSkipped('Skipping test as the improvements on PropertyAccess are required.');
+        }
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "array" given at property path "initialized"');
+
+        try {
+            $this->normalizer->denormalize(['initialized' => ['not a string']], TypedPropertiesObject::class, 'array');
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame(['string'], $e->getExpectedTypes());
+
+            throw $e;
+        }
+    }
+
+    public function testNormalizeWithoutSerializerSet()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "foo" because the injected serializer is not a normalizer.');
+
+        $normalizer->normalize(new ObjectConstructorDummy([], [], []));
     }
 
     public function testNormalizeWithIgnoreAttributeAndPrivateProperties()

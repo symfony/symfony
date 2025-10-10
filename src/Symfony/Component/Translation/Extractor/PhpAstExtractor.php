@@ -51,7 +51,6 @@ final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorIn
             $nameResolver = new NodeVisitor\NameResolver();
             $traverser->addVisitor($nameResolver);
 
-            /** @var AbstractVisitor&NodeVisitor $visitor */
             foreach ($this->visitors as $visitor) {
                 $visitor->initialize($catalogue, $file, $this->prefix);
                 $traverser->addVisitor($visitor);

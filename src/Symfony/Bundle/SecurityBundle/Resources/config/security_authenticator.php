@@ -42,7 +42,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('provider key'),
                 service('logger')->nullOnInvalid(),
                 param('security.authentication.manager.erase_credentials'),
-                param('security.authentication.hide_user_not_found'),
+                param('.security.authentication.expose_security_errors'),
                 abstract_arg('required badges'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add support for `messageThreadId` option in `TelegramOptions`
+
 6.4
 ---
 

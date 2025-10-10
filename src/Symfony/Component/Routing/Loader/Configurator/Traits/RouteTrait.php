@@ -16,10 +16,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 trait RouteTrait
 {
-    /**
-     * @var RouteCollection|Route
-     */
-    protected $route;
+    protected RouteCollection|Route $route;
 
     /**
      * Adds defaults.

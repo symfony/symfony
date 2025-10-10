@@ -22,19 +22,13 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class UserPasswordValidator extends ConstraintValidator
 {
-    private TokenStorageInterface $tokenStorage;
-    private PasswordHasherFactoryInterface $hasherFactory;
-
-    public function __construct(TokenStorageInterface $tokenStorage, PasswordHasherFactoryInterface $hasherFactory)
-    {
-        $this->tokenStorage = $tokenStorage;
-        $this->hasherFactory = $hasherFactory;
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private PasswordHasherFactoryInterface $hasherFactory,
+    ) {
     }
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $password, Constraint $constraint)
+    public function validate(mixed $password, Constraint $constraint): void
     {
         if (!$constraint instanceof UserPassword) {
             throw new UnexpectedTypeException($constraint, UserPassword::class);

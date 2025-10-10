@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Mime\Tests\Crypto;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Message;
 
-/**
- * @requires extension openssl
- */
+#[RequiresPhpExtension('openssl')]
 class SMimeEncrypterTest extends SMimeTestCase
 {
     public function testEncryptMessage()

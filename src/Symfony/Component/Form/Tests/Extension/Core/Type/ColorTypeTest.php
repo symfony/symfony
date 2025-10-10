@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormErrorIterator;
 
 final class ColorTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = ColorType::class;
 
-    /**
-     * @dataProvider validationShouldPassProvider
-     */
+    #[DataProvider('validationShouldPassProvider')]
     public function testValidationShouldPass(bool $html5, ?string $submittedValue)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -30,7 +30,8 @@ final class ColorTypeTest extends BaseTypeTestCase
 
         $form->submit($submittedValue);
 
-        $this->assertEmpty($form->getErrors());
+        $this->assertInstanceOf(FormErrorIterator::class, $form->getErrors());
+        $this->assertCount(0, $form->getErrors());
     }
 
     public static function validationShouldPassProvider(): array
@@ -51,9 +52,7 @@ final class ColorTypeTest extends BaseTypeTestCase
         ];
     }
 
-    /**
-     * @dataProvider validationShouldFailProvider
-     */
+    #[DataProvider('validationShouldFailProvider')]
     public function testValidationShouldFail(string $expectedValueParameterValue, ?string $submittedValue, bool $trim = true)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

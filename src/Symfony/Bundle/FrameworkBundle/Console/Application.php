@@ -21,7 +21,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -31,14 +30,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class Application extends BaseApplication
 {
-    private KernelInterface $kernel;
     private bool $commandsRegistered = false;
     private array $registrationErrors = [];
 
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-
+    public function __construct(
+        private KernelInterface $kernel,
+    ) {
         parent::__construct('Symfony', Kernel::VERSION);
 
         $inputDefinition = $this->getDefinition();
@@ -147,14 +144,7 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
-        $command = parent::get($name);
-
-        if ($command instanceof ContainerAwareInterface) {
-            trigger_deprecation('symfony/dependency-injection', '6.4', 'Relying on "%s" to get the container in "%s" is deprecated, register the command as a service and use dependency injection instead.', ContainerAwareInterface::class, get_debug_type($command));
-            $command->setContainer($this->kernel->getContainer());
-        }
-
-        return $command;
+        return parent::get($name);
     }
 
     public function all(?string $namespace = null): array
@@ -169,17 +159,32 @@ class Application extends BaseApplication
         return parent::getLongVersion().\sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
+    /**
+     * @deprecated since Symfony 7.4, use Application::addCommand() instead
+     */
     public function add(Command $command): ?Command
+    {
+        trigger_deprecation('symfony/framework-bundle', '7.4', 'The "%s()" method is deprecated and will be removed in Symfony 8.0, use "%s::addCommand()" instead.', __METHOD__, self::class);
+
+        return $this->addCommand($command);
+    }
+
+    public function addCommand(callable|Command $command): ?Command
     {
         $this->registerCommands();
 
-        return parent::add($command);
+        if (!method_exists(BaseApplication::class, 'addCommand')) {
+            if (!$command instanceof Command) {
+                throw new \LogicException('Using callables as commands requires symfony/console 7.4 or higher.');
+            }
+
+            return parent::add($command);
+        }
+
+        return parent::addCommand($command);
     }
 
-    /**
-     * @return void
-     */
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         if ($this->commandsRegistered) {
             return;
@@ -210,7 +215,7 @@ class Application extends BaseApplication
             foreach ($container->getParameter('console.command.ids') as $id) {
                 if (!isset($lazyCommandIds[$id])) {
                     try {
-                        $this->add($container->get($id));
+                        $this->addCommand($container->get($id));
                     } catch (\Throwable $e) {
                         $this->registrationErrors[] = $e;
                     }

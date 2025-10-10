@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Marshaller;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\SodiumMarshaller;
 
-/**
- * @requires extension sodium
- */
+#[RequiresPhpExtension('sodium')]
 class SodiumMarshallerTest extends TestCase
 {
     private string $decryptionKey;

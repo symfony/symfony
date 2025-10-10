@@ -43,7 +43,7 @@ class TranslatorConfig
 
     /**
      * looks for translation in old fashion way
-     * @deprecated The child node "books" at path "translator" is deprecated.
+     * @deprecated Since symfony/config 6.0: The child node "books" at path "add_to_list.translator" is deprecated.
     */
     public function books(array $value = []): \Symfony\Config\AddToList\Translator\BooksConfig
     {
@@ -57,28 +57,40 @@ class TranslatorConfig
         return $this->books;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     fallbacks?: list<scalar|null>,
+     *     sources?: array<string, scalar|null>,
+     *     books?: array{ // Deprecated: The child node "books" at path "add_to_list.translator.books" is deprecated. // looks for translation in old fashion way
+     *         page?: list<array{
+     *             number?: int<min, max>,
+     *             content?: scalar|null,
+     *         }>,
+     *     },
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('fallbacks', $value)) {
+        if (array_key_exists('fallbacks', $config)) {
             $this->_usedProperties['fallbacks'] = true;
-            $this->fallbacks = $value['fallbacks'];
-            unset($value['fallbacks']);
+            $this->fallbacks = $config['fallbacks'];
+            unset($config['fallbacks']);
         }
 
-        if (array_key_exists('sources', $value)) {
+        if (array_key_exists('sources', $config)) {
             $this->_usedProperties['sources'] = true;
-            $this->sources = $value['sources'];
-            unset($value['sources']);
+            $this->sources = $config['sources'];
+            unset($config['sources']);
         }
 
-        if (array_key_exists('books', $value)) {
+        if (array_key_exists('books', $config)) {
             $this->_usedProperties['books'] = true;
-            $this->books = new \Symfony\Config\AddToList\Translator\BooksConfig($value['books']);
-            unset($value['books']);
+            $this->books = new \Symfony\Config\AddToList\Translator\BooksConfig($config['books']);
+            unset($config['books']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

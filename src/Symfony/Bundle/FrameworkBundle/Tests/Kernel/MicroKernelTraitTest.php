@@ -13,8 +13,10 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -26,6 +28,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
+require_once __DIR__.'/default/src/DefaultKernel.php';
 require_once __DIR__.'/flex-style/src/FlexStyleMicroKernel.php';
 
 class MicroKernelTraitTest extends TestCase
@@ -140,33 +143,45 @@ class MicroKernelTraitTest extends TestCase
 
         $this->assertSame('Hello World!', $response->getContent());
     }
-}
 
-abstract class MinimalKernel extends Kernel
-{
-    use MicroKernelTrait;
-
-    private string $cacheDir;
-
-    public function __construct(string $cacheDir)
+    public function testSimpleKernel()
     {
-        parent::__construct('test', false);
+        $kernel = $this->kernel = new SimpleKernel('simple_kernel');
+        $kernel->boot();
 
-        $this->cacheDir = sys_get_temp_dir().'/'.$cacheDir;
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('Hello World!', $response->getContent());
     }
 
-    public function registerBundles(): iterable
+    public function testKernelCommand()
     {
-        yield new FrameworkBundle();
+        if (!property_exists(AsCommand::class, 'help')) {
+            $this->markTestSkipped('Invokable command no available.');
+        }
+
+        $kernel = $this->kernel = new KernelCommand('kernel_command');
+        $application = new Application($kernel);
+
+        $input = new ArrayInput(['command' => 'kernel:hello']);
+        $output = new BufferedOutput();
+
+        $this->assertTrue($application->has('kernel:hello'));
+        $this->assertSame(0, $application->doRun($input, $output));
+        $this->assertSame('Hello Kernel!', $output->fetch());
     }
 
-    public function getCacheDir(): string
+    public function testDefaultKernel()
     {
-        return $this->cacheDir;
-    }
+        $kernel = $this->kernel = new DefaultKernel('test', false);
+        $kernel->boot();
 
-    public function getLogDir(): string
-    {
-        return $this->cacheDir;
+        $this->assertTrue($kernel->getContainer()->has('foo_service'));
+
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('OK', $response->getContent());
     }
 }

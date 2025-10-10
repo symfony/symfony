@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
 
 /**
@@ -25,7 +26,7 @@ trait TagAwareTestTrait
         $pool = $this->createCachePool();
         $item = $pool->getItem('foo');
 
-        $this->expectException(\Psr\Cache\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $item->tag(':');
     }
@@ -182,5 +183,28 @@ trait TagAwareTestTrait
         // item should be again a hit
         $cacheItem = $pool->getItem('test');
         $this->assertTrue($cacheItem->isHit());
+    }
+
+    public function testNamespacesAndTags()
+    {
+        $pool = $this->createCachePool();
+        $pool->clear();
+
+        $item = $pool->getItem('foo');
+        $item->tag('baz');
+        $pool->save($item);
+
+        $derived = $pool->withSubNamespace('derived');
+        $item = $derived->getItem('bar');
+        $item->tag('baz');
+        $derived->save($item);
+
+        $this->assertTrue($pool->getItem('foo')->isHit());
+        $this->assertTrue($derived->getItem('bar')->isHit());
+
+        $pool->invalidateTags(['baz']);
+
+        $this->assertFalse($pool->getItem('foo')->isHit());
+        $this->assertFalse($derived->getItem('bar')->isHit());
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -24,9 +25,7 @@ class CacheItemTest extends TestCase
         $this->assertSame('foo', CacheItem::validateKey('foo'));
     }
 
-    /**
-     * @dataProvider provideInvalidKey
-     */
+    #[DataProvider('provideInvalidKey')]
     public function testInvalidKey($key)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -71,9 +70,7 @@ class CacheItemTest extends TestCase
         }, $this, CacheItem::class))();
     }
 
-    /**
-     * @dataProvider provideInvalidKey
-     */
+    #[DataProvider('provideInvalidKey')]
     public function testInvalidTag($tag)
     {
         $item = new CacheItem();

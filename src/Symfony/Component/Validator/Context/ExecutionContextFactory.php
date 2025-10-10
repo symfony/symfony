@@ -19,17 +19,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @internal version 2.5. Code against ExecutionContextFactoryInterface instead.
+ * @internal
  */
 class ExecutionContextFactory implements ExecutionContextFactoryInterface
 {
-    private TranslatorInterface $translator;
-    private ?string $translationDomain;
-
-    public function __construct(TranslatorInterface $translator, ?string $translationDomain = null)
-    {
-        $this->translator = $translator;
-        $this->translationDomain = $translationDomain;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private string|false|null $translationDomain = null,
+    ) {
     }
 
     public function createContext(ValidatorInterface $validator, mixed $root): ExecutionContextInterface

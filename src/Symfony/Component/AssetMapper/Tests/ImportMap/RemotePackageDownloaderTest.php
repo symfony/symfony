@@ -29,9 +29,7 @@ class RemotePackageDownloaderTest extends TestCase
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        if (!file_exists(self::$writableRoot)) {
-            $this->filesystem->mkdir(self::$writableRoot);
-        }
+        $this->filesystem->mkdir(self::$writableRoot);
     }
 
     protected function tearDown(): void
@@ -79,12 +77,12 @@ class RemotePackageDownloaderTest extends TestCase
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo/foo.index.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/bar.js/file.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/baz/baz.index.css');
-        $this->assertEquals('foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
+        $this->assertEquals('foo content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo/path/to/extra-file.woff');
-        $this->assertEquals('extra file contents', file_get_contents(self::$writableRoot.'/assets/vendor/foo/path/to/extra-file.woff'));
-        $this->assertEquals('bar content', file_get_contents(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
-        $this->assertEquals('baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
-        $this->assertEquals('different content', file_get_contents(self::$writableRoot.'/assets/vendor/custom_specifier/custom_specifier.index.js'));
+        $this->assertEquals('extra file contents', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/foo/path/to/extra-file.woff'));
+        $this->assertEquals('bar content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
+        $this->assertEquals('baz content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
+        $this->assertEquals('different content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/custom_specifier/custom_specifier.index.js'));
 
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';
         $this->assertEquals(
@@ -106,9 +104,9 @@ class RemotePackageDownloaderTest extends TestCase
             'bar.js/file' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
             'baz' => ['version' => '1.0.0', 'dependencies' => [], 'extraFiles' => []],
         ];
-        file_put_contents(
+        $this->filesystem->dumpFile(
             self::$writableRoot.'/assets/vendor/installed.php',
-            '<?php return '.var_export($installed, true).';'
+            '<?php return '.var_export($installed, true).';',
         );
 
         $configReader = $this->createMock(ImportMapConfigReader::class);
@@ -116,14 +114,12 @@ class RemotePackageDownloaderTest extends TestCase
 
         // matches installed version and file exists
         $entry1 = ImportMapEntry::createRemote('foo', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'foo', isEntrypoint: false);
-        @mkdir(self::$writableRoot.'/assets/vendor/foo', 0777, true);
-        file_put_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js', 'original foo content');
+        $this->filesystem->dumpFile(self::$writableRoot.'/assets/vendor/foo/foo.index.js', 'original foo content');
         // matches installed version but file does not exist
         $entry2 = ImportMapEntry::createRemote('bar.js/file', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'bar.js/file', isEntrypoint: false);
         // does not match installed version
         $entry3 = ImportMapEntry::createRemote('baz', ImportMapType::CSS, path: '/any', version: '1.1.0', packageModuleSpecifier: 'baz', isEntrypoint: false);
-        @mkdir(self::$writableRoot.'/assets/vendor/baz', 0777, true);
-        file_put_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css', 'original baz content');
+        $this->filesystem->dumpFile(self::$writableRoot.'/assets/vendor/baz/baz.index.css', 'original baz content');
         // matches installed & file exists, but has missing extra file
         $entry4 = ImportMapEntry::createRemote('has-missing-extra', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'has-missing-extra', isEntrypoint: false);
         $importMapEntries = new ImportMapEntries([$entry1, $entry2, $entry3, $entry4]);
@@ -150,9 +146,9 @@ class RemotePackageDownloaderTest extends TestCase
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/foo/foo.index.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/bar.js/file.js');
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/baz/baz.index.css');
-        $this->assertEquals('original foo content', file_get_contents(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
-        $this->assertEquals('new bar content', file_get_contents(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
-        $this->assertEquals('new baz content', file_get_contents(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
+        $this->assertEquals('original foo content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/foo/foo.index.js'));
+        $this->assertEquals('new bar content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/bar.js/file.js'));
+        $this->assertEquals('new baz content', $this->filesystem->readFile(self::$writableRoot.'/assets/vendor/baz/baz.index.css'));
         $this->assertFileExists(self::$writableRoot.'/assets/vendor/has-missing-extra/has-missing-extra.index.js');
 
         $installed = require self::$writableRoot.'/assets/vendor/installed.php';

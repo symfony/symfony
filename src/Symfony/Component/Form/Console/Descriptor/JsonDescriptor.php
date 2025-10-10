@@ -63,6 +63,12 @@ class JsonDescriptor extends Descriptor
 
     protected function describeOption(OptionsResolver $optionsResolver, array $options): void
     {
+        $data = $this->getOptionDescription($optionsResolver, $options);
+        $this->writeData($data, $options);
+    }
+
+    private function getOptionDescription(OptionsResolver $optionsResolver, array $options): array
+    {
         $definition = $this->getOptionDefinition($optionsResolver, $options['option']);
 
         $map = [];
@@ -90,7 +96,17 @@ class JsonDescriptor extends Descriptor
         }
         $data['has_normalizer'] = isset($definition['normalizers']);
 
-        $this->writeData($data, $options);
+        if ($data['has_nested_options'] = isset($definition['nestedOptions'])) {
+            $nestedResolver = new OptionsResolver();
+            foreach ($definition['nestedOptions'] as $nestedOption) {
+                $nestedOption($nestedResolver, $optionsResolver);
+            }
+            foreach ($nestedResolver->getDefinedOptions() as $option) {
+                $data['nested_options'][$option] = $this->getOptionDescription($nestedResolver, ['option' => $option]);
+            }
+        }
+
+        return $data;
     }
 
     private function writeData(array $data, array $options): void

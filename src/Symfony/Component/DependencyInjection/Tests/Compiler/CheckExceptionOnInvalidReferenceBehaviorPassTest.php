@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
@@ -84,10 +85,8 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @testWith [true]
-     *           [false]
-     */
+    #[TestWith([true])]
+    #[TestWith([false])]
     public function testWithErroredServiceLocator(bool $inline)
     {
         $container = new ContainerBuilder();
@@ -105,10 +104,8 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    /**
-     * @testWith [true]
-     *           [false]
-     */
+    #[TestWith([true])]
+    #[TestWith([false])]
     public function testWithErroredHiddenService(bool $inline)
     {
         $container = new ContainerBuilder();

@@ -1,10 +1,20 @@
 CHANGELOG
 =========
 
-6.4
-___
+7.4
+---
 * Add support to change port for ses `ses+smtp`
 * Default remains 465
+
+7.3
+---
+
+* Add support for custom headers in ses+api
+
+7.1
+---
+
+* Add support for `X-SES-LIST-MANAGEMENT-OPTIONS`
 
 6.1
 ---

@@ -16,6 +16,7 @@ use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
 use Http\Promise\FulfilledPromise;
 use Http\Promise\Promise;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -32,9 +33,7 @@ class HttplugClientTest extends TestCase
         TestHttpServer::start();
     }
 
-    /**
-     * @requires function ob_gzhandler
-     */
+    #[RequiresFunction('ob_gzhandler')]
     public function testSendRequest()
     {
         $client = new HttplugClient(new NativeHttpClient());
@@ -49,9 +48,7 @@ class HttplugClientTest extends TestCase
         $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
     }
 
-    /**
-     * @requires function ob_gzhandler
-     */
+    #[RequiresFunction('ob_gzhandler')]
     public function testSendAsyncRequest()
     {
         $client = new HttplugClient(new NativeHttpClient());

@@ -57,7 +57,7 @@ class QtFileLoader implements LoaderInterface
             foreach ($translations as $translation) {
                 $translationValue = (string) $translation->getElementsByTagName('translation')->item(0)->nodeValue;
 
-                if (!empty($translationValue)) {
+                if ($translationValue) {
                     $catalogue->set(
                         (string) $translation->getElementsByTagName('source')->item(0)->nodeValue,
                         $translationValue,

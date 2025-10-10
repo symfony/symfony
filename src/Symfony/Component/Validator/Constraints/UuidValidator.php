@@ -59,10 +59,7 @@ class UuidValidator extends ConstraintValidator
     public const LOOSE_MAX_LENGTH = 39;
     public const LOOSE_FIRST_HYPHEN_POSITION = 4;
 
-    /**
-     * @return void
-     */
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Uuid) {
             throw new UnexpectedTypeException($constraint, Uuid::class);

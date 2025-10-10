@@ -529,44 +529,44 @@ class EmailTest extends TestCase
         $expected = clone $e;
 
         $expectedJson = <<<EOF
-{
-    "text": "Text content",
-    "textCharset": "utf-8",
-    "html": "HTML <b>content</b>",
-    "htmlCharset": "utf-8",
-    "attachments": [
-        {
-            "filename": "test.txt",
-            "mediaType": "application",
-            "body": "Some Text file",
-            "charset": null,
-            "subtype": "octet-stream",
-            "disposition": "attachment",
-            "name": "test.txt",
-            "encoding": "base64",
-            "headers": [],
-            "class": "Symfony\\\Component\\\Mime\\\Part\\\DataPart"
-        }
-    ],
-    "headers": {
-        "to": [
             {
-                "addresses": [
+                "text": "Text content",
+                "textCharset": "utf-8",
+                "html": "HTML <b>content</b>",
+                "htmlCharset": "utf-8",
+                "attachments": [
                     {
-                        "address": "you@example.com",
-                        "name": ""
+                        "filename": "test.txt",
+                        "mediaType": "application",
+                        "body": "Some Text file",
+                        "charset": null,
+                        "subtype": "octet-stream",
+                        "disposition": "attachment",
+                        "name": "test.txt",
+                        "encoding": "base64",
+                        "headers": [],
+                        "class": "Symfony\\\Component\\\Mime\\\Part\\\DataPart"
                     }
                 ],
-                "name": "To",
-                "lineLength": 76,
-                "lang": null,
-                "charset": "utf-8"
+                "headers": {
+                    "to": [
+                        {
+                            "addresses": [
+                                {
+                                    "address": "you@example.com",
+                                    "name": ""
+                                }
+                            ],
+                            "name": "To",
+                            "lineLength": 76,
+                            "lang": null,
+                            "charset": "utf-8"
+                        }
+                    ]
+                },
+                "body": null
             }
-        ]
-    },
-    "body": null
-}
-EOF;
+            EOF;
 
         $extractor = new PhpDocExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);

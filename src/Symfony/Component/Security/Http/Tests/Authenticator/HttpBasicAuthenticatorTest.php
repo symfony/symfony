@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -56,9 +57,7 @@ class HttpBasicAuthenticatorTest extends TestCase
         $this->assertTrue($user->isEqualTo($passport->getUser()));
     }
 
-    /**
-     * @dataProvider provideMissingHttpBasicServerParameters
-     */
+    #[DataProvider('provideMissingHttpBasicServerParameters')]
     public function testHttpBasicServerParametersMissing(array $serverParameters)
     {
         $request = new Request([], [], [], [], [], $serverParameters);

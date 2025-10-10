@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Mime\Tests\Crypto;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Mime\Address;
@@ -18,34 +21,29 @@ use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Message;
 
-/**
- * @group time-sensitive
- *
- * @requires extension openssl
- */
+#[RequiresPhpExtension('openssl')]
+#[Group('time-sensitive')]
 class DkimSignerTest extends TestCase
 {
     private static string $pk = <<<EOF
------BEGIN RSA PRIVATE KEY-----
-MIICXAIBAAKBgQC6lQYNOMaboSOE/c2KNl8Rwk61zoMXrEmXC926an3/jHrtj9wB
-ndP2DY2nUyz0vpmJlcDOjDwTGs8U/C7zn7PDdZ8EuuxlAa7oNo/38YYV+5Oki93m
-io6rGV8zLMGLLygAB1sJaJVP5W9wm0RLY776YFL4V/nekA5ZTnA4+KaIYwIDAQAB
-AoGAJLhjgoKkA8kI1omkxAjDWRlmqD1Ga4hKy2FYd/GxbnPVVZ+0atUG/Cvarw2d
-kWVZjkxcr8nFoPTrwHOJQgUyOXWLuIuirznoTtDKzC+4JlDsZJd8hkVohqwKfdPA
-v4iYceN6V0YRQpsLVwKJinr5k6oHpCGs3sNffpHQzrXc24ECQQDb0JLiMm5OZoYZ
-G3739DsYVycUmYmYJtXuUBHTIwBAaOyo0yEmeQ8Li4H5dSSWqeOO0XrfP7cQ3TOm
-6LuSrIXDAkEA2Uv2PuteQXGSzOEuQbDbYeR0Le0drDUFJkXBM4oS3XB3wx2+umD+
-WqpfLEIXWV3/hkuottTmlsQuuAP3Xv+o4QJAf5FyTRfbcGCLnnKYoyn4Sc36fjgE
-5GpVaXLKhXAgq0C5Z9jvujYzhw21pqJXU6DQ0Ye8+WcuxPi7Czix8xNwpQJBAMm1
-vexCSMivSPpuvaW1KrEAhOhtB/JndVRFxEa3kTOFx2aUIgyZJQO8y4QmBc6rdxuO
-+BpgH30st8GRzPuej4ECQAsLon/QgsyhkfquBMLDC1uhO027K59C/aYRlufPyHkq
-HIyrMg2pQ46h2ybEuB50Cs+xF19KwBuGafBtRjkvXdU=
------END RSA PRIVATE KEY-----
-EOF;
+        -----BEGIN RSA PRIVATE KEY-----
+        MIICXAIBAAKBgQC6lQYNOMaboSOE/c2KNl8Rwk61zoMXrEmXC926an3/jHrtj9wB
+        ndP2DY2nUyz0vpmJlcDOjDwTGs8U/C7zn7PDdZ8EuuxlAa7oNo/38YYV+5Oki93m
+        io6rGV8zLMGLLygAB1sJaJVP5W9wm0RLY776YFL4V/nekA5ZTnA4+KaIYwIDAQAB
+        AoGAJLhjgoKkA8kI1omkxAjDWRlmqD1Ga4hKy2FYd/GxbnPVVZ+0atUG/Cvarw2d
+        kWVZjkxcr8nFoPTrwHOJQgUyOXWLuIuirznoTtDKzC+4JlDsZJd8hkVohqwKfdPA
+        v4iYceN6V0YRQpsLVwKJinr5k6oHpCGs3sNffpHQzrXc24ECQQDb0JLiMm5OZoYZ
+        G3739DsYVycUmYmYJtXuUBHTIwBAaOyo0yEmeQ8Li4H5dSSWqeOO0XrfP7cQ3TOm
+        6LuSrIXDAkEA2Uv2PuteQXGSzOEuQbDbYeR0Le0drDUFJkXBM4oS3XB3wx2+umD+
+        WqpfLEIXWV3/hkuottTmlsQuuAP3Xv+o4QJAf5FyTRfbcGCLnnKYoyn4Sc36fjgE
+        5GpVaXLKhXAgq0C5Z9jvujYzhw21pqJXU6DQ0Ye8+WcuxPi7Czix8xNwpQJBAMm1
+        vexCSMivSPpuvaW1KrEAhOhtB/JndVRFxEa3kTOFx2aUIgyZJQO8y4QmBc6rdxuO
+        +BpgH30st8GRzPuej4ECQAsLon/QgsyhkfquBMLDC1uhO027K59C/aYRlufPyHkq
+        HIyrMg2pQ46h2ybEuB50Cs+xF19KwBuGafBtRjkvXdU=
+        -----END RSA PRIVATE KEY-----
+        EOF;
 
-    /**
-     * @dataProvider getSignData
-     */
+    #[DataProvider('getSignData')]
     public function testSign(int $time, string $bodyCanon, string $headerCanon, string $header)
     {
         ClockMock::withClockMock($time);
@@ -107,9 +105,7 @@ EOF;
         $signer->sign($message, []);
     }
 
-    /**
-     * @dataProvider getCanonicalizeHeaderData
-     */
+    #[DataProvider('getCanonicalizeHeaderData')]
     public function testCanonicalizeHeader(string $bodyCanon, string $canonBody, string $body, int $maxLength)
     {
         $message = (new Email())

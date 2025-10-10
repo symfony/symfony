@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Uid;
 
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
+
 /**
  * A ULID is lexicographically sortable and contains a 48-bit timestamp and 80-bit of crypto-random entropy.
  *
@@ -31,15 +33,15 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         if (null === $ulid) {
             $this->uid = static::generate();
         } elseif (self::NIL === $ulid) {
-            $this->uid = $ulid;
-        } elseif (self::MAX === strtr($ulid, 'z', 'Z')) {
-            $this->uid = $ulid;
+            $this->uid = self::NIL;
         } else {
-            if (!self::isValid($ulid)) {
-                throw new \InvalidArgumentException(\sprintf('Invalid ULID: "%s".', $ulid));
-            }
-
             $this->uid = strtoupper($ulid);
+
+            if (self::MAX === $this->uid) {
+                $this->uid = self::MAX;
+            } elseif (!self::isValid($ulid)) {
+                throw new InvalidArgumentException(\sprintf('Invalid ULID: "%s".', $ulid));
+            }
         }
     }
 
@@ -59,7 +61,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
     public static function fromString(string $ulid): static
     {
         if (36 === \strlen($ulid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $ulid)) {
-            $ulid = uuid_parse($ulid);
+            $ulid = hex2bin(str_replace('-', '', $ulid));
         } elseif (22 === \strlen($ulid) && 22 === strspn($ulid, BinaryUtil::BASE58[''])) {
             $ulid = str_pad(BinaryUtil::fromBase($ulid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
         }
@@ -154,7 +156,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             $time = microtime(false);
             $time = substr($time, 11).substr($time, 2, 3);
         } elseif (0 > $time = $time->format('Uv')) {
-            throw new \InvalidArgumentException('The timestamp must be positive.');
+            throw new InvalidArgumentException('The timestamp must be positive.');
         }
 
         if ($time > self::$time || (null !== $mtime && $time !== self::$time)) {

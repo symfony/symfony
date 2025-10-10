@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 class FrozenParameterBagTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testConstructor()
     {
         $parameters = [
@@ -65,10 +64,10 @@ class FrozenParameterBagTest extends TestCase
     }
 
     /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
+     * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testGetDeprecated()
     {
         $bag = new FrozenParameterBag(
@@ -76,7 +75,7 @@ class FrozenParameterBagTest extends TestCase
             ['foo' => ['symfony/test', '6.3', 'The parameter "%s" is deprecated.', 'foo']]
         );
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo" is deprecated.');
 
         $bag->get('foo');
     }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,22 +22,21 @@ class RememberMeTokenTest extends TestCase
     public function testConstructor()
     {
         $user = $this->getUser();
-        $token = new RememberMeToken($user, 'fookey', 'foo');
+        $token = new RememberMeToken($user, 'fookey');
 
         $this->assertEquals('fookey', $token->getFirewallName());
-        $this->assertEquals('foo', $token->getSecret());
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertSame($user, $token->getUser());
     }
 
-    public function testConstructorSecretCannotBeEmptyString()
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testSecret()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        new RememberMeToken(
-            $this->getUser(),
-            '',
-            ''
-        );
+        $user = $this->getUser();
+        $token = new RememberMeToken($user, 'fookey', 'foo');
+
+        $this->assertEquals('foo', $token->getSecret());
     }
 
     protected function getUser($roles = ['ROLE_FOO'])

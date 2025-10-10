@@ -40,22 +40,28 @@ class KeyedListObjectConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     enabled?: bool, // Default: true
+     *     settings?: list<scalar|null>,
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('enabled', $value)) {
+        if (array_key_exists('enabled', $config)) {
             $this->_usedProperties['enabled'] = true;
-            $this->enabled = $value['enabled'];
-            unset($value['enabled']);
+            $this->enabled = $config['enabled'];
+            unset($config['enabled']);
         }
 
-        if (array_key_exists('settings', $value)) {
+        if (array_key_exists('settings', $config)) {
             $this->_usedProperties['settings'] = true;
-            $this->settings = $value['settings'];
-            unset($value['settings']);
+            $this->settings = $config['settings'];
+            unset($config['settings']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

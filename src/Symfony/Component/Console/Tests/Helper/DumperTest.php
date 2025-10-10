@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -32,9 +33,7 @@ class DumperTest extends TestCase
         putenv('DUMP_COMMA_SEPARATOR');
     }
 
-    /**
-     * @dataProvider provideVariables
-     */
+    #[DataProvider('provideVariables')]
     public function testInvoke($variable)
     {
         $output = $this->createMock(OutputInterface::class);

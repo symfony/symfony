@@ -18,17 +18,6 @@ namespace Symfony\Component\Validator;
  */
 class ConstraintViolation implements ConstraintViolationInterface
 {
-    private string|\Stringable $message;
-    private ?string $messageTemplate;
-    private array $parameters;
-    private ?int $plural;
-    private mixed $root;
-    private ?string $propertyPath;
-    private mixed $invalidValue;
-    private ?Constraint $constraint;
-    private ?string $code;
-    private mixed $cause;
-
     /**
      * Creates a new constraint violation.
      *
@@ -49,18 +38,18 @@ class ConstraintViolation implements ConstraintViolationInterface
      *                                            caused the violation
      * @param mixed              $cause           The cause of the violation
      */
-    public function __construct(string|\Stringable $message, ?string $messageTemplate, array $parameters, mixed $root, ?string $propertyPath, mixed $invalidValue, ?int $plural = null, ?string $code = null, ?Constraint $constraint = null, mixed $cause = null)
-    {
-        $this->message = $message;
-        $this->messageTemplate = $messageTemplate;
-        $this->parameters = $parameters;
-        $this->plural = $plural;
-        $this->root = $root;
-        $this->propertyPath = $propertyPath;
-        $this->invalidValue = $invalidValue;
-        $this->constraint = $constraint;
-        $this->code = $code;
-        $this->cause = $cause;
+    public function __construct(
+        private string|\Stringable $message,
+        private ?string $messageTemplate,
+        private array $parameters,
+        private mixed $root,
+        private ?string $propertyPath,
+        private mixed $invalidValue,
+        private ?int $plural = null,
+        private ?string $code = null,
+        private ?Constraint $constraint = null,
+        private mixed $cause = null,
+    ) {
     }
 
     public function __toString(): string

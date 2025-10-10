@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Zendesk\Tests;
 
 use Symfony\Component\Notifier\Bridge\Zendesk\ZendeskTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class ZendeskTransportFactoryTest extends TransportFactoryTestCase
+final class ZendeskTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): ZendeskTransportFactory
     {
         return new ZendeskTransportFactory();

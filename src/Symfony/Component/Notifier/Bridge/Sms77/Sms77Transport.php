@@ -23,19 +23,19 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author André Matthies <matthiez@gmail.com>
+ *
+ * @deprecated since Symfony 7.3, use the Seven.io bridge instead.
  */
 final class Sms77Transport extends AbstractTransport
 {
     protected const HOST = 'gateway.sms77.io';
 
-    private string $apiKey;
-    private ?string $from;
-
-    public function __construct(#[\SensitiveParameter] string $apiKey, ?string $from = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $apiKey,
+        private ?string $from = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -84,7 +84,7 @@ final class Sms77Transport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        if (false === \in_array($success['success'], [100, 101])) {
+        if (false === \in_array($success['success'], [100, 101], true)) {
             throw new TransportException(\sprintf('Unable to send the SMS: "%s".', $success['success']), $response);
         }
 

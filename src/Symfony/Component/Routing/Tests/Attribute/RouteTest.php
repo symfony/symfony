@@ -9,67 +9,37 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Tests\Annotation;
+namespace Symfony\Component\Routing\Tests\Attribute;
 
-use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\FooController;
-use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\FooController as FooAttributesController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\FooController;
 
 class RouteTest extends TestCase
 {
-    private function getMethodAnnotation(string $method, bool $attributes): Route
+    #[DataProvider('getValidParameters')]
+    public function testLoadFromAttribute(string $methodName, string $property, mixed $expectedReturn)
     {
-        $class = $attributes ? FooAttributesController::class : FooController::class;
-        $reflection = new \ReflectionMethod($class, $method);
+        $route = (new \ReflectionMethod(FooController::class, $methodName))->getAttributes(Route::class)[0]->newInstance();
 
-        if ($attributes) {
-            $attributes = $reflection->getAttributes(Route::class);
-            $route = $attributes[0]->newInstance();
-        } else {
-            $reader = new AnnotationReader();
-            $route = $reader->getMethodAnnotation($reflection, Route::class);
-        }
-
-        if (!$route instanceof Route) {
-            throw new \Exception('Can\'t parse annotation');
-        }
-
-        return $route;
-    }
-
-    /**
-     * @dataProvider getValidParameters
-     */
-    public function testLoadFromAttribute(string $methodName, string $getter, $expectedReturn)
-    {
-        $route = $this->getMethodAnnotation($methodName, true);
-        $this->assertEquals($route->$getter(), $expectedReturn);
-    }
-
-    /**
-     * @dataProvider getValidParameters
-     */
-    public function testLoadFromDoctrineAnnotation(string $methodName, string $getter, $expectedReturn)
-    {
-        $route = $this->getMethodAnnotation($methodName, false);
-        $this->assertEquals($route->$getter(), $expectedReturn);
+        $this->assertEquals($route->$property, $expectedReturn);
     }
 
     public static function getValidParameters(): iterable
     {
         return [
-            ['simplePath', 'getPath', '/Blog'],
-            ['localized', 'getLocalizedPaths', ['nl' => '/hier', 'en' => '/here']],
-            ['requirements', 'getRequirements', ['locale' => 'en']],
-            ['options', 'getOptions', ['compiler_class' => 'RouteCompiler']],
-            ['name', 'getName', 'blog_index'],
-            ['defaults', 'getDefaults', ['_controller' => 'MyBlogBundle:Blog:index']],
-            ['schemes', 'getSchemes', ['https']],
-            ['methods', 'getMethods', ['GET', 'POST']],
-            ['host', 'getHost', '{locale}.example.com'],
-            ['condition', 'getCondition', 'context.getMethod() == \'GET\''],
+            ['simplePath', 'path', '/Blog'],
+            ['localized', 'path', ['nl' => '/hier', 'en' => '/here']],
+            ['requirements', 'requirements', ['locale' => 'en']],
+            ['options', 'options', ['compiler_class' => 'RouteCompiler']],
+            ['name', 'name', 'blog_index'],
+            ['defaults', 'defaults', ['_controller' => 'MyBlogBundle:Blog:index']],
+            ['schemes', 'schemes', ['https']],
+            ['methods', 'methods', ['GET', 'POST']],
+            ['host', 'host', '{locale}.example.com'],
+            ['condition', 'condition', 'context.getMethod() == \'GET\''],
+            ['alias', 'aliases', ['alias', 'completely_different_name']],
         ];
     }
 }

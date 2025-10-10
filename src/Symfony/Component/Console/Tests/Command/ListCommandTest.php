@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -41,11 +42,11 @@ class ListCommandTest extends TestCase
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), '--raw' => true]);
         $output = <<<'EOF'
-completion   Dump the shell completion script
-help         Display help for a command
-list         List commands
+            completion   Dump the shell completion script
+            help         Display help for a command
+            list         List commands
 
-EOF;
+            EOF;
 
         $this->assertEquals($output, $commandTester->getDisplay(true));
     }
@@ -54,13 +55,13 @@ EOF;
     {
         require_once realpath(__DIR__.'/../Fixtures/FooCommand.php');
         $application = new Application();
-        $application->add(new \FooCommand());
+        $application->addCommand(new \FooCommand());
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), 'namespace' => 'foo', '--raw' => true]);
         $output = <<<'EOF'
-foo:bar   The foo:bar command
+            foo:bar   The foo:bar command
 
-EOF;
+            EOF;
 
         $this->assertEquals($output, $commandTester->getDisplay(true));
     }
@@ -69,30 +70,31 @@ EOF;
     {
         require_once realpath(__DIR__.'/../Fixtures/Foo6Command.php');
         $application = new Application();
-        $application->add(new \Foo6Command());
+        $application->addCommand(new \Foo6Command());
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
         $output = <<<'EOF'
-Console Tool
+            Console Tool
 
-Usage:
-  command [options] [arguments]
+            Usage:
+              command [options] [arguments]
 
-Options:
-  -h, --help            Display help for the given command. When no command is given display help for the list command
-  -q, --quiet           Do not output any message
-  -V, --version         Display this application version
-      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
-  -n, --no-interaction  Do not ask any interactive question
-  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+            Options:
+              -h, --help            Display help for the given command. When no command is given display help for the list command
+                  --silent          Do not output any message
+              -q, --quiet           Only errors are displayed. All other output is suppressed
+              -V, --version         Display this application version
+                  --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
+              -n, --no-interaction  Do not ask any interactive question
+              -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
-Available commands:
-  completion  Dump the shell completion script
-  help        Display help for a command
-  list        List commands
- 0foo
-  0foo:bar    0foo:bar command
-EOF;
+            Available commands:
+              completion  Dump the shell completion script
+              help        Display help for a command
+              list        List commands
+             0foo
+              0foo:bar    0foo:bar command
+            EOF;
 
         $this->assertEquals($output, trim($commandTester->getDisplay(true)));
     }
@@ -101,27 +103,25 @@ EOF;
     {
         require_once realpath(__DIR__.'/../Fixtures/Foo6Command.php');
         $application = new Application();
-        $application->add(new \Foo6Command());
+        $application->addCommand(new \Foo6Command());
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), '--raw' => true]);
         $output = <<<'EOF'
-completion   Dump the shell completion script
-help         Display help for a command
-list         List commands
-0foo:bar     0foo:bar command
-EOF;
+            completion   Dump the shell completion script
+            help         Display help for a command
+            list         List commands
+            0foo:bar     0foo:bar command
+            EOF;
 
         $this->assertEquals($output, trim($commandTester->getDisplay(true)));
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         require_once realpath(__DIR__.'/../Fixtures/FooCommand.php');
         $application = new Application();
-        $application->add(new \FooCommand());
+        $application->addCommand(new \FooCommand());
         $tester = new CommandCompletionTester($application->get('list'));
         $suggestions = $tester->complete($input, 2);
         $this->assertSame($expectedSuggestions, $suggestions);

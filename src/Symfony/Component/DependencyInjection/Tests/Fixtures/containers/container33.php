@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 $container = new ContainerBuilder();
 
-$container->register(\Foo\Foo::class)->setPublic(true);
-$container->register(\Bar\Foo::class)->setPublic(true);
+$container->register('Foo\Foo', \Foo\Foo::class)->setPublic(true);
+$container->register('Bar\Foo', \Bar\Foo::class)->setPublic(true);
 
 return $container;

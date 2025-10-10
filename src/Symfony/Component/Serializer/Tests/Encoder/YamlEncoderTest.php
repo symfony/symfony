@@ -62,9 +62,9 @@ class YamlEncoderTest extends TestCase
         $encoder = new YamlEncoder(null, null, [YamlEncoder::YAML_INLINE => 100, YamlEncoder::YAML_INDENTATION => 7]);
 
         $expected = <<<'END'
-foo:
-       bar: baz
-END;
+            foo:
+                   bar: baz
+            END;
         $this->assertSame($expected."\n", $encoder->encode(['foo' => ['bar' => 'baz']], 'yaml'));
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -40,9 +41,7 @@ class ExpressionLanguageProviderTest extends TestCase
         $this->expressionLanguage->registerProvider(new ExpressionLanguageProvider($functionProvider));
     }
 
-    /**
-     * @dataProvider compileProvider
-     */
+    #[DataProvider('compileProvider')]
     public function testCompile(string $expression, string $expected)
     {
         $this->assertSame($expected, $this->expressionLanguage->compile($expression));
@@ -57,9 +56,7 @@ class ExpressionLanguageProviderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider evaluateProvider
-     */
+    #[DataProvider('evaluateProvider')]
     public function testEvaluate(string $expression, $expected)
     {
         $this->assertSame($expected, $this->expressionLanguage->evaluate($expression, ['context' => $this->context]));

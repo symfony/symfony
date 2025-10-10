@@ -18,9 +18,9 @@ class DescriptorApplication2 extends Application
     public function __construct()
     {
         parent::__construct('My Symfony application', 'v1.0');
-        $this->add(new DescriptorCommand1());
-        $this->add(new DescriptorCommand2());
-        $this->add(new DescriptorCommand3());
-        $this->add(new DescriptorCommand4());
+        $this->addCommand(new DescriptorCommand1());
+        $this->addCommand(new DescriptorCommand2());
+        $this->addCommand(new DescriptorCommand3());
+        $this->addCommand(new DescriptorCommand4());
     }
 }

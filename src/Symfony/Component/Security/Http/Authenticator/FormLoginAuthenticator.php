@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -40,19 +41,16 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  */
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 {
-    private HttpUtils $httpUtils;
-    private UserProviderInterface $userProvider;
-    private AuthenticationSuccessHandlerInterface $successHandler;
-    private AuthenticationFailureHandlerInterface $failureHandler;
     private array $options;
     private HttpKernelInterface $httpKernel;
 
-    public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options)
-    {
-        $this->httpUtils = $httpUtils;
-        $this->userProvider = $userProvider;
-        $this->successHandler = $successHandler;
-        $this->failureHandler = $failureHandler;
+    public function __construct(
+        private HttpUtils $httpUtils,
+        private UserProviderInterface $userProvider,
+        private AuthenticationSuccessHandlerInterface $successHandler,
+        private AuthenticationFailureHandlerInterface $failureHandler,
+        array $options,
+    ) {
         $this->options = array_merge([
             'username_parameter' => '_username',
             'password_parameter' => '_password',
@@ -129,13 +127,21 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 
         $credentials['username'] = trim($credentials['username']);
 
+        if ('' === $credentials['username']) {
+            throw new BadCredentialsException(\sprintf('The key "%s" must be a non-empty string.', $this->options['username_parameter']));
+        }
+
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $credentials['username']);
 
-        if (!\is_string($credentials['password']) && (!\is_object($credentials['password']) || !method_exists($credentials['password'], '__toString'))) {
+        if (!\is_string($credentials['password']) && !$credentials['password'] instanceof \Stringable) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be a string, "%s" given.', $this->options['password_parameter'], \gettype($credentials['password'])));
         }
 
-        if (!\is_string($credentials['csrf_token'] ?? '') && (!\is_object($credentials['csrf_token']) || !method_exists($credentials['csrf_token'], '__toString'))) {
+        if ('' === (string) $credentials['password']) {
+            throw new BadCredentialsException(\sprintf('The key "%s" must be a non-empty string.', $this->options['password_parameter']));
+        }
+
+        if (!\is_string($credentials['csrf_token'] ?? '') && !$credentials['csrf_token'] instanceof \Stringable) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be a string, "%s" given.', $this->options['csrf_parameter'], \gettype($credentials['csrf_token'])));
         }
 

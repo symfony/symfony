@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Config\Tests\Builder;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Builder\ClassBuilder;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderInterface;
+use Symfony\Component\Config\Builder\Method;
+use Symfony\Component\Config\Builder\Property;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Tests\Builder\Fixtures\AddToList;
 use Symfony\Component\Config\Tests\Builder\Fixtures\NodeInitialValues;
@@ -28,20 +32,17 @@ use Symfony\Config\AddToListConfig;
  * Test to use the generated config and test its output.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * @covers \Symfony\Component\Config\Builder\ClassBuilder
- * @covers \Symfony\Component\Config\Builder\ConfigBuilderGenerator
- * @covers \Symfony\Component\Config\Builder\Method
- * @covers \Symfony\Component\Config\Builder\Property
  */
+#[CoversClass(ClassBuilder::class)]
+#[CoversClass(ConfigBuilderGenerator::class)]
+#[CoversClass(Method::class)]
+#[CoversClass(Property::class)]
 class GeneratedConfigTest extends TestCase
 {
     private array $tempDir = [];
 
     protected function setup(): void
     {
-        parent::setup();
-
         $this->tempDir = [];
     }
 
@@ -49,8 +50,6 @@ class GeneratedConfigTest extends TestCase
     {
         (new Filesystem())->remove($this->tempDir);
         $this->tempDir = [];
-
-        parent::tearDown();
     }
 
     public static function fixtureNames()
@@ -78,9 +77,7 @@ class GeneratedConfigTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider fixtureNames
-     */
+    #[DataProvider('fixtureNames')]
     public function testConfig(string $name, string $alias)
     {
         $basePath = __DIR__.'/Fixtures/';
@@ -93,7 +90,6 @@ class GeneratedConfigTest extends TestCase
         // $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
         // $this->markTestIncomplete('Re-comment the line above and relaunch the tests');
 
-        $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
         $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);
         $callback($configBuilder);
 
@@ -163,16 +159,18 @@ class GeneratedConfigTest extends TestCase
     /**
      * Generate the ConfigBuilder or return an already generated instance.
      */
-    private function generateConfigBuilder(string $configurationClass, ?string $outputDir = null)
+    private function generateConfigBuilder(string $configurationClass, ?string &$outputDir = null)
     {
-        $outputDir ??= sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
-        if (!str_contains($outputDir, __DIR__)) {
+        if (null === $outputDir) {
+            $outputDir = tempnam(sys_get_temp_dir(), 'sf_config_builder_');
+            unlink($outputDir);
+            mkdir($outputDir);
             $this->tempDir[] = $outputDir;
         }
 
         $configuration = new $configurationClass();
         $rootNode = $configuration->getConfigTreeBuilder()->buildTree();
-        $rootClass = new ClassBuilder('Symfony\\Config', $rootNode->getName());
+        $rootClass = new ClassBuilder('Symfony\\Config', $rootNode->getName(), $rootNode);
         if (class_exists($fqcn = $rootClass->getFqcn())) {
             // Avoid generating the class again
             return new $fqcn();

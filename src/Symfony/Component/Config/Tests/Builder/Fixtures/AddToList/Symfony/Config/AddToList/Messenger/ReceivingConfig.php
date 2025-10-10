@@ -40,22 +40,28 @@ class ReceivingConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     priority?: int<min, max>,
+     *     color?: scalar|null,
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('priority', $value)) {
+        if (array_key_exists('priority', $config)) {
             $this->_usedProperties['priority'] = true;
-            $this->priority = $value['priority'];
-            unset($value['priority']);
+            $this->priority = $config['priority'];
+            unset($config['priority']);
         }
 
-        if (array_key_exists('color', $value)) {
+        if (array_key_exists('color', $config)) {
             $this->_usedProperties['color'] = true;
-            $this->color = $value['color'];
-            unset($value['color']);
+            $this->color = $config['color'];
+            unset($config['color']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

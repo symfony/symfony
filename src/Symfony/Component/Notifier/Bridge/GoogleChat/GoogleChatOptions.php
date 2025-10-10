@@ -21,11 +21,10 @@ use Symfony\Component\Notifier\Notification\Notification;
 final class GoogleChatOptions implements MessageOptionsInterface
 {
     private ?string $threadKey = null;
-    private array $options = [];
 
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     public static function fromNotification(Notification $notification): self
@@ -59,20 +58,6 @@ final class GoogleChatOptions implements MessageOptionsInterface
     public function toArray(): array
     {
         return $this->options;
-    }
-
-    /**
-     * @deprecated since Symfony 6.3, use "cardV2()" instead
-     *
-     * @return $this
-     */
-    public function card(array $card): static
-    {
-        trigger_deprecation('symfony/google-chat-notifier', '6.3', '"%s()" is deprecated, use "cardV2()" instead.', __METHOD__);
-
-        $this->options['cards'][] = $card;
-
-        return $this;
     }
 
     /**

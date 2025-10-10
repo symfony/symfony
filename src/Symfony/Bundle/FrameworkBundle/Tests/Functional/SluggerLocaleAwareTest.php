@@ -11,16 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Slugger\SlugConstructArgService;
 
-/**
- * @group functional
- */
+#[Group('functional')]
 class SluggerLocaleAwareTest extends AbstractWebTestCase
 {
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testLocalizedSlugger()
     {
         $kernel = static::createKernel(['test_case' => 'Slugger', 'root_config' => 'config.yml']);

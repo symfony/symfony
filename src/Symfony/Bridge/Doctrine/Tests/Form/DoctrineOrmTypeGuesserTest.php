@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\JoinColumnMapping;
 use Doctrine\ORM\Mapping\ManyToOneAssociationMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Component\Form\Guess\Guess;
@@ -25,9 +26,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 
 class DoctrineOrmTypeGuesserTest extends TestCase
 {
-    /**
-     * @dataProvider requiredType
-     */
+    #[DataProvider('requiredType')]
     public function testTypeGuesser(string $type, $expected)
     {
         $classMetadata = $this->createMock(ClassMetadata::class);

@@ -11,17 +11,14 @@
 
 namespace Symfony\Component\Mime\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\RawMessage;
 
 class RawMessageTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
-    /**
-     * @dataProvider provideMessages
-     */
+    #[DataProvider('provideMessages')]
     public function testToString(mixed $messageParameter, bool $supportReuse)
     {
         $message = new RawMessage($messageParameter);
@@ -35,9 +32,7 @@ class RawMessageTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideMessages
-     */
+    #[DataProvider('provideMessages')]
     public function testSerialization(mixed $messageParameter, bool $supportReuse)
     {
         $message = new RawMessage($messageParameter);
@@ -49,9 +44,7 @@ class RawMessageTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideMessages
-     */
+    #[DataProvider('provideMessages')]
     public function testToIterable(mixed $messageParameter, bool $supportReuse)
     {
         $message = new RawMessage($messageParameter);
@@ -63,20 +56,15 @@ class RawMessageTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideMessages
-     *
-     * @group legacy
-     */
+    #[DataProvider('provideMessages')]
     public function testToIterableLegacy(mixed $messageParameter, bool $supportReuse)
     {
         $message = new RawMessage($messageParameter);
         $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
 
         if (!$supportReuse) {
-            // in 7.0, the test with a generator will throw an exception
-            $this->expectDeprecation('Since symfony/mime 6.4: Sending an email with a closed generator is deprecated and will throw in 7.0.');
-            $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+            $this->expectException(LogicException::class);
+            iterator_to_array($message->toIterable());
         }
     }
 

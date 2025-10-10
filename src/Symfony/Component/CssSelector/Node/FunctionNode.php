@@ -25,18 +25,17 @@ use Symfony\Component\CssSelector\Parser\Token;
  */
 class FunctionNode extends AbstractNode
 {
-    private NodeInterface $selector;
     private string $name;
-    private array $arguments;
 
     /**
      * @param Token[] $arguments
      */
-    public function __construct(NodeInterface $selector, string $name, array $arguments = [])
-    {
-        $this->selector = $selector;
+    public function __construct(
+        private NodeInterface $selector,
+        string $name,
+        private array $arguments = [],
+    ) {
         $this->name = strtolower($name);
-        $this->arguments = $arguments;
     }
 
     public function getSelector(): NodeInterface

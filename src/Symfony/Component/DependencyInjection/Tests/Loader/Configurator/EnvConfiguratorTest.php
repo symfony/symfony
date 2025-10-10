@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader\Configurator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Loader\Configurator\EnvConfigurator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 final class EnvConfiguratorTest extends TestCase
 {
-    /**
-     * @dataProvider provide
-     */
+    #[DataProvider('provide')]
     public function test(string $expected, EnvConfigurator $envConfigurator)
     {
         $this->assertSame($expected, (string) $envConfigurator);

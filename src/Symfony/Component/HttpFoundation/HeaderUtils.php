@@ -34,7 +34,7 @@ class HeaderUtils
      * Example:
      *
      *     HeaderUtils::split('da, en-gb;q=0.8', ',;')
-     *     // => ['da'], ['en-gb', 'q=0.8']]
+     *     # returns [['da'], ['en-gb', 'q=0.8']]
      *
      * @param string $separators List of characters to split on, ordered by
      *                           precedence, e.g. ',', ';=', or ',;='
@@ -164,7 +164,7 @@ class HeaderUtils
      */
     public static function makeDisposition(string $disposition, string $filename, string $filenameFallback = ''): string
     {
-        if (!\in_array($disposition, [self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE])) {
+        if (!\in_array($disposition, [self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE], true)) {
             throw new \InvalidArgumentException(\sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
         }
 

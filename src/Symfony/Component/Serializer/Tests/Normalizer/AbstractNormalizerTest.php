@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -173,10 +174,8 @@ class AbstractNormalizerTest extends TestCase
         $normalizer->denormalize([], NullableConstructorArgumentDummy::class, null, [AbstractNormalizer::REQUIRE_ALL_PROPERTIES => true]);
     }
 
-    /**
-     * @dataProvider getNormalizer
-     * @dataProvider getNormalizerWithCustomNameConverter
-     */
+    #[DataProvider('getNormalizer')]
+    #[DataProvider('getNormalizerWithCustomNameConverter')]
     public function testObjectWithVariadicConstructorTypedArguments(AbstractNormalizer $normalizer)
     {
         $d1 = new Dummy();
@@ -209,9 +208,7 @@ class AbstractNormalizerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider getNormalizer
-     */
+    #[DataProvider('getNormalizer')]
     public function testVariadicSerializationWithPreservingKeys(AbstractNormalizer $normalizer)
     {
         $d1 = new Dummy();
@@ -272,12 +269,12 @@ class AbstractNormalizerTest extends TestCase
     {
         $extractor = new PhpDocExtractor();
         $nameConverter = new class implements NameConverterInterface {
-            public function normalize(string $propertyName): string
+            public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return ucfirst($propertyName);
             }
 
-            public function denormalize(string $propertyName): string
+            public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return lcfirst($propertyName);
             }
@@ -303,9 +300,6 @@ class AbstractNormalizerTest extends TestCase
         $this->assertSame([], $normalizer->normalize($dummy));
     }
 
-    /**
-     * @requires PHP 8.1.2
-     */
     public function testDenormalizeWhenObjectNotInstantiable()
     {
         $this->expectException(NotNormalizableValueException::class);

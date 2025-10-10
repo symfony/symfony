@@ -24,17 +24,17 @@ class IssnTest extends TestCase
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertFalse($aConstraint->caseSensitive);
         self::assertFalse($aConstraint->requireHyphen);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
         self::assertTrue($bConstraint->caseSensitive);
         self::assertTrue($bConstraint->requireHyphen);
         self::assertSame(['Default', 'IssnDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

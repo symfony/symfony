@@ -32,19 +32,13 @@ final class LokaliseProvider implements ProviderInterface
 {
     private const LOKALISE_GET_KEYS_LIMIT = 5000;
 
-    private HttpClientInterface $client;
-    private LoaderInterface $loader;
-    private LoggerInterface $logger;
-    private string $defaultLocale;
-    private string $endpoint;
-
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
-    {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
+    public function __construct(
+        private HttpClientInterface $client,
+        private LoaderInterface $loader,
+        private LoggerInterface $logger,
+        private string $defaultLocale,
+        private string $endpoint,
+    ) {
     }
 
     public function __toString(): string
@@ -60,10 +54,6 @@ final class LokaliseProvider implements ProviderInterface
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$defaultCatalogue) {
-            $defaultCatalogue = $translatorBag->getCatalogues()[0];
-        }
 
         $this->ensureAllLocalesAreCreated($translatorBag);
         $existingKeysByDomain = [];
@@ -110,10 +100,6 @@ final class LokaliseProvider implements ProviderInterface
     public function delete(TranslatorBagInterface $translatorBag): void
     {
         $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
-
-        if (!$catalogue) {
-            $catalogue = $translatorBag->getCatalogues()[0];
-        }
 
         $keysIds = [];
 

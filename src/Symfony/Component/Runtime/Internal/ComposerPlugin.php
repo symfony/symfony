@@ -82,6 +82,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             $projectDir = substr($projectDir, 3);
         }
 
+        // the hack about __DIR__ is required because composer pre-processes plugins
         if (!$nestingLevel) {
             $projectDir = '__'.'DIR__.'.var_export('/'.$projectDir, true);
         } else {

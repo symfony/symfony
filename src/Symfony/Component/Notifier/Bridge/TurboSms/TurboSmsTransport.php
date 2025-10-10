@@ -34,15 +34,13 @@ final class TurboSmsTransport extends AbstractTransport
     private const SUBJECT_CYRILLIC_LIMIT = 661;
     private const SENDER_LIMIT = 20;
 
-    private string $authToken;
-    private string $from;
-
-    public function __construct(#[\SensitiveParameter] string $authToken, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] private string $authToken,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         $this->assertValidFrom($from);
-
-        $this->authToken = $authToken;
-        $this->from = $from;
 
         parent::__construct($client, $dispatcher);
     }
@@ -116,7 +114,7 @@ final class TurboSmsTransport extends AbstractTransport
     private function assertValidSubject(string $subject): void
     {
         // Detect if there is at least one cyrillic symbol in the text
-        if (preg_match("/\p{Cyrillic}/u", $subject)) {
+        if (preg_match('/\p{Cyrillic}/u', $subject)) {
             $subjectLimit = self::SUBJECT_CYRILLIC_LIMIT;
             $symbols = 'cyrillic';
         } else {

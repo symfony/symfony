@@ -24,10 +24,10 @@ class DelayedMessageHandlingException extends RuntimeException implements Wrappe
     use EnvelopeAwareExceptionTrait;
     use WrappedExceptionsTrait;
 
-    private array $exceptions;
-
-    public function __construct(array $exceptions, ?Envelope $envelope = null)
-    {
+    public function __construct(
+        private array $exceptions,
+        ?Envelope $envelope = null,
+    ) {
         $this->envelope = $envelope;
 
         $exceptionMessages = implode(", \n", array_map(
@@ -41,18 +41,6 @@ class DelayedMessageHandlingException extends RuntimeException implements Wrappe
             $message = \sprintf("Some delayed message handlers threw an exception: \n\n%s", $exceptionMessages);
         }
 
-        $this->exceptions = $exceptions;
-
         parent::__construct($message, 0, $exceptions[array_key_first($exceptions)]);
-    }
-
-    /**
-     * @deprecated since Symfony 6.4, use {@see self::getWrappedExceptions()} instead
-     */
-    public function getExceptions(): array
-    {
-        trigger_deprecation('symfony/messenger', '6.4', 'The "%s()" method is deprecated, use "%s::getWrappedExceptions()" instead.', __METHOD__, self::class);
-
-        return $this->exceptions;
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CheckArgumentsValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -41,9 +42,7 @@ class CheckArgumentsValidityPassTest extends TestCase
         ], $container->getDefinition('foo')->getMethodCalls());
     }
 
-    /**
-     * @dataProvider definitionProvider
-     */
+    #[DataProvider('definitionProvider')]
     public function testException(array $arguments, array $methodCalls)
     {
         $container = new ContainerBuilder();

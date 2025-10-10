@@ -45,4 +45,31 @@ class AttributeAutoconfigurationPassTest extends TestCase
         $this->expectExceptionMessage('Argument "$reflector" of attribute autoconfigurator should have a type, use one or more of "\ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\Reflector" in ');
         (new AttributeAutoconfigurationPass())->process($container);
     }
+
+    public function testProcessesAbstractServicesWithContainerExcludedTag()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, static function (ChildDefinition $definition, AsTaggedItem $attribute, \ReflectionClass $reflector) {
+            $definition->addTag('processed.tag');
+        });
+
+        // Create an abstract service with container.excluded tag and attributes
+        $abstractService = $container->register('abstract_service', TestServiceWithAttributes::class)
+            ->setAutoconfigured(true)
+            ->setAbstract(true)
+            ->addTag('container.excluded', ['source' => 'test']);
+
+        (new AttributeAutoconfigurationPass())->process($container);
+
+        // Abstract service with container.excluded tag should be processed
+        $expected = [
+            TestServiceWithAttributes::class => (new ChildDefinition(''))->addTag('processed.tag'),
+        ];
+        $this->assertEquals($expected, $abstractService->getInstanceofConditionals());
+    }
+}
+
+#[AsTaggedItem]
+class TestServiceWithAttributes
+{
 }

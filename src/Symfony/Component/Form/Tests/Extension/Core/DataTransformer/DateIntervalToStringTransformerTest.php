@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToStringTransformer;
@@ -52,9 +53,7 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
         ];
     }
 
-    /**
-     * @dataProvider dataProviderISO
-     */
+    #[DataProvider('dataProviderISO')]
     public function testTransform($format, $output, $input)
     {
         $transformer = new DateIntervalToStringTransformer($format);
@@ -75,9 +74,7 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
         $transformer->transform('1234');
     }
 
-    /**
-     * @dataProvider dataProviderISO
-     */
+    #[DataProvider('dataProviderISO')]
     public function testReverseTransform($format, $input, $output)
     {
         $reverseTransformer = new DateIntervalToStringTransformer($format, true);
@@ -85,9 +82,7 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
         $this->assertDateIntervalEquals($interval, $reverseTransformer->reverseTransform($input));
     }
 
-    /**
-     * @dataProvider dataProviderDate
-     */
+    #[DataProvider('dataProviderDate')]
     public function testReverseTransformDateString($format, $input, $output)
     {
         $reverseTransformer = new DateIntervalToStringTransformer($format, true);

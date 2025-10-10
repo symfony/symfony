@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\BrowserKit\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\HttpBrowser;
@@ -26,9 +27,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         return new TestHttpClient($server, $history, $cookieJar);
     }
 
-    /**
-     * @dataProvider validContentTypes
-     */
+    #[DataProvider('validContentTypes')]
     public function testRequestHeaders(array $requestArguments, array $expectedArguments)
     {
         $client = $this->createMock(HttpClientInterface::class);
@@ -186,9 +185,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
-    /**
-     * @dataProvider forwardSlashesRequestPathProvider
-     */
+    #[DataProvider('forwardSlashesRequestPathProvider')]
     public function testMultipleForwardSlashesRequestPath(string $requestPath)
     {
         $client = $this->createMock(HttpClientInterface::class);

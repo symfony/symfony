@@ -18,10 +18,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class EnvelopedMessageNormalizer implements NormalizerInterface
 {
-    public function normalize($message, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         return [
-            'text' => $message->text,
+            'text' => $data->text,
         ];
     }
 

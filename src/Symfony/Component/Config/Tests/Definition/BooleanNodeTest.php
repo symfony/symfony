@@ -11,24 +11,48 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\BooleanNode;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 class BooleanNodeTest extends TestCase
 {
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testNormalize(bool $value)
     {
         $node = new BooleanNode('test');
         $this->assertSame($value, $node->normalize($value));
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    public function testNullValueOnNullable()
+    {
+        $node = new BooleanNode('test', null, '.', true);
+
+        $this->assertNull($node->normalize(null));
+    }
+
+    public function testNullValueOnNotNullable()
+    {
+        $node = new BooleanNode('test', null, '.', false);
+
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage('Invalid type for path "test". Expected "bool", but got "null".');
+
+        $this->assertNull($node->normalize(null));
+    }
+
+    public function testInvalidValueOnNullable()
+    {
+        $node = new BooleanNode('test', null, '.', true);
+
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage('Invalid type for path "test". Expected "bool" or "null", but got "int".');
+
+        $node->normalize(123);
+    }
+
+    #[DataProvider('getValidValues')]
     public function testValidNonEmptyValues(bool $value)
     {
         $node = new BooleanNode('test');
@@ -45,9 +69,7 @@ class BooleanNodeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
+    #[DataProvider('getInvalidValues')]
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
         $node = new BooleanNode('test');
@@ -60,7 +82,6 @@ class BooleanNodeTest extends TestCase
     public static function getInvalidValues(): array
     {
         return [
-            [null],
             [''],
             ['foo'],
             [0],

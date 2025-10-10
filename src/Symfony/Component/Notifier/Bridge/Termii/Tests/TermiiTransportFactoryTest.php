@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Termii\Tests;
 
 use Symfony\Component\Notifier\Bridge\Termii\TermiiTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class TermiiTransportFactoryTest extends TransportFactoryTestCase
+final class TermiiTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): TermiiTransportFactory
     {
         return new TermiiTransportFactory();

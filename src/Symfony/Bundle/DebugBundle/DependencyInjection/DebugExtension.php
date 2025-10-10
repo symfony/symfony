@@ -22,16 +22,11 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 
 /**
- * DebugExtension.
- *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class DebugExtension extends Extension
 {
-    /**
-     * @return void
-     */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -90,11 +85,17 @@ class DebugExtension extends Extension
         }
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/debug';

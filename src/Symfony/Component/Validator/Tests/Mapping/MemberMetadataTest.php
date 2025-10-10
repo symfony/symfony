@@ -74,8 +74,8 @@ class MemberMetadataTest extends TestCase
 
     public function testSerialize()
     {
-        $this->metadata->addConstraint(new ConstraintA(['property1' => 'A']));
-        $this->metadata->addConstraint(new ConstraintB(['groups' => 'TestGroup']));
+        $this->metadata->addConstraint(new ConstraintA('A'));
+        $this->metadata->addConstraint(new ConstraintB(null, ['TestGroup']));
 
         $metadata = unserialize(serialize($this->metadata));
 
@@ -84,7 +84,7 @@ class MemberMetadataTest extends TestCase
 
     public function testSerializeCollectionCascaded()
     {
-        $this->metadata->addConstraint(new Valid(['traverse' => true]));
+        $this->metadata->addConstraint(new Valid(traverse: true));
 
         $metadata = unserialize(serialize($this->metadata));
 
@@ -93,7 +93,7 @@ class MemberMetadataTest extends TestCase
 
     public function testSerializeCollectionNotCascaded()
     {
-        $this->metadata->addConstraint(new Valid(['traverse' => false]));
+        $this->metadata->addConstraint(new Valid(traverse: false));
 
         $metadata = unserialize(serialize($this->metadata));
 
@@ -116,9 +116,11 @@ class PropertyCompositeConstraint extends Composite
 {
     public $nested;
 
-    public function getDefaultOption(): ?string
+    public function __construct(array $nested)
     {
-        return $this->getCompositeOption();
+        $this->nested = $nested;
+
+        parent::__construct();
     }
 
     protected function getCompositeOption(): string

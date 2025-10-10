@@ -39,12 +39,12 @@ class ClassExistenceResourceTest extends TestCase
         $this->assertTrue($res->isFresh(time()));
 
         eval(<<<EOF
-namespace Symfony\Component\Config\Tests\Fixtures;
+            namespace Symfony\Component\Config\Tests\Fixtures;
 
-class BarClass
-{
-}
-EOF
+            class BarClass
+            {
+            }
+            EOF
         );
 
         $this->assertFalse($res->isFresh(time()));

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\EnableAutoMapping;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -23,6 +25,8 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class EnableAutoMappingTest extends TestCase
 {
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testGroups()
     {
         $this->expectException(ConstraintDefinitionException::class);

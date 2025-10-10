@@ -10,6 +10,12 @@ class AcmeConfig implements ConfigBuilderInterface
 
     private $nested;
 
+    public function __construct(array $config = [])
+    {
+        $this->color = $config['color'] ?? null;
+        $this->nested = $config['nested'] ?? null;
+    }
+
     public function color($value)
     {
         $this->color = $value;
@@ -29,7 +35,7 @@ class AcmeConfig implements ConfigBuilderInterface
     public function toArray(): array
     {
         return [
-            'color' => $this->color
+            'color' => $this->color,
         ];
     }
 

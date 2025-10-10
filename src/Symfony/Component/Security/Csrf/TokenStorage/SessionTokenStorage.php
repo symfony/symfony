@@ -28,18 +28,15 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public const SESSION_NAMESPACE = '_csrf';
 
-    private RequestStack $requestStack;
-    private string $namespace;
-
     /**
      * Initializes the storage with a RequestStack object and a session namespace.
      *
      * @param string $namespace The namespace under which the token is stored in the requestStack
      */
-    public function __construct(RequestStack $requestStack, string $namespace = self::SESSION_NAMESPACE)
-    {
-        $this->requestStack = $requestStack;
-        $this->namespace = $namespace;
+    public function __construct(
+        private RequestStack $requestStack,
+        private string $namespace = self::SESSION_NAMESPACE,
+    ) {
     }
 
     public function getToken(string $tokenId): string
@@ -56,10 +53,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
         return (string) $session->get($this->namespace.'/'.$tokenId);
     }
 
-    /**
-     * @return void
-     */
-    public function setToken(string $tokenId, #[\SensitiveParameter] string $token)
+    public function setToken(string $tokenId, #[\SensitiveParameter] string $token): void
     {
         $session = $this->getSession();
         if (!$session->isStarted()) {
@@ -89,10 +83,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
         return $session->remove($this->namespace.'/'.$tokenId);
     }
 
-    /**
-     * @return void
-     */
-    public function clear()
+    public function clear(): void
     {
         $session = $this->getSession();
         foreach (array_keys($session->all()) as $key) {

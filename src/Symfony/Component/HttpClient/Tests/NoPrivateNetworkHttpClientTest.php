@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
@@ -66,11 +68,8 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         yield ['fc00::1',  '10.0.0.0/8', true];
     }
 
-    /**
-     * @dataProvider getExcludeIpData
-     *
-     * @group dns-sensitive
-     */
+    #[DataProvider('getExcludeIpData')]
+    #[Group('dns-sensitive')]
     public function testExcludeByIp(string $ipAddr, $subnets, bool $mustThrow)
     {
         $host = strtr($ipAddr, '.:', '--');
@@ -104,11 +103,8 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider getExcludeHostData
-     *
-     * @group dns-sensitive
-     */
+    #[DataProvider('getExcludeHostData')]
+    #[Group('dns-sensitive')]
     public function testExcludeByHost(string $ipAddr, $subnets, bool $mustThrow)
     {
         $host = strtr($ipAddr, '.:', '--');

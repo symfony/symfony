@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -24,20 +26,29 @@ class GreaterThanTest extends TestCase
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame(2, $aConstraint->value);
         self::assertNull($aConstraint->propertyPath);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame(4711, $bConstraint->value);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'GreaterThanDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertNull($cConstraint->value);
         self::assertSame('b', $cConstraint->propertyPath);
         self::assertSame('myMessage', $cConstraint->message);
         self::assertSame(['foo'], $cConstraint->groups);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testDoctrineStyle()
+    {
+        $constraint = new GreaterThan(['value' => 5]);
+
+        $this->assertSame(5, $constraint->value);
     }
 }
 

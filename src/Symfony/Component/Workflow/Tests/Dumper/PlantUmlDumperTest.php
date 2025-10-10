@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Dumper\PlantUmlDumper;
@@ -23,9 +24,7 @@ class PlantUmlDumperTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    /**
-     * @dataProvider provideWorkflowDefinitionWithoutMarking
-     */
+    #[DataProvider('provideWorkflowDefinitionWithoutMarking')]
     public function testDumpWorkflowWithoutMarking($definition, $marking, $expectedFileName, $title)
     {
         $dumper = new PlantUmlDumper(PlantUmlDumper::WORKFLOW_TRANSITION);
@@ -46,9 +45,7 @@ class PlantUmlDumperTest extends TestCase
         yield [self::createComplexWorkflowDefinition(), $marking, 'complex-workflow-marking', 'ComplexDiagram'];
     }
 
-    /**
-     * @dataProvider provideStateMachineDefinitionWithoutMarking
-     */
+    #[DataProvider('provideStateMachineDefinitionWithoutMarking')]
     public function testDumpStateMachineWithoutMarking($definition, $marking, $expectedFileName, $title)
     {
         $dumper = new PlantUmlDumper(PlantUmlDumper::STATEMACHINE_TRANSITION);

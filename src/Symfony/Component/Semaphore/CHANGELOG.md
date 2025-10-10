@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * RedisStore uses `EVALSHA` over `EVAL` when evaluating LUA scripts
+
+7.3
+---
+
+ * Add support for `valkey:` / `valkeys:` schemes
+
 6.3
 ---
 

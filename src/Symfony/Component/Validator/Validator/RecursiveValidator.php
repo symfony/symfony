@@ -29,24 +29,18 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
  */
 class RecursiveValidator implements ValidatorInterface
 {
-    protected $contextFactory;
-    protected $metadataFactory;
-    protected $validatorFactory;
-    protected $objectInitializers;
-    protected ?ContainerInterface $groupProviderLocator;
-
     /**
      * Creates a new validator.
      *
      * @param ObjectInitializerInterface[] $objectInitializers The object initializers
      */
-    public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], ?ContainerInterface $groupProviderLocator = null)
-    {
-        $this->contextFactory = $contextFactory;
-        $this->metadataFactory = $metadataFactory;
-        $this->validatorFactory = $validatorFactory;
-        $this->objectInitializers = $objectInitializers;
-        $this->groupProviderLocator = $groupProviderLocator;
+    public function __construct(
+        protected ExecutionContextFactoryInterface $contextFactory,
+        protected MetadataFactoryInterface $metadataFactory,
+        protected ConstraintValidatorFactoryInterface $validatorFactory,
+        protected array $objectInitializers = [],
+        protected ?ContainerInterface $groupProviderLocator = null,
+    ) {
     }
 
     public function startContext(mixed $root = null): ContextualValidatorInterface

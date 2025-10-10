@@ -41,13 +41,15 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
 
     public function testRedirectWhenNoSlashForNonSafeMethod()
     {
-        $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
         $context = new RequestContext();
         $context->setMethod('POST');
         $matcher = $this->getUrlMatcher($coll, $context);
+
+        $this->expectException(ResourceNotFoundException::class);
+
         $matcher->match('/foo');
     }
 

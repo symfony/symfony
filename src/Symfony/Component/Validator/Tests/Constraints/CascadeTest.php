@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
@@ -35,6 +37,8 @@ class CascadeTest extends TestCase
         self::assertSame(['foo' => 0, 'bar' => 1], $constraint->exclude);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testExcludePropertiesDoctrineStyle()
     {
         $constraint = new Cascade(['exclude' => ['foo', 'bar']]);

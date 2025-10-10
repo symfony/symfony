@@ -30,6 +30,7 @@ use Symfony\Component\HttpClient\Internal\ClientState;
 trait TransportResponseTrait
 {
     private Canary $canary;
+    /** @var array<string, list<string>> */
     private array $headers = [];
     private array $info = [
         'response_headers' => [],
@@ -233,7 +234,11 @@ trait TransportResponseTrait
                         } elseif ($chunk instanceof FirstChunk) {
                             if ($response->logger) {
                                 $info = $response->getInfo();
-                                $response->logger->info(\sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
+                                $response->logger->info('Response: "{http_code} {url}" {total_time} seconds', [
+                                    'http_code' => $info['http_code'],
+                                    'url' => $info['url'],
+                                    'total_time' => $info['total_time'],
+                                ]);
                             }
 
                             $response->inflate = \extension_loaded('zlib') && $response->inflate && 'gzip' === ($response->headers['content-encoding'][0] ?? null) ? inflate_init(\ZLIB_ENCODING_GZIP) : null;

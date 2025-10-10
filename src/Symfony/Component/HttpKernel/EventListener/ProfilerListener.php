@@ -32,15 +32,9 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  */
 class ProfilerListener implements EventSubscriberInterface
 {
-    private Profiler $profiler;
-    private ?RequestMatcherInterface $matcher;
-    private bool $onlyException;
-    private bool $onlyMainRequests;
     private ?\Throwable $exception = null;
     /** @var \SplObjectStorage<Request, Profile> */
     private \SplObjectStorage $profiles;
-    private RequestStack $requestStack;
-    private ?string $collectParameter;
     /** @var \SplObjectStorage<Request, Request|null> */
     private \SplObjectStorage $parents;
 
@@ -48,16 +42,16 @@ class ProfilerListener implements EventSubscriberInterface
      * @param bool $onlyException    True if the profiler only collects data when an exception occurs, false otherwise
      * @param bool $onlyMainRequests True if the profiler only collects data when the request is the main request, false otherwise
      */
-    public function __construct(Profiler $profiler, RequestStack $requestStack, ?RequestMatcherInterface $matcher = null, bool $onlyException = false, bool $onlyMainRequests = false, ?string $collectParameter = null)
-    {
-        $this->profiler = $profiler;
-        $this->matcher = $matcher;
-        $this->onlyException = $onlyException;
-        $this->onlyMainRequests = $onlyMainRequests;
+    public function __construct(
+        private Profiler $profiler,
+        private RequestStack $requestStack,
+        private ?RequestMatcherInterface $matcher = null,
+        private bool $onlyException = false,
+        private bool $onlyMainRequests = false,
+        private ?string $collectParameter = null,
+    ) {
         $this->profiles = new \SplObjectStorage();
         $this->parents = new \SplObjectStorage();
-        $this->requestStack = $requestStack;
-        $this->collectParameter = $collectParameter;
     }
 
     /**
@@ -86,8 +80,8 @@ class ProfilerListener implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        if (null !== $this->collectParameter && null !== $collectParameterValue = $request->get($this->collectParameter)) {
-            true === $collectParameterValue || filter_var($collectParameterValue, \FILTER_VALIDATE_BOOL) ? $this->profiler->enable() : $this->profiler->disable();
+        if (null !== $this->collectParameter && null !== $collectParameterValue = $request->attributes->get($this->collectParameter) ?? $request->query->get($this->collectParameter) ?? $request->request->get($this->collectParameter)) {
+            filter_var($collectParameterValue, \FILTER_VALIDATE_BOOL) ? $this->profiler->enable() : $this->profiler->disable();
         }
 
         $exception = $this->exception;
@@ -135,8 +129,14 @@ class ProfilerListener implements EventSubscriberInterface
             $this->profiler->saveProfile($this->profiles[$request]);
         }
 
+        $this->reset();
+    }
+
+    public function reset(): void
+    {
         $this->profiles = new \SplObjectStorage();
         $this->parents = new \SplObjectStorage();
+        $this->exception = null;
     }
 
     public static function getSubscribedEvents(): array

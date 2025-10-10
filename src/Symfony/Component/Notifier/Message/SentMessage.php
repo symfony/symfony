@@ -16,14 +16,16 @@ namespace Symfony\Component\Notifier\Message;
  */
 class SentMessage
 {
-    private MessageInterface $original;
-    private string $transport;
     private ?string $messageId = null;
 
-    public function __construct(MessageInterface $original, string $transport)
-    {
-        $this->original = $original;
-        $this->transport = $transport;
+    /**
+     * @param array $info attaches any Transport-related information to the sent message
+     */
+    public function __construct(
+        private MessageInterface $original,
+        private string $transport,
+        private array $info = [],
+    ) {
     }
 
     public function getOriginalMessage(): MessageInterface
@@ -44,5 +46,19 @@ class SentMessage
     public function getMessageId(): ?string
     {
         return $this->messageId;
+    }
+
+    /**
+     * Returns extra info attached to the message.
+     *
+     * @param string|null $key if null, the whole info array will be returned, else returns the info value or null
+     */
+    public function getInfo(?string $key = null): mixed
+    {
+        if (null !== $key) {
+            return $this->info[$key] ?? null;
+        }
+
+        return $this->info;
     }
 }

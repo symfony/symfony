@@ -14,8 +14,10 @@ namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\EventStreamResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ServerEvent;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -40,23 +42,16 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public const DISABLED = 1;
     public const ENABLED = 2;
 
-    private Environment $twig;
-    private ?UrlGeneratorInterface $urlGenerator;
-    private bool $interceptRedirects;
-    private int $mode;
-    private string $excludedAjaxPaths;
-    private ?ContentSecurityPolicyHandler $cspHandler;
-    private ?DumpDataCollector $dumpDataCollector;
-
-    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, ?UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ?ContentSecurityPolicyHandler $cspHandler = null, ?DumpDataCollector $dumpDataCollector = null)
-    {
-        $this->twig = $twig;
-        $this->urlGenerator = $urlGenerator;
-        $this->interceptRedirects = $interceptRedirects;
-        $this->mode = $mode;
-        $this->excludedAjaxPaths = $excludedAjaxPaths;
-        $this->cspHandler = $cspHandler;
-        $this->dumpDataCollector = $dumpDataCollector;
+    public function __construct(
+        private Environment $twig,
+        private bool $interceptRedirects = false,
+        private int $mode = self::ENABLED,
+        private ?UrlGeneratorInterface $urlGenerator = null,
+        private string $excludedAjaxPaths = '^/bundles|^/_wdt',
+        private ?ContentSecurityPolicyHandler $cspHandler = null,
+        private ?DumpDataCollector $dumpDataCollector = null,
+        private bool $ajaxReplace = false,
+    ) {
     }
 
     public function isEnabled(): bool
@@ -104,6 +99,10 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
         // do not capture redirects or modify XML HTTP Requests
         if ($request->isXmlHttpRequest()) {
+            if (self::ENABLED === $this->mode && $this->ajaxReplace && !$response->headers->has('Symfony-Debug-Toolbar-Replace')) {
+                $response->headers->set('Symfony-Debug-Toolbar-Replace', '1');
+            }
+
             return;
         }
 
@@ -116,6 +115,27 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location'), 'host' => $request->getSchemeAndHttpHost()]));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
+        }
+
+        if ($response->headers->has('X-Debug-Token') && $response instanceof EventStreamResponse) {
+            $callback = $response->getCallback();
+            $response->setCallback(static function () use ($callback, $response) {
+                $response->sendEvent(new ServerEvent(
+                    [
+                        $response->headers->get('X-Debug-Token') ?? '',
+                        $response->headers->get('X-Debug-Token-Link') ?? '',
+                    ],
+                    'symfony:debug:started',
+                ));
+                try {
+                    $callback();
+                } catch (\Throwable $e) {
+                    $response->sendEvent(new ServerEvent('error', 'symfony:debug:error'));
+                    throw $e;
+                } finally {
+                    $response->sendEvent(new ServerEvent('-', 'symfony:debug:finished'));
+                }
+            });
         }
 
         if (self::DISABLED === $this->mode

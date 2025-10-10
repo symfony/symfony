@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -40,9 +42,7 @@ class ResponseFunctionalTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideCookie
-     */
+    #[DataProvider('provideCookie')]
     public function testCookie($fixture)
     {
         $result = file_get_contents(\sprintf('http://localhost:8054/%s.php', $fixture));
@@ -59,9 +59,7 @@ class ResponseFunctionalTest extends TestCase
         }
     }
 
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function testInformationalResponse()
     {
         if (!(new ExecutableFinder())->find('curl')) {

@@ -21,17 +21,13 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\OAuth2User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
 class UserValueResolverTest extends TestCase
 {
-    /**
-     * In Symfony 7, keep this test case but remove the call to supports().
-     *
-     * @group legacy
-     */
     public function testSupportsFailsWithNoType()
     {
         $tokenStorage = new TokenStorage();
@@ -39,14 +35,8 @@ class UserValueResolverTest extends TestCase
         $metadata = new ArgumentMetadata('foo', null, false, false, null);
 
         $this->assertSame([], $resolver->resolve(Request::create('/'), $metadata));
-        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
-    /**
-     * In Symfony 7, keep this test case but remove the call to supports().
-     *
-     * @group legacy
-     */
     public function testSupportsFailsWhenDefaultValAndNoUser()
     {
         $tokenStorage = new TokenStorage();
@@ -54,7 +44,6 @@ class UserValueResolverTest extends TestCase
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, true, $default = new InMemoryUser('username', 'password'));
 
         $this->assertSame([$default], $resolver->resolve(Request::create('/'), $metadata));
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
     }
 
     public function testResolveSucceedsWithUserInterface()
@@ -103,7 +92,6 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = $this->createMock(ArgumentMetadata::class);
         $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
 
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
@@ -117,8 +105,20 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = $this->createMock(ArgumentMetadata::class);
         $metadata = new ArgumentMetadata('foo', InMemoryUser::class, false, false, null, false, [new CurrentUser()]);
+
+        $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
+    }
+
+    public function testResolveSucceedsWithUnionTypedAttribute()
+    {
+        $user = new InMemoryUser('username', 'password');
+        $token = new UsernamePasswordToken($user, 'provider');
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
+
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', InMemoryUser::class.'|'.OAuth2User::class, false, false, null, false, [new CurrentUser()]);
 
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
@@ -134,7 +134,7 @@ class UserValueResolverTest extends TestCase
         $metadata = new ArgumentMetadata('foo', InMemoryUser::class, false, false, null, false, [new CurrentUser()]);
 
         $this->expectException(AccessDeniedException::class);
-        $this->expectExceptionMessageMatches('/^The logged-in user is an instance of "Mock_UserInterface[^"]+" but a user of type "Symfony\\\\Component\\\\Security\\\\Core\\\\User\\\\InMemoryUser" is expected.$/');
+        $this->expectExceptionMessage(\sprintf('The logged-in user is an instance of "%s" but a user of type "Symfony\Component\Security\Core\User\InMemoryUser" is expected.', $user::class));
         $resolver->resolve(Request::create('/'), $metadata);
     }
 

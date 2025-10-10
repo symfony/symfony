@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -57,9 +58,7 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString('OK', trim($tester->getDisplay()));
     }
 
-    /**
-     * @dataProvider provideStrictFilenames
-     */
+    #[DataProvider('provideStrictFilenames')]
     public function testStrictFilenames($requireStrictFileNames, $fileNamePattern, $targetLanguage, $mustFail)
     {
         $tester = $this->createCommandTester($requireStrictFileNames);
@@ -120,10 +119,11 @@ class XliffLintCommandTest extends TestCase
 
     public function testLintFileNotReadable()
     {
-        $this->expectException(\RuntimeException::class);
         $tester = $this->createCommandTester();
         $filename = $this->createFile();
         unlink($filename);
+
+        $this->expectException(\RuntimeException::class);
 
         $tester->execute(['filename' => $filename], ['decorated' => false]);
     }
@@ -132,12 +132,14 @@ class XliffLintCommandTest extends TestCase
     {
         $command = new XliffLintCommand();
         $expected = <<<EOF
-Or of a whole directory:
+            Or of a whole directory:
 
-  <info>php %command.full_name% dirname</info>
-  <info>php %command.full_name% dirname --format=json</info>
+              <info>php %command.full_name% dirname</info>
 
-EOF;
+            The <info>--format</info> option specifies the format of the command output:
+
+              <info>php %command.full_name% dirname --format=json</info>
+            EOF;
 
         $this->assertStringContainsString($expected, $command->getHelp());
     }
@@ -182,18 +184,18 @@ EOF;
     private function createFile($sourceContent = 'note', $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.xlf'): string
     {
         $xliffContent = <<<XLIFF
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" target-language="$targetLanguage" datatype="plaintext" original="file.ext">
-        <body>
-            <trans-unit id="note">
-                <source>$sourceContent</source>
-                <target>NOTE</target>
-            </trans-unit>
-        </body>
-    </file>
-</xliff>
-XLIFF;
+            <?xml version="1.0"?>
+            <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+                <file source-language="en" target-language="$targetLanguage" datatype="plaintext" original="file.ext">
+                    <body>
+                        <trans-unit id="note">
+                            <source>$sourceContent</source>
+                            <target>NOTE</target>
+                        </trans-unit>
+                    </body>
+                </file>
+            </xliff>
+            XLIFF;
 
         $filename = \sprintf('%s/translation-xliff-lint-test/%s', sys_get_temp_dir(), str_replace('%locale%', 'en', $fileNamePattern));
         file_put_contents($filename, $xliffContent);
@@ -207,14 +209,17 @@ XLIFF;
     {
         if (!$application) {
             $application = new Application();
-            $application->add(new XliffLintCommand(null, null, null, $requireStrictFileNames));
+            $command = new XliffLintCommand(null, null, null, $requireStrictFileNames);
+            if (method_exists($application, 'addCommand')) {
+                $application->addCommand($command);
+            } else {
+                $application->add($command);
+            }
         }
 
         $command = $application->find('lint:xliff');
 
-        if ($application) {
-            $command->setApplication($application);
-        }
+        $command->setApplication($application);
 
         return $command;
     }
@@ -252,9 +257,7 @@ XLIFF;
         yield [true, '%locale%.messages.xlf', 'es', true];
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $tester = new CommandCompletionTester($this->createCommand());

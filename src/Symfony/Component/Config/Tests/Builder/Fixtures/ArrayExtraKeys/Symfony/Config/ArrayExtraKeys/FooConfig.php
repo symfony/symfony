@@ -40,21 +40,28 @@ class FooConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     baz?: scalar|null,
+     *     qux?: scalar|null,
+     *     ...<mixed>
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('baz', $value)) {
+        if (array_key_exists('baz', $config)) {
             $this->_usedProperties['baz'] = true;
-            $this->baz = $value['baz'];
-            unset($value['baz']);
+            $this->baz = $config['baz'];
+            unset($config['baz']);
         }
 
-        if (array_key_exists('qux', $value)) {
+        if (array_key_exists('qux', $config)) {
             $this->_usedProperties['qux'] = true;
-            $this->qux = $value['qux'];
-            unset($value['qux']);
+            $this->qux = $config['qux'];
+            unset($config['qux']);
         }
 
-        $this->_extraKeys = $value;
+        $this->_extraKeys = $config;
 
     }
 

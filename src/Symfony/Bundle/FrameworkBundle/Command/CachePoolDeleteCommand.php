@@ -29,18 +29,14 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 #[AsCommand(name: 'cache:pool:delete', description: 'Delete an item from a cache pool')]
 final class CachePoolDeleteCommand extends Command
 {
-    private Psr6CacheClearer $poolClearer;
-    private ?array $poolNames;
-
     /**
      * @param string[]|null $poolNames
      */
-    public function __construct(Psr6CacheClearer $poolClearer, ?array $poolNames = null)
-    {
+    public function __construct(
+        private Psr6CacheClearer $poolClearer,
+        private ?array $poolNames = null,
+    ) {
         parent::__construct();
-
-        $this->poolClearer = $poolClearer;
-        $this->poolNames = $poolNames;
     }
 
     protected function configure(): void
@@ -51,10 +47,10 @@ final class CachePoolDeleteCommand extends Command
                 new InputArgument('key', InputArgument::REQUIRED, 'The cache key to delete from the pool'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> deletes an item from a given cache pool.
+                The <info>%command.name%</info> deletes an item from a given cache pool.
 
-    %command.full_name% <pool> <key>
-EOF
+                    %command.full_name% <pool> <key>
+                EOF
             )
         ;
     }

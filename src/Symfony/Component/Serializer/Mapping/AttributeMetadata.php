@@ -15,68 +15,27 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since Symfony 7.4
  */
 class AttributeMetadata implements AttributeMetadataInterface
 {
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getName()} instead.
-     */
-    public string $name;
-
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
-     */
-    public array $groups = [];
-
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getMaxDepth()} instead.
-     */
-    public ?int $maxDepth = null;
-
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getSerializedName()} instead.
-     */
-    public ?string $serializedName = null;
-
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getSerializedPath()} instead.
-     */
-    public ?PropertyPath $serializedPath = null;
-
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link isIgnored()} instead.
-     */
-    public bool $ignore = false;
+    private string $name;
+    private array $groups = [];
+    private ?int $maxDepth = null;
+    private ?string $serializedName = null;
+    private ?PropertyPath $serializedPath = null;
+    private bool $ignore = false;
 
     /**
      * @var array[] Normalization contexts per group name ("*" applies to all groups)
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getNormalizationContexts()} instead.
      */
-    public array $normalizationContexts = [];
+    private array $normalizationContexts = [];
 
     /**
      * @var array[] Denormalization contexts per group name ("*" applies to all groups)
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getDenormalizationContexts()} instead.
      */
-    public array $denormalizationContexts = [];
+    private array $denormalizationContexts = [];
 
     public function __construct(string $name)
     {
@@ -90,7 +49,7 @@ class AttributeMetadata implements AttributeMetadataInterface
 
     public function addGroup(string $group): void
     {
-        if (!\in_array($group, $this->groups)) {
+        if (!\in_array($group, $this->groups, true)) {
             $this->groups[] = $group;
         }
     }
@@ -110,12 +69,8 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->maxDepth;
     }
 
-    public function setSerializedName(?string $serializedName = null): void
+    public function setSerializedName(?string $serializedName): void
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/serializer', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
-
         $this->serializedName = $serializedName;
     }
 
@@ -219,9 +174,9 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * Returns the names of the properties that should be serialized.
+     * @internal since Symfony 7.4, will be replaced by `__serialize()` in 8.0
      *
-     * @return string[]
+     * @final since Symfony 7.4, will be replaced by `__serialize()` in 8.0
      */
     public function __sleep(): array
     {

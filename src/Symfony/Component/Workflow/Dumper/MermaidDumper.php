@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Dumper;
 
+use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\Marking;
@@ -39,22 +40,18 @@ class MermaidDumper implements DumperInterface
         self::TRANSITION_TYPE_WORKFLOW,
     ];
 
-    private string $direction;
-    private string $transitionType;
-
     /**
      * Just tracking the transition id is in some cases inaccurate to
      * get the link's number for styling purposes.
      */
     private int $linkCount = 0;
 
-    public function __construct(string $transitionType, string $direction = self::DIRECTION_LEFT_TO_RIGHT)
-    {
+    public function __construct(
+        private string $transitionType,
+        private string $direction = self::DIRECTION_LEFT_TO_RIGHT,
+    ) {
         $this->validateDirection($direction);
         $this->validateTransitionType($transitionType);
-
-        $this->direction = $direction;
-        $this->transitionType = $transitionType;
     }
 
     public function dump(Definition $definition, ?Marking $marking = null, array $options = []): string
@@ -72,8 +69,9 @@ class MermaidDumper implements DumperInterface
                 $placeId,
                 $place,
                 $meta->getPlaceMetadata($place),
-                \in_array($place, $definition->getInitialPlaces()),
-                $marking?->has($place) ?? false
+                \in_array($place, $definition->getInitialPlaces(), true),
+                $marking?->has($place) ?? false,
+                $marking?->getTokenCount($place) ?? 0
             );
 
             $output[] = $placeNode;
@@ -95,16 +93,15 @@ class MermaidDumper implements DumperInterface
                 $transitionLabel = $transitionMeta['label'];
             }
 
-            foreach ($transition->getFroms() as $from) {
-                $from = $placeNameMap[$from];
-
-                foreach ($transition->getTos() as $to) {
-                    $to = $placeNameMap[$to];
-
+            foreach ($transition->getFroms(true) as $fromArc) {
+                foreach ($transition->getTos(true) as $toArc) {
                     if (self::TRANSITION_TYPE_STATEMACHINE === $this->transitionType) {
+                        $from = $placeNameMap[$fromArc->place];
+                        $to = $placeNameMap[$toArc->place];
+
                         $transitionOutput = $this->styleStateMachineTransition($from, $to, $transitionLabel, $transitionMeta);
                     } else {
-                        $transitionOutput = $this->styleWorkflowTransition($from, $to, $transitionId, $transitionLabel, $transitionMeta);
+                        $transitionOutput = $this->styleWorkflowTransition($placeNameMap, $fromArc, $toArc, $transitionId, $transitionLabel, $transitionMeta);
                     }
 
                     foreach ($transitionOutput as $line) {
@@ -126,11 +123,14 @@ class MermaidDumper implements DumperInterface
         return implode("\n", $output);
     }
 
-    private function preparePlace(int $placeId, string $placeName, array $meta, bool $isInitial, bool $hasMarking): array
+    private function preparePlace(int $placeId, string $placeName, array $meta, bool $isInitial, bool $hasMarking, int $tokenCount): array
     {
         $placeLabel = $placeName;
         if (\array_key_exists('label', $meta)) {
             $placeLabel = $meta['label'];
+        }
+        if (1 < $tokenCount) {
+            $placeLabel .= ' ('.$tokenCount.')';
         }
 
         $placeLabel = $this->escape($placeLabel);
@@ -210,7 +210,7 @@ class MermaidDumper implements DumperInterface
         return $transitionOutput;
     }
 
-    private function styleWorkflowTransition(string $from, string $to, int $transitionId, string $transitionLabel, array $transitionMeta): array
+    private function styleWorkflowTransition(array $placeNameMap, Arc $from, Arc $to, int $transitionId, string $transitionLabel, array $transitionMeta): array
     {
         $transitionOutput = [];
 
@@ -224,8 +224,11 @@ class MermaidDumper implements DumperInterface
             $transitionOutput[] = $transitionNodeStyle;
         }
 
-        $connectionStyle = '%s-->%s';
-        $transitionOutput[] = \sprintf($connectionStyle, $from, $transitionNodeName);
+        if ($from->weight > 1) {
+            $transitionOutput[] = \sprintf('%s-->|%d|%s', $placeNameMap[$from->place], $from->weight, $transitionNodeName);
+        } else {
+            $transitionOutput[] = \sprintf('%s-->%s', $placeNameMap[$from->place], $transitionNodeName);
+        }
 
         $linkStyle = $this->styleLink($transitionMeta);
         if ('' !== $linkStyle) {
@@ -234,7 +237,11 @@ class MermaidDumper implements DumperInterface
 
         ++$this->linkCount;
 
-        $transitionOutput[] = \sprintf($connectionStyle, $transitionNodeName, $to);
+        if ($to->weight > 1) {
+            $transitionOutput[] = \sprintf('%s-->|%d|%s', $transitionNodeName, $to->weight, $placeNameMap[$to->place]);
+        } else {
+            $transitionOutput[] = \sprintf('%s-->%s', $transitionNodeName, $placeNameMap[$to->place]);
+        }
 
         $linkStyle = $this->styleLink($transitionMeta);
         if ('' !== $linkStyle) {

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
@@ -39,27 +42,27 @@ class ImportMapConfigReaderTest extends TestCase
     public function testGetEntriesAndWriteEntries()
     {
         $importMap = <<<EOF
-<?php
-return [
-    'remote_package' => [
-        'version' => '3.2.1',
-    ],
-    'local_package' => [
-        'path' => 'app.js',
-    ],
-    'type_css' => [
-        'path' => 'styles/app.css',
-        'type' => 'css',
-    ],
-    'entry_point' => [
-        'path' => 'entry.js',
-        'entrypoint' => true,
-    ],
-    'package/with_file.js' => [
-        'version' => '1.0.0',
-    ],
-];
-EOF;
+            <?php
+            return [
+                'remote_package' => [
+                    'version' => '3.2.1',
+                ],
+                'local_package' => [
+                    'path' => 'app.js',
+                ],
+                'type_css' => [
+                    'path' => 'styles/app.css',
+                    'type' => 'css',
+                ],
+                'entry_point' => [
+                    'path' => 'entry.js',
+                    'entrypoint' => true,
+                ],
+                'package/with_file.js' => [
+                    'version' => '1.0.0',
+                ],
+            ];
+            EOF;
         file_put_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php', $importMap);
 
         $remotePackageStorage = $this->createMock(RemotePackageStorage::class);
@@ -106,9 +109,7 @@ EOF;
         $this->assertSame($originalImportMapData, $newImportMapData);
     }
 
-    /**
-     * @dataProvider getPathToFilesystemPathTests
-     */
+    #[DataProvider('getPathToFilesystemPathTests')]
     public function testConvertPathToFilesystemPath(string $path, string $expectedPath)
     {
         $configReader = new ImportMapConfigReader(realpath(__DIR__.'/../Fixtures/importmap.php'), $this->createMock(RemotePackageStorage::class));
@@ -130,9 +131,7 @@ EOF;
         ];
     }
 
-    /**
-     * @dataProvider getFilesystemPathToPathTests
-     */
+    #[DataProvider('getFilesystemPathToPathTests')]
     public function testConvertFilesystemPathToPath(string $path, ?string $expectedPath)
     {
         $configReader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
@@ -158,5 +157,13 @@ EOF;
         $entry = $configReader->findRootImportMapEntry('file2');
         $this->assertSame('file2', $entry->importName);
         $this->assertSame('file2.js', $entry->path);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testDeprecatedMethodTriggerDeprecation()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/asset-mapper 7.1: The method "Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader::splitPackageNameAndFilePath()" is deprecated and will be removed in 8.0. Use ImportMapEntry::splitPackageNameAndFilePath() instead.');
+        ImportMapConfigReader::splitPackageNameAndFilePath('foo');
     }
 }

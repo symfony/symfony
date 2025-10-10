@@ -18,6 +18,7 @@
             <framework:place name="wait_for_spellchecker" />
             <framework:place name="approved_by_spellchecker" />
             <framework:place name="published" />
+            <!-- We also test different configuration formats here -->
             <framework:transition name="request_review">
                 <framework:from>draft</framework:from>
                 <framework:to>wait_for_journalist</framework:to>
@@ -32,13 +33,13 @@
                 <framework:to>approved_by_spellchecker</framework:to>
             </framework:transition>
             <framework:transition name="publish">
-                <framework:from>approved_by_journalist</framework:from>
-                <framework:from>approved_by_spellchecker</framework:from>
+                <framework:from weight="1">approved_by_journalist</framework:from>
+                <framework:from weight="1">approved_by_spellchecker</framework:from>
                 <framework:to>published</framework:to>
             </framework:transition>
             <framework:transition name="publish">
                 <framework:from>draft</framework:from>
-                <framework:to>published</framework:to>
+                <framework:to weight="2">published</framework:to>
             </framework:transition>
         </framework:workflow>
     </framework:config>

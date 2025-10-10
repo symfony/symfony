@@ -21,13 +21,14 @@ use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Validator\Constraints\Form as AssertForm;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\Validator\Constraints\Traverse;
 
 /**
  * Form represents a form.
@@ -69,9 +70,10 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @implements \IteratorAggregate<string, FormInterface>
  */
+#[AssertForm]
+#[Traverse(false)]
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
-    private FormConfigInterface $config;
     private ?FormInterface $parent = null;
 
     /**
@@ -136,8 +138,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * @throws LogicException if a data mapper is not provided for a compound form
      */
-    public function __construct(FormConfigInterface $config)
-    {
+    public function __construct(
+        private FormConfigInterface $config,
+    ) {
         // Compound forms always need a data mapper, otherwise calls to
         // `setData` and `add` will not lead to the correct population of
         // the child forms.
@@ -151,7 +154,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $this->defaultDataSet = true;
         }
 
-        $this->config = $config;
         $this->children = new OrderedHashMap();
         $this->name = $config->getName();
     }
@@ -218,12 +220,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return true;
     }
 
-    public function setParent(?FormInterface $parent = null): static
+    public function setParent(?FormInterface $parent): static
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
-
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot set the parent of a submitted form.');
         }
@@ -307,7 +305,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
                 $actualType = get_debug_type($viewData);
 
-                throw new LogicException('The form\'s view data is expected to be a "'.$dataClass.'", but it is a "'.$actualType.'". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "'.$actualType.'" to an instance of "'.$dataClass.'".');
+                throw new LogicException(\sprintf('The form\'s view data is expected to be a "%s", but it is a "%s". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "%2$s" to an instance of "%1$s".', $dataClass, $actualType));
             }
         }
 
@@ -731,12 +729,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         if (!$child instanceof FormInterface) {
-            if (!\is_string($child) && !\is_int($child)) {
-                throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormInterface');
-            }
-
-            $child = (string) $child;
-
             // Never initialize child forms automatically
             $options['auto_initialize'] = false;
 

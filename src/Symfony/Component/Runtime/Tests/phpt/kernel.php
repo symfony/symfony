@@ -15,8 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 require __DIR__.'/autoload.php';
 
-class TestKernel implements HttpKernelInterface
-{
+return fn (array $context) => new class($context['APP_ENV'], $context['SOME_VAR']) implements HttpKernelInterface {
     private string $env;
     private string $var;
 
@@ -30,6 +29,4 @@ class TestKernel implements HttpKernelInterface
     {
         return new Response('OK Kernel (env='.$this->env.') '.$this->var);
     }
-}
-
-return fn (array $context) => new TestKernel($context['APP_ENV'], $context['SOME_VAR']);
+};

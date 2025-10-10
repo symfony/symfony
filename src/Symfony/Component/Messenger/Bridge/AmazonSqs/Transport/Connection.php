@@ -39,6 +39,7 @@ class Connection
         'wait_time' => 20,
         'poll_timeout' => 0.1,
         'visibility_timeout' => null,
+        'delete_on_rejection' => true,
         'auto_setup' => true,
         'access_key' => null,
         'secret_key' => null,
@@ -46,6 +47,8 @@ class Connection
         'endpoint' => 'https://sqs.eu-west-1.amazonaws.com',
         'region' => 'eu-west-1',
         'queue_name' => 'messages',
+        'queue_attributes' => null,
+        'queue_tags' => null,
         'account' => null,
         'sslmode' => null,
         'debug' => null,
@@ -56,13 +59,14 @@ class Connection
     private ?ReceiveMessageResult $currentResponse = null;
     /** @var array[] */
     private array $buffer = [];
-    private ?string $queueUrl;
 
-    public function __construct(array $configuration, ?SqsClient $client = null, ?string $queueUrl = null)
-    {
+    public function __construct(
+        array $configuration,
+        ?SqsClient $client = null,
+        private ?string $queueUrl = null,
+    ) {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->client = $client ?? new SqsClient([]);
-        $this->queueUrl = $queueUrl;
     }
 
     public function __serialize(): array
@@ -88,6 +92,8 @@ class Connection
      * * endpoint: absolute URL to the SQS service (Default: https://sqs.eu-west-1.amazonaws.com)
      * * region: name of the AWS region (Default: eu-west-1)
      * * queue_name: name of the queue (Default: messages)
+     * * queue_attributes: attributes of the queue, array<QueueAttributeName::*, string>
+     * * queue_tags: tags of the queue, array<string, string>
      * * account: identifier of the AWS account
      * * access_key: AWS access key
      * * secret_key: AWS secret key
@@ -96,6 +102,7 @@ class Connection
      * * wait_time: long polling duration in seconds (Default: 20)
      * * poll_timeout: amount of seconds the transport should wait for new message
      * * visibility_timeout: amount of seconds the message won't be visible
+     * * delete_on_rejection: Whether to delete message on rejection or allow SQS to handle retries. (Default: true).
      * * sslmode: Can be "disable" to use http for a custom endpoint
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      * * debug: Log all HTTP requests and responses as LoggerInterface::DEBUG (Default: false)
@@ -129,8 +136,11 @@ class Connection
             'wait_time' => (int) $options['wait_time'],
             'poll_timeout' => $options['poll_timeout'],
             'visibility_timeout' => null !== $options['visibility_timeout'] ? (int) $options['visibility_timeout'] : null,
+            'delete_on_rejection' => filter_var($options['delete_on_rejection'], \FILTER_VALIDATE_BOOL),
             'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOL),
             'queue_name' => (string) $options['queue_name'],
+            'queue_attributes' => $options['queue_attributes'],
+            'queue_tags' => $options['queue_tags'],
         ];
 
         $clientConfiguration = [
@@ -147,7 +157,7 @@ class Connection
         unset($query['region']);
 
         if ('default' !== ($params['host'] ?? 'default')) {
-            $clientConfiguration['endpoint'] = \sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
+            $clientConfiguration['endpoint'] = \sprintf('%s://%s%s', ($options['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
             if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $params['host'], $matches)) {
                 $clientConfiguration['region'] = $matches[1];
             }
@@ -156,7 +166,7 @@ class Connection
         }
 
         $parsedPath = explode('/', ltrim($params['path'] ?? '/', '/'));
-        if (\count($parsedPath) > 0 && !empty($queueName = end($parsedPath))) {
+        if ($queueName = end($parsedPath)) {
             $configuration['queue_name'] = $queueName;
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
@@ -202,7 +212,7 @@ class Connection
      */
     private function getPendingMessages(): \Generator
     {
-        while (!empty($this->buffer)) {
+        while ($this->buffer) {
             yield array_shift($this->buffer);
         }
     }
@@ -277,12 +287,14 @@ class Connection
             throw new InvalidArgumentException(\sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
         }
 
-        $parameters = ['QueueName' => $this->configuration['queue_name']];
+        $parameters = [
+            'QueueName' => $this->configuration['queue_name'],
+            'Attributes' => $this->configuration['queue_attributes'],
+            'tags' => $this->configuration['queue_tags'],
+        ];
 
         if (self::isFifoQueue($this->configuration['queue_name'])) {
-            $parameters['Attributes'] = [
-                'FifoQueue' => 'true',
-            ];
+            $parameters['Attributes'][QueueAttributeName::FIFO_QUEUE] = 'true';
         }
 
         $this->client->createQueue($parameters);
@@ -300,6 +312,36 @@ class Connection
         $this->client->deleteMessage([
             'QueueUrl' => $this->getQueueUrl(),
             'ReceiptHandle' => $id,
+        ]);
+    }
+
+    public function reject(string $id): void
+    {
+        if ($this->configuration['delete_on_rejection']) {
+            $this->delete($id);
+        } else {
+            $this->client->changeMessageVisibility([
+                'QueueUrl' => $this->getQueueUrl(),
+                'ReceiptHandle' => $id,
+                'VisibilityTimeout' => $this->configuration['visibility_timeout'] ?? 30,
+            ]);
+        }
+    }
+
+    /**
+     * @param int|null $seconds the minimum duration the message should be kept alive
+     */
+    public function keepalive(string $id, ?int $seconds = null): void
+    {
+        $visibilityTimeout = $this->configuration['visibility_timeout'];
+        if (null !== $visibilityTimeout && null !== $seconds && $visibilityTimeout < $seconds) {
+            throw new TransportException(\sprintf('SQS visibility_timeout (%ds) cannot be smaller than the keepalive interval (%ds).', $visibilityTimeout, $seconds));
+        }
+
+        $this->client->changeMessageVisibility([
+            'QueueUrl' => $this->getQueueUrl(),
+            'ReceiptHandle' => $id,
+            'VisibilityTimeout' => $this->configuration['visibility_timeout'],
         ]);
     }
 
@@ -359,8 +401,8 @@ class Connection
         }
 
         if (self::isFifoQueue($this->configuration['queue_name'])) {
-            $parameters['MessageGroupId'] = null !== $messageGroupId ? $messageGroupId : __METHOD__;
-            $parameters['MessageDeduplicationId'] = null !== $messageDeduplicationId ? $messageDeduplicationId : sha1(json_encode(['body' => $body, 'headers' => $headers]));
+            $parameters['MessageGroupId'] = $messageGroupId ?? __METHOD__;
+            $parameters['MessageDeduplicationId'] = $messageDeduplicationId ?? sha1(json_encode(['body' => $body, 'headers' => $headers]));
             unset($parameters['DelaySeconds']);
         }
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy;
 
-class Php82NullStandaloneReturnType
+class Php82NullStandaloneReturnType extends \stdClass
 {
     public function foo(): null
     {

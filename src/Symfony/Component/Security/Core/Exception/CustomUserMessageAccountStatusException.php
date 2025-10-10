@@ -38,10 +38,8 @@ class CustomUserMessageAccountStatusException extends AccountStatusException
      *
      * @param string $messageKey  The message or message key
      * @param array  $messageData Data to be passed into the translator
-     *
-     * @return void
      */
-    public function setSafeMessage(string $messageKey, array $messageData = [])
+    public function setSafeMessage(string $messageKey, array $messageData = []): void
     {
         $this->messageKey = $messageKey;
         $this->messageData = $messageData;

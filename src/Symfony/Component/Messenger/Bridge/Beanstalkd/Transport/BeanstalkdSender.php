@@ -23,12 +23,12 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class BeanstalkdSender implements SenderInterface
 {
-    private Connection $connection;
     private SerializerInterface $serializer;
 
-    public function __construct(Connection $connection, ?SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection,
+        ?SerializerInterface $serializer = null,
+    ) {
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
@@ -36,11 +36,12 @@ class BeanstalkdSender implements SenderInterface
     {
         $encodedMessage = $this->serializer->encode($envelope);
 
-        /** @var DelayStamp|null $delayStamp */
-        $delayStamp = $envelope->last(DelayStamp::class);
-        $delayInMs = null !== $delayStamp ? $delayStamp->getDelay() : 0;
-
-        $id = $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delayInMs);
+        $id = $this->connection->send(
+            $encodedMessage['body'],
+            $encodedMessage['headers'] ?? [],
+            $envelope->last(DelayStamp::class)?->getDelay() ?? 0,
+            $envelope->last(BeanstalkdPriorityStamp::class)?->priority,
+        );
 
         return $envelope->with(new TransportMessageIdStamp($id));
     }

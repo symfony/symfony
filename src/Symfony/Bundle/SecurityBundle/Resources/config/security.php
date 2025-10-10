@@ -31,13 +31,14 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\ClosureVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -67,6 +68,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.access.decision_manager'),
             ])
         ->alias(AuthorizationCheckerInterface::class, 'security.authorization_checker')
+        ->alias(UserAuthorizationCheckerInterface::class, 'security.authorization_checker')
 
         ->set('security.token_storage', UsageTrackingTokenStorage::class)
             ->args([
@@ -86,6 +88,7 @@ return static function (ContainerConfigurator $container) {
                 service_locator([
                     'security.token_storage' => service('security.token_storage'),
                     'security.authorization_checker' => service('security.authorization_checker'),
+                    'security.user_authorization_checker' => service('security.authorization_checker'),
                     'security.authenticator.managers_locator' => service('security.authenticator.managers_locator')->ignoreOnInvalid(),
                     'request_stack' => service('request_stack'),
                     'security.firewall.map' => service('security.firewall.map'),
@@ -96,8 +99,6 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('authenticators'),
             ])
         ->alias(Security::class, 'security.helper')
-        ->alias(LegacySecurity::class, 'security.helper')
-            ->deprecate('symfony/security-bundle', '6.2', 'The "%alias_id%" service alias is deprecated, use "'.Security::class.'" instead.')
 
         ->set('security.user_value_resolver', UserValueResolver::class)
             ->args([
@@ -162,6 +163,12 @@ return static function (ContainerConfigurator $container) {
                 service('security.authentication.trust_resolver'),
                 service('security.authorization_checker'),
                 service('security.role_hierarchy')->nullOnInvalid(),
+            ])
+            ->tag('security.voter', ['priority' => 245])
+
+        ->set('security.access.closure_voter', ClosureVoter::class)
+            ->args([
+                service('security.authorization_checker'),
             ])
             ->tag('security.voter', ['priority' => 245])
 
@@ -307,6 +314,13 @@ return static function (ContainerConfigurator $container) {
             ->args([service('cache.security_is_granted_attribute_expression_language')->nullOnInvalid()])
 
         ->set('cache.security_is_granted_attribute_expression_language')
+            ->parent('cache.system')
+            ->tag('cache.pool')
+
+        ->set('security.is_csrf_token_valid_attribute_expression_language', BaseExpressionLanguage::class)
+            ->args([service('cache.security_is_csrf_token_valid_attribute_expression_language')->nullOnInvalid()])
+
+        ->set('cache.security_is_csrf_token_valid_attribute_expression_language')
             ->parent('cache.system')
             ->tag('cache.pool')
     ;

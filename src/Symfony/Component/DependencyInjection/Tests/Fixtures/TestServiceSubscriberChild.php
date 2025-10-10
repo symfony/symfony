@@ -3,12 +3,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Symfony\Contracts\Service\Attribute\SubscribedService;
-use Symfony\Contracts\Service\ServiceSubscriberTrait;
+use Symfony\Contracts\Service\ServiceMethodsSubscriberTrait;
 
 class TestServiceSubscriberChild extends TestServiceSubscriberParent
 {
-    use ServiceSubscriberTrait;
-    use TestServiceSubscriberTrait;
+    use ServiceMethodsSubscriberTrait;
+    use TestServiceMethodsSubscriberTrait;
 
     #[SubscribedService]
     private function testDefinition2(): ?TestDefinition2

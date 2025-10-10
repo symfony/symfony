@@ -41,8 +41,6 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $_GET = [];
         $_POST = [];
         $_FILES = [];
@@ -99,6 +97,9 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
             'name' => [
                 'field' => 'upload.txt',
             ],
+            'full_path' => [
+                'field' => 'path/to/file/upload.txt',
+            ],
             'type' => [
                 'field' => 'text/plain',
             ],
@@ -118,6 +119,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $this->assertTrue($form->isSubmitted());
         $this->assertEquals([
             'name' => 'upload.txt',
+            'full_path' => 'path/to/file/upload.txt',
             'type' => 'text/plain',
             'tmp_name' => 'owfdskjasdfsa',
             'error' => \UPLOAD_ERR_OK,

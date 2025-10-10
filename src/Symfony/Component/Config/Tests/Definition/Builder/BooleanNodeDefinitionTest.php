@@ -25,6 +25,30 @@ class BooleanNodeDefinitionTest extends TestCase
         $def->cannotBeEmpty();
     }
 
+    public function testBooleanNodeWithDefaultNull()
+    {
+        $def = new BooleanNodeDefinition('foo');
+        $def->defaultNull();
+
+        $node = $def->getNode();
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertNull($node->getDefaultValue());
+
+        $this->assertNull($node->normalize(null));
+    }
+
+    public function testBooleanNodeWithDefaultValueAtNull()
+    {
+        $def = new BooleanNodeDefinition('foo');
+        $def->defaultValue(null);
+
+        $node = $def->getNode();
+        $this->assertTrue($node->hasDefaultValue());
+        $this->assertNull($node->getDefaultValue());
+
+        $this->assertNull($node->normalize(null));
+    }
+
     public function testSetDeprecated()
     {
         $def = new BooleanNodeDefinition('foo');
@@ -37,5 +61,6 @@ class BooleanNodeDefinitionTest extends TestCase
         $this->assertSame('The "foo" node is deprecated.', $deprecation['message']);
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
+        $this->assertSame('Since vendor/package 1.1: The "foo" node is deprecated.', $node->getDeprecationMessage());
     }
 }

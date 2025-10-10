@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Command;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -25,9 +26,7 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class FailedMessagesShowCommandTest extends TestCase
 {
     private string|false $colSize;
@@ -70,17 +69,16 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => 15]);
 
-        $this->assertStringContainsString(sprintf(<<<EOF
-------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Code    123                  
-  Error Class   Exception            
-  Transport     async
-EOF
-            ,
+        $this->assertStringContainsString(\sprintf(<<<EOF
+            ------------- --------------------- 
+              Class         stdClass             
+              Message Id    15                   
+              Failed at     %s  
+              Error         Things are bad!      
+              Error Code    123                  
+              Error Class   Exception            
+              Transport     async
+            EOF,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
     }
@@ -112,17 +110,16 @@ EOF
         );
         $tester = new CommandTester($command);
         $tester->execute(['id' => 15]);
-        $this->assertStringContainsString(sprintf(<<<EOF
- ------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Code    123                  
-  Error Class   Exception            
-  Transport     async
-EOF
-            ,
+        $this->assertStringContainsString(\sprintf(<<<EOF
+             ------------- --------------------- 
+              Class         stdClass             
+              Message Id    15                   
+              Failed at     %s  
+              Error         Things are bad!      
+              Error Code    123                  
+              Error Class   Exception            
+              Transport     async
+            EOF,
             $redeliveryStamp2->getRedeliveredAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
     }
@@ -177,16 +174,15 @@ EOF
         $tester->setInputs([0]);
         $tester->execute([]);
 
-        $this->assertStringContainsString(sprintf(<<<EOF
-15   stdClass   %s   Things are bad!
-EOF
-            ,
+        $this->assertStringContainsString(\sprintf(<<<EOF
+            15   stdClass   %s   Things are bad!
+            EOF,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
 
         $expectedLoadingMessage = <<<EOF
-> Available failure transports are: failure_receiver, failure_receiver_2, failure_receiver_3
-EOF;
+            > Available failure transports are: failure_receiver, failure_receiver_2, failure_receiver_3
+            EOF;
 
         $this->assertStringContainsString($expectedLoadingMessage, $tester->getDisplay());
         $this->assertStringContainsString('Run messenger:failed:show {id} --transport=failure_receiver -vv to see message details.', $tester->getDisplay());
@@ -335,26 +331,25 @@ EOF;
         $command = new FailedMessagesShowCommand($failureTransportName, $serviceLocator);
         $tester = new CommandTester($command);
         $tester->execute(['id' => 42], ['verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
-        $this->assertStringMatchesFormat(sprintf(<<<'EOF'
-%%A
-Exception:
-==========
+        $this->assertStringMatchesFormat(\sprintf(<<<'EOF'
+            %%A
+            Exception:
+            ==========
 
-RuntimeException {
-  message: "Things are bad!"
-  code: 0
-  file: "%s"
-  line: %d
-  trace: {
-    %%s%%eTests%%eCommand%%eFailedMessagesShowCommandTest.php:%d {
-      Symfony\Component\Messenger\Tests\Command\FailedMessagesShowCommandTest->testVeryVerboseOutputForSingleMessageContainsExceptionWithTraceWithServiceLocator()
-      › {
-      ›     $exception = new \RuntimeException('Things are bad!');
-      ›     $exceptionLine = __LINE__ - 1;
-    }
-%%A
-EOF
-            ,
+            RuntimeException {
+              message: "Things are bad!"
+              code: 0
+              file: "%s"
+              line: %d
+              trace: {
+                %%s%%eTests%%eCommand%%eFailedMessagesShowCommandTest.php:%d {
+                  Symfony\Component\Messenger\Tests\Command\FailedMessagesShowCommandTest->testVeryVerboseOutputForSingleMessageContainsExceptionWithTraceWithServiceLocator()
+                  › {
+                  ›     $exception = new \RuntimeException('Things are bad!');
+                  ›     $exceptionLine = __LINE__ - 1;
+                }
+            %%A
+            EOF,
             __FILE__, $exceptionLine, $exceptionLine),
             $tester->getDisplay(true));
     }
@@ -385,14 +380,12 @@ EOF
 
         $tester = new CommandTester($command);
         $tester->execute(['--transport' => $failureTransportName]);
-        $this->assertStringContainsString(sprintf(<<<EOF
-15   stdClass   %s   Things are bad!
-EOF
-            ,
+        $this->assertStringContainsString(\sprintf(<<<EOF
+            15   stdClass   %s   Things are bad!
+            EOF,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
     }
-
 
     public function testCompletingTransport()
     {

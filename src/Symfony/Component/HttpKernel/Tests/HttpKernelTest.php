@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -52,7 +53,7 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel(new EventDispatcher(), static fn () => throw new \RuntimeException(), $requestStack);
 
         try {
-            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+            $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
         } catch (\Throwable $exception) {
         }
 
@@ -65,7 +66,7 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel(new EventDispatcher(), static fn () => throw new \RuntimeException(), $requestStack);
 
         try {
-            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
+            $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, false);
         } catch (\Throwable $exception) {
         }
 
@@ -78,7 +79,7 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel(new EventDispatcher(), static fn () => throw new \Error(), $requestStack);
 
         try {
-            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+            $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
         } catch (\Throwable $exception) {
         }
 
@@ -245,9 +246,7 @@ class HttpKernelTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getSpecificStatusCodes
-     */
+    #[DataProvider('getSpecificStatusCodes')]
     public function testHandleWhenAnExceptionIsHandledWithASpecificStatusCode($expectedStatusCode)
     {
         $dispatcher = new EventDispatcher();

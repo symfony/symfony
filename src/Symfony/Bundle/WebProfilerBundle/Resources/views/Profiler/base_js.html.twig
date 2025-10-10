@@ -12,6 +12,7 @@
     class SymfonyProfiler {
         constructor() {
             this.#createTabs();
+            this.#createTableSearchFields();
             this.#createToggles();
             this.#createCopyToClipboard();
             this.#convertDateTimesToUserTimezone();
@@ -102,6 +103,56 @@
                 });
 
                 tabGroup.setAttribute('data-processed', 'true');
+            });
+        }
+
+        #createTableSearchFields() {
+            document.querySelectorAll('div.table-with-search-field').forEach((tableWrapper, i) => {
+                const searchField = document.createElement('input');
+                searchField.type = 'search';
+                searchField.placeholder = 'search...';
+                searchField.id = `table-search-field-${i}`;
+                searchField.classList.add(`table-search-field-input`);
+                searchField.autocapitalize = 'off';
+                searchField.autocomplete = 'off';
+                searchField.autocorrect = 'off';
+                tableWrapper.insertBefore(searchField, tableWrapper.firstChild);
+
+                const labelField = document.createElement('label');
+                labelField.htmlFor = `table-search-field-${i}`;
+                labelField.classList.add(`table-search-field-label`);
+                labelField.textContent = 'Search inside the contents of the table';
+                tableWrapper.insertBefore(labelField, tableWrapper.firstChild);
+
+                searchField.addEventListener('input', () => {
+                    const query = searchField.value.toLowerCase();
+                    let allRowsAreHidden = true;
+                    tableWrapper.querySelectorAll('tbody tr').forEach((row) => {
+                        const rowMatchesQuery = row.textContent.toLowerCase().includes(query);
+                        row.style.display = rowMatchesQuery ? '' : 'none';
+
+                        if (rowMatchesQuery) {
+                            allRowsAreHidden = false;
+                        }
+                    });
+
+                    /* if there are no results and all rows are hidden, show a message to avoid confusion */
+                    const noResultsElement = tableWrapper.querySelector('.no-results-message');
+                    if (allRowsAreHidden) {
+                        if (null === noResultsElement) {
+                            const noResultsElement = document.createElement('p');
+                            noResultsElement.textContent = 'No results found.';
+                            noResultsElement.classList.add('no-results-message');
+                            tableWrapper.appendChild(noResultsElement);
+                        } else {
+                            noResultsElement.style.display = '';
+                        }
+                    } else {
+                        if (null !== noResultsElement) {
+                            noResultsElement.style.display = 'none';
+                        }
+                    }
+                });
             });
         }
 

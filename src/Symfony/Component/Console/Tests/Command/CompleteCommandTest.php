@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -33,7 +34,7 @@ class CompleteCommandTest extends TestCase
         $this->command = new CompleteCommand();
 
         $this->application = new Application();
-        $this->application->add(new CompleteCommandTest_HelloCommand());
+        $this->application->addCommand(new CompleteCommandTest_HelloCommand());
 
         $this->command->setApplication($this->application);
         $this->tester = new CommandTester($this->command);
@@ -53,6 +54,8 @@ class CompleteCommandTest extends TestCase
 
     public function testAdditionalShellSupport()
     {
+        $this->expectNotToPerformAssertions();
+
         $this->command = new CompleteCommand(['supported' => BashCompletionOutput::class]);
         $this->command->setApplication($this->application);
         $this->tester = new CommandTester($this->command);
@@ -61,13 +64,9 @@ class CompleteCommandTest extends TestCase
 
         // verify that the default set of shells is still supported
         $this->execute(['--shell' => 'bash', '--current' => '1', '--input' => ['bin/console']]);
-
-        $this->assertTrue(true);
     }
 
-    /**
-     * @dataProvider provideInputAndCurrentOptionValues
-     */
+    #[DataProvider('provideInputAndCurrentOptionValues')]
     public function testInputAndCurrentOptionValidation(array $input, ?string $exceptionMessage)
     {
         if ($exceptionMessage) {
@@ -91,9 +90,7 @@ class CompleteCommandTest extends TestCase
         yield [['--current' => '2', '--input' => ['bin/console', 'cache:clear']], null];
     }
 
-    /**
-     * @dataProvider provideCompleteCommandNameInputs
-     */
+    #[DataProvider('provideCompleteCommandNameInputs')]
     public function testCompleteCommandName(array $input, array $suggestions)
     {
         $this->execute(['--current' => '1', '--input' => $input]);
@@ -108,9 +105,7 @@ class CompleteCommandTest extends TestCase
         yield 'complete-aliases' => [['bin/console', 'ah'], ['hello', 'ahoy']];
     }
 
-    /**
-     * @dataProvider provideCompleteCommandInputDefinitionInputs
-     */
+    #[DataProvider('provideCompleteCommandInputDefinitionInputs')]
     public function testCompleteCommandInputDefinition(array $input, array $suggestions)
     {
         $this->execute(['--current' => '2', '--input' => $input]);
@@ -119,9 +114,9 @@ class CompleteCommandTest extends TestCase
 
     public static function provideCompleteCommandInputDefinitionInputs()
     {
-        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
+        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
         yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
-        yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
+        yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
         yield 'custom-aliased' => [['bin/console', 'ahoy'], ['Fabien', 'Robin', 'Wouter']];
     }
 

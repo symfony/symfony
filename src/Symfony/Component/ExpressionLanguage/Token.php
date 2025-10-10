@@ -12,16 +12,12 @@
 namespace Symfony\Component\ExpressionLanguage;
 
 /**
- * Represents a Token.
+ * Represents a token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Token
 {
-    public $value;
-    public $type;
-    public $cursor;
-
     public const EOF_TYPE = 'end of expression';
     public const NAME_TYPE = 'name';
     public const NUMBER_TYPE = 'number';
@@ -33,11 +29,11 @@ class Token
      * @param self::*_TYPE $type
      * @param int|null     $cursor The cursor position in the source
      */
-    public function __construct(string $type, string|int|float|null $value, ?int $cursor)
-    {
-        $this->type = $type;
-        $this->value = $value;
-        $this->cursor = $cursor;
+    public function __construct(
+        public string $type,
+        public string|int|float|null $value,
+        public ?int $cursor,
+    ) {
     }
 
     /**

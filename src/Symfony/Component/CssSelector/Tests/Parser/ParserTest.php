@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\CssSelector\Tests\Parser;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
 use Symfony\Component\CssSelector\Node\FunctionNode;
@@ -20,7 +21,7 @@ use Symfony\Component\CssSelector\Parser\Token;
 
 class ParserTest extends TestCase
 {
-    /** @dataProvider getParserTestData */
+    #[DataProvider('getParserTestData')]
     public function testParser($source, $representation)
     {
         $parser = new Parser();
@@ -28,7 +29,7 @@ class ParserTest extends TestCase
         $this->assertEquals($representation, array_map(fn (SelectorNode $node) => (string) $node->getTree(), $parser->parse($source)));
     }
 
-    /** @dataProvider getParserExceptionTestData */
+    #[DataProvider('getParserExceptionTestData')]
     public function testParserException($source, $message)
     {
         $parser = new Parser();
@@ -41,7 +42,7 @@ class ParserTest extends TestCase
         }
     }
 
-    /** @dataProvider getPseudoElementsTestData */
+    #[DataProvider('getPseudoElementsTestData')]
     public function testPseudoElements($source, $element, $pseudo)
     {
         $parser = new Parser();
@@ -54,7 +55,7 @@ class ParserTest extends TestCase
         $this->assertEquals($pseudo, (string) $selector->getPseudoElement());
     }
 
-    /** @dataProvider getSpecificityTestData */
+    #[DataProvider('getSpecificityTestData')]
     public function testSpecificity($source, $value)
     {
         $parser = new Parser();
@@ -66,7 +67,7 @@ class ParserTest extends TestCase
         $this->assertEquals($value, $selector->getSpecificity()->getValue());
     }
 
-    /** @dataProvider getParseSeriesTestData */
+    #[DataProvider('getParseSeriesTestData')]
     public function testParseSeries($series, $a, $b)
     {
         $parser = new Parser();
@@ -78,7 +79,7 @@ class ParserTest extends TestCase
         $this->assertEquals([$a, $b], Parser::parseSeries($function->getArguments()));
     }
 
-    /** @dataProvider getParseSeriesExceptionTestData */
+    #[DataProvider('getParseSeriesExceptionTestData')]
     public function testParseSeriesException($series)
     {
         $parser = new Parser();
@@ -152,6 +153,10 @@ class ParserTest extends TestCase
             [':scope', ['Pseudo[Element[*]:scope]']],
             ['foo bar, :scope > div', ['CombinedSelector[Element[foo] <followed> Element[bar]]', 'CombinedSelector[Pseudo[Element[*]:scope] > Element[div]]']],
             ['foo bar,:scope > div', ['CombinedSelector[Element[foo] <followed> Element[bar]]', 'CombinedSelector[Pseudo[Element[*]:scope] > Element[div]]']],
+            ['div:is(.foo, #bar)', ['Matching[Element[div]:is(Selector[Class[Element[*].foo]], Selector[Hash[Element[*]#bar]])]']],
+            [':is(:hover, :visited)', ['Matching[Element[*]:is(Selector[Pseudo[Element[*]:hover]], Selector[Pseudo[Element[*]:visited]])]']],
+            ['div:where(.foo, #bar)', ['SpecificityAdjustment[Element[div]:where(Selector[Class[Element[*].foo]], Selector[Hash[Element[*]#bar]])]']],
+            [':where(:hover, :visited)', ['SpecificityAdjustment[Element[*]:where(Selector[Pseudo[Element[*]:hover]], Selector[Pseudo[Element[*]:visited]])]']],
         ];
     }
 
@@ -183,6 +188,7 @@ class ParserTest extends TestCase
             [':contains("foo', SyntaxErrorException::unclosedString(10)->getMessage()],
             ['foo!', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '!', 3))->getMessage()],
             [':scope > div :scope header', SyntaxErrorException::notAtTheStartOfASelector('scope')->getMessage()],
+            [':not(:not(a))', SyntaxErrorException::nestedNot()->getMessage()],
         ];
     }
 
@@ -233,6 +239,18 @@ class ParserTest extends TestCase
             ['foo::before', 2],
             ['foo:empty::before', 12],
             ['#lorem + foo#ipsum:first-child > bar:first-line', 213],
+            [':is(*)', 0],
+            [':is(foo)', 1],
+            [':is(.foo)', 10],
+            [':is(#foo)', 100],
+            [':is(#foo, :empty, foo)', 100],
+            ['#foo:is(#bar:empty)', 210],
+            [':where(*)', 0],
+            [':where(foo)', 0],
+            [':where(.foo)', 0],
+            [':where(#foo)', 0],
+            [':where(#foo, :empty, foo)', 0],
+            ['#foo:where(#bar:empty)', 100],
         ];
     }
 

@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Messenger\Tests\Handler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 
 class HandleDescriptorTest extends TestCase
 {
-    /**
-     * @dataProvider provideHandlers
-     */
+    #[DataProvider('provideHandlers')]
     public function testDescriptorNames(callable $handler, ?string $expectedHandlerString)
     {
         $descriptor = new HandlerDescriptor($handler);

@@ -23,14 +23,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  */
 class PasswordHasherFactory implements PasswordHasherFactoryInterface
 {
-    private array $passwordHashers;
-
     /**
      * @param array<string, PasswordHasherInterface|array> $passwordHashers
      */
-    public function __construct(array $passwordHashers)
-    {
-        $this->passwordHashers = $passwordHashers;
+    public function __construct(
+        private array $passwordHashers,
+    ) {
     }
 
     public function getPasswordHasher(string|PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user): PasswordHasherInterface
@@ -200,7 +198,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                     $config['algorithm'] = 'native';
                     $config['native_algorithm'] = \PASSWORD_ARGON2ID;
                 } else {
-                    throw new LogicException(\sprintf('Algorithm "argon2id" is not available. Either use "%s", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
+                    throw new LogicException(\sprintf('Algorithm "argon2id" is not available; use "%s" or libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
                 }
 
                 return $this->getHasherConfigFromAlgorithm($config);

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\String\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\String\Exception\InvalidArgumentException;
 
 abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
@@ -50,6 +52,39 @@ END'],
         $this->assertSame('Dieser Wert sollte grOEsser oder gleich', (string) $s->ascii([$rule]));
     }
 
+    #[DataProvider('provideLocaleLower')]
+    #[RequiresPhpExtension('intl')]
+    public function testLocaleLower(string $locale, string $expected, string $origin)
+    {
+        $instance = static::createFromString($origin)->localeLower($locale);
+
+        $this->assertNotSame(static::createFromString($origin), $instance);
+        $this->assertEquals(static::createFromString($expected), $instance);
+        $this->assertSame($expected, (string) $instance);
+    }
+
+    #[DataProvider('provideLocaleUpper')]
+    #[RequiresPhpExtension('intl')]
+    public function testLocaleUpper(string $locale, string $expected, string $origin)
+    {
+        $instance = static::createFromString($origin)->localeUpper($locale);
+
+        $this->assertNotSame(static::createFromString($origin), $instance);
+        $this->assertEquals(static::createFromString($expected), $instance);
+        $this->assertSame($expected, (string) $instance);
+    }
+
+    #[DataProvider('provideLocaleTitle')]
+    #[RequiresPhpExtension('intl')]
+    public function testLocaleTitle(string $locale, string $expected, string $origin)
+    {
+        $instance = static::createFromString($origin)->localeTitle($locale);
+
+        $this->assertNotSame(static::createFromString($origin), $instance);
+        $this->assertEquals(static::createFromString($expected), $instance);
+        $this->assertSame($expected, (string) $instance);
+    }
+
     public static function provideCreateFromCodePoint(): array
     {
         return [
@@ -75,9 +110,7 @@ END'],
         );
     }
 
-    /**
-     * @dataProvider provideCodePointsAt
-     */
+    #[DataProvider('provideCodePointsAt')]
     public function testCodePointsAt(array $expected, string $string, int $offset, ?int $form = null)
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
@@ -296,6 +329,78 @@ END'],
                 ['déjà σσς i̇iıi', 'DÉJÀ Σσς İIıi'],
             ]
         );
+    }
+
+    public static function provideLocaleLower(): array
+    {
+        return [
+            // Lithuanian
+            // Introduce an explicit dot above when lowercasing capital I's and J's
+            // whenever there are more accents above.
+            // LATIN CAPITAL LETTER I WITH OGONEK -> LATIN SMALL LETTER I WITH OGONEK
+            ['lt', 'į', 'Į'],
+            // LATIN CAPITAL LETTER I WITH GRAVE -> LATIN SMALL LETTER I COMBINING DOT ABOVE
+            ['lt', 'i̇̀', 'Ì'],
+            // LATIN CAPITAL LETTER I WITH ACUTE -> LATIN SMALL LETTER I COMBINING DOT ABOVE COMBINING ACUTE ACCENT
+            ['lt', 'i̇́', 'Í'],
+            // LATIN CAPITAL LETTER I WITH TILDE -> LATIN SMALL LETTER I COMBINING DOT ABOVE COMBINING TILDE
+            ['lt', 'i̇̃', 'Ĩ'],
+
+            // Turkish and Azeri
+            // When lowercasing, remove dot_above in the sequence I + dot_above, which will turn into 'i'.
+            // LATIN CAPITAL LETTER I WITH DOT ABOVE -> LATIN SMALL LETTER I
+            ['tr', 'i', 'İ'],
+            ['tr_TR', 'i', 'İ'],
+            ['az', 'i', 'İ'],
+
+            // Default casing rules
+            // LATIN CAPITAL LETTER I WITH DOT ABOVE -> LATIN SMALL LETTER I COMBINING DOT ABOVE
+            ['en_US', 'i̇', 'İ'],
+            ['en', 'i̇', 'İ'],
+        ];
+    }
+
+    public static function provideLocaleUpper(): array
+    {
+        return [
+            // Turkish and Azeri
+            // When uppercasing, i turns into a dotted capital I
+            // LATIN SMALL LETTER I -> LATIN CAPITAL LETTER I WITH DOT ABOVE
+            ['tr', 'İ', 'i'],
+            ['tr_TR', 'İ', 'i'],
+            ['az', 'İ', 'i'],
+
+            // Greek
+            // Remove accents when uppercasing
+            // GREEK SMALL LETTER ALPHA WITH TONOS -> GREEK CAPITAL LETTER ALPHA
+            ['el', 'Α', 'ά'],
+            ['el_GR', 'Α', 'ά'],
+
+            // Default casing rules
+            // GREEK SMALL LETTER ALPHA WITH TONOS -> GREEK CAPITAL LETTER ALPHA WITH TONOS
+            ['en_US', 'Ά', 'ά'],
+            ['en', 'Ά', 'ά'],
+        ];
+    }
+
+    public static function provideLocaleTitle(): array
+    {
+        return [
+            // Greek
+            // Titlecasing words, should keep the accents on the first letter
+            ['el', 'Άδικος', 'άδικος'],
+            ['el_GR', 'Άδικος', 'άδικος'],
+            ['en', 'Άδικος', 'άδικος'],
+
+            // Dutch
+            // Title casing should treat 'ij' as one character
+            ['nl_NL', 'IJssel', 'ijssel'],
+            ['nl_BE', 'IJssel', 'ijssel'],
+            ['nl', 'IJssel', 'ijssel'],
+
+            // Default casing rules
+            ['en', 'Ijssel', 'ijssel'],
+        ];
     }
 
     public static function provideUpper(): array
@@ -541,6 +646,17 @@ END'],
         );
     }
 
+    public static function providePascal(): array
+    {
+        return array_merge(
+            parent::providePascal(),
+            [
+                ['SymfonyIstÄußerstCool', 'symfonyIstÄußerstCool'],
+                ['SymfonyWithEmojis', 'Symfony with 😃 emojis'],
+            ]
+        );
+    }
+
     public static function provideSnake()
     {
         return array_merge(
@@ -549,6 +665,15 @@ END'],
                 ['symfony_ist_äußerst_cool', 'symfonyIstÄußerstCool'],
             ]
         );
+    }
+
+    public static function provideKebab(): array
+    {
+        return [
+            ...parent::provideKebab(),
+            ['symfony-ist-äußerst-cool', 'symfonyIstÄußerstCool'],
+            ['symfony-with-emojis', 'Symfony with 😃 emojis'],
+        ];
     }
 
     public static function provideEqualsTo()
@@ -617,7 +742,7 @@ END'],
             [
                 ['äuß⭐erst', 'tsre⭐ßuä'],
                 ['漢字ーユニコードéèΣσς', 'ςσΣèéドーコニユー字漢'],
-                ['नमस्ते', 'तेस्मन'],
+                // ['नमस्ते', 'तेस्मन'], this case requires a version of intl that supports Unicode 15.1
             ]
         );
     }

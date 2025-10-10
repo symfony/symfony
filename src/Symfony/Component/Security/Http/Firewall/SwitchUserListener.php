@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -42,43 +43,29 @@ class SwitchUserListener extends AbstractListener
 {
     public const EXIT_VALUE = '_exit';
 
-    private TokenStorageInterface $tokenStorage;
-    private UserProviderInterface $provider;
-    private UserCheckerInterface $userChecker;
-    private string $firewallName;
-    private AccessDecisionManagerInterface $accessDecisionManager;
-    private string $usernameParameter;
-    private string $role;
-    private ?LoggerInterface $logger;
-    private ?EventDispatcherInterface $dispatcher;
-    private bool $stateless;
-    private ?UrlGeneratorInterface $urlGenerator;
-    private ?string $targetRoute;
-
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, ?LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', ?EventDispatcherInterface $dispatcher = null, bool $stateless = false, ?UrlGeneratorInterface $urlGenerator = null, ?string $targetRoute = null)
-    {
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private UserProviderInterface $provider,
+        private UserCheckerInterface $userChecker,
+        private string $firewallName,
+        private AccessDecisionManagerInterface $accessDecisionManager,
+        private ?LoggerInterface $logger = null,
+        private string $usernameParameter = '_switch_user',
+        private string $role = 'ROLE_ALLOWED_TO_SWITCH',
+        private ?EventDispatcherInterface $dispatcher = null,
+        private bool $stateless = false,
+        private ?UrlGeneratorInterface $urlGenerator = null,
+        private ?string $targetRoute = null,
+    ) {
         if ('' === $firewallName) {
             throw new \InvalidArgumentException('$firewallName must not be empty.');
         }
-
-        $this->tokenStorage = $tokenStorage;
-        $this->provider = $provider;
-        $this->userChecker = $userChecker;
-        $this->firewallName = $firewallName;
-        $this->accessDecisionManager = $accessDecisionManager;
-        $this->usernameParameter = $usernameParameter;
-        $this->role = $role;
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
-        $this->stateless = $stateless;
-        $this->urlGenerator = $urlGenerator;
-        $this->targetRoute = $targetRoute;
     }
 
     public function supports(Request $request): ?bool
     {
         // usernames can be falsy
-        $username = $request->get($this->usernameParameter);
+        $username = $request->query->get($this->usernameParameter) ?? (!\in_array($request->getMethod(), ['GET', 'HEAD'], true) ? $request->request->get($this->usernameParameter) : null);
 
         if (null === $username || '' === $username) {
             $username = $request->headers->get($this->usernameParameter);
@@ -167,20 +154,21 @@ class SwitchUserListener extends AbstractListener
 
             throw $e;
         }
+        $accessDecision = new AccessDecision();
 
-        if (false === $this->accessDecisionManager->decide($token, [$this->role], $user)) {
-            $exception = new AccessDeniedException();
-            $exception->setAttributes($this->role);
+        if (!$accessDecision->isGranted = $this->accessDecisionManager->decide($token, [$this->role], $user, $accessDecision)) {
+            $e = new AccessDeniedException($accessDecision->getMessage());
+            $e->setAttributes($this->role);
+            $e->setAccessDecision($accessDecision);
 
-            throw $exception;
+            throw $e;
         }
 
         $this->logger?->info('Attempting to switch to user.', ['username' => $username]);
 
-        $this->userChecker->checkPostAuth($user);
+        $this->userChecker->checkPostAuth($user, $token);
 
         $roles = $user->getRoles();
-        $roles[] = 'ROLE_PREVIOUS_ADMIN';
         $originatedFromUri = str_replace('/&', '/?', preg_replace('#[&?]'.$this->usernameParameter.'=[^&]*#', '', $request->getRequestUri()));
         $token = new SwitchUserToken($user, $this->firewallName, $roles, $token, $originatedFromUri);
 

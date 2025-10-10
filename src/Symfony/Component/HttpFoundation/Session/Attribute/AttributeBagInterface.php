@@ -32,10 +32,8 @@ interface AttributeBagInterface extends SessionBagInterface
 
     /**
      * Sets an attribute.
-     *
-     * @return void
      */
-    public function set(string $name, mixed $value);
+    public function set(string $name, mixed $value): void;
 
     /**
      * Returns attributes.
@@ -44,10 +42,7 @@ interface AttributeBagInterface extends SessionBagInterface
      */
     public function all(): array;
 
-    /**
-     * @return void
-     */
-    public function replace(array $attributes);
+    public function replace(array $attributes): void;
 
     /**
      * Removes an attribute.

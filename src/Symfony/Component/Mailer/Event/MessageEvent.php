@@ -24,21 +24,17 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class MessageEvent extends Event
 {
-    private RawMessage $message;
-    private Envelope $envelope;
-    private string $transport;
-    private bool $queued;
     private bool $rejected = false;
 
     /** @var StampInterface[] */
     private array $stamps = [];
 
-    public function __construct(RawMessage $message, Envelope $envelope, string $transport, bool $queued = false)
-    {
-        $this->message = $message;
-        $this->envelope = $envelope;
-        $this->transport = $transport;
-        $this->queued = $queued;
+    public function __construct(
+        private RawMessage $message,
+        private Envelope $envelope,
+        private string $transport,
+        private bool $queued = false,
+    ) {
     }
 
     public function getMessage(): RawMessage

@@ -28,16 +28,13 @@ final class AllMySmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.allmysms.com';
 
-    private string $login;
-    private string $apiKey;
-    private ?string $from;
-
-    public function __construct(string $login, #[\SensitiveParameter] string $apiKey, ?string $from = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->login = $login;
-        $this->apiKey = $apiKey;
-        $this->from = $from;
-
+    public function __construct(
+        private string $login,
+        #[\SensitiveParameter] private string $apiKey,
+        private ?string $from = null,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
@@ -51,6 +48,9 @@ final class AllMySmsTransport extends AbstractTransport
         return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof AllMySmsOptions);
     }
 
+    /**
+     * @see https://doc.allmysms.com/api/en/#api-SMS-sendsimple
+     */
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
@@ -86,7 +86,13 @@ final class AllMySmsTransport extends AbstractTransport
             throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $success['description'], $success['code']), $response);
         }
 
-        $sentMessage = new SentMessage($message, (string) $this);
+        $additionalInfo = [
+            'nbSms' => $success['nbSms'] ?? null,
+            'balance' => $success['balance'] ?? null,
+            'cost' => $success['cost'] ?? null,
+        ];
+
+        $sentMessage = new SentMessage($message, (string) $this, $additionalInfo);
         $sentMessage->setMessageId($success['smsId']);
 
         return $sentMessage;

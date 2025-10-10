@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand;
@@ -18,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -84,13 +85,11 @@ class CachePoolDeleteCommandTest extends TestCase
         $tester->execute(['pool' => 'foo', 'key' => 'bar']);
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $application = new Application($this->getKernel());
-        $application->add(new CachePoolDeleteCommand(new Psr6CacheClearer(['foo' => $this->cachePool]), ['foo']));
+        $application->addCommand(new CachePoolDeleteCommand(new Psr6CacheClearer(['foo' => $this->cachePool]), ['foo']));
         $tester = new CommandCompletionTester($application->get('cache:pool:delete'));
 
         $suggestions = $tester->complete($input);
@@ -108,13 +107,11 @@ class CachePoolDeleteCommandTest extends TestCase
 
     private function getKernel(): MockObject&KernelInterface
     {
-        $container = $this->createMock(ContainerInterface::class);
-
         $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->any())
             ->method('getContainer')
-            ->willReturn($container);
+            ->willReturn(new Container());
 
         $kernel
             ->expects($this->once())
@@ -127,7 +124,7 @@ class CachePoolDeleteCommandTest extends TestCase
     private function getCommandTester(KernelInterface $kernel): CommandTester
     {
         $application = new Application($kernel);
-        $application->add(new CachePoolDeleteCommand(new Psr6CacheClearer(['foo' => $this->cachePool])));
+        $application->addCommand(new CachePoolDeleteCommand(new Psr6CacheClearer(['foo' => $this->cachePool])));
 
         return new CommandTester($application->find('cache:pool:delete'));
     }

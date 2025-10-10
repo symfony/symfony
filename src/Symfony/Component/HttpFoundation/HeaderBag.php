@@ -26,8 +26,8 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     /**
      * @var array<string, list<string|null>>
      */
-    protected $headers = [];
-    protected $cacheControl = [];
+    protected array $headers = [];
+    protected array $cacheControl = [];
 
     public function __construct(array $headers = [])
     {
@@ -86,10 +86,8 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
 
     /**
      * Replaces the current HTTP headers by a new set.
-     *
-     * @return void
      */
-    public function replace(array $headers = [])
+    public function replace(array $headers = []): void
     {
         $this->headers = [];
         $this->add($headers);
@@ -97,10 +95,8 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
 
     /**
      * Adds new headers the current HTTP headers set.
-     *
-     * @return void
      */
-    public function add(array $headers)
+    public function add(array $headers): void
     {
         foreach ($headers as $key => $values) {
             $this->set($key, $values);
@@ -122,7 +118,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
             return null;
         }
 
-        return (string) $headers[0];
+        return $headers[0];
     }
 
     /**
@@ -130,10 +126,8 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      *
      * @param string|string[]|null $values  The value or an array of values
      * @param bool                 $replace Whether to replace the actual value or not (true by default)
-     *
-     * @return void
      */
-    public function set(string $key, string|array|null $values, bool $replace = true)
+    public function set(string $key, string|array|null $values, bool $replace = true): void
     {
         $key = strtr($key, self::UPPER, self::LOWER);
 
@@ -171,15 +165,13 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     public function contains(string $key, string $value): bool
     {
-        return \in_array($value, $this->all($key));
+        return \in_array($value, $this->all($key), true);
     }
 
     /**
      * Removes a header.
-     *
-     * @return void
      */
-    public function remove(string $key)
+    public function remove(string $key): void
     {
         $key = strtr($key, self::UPPER, self::LOWER);
 
@@ -193,11 +185,9 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     /**
      * Returns the HTTP header value converted to a date.
      *
-     * @return \DateTimeImmutable|null
-     *
      * @throws \RuntimeException When the HTTP header is not parseable
      */
-    public function getDate(string $key, ?\DateTimeInterface $default = null): ?\DateTimeInterface
+    public function getDate(string $key, ?\DateTimeInterface $default = null): ?\DateTimeImmutable
     {
         if (null === $value = $this->get($key)) {
             return null !== $default ? \DateTimeImmutable::createFromInterface($default) : null;
@@ -212,10 +202,8 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
 
     /**
      * Adds a custom Cache-Control directive.
-     *
-     * @return void
      */
-    public function addCacheControlDirective(string $key, bool|string $value = true)
+    public function addCacheControlDirective(string $key, bool|string $value = true): void
     {
         $this->cacheControl[$key] = $value;
 
@@ -240,10 +228,8 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
 
     /**
      * Removes a Cache-Control directive.
-     *
-     * @return void
      */
-    public function removeCacheControlDirective(string $key)
+    public function removeCacheControlDirective(string $key): void
     {
         unset($this->cacheControl[$key]);
 
@@ -268,10 +254,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
         return \count($this->headers);
     }
 
-    /**
-     * @return string
-     */
-    protected function getCacheControlHeader()
+    protected function getCacheControlHeader(): string
     {
         ksort($this->cacheControl);
 

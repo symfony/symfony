@@ -31,14 +31,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'secrets:list', description: 'List all secrets')]
 final class SecretsListCommand extends Command
 {
-    private AbstractVault $vault;
-    private ?AbstractVault $localVault;
-
-    public function __construct(AbstractVault $vault, ?AbstractVault $localVault = null)
-    {
-        $this->vault = $vault;
-        $this->localVault = $localVault;
-
+    public function __construct(
+        private AbstractVault $vault,
+        private ?AbstractVault $localVault = null,
+    ) {
         parent::__construct();
     }
 
@@ -47,14 +43,14 @@ final class SecretsListCommand extends Command
         $this
             ->addOption('reveal', 'r', InputOption::VALUE_NONE, 'Display decrypted values alongside names')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command list all stored secrets.
+                The <info>%command.name%</info> command list all stored secrets.
 
-    <info>%command.full_name%</info>
+                    <info>%command.full_name%</info>
 
-When the option <info>--reveal</info> is provided, the decrypted secrets are also displayed.
+                When the option <info>--reveal</info> is provided, the decrypted secrets are also displayed.
 
-    <info>%command.full_name% --reveal</info>
-EOF
+                    <info>%command.full_name% --reveal</info>
+                EOF
             )
         ;
     }

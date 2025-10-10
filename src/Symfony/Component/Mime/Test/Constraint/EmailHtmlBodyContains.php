@@ -17,11 +17,9 @@ use Symfony\Component\Mime\RawMessage;
 
 final class EmailHtmlBodyContains extends Constraint
 {
-    private string $expectedText;
-
-    public function __construct(string $expectedText)
-    {
-        $this->expectedText = $expectedText;
+    public function __construct(
+        private string $expectedText,
+    ) {
     }
 
     public function toString(): string

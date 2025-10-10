@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\DateTimeValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -53,18 +54,15 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('This value is not a valid datetime.')
             ->setParameter('{{ value }}', '"1995-03-24"')
+            ->setParameter('{{ format }}', '"Y-m-d H:i:s"')
             ->setCode(DateTime::INVALID_FORMAT_ERROR)
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getValidDateTimes
-     */
+    #[DataProvider('getValidDateTimes')]
     public function testValidDateTimes($format, $dateTime)
     {
-        $constraint = new DateTime([
-            'format' => $format,
-        ]);
+        $constraint = new DateTime(format: $format);
 
         $this->validator->validate($dateTime, $constraint);
 
@@ -82,20 +80,19 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidDateTimes
-     */
+    #[DataProvider('getInvalidDateTimes')]
     public function testInvalidDateTimes($format, $dateTime, $code)
     {
-        $constraint = new DateTime([
-            'message' => 'myMessage',
-            'format' => $format,
-        ]);
+        $constraint = new DateTime(
+            message: 'myMessage',
+            format: $format,
+        );
 
         $this->validator->validate($dateTime, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$dateTime.'"')
+            ->setParameter('{{ format }}', '"'.$format.'"')
             ->setCode($code)
             ->assertRaised();
     }
@@ -124,15 +121,14 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"2010-01-01 00:00:00"')
+            ->setParameter('{{ format }}', '"Y-m-d"')
             ->setCode(DateTime::INVALID_FORMAT_ERROR)
             ->assertRaised();
     }
 
     public function testDateTimeWithTrailingData()
     {
-        $this->validator->validate('1995-05-10 00:00:00', new DateTime([
-            'format' => 'Y-m-d+',
-        ]));
+        $this->validator->validate('1995-05-10 00:00:00', new DateTime(format: 'Y-m-d+'));
         $this->assertNoViolation();
     }
 }

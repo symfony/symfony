@@ -42,16 +42,16 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         self::INVERT => 'r',
     ];
     private array $fields;
-    private bool $pad;
 
     /**
      * @param string[]|null $fields The date fields
      * @param bool          $pad    Whether to use padding
      */
-    public function __construct(?array $fields = null, bool $pad = false)
-    {
+    public function __construct(
+        ?array $fields = null,
+        private bool $pad = false,
+    ) {
         $this->fields = $fields ?? ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'invert'];
-        $this->pad = $pad;
     }
 
     /**
@@ -93,9 +93,8 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
             }
         }
         $result['invert'] = '-' === $result['invert'];
-        $result = array_intersect_key($result, array_flip($this->fields));
 
-        return $result;
+        return array_intersect_key($result, array_flip($this->fields));
     }
 
     /**
@@ -140,7 +139,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
                     'P%sY%sM%sWT%sH%sM%sS',
                     empty($value['years']) ? '0' : $value['years'],
                     empty($value['months']) ? '0' : $value['months'],
-                    empty($value['weeks']) ? '0' : $value['weeks'],
+                    $value['weeks'],
                     empty($value['hours']) ? '0' : $value['hours'],
                     empty($value['minutes']) ? '0' : $value['minutes'],
                     empty($value['seconds']) ? '0' : $value['seconds']

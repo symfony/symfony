@@ -35,7 +35,7 @@
     </class>
 
     <class name="Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy">
-        <discriminator-map type-property="type">
+        <discriminator-map type-property="type" default-type="second">
             <mapping type="first" class="Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild" />
             <mapping type="second" class="Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild" />
         </discriminator-map>

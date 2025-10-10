@@ -17,10 +17,8 @@ use Twig\Environment;
 use Twig\Node\BlockNode;
 use Twig\Node\EmptyNode;
 use Twig\Node\Expression\ArrayExpression;
-use Twig\Node\Expression\AssignNameExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
-use Twig\Node\Expression\NameExpression;
 use Twig\Node\Expression\Variable\AssignContextVariable;
 use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\ModuleNode;
@@ -52,17 +50,18 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
                 $this->scope->set('domain', $node->getNode('expr'));
 
                 return $node;
-            } else {
-                $var = $this->getVarName();
-                $name = class_exists(AssignContextVariable::class) ? new AssignContextVariable($var, $node->getTemplateLine()) : new AssignNameExpression($var, $node->getTemplateLine());
-                $this->scope->set('domain', class_exists(ContextVariable::class) ? new ContextVariable($var, $node->getTemplateLine()) : new NameExpression($var, $node->getTemplateLine()));
-
-                if (class_exists(Nodes::class)) {
-                    return new SetNode(false, new Nodes([$name]), new Nodes([$node->getNode('expr')]), $node->getTemplateLine());
-                } else {
-                    return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
-                }
             }
+
+            if (null === $templateName = $node->getTemplateName()) {
+                throw new \LogicException('Cannot traverse a node without a template name.');
+            }
+
+            $var = '__internal_trans_default_domain'.hash('xxh128', $templateName);
+
+            $name = new AssignContextVariable($var, $node->getTemplateLine());
+            $this->scope->set('domain', new ContextVariable($var, $node->getTemplateLine()));
+
+            return new SetNode(false, new Nodes([$name]), new Nodes([$node->getNode('expr')]), $node->getTemplateLine());
         }
 
         if (!$this->scope->has('domain')) {
@@ -124,10 +123,5 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
         }
 
         return false;
-    }
-
-    private function getVarName(): string
-    {
-        return \sprintf('__internal_%s', hash('sha256', uniqid(mt_rand(), true), false));
     }
 }

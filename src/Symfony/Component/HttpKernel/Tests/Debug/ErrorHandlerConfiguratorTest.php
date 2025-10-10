@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Debug;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -33,9 +34,7 @@ class ErrorHandlerConfiguratorTest extends TestCase
         $this->assertSame([$logger, LogLevel::INFO], $loggers[\E_DEPRECATED]);
     }
 
-    /**
-     * @dataProvider provideLevelsAssignedToLoggers
-     */
+    #[DataProvider('provideLevelsAssignedToLoggers')]
     public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, array|int $levels, array|int|null $expectedLoggerLevels, array|int|null $expectedDeprecationLoggerLevels)
     {
         $handler = $this->createMock(ErrorHandler::class);

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `DiscordBotTransport`
+
 6.2
 ---
 

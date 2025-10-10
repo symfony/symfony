@@ -11,11 +11,13 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -23,7 +25,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -32,6 +36,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -53,9 +58,7 @@ class SecurityTest extends TestCase
         $this->assertSame($token, $security->getToken());
     }
 
-    /**
-     * @dataProvider getUserTests
-     */
+    #[DataProvider('getUserTests')]
     public function testGetUser($userInToken, $expectedUser)
     {
         $token = $this->createMock(TokenInterface::class);
@@ -97,9 +100,52 @@ class SecurityTest extends TestCase
         $this->assertTrue($security->isGranted('SOME_ATTRIBUTE', 'SOME_SUBJECT'));
     }
 
-    /**
-     * @dataProvider getFirewallConfigTests
-     */
+    public function testAccessDecision()
+    {
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+
+        $authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('SOME_ATTRIBUTE', 'SOME_SUBJECT', $this->isInstanceOf(AccessDecision::class))
+            ->willReturnCallback(function ($attribute, $subject, $accessDecision) {
+                $accessDecision->isGranted = true;
+
+                return true;
+            });
+
+        $container = $this->createContainer('security.authorization_checker', $authorizationChecker);
+
+        $security = new Security($container);
+        $accessDecision = $security->getAccessDecision('SOME_ATTRIBUTE', 'SOME_SUBJECT');
+
+        $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+        $this->assertTrue($accessDecision->isGranted);
+    }
+
+    public function testAccessDecisionForUser()
+    {
+        $user = new InMemoryUser('test_user', 'password');
+        $userAuthorizationChecker = $this->createMock(UserAuthorizationCheckerInterface::class);
+
+        $userAuthorizationChecker->expects($this->once())
+            ->method('isGrantedForUser')
+            ->with($user, 'SOME_ATTRIBUTE', 'SOME_SUBJECT', $this->isInstanceOf(AccessDecision::class))
+            ->willReturnCallback(function ($user, $attribute, $subject, $accessDecision) {
+                $accessDecision->isGranted = false;
+
+                return false;
+            });
+
+        $container = $this->createContainer('security.user_authorization_checker', $userAuthorizationChecker);
+
+        $security = new Security($container);
+        $accessDecision = $security->getAccessDecisionForUser($user, 'SOME_ATTRIBUTE', 'SOME_SUBJECT');
+
+        $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+        $this->assertFalse($accessDecision->isGranted);
+    }
+
+    #[DataProvider('getFirewallConfigTests')]
     public function testGetFirewallConfig(Request $request, ?FirewallConfig $expectedFirewallConfig)
     {
         $firewallMap = $this->createMock(FirewallMap::class);
@@ -127,28 +173,23 @@ class SecurityTest extends TestCase
     {
         $request = new Request();
         $authenticator = $this->createMock(AuthenticatorInterface::class);
-        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
         $firewallMap = $this->createMock(FirewallMap::class);
         $firewall = new FirewallConfig('main', 'main');
         $userAuthenticator = $this->createMock(UserAuthenticatorInterface::class);
         $user = $this->createMock(UserInterface::class);
         $userChecker = $this->createMock(UserCheckerInterface::class);
+        $badge = new UserBadge('foo');
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['request_stack', $requestStack],
-                ['security.firewall.map', $firewallMap],
-                ['security.authenticator.managers_locator', $this->createContainer('main', $userAuthenticator)],
-                ['security.user_checker_locator', $this->createContainer('main', $userChecker)],
-            ])
-        ;
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('security.firewall.map', $firewallMap);
+        $container->set('security.authenticator.managers_locator', $this->createContainer('main', $userAuthenticator));
+        $container->set('security.user_checker_locator', $this->createContainer('main', $userChecker));
 
-        $requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewall);
-        $userAuthenticator->expects($this->once())->method('authenticateUser')->with($user, $authenticator, $request);
+        $userAuthenticator->expects($this->once())->method('authenticateUser')->with($user, $authenticator, $request, [$badge], ['foo' => 'bar']);
         $userChecker->expects($this->once())->method('checkPreAuth')->with($user);
 
         $firewallAuthenticatorLocator = $this->createMock(ServiceProviderInterface::class);
@@ -169,33 +210,27 @@ class SecurityTest extends TestCase
 
         $security = new Security($container, ['main' => $firewallAuthenticatorLocator]);
 
-        $security->login($user);
+        $security->login($user, badges: [$badge], attributes: ['foo' => 'bar']);
     }
 
     public function testLoginReturnsAuthenticatorResponse()
     {
         $request = new Request();
         $authenticator = $this->createMock(AuthenticatorInterface::class);
-        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
         $firewallMap = $this->createMock(FirewallMap::class);
         $firewall = new FirewallConfig('main', 'main');
         $user = $this->createMock(UserInterface::class);
         $userChecker = $this->createMock(UserCheckerInterface::class);
         $userAuthenticator = $this->createMock(UserAuthenticatorInterface::class);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['request_stack', $requestStack],
-                ['security.firewall.map', $firewallMap],
-                ['security.authenticator.managers_locator', $this->createContainer('main', $userAuthenticator)],
-                ['security.user_checker_locator', $this->createContainer('main', $userChecker)],
-            ])
-        ;
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('security.firewall.map', $firewallMap);
+        $container->set('security.authenticator.managers_locator', $this->createContainer('main', $userAuthenticator));
+        $container->set('security.user_checker_locator', $this->createContainer('main', $userChecker));
 
-        $requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewall);
         $userChecker->expects($this->once())->method('checkPreAuth')->with($user);
         $userAuthenticator->expects($this->once())->method('authenticateUser')
@@ -226,25 +261,18 @@ class SecurityTest extends TestCase
     public function testLoginWithoutAuthenticatorThrows()
     {
         $request = new Request();
-        $authenticator = $this->createMock(AuthenticatorInterface::class);
-        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
         $firewallMap = $this->createMock(FirewallMap::class);
         $firewall = new FirewallConfig('main', 'main');
         $user = $this->createMock(UserInterface::class);
         $userChecker = $this->createMock(UserCheckerInterface::class);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['request_stack', $requestStack],
-                ['security.firewall.map', $firewallMap],
-                ['security.user_checker', $userChecker],
-            ])
-        ;
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('security.firewall.map', $firewallMap);
+        $container->set('security.user_checker', $userChecker);
 
-        $requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewall);
 
         $security = new Security($container, ['main' => null]);
@@ -260,14 +288,8 @@ class SecurityTest extends TestCase
         $requestStack = new RequestStack();
         $user = $this->createMock(UserInterface::class);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['request_stack', $requestStack],
-            ])
-        ;
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
 
         $security = new Security($container, ['main' => null]);
 
@@ -323,8 +345,8 @@ class SecurityTest extends TestCase
     public function testLogout()
     {
         $request = new Request();
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->once())->method('getMainRequest')->willReturn($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn(new InMemoryUser('foo', 'bar'));
@@ -347,26 +369,14 @@ class SecurityTest extends TestCase
             ->willReturn($firewallConfig)
         ;
 
-        $eventDispatcherLocator = $this->createMock(ContainerInterface::class);
-        $eventDispatcherLocator
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['my_firewall', $eventDispatcher],
-            ])
-        ;
+        $eventDispatcherLocator = new Container();
+        $eventDispatcherLocator->set('my_firewall', $eventDispatcher);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['request_stack', $requestStack],
-                ['security.token_storage', $tokenStorage],
-                ['security.firewall.map', $firewallMap],
-                ['security.firewall.event_dispatcher_locator', $eventDispatcherLocator],
-            ])
-        ;
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('security.token_storage', $tokenStorage);
+        $container->set('security.firewall.map', $firewallMap);
+        $container->set('security.firewall.event_dispatcher_locator', $eventDispatcherLocator);
         $security = new Security($container);
         $security->logout(false);
     }
@@ -374,8 +384,8 @@ class SecurityTest extends TestCase
     public function testLogoutWithoutFirewall()
     {
         $request = new Request();
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->once())->method('getMainRequest')->willReturn($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn(new InMemoryUser('foo', 'bar'));
@@ -393,16 +403,10 @@ class SecurityTest extends TestCase
             ->willReturn(null)
         ;
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['request_stack', $requestStack],
-                ['security.token_storage', $tokenStorage],
-                ['security.firewall.map', $firewallMap],
-            ])
-        ;
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('security.token_storage', $tokenStorage);
+        $container->set('security.firewall.map', $firewallMap);
 
         $this->expectException(LogicException::class);
         $security = new Security($container);
@@ -412,8 +416,8 @@ class SecurityTest extends TestCase
     public function testLogoutWithResponse()
     {
         $request = new Request();
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->once())->method('getMainRequest')->willReturn($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn(new InMemoryUser('foo', 'bar'));
@@ -440,24 +444,14 @@ class SecurityTest extends TestCase
         $firewallConfig = new FirewallConfig('my_firewall', 'user_checker');
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewallConfig);
 
-        $eventDispatcherLocator = $this->createMock(ContainerInterface::class);
-        $eventDispatcherLocator
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([['my_firewall', $eventDispatcher]])
-        ;
+        $eventDispatcherLocator = new Container();
+        $eventDispatcherLocator->set('my_firewall', $eventDispatcher);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['request_stack', $requestStack],
-                ['security.token_storage', $tokenStorage],
-                ['security.firewall.map', $firewallMap],
-                ['security.firewall.event_dispatcher_locator', $eventDispatcherLocator],
-            ])
-        ;
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('security.token_storage', $tokenStorage);
+        $container->set('security.firewall.map', $firewallMap);
+        $container->set('security.firewall.event_dispatcher_locator', $eventDispatcherLocator);
         $security = new Security($container);
         $response = $security->logout(false);
 
@@ -468,8 +462,8 @@ class SecurityTest extends TestCase
     public function testLogoutWithValidCsrf()
     {
         $request = new Request(['_csrf_token' => 'dummytoken']);
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->once())->method('getMainRequest')->willReturn($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn(new InMemoryUser('foo', 'bar'));
@@ -496,29 +490,18 @@ class SecurityTest extends TestCase
         $firewallConfig = new FirewallConfig(name: 'my_firewall', userChecker: 'user_checker', logout: ['csrf_parameter' => '_csrf_token', 'csrf_token_id' => 'logout']);
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewallConfig);
 
-        $eventDispatcherLocator = $this->createMock(ContainerInterface::class);
-        $eventDispatcherLocator
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([['my_firewall', $eventDispatcher]])
-        ;
+        $eventDispatcherLocator = new Container();
+        $eventDispatcherLocator->set('my_firewall', $eventDispatcher);
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfTokenManager->expects($this->once())->method('isTokenValid')->with($this->equalTo(new CsrfToken('logout', 'dummytoken')))->willReturn(true);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->once())->method('has')->with('security.csrf.token_manager')->willReturn(true);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['request_stack', $requestStack],
-                ['security.token_storage', $tokenStorage],
-                ['security.firewall.map', $firewallMap],
-                ['security.firewall.event_dispatcher_locator', $eventDispatcherLocator],
-                ['security.csrf.token_manager', $csrfTokenManager],
-            ])
-        ;
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('security.token_storage', $tokenStorage);
+        $container->set('security.firewall.map', $firewallMap);
+        $container->set('security.firewall.event_dispatcher_locator', $eventDispatcherLocator);
+        $container->set('security.csrf.token_manager', $csrfTokenManager);
         $security = new Security($container);
         $response = $security->logout();
 
@@ -530,14 +513,8 @@ class SecurityTest extends TestCase
     {
         $requestStack = new RequestStack();
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->willReturnMap([
-                ['request_stack', $requestStack],
-            ])
-        ;
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
 
         $security = new Security($container, ['main' => null]);
 

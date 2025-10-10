@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator\AccessToken;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
@@ -75,15 +75,13 @@ class QueryAccessTokenAuthenticatorTest extends TestCase
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
     }
 
-    /**
-     * @dataProvider provideInvalidAuthenticateData
-     */
-    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
+    #[DataProvider('provideInvalidAuthenticateData')]
+    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType)
     {
+        $this->setUpAuthenticator();
+
         $this->expectException($exceptionType);
         $this->expectExceptionMessage($errorMessage);
-
-        $this->setUpAuthenticator();
 
         $this->authenticator->authenticate($request);
     }

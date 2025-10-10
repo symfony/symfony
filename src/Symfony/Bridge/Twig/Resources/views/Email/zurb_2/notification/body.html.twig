@@ -3,15 +3,15 @@
 <head>
 <style>
     {% block style %}
-        {{ source("@email/zurb_2/main.css") }}
-        {{ source("@email/zurb_2/notification/local.css") }}
+        {{ source('@email/zurb_2/main.css') }}
+        {{ source('@email/zurb_2/notification/local.css') }}
     {% endblock %}
 </style>
 </head>
 <body>
 <spacer size="32"></spacer>
 <wrapper class="body">
-    <container class="body_{{ ("urgent" == importance ? "alert" : ("high" == importance ? "warning" : "default")) }}">
+    <container class="body_{{ ('urgent' == importance ? 'alert' : ('high' == importance ? 'warning' : 'default')) }}">
         <spacer size="16"></spacer>
         <row>
             <columns large="12" small="12">

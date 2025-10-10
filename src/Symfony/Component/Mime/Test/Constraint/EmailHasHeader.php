@@ -16,11 +16,9 @@ use Symfony\Component\Mime\RawMessage;
 
 final class EmailHasHeader extends Constraint
 {
-    private string $headerName;
-
-    public function __construct(string $headerName)
-    {
-        $this->headerName = $headerName;
+    public function __construct(
+        private string $headerName,
+    ) {
     }
 
     public function toString(): string

@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\HtmlSanitizer\Tests\Parser;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\Parser\MastermindsParser;
 
+#[IgnoreDeprecations]
+#[Group('legacy')]
 class MastermindsParserTest extends TestCase
 {
     public function testParseValid()

@@ -16,11 +16,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class FormFactory implements FormFactoryInterface
 {
-    private FormRegistryInterface $registry;
-
-    public function __construct(FormRegistryInterface $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        private FormRegistryInterface $registry,
+    ) {
     }
 
     public function create(string $type = FormType::class, mixed $data = null, array $options = []): FormInterface

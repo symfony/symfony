@@ -19,11 +19,9 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 class CacheStorage implements StorageInterface
 {
-    private CacheItemPoolInterface $pool;
-
-    public function __construct(CacheItemPoolInterface $pool)
-    {
-        $this->pool = $pool;
+    public function __construct(
+        private CacheItemPoolInterface $pool,
+    ) {
     }
 
     public function save(LimiterStateInterface $limiterState): void

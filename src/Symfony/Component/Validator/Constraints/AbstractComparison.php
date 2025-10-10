@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -24,21 +25,30 @@ use Symfony\Component\Validator\Exception\LogicException;
  */
 abstract class AbstractComparison extends Constraint
 {
-    public $message;
-    public $value;
-    public $propertyPath;
+    public string $message;
+    public mixed $value = null;
+    public ?string $propertyPath = null;
 
-    public function __construct(mixed $value = null, ?string $propertyPath = null, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
+    #[HasNamedArguments]
+    public function __construct(mixed $value = null, ?string $propertyPath = null, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
     {
         if (\is_array($value)) {
-            $options = array_merge($value, $options);
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($value, $options ?? []);
+            $value = null;
         } elseif (null !== $value) {
-            $options['value'] = $value;
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+                $options['value'] = $value;
+            }
         }
 
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
+        $this->value = $value ?? $this->value;
         $this->propertyPath = $propertyPath ?? $this->propertyPath;
 
         if (null === $this->value && null === $this->propertyPath) {
@@ -54,8 +64,15 @@ abstract class AbstractComparison extends Constraint
         }
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getDefaultOption(): ?string
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return 'value';
     }
 }

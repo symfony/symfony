@@ -26,16 +26,15 @@ class_exists(NotFoundExceptionInterface::class);
  */
 trait ServiceLocatorTrait
 {
-    private array $factories;
     private array $loading = [];
     private array $providedTypes;
 
     /**
      * @param array<string, callable> $factories
      */
-    public function __construct(array $factories)
-    {
-        $this->factories = $factories;
+    public function __construct(
+        private array $factories,
+    ) {
     }
 
     public function has(string $id): bool

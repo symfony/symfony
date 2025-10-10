@@ -24,8 +24,10 @@ use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\CustomEvent;
+use Symfony\Component\EventDispatcher\Tests\Fixtures\DummyEvent;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedInvokableListener;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedMultiListener;
+use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedUnionTypeListener;
 
 class RegisterListenersPassTest extends TestCase
 {
@@ -353,6 +355,70 @@ class RegisterListenersPassTest extends TestCase
                 ],
             ],
         ];
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
+
+    public function testTaggedMethodUnionTypeEventListener()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class,
+            static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+
+                if (!$reflector instanceof \ReflectionMethod) {
+                    $definition->addTag('kernel.event_listener', $tagAttributes);
+
+                    return;
+                }
+
+                if (isset($tagAttributes['method'])) {
+                    throw new \LogicException(\sprintf('AsEventListener attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+                }
+
+                $tagAttributes['method'] = $reflector->getName();
+
+                if (!$eventArg = $reflector->getParameters()[0] ?? null) {
+                    throw new \LogicException(\sprintf('AsEventListener attribute requires the first argument of "%s::%s()" to be an event object.', $reflector->class, $reflector->name));
+                }
+
+                $types = ($type = $eventArg->getType() instanceof \ReflectionUnionType ? $eventArg->getType()->getTypes() : [$eventArg->getType()]) ?: [];
+
+                foreach ($types as $type) {
+                    if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+                        $tagAttributes['event'] = $type->getName();
+
+                        $definition->addTag('kernel.event_listener', $tagAttributes);
+                    }
+                }
+            });
+
+        $container->register('foo', TaggedUnionTypeListener::class)->setAutoconfigured(true);
+        $container->register('event_dispatcher', \stdClass::class);
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new RegisterListenersPass())->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onUnionEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    DummyEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onUnionEvent'],
+                    0,
+                ],
+            ],
+        ];
+
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 

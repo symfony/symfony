@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
@@ -53,9 +54,7 @@ class AddressTest extends TestCase
         Address::create('<fabien@symfony');
     }
 
-    /**
-     * @dataProvider fromStringProvider
-     */
+    #[DataProvider('fromStringProvider')]
     public function testCreateWithString($string, $displayName, $addrSpec)
     {
         $address = Address::create($string);
@@ -81,15 +80,20 @@ class AddressTest extends TestCase
         $this->assertEquals([$fabien], Address::createArray(['fabien@symfony.com']));
     }
 
+    public function testUnicodeLocalpart()
+    {
+        /* dømi means example and is reserved by the .fo registry */
+        $this->assertFalse((new Address('info@dømi.fo'))->hasUnicodeLocalpart());
+        $this->assertTrue((new Address('dømi@dømi.fo'))->hasUnicodeLocalpart());
+    }
+
     public function testCreateArrayWrongArg()
     {
         $this->expectException(\TypeError::class);
         Address::createArray([new \stdClass()]);
     }
 
-    /**
-     * @dataProvider nameEmptyDataProvider
-     */
+    #[DataProvider('nameEmptyDataProvider')]
     public function testNameEmpty(string $name)
     {
         $mail = 'mail@example.org';

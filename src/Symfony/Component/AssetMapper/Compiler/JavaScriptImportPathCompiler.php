@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Compiler;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Compiler\Parser\JavascriptSequenceParser;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
@@ -61,15 +62,13 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
-        return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper, $content) {
+        $jsParser = new JavascriptSequenceParser($content);
+
+        return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper, $jsParser) {
             $fullImportString = $matches[0][0];
 
-            // Ignore matches that did not capture import statements
-            if (!isset($matches[1][0])) {
-                return $fullImportString;
-            }
-
-            if ($this->isCommentedOut($matches[0][1], $content)) {
+            $jsParser->parseUntil($matches[0][1]);
+            if (!$jsParser->isExecutable()) {
                 return $fullImportString;
             }
 
@@ -144,33 +143,6 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             AssetCompilerInterface::MISSING_IMPORT_WARN => $this->logger?->warning($message),
             AssetCompilerInterface::MISSING_IMPORT_STRICT => throw new RuntimeException($message, 0, $e),
         };
-    }
-
-    /**
-     * Simple check for the most common types of comments.
-     *
-     * This is not a full parser, but should be good enough for most cases.
-     */
-    private function isCommentedOut(mixed $offsetStart, string $fullContent): bool
-    {
-        $lineStart = strrpos($fullContent, "\n", $offsetStart - \strlen($fullContent));
-        $lineContentBeforeImport = substr($fullContent, $lineStart, $offsetStart - $lineStart);
-        $firstTwoChars = substr(ltrim($lineContentBeforeImport), 0, 2);
-        if ('//' === $firstTwoChars) {
-            return true;
-        }
-
-        if ('/*' === $firstTwoChars) {
-            $commentEnd = strpos($fullContent, '*/', $lineStart);
-            // if we can't find the end comment, be cautious: assume this is not a comment
-            if (false === $commentEnd) {
-                return false;
-            }
-
-            return $offsetStart < $commentEnd;
-        }
-
-        return false;
     }
 
     private function findAssetForBareImport(string $importedModule, AssetMapperInterface $assetMapper): ?MappedAsset

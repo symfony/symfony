@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
@@ -21,21 +22,12 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 
 class BackedEnumValueResolverTest extends TestCase
 {
-    /**
-     * In Symfony 7, keep this test case but remove the call to supports().
-     *
-     * @group legacy
-     *
-     * @dataProvider provideTestSupportsData
-     */
+    #[DataProvider('provideTestSupportsData')]
     public function testSupports(Request $request, ArgumentMetadata $metadata, bool $expectedSupport)
     {
         $resolver = new BackedEnumValueResolver();
 
-        if (!$expectedSupport) {
-            $this->assertSame([], $resolver->resolve($request, $metadata));
-        }
-        self::assertSame($expectedSupport, $resolver->supports($request, $metadata));
+        $this->assertCount((int) $expectedSupport, $resolver->resolve($request, $metadata));
     }
 
     public static function provideTestSupportsData(): iterable
@@ -75,9 +67,7 @@ class BackedEnumValueResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideTestResolveData
-     */
+    #[DataProvider('provideTestResolveData')]
     public function testResolve(Request $request, ArgumentMetadata $metadata, $expected)
     {
         $resolver = new BackedEnumValueResolver();

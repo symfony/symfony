@@ -1,0 +1,3 @@
+services:
+    firewall_entry_point.entry_point.stub:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub

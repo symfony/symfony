@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -24,11 +26,17 @@ class LengthTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $length = new Length(['min' => 0, 'max' => 10, 'normalizer' => 'trim']);
+        $length = new Length(
+            min: 0,
+            max: 10,
+            normalizer: 'trim',
+        );
 
         $this->assertEquals('trim', $length->normalizer);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -36,6 +44,8 @@ class LengthTest extends TestCase
         new Length(['min' => 0, 'max' => 10, 'normalizer' => 'Unknown Callable']);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -45,13 +55,13 @@ class LengthTest extends TestCase
 
     public function testDefaultCountUnitIsUsed()
     {
-        $length = new Length(['min' => 0, 'max' => 10]);
+        $length = new Length(min: 0, max: 10);
         $this->assertSame(Length::COUNT_CODEPOINTS, $length->countUnit);
     }
 
     public function testNonDefaultCountUnitCanBeSet()
     {
-        $length = new Length(['min' => 0, 'max' => 10, 'countUnit' => Length::COUNT_GRAPHEMES]);
+        $length = new Length(min: 0, max: 10, countUnit: Length::COUNT_GRAPHEMES);
         $this->assertSame(Length::COUNT_GRAPHEMES, $length->countUnit);
     }
 
@@ -59,7 +69,7 @@ class LengthTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('The "countUnit" option must be one of the "%s"::COUNT_* constants ("%s" given).', Length::class, 'nonExistentCountUnit'));
-        new Length(['min' => 0, 'max' => 10, 'countUnit' => 'nonExistentCountUnit']);
+        new Length(min: 0, max: 10, countUnit: 'nonExistentCountUnit');
     }
 
     public function testConstraintDefaultOption()
@@ -70,9 +80,9 @@ class LengthTest extends TestCase
         self::assertEquals(5, $constraint->max);
     }
 
-    public function testConstraintAnnotationDefaultOption()
+    public function testConstraintAttributeDefaultOption()
     {
-        $constraint = new Length(['value' => 5, 'exactMessage' => 'message']);
+        $constraint = new Length(exactly: 5, exactMessage: 'message');
 
         self::assertEquals(5, $constraint->min);
         self::assertEquals(5, $constraint->max);
@@ -85,11 +95,11 @@ class LengthTest extends TestCase
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame(42, $aConstraint->min);
         self::assertSame(42, $aConstraint->max);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame(1, $bConstraint->min);
         self::assertSame(4711, $bConstraint->max);
         self::assertSame('myMinMessage', $bConstraint->minMessage);
@@ -98,7 +108,7 @@ class LengthTest extends TestCase
         self::assertSame('ISO-8859-15', $bConstraint->charset);
         self::assertSame(['Default', 'LengthDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

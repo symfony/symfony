@@ -14,11 +14,13 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\BadMethodCallException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -29,13 +31,12 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
+class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, PruneableInterface, ResettableInterface
 {
     use ContractsTrait;
 
     private array $adapters = [];
     private int $adapterCount;
-    private int $defaultLifetime;
 
     private static \Closure $syncItem;
 
@@ -43,8 +44,10 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
      * @param CacheItemPoolInterface[] $adapters        The ordered list of adapters used to fetch cached items
      * @param int                      $defaultLifetime The default lifetime of items propagated from lower adapters to upper ones
      */
-    public function __construct(array $adapters, int $defaultLifetime = 0)
-    {
+    public function __construct(
+        array $adapters,
+        private int $defaultLifetime = 0,
+    ) {
         if (!$adapters) {
             throw new InvalidArgumentException('At least one adapter must be specified.');
         }
@@ -64,7 +67,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             }
         }
         $this->adapterCount = \count($this->adapters);
-        $this->defaultLifetime = $defaultLifetime;
 
         self::$syncItem ??= \Closure::bind(
             static function ($sourceItem, $item, $defaultLifetime, $sourceMetadata = null) {
@@ -280,10 +282,24 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $pruned;
     }
 
-    /**
-     * @return void
-     */
-    public function reset()
+    public function withSubNamespace(string $namespace): static
+    {
+        $clone = clone $this;
+        $adapters = [];
+
+        foreach ($this->adapters as $adapter) {
+            if (!$adapter instanceof NamespacedPoolInterface) {
+                throw new BadMethodCallException('All adapters must implement NamespacedPoolInterface to support namespaces.');
+            }
+
+            $adapters[] = $adapter->withSubNamespace($namespace);
+        }
+        $clone->adapters = $adapters;
+
+        return $clone;
+    }
+
+    public function reset(): void
     {
         foreach ($this->adapters as $adapter) {
             if ($adapter instanceof ResetInterface) {

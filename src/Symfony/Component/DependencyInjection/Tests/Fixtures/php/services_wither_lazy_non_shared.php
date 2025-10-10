@@ -58,7 +58,7 @@ class Symfony_DI_PhpDumper_Service_Wither_Lazy_Non_Shared extends Container
         $container->factories['wither'] ??= fn () => self::getWitherService($container);
 
         if (true === $lazyLoad) {
-            return $container->createProxy('WitherProxyDd381be', static fn () => \WitherProxyDd381be::createLazyProxy(static fn () => self::getWitherService($container, false)));
+            return new \ReflectionClass('Symfony\Component\DependencyInjection\Tests\Compiler\Wither')->newLazyProxy(static fn () => self::getWitherService($container, false));
         }
 
         $instance = new \Symfony\Component\DependencyInjection\Tests\Compiler\Wither();
@@ -72,52 +72,3 @@ class Symfony_DI_PhpDumper_Service_Wither_Lazy_Non_Shared extends Container
         return $instance;
     }
 }
-
-class WitherProxyDd381be extends \Symfony\Component\DependencyInjection\Tests\Compiler\Wither implements \Symfony\Component\VarExporter\LazyObjectInterface
-{
-    use \Symfony\Component\VarExporter\Internal\LazyDecoratorTrait;
-
-    private const LAZY_OBJECT_PROPERTY_SCOPES = [
-        'foo' => [parent::class, 'foo', null, 4],
-    ];
-
-    public function setFoo(\Symfony\Component\DependencyInjection\Tests\Compiler\Foo $foo)
-    {
-        ${0} = $this->lazyObjectState->realInstance;
-        ${1} = ${0}->setFoo(...\func_get_args());
-
-        return match (true) {
-            ${1} === ${0} => $this,
-            !${1} instanceof ${0} || !${0} instanceof ${1} => ${1},
-            null !== $this->lazyObjectState->cloneInstance =& ${1} => clone $this,
-        };
-    }
-
-    public function withFoo1(\Symfony\Component\DependencyInjection\Tests\Compiler\Foo $foo): static
-    {
-        ${0} = $this->lazyObjectState->realInstance;
-        ${1} = ${0}->withFoo1(...\func_get_args());
-
-        return match (true) {
-            ${1} === ${0} => $this,
-            !${1} instanceof ${0} || !${0} instanceof ${1} => ${1},
-            null !== $this->lazyObjectState->cloneInstance =& ${1} => clone $this,
-        };
-    }
-
-    public function withFoo2(\Symfony\Component\DependencyInjection\Tests\Compiler\Foo $foo): static
-    {
-        ${0} = $this->lazyObjectState->realInstance;
-        ${1} = ${0}->withFoo2(...\func_get_args());
-
-        return match (true) {
-            ${1} === ${0} => $this,
-            !${1} instanceof ${0} || !${0} instanceof ${1} => ${1},
-            null !== $this->lazyObjectState->cloneInstance =& ${1} => clone $this,
-        };
-    }
-}
-
-// Help opcache.preload discover always-needed symbols
-class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);

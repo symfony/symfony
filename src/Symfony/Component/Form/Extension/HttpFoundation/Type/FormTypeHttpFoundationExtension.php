@@ -29,10 +29,7 @@ class FormTypeHttpFoundationExtension extends AbstractTypeExtension
         $this->requestHandler = $requestHandler ?? new HttpFoundationRequestHandler();
     }
 
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->setRequestHandler($this->requestHandler);
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
@@ -24,20 +25,10 @@ use Symfony\Component\Uid\UuidV4;
 
 class UidValueResolverTest extends TestCase
 {
-    /**
-     * In Symfony 7, keep this test case but remove the call to supports().
-     *
-     * @group legacy
-     *
-     * @dataProvider provideSupports
-     */
+    #[DataProvider('provideSupports')]
     public function testSupports(bool $expected, Request $request, ArgumentMetadata $argument)
     {
-        if (!$expected) {
-            $this->assertSame([], (new UidValueResolver())->resolve($request, $argument));
-        }
-
-        $this->assertSame($expected, (new UidValueResolver())->supports($request, $argument));
+        $this->assertCount((int) $expected, (new UidValueResolver())->resolve($request, $argument));
     }
 
     public static function provideSupports()
@@ -50,16 +41,12 @@ class UidValueResolverTest extends TestCase
             'Argument type is not a class' => [false, new Request([], [], ['foo' => (string) $uuidV4]), new ArgumentMetadata('foo', 'string', false, false, null)],
             'Argument type is not a subclass of AbstractUid' => [false, new Request([], [], ['foo' => (string) $uuidV4]), new ArgumentMetadata('foo', UlidFactory::class, false, false, null)],
             'AbstractUid is not supported' => [false, new Request([], [], ['foo' => (string) $uuidV4]), new ArgumentMetadata('foo', AbstractUid::class, false, false, null)],
-            'Custom abstract subclass is supported but will fail in resolve' => [true, new Request([], [], ['foo' => (string) $uuidV4]), new ArgumentMetadata('foo', TestAbstractCustomUid::class, false, false, null)],
             'Known subclass' => [true, new Request([], [], ['foo' => (string) $uuidV4]), new ArgumentMetadata('foo', UuidV4::class, false, false, null)],
             'Format does not matter' => [true, new Request([], [], ['foo' => (string) $uuidV4]), new ArgumentMetadata('foo', Ulid::class, false, false, null)],
-            'Custom subclass' => [true, new Request([], [], ['foo' => '01FPND7BD15ZV07X5VGDXAJ8VD']), new ArgumentMetadata('foo', TestCustomUid::class, false, false, null)],
         ];
     }
 
-    /**
-     * @dataProvider provideResolveOK
-     */
+    #[DataProvider('provideResolveOK')]
     public function testResolveOK(AbstractUid $expected, string $requestUid)
     {
         $this->assertEquals([$expected], (new UidValueResolver())->resolve(
@@ -83,9 +70,7 @@ class UidValueResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideResolveKO
-     */
+    #[DataProvider('provideResolveKO')]
     public function testResolveKO(string $requestUid, string $argumentType)
     {
         $this->expectException(NotFoundHttpException::class);

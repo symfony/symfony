@@ -19,6 +19,6 @@ class TestLogger extends AbstractLogger
 
     public function log($level, $message, array $context = []): void
     {
-        $this->logs[] = $message;
+        $this->logs[] = preg_replace_callback('!\{([^\}\s]++)\}!', static fn ($m) => $context[$m[1]] ?? $m[0], $message);
     }
 }

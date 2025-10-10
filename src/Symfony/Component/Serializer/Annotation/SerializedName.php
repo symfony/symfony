@@ -14,6 +14,9 @@ namespace Symfony\Component\Serializer\Annotation;
 class_exists(\Symfony\Component\Serializer\Attribute\SerializedName::class);
 
 if (false) {
+    /**
+     * @deprecated since Symfony 7.4, use {@see \Symfony\Component\Serializer\Attribute\SerializedName} instead
+     */
     #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
     class SerializedName extends \Symfony\Component\Serializer\Attribute\SerializedName
     {

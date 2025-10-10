@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sms77\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Sms77\Sms77Transport;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -19,6 +21,8 @@ use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+#[IgnoreDeprecations]
+#[Group('legacy')]
 final class Sms77TransportTest extends TransportTestCase
 {
     public static function createTransport(?HttpClientInterface $client = null, ?string $from = null): Sms77Transport

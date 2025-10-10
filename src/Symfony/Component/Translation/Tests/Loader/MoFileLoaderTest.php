@@ -47,17 +47,15 @@ class MoFileLoaderTest extends TestCase
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);
-        $loader = new MoFileLoader();
-        $resource = __DIR__.'/../Fixtures/non-existing.mo';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new MoFileLoader())->load(__DIR__.'/../Fixtures/non-existing.mo', 'en', 'domain1');
     }
 
     public function testLoadInvalidResource()
     {
         $this->expectException(InvalidResourceException::class);
-        $loader = new MoFileLoader();
-        $resource = __DIR__.'/../Fixtures/empty.mo';
-        $loader->load($resource, 'en', 'domain1');
+
+        (new MoFileLoader())->load(__DIR__.'/../Fixtures/empty.mo', 'en', 'domain1');
     }
 
     public function testLoadEmptyTranslation()

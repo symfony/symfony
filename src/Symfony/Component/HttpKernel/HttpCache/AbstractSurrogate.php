@@ -23,23 +23,13 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 abstract class AbstractSurrogate implements SurrogateInterface
 {
-    protected $contentTypes;
-
-    /**
-     * @deprecated since Symfony 6.3
-     */
-    protected $phpEscapeMap = [
-        ['<?', '<%', '<s', '<S'],
-        ['<?php echo "<?"; ?>', '<?php echo "<%"; ?>', '<?php echo "<s"; ?>', '<?php echo "<S"; ?>'],
-    ];
-
     /**
      * @param array $contentTypes An array of content-type that should be parsed for Surrogate information
      *                            (default: text/html, text/xml, application/xhtml+xml, and application/xml)
      */
-    public function __construct(array $contentTypes = ['text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'])
-    {
-        $this->contentTypes = $contentTypes;
+    public function __construct(
+        protected array $contentTypes = ['text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'],
+    ) {
     }
 
     /**
@@ -59,10 +49,7 @@ abstract class AbstractSurrogate implements SurrogateInterface
         return str_contains($value, \sprintf('%s/1.0', strtoupper($this->getName())));
     }
 
-    /**
-     * @return void
-     */
-    public function addSurrogateCapability(Request $request)
+    public function addSurrogateCapability(Request $request): void
     {
         $current = $request->headers->get('Surrogate-Capability');
         $new = \sprintf('symfony="%s/1.0"', strtoupper($this->getName()));
@@ -83,7 +70,7 @@ abstract class AbstractSurrogate implements SurrogateInterface
 
     public function handle(HttpCache $cache, string $uri, string $alt, bool $ignoreErrors): string
     {
-        $subRequest = Request::create($uri, Request::METHOD_GET, [], $cache->getRequest()->cookies->all(), [], $cache->getRequest()->server->all());
+        $subRequest = Request::create($uri, 'GET', [], $cache->getRequest()->cookies->all(), [], $cache->getRequest()->server->all());
 
         try {
             $response = $cache->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
@@ -108,10 +95,8 @@ abstract class AbstractSurrogate implements SurrogateInterface
 
     /**
      * Remove the Surrogate from the Surrogate-Control header.
-     *
-     * @return void
      */
-    protected function removeFromControl(Response $response)
+    protected function removeFromControl(Response $response): void
     {
         if (!$response->headers->has('Surrogate-Control')) {
             return;

@@ -1,6 +1,75 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Deprecate extending the `RememberMeDetails` class with a constructor expecting the user FQCN
+
+   Before:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userFqcn, string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userFqcn, $userIdentifier, $expires, $value);
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userIdentifier, $expires, $value);
+       }
+   }
+   ```
+ * Add support for union types with `#[CurrentUser]`
+ * Deprecate callable firewall listeners, extend `AbstractListener` or implement `FirewallListenerInterface` instead
+ * Deprecate `AbstractListener::__invoke`
+ * Add `$methods` argument to `#[IsGranted]` to restrict validation to specific HTTP methods
+ * Allow subclassing `#[IsGranted]`
+ * Add `$tokenSource` argument to `#[IsCsrfTokenValid]` to support reading tokens from the query string or headers
+ * Deprecate `RememberMeDetails::getUserFqcn()`, the user FQCN will be removed from the remember-me cookie in 8.0
+
+7.3
+---
+
+ * Add encryption support to `OidcTokenHandler` (JWE)
+ * Replace `$hideAccountStatusExceptions` argument with `$exposeSecurityErrors` in `AuthenticatorManager` constructor
+ * Add argument `$identifierNormalizer` to `UserBadge::__construct()` to allow normalizing the identifier
+ * Support hashing the hashed password using crc32c when putting the user in the session
+ * Add support for closures in `#[IsGranted]`
+ * Add `OAuth2TokenHandler` with OAuth2 Token Introspection support for `AccessTokenAuthenticator`
+ * Add discovery support to `OidcTokenHandler` and `OidcUserInfoTokenHandler`
+
+7.2
+---
+
+ * Pass the current token to the `checkPostAuth()` method of user checkers
+ * Deprecate argument `$secret` of `RememberMeAuthenticator`
+ * Deprecate passing an empty string as `$userIdentifier` argument to `UserBadge` constructor
+ * Allow passing passport attributes to the `UserAuthenticatorInterface::authenticateUser()` method
+
+7.1
+---
+
+ * Add `#[IsCsrfTokenValid]` attribute
+ * Add CAS 2.0 access token handler
+ * Make empty username or empty password on form login attempts throw `BadCredentialsException`
+
+7.0
+---
+
+ * Add argument `$badgeFqcn` to `Passport::addBadge()`
+ * Add argument `$lifetime` to `LoginLinkHandlerInterface::createLoginLink()`
+ * Throw when calling the constructor of `DefaultLoginRateLimiter` with an empty secret
+
 6.4
 ---
 

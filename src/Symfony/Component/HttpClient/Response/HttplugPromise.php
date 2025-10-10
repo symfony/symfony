@@ -23,11 +23,9 @@ use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
  */
 final class HttplugPromise implements HttplugPromiseInterface
 {
-    private GuzzlePromiseInterface $promise;
-
-    public function __construct(GuzzlePromiseInterface $promise)
-    {
-        $this->promise = $promise;
+    public function __construct(
+        private GuzzlePromiseInterface $promise,
+    ) {
     }
 
     public function then(?callable $onFulfilled = null, ?callable $onRejected = null): self

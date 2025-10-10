@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Kernel;
 
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
@@ -48,12 +49,12 @@ trait MicroKernelTrait
      */
     private function configureContainer(ContainerConfigurator $container, LoaderInterface $loader, ContainerBuilder $builder): void
     {
-        $configDir = $this->getConfigDir();
+        $configDir = preg_replace('{/config$}', '/{config}', $this->getConfigDir());
 
         $container->import($configDir.'/{packages}/*.{php,yaml}');
         $container->import($configDir.'/{packages}/'.$this->environment.'/*.{php,yaml}');
 
-        if (is_file($configDir.'/services.yaml')) {
+        if (is_file($this->getConfigDir().'/services.yaml')) {
             $container->import($configDir.'/services.yaml');
             $container->import($configDir.'/{services}_'.$this->environment.'.yaml');
         } else {
@@ -73,18 +74,18 @@ trait MicroKernelTrait
      */
     private function configureRoutes(RoutingConfigurator $routes): void
     {
-        $configDir = $this->getConfigDir();
+        $configDir = preg_replace('{/config$}', '/{config}', $this->getConfigDir());
 
         $routes->import($configDir.'/{routes}/'.$this->environment.'/*.{php,yaml}');
         $routes->import($configDir.'/{routes}/*.{php,yaml}');
 
-        if (is_file($configDir.'/routes.yaml')) {
+        if (is_file($this->getConfigDir().'/routes.yaml')) {
             $routes->import($configDir.'/routes.yaml');
         } else {
             $routes->import($configDir.'/{routes}.php');
         }
 
-        if (false !== ($fileName = (new \ReflectionObject($this))->getFileName())) {
+        if ($fileName = (new \ReflectionObject($this))->getFileName()) {
             $routes->import($fileName, 'attribute');
         }
     }
@@ -130,7 +131,13 @@ trait MicroKernelTrait
 
     public function registerBundles(): iterable
     {
-        $contents = require $this->getBundlesPath();
+        if (!is_file($bundlesPath = $this->getBundlesPath())) {
+            yield new FrameworkBundle();
+
+            return;
+        }
+
+        $contents = require $bundlesPath;
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
                 yield new $class();
@@ -138,10 +145,7 @@ trait MicroKernelTrait
         }
     }
 
-    /**
-     * @return void
-     */
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(function (ContainerBuilder $container) use ($loader) {
             $container->loadFromExtension('framework', [
@@ -217,8 +221,10 @@ trait MicroKernelTrait
 
             if (\is_array($controller) && [0, 1] === array_keys($controller) && $this === $controller[0]) {
                 $route->setDefault('_controller', ['kernel', $controller[1]]);
-            } elseif ($controller instanceof \Closure && $this === ($r = new \ReflectionFunction($controller))->getClosureThis() && !str_contains($r->name, '{closure')) {
+            } elseif ($controller instanceof \Closure && $this === ($r = new \ReflectionFunction($controller))->getClosureThis() && !$r->isAnonymous()) {
                 $route->setDefault('_controller', ['kernel', $r->name]);
+            } elseif ($this::class === $controller && method_exists($this, '__invoke')) {
+                $route->setDefault('_controller', 'kernel');
             }
         }
 

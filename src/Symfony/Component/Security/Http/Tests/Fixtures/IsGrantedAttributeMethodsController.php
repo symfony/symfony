@@ -77,4 +77,14 @@ class IsGrantedAttributeMethodsController
     public function withRequestAsSubject()
     {
     }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', methods: 'get')]
+    public function adminWithMethodGet(): void
+    {
+    }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', methods: ['GET', 'POST'])]
+    public function adminWithMethodGetAndPost(): void
+    {
+    }
 }

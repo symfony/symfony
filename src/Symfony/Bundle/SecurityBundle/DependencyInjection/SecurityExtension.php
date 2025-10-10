@@ -11,12 +11,12 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Composer\InstalledVersions;
 use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
@@ -49,6 +49,7 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Loader\ContainerLoader;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
@@ -59,6 +60,8 @@ use Symfony\Component\Security\Core\User\ChainUserChecker;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
@@ -79,10 +82,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private array $sortedFactories = [];
     private array $userProviderFactories = [];
 
-    /**
-     * @return void
-     */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         foreach ($this->getSortedFactories() as $factory) {
             if ($factory instanceof PrependExtensionInterface) {
@@ -91,17 +91,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         if (!array_filter($configs)) {
-            trigger_deprecation('symfony/security-bundle', '6.3', 'Enabling bundle "%s" and not configuring it is deprecated.', SecurityBundle::class);
+            $hint = class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('symfony/flex') ? 'Try running "composer symfony:recipes:install symfony/security-bundle".' : 'Please define your settings for the "security" config section.';
 
-            // uncomment the following line in 7.0
-            // throw new InvalidConfigurationException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
-            return;
+            throw new InvalidConfigurationException('The SecurityBundle is enabled but is not configured. '.$hint);
         }
 
         $mainConfig = $this->getConfiguration($configs, $container);
@@ -114,11 +109,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $loader->load('security.php');
         $loader->load('password_hasher.php');
         $loader->load('security_listeners.php');
-
-        if (!$config['enable_authenticator_manager']) {
-            throw new InvalidConfigurationException('"security.enable_authenticator_manager" must be set to "true".');
-        }
-
         $loader->load('security_authenticator.php');
         $loader->load('security_authenticator_access_token.php');
 
@@ -136,6 +126,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
             $container->removeDefinition('security.is_granted_attribute_expression_language');
+            $container->removeDefinition('security.is_csrf_token_valid_attribute_expression_language');
         }
 
         if (!class_exists(PasswordHasherExtension::class)) {
@@ -165,7 +156,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ));
         }
 
-        $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
+        $container->setParameter('security.authentication.hide_user_not_found', ExposeSecurityLevel::All !== $config['expose_security_errors']);
+        $container->deprecateParameter('security.authentication.hide_user_not_found', 'symfony/security-bundle', '7.4');
+
+        $container->setParameter('.security.authentication.expose_security_errors', $config['expose_security_errors']);
 
         if (class_exists(Application::class)) {
             $loader->load('debug_console.php');
@@ -192,13 +186,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container->getDefinition('security.command.user_password_hash')->replaceArgument(1, array_keys($config['password_hashers']));
         }
 
+        if ($container->hasDefinition('security.role_hierarchy')) {
+            $loader->load('security_role_hierarchy_dump_command.php');
+        }
+
         $container->registerForAutoconfiguration(VoterInterface::class)
             ->addTag('security.voter');
-
-        // required for compatibility with Symfony 5.4
-        $container->getDefinition('security.access_listener')->setArgument(3, false);
-        $container->getDefinition('security.authorization_checker')->setArgument(2, false);
-        $container->getDefinition('security.authorization_checker')->setArgument(3, false);
     }
 
     private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition
@@ -323,14 +316,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
             $configId = 'security.firewall.map.config.'.$name;
 
-            [$matcher, $listeners, $exceptionListener, $logoutListener, $firewallAuthenticators] = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
+            [$matcher, $listeners, $exceptionListener, $logoutListener, $firewallAuthenticators] = $this->createFirewall($container, $name, $firewall, $providerIds, $configId);
 
             if (!$firewallAuthenticators) {
                 $authenticators[$name] = null;
             } else {
                 $firewallAuthenticatorRefs = [];
-                foreach ($firewallAuthenticators as $authenticatorId) {
-                    $firewallAuthenticatorRefs[$authenticatorId] = new Reference($authenticatorId);
+                foreach ($firewallAuthenticators as $originalAuthenticatorId => $managerAuthenticatorId) {
+                    $firewallAuthenticatorRefs[$originalAuthenticatorId] = new Reference($originalAuthenticatorId);
                 }
                 $authenticators[$name] = ServiceLocatorTagPass::register($container, $firewallAuthenticatorRefs);
             }
@@ -364,7 +357,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    private function createFirewall(ContainerBuilder $container, string $id, array $firewall, array &$authenticationProviders, array $providerIds, string $configId): array
+    private function createFirewall(ContainerBuilder $container, string $id, array $firewall, array $providerIds, string $configId): array
     {
         $config = $container->setDefinition($configId, new ChildDefinition('security.firewall.config'));
         $config->replaceArgument(0, $id);
@@ -517,7 +510,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $configuredEntryPoint = $defaultEntryPoint;
 
         // authenticator manager
-        $authenticators = array_map(fn ($id) => new Reference($id), $firewallAuthenticationProviders);
+        $authenticators = array_map(fn ($id) => new Reference($id), $firewallAuthenticationProviders, []);
         $container
             ->setDefinition($managerId = 'security.authenticator.manager.'.$id, new ChildDefinition('security.authenticator.manager'))
             ->replaceArgument(0, $authenticators)
@@ -641,11 +634,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
                 if (\is_array($authenticators)) {
                     foreach ($authenticators as $authenticator) {
-                        $authenticationProviders[] = $authenticator;
+                        $authenticationProviders[$authenticator] = $authenticator;
                         $entryPoints[] = $authenticator;
                     }
                 } else {
-                    $authenticationProviders[] = $authenticators;
+                    $authenticationProviders[$authenticators] = $authenticators;
                     $entryPoints[$key] = $authenticators;
                 }
 
@@ -655,6 +648,17 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                         $listeners[] = new Reference($firewallListenerId);
                     }
                 }
+            }
+        }
+
+        if ($container->hasDefinition('debug.security.firewall')) {
+            foreach ($authenticationProviders as &$authenticatorId) {
+                $traceableId = 'debug.'.$authenticatorId;
+                $container
+                    ->register($traceableId, TraceableAuthenticator::class)
+                    ->setArguments([new Reference($authenticatorId)])
+                ;
+                $authenticatorId = $traceableId;
             }
         }
 
@@ -686,15 +690,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return $this->createMissingUserProvider($container, $id, $factoryKey);
         }
 
-        if ('remember_me' === $factoryKey || 'custom_authenticators' === $factoryKey) {
-            if ('custom_authenticators' === $factoryKey) {
-                trigger_deprecation('symfony/security-bundle', '5.4', 'Not configuring explicitly the provider for the "%s" firewall is deprecated because it\'s ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.', $id);
-            }
-
+        if ('remember_me' === $factoryKey) {
             return 'security.user_providers';
         }
 
-        throw new InvalidConfigurationException(\sprintf('Not configuring explicitly the provider for the "%s" authenticator on "%s" firewall is ambiguous as there is more than one registered provider.', $factoryKey, $id));
+        throw new InvalidConfigurationException(\sprintf('Not configuring explicitly the provider for the "%s" authenticator on "%s" firewall is ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.', $factoryKey, $id));
     }
 
     private function createMissingUserProvider(ContainerBuilder $container, string $id, string $factoryKey): string
@@ -713,6 +713,17 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $hasherMap = [];
         foreach ($hashers as $class => $hasher) {
             $hasherMap[$class] = $this->createHasher($hasher);
+            // The key is not a class, so we register an alias for argument to
+            // ease getting the hasher
+            if (!class_exists($class) && !interface_exists($class)) {
+                $id = 'security.password_hasher.'.$class;
+                $container
+                    ->register($id, PasswordHasherInterface::class)
+                    ->setFactory([new Reference('security.password_hasher_factory'), 'getPasswordHasher'])
+                    ->setArgument(0, $class)
+                ;
+                $container->registerAliasForArgument($id, PasswordHasherInterface::class, $class);
+            }
         }
 
         $container
@@ -779,7 +790,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $config['algorithm'] = 'native';
                 $config['native_algorithm'] = \PASSWORD_ARGON2I;
             } else {
-                throw new InvalidConfigurationException(\sprintf('Algorithm "argon2i" is not available. Either use "%s" or upgrade to PHP 7.2+ instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id", "auto' : 'auto'));
+                throw new InvalidConfigurationException(\sprintf('Algorithm "argon2i" is not available; use "%s" instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id" or "auto' : 'auto'));
             }
 
             return $this->createHasher($config);
@@ -792,7 +803,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $config['algorithm'] = 'native';
                 $config['native_algorithm'] = \PASSWORD_ARGON2ID;
             } else {
-                throw new InvalidConfigurationException(\sprintf('Algorithm "argon2id" is not available. Either use "%s", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
+                throw new InvalidConfigurationException(\sprintf('Algorithm "argon2id" is not available; use "%s" or libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
             }
 
             return $this->createHasher($config);
@@ -1030,11 +1041,17 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $this->userProviderFactories[] = $factory;
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/security';

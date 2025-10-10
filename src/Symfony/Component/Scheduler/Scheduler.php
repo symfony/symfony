@@ -83,10 +83,10 @@ final class Scheduler
                     }
 
                     try {
-                        $this->handlers[$message::class]($message);
+                        $result = $this->handlers[$message::class]($message);
                         $ran = true;
 
-                        $this->dispatcher->dispatch(new PostRunEvent($generator->getSchedule(), $context, $message));
+                        $this->dispatcher->dispatch(new PostRunEvent($generator->getSchedule(), $context, $message, $result));
                     } catch (\Throwable $error) {
                         $failureEvent = new FailureEvent($generator->getSchedule(), $context, $message, $error);
                         $this->dispatcher->dispatch($failureEvent);

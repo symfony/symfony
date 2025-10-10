@@ -19,6 +19,12 @@ namespace Symfony\Component\EventDispatcher\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class AsEventListener
 {
+    /**
+     * @param string|null $event      The event name to listen to
+     * @param string|null $method     The method to run when the listened event is triggered
+     * @param int         $priority   The priority of this listener if several are declared for the same event
+     * @param string|null $dispatcher The service id of the event dispatcher to listen to
+     */
     public function __construct(
         public ?string $event = null,
         public ?string $method = null,

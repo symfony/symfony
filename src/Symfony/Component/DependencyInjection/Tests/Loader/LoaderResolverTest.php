@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -51,9 +52,7 @@ class LoaderResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideResourcesToLoad
-     */
+    #[DataProvider('provideResourcesToLoad')]
     public function testResolvesForcedType($resource, $type, $expectedClass)
     {
         $this->assertInstanceOf($expectedClass, $this->resolver->resolve($resource, $type));

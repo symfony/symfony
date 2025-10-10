@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -28,9 +29,7 @@ use Symfony\Component\Serializer\Serializer;
  */
 trait ContextMetadataTestTrait
 {
-    /**
-     * @dataProvider contextMetadataDummyProvider
-     */
+    #[DataProvider('contextMetadataDummyProvider')]
     public function testContextMetadataNormalize(string $contextMetadataDummyClass)
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -51,9 +50,7 @@ trait ContextMetadataTestTrait
         ]), 'base denormalization context is unchanged for this group');
     }
 
-    /**
-     * @dataProvider contextMetadataDummyProvider
-     */
+    #[DataProvider('contextMetadataDummyProvider')]
     public function testContextMetadataContextDenormalize(string $contextMetadataDummyClass)
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());

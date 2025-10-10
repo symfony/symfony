@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +23,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class DefaultAuthenticationSuccessHandlerTest extends TestCase
 {
-    /**
-     * @dataProvider getRequestRedirections
-     */
+    #[DataProvider('getRequestRedirections')]
     public function testRequestRedirections(Request $request, $options, $redirectedUrl)
     {
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
@@ -147,10 +146,8 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $options = ['target_path_parameter' => '_my_target_path'];
         $token = $this->createMock(TokenInterface::class);
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
-            ->method('get')->with('_my_target_path')
-            ->willReturn('some_route_name');
+        $request = Request::create('/');
+        $request->attributes->set('_my_target_path', 'some_route_name');
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
@@ -166,10 +163,8 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
     {
         $options = ['target_path_parameter' => '_my_target_path'];
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
-            ->method('get')->with('_my_target_path')
-            ->willReturn('https://localhost/some-path');
+        $request = Request::create('/');
+        $request->attributes->set('_my_target_path', 'https://localhost/some-path');
 
         $httpUtils = $this->createMock(HttpUtils::class);
         $httpUtils->expects($this->once())

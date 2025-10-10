@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Validator\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -48,9 +49,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
-    /**
-     * @dataProvider provideConstraints
-     */
+    #[DataProvider('provideConstraints')]
     public function testPasswordIsValid(UserPassword $constraint)
     {
         $this->hasher->expects($this->once())
@@ -63,9 +62,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider provideConstraints
-     */
+    #[DataProvider('provideConstraints')]
     public function testPasswordIsNotValid(UserPassword $constraint)
     {
         $this->hasher->expects($this->once())
@@ -87,9 +84,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
         yield 'named arguments' => [new UserPassword(message: 'myMessage')];
     }
 
-    /**
-     * @dataProvider emptyPasswordData
-     */
+    #[DataProvider('emptyPasswordData')]
     public function testEmptyPasswordsAreNotValid($password)
     {
         $constraint = new UserPassword([
@@ -113,12 +108,13 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
 
     public function testUserIsNotValid()
     {
-        $this->expectException(ConstraintDefinitionException::class);
         $user = new \stdClass();
 
         $this->tokenStorage = $this->createTokenStorage($user);
         $this->validator = $this->createValidator();
         $this->validator->initialize($this->context);
+
+        $this->expectException(ConstraintDefinitionException::class);
 
         $this->validator->validate('secret', new UserPassword());
     }

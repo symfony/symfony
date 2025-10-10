@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
@@ -42,7 +46,7 @@ class PhpFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(1, $routes, 'One route is loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         foreach ($routes as $route) {
             $this->assertSame('/blog/{slug}', $route->getPath());
@@ -62,7 +66,7 @@ class PhpFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(1, $routes, 'One route is loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         foreach ($routes as $route) {
             $this->assertSame('/prefix/blog/{slug}', $route->getPath());
@@ -81,7 +85,7 @@ class PhpFileLoaderTest extends TestCase
         $routeCollection = $loader->load('with_define_path_variable.php');
         $resources = $routeCollection->getResources();
         $this->assertCount(1, $resources);
-        $this->assertContainsOnly('Symfony\Component\Config\Resource\ResourceInterface', $resources);
+        $this->assertContainsOnlyInstancesOf(ResourceInterface::class, $resources);
         $fileResource = reset($resources);
         $this->assertSame(
             realpath($locator->locate('with_define_path_variable.php')),
@@ -256,6 +260,20 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testTriggersDeprecationWhenAccessingLoaderInternalScope()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator);
+
+        $this->expectUserDeprecationMessageMatches('{^Since symfony/routing 7.4: Accessing the internal scope of the loader in config files is deprecated, use only its public API instead in ".+" on line \d+\.$}');
+
+        $routes = $loader->load('legacy_internal_scope.php');
+
+        $this->assertInstanceOf(RouteCollection::class, $routes);
+    }
+
     public function testRoutingI18nConfigurator()
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);
@@ -337,9 +355,44 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
 
-    /**
-     * @dataProvider providePsr4ConfigFiles
-     */
+    public function testWhenEnv()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator, 'some-env');
+        $routes = $loader->load('when-env.php');
+
+        $this->assertSame(['b', 'a'], array_keys($routes->all()));
+        $this->assertSame('/b', $routes->get('b')->getPath());
+    }
+
+    public function testLoadsArrayRoutes()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('array_routes.php');
+        $this->assertSame('/a', $routes->get('a')->getPath());
+        $this->assertSame('/b', $routes->get('b')->getPath());
+        $this->assertSame(['GET'], $routes->get('b')->getMethods());
+    }
+
+    public function testLoadsObjectRoutes()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('routes_object.php');
+        $this->assertSame('/a', $routes->get('a')->getPath());
+        $this->assertSame('/b', $routes->get('b')->getPath());
+        $this->assertSame(['GET'], $routes->get('b')->getMethods());
+    }
+
+    public function testWhenEnvWithArray()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator, 'some-env');
+        $routes = $loader->load('array_when_env.php');
+        $this->assertSame('/a', $routes->get('a')->getPath());
+        $this->assertSame('/x', $routes->get('x')->getPath());
+    }
+
+    #[DataProvider('providePsr4ConfigFiles')]
     public function testImportAttributesWithPsr4Prefix(string $configFile)
     {
         $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
@@ -347,7 +400,7 @@ class PhpFileLoaderTest extends TestCase
             $loader = new PhpFileLoader($locator),
             new Psr4DirectoryLoader($locator),
             new class extends AttributeClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }
@@ -372,7 +425,7 @@ class PhpFileLoaderTest extends TestCase
         new LoaderResolver([
             $loader = new PhpFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
             new class extends AttributeClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }

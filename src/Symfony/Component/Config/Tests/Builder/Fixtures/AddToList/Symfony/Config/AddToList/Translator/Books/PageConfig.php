@@ -40,22 +40,28 @@ class PageConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    /**
+     * @param array{
+     *     number?: int<min, max>,
+     *     content?: scalar|null,
+     * } $config
+     */
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('number', $value)) {
+        if (array_key_exists('number', $config)) {
             $this->_usedProperties['number'] = true;
-            $this->number = $value['number'];
-            unset($value['number']);
+            $this->number = $config['number'];
+            unset($config['number']);
         }
 
-        if (array_key_exists('content', $value)) {
+        if (array_key_exists('content', $config)) {
             $this->_usedProperties['content'] = true;
-            $this->content = $value['content'];
-            unset($value['content']);
+            $this->content = $config['content'];
+            unset($config['content']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

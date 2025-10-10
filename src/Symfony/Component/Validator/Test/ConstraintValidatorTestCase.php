@@ -30,6 +30,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -44,24 +45,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class ConstraintValidatorTestCase extends TestCase
 {
-    /**
-     * @var ExecutionContextInterface
-     */
-    protected $context;
+    protected ExecutionContextInterface $context;
 
     /**
      * @var T
      */
-    protected $validator;
+    protected ConstraintValidatorInterface $validator;
 
-    protected $group;
-    protected $metadata;
-    protected $object;
-    protected $value;
-    protected $root;
-    protected $propertyPath;
-    protected $constraint;
-    protected $defaultTimezone;
+    protected string $group;
+    protected ?MetadataInterface $metadata;
+    protected mixed $object;
+    protected mixed $value;
+    protected mixed $root;
+    protected string $propertyPath;
+    protected Constraint $constraint;
+    protected ?string $defaultTimezone = null;
+
     private string $defaultLocale;
     private array $expectedViolations;
     private int $call;
@@ -98,7 +97,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $this->restoreDefaultTimezone();
 
-        if (class_exists(\Locale::class)) {
+        if (class_exists(\Locale::class) && isset($this->defaultLocale)) {
             \Locale::setDefault($this->defaultLocale);
         }
     }
@@ -235,7 +234,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
         $contextualValidator->expectValidation($i, null, $value, $group, function ($passedConstraints) use ($constraints) {
-            if (\is_array($constraints) && !\is_array($passedConstraints)) {
+            if (!\is_array($passedConstraints)) {
                 $passedConstraints = [$passedConstraints];
             }
 
@@ -247,7 +246,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
         $contextualValidator->expectValidation($i, null, $value, $group, function ($passedConstraints) use ($constraints) {
-            if (\is_array($constraints) && !\is_array($passedConstraints)) {
+            if (!\is_array($passedConstraints)) {
                 $passedConstraints = [$passedConstraints];
             }
 
@@ -289,40 +288,31 @@ abstract class ConstraintValidatorTestCase extends TestCase
     }
 
     /**
-     * @return ConstraintValidatorInterface
-     *
-     * @psalm-return T
+     * @return T
      */
-    abstract protected function createValidator();
+    abstract protected function createValidator(): ConstraintValidatorInterface;
 }
 
 final class ConstraintViolationAssertion
 {
-    private ExecutionContextInterface $context;
-
-    /**
-     * @var ConstraintViolationAssertion[]
-     */
-    private array $assertions;
-
-    private string $message;
     private array $parameters = [];
     private mixed $invalidValue = 'InvalidValue';
     private string $propertyPath = 'property.path';
     private ?int $plural = null;
     private ?string $code = null;
-    private ?Constraint $constraint;
     private mixed $cause = null;
 
     /**
+     * @param ConstraintViolationAssertion[] $assertions
+     *
      * @internal
      */
-    public function __construct(ExecutionContextInterface $context, string $message, ?Constraint $constraint = null, array $assertions = [])
-    {
-        $this->context = $context;
-        $this->message = $message;
-        $this->constraint = $constraint;
-        $this->assertions = $assertions;
+    public function __construct(
+        private ExecutionContextInterface $context,
+        private string $message,
+        private ?Constraint $constraint = null,
+        private array $assertions = [],
+    ) {
     }
 
     /**
@@ -455,16 +445,15 @@ final class ConstraintViolationAssertion
  */
 class AssertingContextualValidator implements ContextualValidatorInterface
 {
-    private ExecutionContextInterface $context;
     private bool $expectNoValidate = false;
     private int $atPathCalls = -1;
     private array $expectedAtPath = [];
     private int $validateCalls = -1;
     private array $expectedValidate = [];
 
-    public function __construct(ExecutionContextInterface $context)
-    {
-        $this->context = $context;
+    public function __construct(
+        private ExecutionContextInterface $context,
+    ) {
     }
 
     public function __destruct()

@@ -28,14 +28,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'secrets:decrypt-to-local', description: 'Decrypt all secrets and stores them in the local vault')]
 final class SecretsDecryptToLocalCommand extends Command
 {
-    private AbstractVault $vault;
-    private ?AbstractVault $localVault;
-
-    public function __construct(AbstractVault $vault, ?AbstractVault $localVault = null)
-    {
-        $this->vault = $vault;
-        $this->localVault = $localVault;
-
+    public function __construct(
+        private AbstractVault $vault,
+        private ?AbstractVault $localVault = null,
+    ) {
         parent::__construct();
     }
 
@@ -44,14 +40,14 @@ final class SecretsDecryptToLocalCommand extends Command
         $this
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force overriding of secrets that already exist in the local vault')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command decrypts all secrets and copies them in the local vault.
+                The <info>%command.name%</info> command decrypts all secrets and copies them in the local vault.
 
-    <info>%command.full_name%</info>
+                    <info>%command.full_name%</info>
 
-When the <info>--force</info> option is provided, secrets that already exist in the local vault are overridden.
+                When the <info>--force</info> option is provided, secrets that already exist in the local vault are overridden.
 
-    <info>%command.full_name% --force</info>
-EOF
+                    <info>%command.full_name% --force</info>
+                EOF
             )
         ;
     }
@@ -87,14 +83,20 @@ EOF
             ]);
         }
 
+        $hadErrors = false;
         foreach ($secrets as $k => $v) {
             if (null === $v) {
                 $io->error($this->vault->getLastMessage() ?? \sprintf('Secret "%s" has been skipped as there was an error reading it.', $k));
+                $hadErrors = true;
                 continue;
             }
 
             $this->localVault->seal($k, $v);
             $io->note($this->localVault->getLastMessage());
+        }
+
+        if ($hadErrors) {
+            return 1;
         }
 
         return 0;

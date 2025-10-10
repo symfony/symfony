@@ -94,9 +94,9 @@ class ProcessHelper extends Helper
      *
      * @see run()
      */
-    public function mustRun(OutputInterface $output, array|Process $cmd, ?string $error = null, ?callable $callback = null): Process
+    public function mustRun(OutputInterface $output, array|Process $cmd, ?string $error = null, ?callable $callback = null, int $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE): Process
     {
-        $process = $this->run($output, $cmd, $error, $callback);
+        $process = $this->run($output, $cmd, $error, $callback, $verbosity);
 
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);

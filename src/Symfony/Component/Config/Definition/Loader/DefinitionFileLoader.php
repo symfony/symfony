@@ -46,12 +46,22 @@ class DefinitionFileLoader extends FileLoader
         // the closure forbids access to the private scope in the included file
         $load = \Closure::bind(static function ($file) use ($loader) {
             return include $file;
-        }, null, ProtectedDefinitionFileLoader::class);
+        }, null, null);
 
-        $callback = $load($path);
+        try {
+            $callback = $load($path);
+        } catch (\Error $e) {
+            $load = \Closure::bind(static function ($file) use ($loader) {
+                return include $file;
+            }, null, ProtectedDefinitionFileLoader::class);
+
+            $callback = $load($path);
+
+            trigger_deprecation('symfony/config', '7.4', 'Accessing the internal scope of the loader in config files is deprecated, use only its public API instead in "%s" on line %d.', $e->getFile(), $e->getLine());
+        }
 
         if (\is_object($callback) && \is_callable($callback)) {
-            $this->executeCallback($callback, new DefinitionConfigurator($this->treeBuilder, $this, $path, $resource), $path);
+            $this->callConfigurator($callback, new DefinitionConfigurator($this->treeBuilder, $this, $path, $resource), $path);
         }
 
         return null;
@@ -70,7 +80,7 @@ class DefinitionFileLoader extends FileLoader
         return 'php' === $type;
     }
 
-    private function executeCallback(callable $callback, DefinitionConfigurator $configurator, string $path): void
+    private function callConfigurator(callable $callback, DefinitionConfigurator $configurator, string $path): void
     {
         $callback = $callback(...);
 

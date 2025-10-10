@@ -73,6 +73,14 @@ class Exporter
                 goto handle_value;
             }
 
+            if ($value instanceof \Closure && !($r = new \ReflectionFunction($value))->isAnonymous()) {
+                $callable = [$r->getClosureThis() ?? $r->getClosureCalledClass()?->name, $r->name];
+                $r = $callable[0] ? new \ReflectionMethod(...$callable) : null;
+                $value = new NamedClosure(self::prepare($callable, $objectsPool, $refsPool, $objectsCount, $valueIsStatic), $r);
+
+                goto handle_value;
+            }
+
             $class = $value::class;
             $reflector = Registry::$reflectors[$class] ??= Registry::getClassReflector($class);
             $properties = [];
@@ -108,7 +116,7 @@ class Exporter
                 }
                 $properties = ['SplObjectStorage' => ["\0" => $properties]];
                 $arrayValue = (array) $value;
-            } elseif ($value instanceof \Serializable || $value instanceof \__PHP_Incomplete_Class || \PHP_VERSION_ID < 80200 && $value instanceof \DatePeriod) {
+            } elseif ($value instanceof \Serializable || $value instanceof \__PHP_Incomplete_Class) {
                 ++$objectsCount;
                 $objectsPool[$value] = [$id = \count($objectsPool), serialize($value), [], 0];
                 $value = new Reference($id);
@@ -216,6 +224,19 @@ class Exporter
             return '&$r['.$value.']';
         }
         $subIndent = $indent.'    ';
+
+        if ($value instanceof NamedClosure) {
+            if ($value->method?->isPublic() ?? true) {
+                return match (true) {
+                    null === $value->callable[0] => '\\'.$value->callable[1],
+                    \is_string($value->callable[0]) => '\\'.$value->callable[0].'::'.$value->callable[1],
+                    \is_object($value->callable[0]) => self::export($value->callable[0], $subIndent).'->'.$value->callable[1],
+                }.'(...)';
+            }
+
+            return 'new \ReflectionMethod(\\'.$value->method->class.'::class, '.self::export($value->callable[1]).')'
+                .'->getClosure('.(\is_object($value->callable[0]) ? self::export($value->callable[0]) : '').')';
+        }
 
         if (\is_string($value)) {
             $code = \sprintf("'%s'", addcslashes($value, "'\\"));

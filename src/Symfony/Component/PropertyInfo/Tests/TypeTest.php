@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[IgnoreDeprecations]
+#[Group('legacy')]
 class TypeTest extends TestCase
 {
     public function testConstruct()

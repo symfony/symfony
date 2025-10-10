@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,9 +35,7 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    /**
-     * @dataProvider dataForTestCamelize
-     */
+    #[DataProvider('dataForTestCamelize')]
     public function testCamelize($id, $expected)
     {
         $this->assertEquals($expected, Container::camelize($id), \sprintf('Container::camelize("%s")', $id));
@@ -58,9 +57,7 @@ class ContainerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataForTestUnderscore
-     */
+    #[DataProvider('dataForTestUnderscore')]
     public function testUnderscore($id, $expected)
     {
         $this->assertEquals($expected, Container::underscore($id), \sprintf('Container::underscore("%s")', $id));
@@ -223,8 +220,8 @@ class ContainerTest extends TestCase
         $sc->set('Foo', $foo2 = new \stdClass());
 
         $this->assertSame(['service_container', 'foo', 'Foo'], $sc->getServiceIds());
-        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case sensitively');
-        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case sensitively');
+        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case-sensitively');
+        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case-sensitively');
     }
 
     public function testGetThrowServiceNotFoundException()

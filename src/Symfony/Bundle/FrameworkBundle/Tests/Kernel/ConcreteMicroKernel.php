@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -44,13 +43,6 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
     public function dangerousAction()
     {
         throw new Danger();
-    }
-
-    public function registerBundles(): iterable
-    {
-        return [
-            new FrameworkBundle(),
-        ];
     }
 
     public function getCacheDir(): string

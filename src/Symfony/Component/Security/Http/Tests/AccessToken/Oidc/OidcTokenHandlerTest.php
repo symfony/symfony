@@ -13,27 +13,25 @@ namespace Symfony\Component\Security\Http\Tests\AccessToken\Oidc;
 
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
-use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
-/**
- * @requires extension openssl
- */
+#[RequiresPhpExtension('openssl')]
 class OidcTokenHandlerTest extends TestCase
 {
     private const AUDIENCE = 'Symfony OIDC';
 
-    /**
-     * @dataProvider getClaims
-     */
+    #[DataProvider('getClaims')]
     public function testGetsUserIdentifierFromSignedToken(string $claim, string $expected)
     {
         $time = time();
@@ -53,8 +51,8 @@ class OidcTokenHandlerTest extends TestCase
         $loggerMock->expects($this->never())->method('error');
 
         $userBadge = (new OidcTokenHandler(
-            new ES256(),
-            $this->getJWK(),
+            new AlgorithmManager([new ES256()]),
+            $this->getJWKSet(),
             self::AUDIENCE,
             ['https://www.example.com'],
             $claim,
@@ -62,7 +60,9 @@ class OidcTokenHandlerTest extends TestCase
         ))->getUserBadgeFrom($token);
         $actualUser = $userBadge->getUserLoader()();
 
-        $this->assertEquals(new UserBadge($expected, new FallbackUserLoader(fn () => $expectedUser), $claims), $userBadge);
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame($expected, $userBadge->getUserIdentifier());
+        $this->assertSame($claims, $userBadge->getAttributes());
         $this->assertInstanceOf(OidcUser::class, $actualUser);
         $this->assertEquals($expectedUser, $actualUser);
         $this->assertEquals($claims, $userBadge->getAttributes());
@@ -75,20 +75,18 @@ class OidcTokenHandlerTest extends TestCase
         yield ['email', 'foo@example.com'];
     }
 
-    /**
-     * @dataProvider getInvalidTokens
-     */
+    #[DataProvider('getInvalidTokens')]
     public function testThrowsAnErrorIfTokenIsInvalid(string $token)
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
         $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock->expects($this->once())->method('error');
 
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+
         (new OidcTokenHandler(
-            new ES256(),
-            $this->getJWK(),
+            new AlgorithmManager([new ES256()]),
+            $this->getJWKSet(),
             self::AUDIENCE,
             ['https://www.example.com'],
             'sub',
@@ -128,9 +126,6 @@ class OidcTokenHandlerTest extends TestCase
 
     public function testThrowsAnErrorIfUserPropertyIsMissing()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Invalid credentials.');
-
         $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock->expects($this->once())->method('error');
 
@@ -145,9 +140,12 @@ class OidcTokenHandlerTest extends TestCase
         ];
         $token = $this->buildJWS(json_encode($claims));
 
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+
         (new OidcTokenHandler(
-            new ES256(),
-            self::getJWK(),
+            new AlgorithmManager([new ES256()]),
+            self::getJWKSet(),
             self::AUDIENCE,
             ['https://www.example.com'],
             'email',
@@ -175,6 +173,20 @@ class OidcTokenHandlerTest extends TestCase
             'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
             'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
             'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
+        ]);
+    }
+
+    private static function getJWKSet(): JWKSet
+    {
+        return new JWKSet([
+            new JWK([
+                'kty' => 'EC',
+                'crv' => 'P-256',
+                'x' => 'FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars',
+                'y' => 'rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY',
+                'd' => '4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0',
+            ]),
+            self::getJWK(),
         ]);
     }
 }

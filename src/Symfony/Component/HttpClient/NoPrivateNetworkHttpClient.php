@@ -159,8 +159,13 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         });
     }
 
+    /**
+     * @deprecated since Symfony 7.1, configure the logger on the wrapped HTTP client directly instead
+     */
     public function setLogger(LoggerInterface $logger): void
     {
+        trigger_deprecation('symfony/http-client', '7.1', 'Configure the logger on the wrapped HTTP client directly instead.');
+
         if ($this->client instanceof LoggerAwareInterface) {
             $this->client->setLogger($logger);
         }

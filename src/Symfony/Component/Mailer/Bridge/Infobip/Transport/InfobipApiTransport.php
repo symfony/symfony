@@ -39,14 +39,17 @@ final class InfobipApiTransport extends AbstractApiTransport
         'X-Infobip-NotifyContentType' => 'notifyContentType',
         'X-Infobip-MessageId' => 'messageId',
         'X-Infobip-Track' => 'track',
+        'X-Infobip-TrackingUrl' => 'trackingUrl',
+        'X-Infobip-TrackClicks' => 'trackClicks',
+        'X-Infobip-TrackOpens' => 'trackOpens',
     ];
 
-    private string $key;
-
-    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->key = $key;
-
+    public function __construct(
+        #[\SensitiveParameter] private string $key,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 

@@ -208,7 +208,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return $this
      */
-    public function setFormFactory(FormFactoryInterface $formFactory);
+    public function setFormFactory(FormFactoryInterface $formFactory): static;
 
     /**
      * Sets the target URL of the form.

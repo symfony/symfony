@@ -14,12 +14,6 @@ namespace Symfony\Component\Serializer\Attribute;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
- * Annotation class for @Groups().
- *
- * @Annotation
- * @NamedArgumentConstructor
- * @Target({"PROPERTY", "METHOD", "CLASS"})
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS)]
@@ -28,10 +22,10 @@ class Groups
     /**
      * @var string[]
      */
-    private readonly array $groups;
+    public readonly array $groups;
 
     /**
-     * @param string|string[] $groups
+     * @param string|string[] $groups The groups to define on the attribute target
      */
     public function __construct(string|array $groups)
     {
@@ -51,6 +45,7 @@ class Groups
     /**
      * @return string[]
      */
+    #[\Deprecated('Use the "groups" property instead', 'symfony/serializer:7.4')]
     public function getGroups(): array
     {
         return $this->groups;

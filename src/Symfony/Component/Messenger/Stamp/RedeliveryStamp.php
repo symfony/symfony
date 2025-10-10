@@ -18,12 +18,12 @@ use Symfony\Component\Messenger\Envelope;
  */
 final class RedeliveryStamp implements StampInterface
 {
-    private int $retryCount;
     private \DateTimeInterface $redeliveredAt;
 
-    public function __construct(int $retryCount, ?\DateTimeInterface $redeliveredAt = null)
-    {
-        $this->retryCount = $retryCount;
+    public function __construct(
+        private int $retryCount,
+        ?\DateTimeInterface $redeliveredAt = null,
+    ) {
         $this->redeliveredAt = $redeliveredAt ?? new \DateTimeImmutable();
     }
 

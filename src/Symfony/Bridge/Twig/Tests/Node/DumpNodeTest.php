@@ -16,9 +16,7 @@ use Symfony\Bridge\Twig\Node\DumpNode;
 use Twig\Compiler;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
-use Twig\Node\Expression\NameExpression;
 use Twig\Node\Expression\Variable\ContextVariable;
-use Twig\Node\Node;
 use Twig\Node\Nodes;
 
 class DumpNodeTest extends TestCase
@@ -31,18 +29,18 @@ class DumpNodeTest extends TestCase
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
-if ($this->env->isDebug()) {
-    $barvars = [];
-    foreach ($context as $barkey => $barval) {
-        if (!$barval instanceof \Twig\Template) {
-            $barvars[$barkey] = $barval;
-        }
-    }
-    // line 7
-    \Symfony\Component\VarDumper\VarDumper::dump($barvars);
-}
+            if ($this->env->isDebug()) {
+                $barvars = [];
+                foreach ($context as $barkey => $barval) {
+                    if (!$barval instanceof \Twig\Template) {
+                        $barvars[$barkey] = $barval;
+                    }
+                }
+                // line 7
+                \Symfony\Component\VarDumper\VarDumper::dump($barvars);
+            }
 
-EOTXT;
+            EOTXT;
 
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }
@@ -55,33 +53,27 @@ EOTXT;
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
-    if ($this->env->isDebug()) {
-        $barvars = [];
-        foreach ($context as $barkey => $barval) {
-            if (!$barval instanceof \Twig\Template) {
-                $barvars[$barkey] = $barval;
-            }
-        }
-        // line 7
-        \Symfony\Component\VarDumper\VarDumper::dump($barvars);
-    }
+                if ($this->env->isDebug()) {
+                    $barvars = [];
+                    foreach ($context as $barkey => $barval) {
+                        if (!$barval instanceof \Twig\Template) {
+                            $barvars[$barkey] = $barval;
+                        }
+                    }
+                    // line 7
+                    \Symfony\Component\VarDumper\VarDumper::dump($barvars);
+                }
 
-EOTXT;
+            EOTXT;
 
         $this->assertSame($expected, $compiler->compile($node, 1)->getSource());
     }
 
     public function testOneVar()
     {
-        if (class_exists(Nodes::class)) {
-            $vars = new Nodes([
-                new ContextVariable('foo', 7),
-            ]);
-        } else {
-            $vars = new Node([
-                new NameExpression('foo', 7),
-            ]);
-        }
+        $vars = new Nodes([
+            new ContextVariable('foo', 7),
+        ]);
 
         $node = new DumpNode('bar', $vars, 7);
 
@@ -89,12 +81,12 @@ EOTXT;
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
-if ($this->env->isDebug()) {
-    // line 7
-    \Symfony\Component\VarDumper\VarDumper::dump(%foo%);
-}
+            if ($this->env->isDebug()) {
+                // line 7
+                \Symfony\Component\VarDumper\VarDumper::dump(%foo%);
+            }
 
-EOTXT;
+            EOTXT;
 
         $expected = preg_replace('/%(.*?)%/', '($context["$1"] ?? null)', $expected);
 
@@ -103,33 +95,25 @@ EOTXT;
 
     public function testMultiVars()
     {
-        if (class_exists(Nodes::class)) {
-            $vars = new Nodes([
-                new ContextVariable('foo', 7),
-                new ContextVariable('bar', 7),
-            ]);
-        } else {
-            $vars = new Node([
-                new NameExpression('foo', 7),
-                new NameExpression('bar', 7),
-            ]);
-        }
-
+        $vars = new Nodes([
+            new ContextVariable('foo', 7),
+            new ContextVariable('bar', 7),
+        ]);
         $node = new DumpNode('bar', $vars, 7);
 
         $env = new Environment($this->createMock(LoaderInterface::class));
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
-if ($this->env->isDebug()) {
-    // line 7
-    \Symfony\Component\VarDumper\VarDumper::dump([
-        "foo" => %foo%,
-        "bar" => %bar%,
-    ]);
-}
+            if ($this->env->isDebug()) {
+                // line 7
+                \Symfony\Component\VarDumper\VarDumper::dump([
+                    "foo" => %foo%,
+                    "bar" => %bar%,
+                ]);
+            }
 
-EOTXT;
+            EOTXT;
 
         $expected = preg_replace('/%(.*?)%/', '($context["$1"] ?? null)', $expected);
 

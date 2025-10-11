@@ -90,6 +90,11 @@ class ParameterBag implements \IteratorAggregate, \Countable
         return \array_key_exists($key, $this->parameters);
     }
 
+    public function isSet(string $key): bool
+    {
+        return isset($this->parameters[$key]);
+    }
+
     /**
      * Removes a parameter.
      */

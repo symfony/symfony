@@ -366,4 +366,33 @@ class ParameterBagTest extends TestCase
 
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
+
+    public function testIsSetReturnsExpectedValues(): void
+    {
+        $bag = new ParameterBag([
+            'string' => 'bar',
+            'null' => null,
+            'empty' => '',
+            'zero' => 0,
+            'false' => false,
+        ]);
+
+        $this->assertTrue($bag->isSet('string'));
+        $this->assertFalse($bag->isSet('null'));
+        $this->assertTrue($bag->isSet('empty'));
+        $this->assertTrue($bag->isSet('zero'));
+        $this->assertTrue($bag->isSet('false'));
+        $this->assertFalse($bag->isSet('missing'));
+    }
+
+    public function testIsSetWorksSafelyWithGetString(): void
+    {
+        $bag = new ParameterBag(['foo' => 'bar', 'nullValue' => null]);
+
+        if ($bag->isSet('foo')) {
+            $this->assertSame('bar', $bag->getString('foo'));
+        }
+
+        $this->assertFalse($bag->isSet('nullValue'));
+    }
 }

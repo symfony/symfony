@@ -83,15 +83,16 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns true if the parameter is defined.
+     * @param bool $acceptNull
      */
-    public function has(string $key): bool
+    public function has(string $key/*, bool $acceptNull = true */): bool
     {
-        return \array_key_exists($key, $this->parameters);
-    }
+        $acceptNull = 2 > \func_num_args() || func_get_arg(1);
 
-    public function isSet(string $key): bool
-    {
+        if ($acceptNull) {
+            return \array_key_exists($key, $this->parameters);
+        }
+
         return isset($this->parameters[$key]);
     }
 

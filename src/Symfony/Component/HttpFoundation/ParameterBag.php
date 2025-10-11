@@ -87,9 +87,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function has(string $key/*, bool $acceptNull = true */): bool
     {
-        $acceptNull = 2 > \func_num_args() || func_get_arg(1);
-
-        if ($acceptNull) {
+        if (2 > \func_num_args() || func_get_arg(1)) {
             return \array_key_exists($key, $this->parameters);
         }
 

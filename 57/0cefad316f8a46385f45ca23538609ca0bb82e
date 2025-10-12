@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by allflame at 2025-10-11T11:05:41Z
+
+> Is it worth it to expand the readme around this?
+
+I'm fine with updating the readme, if needed. I honestly tried to stick to the existing pattern in the codebase. The confirm array has very specific structure that can be described using docblock, however this seems not to be the approach through the code base, so I didnt do it here aswell. Ultimately the usage of this code requires having Slack API doc opened in another tab anyway. At least this is my experience with it
+
+If you insist on the readme I'll add it, no problem

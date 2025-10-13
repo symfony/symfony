@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2025-10-13T10:24:19Z
+
+I understand the intent but our BC promise doesn't cover that case, I fear doing this might send the wrong signal
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-13T10:31:35Z
+
+While at it: what would it take to preserve the previous behavior? Would there really be a new-BC concern?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-13T10:32:09Z
+
+The fact that our BC promise does not cover that change is what allows us to do it. But it might make sense to document this change (probably not as a `BC Break` IMO), to make people reading the changelog aware of it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-10-13T14:08:47Z
+
+> While at it: what would it take to preserve the previous behavior? Would there really be a new-BC concern?
+
+Let's say someone overrides both `renderView()` and `render()` to hook into the rendering and execute some additional logic. If we restored the previous behavior and have `render()` call `renderView()` again, that hook logic is called twice. So for someone who relied on the post-6.4 behavior, restoring the pre-6.4 behavior is a BC break. I wouldn't do it.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-10-13T14:16:53Z
+
+I updated the message to remove the "BC break" mention.

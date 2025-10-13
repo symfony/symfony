@@ -566,7 +566,7 @@ class Connection implements ResetInterface
         } else {
             $table->setPrimaryKey(['id']);
         }
-        $table->addIndex(['queue_name']);
+        $table->addIndex(['queue_name', 'available_at', 'delivered_at']);
         $table->addIndex(['available_at']);
         $table->addIndex(['delivered_at']);
 

@@ -71,7 +71,6 @@ abstract class AbstractPipes implements PipesInterface
             $this->input->close();
         }
 
-        // Do not consume iterators; just drop the reference
         $this->input = null;
     }
 

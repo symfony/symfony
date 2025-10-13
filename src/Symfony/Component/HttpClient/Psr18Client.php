@@ -102,9 +102,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
                 'body' => $body->getContents(),
             ];
 
-            if ('1.0' === $request->getProtocolVersion()) {
-                $options['http_version'] = '1.0';
-            }
+            $options['http_version'] = $request->getProtocolVersion();
 
             $response = $this->client->request($request->getMethod(), (string) $request->getUri(), $options);
 

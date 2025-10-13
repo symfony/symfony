@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by andrew-demb at 2025-10-09T20:39:04Z
+
+Does this change also fix this issue?
+https://github.com/symfony/symfony/issues/61762
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-10-10T06:58:04Z
+
+@andrew-demb nope, but this would change the `RequestContext` so that it always have a `_locale` parameter in a Symfony application.

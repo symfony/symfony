@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2025-10-13T06:43:26Z
+
+> Do we want to keep synchronous HTTP calls? Shouldn't we do concurrent ones?
+
+I like it, will check it out! Thanks for the review 🙏
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-10-13T06:46:07Z
+
+> > Do we want to keep synchronous HTTP calls? Shouldn't we do concurrent ones?
+
+But how to do that, in combination with the Symfony Cache callbacks?
+
+They have their own cache, so they could also be evicted separately etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-13T10:16:04Z
+
+(well, please check tests before :)
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-10-13T10:57:40Z
+
+Alright, it's ready !

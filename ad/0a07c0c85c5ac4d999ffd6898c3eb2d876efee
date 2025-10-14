@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by ajgarlag at 2025-10-14T08:00:01Z
+
+I have a few questions about the initial implementation:
+
+* should the property `$honorRequestHttpVersion` be exposed as a constructor argument?
+* should the type of the property `$honorRequestHttpVersion` be restricted to bool values? If so, should a deprecation be triggered when it is set to false and the protocol version is set to `1.0`?
+
+Any proposal for a better option name is welcome too.

@@ -339,6 +339,10 @@ final class PhpAstBuilder
         }
 
         if ($dataModelNode instanceof ObjectNode) {
+            if ($dataModelNode->isValueObject()) {
+                return $this->buildValueObjectYieldStatements($dataModelNode, $context);
+            }
+
             if (isset($context['generators'][$dataModelNode->getIdentifier()]) || $dataModelNode->isMock()) {
                 $depthArgument = ($context['building_generator'] ?? false)
                     ? new Plus($this->builder->var('depth'), $this->builder->val(1))
@@ -436,5 +440,29 @@ final class PhpAstBuilder
         }
 
         return true;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return list<Stmt>
+     */
+    private function buildValueObjectYieldStatements(DataModelNodeInterface $dataModelNode, array $context): array
+    {
+        if ($dataModelNode->getType()->isIdentifiedBy(\DateTimeInterface::class)) {
+            $valueTransformerServiceAccessor = $this->builder->methodCall(
+                $this->builder->var('valueTransformers'),
+                'get',
+                [$this->builder->val('json_streamer.value_transformer.date_time_to_string')],
+            );
+
+            $valueAccessor = $this->builder->methodCall($valueTransformerServiceAccessor, 'transform', [$dataModelNode->getAccessor()->toPhpExpr(), $this->builder->var('options')]);
+
+            return [
+                new Expression(new Yield_($this->encodeValue($valueAccessor, $context))),
+            ];
+        }
+
+        throw new LogicException(\sprintf('Unhandled "%s" value object.', $dataModelNode->getType()));
     }
 }

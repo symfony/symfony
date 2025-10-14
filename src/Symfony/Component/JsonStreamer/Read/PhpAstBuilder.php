@@ -261,6 +261,10 @@ final class PhpAstBuilder
                 return $this->builder->funcCall('\is_'.$type->getBackingType()->getTypeIdentifier()->value, [$this->builder->var('data')]);
             }
 
+            if ($node instanceof ObjectNode && $node->isValueObject()) {
+                return $this->buildValueObjectNodeItemConditionStatement($node, $accessor);
+            }
+
             if ($type instanceof ObjectType) {
                 return $this->builder->funcCall('\is_array', [$this->builder->var('data')]);
             }
@@ -272,6 +276,10 @@ final class PhpAstBuilder
             throw new LogicException(\sprintf('Unexpected "%s" type.', $type::class));
         };
 
+        $params = $decodeFromStream
+            ? [new Param($this->builder->var('stream')), new Param($this->builder->var('offset')), new Param($this->builder->var('length'))]
+            : [new Param($this->builder->var('data'))];
+
         foreach ($node->getNodes() as $n) {
             if ($this->nodeOnlyNeedsDecode($n, $decodeFromStream)) {
                 $nodeValueStmt = $this->buildFormatValueStatement($n, $this->builder->var('data'));
@@ -279,16 +287,14 @@ final class PhpAstBuilder
                 $providersStmts = [...$providersStmts, ...$this->buildProvidersStatements($n, $decodeFromStream, $context)];
                 $nodeValueStmt = $this->builder->funcCall(
                     new ArrayDimFetch($this->builder->var('providers'), $this->builder->val($n->getIdentifier())),
-                    [$this->builder->var('data')],
+                    $decodeFromStream
+                        ? [$this->builder->var('stream'), $this->builder->var('offset'), $this->builder->var('length')]
+                        : [$this->builder->var('data')]
                 );
             }
 
             $nodesStmts[] = new If_($nodeCondition($n, $this->builder->var('data')), ['stmts' => [new Return_($nodeValueStmt)]]);
         }
-
-        $params = $decodeFromStream
-            ? [new Param($this->builder->var('stream')), new Param($this->builder->var('offset')), new Param($this->builder->var('length'))]
-            : [new Param($this->builder->var('data'))];
 
         return [
             ...$providersStmts,
@@ -490,6 +496,26 @@ final class PhpAstBuilder
             ))),
         ] : [];
 
+        if ($node->isValueObject()) {
+            return [
+                new Expression(new Assign(
+                    new ArrayDimFetch($this->builder->var('providers'), $this->builder->val($node->getIdentifier())),
+                    new Closure([
+                        'static' => true,
+                        'params' => $params,
+                        'uses' => [
+                            new ClosureUse($this->builder->var('options')),
+                            new ClosureUse($this->builder->var('valueTransformers')),
+                            new ClosureUse($this->builder->var('instantiator')),
+                            new ClosureUse($this->builder->var('providers'), byRef: true),
+                        ],
+                        'stmts' => $this->buildValueObjectTransformationStatements($node, $decodeFromStream, $context),
+                    ]),
+                )),
+                ...$propertyValueProvidersStmts,
+            ];
+        }
+
         if ($decodeFromStream) {
             $instantiateStmts = [
                 new Return_($this->builder->methodCall($this->builder->var('instantiator'), 'instantiate', [
@@ -588,5 +614,46 @@ final class PhpAstBuilder
         }
 
         return true;
+    }
+
+    private function buildValueObjectNodeItemConditionStatement(DataModelNodeInterface $dataModelNode, Expr $accessor): Expr
+    {
+        if ($dataModelNode->getType()->isIdentifiedBy(\DateTimeInterface::class)) {
+            return $this->builder->funcCall('\is_string', [$accessor]);
+        }
+
+        throw new LogicException(\sprintf('Unhandled "%s" value object.', $dataModelNode->getType()));
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return list<Stmt>
+     */
+    private function buildValueObjectTransformationStatements(DataModelNodeInterface $dataModelNode, bool $decodeFromStream, array $context): array
+    {
+        $dataAccessor = $decodeFromStream
+            ? $this->builder->staticCall(new FullyQualified(Decoder::class), 'decodeStream', [
+                $this->builder->var('stream'),
+                $this->builder->var('offset'),
+                $this->builder->var('length'),
+            ])
+            : $this->builder->var('data');
+
+        if ($dataModelNode->getType()->isIdentifiedBy(\DateTimeInterface::class)) {
+            $valueTransformerServiceAccessor = $this->builder->methodCall(
+                $this->builder->var('valueTransformers'),
+                'get',
+                [$this->builder->val('json_streamer.value_transformer.string_to_date_time')],
+            );
+
+            $valueAccessor = $this->builder->methodCall($valueTransformerServiceAccessor, 'transform', [$dataAccessor, $this->builder->var('options')]);
+
+            return [
+                new Return_($valueAccessor),
+            ];
+        }
+
+        throw new LogicException(\sprintf('Unhandled "%s" value object.', $dataModelNode->getType()));
     }
 }

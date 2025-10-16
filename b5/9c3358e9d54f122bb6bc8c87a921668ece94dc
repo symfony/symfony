@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by deguif at 2025-10-07T18:36:58Z
+
+Changelog was added. And in the meantime, as discussed I only used the `retry_delay` option to configure the delay before the message will be available again on the SQS queue. This defaults to `0` seconds but can be configured in the DSN. Not a BC break as the retry/DLQ feature targets 7.4 branch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-08T06:16:21Z
+
+/cc @maxbaldanza FYI

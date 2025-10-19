@@ -11,6 +11,7 @@ CHANGELOG
  * Make `Profile` final and `Profiler::__sleep()` internal
  * Collect the application runner class
  * Allow configuring `DumpListener` to use a different dumper when CLI profiling is enabled
+ * Add `#[RequestRateLimit]` attribute to enforce rate limiting validation
 
 7.3
 ---

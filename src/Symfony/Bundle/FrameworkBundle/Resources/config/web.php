@@ -34,6 +34,7 @@ use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\IsSignatureValidAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
+use Symfony\Component\HttpKernel\EventListener\RequestRateLimiterListener;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
 
@@ -152,6 +153,12 @@ return static function (ContainerConfigurator $container) {
         ->set('controller.is_signature_valid_attribute_listener', IsSignatureValidAttributeListener::class)
             ->args([
                 service('uri_signer'),
+            ])
+            ->tag('kernel.event_subscriber')
+
+        ->set('controller.request_rate_limiter_listener', RequestRateLimiterListener::class)
+            ->args([
+                service('request_rate_limiter'),
             ])
             ->tag('kernel.event_subscriber')
 

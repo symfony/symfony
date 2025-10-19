@@ -112,6 +112,7 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\EventListener\IsSignatureValidAttributeListener;
+use Symfony\Component\HttpKernel\EventListener\RequestRateLimiterListener;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
 use Symfony\Component\HttpKernel\Profiler\ProfilerStateChecker;
 use Symfony\Component\JsonStreamer\Attribute\JsonStreamable;
@@ -300,6 +301,9 @@ class FrameworkExtension extends Extension
         }
         if (!class_exists(ConfigBuilderGenerator::class)) {
             $container->removeDefinition('config_builder.warmer');
+        }
+        if (!class_exists(RequestRateLimiterListener::class)) {
+            $container->removeDefinition('controller.request_rate_limiter_listener');
         }
 
         if ($this->hasConsole()) {

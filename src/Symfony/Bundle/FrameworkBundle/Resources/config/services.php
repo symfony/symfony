@@ -50,6 +50,7 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\RateLimiter\RequestRateLimiter;
 use Symfony\Component\Runtime\Runner\Symfony\HttpKernelRunner;
 use Symfony\Component\Runtime\Runner\Symfony\ResponseRunner;
 use Symfony\Component\Runtime\SymfonyRuntime;
@@ -226,6 +227,12 @@ return static function (ContainerConfigurator $container) {
                 [tagged_locator('routing.condition_service', 'alias'), 'get'],
             ])
             ->tag('routing.expression_language_function', ['function' => 'service'])
+
+        ->set('request_rate_limiter', RequestRateLimiter::class)
+            ->args([
+                tagged_locator('rate_limiter'),
+                new Parameter('container.build_hash'),
+            ])
 
         // inherit from this service to lazily access env vars
         ->set('container.env', LazyString::class)

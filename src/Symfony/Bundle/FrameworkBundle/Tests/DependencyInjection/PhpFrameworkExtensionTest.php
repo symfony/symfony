@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\EnabledLocalesPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -424,6 +425,101 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             yield [$mode];
         }
         yield ['loose'];
+    }
+
+    #[DataProvider('enabledLocalesDataProvider')]
+    /**
+     * @dataProvider enabledLocalesDataProvider
+     */
+    public function testEnabledLocales(mixed $enabledLocalesValue, array $envVars, array $expectedLocales)
+    {
+        $container = $this->createContainerFromClosure(function ($container) use ($enabledLocalesValue, $envVars) {
+            foreach ($envVars as $name => $value) {
+                $container->setParameter('env('.$name.')', $value);
+            }
+            $container->addCompilerPass(new EnabledLocalesPass());
+
+            $container->loadFromExtension('framework', [
+                'enabled_locales' => $enabledLocalesValue,
+                'translator' => [
+                    'enabled' => true,
+                    'fallbacks' => ['en'],
+                    'providers' => [
+                        'loco' => [
+                            'dsn' => '%env(DSN)%',
+                            'domains' => ['messages'],
+                            'locales' => ['uk']
+                        ],
+                        'crowdin' => [
+                            'dsn' => '%env(DSN)%',
+                            'domains' => ['messages'],
+                            'locales' => ['sk']
+                        ],
+                        'lokalise' => [
+                            'dsn' => '%env(DSN)%',
+                            'domains' => ['messages'],
+                            'locales' => ['cz']
+                        ],
+                        'phrase' => [
+                            'dsn' => '%env(DSN)%',
+                            'domains' => ['messages'],
+                            'locales' => ['pl']
+                        ]
+                    ]
+                ],
+                'router' => [
+                    'resource' => '%kernel.project_dir%/config/routes.yaml',
+                    'type' => 'yaml',
+                ],
+            ]);
+        });
+
+        $this->assertEquals($expectedLocales, $container->getParameter('kernel.enabled_locales'));
+
+        $routerLoaderDef = $container->getDefinition('routing.loader');
+        $this->assertSame(['_locale' => implode('|', $expectedLocales)], $routerLoaderDef->getArgument(2));
+
+        $translatorDef = $container->getDefinition('translator.default');
+        $this->assertSame($expectedLocales, $translatorDef->getArgument(5));
+
+        $providerDefinitions = [
+            'translation.provider_collection_factory' => 1,
+            'console.command.translation_pull' => 5,
+            'console.command.translation_push' => 3,
+        ];
+
+        foreach ($providerDefinitions as $definitionId => $argumentIndex) {
+            $this->assertEquals(
+                array_merge(
+                    $expectedLocales,
+                    ['uk', 'sk', 'cz', 'pl']
+                ),
+                $container->getDefinition($definitionId)->getArgument($argumentIndex)
+            );
+        }
+    }
+
+    public static function enabledLocalesDataProvider(): \Generator
+    {
+        yield [
+            'enabledLocalesValue' => ['fr', 'de'],
+            'envVars' => [],
+            'expectedLocales' => ['fr', 'de']];
+        yield [
+            'enabledLocalesValue' => ['%env(LOCALE)%'],
+            'envVars' => ['LOCALE' => 'de'],
+            'expectedLocales' => ['de']
+        ];
+        yield [
+            'enabledLocalesValue' => '%env(json:AVAILABLE_LOCALES)%',
+            'envVars' => ['AVAILABLE_LOCALES' => '["en", "fr", "de"]'],
+            'expectedLocales' => ['en', 'fr', 'de']
+        ];
+        yield [
+            'enabledLocalesValue' => '%env(json:resolve::AVAILABLE_LOCALES)%',
+            'envVars' => ['LOCALE' => 'de', 'AVAILABLE_LOCALES' => '["en", "fr", "%env(LOCALE)%"]'],
+            'expectedLocales' => ['en', 'fr', 'de']
+        ];
     }
 }
 

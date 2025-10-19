@@ -447,10 +447,10 @@ class FrameworkExtension extends Extension
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
-        $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale'], $config['enabled_locales']);
+        $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale']);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
-        $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
+        $this->registerRouterConfiguration($config['router'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
 
@@ -1347,7 +1347,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerRouterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $enabledLocales = []): void
+    private function registerRouterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$this->readConfigEnabled('router', $container, $config)) {
             $container->removeDefinition('console.command.router_debug');
@@ -1372,11 +1372,6 @@ class FrameworkExtension extends Extension
 
         if ($config['utf8']) {
             $container->getDefinition('routing.loader')->replaceArgument(1, ['utf8' => true]);
-        }
-
-        if ($enabledLocales) {
-            $enabledLocales = implode('|', array_map('preg_quote', $enabledLocales));
-            $container->getDefinition('routing.loader')->replaceArgument(2, ['_locale' => $enabledLocales]);
         }
 
         if (!ContainerBuilder::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/framework-bundle', 'symfony/routing'])) {
@@ -1636,7 +1631,7 @@ class FrameworkExtension extends Extension
         return new Reference('assets.empty_version_strategy');
     }
 
-    private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale, array $enabledLocales): void
+    private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale): void
     {
         if (!$this->readConfigEnabled('translator', $container, $config)) {
             $container->removeDefinition('console.command.translation_debug');
@@ -1672,7 +1667,6 @@ class FrameworkExtension extends Extension
         $defaultOptions = $translator->getArgument(4);
         $defaultOptions['cache_dir'] = $config['cache_dir'];
         $translator->setArgument(4, $defaultOptions);
-        $translator->setArgument(5, $enabledLocales);
 
         $container->setParameter('translator.logging', $config['logging']);
         $container->setParameter('translator.default_path', $config['default_path']);
@@ -1806,11 +1800,11 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        $locales = $enabledLocales;
+        $locales = [];
 
         foreach ($config['providers'] as $provider) {
             if ($provider['locales']) {
-                $locales += $provider['locales'];
+                $locales = array_merge($locales, $provider['locales']);
             }
         }
 

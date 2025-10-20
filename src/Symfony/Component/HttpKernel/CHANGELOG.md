@@ -10,6 +10,7 @@ CHANGELOG
  * Add `#[IsSignatureValid]` attribute to validate URI signatures
  * Make `Profile` final and `Profiler::__sleep()` internal
  * Collect the application runner class
+ * Add release link to welcome page
 
 7.3
 ---

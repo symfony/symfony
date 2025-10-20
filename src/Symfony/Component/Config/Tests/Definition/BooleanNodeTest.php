@@ -45,6 +45,7 @@ class BooleanNodeTest extends TestCase
     public function testInvalidValueOnNullable()
     {
         $node = new BooleanNode('test', null, '.', true);
+        $this->assertTrue($node->getAllowEmptyValue());
 
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessage('Invalid type for path "test". Expected "bool" or "null", but got "int".');
@@ -58,6 +59,7 @@ class BooleanNodeTest extends TestCase
         $node = new BooleanNode('test');
         $node->setAllowEmptyValue(false);
 
+        $this->assertFalse($node->getAllowEmptyValue());
         $this->assertSame($value, $node->finalize($value));
     }
 

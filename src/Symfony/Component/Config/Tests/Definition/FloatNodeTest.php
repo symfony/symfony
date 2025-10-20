@@ -22,6 +22,7 @@ class FloatNodeTest extends TestCase
     public function testNormalize(int|float $value)
     {
         $node = new FloatNode('test');
+        $this->assertTrue($node->getAllowEmptyValue());
         $this->assertSame($value, $node->normalize($value));
     }
 
@@ -31,6 +32,7 @@ class FloatNodeTest extends TestCase
         $node = new FloatNode('test');
         $node->setAllowEmptyValue(false);
 
+        $this->assertFalse($node->getAllowEmptyValue());
         $this->assertSame($value, $node->finalize($value));
     }
 

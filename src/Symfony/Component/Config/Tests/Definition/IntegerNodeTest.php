@@ -22,6 +22,7 @@ class IntegerNodeTest extends TestCase
     public function testNormalize(int $value)
     {
         $node = new IntegerNode('test');
+        $this->assertTrue($node->getAllowEmptyValue());
         $this->assertSame($value, $node->normalize($value));
     }
 
@@ -31,6 +32,7 @@ class IntegerNodeTest extends TestCase
         $node = new IntegerNode('test');
         $node->setAllowEmptyValue(false);
 
+        $this->assertFalse($node->getAllowEmptyValue());
         $this->assertSame($value, $node->finalize($value));
     }
 

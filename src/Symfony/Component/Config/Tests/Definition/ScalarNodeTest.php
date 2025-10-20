@@ -127,6 +127,7 @@ class ScalarNodeTest extends TestCase
     {
         $node = new ScalarNode('test');
         $node->setInfo('"the test value"');
+        $this->assertTrue($node->getAllowEmptyValue());
 
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessage("Invalid type for path \"test\". Expected \"scalar\", but got \"array\".\nHint: \"the test value\"");
@@ -140,6 +141,7 @@ class ScalarNodeTest extends TestCase
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);
 
+        $this->assertFalse($node->getAllowEmptyValue());
         $this->assertSame($value, $node->finalize($value));
     }
 
@@ -161,6 +163,7 @@ class ScalarNodeTest extends TestCase
     {
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);
+        $this->assertFalse($node->getAllowEmptyValue());
 
         $this->expectException(InvalidConfigurationException::class);
 

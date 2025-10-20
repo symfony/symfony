@@ -48,11 +48,16 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets if this node is allowed to have an empty value.
      *
-     * @param bool $boolean True if this entity will accept empty values
+     * @param bool $boolean True if this entity accepts empty values
      */
     public function setAllowEmptyValue(bool $boolean): void
     {
         $this->allowEmptyValue = $boolean;
+    }
+
+    public function getAllowEmptyValue(): bool
+    {
+        return $this->allowEmptyValue;
     }
 
     public function setName(string $name): void

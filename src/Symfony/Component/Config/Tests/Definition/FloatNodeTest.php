@@ -26,6 +26,18 @@ class FloatNodeTest extends TestCase
         $this->assertSame($value, $node->normalize($value));
     }
 
+    public function testEquivalentValues()
+    {
+        $node = new FloatNode('test');
+        $node->addEquivalentValue(true, 4.2);
+
+        $this->assertSame([
+            [true, 4.2],
+        ], $node->getEquivalentValues());
+
+        $this->assertSame(4.2, $node->normalize(true));
+    }
+
     #[DataProvider('getValidValues')]
     public function testValidNonEmptyValues(int|float $value)
     {

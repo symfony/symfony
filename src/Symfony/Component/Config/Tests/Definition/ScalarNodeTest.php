@@ -43,6 +43,24 @@ class ScalarNodeTest extends TestCase
         ];
     }
 
+    public function testEquivalentValues()
+    {
+        $node = new ScalarNode('test');
+        $node->addEquivalentValue(0, 'equivalentZero');
+        $node->addEquivalentValue(null, 'equivalentNull');
+        $node->addEquivalentValue(true, 'equivalentTrue');
+
+        $this->assertSame([
+            [0, 'equivalentZero'],
+            [null, 'equivalentNull'],
+            [true, 'equivalentTrue'],
+        ], $node->getEquivalentValues());
+
+        $this->assertSame('equivalentZero', $node->normalize(0));
+        $this->assertSame('equivalentNull', $node->normalize(null));
+        $this->assertSame('equivalentTrue', $node->normalize(true));
+    }
+
     public function testSetDeprecated()
     {
         $childNode = new ScalarNode('foo');

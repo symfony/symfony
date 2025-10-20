@@ -25,6 +25,18 @@ class BooleanNodeTest extends TestCase
         $this->assertSame($value, $node->normalize($value));
     }
 
+    public function testEquivalentValues()
+    {
+        $node = new BooleanNode('test', null);
+        $node->addEquivalentValue(null, true);
+
+        $this->assertSame([
+            [null, true],
+        ], $node->getEquivalentValues());
+
+        $this->assertTrue($node->normalize(null));
+    }
+
     public function testNullValueOnNullable()
     {
         $node = new BooleanNode('test', null, '.', true);

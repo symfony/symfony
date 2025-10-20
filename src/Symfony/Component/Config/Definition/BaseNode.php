@@ -170,6 +170,16 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * Gets the list of equivalent values [original, equivalent].
+     *
+     * @return list<array{0: mixed, 1: mixed}>
+     */
+    public function getEquivalentValues(): array
+    {
+        return $this->equivalentValues;
+    }
+
+    /**
      * Set this node as required.
      */
     public function setRequired(bool $boolean): void

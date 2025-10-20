@@ -4,7 +4,7 @@ CHANGELOG
 7.4
 ---
 
- * Add TagAwareAdapterInterface to NullAdapter
+ * Add `TagAwareAdapterInterface` to `NullAdapter`
  * Add argument `$singular` to `NodeBuilder::arrayNode()` to decouple plurals/singulars from XML
  * Add support for `defaultNull()` on `ArrayNodeDefinition`
  * Add `ArrayNodeDefinition::acceptAndWrap()` to list alternative types that should be accepted and wrapped in an array
@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate accessing the internal scope of the loader in PHP config files, use only its public API instead
  * Deprecate setting a default value to a node that is required, and vice versa
  * Deprecate generating fluent methods in config builders
+ * Add getters `BaseNode::getEquivalentValues()`, `VariableNode::getAllowEmptyValue()`, `NumericNode::getMin()`, `NumericNode::getMax()` and `BooleanNode::isNullable()`
 
 7.3
 ---

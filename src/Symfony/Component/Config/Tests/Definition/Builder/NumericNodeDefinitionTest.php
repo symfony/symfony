@@ -42,21 +42,27 @@ class NumericNodeDefinitionTest extends TestCase
     public function testIntegerMinAssertion()
     {
         $node = new IntegerNodeDefinition('foo');
+        $node = $node->min(5)->getNode();
+        $this->assertSame(5, $node->getMin());
+        $this->assertNull($node->getMax());
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The value 4 is too small for path "foo". Should be greater than or equal to 5');
 
-        $node->min(5)->getNode()->finalize(4);
+        $node->finalize(4);
     }
 
     public function testIntegerMaxAssertion()
     {
         $node = new IntegerNodeDefinition('foo');
+        $node = $node->max(3)->getNode();
+        $this->assertSame(3, $node->getMax());
+        $this->assertNull($node->getMin());
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The value 4 is too big for path "foo". Should be less than or equal to 3');
 
-        $node->max(3)->getNode()->finalize(4);
+        $node->finalize(4);
     }
 
     public function testIntegerValidMinMaxAssertion()

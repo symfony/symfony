@@ -26,6 +26,18 @@ class IntegerNodeTest extends TestCase
         $this->assertSame($value, $node->normalize($value));
     }
 
+    public function testEquivalentValues()
+    {
+        $node = new IntegerNode('test');
+        $node->addEquivalentValue(true, 42);
+
+        $this->assertSame([
+            [true, 42],
+        ], $node->getEquivalentValues());
+
+        $this->assertSame(42, $node->normalize(true));
+    }
+
     #[DataProvider('getValidValues')]
     public function testValidNonEmptyValues(int $value)
     {

@@ -43,4 +43,16 @@ class StringNodeTest extends TestCase
 
         $node->normalize($value);
     }
+
+    public function testEquivalentValues()
+    {
+        $node = new StringNode('test');
+        $node->addEquivalentValue(true, 'equivalentTrue');
+
+        $this->assertSame([
+            [true, 'equivalentTrue'],
+        ], $node->getEquivalentValues());
+
+        $this->assertSame('equivalentTrue', $node->normalize(true));
+    }
 }

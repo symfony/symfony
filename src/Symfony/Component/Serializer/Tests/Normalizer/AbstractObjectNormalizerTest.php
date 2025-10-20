@@ -968,7 +968,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $foobar->baz = 'baz';
 
         $normalizer = new class extends AbstractObjectNormalizerDummy {
-            public $childContextCacheKey;
+            public array $childContextCacheKeys = [];
 
             protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
             {
@@ -983,7 +983,7 @@ class AbstractObjectNormalizerTest extends TestCase
             protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
             {
                 $childContext = parent::createChildContext($parentContext, $attribute, $format);
-                $this->childContextCacheKey = $childContext['cache_key'];
+                $this->childContextCacheKeys[$attribute] = $childContext['cache_key'];
 
                 return $childContext;
             }
@@ -992,7 +992,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $serializer = new Serializer([$normalizer]);
         $serializer->normalize($foobar, null, ['cache_key' => 'hardcoded', 'iri' => '/dummy/1']);
 
-        $this->assertSame('hardcoded-baz', $normalizer->childContextCacheKey);
+        $this->assertSame(['foo' => 'hardcoded-foo', 'bar' => 'hardcoded-bar', 'baz' => 'hardcoded-baz'], $normalizer->childContextCacheKeys);
     }
 
     public function testChildContextCacheKeyStaysFalseWhenOriginalCacheKeyIsFalse()

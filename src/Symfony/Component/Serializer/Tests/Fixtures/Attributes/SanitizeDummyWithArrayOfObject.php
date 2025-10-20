@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 /**
  * @author Mohamed Senoussi <lesfootix@gmail.com>
  */
-class SanitizeDummyWithArrayOfObjects
+class SanitizeDummyWithArrayOfObject
 {
     public function __construct(
         public string $id,

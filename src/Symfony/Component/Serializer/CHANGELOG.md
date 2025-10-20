@@ -13,6 +13,7 @@ CHANGELOG
  * Deprecate class aliases in the `Annotation` namespace, use attributes instead
  * Deprecate getters in attribute classes in favor of public properties
  * Deprecate `ClassMetadataFactoryCompiler`
+ * Add `#[Sanitize]` attribute and `SanitizeDenormalizer` to automatically sanitize string and array of string properties during deserialization.
 
 7.3
 ---

@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Attribute\Sanitize;
 /**
  * @author Mohamed Senoussi <lesfootix@gmail.com>
  */
-class SanitizeDummyWithArrayOfStrings
+class SanitizeDummyWithArrayOfString
 {
     public function __construct(
         public string $id,

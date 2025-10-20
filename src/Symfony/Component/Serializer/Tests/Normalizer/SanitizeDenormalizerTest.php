@@ -24,13 +24,13 @@ use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithArrayOfStrings;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithArrayOfString;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithCustomSanitizer;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithInvalidArray;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithObject;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithInvalidType;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithArrayOfObjects;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithArrayOfObject;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithUnknownSanitizer;
 
 /**
@@ -154,10 +154,10 @@ class SanitizeDenormalizerTest extends TestCase
         ];
 
         // Act
-        $result = $this->serializer->denormalize($data, SanitizeDummyWithArrayOfObjects::class);
+        $result = $this->serializer->denormalize($data, SanitizeDummyWithArrayOfObject::class);
 
         // Assert
-        $this->assertInstanceOf(SanitizeDummyWithArrayOfObjects::class, $result);
+        $this->assertInstanceOf(SanitizeDummyWithArrayOfObject::class, $result);
         $this->assertSame('123e4567-e89b-12d3-a456-426614174000', $result->id);
         $this->assertCount(2, $result->objects);
         $this->assertInstanceOf(SanitizeDummy::class, $result->objects[0]);
@@ -185,10 +185,10 @@ class SanitizeDenormalizerTest extends TestCase
         ];
 
         // Act
-        $result = $this->serializer->denormalize($data, SanitizeDummyWithArrayOfStrings::class);
+        $result = $this->serializer->denormalize($data, SanitizeDummyWithArrayOfString::class);
 
         // Assert
-        $this->assertInstanceOf(SanitizeDummyWithArrayOfStrings::class, $result);
+        $this->assertInstanceOf(SanitizeDummyWithArrayOfString::class, $result);
         $this->assertSame('123e4567-e89b-12d3-a456-426614174000', $result->id);
         $this->assertCount(3, $result->strings);
         $this->assertSame('<b>String 1</b>', $result->strings[0]);

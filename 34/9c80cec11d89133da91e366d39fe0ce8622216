@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2025-10-17T08:40:31Z
+
+I appreciate the massive work on this PR at quick notice. However, as I also shared in an internal discussion about the config formats, I'm leaning towards :-1: for 7.4:
+
+- **We're 2 weeks into feature freeze** already. If anything, we should be releasing a beta release this week not introducing a new big deprecation.
+- **The array shape format is very new**. We should wait a bit with getting experience before telling people to mass-migrate their applications to it. (I would even be in favor of making array-shape experimental in 8.0)
+- Given its big impact on applications using the fluent format, we can **provide a nice migration tool** for this. I would prefer to first build that tool, so we know it's ready for the stable release and then merge the deprecation.
+- **I don't see an immediate need to rush this out now**. It's running for 5 years without major issues, despite its limitations.
+
+All this makes me think we better get things ready and stable and make this a great migration/deprecation in 8.1, rather than rushing it out because we found 1 workflow config bug and leaving the community empty handed in fixing the deprecation.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-17T08:56:04Z
+
+> rather than rushing it out because we found 1 workflow config bug
+
+that's not the only issue we are aware of. Any place using `->beforeNormalization` leads to issues in the fluent config as the generated code is strict about input types without being aware of what gets actually supported through normalization rules.
+And we cannot even improve that situation generally, as changes in the code generator will likely become immediate BC breaks in the generated fluent DSL.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-17T10:11:41Z
+
+> We're 2 weeks into feature freeze already. If anything, we should be releasing a beta release this week not introducing a new big deprecation.
+
+This is in the making since months. I couldn't do it faster. Yet the fluent PHP format is keeping us behind. It blocks progress. We have to remove it ASAP. From the doc to begin with, and from the code.
+
+> The array shape format is very new. We should wait a bit with getting experience before telling people to mass-migrate their applications to it. (I would even be in favor of making array-shape experimental in 8.0)
+
+We have more that ten years of experience with that array-based format because it's based on the exact same code as the yaml one.
+About migration tools: people will have 3 years of 7.4 LTS to migrate.
+Also: this format is niche. We *never* advocated for it to be considered as anything but "you're on your own". The reason is that we know since always that it comes with significant drawbacks. (no flex support to begin with).
+
+> Given its big impact on applications using the fluent format, we can provide a nice migration tool for this. I would prefer to first build that tool, so we know it's ready for the stable release and then merge the deprecation.
+
+This tool is certainly not ours to make. Again, this format is a dead end. It's used marginally because it's incomplete. Let's not exaggerate its importance.
+
+> All this makes me think we better get things ready and stable and make this a great migration/deprecation in 8.1, rather than rushing it out because we found 1 workflow config bug and leaving the community empty handed in fixing the deprecation.
+
+What you state as "1 workflow config bug" is in reality a structural design issue. @stof already told about it just before. And this is precisely the issue that makes deprecating this format urgent. It only creates confusion and diverts us from doing more useful stuff.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-17T17:10:51Z
+
+Doc update in progress, targeting branch 8.0, see https://github.com/symfony/symfony-docs/pull/21511
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-10-17T17:11:40Z
+
+Happy to have not used this format 🙏
+
+@wouterj i think pushing for 7.4 is OK, we have 3 years of migration time still
+
+however i do want to emphasize the ideal importance of migration tools with changes like this
+
+---------------------------------------------------------------------------
+
+by wouterj at 2025-10-18T14:40:58Z
+
+One last post from me on this subject, as I think my stance is pretty clear by now and I want to avoid endless 1v1 discussions. Apparently, other core team members either don't mind much or agree with the change :)
+
+In short:
+* I don't see anything that warrants us breaking our release policy to merge this deprecation now
+* I think we have to guide the community better in the migration, and we can make a much stronger communication post about this if we do this in a later release (especially now that https://symfony.com/blog/new-in-symfony-7-4-deprecated-xml-configuration is already published)
+* I think we can make array shapes better and more battle tested, before suggesting the config builder part of the community to move over
+
+---
+
+> Yet the fluent PHP format is keeping us behind. It blocks progress. We have to remove it ASAP. From the doc to begin with, and from the code.
+
+This might be the crucial miscommunication here: What progress has it blocked? We have normalization rules for 15 years and IIUC these have never worked with fluent PHP. Despite the workflow feature not having full support for the fluent PHP config format, it still is part of the 7.4 release.
+People of the fluent PHP format obviously have been fine with the format not being able to use these normalization rules.
+
+I fully agree that this is an issue of the format and we must do something about it. But I have not heard anything that warrants the "ASAP" in the middle of feature freeze. It's not a security vulnerability, it's not something fundamentally wrong with a change in 7.4, it's a not bug in a new feature, etc. It's simply a limitation of a format that exists since 5.4. It hasn't blocked the 6.1, 6.2, 6.3, 6.4, 7.0, 7.1, 7.2 and 7.3 releases, why is it this important for 7.4?
+We better use an extra 6 months to plan it carefully and inform community in a timely matter, rather than rushing this into the feature freeze to make the beta1 release.
+
+Maybe it's only me, but I believe we aren't really happy with people getting stuck on LTS releases. We've been advocating for quite a while now to upgrade to each minor and fix deprecations early, to make the upgrade process the least time consuming. "Just stick to the LTS" doesn't seem the greatest DX solution :slightly_smiling_face:
+
+> Also: this format is niche. We never advocated for it to be considered as anything but "you're on your own". The reason is that we know since always that it comes with significant drawbacks. (no flex support to begin with).
+
+[Our announcement post](https://symfony.com/blog/new-in-symfony-5-3-config-builder-classes) said _"We intend to keep supporting YAML, XML and PHP formats equally in the future, but **we hope that these new config builders will make you give PHP config a try**. The new PHP config is as concise and readable as YAML, it provides better autocompletion than XML and it requires zero dependencies and extensions."_ (emphasis mine).
+Besides that, the community has been advocating it, including some high profile names and tools like Rector. E.g. https://getrector.com/blog/modernize-symfony-configs , https://tomasvotruba.com/blog/how-we-maintain-dozens-of-symfony-workflows-with-peace and https://medium.com/@benr77/why-you-should-migrate-your-symfony-configs-to-php-8c7c12f6c75c
+
+I've also seen quite a lot of questions/reports about PHPstan not being able to find the config builder classes (people didn't realize they were generated at runtime). This makes me believe the config format is not that niche (definitely way more used in applications than XML and PHP arrays).
+
+While the handling logic is indeed based on mature battle-tested code, the array shapes are introduced [3 weeks ago](https://github.com/symfony/symfony/pull/61879). We've not been able to test this out in the wild. We're prone to the same situation as with fluent PHP config: we might miss support for some features we're not aware of now. I don't feel confident pushing people to that format in an LTS release we have to support for 3 more years.
+And I would also want to see if we can somehow directly tackle the "class not found" error before/when launching this initiative. That feels to be a big DX hurdle with the config builder, which isn't fixed by array shapes (yet).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-20T08:00:22Z
+
+@wouterj thanks for the high-level defense of the fluent PHP format. However, I think you didn’t realize strongly enough that the arguments I put in the PR description are cold facts about it. There’s nothing to discuss when talking about the rigidity of the resulting config description. Before-normalizers are just hard walls that make the format a dead end: we cannot envision any forward path for that format that’d fix that.
+
+Since you linked work by @TomasVotruba: he’s been a big proponent of the fluent PHP format, even calling YAML deprecated on X. While that’s certainly not true, he put his time where his mouth is and created those migration tools. He then also wrote about the issues with the format, as highlighted by @GromNaN. I interpret this push as a wish to move to a PHP-based format - not  specifically for the fluent one we have today.
+
+If I may, I’d sum up the situation as follows: there’s a strong desire, at least from some, to have a PHP-based config format. We do want to address this desire. The fluent PHP one we have today has been our tentative solution so far. But now we know: you enter this format with bells and whistles and end up in a PR to hell. The devil is in the details (pun intended, but still in line with my stance 😉). I invite anyone that wants to get a taste of that to try to make the examples in https://github.com/symfony/symfony-docs/pull/21499 work.
+
+About the timing of submission: we lost two months on the PR deprecating XML - two months of silence. I take responsibility for that. We have only one life and planning to continue dealing with the fluent format for five more years would be a huge distraction - three years of 7.4LTS is already too much. I'd also feel irresponsible for not actively preventing new code from entering this dead-end format.
+
+I'm therefore going to take leadership and responsibility on this topic, and merge this PR. I also have approvals from core-team members who worked deep on the topic, so I'm confident that's the right path forward.
+
+Let's keep our energy and goodwill to improve the array-shape format. We can start by the issues you mentioned.

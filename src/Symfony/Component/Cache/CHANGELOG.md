@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Bump ext-redis to 6.2 and ext-relay to 0.12 minimum
+ * Add support for `prefix` option in Redis DSN
 
 7.3
 ---

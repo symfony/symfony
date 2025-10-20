@@ -52,6 +52,7 @@ trait RedisTrait
         'dbindex' => 0,
         'failover' => 'none',
         'ssl' => null, // see https://php.net/context.ssl
+        'prefix' => null,
     ];
     private \Redis|Relay|RelayCluster|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis;
     private MarshallerInterface $marshaller;
@@ -318,6 +319,9 @@ trait RedisTrait
                     if (0 < $params['tcp_keepalive'] && (!$isRedisExt || \defined('Redis::OPT_TCP_KEEPALIVE'))) {
                         $redis->setOption($isRedisExt ? \Redis::OPT_TCP_KEEPALIVE : Relay::OPT_TCP_KEEPALIVE, $params['tcp_keepalive']);
                     }
+                    if (isset($params['prefix']) && (!$isRedisExt || \defined('Redis::OPT_PREFIX'))) {
+                        $redis->setOption($isRedisExt ? \Redis::OPT_PREFIX : Relay::OPT_PREFIX, $params['prefix']);
+                    }
                 } catch (\RedisException|\Relay\Exception $e) {
                     throw new InvalidArgumentException('Redis connection failed: '.$e->getMessage());
                 }
@@ -349,6 +353,9 @@ trait RedisTrait
 
             if (0 < $params['tcp_keepalive'] && (!$isRedisExt || \defined('Redis::OPT_TCP_KEEPALIVE'))) {
                 $redis->setOption($isRedisExt ? \Redis::OPT_TCP_KEEPALIVE : Relay::OPT_TCP_KEEPALIVE, $params['tcp_keepalive']);
+            }
+            if (isset($params['prefix']) && (!$isRedisExt || \defined('Redis::OPT_PREFIX'))) {
+                $redis->setOption($isRedisExt ? \Redis::OPT_PREFIX : Relay::OPT_PREFIX, $params['prefix']);
             }
         } elseif (is_a($class, RelayCluster::class, true)) {
             $initializer = static function () use ($class, $params, $hosts) {
@@ -395,6 +402,10 @@ trait RedisTrait
                     $relayCluster->setOption(Relay::OPT_READ_TIMEOUT, $params['read_timeout']);
                 }
 
+                if (isset($params['prefix'])) {
+                    $relayCluster->setOption(Relay::OPT_PREFIX, $params['prefix']);
+                }
+
                 return $relayCluster;
             };
 
@@ -417,6 +428,9 @@ trait RedisTrait
 
                 if (0 < $params['tcp_keepalive'] && (!$isRedisExt || \defined('Redis::OPT_TCP_KEEPALIVE'))) {
                     $redis->setOption($isRedisExt ? \Redis::OPT_TCP_KEEPALIVE : Relay::OPT_TCP_KEEPALIVE, $params['tcp_keepalive']);
+                }
+                if (isset($params['prefix']) && (!$isRedisExt || \defined('Redis::OPT_PREFIX'))) {
+                    $redis->setOption($isRedisExt ? \Redis::OPT_PREFIX : Relay::OPT_PREFIX, $params['prefix']);
                 }
                 $redis->setOption(\RedisCluster::OPT_SLAVE_FAILOVER, match ($params['failover']) {
                     'error' => \RedisCluster::FAILOVER_ERROR,
@@ -473,7 +487,7 @@ trait RedisTrait
             }
             $params['exceptions'] = false;
 
-            $redis = new $class($hosts, array_diff_key($params, array_diff_key(self::$defaultConnectionOptions, ['cluster' => null])));
+            $redis = new $class($hosts, array_diff_key($params, array_diff_key(self::$defaultConnectionOptions, ['cluster' => null, 'prefix' => null])));
             if (isset($params['sentinel'])) {
                 $redis->getConnection()->setSentinelTimeout($params['timeout']);
             }

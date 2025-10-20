@@ -201,4 +201,45 @@ class RedisTraitTest extends TestCase
             ],
         ];
     }
+
+    #[DataProvider('providePrefixDsnParameter')]
+    public function testPrefixDsnParameter(string $dsn, ?string $expectedPrefix)
+    {
+        if (!getenv('REDIS_AUTHENTICATED_HOST')) {
+            self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
+        }
+
+        $mock = new class {
+            use RedisTrait;
+        };
+        $connection = $mock::createConnection($dsn);
+        self::assertInstanceOf(\Redis::class, $connection);
+        self::assertSame($expectedPrefix, $connection->getOption(\Redis::OPT_PREFIX));
+    }
+
+    public static function providePrefixDsnParameter(): array
+    {
+        return [
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST'),
+                null,
+            ],
+            [
+                'redis:?host['.getenv('REDIS_HOST').']',
+                null,
+            ],
+            [
+                'redis:?host['.getenv('REDIS_HOST').']&prefix=prefix1:',
+                'prefix1:',
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'?prefix=prefix2:',
+                'prefix2:',
+            ],
+            [
+                'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/?prefix=prefix3:',
+                'prefix3:',
+            ],
+        ];
+    }
 }

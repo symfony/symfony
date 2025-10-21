@@ -58,7 +58,7 @@ class SanitizeDenormalizerTest extends TestCase
         $phpDocExtractor = new PhpDocExtractor();
         $reflectionExtractor = new ReflectionExtractor();
         $propertyInfo = new PropertyInfoExtractor([], [$phpDocExtractor, $reflectionExtractor]);
-        $objectNormalizer = new ObjectNormalizer(null, null , null, $propertyInfo);
+        $objectNormalizer = new ObjectNormalizer(null, null, null, $propertyInfo);
         $sanitizeDenormalizer = new SanitizeDenormalizer($container);
         $arrayDenormalizer = new ArrayDenormalizer();
 
@@ -79,7 +79,7 @@ class SanitizeDenormalizerTest extends TestCase
             'bio' => '<script>alert("xss")</script>',
         ];
 
-        $result = $this->serializer->denormalize($data, SanitizeDummy::class,'json');
+        $result = $this->serializer->denormalize($data, SanitizeDummy::class, 'json');
 
         $this->assertInstanceOf(SanitizeDummy::class, $result);
         $this->assertSame('123e4567-e89b-12d3-a456-426614174000', $result->id);
@@ -100,7 +100,7 @@ class SanitizeDenormalizerTest extends TestCase
         $this->assertSame('<img src="https://symfony.com" alt="symfony" />', $result->foo);
     }
 
-   public function testDenormalizeNestedObject()
+    public function testDenormalizeNestedObject()
     {
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',
@@ -109,7 +109,7 @@ class SanitizeDenormalizerTest extends TestCase
                 'firstName' => '<b>John</b>',
                 'lastName' => '<i>Doe</i>',
                 'bio' => '<script>alert("xss")</script>',
-            ]
+            ],
         ];
 
         $result = $this->serializer->denormalize($data, SanitizeDummyWithObject::class);
@@ -139,8 +139,8 @@ class SanitizeDenormalizerTest extends TestCase
                     'firstName' => '<b>Jane</b>',
                     'lastName' => '<i>Smith</i>',
                     'bio' => '<img src="https://symfony.com" onclick="alert(\'xss\')" alt="symfony" title="symfony"/>',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $result = $this->serializer->denormalize($data, SanitizeDummyWithArrayOfObject::class);
@@ -168,7 +168,7 @@ class SanitizeDenormalizerTest extends TestCase
                 '<b>String 1</b>',
                 '<i>String 2</i>',
                 '<script>alert("xss")</script>',
-            ]
+            ],
         ];
 
         $result = $this->serializer->denormalize($data, SanitizeDummyWithArrayOfString::class);

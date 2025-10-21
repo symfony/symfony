@@ -89,6 +89,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\SanitizeDenormalizer;
 use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
@@ -2960,5 +2961,18 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'cache.adapter.array' => $this->assertSame(ArrayAdapter::class, $parentDefinition->getClass()),
             default => $this->fail('Unresolved adapter: '.$adapter),
         };
+    }
+
+    public function testSanitizeDenormalizerRegistered()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('serializer.denormalizer.sanitize');
+        $argument = $definition->getArgument(0);
+        $tag = $definition->getTag('serializer.normalizer');
+
+        $this->assertSame(SanitizeDenormalizer::class, $definition->getClass());
+        $this->assertSame('service_container', $argument->__toString());
+        $this->assertSame(-800, $tag[0]['priority']);
     }
 }

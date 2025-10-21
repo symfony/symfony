@@ -396,6 +396,21 @@ class DateTypeTest extends BaseTypeTestCase
         $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
+    public function testSubmitJulianCalendarDate()
+    {
+        if (\PHP_INT_SIZE === 4) {
+            $this->markTestSkipped('32-bit systems cannot represent julian calendar dates.');
+        }
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'single_text',
+        ]);
+        $form->submit('950-12-19');
+
+        $this->assertSame('0950-12-19', $form->getData()->format('Y-m-d'));
+        $this->assertSame('0950-12-19', $form->getViewData());
+    }
+
     /**
      * @dataProvider provideDateFormats
      */

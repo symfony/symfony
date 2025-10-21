@@ -34,6 +34,7 @@
         "symfony/form": "^6.4|^7.0|^8.0",
         "symfony/http-foundation": "^6.4|^7.0|^8.0",
         "symfony/http-kernel": "^6.4|^7.0|^8.0",
+        "symfony/html-sanitizer": "^6.4|^7.0|^8.0",
         "symfony/messenger": "^6.4|^7.0|^8.0",
         "symfony/mime": "^6.4|^7.0|^8.0",
         "symfony/property-access": "^6.4|^7.0|^8.0",

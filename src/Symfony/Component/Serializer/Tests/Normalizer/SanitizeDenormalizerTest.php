@@ -67,7 +67,6 @@ class SanitizeDenormalizerTest extends TestCase
             $sanitizeDenormalizer,
             $objectNormalizer,
         ]);
-
     }
 
     public function testDenormalizeObject()

@@ -52,17 +52,13 @@ class SanitizeDenormalizerTest extends TestCase
                 ->allowElement('h1')
                 ->allowElement('div')
         );
-        $container = new class([
-            'default' => fn () => $sanitizer,
-            'custom' => fn () => $customSanitizer,
-        ]) implements ServiceProviderInterface {
+        $container = new class(['default' => fn () => $sanitizer, 'custom' => fn () => $customSanitizer]) implements ServiceProviderInterface {
             use ServiceLocatorTrait;
         };
-
         $phpDocExtractor = new PhpDocExtractor();
         $reflectionExtractor = new ReflectionExtractor();
         $propertyInfo = new PropertyInfoExtractor([], [$phpDocExtractor, $reflectionExtractor]);
-        $objectNormalizer = new ObjectNormalizer(null, null , null, $propertyInfo);
+        $objectNormalizer = new ObjectNormalizer(null,null ,null, $propertyInfo);
         $sanitizeDenormalizer = new SanitizeDenormalizer($container);
         $arrayDenormalizer = new ArrayDenormalizer();
 
@@ -74,13 +70,13 @@ class SanitizeDenormalizerTest extends TestCase
 
     }
 
-   public function testDenormalizeObject(): void
+   public function testDenormalizeObject()
     {
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',
             'firstName' => '<b>John</b>',
             'lastName' => '<i>Doe</i>',
-            'bio' => '<script>alert("xss")</script>'
+            'bio' => '<script>alert("xss")</script>',
         ];
 
         $result = $this->serializer->denormalize($data, SanitizeDummy::class,'json');
@@ -92,7 +88,7 @@ class SanitizeDenormalizerTest extends TestCase
         $this->assertSame('', $result->bio);
     }
 
-    public function testDenormalizeObjectWithCustomSanitizer(): void
+    public function testDenormalizeObjectWithCustomSanitizer()
     {
         $data = [
             'foo' => '<img src="https://symfony.com" onclick="alert(\'xss\')" alt="symfony" title="symfony"/>',
@@ -104,7 +100,7 @@ class SanitizeDenormalizerTest extends TestCase
         $this->assertSame('<img src="https://symfony.com" alt="symfony" />', $result->foo);
     }
 
-   public function testDenormalizeNestedObject(): void
+   public function testDenormalizeNestedObject()
     {
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',
@@ -112,7 +108,7 @@ class SanitizeDenormalizerTest extends TestCase
                 'id' => '223e4567-e89b-12d3-a456-426614174000',
                 'firstName' => '<b>John</b>',
                 'lastName' => '<i>Doe</i>',
-                'bio' => '<script>alert("xss")</script>'
+                'bio' => '<script>alert("xss")</script>',
             ]
         ];
 
@@ -127,7 +123,7 @@ class SanitizeDenormalizerTest extends TestCase
         $this->assertSame('', $result->object->bio);
     }
 
-    public function testDenormalizeArrayOfObject(): void
+    public function testDenormalizeArrayOfObject()
     {
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',
@@ -136,13 +132,13 @@ class SanitizeDenormalizerTest extends TestCase
                     'id' => '223e4567-e89b-12d3-a456-426614174000',
                     'firstName' => '<b>John</b>',
                     'lastName' => '<i>Doe</i>',
-                    'bio' => '<script>alert("xss")</script>'
+                    'bio' => '<script>alert("xss")</script>',
                 ],
                 [
                     'id' => '323e4567-e89b-12d3-a456-426614174000',
                     'firstName' => '<b>Jane</b>',
                     'lastName' => '<i>Smith</i>',
-                    'bio' => '<img src="https://symfony.com" onclick="alert(\'xss\')" alt="symfony" title="symfony"/>'
+                    'bio' => '<img src="https://symfony.com" onclick="alert(\'xss\')" alt="symfony" title="symfony"/>',
                 ]
             ]
         ];
@@ -164,14 +160,14 @@ class SanitizeDenormalizerTest extends TestCase
         $this->assertSame('<img src="https://symfony.com" alt="symfony" title="symfony" />', $result->objects[1]->bio);
     }
 
-    public function testDenormalizeArrayOfStrings(): void
+    public function testDenormalizeArrayOfStrings()
     {
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',
             'strings' => [
                 '<b>String 1</b>',
                 '<i>String 2</i>',
-                '<script>alert("xss")</script>'
+                '<script>alert("xss")</script>',
             ]
         ];
 
@@ -185,7 +181,7 @@ class SanitizeDenormalizerTest extends TestCase
         $this->assertSame('', $result->strings[2]);
     }
 
-    public function testDenormalizeWithAttributeOnNonStringPropertyThrowsLogicException(): void
+    public function testDenormalizeWithAttributeOnNonStringPropertyThrowsLogicException()
     {
         $data = [
             'foo' => 42,
@@ -197,7 +193,7 @@ class SanitizeDenormalizerTest extends TestCase
         $this->serializer->denormalize($data, SanitizeDummyWithInvalidType::class);
     }
 
-    public function testDenormalizeWithAttributeOnInvalidArrayPropertyThrowsLogicException(): void
+    public function testDenormalizeWithAttributeOnInvalidArrayPropertyThrowsLogicException()
     {
         $data = [
             'foo' => [42, 43],
@@ -209,7 +205,7 @@ class SanitizeDenormalizerTest extends TestCase
         $this->serializer->denormalize($data, SanitizeDummyWithInvalidArray::class);
     }
 
-    public function testDenormalizeWithUnknownSanitizerThrowsInvalidArgumentException(): void
+    public function testDenormalizeWithUnknownSanitizerThrowsInvalidArgumentException()
     {
         $data = [
             'foo' => '<b>Test</b>',

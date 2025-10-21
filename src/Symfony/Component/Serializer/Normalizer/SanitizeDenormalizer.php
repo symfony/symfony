@@ -31,7 +31,8 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
 
     public function __construct(
         private ContainerInterface $sanitizers,
-    ) {}
+    ) {
+    }
 
     public function getSupportedTypes(?string $format): array
     {
@@ -44,7 +45,7 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
             throw new BadMethodCallException('Please set a denormalizer before calling denormalize()!');
         }
 
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return $this->denormalizer->denormalize($data, $type, $format, $context);
         }
 
@@ -81,8 +82,7 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
             return false;
         }
 
-        if(isset($context['sanitized']))
-        {
+        if(isset($context['sanitized'])) {
             return false;
         }
 
@@ -102,26 +102,26 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
     private function sanitizeValue(mixed $value, HtmlSanitizerInterface $sanitizer, string $propertyName): mixed
     {
         return match (true) {
-            is_string($value) => $sanitizer->sanitize($value),
-            is_array($value) => array_map(static function ($v) use ($sanitizer, $propertyName) {
+            \is_string($value) => $sanitizer->sanitize($value),
+            \is_array($value) => array_map(static function ($v) use ($sanitizer, $propertyName) {
                 if (!is_string($v)) {
-                    throw new LogicException(sprintf('Cannot sanitize property "%s". Only string items are supported.', $propertyName));
+                    throw new LogicException(\sprintf('Cannot sanitize property "%s". Only string items are supported.', $propertyName));
                 }
                 return $sanitizer->sanitize($v);
             }, $value),
-            default => throw new LogicException(sprintf('Cannot sanitize property "%s". Only string or array of strings are supported.', $propertyName)),
+            default => throw new LogicException(\sprintf('Cannot sanitize property "%s". Only string or array of strings are supported.', $propertyName)),
         };
     }
 
     private function getSanitizer(string $name): HtmlSanitizerInterface
     {
         if (!$this->sanitizers->has($name)) {
-            throw new LogicException(sprintf('Sanitizer "%s" is not defined in the container.', $name));
+            throw new LogicException(\sprintf('Sanitizer "%s" is not defined in the container.', $name));
         }
 
         $sanitizer = $this->sanitizers->get($name);
         if (!$sanitizer instanceof HtmlSanitizerInterface) {
-            throw new LogicException(sprintf('Sanitizer "%s" must implement HtmlSanitizerInterface.', $name));
+            throw new LogicException(\sprintf('Sanitizer "%s" must implement HtmlSanitizerInterface.', $name));
         }
 
         return $sanitizer;

@@ -11,25 +11,32 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
-use Symfony\Component\Serializer\Attribute\Sanitize;
+use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 
 /**
- * Denormalizer that sanitizes string properties marked with the #[Sanitize] attribute.
+ * Denormalizer that sanitizes string properties based on the Context attribute.
  *
  * @author Mohamed Senoussi <lesfootix@gmail.com>
  */
-final class SanitizeDenormalizer implements DenormalizerInterface
+final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
 
+    public const SANITIZER_KEY = 'sanitizer';
+    public const DEFAULT_SANITIZER = 'default';
+
     public function __construct(
-        private readonly HtmlSanitizerInterface $defaultSanitizer,
-        private readonly array $sanitizers = [],
+        private ContainerInterface $sanitizers,
     ) {}
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['*' => false];
+    }
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
@@ -37,77 +44,86 @@ final class SanitizeDenormalizer implements DenormalizerInterface
             throw new BadMethodCallException('Please set a denormalizer before calling denormalize()!');
         }
 
-        if (!is_array($data) || !class_exists($type)) {
-            return $data;
+        if (!is_array($data)) {
+            return $this->denormalizer->denormalize($data, $type, $format, $context);
         }
 
-        $reflectionClass = new \ReflectionClass($type);
-        foreach ($reflectionClass->getProperties() as $property) {
-            $attributes = $property->getAttributes(Sanitize::class);
-            if ($attributes && array_key_exists($property->getName(), $data)) {
-                /** @var Sanitize $sanitizeAttribute */
-                $sanitizeAttribute = $attributes[0]->newInstance();
-                $sanitizer = $this->getSanitizer($sanitizeAttribute->sanitizer);
-                $data[$property->getName()] = $this->sanitizeValue($data[$property->getName()], $sanitizer, $property, $type);
+        $reflection = new \ReflectionClass($type);
+        $sanitizedData = $data;
+
+        foreach ($reflection->getProperties() as $property) {
+            $name = $property->getName();
+            if (!isset($data[$name])) {
+                continue;
+            }
+
+            foreach ($property->getAttributes(Context::class) as $attribute) {
+                $attributeContext = $attribute->newInstance();
+                if (!isset($attributeContext->denormalizationContext[self::SANITIZER_KEY])) {
+                    continue;
+                }
+                $sanitizer = $this->getSanitizer($attributeContext->denormalizationContext[self::SANITIZER_KEY]);
+                $sanitizedData[$name] = $this->sanitizeValue($data[$name], $sanitizer, $name);
+                $context['sanitized'] = true;
             }
         }
 
-        return $this->denormalizer->denormalize($data, $type, $format, $context);
+        return $this->denormalizer->denormalize($sanitizedData, $type, $format, $context);
     }
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
+        if (!isset($this->denormalizer)) {
+            return false;
+        }
+
         if (!class_exists($type)) {
             return false;
         }
-        $reflectionClass = new \ReflectionClass($type);
-        foreach ($reflectionClass->getProperties() as $property) {
-            if ($property->getAttributes(Sanitize::class)) {
-                return true;
+
+        if(isset($context['sanitized']))
+        {
+            return false;
+        }
+
+        $reflection = new \ReflectionClass($type);
+        foreach ($reflection->getProperties() as $property) {
+            foreach ($property->getAttributes(Context::class) as $attribute) {
+                $attrContext = $attribute->newInstance();
+                if (isset($attrContext->denormalizationContext[self::SANITIZER_KEY])) {
+                    return true;
+                }
             }
         }
 
         return false;
     }
 
-    public function getSupportedTypes(?string $format): array
-    {
-        return ['object' => true];
-    }
-
-    private function sanitizeValue(mixed $value, HtmlSanitizerInterface $sanitizer, \ReflectionProperty $property, string $className): string|array
+    private function sanitizeValue(mixed $value, HtmlSanitizerInterface $sanitizer, string $propertyName): mixed
     {
         return match (true) {
-            is_string($value) && $property->getType()?->getName() === 'string' => $sanitizer->sanitize($value),
-            is_array($value) && $property->getType()?->getName() === 'array' =>
-            array_map(static function ($item) use ($sanitizer, $property, $className) {
-                if (!is_string($item)) {
-                    throw new LogicException(sprintf(
-                        'The #[Sanitize] attribute can only be applied to array of string properties. Property $%s in class %s contains a non-string value.',
-                        $property->getName(),
-                        $className
-                    ));
+            is_string($value) => $sanitizer->sanitize($value),
+            is_array($value) => array_map(static function ($v) use ($sanitizer, $propertyName) {
+                if (!is_string($v)) {
+                    throw new LogicException(sprintf('Cannot sanitize property "%s". Only string items are supported.', $propertyName));
                 }
-                return $sanitizer->sanitize($item);
+                return $sanitizer->sanitize($v);
             }, $value),
-            default => throw new LogicException(sprintf(
-                'The #[Sanitize] attribute can only be applied to string or array of string properties. Property $%s in class %s is not supported.',
-                $property->getName(),
-                $className
-            )),
+            default => throw new LogicException(sprintf('Cannot sanitize property "%s". Only string or array of strings are supported.', $propertyName)),
         };
     }
 
-    private function getSanitizer(?string $name): HtmlSanitizerInterface
+    private function getSanitizer(string $name): HtmlSanitizerInterface
     {
-        if (null === $name) {
-            return $this->defaultSanitizer;
+        if (!$this->sanitizers->has($name)) {
+            throw new LogicException(sprintf('Sanitizer "%s" is not defined in the container.', $name));
         }
 
-        if (!isset($this->sanitizers[$name])) {
-            throw new InvalidArgumentException(sprintf('The HTML sanitizer "%s" does not exist. Available sanitizers are: %s', $name, implode(', ', array_keys($this->sanitizers))));
+        $sanitizer = $this->sanitizers->get($name);
+        if (!$sanitizer instanceof HtmlSanitizerInterface) {
+            throw new LogicException(sprintf('Sanitizer "%s" must implement HtmlSanitizerInterface.', $name));
         }
 
-        return $this->sanitizers[$name];
+        return $sanitizer;
     }
 }

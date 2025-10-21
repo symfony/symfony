@@ -50,6 +50,7 @@ use Symfony\Component\Serializer\Normalizer\NumberNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Normalizer\SanitizeDenormalizer;
 use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
@@ -233,5 +234,9 @@ return static function (ContainerConfigurator $container) {
 
         ->set('serializer.normalizer.number', NumberNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -915])
+
+        ->set('serializer.denormalizer.sanitize', SanitizeDenormalizer::class)
+            ->args([service('service_container')])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -800])
     ;
 };

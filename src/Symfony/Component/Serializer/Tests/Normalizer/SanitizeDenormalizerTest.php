@@ -14,7 +14,6 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\SanitizeDenormalizer;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -32,6 +31,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithInva
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithArrayOfObject;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithUnknownSanitizer;
+use Symfony\Contracts\Service\ServiceLocatorTrait;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @author Mohamed Senoussi <lesfootix@gmail.com>
@@ -45,22 +46,25 @@ class SanitizeDenormalizerTest extends TestCase
         $sanitizer = new HtmlSanitizer(
             (new HtmlSanitizerConfig())->allowSafeElements()
         );
-        $customSanitizer = [
-            'custom' => new HtmlSanitizer(
-                (new HtmlSanitizerConfig())
-                    ->allowElement('img', ['src', 'alt'])
-                    ->allowElement('h1')
-                    ->allowElement('div')
-            ),
-        ];
+        $customSanitizer = new HtmlSanitizer(
+            (new HtmlSanitizerConfig())
+                ->allowElement('img', ['src', 'alt'])
+                ->allowElement('h1')
+                ->allowElement('div')
+        );
+        $container = new class([
+            'default' => fn () => $sanitizer,
+            'custom' => fn () => $customSanitizer,
+        ]) implements ServiceProviderInterface {
+            use ServiceLocatorTrait;
+        };
+
         $phpDocExtractor = new PhpDocExtractor();
         $reflectionExtractor = new ReflectionExtractor();
-        $propertyInfo = new PropertyInfoExtractor(typeExtractors: [$phpDocExtractor, $reflectionExtractor]);
-        $objectNormalizer = new ObjectNormalizer(propertyTypeExtractor:  $propertyInfo);
-        $sanitizeDenormalizer = new SanitizeDenormalizer($sanitizer, $customSanitizer);
-        $sanitizeDenormalizer->setDenormalizer($objectNormalizer);
+        $propertyInfo = new PropertyInfoExtractor([], [$phpDocExtractor, $reflectionExtractor]);
+        $objectNormalizer = new ObjectNormalizer(null, null , null, $propertyInfo);
+        $sanitizeDenormalizer = new SanitizeDenormalizer($container);
         $arrayDenormalizer = new ArrayDenormalizer();
-        $arrayDenormalizer->setDenormalizer($sanitizeDenormalizer);
 
         $this->serializer = new Serializer([
             $arrayDenormalizer,
@@ -72,7 +76,6 @@ class SanitizeDenormalizerTest extends TestCase
 
    public function testDenormalizeObject(): void
     {
-        // Arrange
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',
             'firstName' => '<b>John</b>',
@@ -80,10 +83,8 @@ class SanitizeDenormalizerTest extends TestCase
             'bio' => '<script>alert("xss")</script>'
         ];
 
-        // Act
-        $result = $this->serializer->denormalize($data, SanitizeDummy::class);
+        $result = $this->serializer->denormalize($data, SanitizeDummy::class,'json');
 
-        // Assert
         $this->assertInstanceOf(SanitizeDummy::class, $result);
         $this->assertSame('123e4567-e89b-12d3-a456-426614174000', $result->id);
         $this->assertSame('<b>John</b>', $result->firstName);
@@ -93,22 +94,18 @@ class SanitizeDenormalizerTest extends TestCase
 
     public function testDenormalizeObjectWithCustomSanitizer(): void
     {
-        // Arrange
         $data = [
             'foo' => '<img src="https://symfony.com" onclick="alert(\'xss\')" alt="symfony" title="symfony"/>',
         ];
 
-        // Act
         $result = $this->serializer->denormalize($data, SanitizeDummyWithCustomSanitizer::class);
 
-        // Assert
         $this->assertInstanceOf(SanitizeDummyWithCustomSanitizer::class, $result);
         $this->assertSame('<img src="https://symfony.com" alt="symfony" />', $result->foo);
     }
 
-    public function testDenormalizeNestedObject(): void
+   public function testDenormalizeNestedObject(): void
     {
-        // Arrange
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',
             'object' => [
@@ -119,10 +116,8 @@ class SanitizeDenormalizerTest extends TestCase
             ]
         ];
 
-        // Act
         $result = $this->serializer->denormalize($data, SanitizeDummyWithObject::class);
 
-        // Assert
         $this->assertInstanceOf(SanitizeDummyWithObject::class, $result);
         $this->assertSame('123e4567-e89b-12d3-a456-426614174000', $result->id);
         $this->assertInstanceOf(SanitizeDummy::class, $result->object);
@@ -132,9 +127,8 @@ class SanitizeDenormalizerTest extends TestCase
         $this->assertSame('', $result->object->bio);
     }
 
-    public function testDenormalizeArray(): void
+    public function testDenormalizeArrayOfObject(): void
     {
-        // Arrange
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',
             'objects' => [
@@ -153,10 +147,8 @@ class SanitizeDenormalizerTest extends TestCase
             ]
         ];
 
-        // Act
         $result = $this->serializer->denormalize($data, SanitizeDummyWithArrayOfObject::class);
 
-        // Assert
         $this->assertInstanceOf(SanitizeDummyWithArrayOfObject::class, $result);
         $this->assertSame('123e4567-e89b-12d3-a456-426614174000', $result->id);
         $this->assertCount(2, $result->objects);
@@ -174,7 +166,6 @@ class SanitizeDenormalizerTest extends TestCase
 
     public function testDenormalizeArrayOfStrings(): void
     {
-        // Arrange
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',
             'strings' => [
@@ -184,10 +175,8 @@ class SanitizeDenormalizerTest extends TestCase
             ]
         ];
 
-        // Act
         $result = $this->serializer->denormalize($data, SanitizeDummyWithArrayOfString::class);
 
-        // Assert
         $this->assertInstanceOf(SanitizeDummyWithArrayOfString::class, $result);
         $this->assertSame('123e4567-e89b-12d3-a456-426614174000', $result->id);
         $this->assertCount(3, $result->strings);
@@ -198,60 +187,37 @@ class SanitizeDenormalizerTest extends TestCase
 
     public function testDenormalizeWithAttributeOnNonStringPropertyThrowsLogicException(): void
     {
-        // Arrange
         $data = [
             'foo' => 42,
         ];
 
-        // Assert
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf(
-            'The #[Sanitize] attribute can only be applied to string or array of string properties. Property $%s in class %s is not supported.',
-            'foo',
-            SanitizeDummyWithInvalidType::class)
-        );
+        $this->expectExceptionMessage('Cannot sanitize property "foo". Only string or array of strings are supported.');
 
-        // Act
         $this->serializer->denormalize($data, SanitizeDummyWithInvalidType::class);
     }
 
     public function testDenormalizeWithAttributeOnInvalidArrayPropertyThrowsLogicException(): void
     {
-        // Arrange
         $data = [
             'foo' => [42, 43],
         ];
 
-        // Assert
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf(
-            'The #[Sanitize] attribute can only be applied to array of string properties. Property $%s in class %s contains a non-string value.',
-            'foo',
-            SanitizeDummyWithInvalidArray::class)
-        );
+        $this->expectExceptionMessage('Cannot sanitize property "foo". Only string items are supported.');
 
-        // Act
         $this->serializer->denormalize($data, SanitizeDummyWithInvalidArray::class);
     }
 
     public function testDenormalizeWithUnknownSanitizerThrowsInvalidArgumentException(): void
     {
-        // Arrange
         $data = [
             'foo' => '<b>Test</b>',
         ];
 
-        // Assert
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The HTML sanitizer "unknown" does not exist.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Sanitizer "unknown" is not defined in the container.');
 
-        // Act
-        $this->serializer->denormalize($data, SanitizeDummyWithUnknownSanitizer::class, null, [
-            'sanitizers' => [
-                'default' => new HtmlSanitizer(
-                    (new HtmlSanitizerConfig())->allowSafeElements()
-                ),
-            ],
-        ]);
+        $this->serializer->denormalize($data, SanitizeDummyWithUnknownSanitizer::class);
     }
 }

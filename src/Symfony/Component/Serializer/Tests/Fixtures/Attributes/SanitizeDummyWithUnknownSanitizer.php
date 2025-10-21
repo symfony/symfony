@@ -11,15 +11,13 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
-use Symfony\Component\Serializer\Attribute\Sanitize;
+use Symfony\Component\Serializer\Attribute\Context;
+use Symfony\Component\Serializer\Normalizer\SanitizeDenormalizer;
 
-/**
- * @author Mohamed Senoussi <lesfootix@gmail.com>
- */
 class SanitizeDummyWithUnknownSanitizer
 {
     public function __construct(
-        #[Sanitize(sanitizer: 'unknown')]
+        #[Context(denormalizationContext: [SanitizeDenormalizer::SANITIZER_KEY => 'unknown'])]
         public string $foo
     ) {}
 }

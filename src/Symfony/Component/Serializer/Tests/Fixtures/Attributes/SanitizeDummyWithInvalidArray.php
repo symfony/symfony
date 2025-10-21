@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
-use Symfony\Component\Serializer\Attribute\Sanitize;
+use Symfony\Component\Serializer\Attribute\Context;
+use Symfony\Component\Serializer\Normalizer\SanitizeDenormalizer;
 
 /**
  * @author Mohamed Senoussi <lesfootix@gmail.com>
@@ -22,7 +23,7 @@ class SanitizeDummyWithInvalidArray
         /**
          * @var int[]
          */
-        #[Sanitize]
+        #[Context(denormalizationContext: [SanitizeDenormalizer::SANITIZER_KEY => SanitizeDenormalizer::DEFAULT_SANITIZER])]
         public array $foo
     ) {}
 }

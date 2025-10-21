@@ -36,7 +36,7 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
 
     public function getSupportedTypes(?string $format): array
     {
-        return ['*' => false];
+        return ['native-string' => false, 'native-array' => false, '*' => false];
     }
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
@@ -82,7 +82,7 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
             return false;
         }
 
-        if(isset($context['sanitized'])) {
+        if (isset($context['sanitized'])) {
             return false;
         }
 
@@ -104,9 +104,10 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
         return match (true) {
             \is_string($value) => $sanitizer->sanitize($value),
             \is_array($value) => array_map(static function ($v) use ($sanitizer, $propertyName) {
-                if (!is_string($v)) {
+                if (!\is_string($v)) {
                     throw new LogicException(\sprintf('Cannot sanitize property "%s". Only string items are supported.', $propertyName));
                 }
+
                 return $sanitizer->sanitize($v);
             }, $value),
             default => throw new LogicException(\sprintf('Cannot sanitize property "%s". Only string or array of strings are supported.', $propertyName)),

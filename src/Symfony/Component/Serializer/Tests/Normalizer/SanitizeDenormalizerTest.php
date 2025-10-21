@@ -14,22 +14,22 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
-use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Normalizer\SanitizeDenormalizer;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\SanitizeDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithArrayOfObject;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithArrayOfString;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithCustomSanitizer;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithInvalidArray;
-use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithObject;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithInvalidType;
-use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithArrayOfObject;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithObject;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SanitizeDummyWithUnknownSanitizer;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -58,7 +58,7 @@ class SanitizeDenormalizerTest extends TestCase
         $phpDocExtractor = new PhpDocExtractor();
         $reflectionExtractor = new ReflectionExtractor();
         $propertyInfo = new PropertyInfoExtractor([], [$phpDocExtractor, $reflectionExtractor]);
-        $objectNormalizer = new ObjectNormalizer(null,null ,null, $propertyInfo);
+        $objectNormalizer = new ObjectNormalizer(null, null , null, $propertyInfo);
         $sanitizeDenormalizer = new SanitizeDenormalizer($container);
         $arrayDenormalizer = new ArrayDenormalizer();
 
@@ -70,7 +70,7 @@ class SanitizeDenormalizerTest extends TestCase
 
     }
 
-   public function testDenormalizeObject()
+    public function testDenormalizeObject()
     {
         $data = [
             'id' => '123e4567-e89b-12d3-a456-426614174000',

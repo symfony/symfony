@@ -47,10 +47,7 @@ class ArrayShapeGeneratorTest extends TestCase
 
         yield [new BooleanNode('node'), 'bool'];
 
-        $nullableBooleanNode = new BooleanNode('node');
-        $nullableBooleanNode->setDefaultValue(null);
-
-        yield [$nullableBooleanNode, 'bool|null'];
+        yield [new BooleanNode('node', nullable: true), 'bool|null'];
         yield [new EnumNode('node', values: ['a', 'b']), '"a"|"b"'];
         yield [new ScalarNode('node'), 'scalar|null'];
         yield [new VariableNode('node'), 'mixed'];

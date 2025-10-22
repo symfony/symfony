@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by soyuka at 2025-10-17T07:18:17Z
+
+Really great improvement, this is quite painful for now in API Platform as we use `id` everywhere  and sometimes the property doesn't exist.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-10-17T14:15:41Z
+
+From https://www.php.net/manual/en/language.oop5.property-hooks.php
+
+> A property may be "backed" or "virtual". [...] A virtual property is one that has hooks and those hooks do not interact with the property itself. In this case, the hooks are effectively the same as methods, and the object does not use any space to store a value for that property.
+
+Should we find another name?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-17T14:46:40Z
+
+The reason for the name is actually similar to the reason in property hooks (a JsonStreamer property that is either backed by a PHP property or not). But it might indeed cause confusion, especially when the 2 different layers are closely tied to each other.
+I don't have an idea for a good alternate name though.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-10-17T14:53:13Z
+
+"synthetic" means that it is created from nothing, or from transforming other things.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-10-17T15:09:30Z
+
+I like it.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-10-18T09:36:35Z
+
+Updated with the synthetic name instead. It's a nice name, I like it as well, thanks for the review.

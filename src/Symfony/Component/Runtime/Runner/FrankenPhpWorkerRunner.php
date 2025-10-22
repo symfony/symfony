@@ -25,8 +25,6 @@ use Symfony\Component\Runtime\RunnerInterface;
 class FrankenPhpWorkerRunner implements RunnerInterface
 {
     /**
-     * @param HttpKernelInterface $kernel
-     * @param int $loopMax
      * @param iterable<MiddlewareInterface> $middlewares
      */
     public function __construct(

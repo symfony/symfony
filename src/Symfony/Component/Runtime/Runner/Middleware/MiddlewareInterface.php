@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Symfony\Component\Runtime\Runner\Middleware;
 
 /**
- * @author Sascha Heilmeier<sascha.heilmeier@netlogix.de>
+ * @author Sascha Heilmeier <sascha.heilmeier@netlogix.de>
  */
 interface MiddlewareInterface
 {

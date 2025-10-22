@@ -159,7 +159,7 @@ class SymfonyRuntime extends GenericRuntime
         $workerMiddlewares = ($options['worker_middlewares'] ?? $_SERVER['FRANKENPHP_MIDDLEWARES'] ?? $_ENV['FRANKENPHP_MIDDLEWARES'] ?? '');
 
         if (!\is_string($workerMiddlewares)) {
-            throw new \LogicException(\sprintf('The "worker_middlewares" runtime option must be an string, "%s" given.', get_debug_type($workerLoopMax)));
+            throw new \LogicException(\sprintf('The "worker_middlewares" runtime option must be an string, "%s" given.', get_debug_type($workerMiddlewares)));
         }
 
         $workerMiddlewares = array_filter(explode("\n", $workerMiddlewares));

@@ -58,10 +58,11 @@ class SymfonyRuntimeTest extends TestCase
         } finally {
             restore_error_handler();
             restore_exception_handler();
+            unset($_SERVER['FRANKENPHP_MIDDLEWARES']);
         }
     }
 
-    public function _testStringWorkerMaxLoopThrows()
+    public function testStringWorkerMaxLoopThrows()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "worker_loop_max" runtime option must be an integer, "string" given.');
@@ -69,7 +70,7 @@ class SymfonyRuntimeTest extends TestCase
         new SymfonyRuntime(['worker_loop_max' => 'foo']);
     }
 
-    public function _testBoolWorkerMaxLoopThrows()
+    public function testBoolWorkerMaxLoopThrows()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "worker_loop_max" runtime option must be an integer, "bool" given.');
@@ -79,6 +80,16 @@ class SymfonyRuntimeTest extends TestCase
 
     public static function workerMiddlewaresOptionData(): iterable
     {
+        yield 'empty middleware - null' => [
+            'value' => null,
+            'expectedWorkerMiddlewares' => [],
+        ];
+
+        yield 'empty middleware - empty' => [
+            'value' => '',
+            'expectedWorkerMiddlewares' => [],
+        ];
+
         yield 'valid middleware' => [
             'value' => TestMiddleware::class,
             'expectedWorkerMiddlewares' => [TestMiddleware::class],
@@ -92,10 +103,30 @@ class SymfonyRuntimeTest extends TestCase
                 MiddlewareInterface::class
             ),
         ];
+
+        yield 'invalid middleware not a class' => [
+            'value' => 'unknown',
+            'expectedMessage' =>
+                \sprintf(
+                'The middleware class "%s" must implement "%s"',
+                'unknown',
+                MiddlewareInterface::class
+            ),
+        ];
+
+        yield 'invalid worker_middlewares option type - bool' => [
+            'value' => false,
+            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an string, "%s" given.', 'bool')
+        ];
+
+        yield 'invalid worker_middlewares option type - int' => [
+            'value' => 42,
+            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an string, "%s" given.', 'int')
+        ];
     }
 
     #[DataProvider('workerMiddlewaresOptionData')]
-    public function _testWorkerMiddlewaresOption(
+    public function testWorkerMiddlewaresOption(
         mixed $value,
         ?array $expectedWorkerMiddlewares = null,
         ?string $expectedMessage = null,

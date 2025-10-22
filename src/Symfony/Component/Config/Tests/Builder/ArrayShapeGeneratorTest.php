@@ -47,20 +47,24 @@ class ArrayShapeGeneratorTest extends TestCase
 
         yield [new BooleanNode('node'), 'bool'];
 
-        yield [new BooleanNode('node', nullable: true), 'bool|null'];
-        yield [new EnumNode('node', values: ['a', 'b']), '"a"|"b"'];
+        yield [
+            new BooleanNode('node', null, BooleanNode::DEFAULT_PATH_SEPARATOR, true),
+            'bool|null',
+        ];
+
+        yield [new EnumNode('node', null, ['a', 'b']), '"a"|"b"'];
         yield [new ScalarNode('node'), 'scalar|null'];
         yield [new VariableNode('node'), 'mixed'];
 
         yield [new IntegerNode('node'), 'int<min, max>'];
-        yield [new IntegerNode('node', min: 1), 'int<1, max>'];
-        yield [new IntegerNode('node', max: 10), 'int<min, 10>'];
-        yield [new IntegerNode('node', min: 1, max: 10), 'int<1, 10>'];
+        yield [new IntegerNode('node', null, 1), 'int<1, max>'];
+        yield [new IntegerNode('node', null, null, 10), 'int<min, 10>'];
+        yield [new IntegerNode('node', null, 1, max: 10), 'int<1, 10>'];
 
         yield [new FloatNode('node'), 'float'];
-        yield [new FloatNode('node', min: 1.1), 'float'];
-        yield [new FloatNode('node', max: 10.1), 'float'];
-        yield [new FloatNode('node', min: 1.1, max: 10.1), 'float'];
+        yield [new FloatNode('node', null, 1.1), 'float'];
+        yield [new FloatNode('node', null, null, 10.1), 'float'];
+        yield [new FloatNode('node', null, 1.1, 10.1), 'float'];
     }
 
     public function testPrototypedArrayNodePhpDoc()

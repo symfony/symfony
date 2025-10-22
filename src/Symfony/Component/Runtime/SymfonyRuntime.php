@@ -24,6 +24,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Runtime\Internal\MissingDotenv;
 use Symfony\Component\Runtime\Internal\SymfonyErrorHandler;
 use Symfony\Component\Runtime\Runner\FrankenPhpWorkerRunner;
+use Symfony\Component\Runtime\Runner\Middleware\MiddlewareFactory;
+use Symfony\Component\Runtime\Runner\Middleware\MiddlewareInterface;
 use Symfony\Component\Runtime\Runner\Symfony\ConsoleApplicationRunner;
 use Symfony\Component\Runtime\Runner\Symfony\HttpKernelRunner;
 use Symfony\Component\Runtime\Runner\Symfony\ResponseRunner;
@@ -91,6 +93,7 @@ class SymfonyRuntime extends GenericRuntime
      *   dotenv_overload?: ?bool,
      *   dotenv_extra_paths?: ?string[],
      *   worker_loop_max?: int, // Use 0 or a negative integer to never restart the worker. Default: 500
+     *   worker_middlewares?: string
      * } $options
      */
     public function __construct(array $options = [])
@@ -153,6 +156,22 @@ class SymfonyRuntime extends GenericRuntime
 
         $options['worker_loop_max'] = (int) ($workerLoopMax ?? 500);
 
+        $workerMiddlewares = ($options['worker_middlewares'] ?? $_SERVER['FRANKENPHP_MIDDLEWARES'] ?? $_ENV['FRANKENPHP_MIDDLEWARES'] ?? '');
+
+        if (!\is_string($workerMiddlewares)) {
+            throw new \LogicException(\sprintf('The "worker_middlewares" runtime option must be an string, "%s" given.', get_debug_type($workerLoopMax)));
+        }
+
+        $workerMiddlewares = array_filter(explode("\n", $workerMiddlewares));
+
+        foreach ($workerMiddlewares as $workerMiddleware) {
+            if (!is_a($workerMiddleware, MiddlewareInterface::class, true)) {
+                throw new \LogicException(\sprintf('The middleware class "%s" must implement "%s".', $workerMiddleware, MiddlewareInterface::class));
+            }
+        }
+
+        $options['worker_middlewares'] = $workerMiddlewares;
+
         parent::__construct($options);
     }
 
@@ -160,7 +179,8 @@ class SymfonyRuntime extends GenericRuntime
     {
         if ($application instanceof HttpKernelInterface) {
             if ($_SERVER['FRANKENPHP_WORKER'] ?? false) {
-                return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max']);
+                $middlewareFactory = new MiddlewareFactory();
+                return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max'], $middlewareFactory->create(...$this->options['worker_middlewares']));
             }
 
             return new HttpKernelRunner($application, Request::createFromGlobals(), $this->options['debug'] ?? false);

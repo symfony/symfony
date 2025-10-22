@@ -13,12 +13,14 @@ namespace Symfony\Component\Runtime\Tests;
 
 require_once __DIR__.'/frankenphp-function-mock.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\Runtime\Runner\FrankenPhpWorkerRunner;
+use Symfony\Component\Runtime\Runner\Middleware\MiddlewareInterface;
 
 interface TestAppInterface extends HttpKernelInterface, TerminableInterface
 {
@@ -26,8 +28,20 @@ interface TestAppInterface extends HttpKernelInterface, TerminableInterface
 
 class FrankenPhpWorkerRunnerTest extends TestCase
 {
-    public function testRun()
+    public static function runData(): iterable
     {
+        yield 'default' => [];
+
+        yield 'middleware' => [
+            'withMiddleware' => true,
+        ];
+    }
+
+    /**
+     * @param class-string<MiddlewareInterface>|null $middleware
+     */
+    #[DataProvider('runData')]
+    public function testRun(bool $withMiddleware = false) {
         $application = $this->createMock(TestAppInterface::class);
         $application
             ->expects($this->once())
@@ -41,7 +55,30 @@ class FrankenPhpWorkerRunnerTest extends TestCase
 
         $_SERVER['FOO'] = 'bar';
 
-        $runner = new FrankenPhpWorkerRunner($application, 500);
+        if ($withMiddleware) {
+            $middlewareMock = $this->createMock(MiddlewareInterface::class);
+            $middlewareMock
+                ->expects($this->once())
+                ->method('wrap')->willReturnCallback(fn ($handler) => $handler());
+        }
+
+        $runner = new FrankenPhpWorkerRunner($application, 500, array_filter([$middlewareMock ?? null]));
+
         $this->assertSame(0, $runner->run());
+    }
+
+    public function testRunInvalidMiddleware()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            \sprintf(
+                'The middleware "%s" must implement the "%s" interface',
+                \stdClass::class,
+                MiddlewareInterface::class
+            )
+        );
+        $application = $this->createMock(TestAppInterface::class);
+        $runner = new FrankenPhpWorkerRunner($application, 500, [new \stdClass]);
+        $runner->run();
     }
 }

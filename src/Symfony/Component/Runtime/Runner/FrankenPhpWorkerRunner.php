@@ -14,6 +14,7 @@ namespace Symfony\Component\Runtime\Runner;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
+use Symfony\Component\Runtime\Runner\Middleware\MiddlewareInterface;
 use Symfony\Component\Runtime\RunnerInterface;
 
 /**
@@ -23,9 +24,15 @@ use Symfony\Component\Runtime\RunnerInterface;
  */
 class FrankenPhpWorkerRunner implements RunnerInterface
 {
+    /**
+     * @param HttpKernelInterface $kernel
+     * @param int $loopMax
+     * @param iterable<MiddlewareInterface> $middlewares
+     */
     public function __construct(
         private HttpKernelInterface $kernel,
         private int $loopMax,
+        private iterable $middlewares = [],
     ) {
     }
 
@@ -51,6 +58,13 @@ class FrankenPhpWorkerRunner implements RunnerInterface
 
             $sfResponse->send();
         };
+
+        foreach ($this->middlewares as $middleware) {
+            if (!$middleware instanceof MiddlewareInterface) {
+                throw new \LogicException(\sprintf('The middleware "%s" must implement the "%s" interface.', \is_object($middleware) ? $middleware::class : \gettype($middleware), MiddlewareInterface::class));
+            }
+            $handler = fn () => $middleware->wrap($handler, $server);
+        }
 
         $loops = 0;
         do {

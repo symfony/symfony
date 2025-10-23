@@ -35,6 +35,11 @@ class PhpConfigReferenceDumpPassTest extends TestCase
     protected function tearDown(): void
     {
         if (is_dir($this->tempDir)) {
+            // Make the directory is writable on Windows
+            if ('\\' === DIRECTORY_SEPARATOR && !is_writable($this->tempDir)) {
+                exec('attrib -r ' . escapeshellarg($this->tempDir));
+            }
+
             $fs = new Filesystem();
             $fs->remove($this->tempDir);
         }
@@ -61,13 +66,14 @@ class PhpConfigReferenceDumpPassTest extends TestCase
 
     public function testProcessIgnoresFileWriteErrors()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            self::markTestSkipped('Cannot reliably make directory read-only on Windows.');
-        }
-
         // Create a read-only directory to simulate write errors
         $readOnlyDir = $this->tempDir.'/readonly';
         mkdir($readOnlyDir, 0o444, true);
+
+        // Make the directory read-only on Windows
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            exec('attrib +r ' . escapeshellarg($readOnlyDir));
+        }
 
         $container = new ContainerBuilder();
         $container->setParameter('.container.known_envs', ['dev', 'prod', 'test']);

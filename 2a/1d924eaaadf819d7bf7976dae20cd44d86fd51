@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-22T18:19:21Z
+
+Thanks for the reviews, I addressed your comments!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-10-23T07:48:26Z
+
+I played with it a bit, that's nice and it works well! I stumbled across a problem however: when testing your first example:
+
+```php
+<?php
+
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+return App::config([
+    'App\\' => [
+        'resource' => '../src/'
+    ],
+]);
+```
+
+It doesn't compile and I get this error:
+
+```
+In FileLoader.php line 177:
+
+  Container extension "App\" is not registered in /Users/alex/PhpstormProjects/config/config/services.php (which is being imported from "/Users/alex/PhpstormProjects/config/src/K
+  ernel.php").
+
+In ContainerBuilder.php line 224:
+
+  Container extension "App\" is not registered.
+```
+
+Do I miss something? Tested with a minimal project and default configuration.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-23T07:53:37Z
+
+My example in the PR description was incorrect.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-10-23T08:48:36Z
+
+> I think it should be mentioned in `reference.php` that the file is meant to be committed to the project? Such generated files are usually excluded from projects and people may not understand it shouldn't be ignored. Mentioning this would avoid ambiguity?
+
+The file is only useful for static analysis and IDE completion. It's not required to run the application. It can be versioned or not, whatever.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-10-23T10:28:08Z
+
+Alright, maybe the description saying "This means that the file should be committed" should be interpreted as "the file _may_ be committed". Got it 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-23T14:15:11Z
+
+PR updated:
+
+- I removed generation of `int<min,max>` [for now](https://youtrack.jetbrains.com/issue/WI-81098/Comment-added-after-nested-int-range-declaration-in-PhpDocs-array-shape-breaks-parsing)
+- specific `when@env` are listed as suggested by @GromNaN - this makes part of autocompletion work without waiting for a future phpStorm release
+- some improvements to the shape generation
+- psalm-type are imported by duplicating them, further reducing the immediate need for a future phpStorm version
+
+Support for `...<>` in shapes would still be highly desired as we have to use them for routes and for services.
+Note also that phpStorm autocompletion could be improved when nesting into an array (with branch-level elimination of impossible suggestions)
+
+These changes are in a second commit for ppl that did review the first one.

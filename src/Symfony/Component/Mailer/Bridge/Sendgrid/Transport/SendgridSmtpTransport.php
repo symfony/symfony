@@ -27,4 +27,13 @@ class SendgridSmtpTransport extends EsmtpTransport
         $this->setUsername('apikey');
         $this->setPassword($key);
     }
+
+    protected function parseMessageId(string $mtaResult): string
+    {
+        if (\preg_match('/250 Ok:? queued as (?P<id>\S+)\r?$/mis', $mtaResult, $matches)) {
+            return $matches['id'];
+        }
+
+        return '';
+    }
 }

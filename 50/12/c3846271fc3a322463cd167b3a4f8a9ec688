@@ -1,0 +1,527 @@
+---------------------------------------------------------------------------
+
+by connorhu at 2025-04-14T10:40:15Z
+
+Great idea! I've looked at the previous PR and could use it! One question came up: how can I jump back to a specific step without having to press the back button many times?
+May the answer is can't by default. I solved this issue by keeping track of which valid step we are at and the url contains the step number (1..n), so I can generate a url for the previous steps, but I dont allow to go to not-yet-valid next steps.
+I think I can see the points where I need to customize to achieve this.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-04-14T11:30:03Z
+
+>how can I jump back to a specific step without having to press the back button many times?
+
+Hey! take a look at the `testMoveBackToStep()` test, it covers this case. It's possible via submit operation or manually using `$flow->movePrevious('step')` directly.
+
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-04-15T12:04:03Z
+
+Hey @yceruto, awesome to see this may become a native part of Symfony Forms!
+
+I just had a quick look at the implementation and didn't find anything about `UploadedFile` (yet).
+This was one of the big challenges we had to solve with CraueFormFlowBundle in combination with https://rekalogika.dev/file-bundle/file-upload-filepond, especially to make restore work (when going back to show the previously submitted files) and then to handle those if the step is submitted again.
+
+It would be very helpful to have a default way the FormFlow can handle file uploads, but also to have some interface to interact with the full lifecycle of uploaded files, e.g. to decide where and how to store them, how to reference them inside form data, etc.
+
+I think the lifecycle consists of the following steps:
+1. Initial upload. I think it would be best to already store the file(s) to a temporary location on the filesystem and just work with references to them.
+In our case we use the Rekalogika file bundle to directly reference Files with our Doctrine `Media` Entity (see https://rekalogika.dev/file-bundle/doctrine-entity and https://rekalogika.dev/file-bundle/working-with-entities) and then store the Media entity inside our Form Data.
+2. "Restore" already uploaded file(s) when the user goes back to a step with a file upload field.
+3. Handle resubmit, especially for file inputs with `multiple` attribute. If the same step is submitted more then once, the following cases need to be handled:
+- keep unchanged files
+- delete files which were removed
+- create newly uploaded files
+4. Final submission. Maybe we want to move files from a temporary location to persistent storage.
+
+Maybe file uploads are not as important for an initial implementation, but it's definitely a use case which should be thought about.
+
+Feel free to ping me if you have any questions. Maybe I could even build a minimal demo of the current implementation we use in our project and share it with you.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-04-15T12:07:06Z
+
+> 1. I think it would be best to already store the file(s) to a temporary location on the filesystem and just work with references to them.
+
+this would be incompatible with apps using a load balancer with several servers, as there is no guarantee that the next request goes to the same server behind the load balancer. Such case require storing uploads in a shared storage (for instance using a S3 bucket or similar storage)
+
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-04-15T12:17:30Z
+
+> > 1. I think it would be best to already store the file(s) to a temporary location on the filesystem and just work with references to them.
+>
+> this would be incompatible with apps using a load balancer with several servers, as there is no guarantee that the next request goes to the same server behind the load balancer. Such case require storing uploads in a shared storage (for instance using a S3 bucket or similar storage)
+
+You're very right, thanks for pointing this out. So it's especially important to have the possibility of handling those different cases. Maybe a `FileUploadHandlerInterface` could be introduced. I don't really like the [default handling of CraueFormFlowBundle](https://github.com/craue/CraueFormFlowBundle?tab=readme-ov-file#handling-of-file-uploads) (storing files as base64 to the session), but also can't come up with a better approach which would be compatible with horizontal scaling.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-04-15T13:24:01Z
+
+I haven’t checked the file upload yet because I knew it would be a complicated topic, but I think using a custom flow button (as explained above) will give you the flexibility to do custom things on your own.
+
+One option is to create your own `next` flow button with a dedicated `handler` where file uploads can be managed. Then, you can keep track of the uploaded files by saving the references in the DTO, which is preserved between steps.
+
+Imagine you have a `documents` step defined for files uploading. In your navigator form, you can define this new button:
+```php
+$builder->add('upload', ButtonFlowType::class, [
+    'handler' => function (MyDto $data, ButtonFlowInterface $button, FormFlowInterface $flow) {
+        // handle files uploading here ... store them somewhere ... create references ...
+
+        // $data->uploadedFiles = ... save references if we go back ...
+
+        $flow->moveNext();
+    },
+    'include_if' => ['documents'], // the steps where this button will appear
+]);
+```
+So, it’s up to you where to store the files, how to reference them in the DTO, and how to render them again if the user goes back to this step, just by looking into `$data->uploadedFiles`.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-04-15T14:28:00Z
+
+Think of Flow buttons like mini-controllers with a focused job. The main controller handles the shared logic across all steps, while each action handler takes care of custom operations.
+
+You can even use them for inter-step operations (like in the demo preview, where I showed how to add or remove skill items from a `CollectionType`). In those cases, the step stays the same, but the bound data gets updated, and the form is rebuilt when `$flow->getStepForm()` is called again, now with new data and form updated.
+
+This part feels a bit like magic, but it’s a helpful one given how complex multistep forms can be.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2025-06-02T06:59:35Z
+
+Does this handle the `EntityType` field? That is, related entities.
+I am referring to this link: https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/cookbook/entities-in-session.html
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-06-03T05:08:16Z
+
+Can we remove the draft status @yceruto ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-03T13:20:57Z
+
+>Can we remove the draft status @yceruto ?
+
+It's officially ready for review now :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-03T13:27:08Z
+
+>Does this handle the EntityType field? That is, related entities.
+I am referring to this link: https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/cookbook/entities-in-session.html
+
+@seb-jean I'll look into it during the week, but there shouldn't be any issue as long as we follow those recommendations. I'll be back with more details soon.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-03T22:28:20Z
+
+@seb-jean I’ve played with a `Role` entity, the `EntityType`, and the default storage (Session), and I encountered the following runtime exception when moving back to the previous step:
+
+>Entity of type "App\Entity\Role" passed to the choice field must be managed. Maybe you forget to persist it in the entity manager?
+
+That happens during the choice value resolution, where the `IdReader` tries to get the ID value of the entity (first checking if the given entity is currently managed) but it fails in this case (as expected) because the entity object was retrieved from the session, not from the EM (which is fresh in the next request).
+
+In this scenario, given the context, my recommendation is to provide the `choice_value` resolver directly:
+```php
+->add('role', EntityType::class, [
+    'class' => Role::class,
+    'choice_value' => fn (?Role $role) => $role?->id, // <-- resolving the choice value manually
+])
+```
+I don’t think `FormFlow` (or its data storage) can handle this situation any better.
+
+Once the `FormFlow` is finished, it's over, and you've full control over the following [doctrine recommendations](https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/cookbook/entities-in-session.html), either by mapping your DTO back to entities or by reloading the related entities when necessary.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2025-06-04T04:46:23Z
+
+@yceruto Thank you for your reply. Have you also tried to see if the `User` entity is persisted in the database once the `FormFlow` is finished?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-04T14:32:33Z
+
+@seb-jean Thank you for raising this topic.
+
+>Have you also tried to see if the User entity is persisted in the database once the FormFlow is finished?
+
+The root object is a DTO in my case, and that’s what I’d recommend most of the time. So, in the controller, when the FormFlow is finished, I can persist/update all related entities without any problem.
+```php
+$user = User::newFromDto($flow->getData());
+
+$this->em->persist($user);
+$this->em->flush();
+```
+
+If the root object is an entity instead (one that hasn’t been persisted yet) it will work the same as a DTO approach:
+```php
+$this->em->persist($flow->getData());
+$this->em->flush();
+```
+In both cases above, you might need to reload the related entities, if there are any.
+
+However, when it’s a managed entity (one that has already been persisted), and the FormFlow is finished, you’ll need to use that managed entity and map/update all fields from `$flow->getData()`. Otherwise, you’ll end up ignoring the changes or creating a new record in the database (if `persist()` is used) instead of updating the existing one:
+```php
+$user->updateFrom($flow->getData());
+
+$this->em->flush();
+```
+
+Another alternative is to create a `DoctrineDataStorage` (it might be introduced later in a different PR) that handles persisting and flushing changes across steps ([here is a sample](https://gist.github.com/yceruto/4be95e605934311f066b8171c3503167)), instead of the default `SessionDataStorage`. Thus, your root entity (along with its related entities) will always be in a "managed" state.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-06-05T12:35:40Z
+
+@yceruto feel free to close the comments from Copilot, I just wanted to try it out on such a big change.
+
+---------------------------------------------------------------------------
+
+by Lorenzschaef at 2025-06-08T09:29:22Z
+
+This looks very interesting, I'm looking forward to using this component!
+
+I recently built a wizard in my project, where the steps vary based on user choices. To take up your signup example: Imagine that in the first step, the user has to choose between signing up as a company or as an individual, and the following steps would be different based on that choice. Would something like that be possible to build with this component?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-08T13:09:15Z
+
+@Lorenzschaef Absolutely possible!
+
+I will be sharing a demo project with several examples very soon:
+ * Basic multistep form
+ * Advanced multistep form
+    * Custom form themes
+    * Skip steps dynamically based on previous choices
+    * Navigate to any previous step
+    * Dynamic steps definition
+    * Custom Flow Buttons
+       * Managing input collections (CollectionType without JS)
+       * Skip step on user demand
+       * File uploading
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-08T13:46:37Z
+
+I’ve also identified another use case for this feature: when dealing with a configuration settings panel containing multiple forms or fields, logically grouped into tabs without a strict order or interdependency, you can leverage FormFlow to split the large form into sections/tabs.
+
+For instance: Profile | Password | Team | Notification | etc. and all of which belong to a single `Account` entity. In this case, instead of creating separate controllers and routes for each section, you can define a single controller and route e.g. `/account/settings` to handle them all, using multiple "step" forms that can be customized and accessed independently, without enforcing any specific flow order.
+
+![settings-sample](https://github.com/user-attachments/assets/876a13c1-b4df-44c7-86af-86be5ce014d2)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-06-14T20:43:20Z
+
+As promised, here’s the demo app: https://github.com/yceruto/formflow-demo.
+
+I’d love to see what other use cases you think this feature could support, feel free to share your ideas!
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-07-02T21:10:03Z
+
+Hi @yceruto,
+
+Thank you very much for the demo.  I found it really straightforward to understand how to use and customize the form, the steps, and the actions 👍🏽 .
+
+I’ve tested several use cases, and everything works well except for one scenario. I might be missing something, but it seems that the form events on the steps are not being triggered. Specifically, in a flow where the user is first asked to pick a color (choice type), and then to select a gradient based on the chosen color, the gradient step uses a choice type with options depending on the previous selection. Unfortunately, the event responsible for setting these dynamic choices is never called.
+
+I might be misunderstanding how to properly use form events with the form flow, but I wanted to check with you in case there’s a recommended way to handle this scenario.
+
+Other than this issue, everything else is working perfectly.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-07-02T21:20:07Z
+
+Hi @Spomky, thanks for testing it :)
+
+Can you please share the changes that I need to reproduce the issue? Thanks!
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-07-03T09:00:48Z
+
+Hi,
+
+As mentioned [in the PR](https://github.com/yceruto/formflow-demo/pull/1) I created to show the issue, I eventually managed to get it working. So to me, this is definitely a very good addition, allowing lots of use cases to be covered.
+Also I confirm it works fine with Doctrine entities.
+
+Thank you very much for your work on this! I really appreciate the time and effort you put into it. Approved!
+
+This could be marked as experimental for 7.4 and officially adopted in 8.0.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-07-03T09:09:47Z
+
+> This could be marked as experimental for 7.4 and officially adopted in 8.0.
+
+Unfortunately we cannot introduce experimental features in LTS versions. See https://symfony.com/doc/current/contributing/code/experimental.html
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-07-03T10:35:20Z
+
+Indeed. So let's play with it and we'll see starting from 8.1.
+
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-07-03T10:56:28Z
+
+Would it be possible to already provide it via an experimental "addon" bundle (e.g. symfony/experimental-form-flow) before it's released with the official Symfony Forms component? That way it could already be battle-tested with a current stable release (7.3+ or even earlier).
+
+Waiting until 8.1 (released in May 2026) for a first experimental release seems like a pretty long time to me.
+
+---------------------------------------------------------------------------
+
+by jmsche at 2025-07-03T11:06:09Z
+
+If there's a need to mark it as experimental, it could be added as part of 8.0 as experimental, like symfony/string was for version 5.0.
+
+---------------------------------------------------------------------------
+
+by ker0x at 2025-07-03T11:13:07Z
+
+@RafaelKr there's already a bundle port of the feature that you can use: https://github.com/yceruto/formflow-bundle
+
+The demo app use it!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-07-03T13:20:15Z
+
+Absolutely! I'm currently beta testing this feature in two projects using [yceruto/formflow-bundle](https://github.com/yceruto/formflow-bundle) and everything is working good so far. However, It would be fantastic to get feedback from some of the more experienced Form contributors, many come to mind, but I'd love to hear the thoughts of @xabbuh, @weaverryan, @wouterj, @HeahDude and @stof in particular if possible 🙏
+
+Naming conventions, design, DX, etc. there is always room for improvement.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-07-08T23:20:21Z
+
+I received feedback regarding the flow button handler logic, so I simplified it by delegating execution responsibilities directly to the `ButtonFlow` class. This allowed me to remove redundant methods and improve overall code clarity.
+
+In general, you don’t need to manually call `$flow->getClickedButton()->handle()`, as it’s automatically executed during the `$flow->getStepForm()` process (if the clicked submit button is an FlowButton and hasn’t been handled yet).
+
+However, you might occasionally need to invoke the handler associated with the clicked flow button manually, such as when you want to perform additional logic after its execution but before the new step form:
+```php
+$flow->handleRequest($request);
+
+$flow->getClickedButton()->handle();
+
+// do something between the current step and the new step form creation...
+
+$flow = $flow->getStepForm();
+```
+
+The related changes are visible [here](https://github.com/yceruto/formflow-bundle/pull/3/files).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-07-24T08:52:43Z
+
+Hey there! Just one more review & vote and we can merge this into 7.4 😊 Friendly ping to @symfony/mergers.
+
+A quick reminder: there’s a [demo app](https://github.com/yceruto/formflow-demo) available if you’d like to test it out first. You can also check out the mirrored [bundle](https://github.com/yceruto/formflow-bundle) featuring the same code.
+
+Thanks! 🙌
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-07-27T00:10:55Z
+
+Thanks @smnandre for your review!
+
+Summary of the latest changes:
+ * Renamed `back` to `previous` (wherever it makes sense)
+ * Improved class naming for Flow button, type, step, builder, cursor, and navigator (now shorter and more concise)
+ * Removed the `action` option from `FlowButtonType` in favor of dedicated types: `FlowResetType`, `FlowPreviousType`, `FlowNextType`, and `FlowFinishType`, each with specific options tailored to their respective actions
+
+The description of the PR was also updated to reflect the current state of the code.
+
+It's ready for code review again!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-07-29T09:51:55Z
+
+To improve DX, I added a new method to `AbstractFlowType` that exposes the `FormFlowBuilderInterface` signature directly. This would eliminate the need to rely on phpdoc/assert for guidance/discovery/IDE autocomplete, which is currently unintuitive.
+
+This makes sense to me, by extending `AbstractFlowType` the developer clearly signals the intent to build a form flow. In practice, it could be like this:
+```php
+class SignUpFlowType extends AbstractFlowType
+{
+    public function buildFormFlow(FormFlowBuilderInterface $builder, array $options): void
+    {
+        // $builder->addStep(...);
+
+        // $builder->add(...);
+    }
+}
+```
+here `buildFormFlow()` is the new method I'm talking about, while `buildForm()` can be final in `AbstractFlowType`, so only the new method can be used.
+
+---------------------------------------------------------------------------
+
+by virtualize at 2025-07-29T13:40:33Z
+
+I really like the implementation and your impressive demos so far. We would like to try the FormFlow in a new feature on our production system (Symfony 7.2).
+Are you planning to update the back ported bundle https://github.com/yceruto/formflow-bundle with your lastest changes any time soon?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-07-29T13:51:17Z
+
+@virtualize I've actually planned to work on that topic today 🙂
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-07-29T17:08:21Z
+
+Updated bundle and demo with latest changes.
+
+---------------------------------------------------------------------------
+
+by virtualize at 2025-08-08T17:19:34Z
+
+I noticed that already submitted form data gets reset if you navigate two steps back (e.g. to simply review your form entries) and then navigate forward again. This behaviour is reproducible with the Basic and SignIn demos.
+
+Steps to reproduce with SignIn Demo:
+- Choose account type (e.g. individual)
+- Continue Button
+- Enter Name & About
+- Continue Button
+- Back Button (to Name & About step)
+- Back Button (to Account type step)
+- Continue Button
+- now the everything in the Name & About step has been cleared
+
+Is this intentional or could this be a bug?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-08-09T11:32:01Z
+
+@virtualize Yes, by default, the back/previous step action clears the submitted data from the current step form. It's like this because, from my experience, most multistep forms I've built have the current step hardly depending on the previous step's data.
+
+See `PreviousFlowType` definition:
+```php
+class PreviousFlowType extends AbstractType implements ButtonFlowTypeInterface
+{
+    // ...
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            // ...
+
+            'clear_submission' => true, // <-- data sent will never be mapped into the current step form
+        ]);
+    }
+
+    // ...
+}
+```
+As you may guess, by setting it to `false` you'll disable that behaviour.
+
+However, in the demo (I guess you're referring to the SignUp demo), we are assuming that going back to the previous step will mean discarding any changes made in the current step and restoring the previous step's original state. To review, you can simply click on the step number and move forward again with all the data preserved.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-08-09T11:46:30Z
+
+I received feedback that creating custom flow buttons will be a common need, so I added a new `AbstractButtonFlowType` to make their creation easier. Thus, never forgetting to implement `ButtonFlowTypeInterface` and `getParent()` method targeting `ButtonFlowType`.
+
+```php
+abstract class AbstractButtonFlowType extends AbstractType implements ButtonFlowTypeInterface
+{
+    public function getParent(): string
+    {
+        return ButtonFlowType::class;
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2025-08-09T12:46:17Z
+
+Yonel, thank you so much for this contribution. Words can't do it justice: it's simply brilliant and wonderful ❤️
+
+I love everything you're proposing, but I have some concerns about using the word "flow." The most common names for this type of forms are "multi-step form" or "stepped form" _(historically, they were also called "form wizard")_. The word "flow" in this context seems a bit vague to me.
+
+Since you're already using the term "step" throughout much of this new functionality, why not use it everywhere? Here's how the naming would look if we used "multi-step form":
+
+| Current Name           | Proposed Alternative
+| --------------------- | --------------------------
+| `AbstractFlowType`    | `AbstractMultiStepType`
+| `FlowResetType`       | `ResetFormType`
+| `FlowNextType`        | `NextStepType`
+| `FlowPreviousType`    | `PreviousStepType`
+| `FlowFinishType`      | `FinishFormType`
+| `FlowNavigatorType`   | `MultiStepNavigatorType`
+| `FlowButtonInterface` | `MultiStepButtonInterface`
+| `FormFlowInterface`   | `MultiStepFormInterface`
+| `FlowCursor`          | `MultiStepCursor`
+
+---------------------------------------------------------------------------
+
+by virtualize at 2025-08-09T13:32:35Z
+
+@yceruto thank you for clarifying the FlowButton behaviour. Looking at the FlowPreviousType source this now seems obvious :)
+
+Regarding the naming I would much rather prefer the current Flow-based naming. MultiStep sounds a bit cumbersome to me. If we take the Workflow component as an analogy, which also builds flows that are composed of steps, then FormFlow fits perfectly for this component IMHO.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-08-10T08:43:47Z
+
+Thank you Javier for your thoughtful input and kind words!
+
+Naming is always a tricky subject: I chose "Flow" because it comes from the popular CraueFormFlowBundle, so it feels familiar to anyone who has used that bundle. Also because the class names stay short, elegant, and readable. However, I've to admit that newcomers might find this terminology a bit confusing and not so obvious at the beginning.
+
+I agree that using the term "Multistep" is clearer for people who have never seen this code, but it's also longer and doesn't always add real clarity.
+
+I still prefer the more concise/vague "Flow" name (which also works as a prefix to quickly locate these classes) and I believe that once people understand what "FormFlow" means, the code becomes simpler and more readable.
+
+So let's gather more opinions before making a decision.
+
+---------------------------------------------------------------------------
+
+by RafaelKr at 2025-08-10T11:44:42Z
+
+I also like the short but precise terminology "Flow" and as long as we can find it inside the documentation with those "synonyms" (Multi Step Form, Form Wizard, etc.) I think we're good :)
+
+And if those synonyms are also mentioned inside a PHPDoc comment and/or the test cases it's also searchable inside the code-base.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2025-08-11T06:44:14Z
+
+after my first [PR review](https://github.com/symfony/symfony/pull/60212#discussion_r2041500648), I also didnt get the naming
+but now I am used to it so indeed it can be good like so
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-10-15T14:05:33Z
+
+I like `Flow` instead of `MultiStep`. Even if it's less common, it's a cool name that does convey the feature's purpose. The fact it's a subset of the Form component and not a component on its own makes it even more OK. Also the `Step` term appears everywhere in the public API which removes the potential obscurity.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-17T08:31:57Z
+
+Thanks for the review!

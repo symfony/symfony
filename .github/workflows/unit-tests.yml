@@ -21,7 +21,7 @@ jobs:
     name: Unit Tests
 
     env:
-      extensions: amqp,apcu,brotli,igbinary,intl,mbstring,memcached,redis-6.1.0,relay,zstd
+      extensions: amqp,apcu,brotli,igbinary,intl,mbstring,memcached,redis,relay,zstd
 
     strategy:
       matrix:
@@ -35,7 +35,7 @@ jobs:
           - php: '8.4'
           - php: '8.5'
             # to be removed when ext-zstd is ready for PHP 8.5
-            extensions: amqp,apcu,brotli,igbinary,intl,mbstring,memcached,redis-6.1.0,relay
+            extensions: amqp,apcu,brotli,igbinary,intl,mbstring,memcached,redis,relay
             #mode: experimental
       fail-fast: false
 

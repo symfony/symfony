@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-10-02T13:00:30Z
+
+I changed the implementation. It's not a compiler pass anymore, it's a dedicated class!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-10-22T09:51:48Z
+
+Failure on windows are not related. Can I merge this one, so It'll unlock another PR? Thanks

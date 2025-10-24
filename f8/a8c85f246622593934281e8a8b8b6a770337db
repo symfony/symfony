@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-09-29T10:39:42Z
+
+Could this be implemented with a BC layer ?
+
+The fact that the component is experimental in 7.3 allows us to do BC breaks in minor versions if needed, but I think this is a case where the BC layer is easy enough to implement. An immediate BC break is more costly for the ecosystem than a deprecation, so we should still prefer doing a deprecation.

@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-10-11T14:51:16Z
+
+> Can't this be dealt with outside of the class? Inside the injected dumper? I'm asking because this makes the constructor a bit weird. Some explanations could be helpful.
+
+@nicolas-grekas I've considered several approaches. The main obstacle I came across was having access to the `Input` object to check for the `--profile` option, while also avoiding unnecessary instantiation of the `DumpDataCollector` when profiling isn't enabled.
+
+I also thought about creating a new implementation of `DataDumperInterface`, injecting both the CLI and collector dumpers into it, and turning it into a console event listener so it could access the `Input` object. Maybe that would be a better approach?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-11T15:48:29Z
+
+I wonder if not-instantiating the dump-collector is really a concern? Would it make things simpler if not?
+
+Otherwise, let's add some explanation about the argument in an `@param` then?
+Also some notes in the changelog/upgrade files.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-10-11T16:47:08Z
+
+> I wonder if not-instantiating the dump-collector is really a concern? Would it make things simpler if not?
+
+@nicolas-grekas It might not be a real concern, but it doesn't simplify things either. I could always inject the `DumpDataCollector`, but I'd still need access to the `Input` object, which would require making it a listener. Also, I'd need to add a new constructor argument to inject the CLI dumper, since the current dumper might be a `Connection`.
+
+> Otherwise, let's add some explanation about the argument in an `@param` then? Also some notes in the changelog/upgrade files.
+
+Regarding the changelog/upgrade part, should I retarget 7.4 and mark it as a feature?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-11T16:58:18Z
+
+Yes, let's target 7.4.
+Thanks for the chat 🙂
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-10-11T17:44:10Z
+
+> Yes, let's target 7.4. Thanks for the chat 🙂
+
+@nicolas-grekas Done. Thanks for the feedback.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-10-12T10:52:08Z
+
+I thought the logic was that if the dump had somewhere to be displayed on it wouldn’t appear in the profiler: that matched Twig’s `dump` function’s behavior. Should this one be updated too?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-10-12T22:35:03Z
+
+@MatTheCat With this PR, the `dump()` function works in the CLI the same way it does in the web context. When the profiler is not enabled, it outputs directly, otherwise, it sends the data to the profiler.
+
+The Twig `dump()` function, on the other hand, renders the dump as part of the template in both contexts.

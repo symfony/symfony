@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-09-22T14:52:16Z
+
+The integration in FrameworkBundle should probably be updated to use it, so that it benefits of all the http_client configuration in FrameworkBundle.
+
+---------------------------------------------------------------------------
+
+by WaylandAce at 2025-09-23T06:27:49Z
+
+@stof It could lead to BC problems, therefore I decided to keep it as is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-23T07:16:30Z
+
+Which kind of problem?
+To me not having the `http_client` service injected means we won't see requests in the profiler.
+This PR is the opportunity to fix this inconsistency \o/

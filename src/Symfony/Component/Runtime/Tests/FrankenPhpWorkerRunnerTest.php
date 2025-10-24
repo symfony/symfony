@@ -64,7 +64,7 @@ class FrankenPhpWorkerRunnerTest extends TestCase
         $middlewareMock = $this->createMock(MiddlewareInterface::class);
         $middlewareMock
             ->expects($this->once())
-            ->method('wrap')->willReturnCallback(fn ($handler) => $handler());
+            ->method('handle')->willReturnCallback(fn ($handler) => $handler());
 
         $runner = new FrankenPhpWorkerRunner($application, 500, array_filter([$middlewareMock ?? null]));
 

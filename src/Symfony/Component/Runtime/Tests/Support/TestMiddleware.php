@@ -17,7 +17,7 @@ use Symfony\Component\Runtime\Runner\Middleware\MiddlewareInterface;
 
 class TestMiddleware implements MiddlewareInterface
 {
-    public function wrap(callable $handler, array $server): void
+    public function handle(callable $handler, array $server): void
     {
         $handler();
     }

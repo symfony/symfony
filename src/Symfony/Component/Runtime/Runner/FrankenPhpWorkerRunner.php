@@ -61,7 +61,7 @@ class FrankenPhpWorkerRunner implements RunnerInterface
             if (!$middleware instanceof MiddlewareInterface) {
                 throw new \LogicException(\sprintf('The middleware "%s" must implement the "%s" interface.', \is_object($middleware) ? $middleware::class : \gettype($middleware), MiddlewareInterface::class));
             }
-            $handler = fn () => $middleware->wrap($handler, $server);
+            $handler = fn () => $middleware->handle($handler, $server);
         }
 
         $loops = 0;

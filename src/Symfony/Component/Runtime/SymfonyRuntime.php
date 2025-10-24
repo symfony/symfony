@@ -163,7 +163,7 @@ class SymfonyRuntime extends GenericRuntime
         }
 
         $workerMiddlewares = array_filter(
-            is_array($workerMiddlewares) ? $workerMiddlewares : explode("\n", $workerMiddlewares)
+            \is_array($workerMiddlewares) ? $workerMiddlewares : explode("\n", $workerMiddlewares)
         );
 
         foreach ($workerMiddlewares as $workerMiddleware) {
@@ -182,6 +182,7 @@ class SymfonyRuntime extends GenericRuntime
         if ($application instanceof HttpKernelInterface) {
             if ($_SERVER['FRANKENPHP_WORKER'] ?? false) {
                 $middlewareFactory = new MiddlewareFactory();
+
                 return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max'], $middlewareFactory->create($this->options['worker_middlewares']));
             }
 

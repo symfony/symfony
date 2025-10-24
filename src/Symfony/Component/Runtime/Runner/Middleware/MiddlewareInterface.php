@@ -17,8 +17,8 @@ namespace Symfony\Component\Runtime\Runner\Middleware;
 interface MiddlewareInterface
 {
     /**
-     * @param callable $handler The request handler, which should be called to process the request
-     * @param array<string, mixed> $server environment variables coming from DotEnv
+     * @param callable             $handler The request handler, which should be called to process the request
+     * @param array<string, mixed> $server  environment variables coming from DotEnv
      */
     public function handle(callable $handler, array $server): void;
 }

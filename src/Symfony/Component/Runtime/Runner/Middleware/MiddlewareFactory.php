@@ -13,12 +13,14 @@ namespace Symfony\Component\Runtime\Runner\Middleware;
 
 /**
  * @author Sascha Heilmeier <sascha.heilmeier@netlogix.de>
+ *
  * @internal
  */
 final class MiddlewareFactory
 {
     /**
      * @param class-string<MiddlewareInterface>[] $middleware
+     *
      * @return \Generator<MiddlewareInterface>
      */
     public function create(array $middleware): \Generator

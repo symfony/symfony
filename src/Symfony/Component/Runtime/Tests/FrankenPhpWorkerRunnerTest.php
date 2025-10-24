@@ -13,7 +13,6 @@ namespace Symfony\Component\Runtime\Tests;
 
 require_once __DIR__.'/frankenphp-function-mock.php';
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +27,8 @@ interface TestAppInterface extends HttpKernelInterface, TerminableInterface
 
 class FrankenPhpWorkerRunnerTest extends TestCase
 {
-    public function testRun() {
+    public function testRun()
+    {
         $application = $this->createMock(TestAppInterface::class);
         $application
             ->expects($this->once())
@@ -47,7 +47,8 @@ class FrankenPhpWorkerRunnerTest extends TestCase
         $this->assertSame(0, $runner->run());
     }
 
-    public function testRunWithMiddleware() {
+    public function testRunWithMiddleware()
+    {
         $application = $this->createMock(TestAppInterface::class);
         $application
             ->expects($this->once())
@@ -82,7 +83,7 @@ class FrankenPhpWorkerRunnerTest extends TestCase
             )
         );
         $application = $this->createMock(TestAppInterface::class);
-        $runner = new FrankenPhpWorkerRunner($application, 500, [new \stdClass]);
+        $runner = new FrankenPhpWorkerRunner($application, 500, [new \stdClass()]);
         $runner->run();
     }
 }

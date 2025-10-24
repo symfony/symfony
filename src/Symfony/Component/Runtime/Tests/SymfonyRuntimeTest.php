@@ -95,7 +95,6 @@ class SymfonyRuntimeTest extends TestCase
             'expectedWorkerMiddlewares' => [TestMiddleware::class],
         ];
 
-
         yield 'valid middleware - array' => [
             'value' => [TestMiddleware::class],
             'expectedWorkerMiddlewares' => [TestMiddleware::class],
@@ -112,8 +111,7 @@ class SymfonyRuntimeTest extends TestCase
 
         yield 'invalid middleware not a class' => [
             'value' => 'unknown',
-            'expectedMessage' =>
-                \sprintf(
+            'expectedMessage' => \sprintf(
                 'The middleware class "%s" must implement "%s"',
                 'unknown',
                 MiddlewareInterface::class
@@ -122,12 +120,12 @@ class SymfonyRuntimeTest extends TestCase
 
         yield 'invalid worker_middlewares option type - bool' => [
             'value' => false,
-            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an array or string, "%s" given.', 'bool')
+            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an array or string, "%s" given.', 'bool'),
         ];
 
         yield 'invalid worker_middlewares option type - int' => [
             'value' => 42,
-            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an array or string, "%s" given.', 'int')
+            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an array or string, "%s" given.', 'int'),
         ];
     }
 
@@ -162,7 +160,7 @@ class SymfonyRuntimeTest extends TestCase
             $this->expectExceptionMessage($expectedMessage);
         }
 
-        $_ENV['FRANKENPHP_MIDDLEWARES'] = (is_array($value) ? implode("\n", $value) : $value);
+        $_ENV['FRANKENPHP_MIDDLEWARES'] = (\is_array($value) ? implode("\n", $value) : $value);
 
         $runtime = new SymfonyRuntime(['error_handler' => false]);
 

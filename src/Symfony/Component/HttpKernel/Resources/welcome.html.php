@@ -247,7 +247,7 @@ SVG;
                 <ul>
                     <li>
                         <?php echo $renderBoxIconSvg; ?>
-                        <span>You are using Symfony <strong><?php echo $version; ?></strong> version</span>
+                        <span>You are using <a href="https://symfony.com/releases/<?php echo $docVersion; ?>" target="_blank"><strong>Symfony <?php echo $docVersion; ?></strong></a><?php echo substr($version, strlen($docVersion)); ?> version</span>
                     </li>
 
                     <li>

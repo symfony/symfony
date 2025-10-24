@@ -40,6 +40,16 @@ class ValidationExceptionTest extends HttpExceptionTest
         $this->assertSame($violations, $exception->getViolations());
     }
 
+    public function testGetMessage()
+    {
+        $value = 'test';
+        $violations = new ConstraintViolationList();
+        $exception = new ValidationException($value, $violations);
+        $message = implode("\n", array_map(static fn ($e) => $e->getMessage(), iterator_to_array($violations)));
+
+        $this->assertSame($message, $exception->getMessage());
+    }
+
     public function testDefaultPreviousIsValidationFailedException()
     {
         $value = 'test';
@@ -51,4 +61,3 @@ class ValidationExceptionTest extends HttpExceptionTest
         $this->assertSame($violations, $exception->getPrevious()->getViolations());
     }
 }
-

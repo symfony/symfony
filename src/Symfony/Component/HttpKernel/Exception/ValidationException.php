@@ -14,6 +14,9 @@ namespace Symfony\Component\HttpKernel\Exception;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
+/**
+ * @author Mohamed Senoussi <lesfootix@gmail.com>
+ */
 final class ValidationException extends HttpException
 {
     public function __construct(
@@ -26,7 +29,6 @@ final class ValidationException extends HttpException
     ) {
         $message = implode("\n", array_map(static fn ($e) => $e->getMessage(), iterator_to_array($violations)));
         parent::__construct($statusCode, $message, $previous ?? new ValidationFailedException($value, $violations, $previous), $headers, $code);
-
     }
 
     public function getValue(): mixed

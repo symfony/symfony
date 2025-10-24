@@ -90,8 +90,14 @@ class SymfonyRuntimeTest extends TestCase
             'expectedWorkerMiddlewares' => [],
         ];
 
-        yield 'valid middleware' => [
+        yield 'valid middleware - string' => [
             'value' => TestMiddleware::class,
+            'expectedWorkerMiddlewares' => [TestMiddleware::class],
+        ];
+
+
+        yield 'valid middleware - array' => [
+            'value' => [TestMiddleware::class],
             'expectedWorkerMiddlewares' => [TestMiddleware::class],
         ];
 
@@ -116,12 +122,12 @@ class SymfonyRuntimeTest extends TestCase
 
         yield 'invalid worker_middlewares option type - bool' => [
             'value' => false,
-            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an string, "%s" given.', 'bool')
+            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an array or string, "%s" given.', 'bool')
         ];
 
         yield 'invalid worker_middlewares option type - int' => [
             'value' => 42,
-            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an string, "%s" given.', 'int')
+            'expectedMessage' => \sprintf('The "worker_middlewares" runtime option must be an array or string, "%s" given.', 'int')
         ];
     }
 
@@ -137,6 +143,28 @@ class SymfonyRuntimeTest extends TestCase
         }
 
         $runtime = new SymfonyRuntime(['worker_middlewares' => $value, 'error_handler' => false]);
+
+        if (null !== $expectedWorkerMiddlewares) {
+            $optionsReflection = new \ReflectionProperty($runtime, 'options');
+            $workerMiddlewares = $optionsReflection->getValue($runtime)['worker_middlewares'] ?? [];
+            $this->assertEquals($expectedWorkerMiddlewares, $workerMiddlewares);
+        }
+    }
+
+    #[DataProvider('workerMiddlewaresOptionData')]
+    public function testWorkerMiddlewaresEnv(
+        mixed $value,
+        ?array $expectedWorkerMiddlewares = null,
+        ?string $expectedMessage = null,
+    ) {
+        if (null !== $expectedMessage) {
+            $this->expectException(\LogicException::class);
+            $this->expectExceptionMessage($expectedMessage);
+        }
+
+        $_ENV['FRANKENPHP_MIDDLEWARES'] = (is_array($value) ? implode("\n", $value) : $value);
+
+        $runtime = new SymfonyRuntime(['error_handler' => false]);
 
         if (null !== $expectedWorkerMiddlewares) {
             $optionsReflection = new \ReflectionProperty($runtime, 'options');

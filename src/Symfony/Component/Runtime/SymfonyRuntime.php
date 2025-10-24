@@ -93,7 +93,7 @@ class SymfonyRuntime extends GenericRuntime
      *   dotenv_overload?: ?bool,
      *   dotenv_extra_paths?: ?string[],
      *   worker_loop_max?: int, // Use 0 or a negative integer to never restart the worker. Default: 500
-     *   worker_middlewares?: string
+     *   worker_middlewares?: string|string[],
      * } $options
      */
     public function __construct(array $options = [])
@@ -158,11 +158,13 @@ class SymfonyRuntime extends GenericRuntime
 
         $workerMiddlewares = ($options['worker_middlewares'] ?? $_SERVER['FRANKENPHP_MIDDLEWARES'] ?? $_ENV['FRANKENPHP_MIDDLEWARES'] ?? '');
 
-        if (!\is_string($workerMiddlewares)) {
-            throw new \LogicException(\sprintf('The "worker_middlewares" runtime option must be an string, "%s" given.', get_debug_type($workerMiddlewares)));
+        if (!\is_string($workerMiddlewares) && !\is_array($workerMiddlewares)) {
+            throw new \LogicException(\sprintf('The "worker_middlewares" runtime option must be an array or string, "%s" given.', get_debug_type($workerMiddlewares)));
         }
 
-        $workerMiddlewares = array_filter(explode("\n", $workerMiddlewares));
+        $workerMiddlewares = array_filter(
+            is_array($workerMiddlewares) ? $workerMiddlewares : explode("\n", $workerMiddlewares)
+        );
 
         foreach ($workerMiddlewares as $workerMiddleware) {
             if (!is_a($workerMiddleware, MiddlewareInterface::class, true)) {
@@ -180,7 +182,7 @@ class SymfonyRuntime extends GenericRuntime
         if ($application instanceof HttpKernelInterface) {
             if ($_SERVER['FRANKENPHP_WORKER'] ?? false) {
                 $middlewareFactory = new MiddlewareFactory();
-                return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max'], $middlewareFactory->create(...$this->options['worker_middlewares']));
+                return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max'], $middlewareFactory->create($this->options['worker_middlewares']));
             }
 
             return new HttpKernelRunner($application, Request::createFromGlobals(), $this->options['debug'] ?? false);

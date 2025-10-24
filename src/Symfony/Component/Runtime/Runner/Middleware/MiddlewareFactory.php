@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -15,14 +13,15 @@ namespace Symfony\Component\Runtime\Runner\Middleware;
 
 /**
  * @author Sascha Heilmeier <sascha.heilmeier@netlogix.de>
+ * @internal
  */
-readonly class MiddlewareFactory
+final class MiddlewareFactory
 {
     /**
-     * @param class-string<MiddlewareInterface> ...$middleware
+     * @param class-string<MiddlewareInterface>[] $middleware
      * @return \Generator<MiddlewareInterface>
      */
-    public function create(string ...$middleware): \Generator
+    public function create(array $middleware): \Generator
     {
         foreach ($middleware as $middlewareClass) {
             yield new $middlewareClass();

@@ -28,20 +28,7 @@ interface TestAppInterface extends HttpKernelInterface, TerminableInterface
 
 class FrankenPhpWorkerRunnerTest extends TestCase
 {
-    public static function runData(): iterable
-    {
-        yield 'default' => [];
-
-        yield 'middleware' => [
-            'withMiddleware' => true,
-        ];
-    }
-
-    /**
-     * @param class-string<MiddlewareInterface>|null $middleware
-     */
-    #[DataProvider('runData')]
-    public function testRun(bool $withMiddleware = false) {
+    public function testRun() {
         $application = $this->createMock(TestAppInterface::class);
         $application
             ->expects($this->once())
@@ -55,12 +42,29 @@ class FrankenPhpWorkerRunnerTest extends TestCase
 
         $_SERVER['FOO'] = 'bar';
 
-        if ($withMiddleware) {
-            $middlewareMock = $this->createMock(MiddlewareInterface::class);
-            $middlewareMock
-                ->expects($this->once())
-                ->method('wrap')->willReturnCallback(fn ($handler) => $handler());
-        }
+        $runner = new FrankenPhpWorkerRunner($application, 500);
+
+        $this->assertSame(0, $runner->run());
+    }
+
+    public function testRunWithMiddleware() {
+        $application = $this->createMock(TestAppInterface::class);
+        $application
+            ->expects($this->once())
+            ->method('handle')
+            ->willReturnCallback(function (Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response {
+                $this->assertSame('bar', $request->server->get('FOO'));
+
+                return new Response();
+            });
+        $application->expects($this->once())->method('terminate');
+
+        $_SERVER['FOO'] = 'bar';
+
+        $middlewareMock = $this->createMock(MiddlewareInterface::class);
+        $middlewareMock
+            ->expects($this->once())
+            ->method('wrap')->willReturnCallback(fn ($handler) => $handler());
 
         $runner = new FrankenPhpWorkerRunner($application, 500, array_filter([$middlewareMock ?? null]));
 

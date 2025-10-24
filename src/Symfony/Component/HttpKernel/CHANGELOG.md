@@ -10,7 +10,7 @@ CHANGELOG
  * Add `#[IsSignatureValid]` attribute to validate URI signatures
  * Make `Profile` final and `Profiler::__sleep()` internal
  * Collect the application runner class
- * Add `ValidationException` to improve request payload validation
+ * Add `ValidationException` to improve request payload validation by throwing a dedicated exception when validation fails
 
 7.3
 ---

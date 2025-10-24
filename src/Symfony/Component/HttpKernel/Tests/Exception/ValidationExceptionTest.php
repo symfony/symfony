@@ -20,7 +20,7 @@ class ValidationExceptionTest extends HttpExceptionTest
 {
     protected function createException(string $message = '', ?\Throwable $previous = null, int $code = 0, array $headers = []): HttpException
     {
-        return new ValidationException('invalid value', new ConstraintViolationList(), 422, $message, $previous, $headers, $code);
+        return new ValidationException('invalid value', new ConstraintViolationList(), 422, $headers, $previous, $code);
     }
 
     public function testGetValue()
@@ -51,3 +51,4 @@ class ValidationExceptionTest extends HttpExceptionTest
         $this->assertSame($violations, $exception->getPrevious()->getViolations());
     }
 }
+

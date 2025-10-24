@@ -14,19 +14,19 @@ namespace Symfony\Component\HttpKernel\Exception;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
-class ValidationException extends HttpException
+final class ValidationException extends HttpException
 {
     public function __construct(
         private mixed $value,
         private ConstraintViolationListInterface $violations,
         int $statusCode = 422,
-        string $message = 'Validation failed',
-        ?\Throwable $previous = null,
         array $headers = [],
+        ?\Throwable $previous = null,
         int $code = 0,
     ) {
-        $validationFailedException = new ValidationFailedException($value, $violations);
-        parent::__construct($statusCode, $message, $previous ?? $validationFailedException, $headers, $code);
+        $message = implode("\n", array_map(static fn ($e) => $e->getMessage(), iterator_to_array($violations)));
+        parent::__construct($statusCode, $message, $previous ?? new ValidationFailedException($value, $violations, $previous), $headers, $code);
+
     }
 
     public function getValue(): mixed

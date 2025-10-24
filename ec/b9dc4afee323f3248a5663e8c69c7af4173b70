@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-03-25T01:31:24Z
+
+Now after updating some related tests, I'm concerned that this might break some functional tests out there (after upgrading to 7.3) for example: testing HTML error pages using `WebTestCase` won't work anymore if these tests are checking for more than just the error message.
+
+Should we consider this a BC break?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-04-08T15:03:02Z
+
+Hi,
+
+Thanks, it looks good to me at first glance.
+I'll test it on my side to see how it behaves.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-04-08T15:04:53Z
+
+> testing HTML error pages using `WebTestCase` won't work anymore if these tests are checking for more than just the error message.
+
+Is there a way to opt-in for this feature (e.g. a dedicated env var)?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-04-08T15:38:45Z
+
+>> testing HTML error pages using WebTestCase won't work anymore if these tests are checking for more than just the error message.
+>
+>Is there a way to opt-in for this feature (e.g. a dedicated env var)?
+
+This small change restores the previous behavior. We could document this adjustment for situations where you specifically want to test the actual HTML error page:
+```diff
+-    ->alias('error_renderer.default', 'error_handler.error_renderer.default')
++    ->alias('error_renderer.default', 'error_renderer.html')
+```
+Most functional/end-to-end tests have a dedicated config file. That could be better than using an env var, since you can enable or disable this behavior case by case.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-04-08T15:51:40Z
+
+Or we could add a new framework option to opt-in for this behavior, include a deprecation notice to make it the default in 8.0, and update the recipe file to set it as the default for new projects. What do you think?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2025-04-08T15:59:28Z
+
+Sounds good 👍
+
+---------------------------------------------------------------------------
+
+by craigh at 2025-10-15T15:05:36Z
+
+support 👍
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-17T09:46:08Z
+
+Still pending on my side to add the deprecation notice to make the new option defaults to `true` in 8.0. + a new recipe to set it to `true` for 7.4 (new projects)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-10-18T16:07:43Z
+
+Looks like security-bundle needs a conflict for fwb <7.4, or version-specific configs
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-10-23T06:55:01Z
+
+Test failure on [php_errors_log_levels.yml](https://github.com/symfony/symfony/pull/60033/files#diff-0ae3f79c30ac87737eb5cfc56ed3d450cadae4516fd5fe114b61df0a6a7495c6) is a false-positive.
+
+```
+  # Check YAML files for syntax errors
+  rm -rf b && cp -a a b && cd b
+  find . -name '*.yml' -o -name '*.yaml' \
+    | while read -r FILE; do php -r '
+      use Symfony\Component\Yaml\{Parser,Yaml};
+      require $_SERVER["HOME"]."/.composer/vendor/autoload.php";
+      try { (new Parser())->parse(file_get_contents($argv[1]), Yaml::PARSE_CUSTOM_TAGS); }
+      catch (Exception $e) { echo "::error::in $argv[1]:\n{$e->getMessage()}\n"; exit(1); }
+    ' "$FILE"
+    done
+  cd ..
+  shell: /usr/bin/bash -e {0}
+  env:
+    GH_TOKEN: ***
+Error: in ./src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/Fixtures/yml/php_errors_log_levels.yml:
+Non-string keys are not supported. Quote your evaluable mapping keys instead at line 8 (near "!php/const \E_NOTICE: !php/const Psr\Log\LogLevel::ERROR").
+```
+
+@symfony/mergers This PR is ready for 7.4
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-10-24T14:26:48Z
+
+Now with the last suggestion I think the option can be removed as ppl will have the APP_RUNTIME_MODE to switch when they need it.
+
+I will do the changes so we can merge this in 7.4, is it ok for you @nicolas-grekas ?

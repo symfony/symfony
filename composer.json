@@ -170,7 +170,7 @@
     },
     "conflict": {
         "ext-psr": "<1.1|>=2",
-        "ext-redis": "<6.2",
+        "ext-redis": "<6.1",
         "ext-relay": "<0.12.1",
         "amphp/amp": "<2.5",
         "async-aws/core": "<1.5",

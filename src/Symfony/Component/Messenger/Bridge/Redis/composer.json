@@ -26,7 +26,7 @@
         "symfony/var-dumper": "^6.4|^7.0|^8.0"
     },
     "conflict": {
-        "ext-redis": "<6.2",
+        "ext-redis": "<6.1",
         "ext-relay": "<0.12"
     },
     "autoload": {

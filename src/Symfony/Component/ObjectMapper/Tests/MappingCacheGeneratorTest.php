@@ -132,4 +132,17 @@ final class MappingCacheGeneratorTest extends TestCase
         $expectedFixturePath = __DIR__.'/Fixtures/generated/promoted_constructor_mapping.php';
         $this->assertStringEqualsFile($expectedFixturePath, $generatedCode);
     }
+
+    public function testStdClassToDConstructorMappingCacheGeneration()
+    {
+        $metadataFactory = new ReflectionObjectMapperMetadataFactory();
+        $generator = new MappingCacheGenerator($metadataFactory);
+
+        $sourceClass = \stdClass::class;
+        $targetClass = Fixtures\InitializedConstructor\D::class;
+
+        $generatedCode = $generator->generate($sourceClass, $targetClass);
+        $expectedFixturePath = __DIR__.'/Fixtures/generated/stdclass_to_d_constructor_mapping.php';
+        $this->assertStringEqualsFile($expectedFixturePath, $generatedCode);
+    }
 }

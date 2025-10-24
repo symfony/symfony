@@ -97,28 +97,50 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         $this->objectMap[$source] = $mappedTarget;
+
         $ctorArguments = [];
+        $ctorValues = [];
         $targetConstructor = $targetRefl->getConstructor();
+        $sourceRefl = $this->getSourceReflectionClass($source);
+
         foreach ($targetConstructor?->getParameters() ?? [] as $parameter) {
             $parameterName = $parameter->getName();
+            $hasDefault = $parameter->isDefaultValueAvailable();
+            $defaultValue = $hasDefault ? $parameter->getDefaultValue() : null;
+            $sourceIsMappable = $this->isReadable($source, $parameterName);
 
-            if ($targetRefl->hasProperty($parameterName)) {
-                $property = $targetRefl->getProperty($parameterName);
-
-                if ($property->isReadOnly() && $property->isInitialized($mappedTarget)) {
+            if (
+                $targetRefl->hasProperty($parameterName) &&
+                ($property = $targetRefl->getProperty($parameterName)) &&
+                $property->isReadOnly() &&
+                $property->isInitialized($mappedTarget)
+            ) {
+                    $ctorArguments[$parameterName] = [
+                        'name' => $parameterName,
+                        'hasDefault' => $hasDefault,
+                        'defaultValue' => $defaultValue,
+                        'propertyIsMappable' => $this->propertyIsMappable($targetRefl, $parameterName),
+                        'sourceIsMappable' => $sourceIsMappable,
+                    ];
                     continue;
-                }
             }
 
-            if ($this->isReadable($source, $parameterName)) {
-                $ctorArguments[$parameterName] = $this->getRawValue($source, $parameterName);
+            if ($sourceIsMappable) {
+                $ctorValues[$parameterName] = $this->getRawValue($source, $parameterName);
             } else {
-                $ctorArguments[$parameterName] = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
+                $ctorValues[$parameterName] = $defaultValue;
             }
+
+            $ctorArguments[$parameterName] = [
+                'name' => $parameterName,
+                'hasDefault' => $hasDefault,
+                'defaultValue' => $defaultValue,
+                'propertyIsMappable' => $this->propertyIsMappable($targetRefl, $parameterName),
+                'sourceIsMappable' => $sourceIsMappable,
+            ];
         }
 
         $readMetadataFrom = $source;
-        $sourceRefl = $this->getSourceReflectionClass($source);
         $refl = $sourceRefl ?? $targetRefl;
 
         // When source contains no metadata, we read metadata on the target instead
@@ -126,7 +148,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             $readMetadataFrom = $mappedTarget;
         }
 
-        $properties = $this->analyzeProperties($refl, $readMetadataFrom, $sourceRefl ?? $refl, $targetRefl, $source, $ctorArguments);
+        $properties = $this->analyzeProperties($refl, $readMetadataFrom, $sourceRefl, $targetRefl, $source, $ctorArguments);
         $mapToProperties = [];
 
         foreach ($properties as ['source' => $sourceProperty, 'target' => $targetProperty, 'mapping' => $mapping]) {
@@ -141,20 +163,20 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             }
 
             $value = $this->getSourceValue($source, $mappedTarget, $value, $this->objectMap, $mapping);
-            $this->storeValue($targetProperty, $mapToProperties, $ctorArguments, $value);
+            $this->storeValue($targetProperty, $mapToProperties, $ctorValues, $value);
         }
 
         if (!$mappingToObject && !$map?->transform && $targetConstructor) {
             try {
-                $mappedTarget->__construct(...$ctorArguments);
+                $mappedTarget->__construct(...$ctorValues);
             } catch (\ReflectionException $e) {
                 throw new MappingException($e->getMessage(), $e->getCode(), $e);
             }
         }
 
-        if ($mappingToObject && $ctorArguments) {
-            foreach ($ctorArguments as $property => $value) {
-                if ($this->propertyIsMappable($refl, $property) && $this->propertyIsMappable($targetRefl, $property)) {
+        if ($mappingToObject && $ctorValues) {
+            foreach ($ctorValues as $property => $value) {
+                if ($ctorArguments[$property]['propertyIsMappable'] && $ctorArguments[$property]['sourceIsMappable']) {
                     $mapToProperties[$property] = $value;
                 }
             }
@@ -244,3 +266,4 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $mapToProperties[$propertyName] = $value;
     }
 }
+

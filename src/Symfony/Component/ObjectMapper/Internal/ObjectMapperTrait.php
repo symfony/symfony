@@ -30,11 +30,11 @@ trait ObjectMapperTrait
     private ?ContainerInterface $conditionCallableLocator = null;
 
     /**
-     * @param array<non-empty-string, array{defaultValue: mixed|null, hasDefault: bool, name: non-empty-string, propertyIsMappable: bool}> $constructorParams
+     * @param array<non-empty-string, array{defaultValue: mixed|null, hasDefault: bool, name: non-empty-string, propertyIsMappable: bool, sourceIsMappable: bool}> $constructorParams
      *
      * @return list<array{isConstructorParam: bool, mapping: Mapping|null, source: non-empty-string, target: string}>
      */
-    private function analyzeProperties(\ReflectionClass $refl, object $readMetadataFrom, \ReflectionClass $sourceRefl, \ReflectionClass $targetRefl, object $source, array $constructorParams): array
+    private function analyzeProperties(\ReflectionClass $refl, object $readMetadataFrom, ?\ReflectionClass $sourceRefl, \ReflectionClass $targetRefl, object $source, array $constructorParams): array
     {
         $properties = [];
         foreach ($refl->getProperties() as $property) {
@@ -51,12 +51,12 @@ trait ObjectMapperTrait
                 }
 
                 $sourcePropertyName = $propertyName;
-                if ($mapping->source && (!$sourceRefl->hasProperty($propertyName) || !property_exists($source, $propertyName))) {
+                if ($mapping->source && (!$sourceRefl || !$sourceRefl->hasProperty($propertyName))) {
                     $sourcePropertyName = $mapping->source;
                 }
 
                 $targetPropertyName = $mapping->target ?? $propertyName;
-                if (!$targetRefl->hasProperty($targetPropertyName)) {
+                if (!$targetRefl->hasProperty($targetPropertyName) && !isset($constructorParams[$targetPropertyName])) {
                     continue;
                 }
 
@@ -68,12 +68,33 @@ trait ObjectMapperTrait
                 ];
             }
 
-            if (!$propertyMappings && $targetRefl->hasProperty($propertyName) && $sourceRefl->hasProperty($propertyName)) {
+            $sourceHasProperty = !$sourceRefl || $sourceRefl->hasProperty($propertyName);
+            if (!$propertyMappings && $targetRefl->hasProperty($propertyName) && $sourceHasProperty) {
                 $properties[] = [
                     'source' => $propertyName,
                     'target' => $propertyName,
                     'mapping' => null,
                     'isConstructorParam' => isset($constructorParams[$propertyName]),
+                ];
+            }
+        }
+
+        foreach ($constructorParams as $paramName => $paramData) {
+            $sourceIsMappable = $paramData['sourceIsMappable'];
+
+            if ($sourceIsMappable && !$targetRefl->hasProperty($paramName)) {
+                // Check if this property is already handled
+                foreach ($properties as $prop) {
+                    if ($prop['target'] === $paramName) {
+                        continue 2;
+                    }
+                }
+
+                $properties[] = [
+                    'source' => $paramName,
+                    'target' => $paramName,
+                    'mapping' => null, // No mapping attributes, it's a direct constructor param map
+                    'isConstructorParam' => true,
                 ];
             }
         }
@@ -164,3 +185,4 @@ trait ObjectMapperTrait
         return $targetRefl->hasProperty($property) && $targetRefl->getProperty($property)->isPublic();
     }
 }
+

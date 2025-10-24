@@ -474,7 +474,7 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame($v->number, $a->number);
     }
 
-    #[IgnoreDeprecations]
+    #[IgnorePhpunitDeprecations]
     #[Group('legacy')]
     #[DataProvider('objectMapperProvider')]
     public function testMapInitializesLazyObject(ObjectMapperInterface $objectMapper)

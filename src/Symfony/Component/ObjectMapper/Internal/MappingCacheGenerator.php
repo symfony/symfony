@@ -66,22 +66,7 @@ final class MappingCacheGenerator implements MappingCacheGeneratorInterface
             throw new MappingException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $constructorParams = [];
         $refl = $sourceRefl ?? $targetRefl;
-
-        if ($constructor = $targetRefl->getConstructor()) {
-            foreach ($constructor->getParameters() as $parameter) {
-                if ($parameter->isPromoted()) {
-                    $constructorParams[$parameter->getName()] = [
-                        'name' => $parameter->getName(),
-                        'hasDefault' => $parameter->isDefaultValueAvailable(),
-                        'defaultValue' => $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null,
-                        'propertyIsMappable' => $this->propertyIsMappable($refl, $parameter->getName()) && $this->propertyIsMappable($targetRefl, $parameter->getName()),
-                    ];
-                }
-            }
-        }
-
         $readMetadataFrom = $source;
         if (!$this->metadataFactory->create($source)) {
             $targetInstance = $targetRefl->newInstanceWithoutConstructor();
@@ -97,8 +82,25 @@ final class MappingCacheGenerator implements MappingCacheGeneratorInterface
         $metadata = $this->metadataFactory->create($readMetadataFrom);
         $map = $this->getMapTarget($metadata, null, $source, null);
 
+        $constructorParams = [];
+        if ($constructor = $targetRefl->getConstructor()) {
+            foreach ($constructor->getParameters() as $parameter) {
+                $paramName = $parameter->getName();
+                // If $sourceRefl is null (stdClass), assume it is mappable, runtime will fail if it needs to
+                $sourceIsMappable = !$sourceRefl || $sourceRefl->hasProperty($paramName);
+
+                $constructorParams[$paramName] = [
+                    'name' => $paramName,
+                    'hasDefault' => $parameter->isDefaultValueAvailable(),
+                    'defaultValue' => $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null,
+                    'propertyIsMappable' => $this->propertyIsMappable($targetRefl, $paramName),
+                    'sourceIsMappable' => $sourceIsMappable,
+                ];
+            }
+        }
+
         return [
-            'properties' => $this->analyzeProperties($refl, $readMetadataFrom, $sourceRefl ?? $refl, $targetRefl, $source, $constructorParams),
+            'properties' => $this->analyzeProperties($refl, $readMetadataFrom, $sourceRefl, $targetRefl, $source, $constructorParams),
             'hasConstructor' => null !== $targetRefl->getConstructor(),
             'constructorParams' => $constructorParams,
             'targetTransform' => $map?->transform,
@@ -160,6 +162,7 @@ final class MappingCacheGenerator implements MappingCacheGeneratorInterface
                 if ($hasDefault) {
                     $defaultValue = VarExporter::export($defaultValue);
                     $lines[] = "    \$ctorArguments['{$name}'] = {$defaultValue};";
+                    continue;
                 }
             }
             $lines[] = '';
@@ -217,6 +220,7 @@ final class MappingCacheGenerator implements MappingCacheGeneratorInterface
             if ($condition && true !== $condition) {
                 $lines[] = '        }';
             }
+
             $lines[] = '    }';
             $lines[] = '';
         }
@@ -227,10 +231,11 @@ final class MappingCacheGenerator implements MappingCacheGeneratorInterface
             $lines[] = '    }';
         }
 
-        if ($mappingData['constructorParams']) {
+        // Do not output the ctor `if` if we do not need to
+        if (array_filter($mappingData['constructorParams'], fn($v) => $v['propertyIsMappable'])) {
             $lines[] = '    if ($mappingToObject && $ctorArguments) {';
             foreach ($mappingData['constructorParams'] as $property => $param) {
-                if ($param['propertyIsMappable']) {
+                if ($param['propertyIsMappable'] && $param['sourceIsMappable']) {
                     $lines[] = "        if (isset(\$ctorArguments['$property'])) {";
                     $lines[] = "            \$mapToProperties['$property'] = \$ctorArguments['$property'];";
                     $lines[] = '        }';
@@ -250,3 +255,4 @@ final class MappingCacheGenerator implements MappingCacheGeneratorInterface
         return implode("\n", $lines);
     }
 }
+

@@ -12,6 +12,8 @@
 namespace Symfony\Component\JsonStreamer\Tests\Write;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
@@ -57,6 +59,8 @@ class StreamWriterGeneratorTest extends TestCase
         }
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     #[DataProvider('generatedStreamWriterDataProvider')]
     public function testGeneratedStreamWriter(string $fixture, Type $type, ?PropertyMetadataLoaderInterface $propertyMetadataLoader = null)
     {

@@ -12,6 +12,8 @@
 namespace Symfony\Component\JsonStreamer\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
@@ -276,6 +278,8 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{"$foo":true,"{$foo->bar}":true}', new DummyWithDollarNamedProperties(), Type::object(DummyWithDollarNamedProperties::class));
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testWriteObjectWithSyntheticProperty()
     {
         $writer = new JsonStreamWriter($this->createMock(ContainerInterface::class), new SyntheticPropertyMetadataLoader(), $this->streamWritersDir);

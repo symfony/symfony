@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\JsonStreamer\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
@@ -179,6 +181,8 @@ class JsonStreamReaderTest extends TestCase
         }, '{"interface":"2024-11-20","immutable":"2025-11-20"}', Type::object(DummyWithDateTimes::class));
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testReadObjectWithSyntheticProperties()
     {
         $reader = new JsonStreamReader($this->createMock(ContainerInterface::class), new SyntheticPropertyMetadataLoader(), $this->streamReadersDir, $this->lazyGhostsDir);

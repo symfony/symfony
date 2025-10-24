@@ -188,7 +188,7 @@ CHANGELOG
        }
    }
    ```
- * Fix `ValidationFailedException` constructor to properly pass string to parent
+ * Add $previous optional parameter to `ValidationFailedException` constructor to allow exception chaining
 
 7.3
 ---

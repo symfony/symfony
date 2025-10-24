@@ -21,8 +21,9 @@ class ValidationFailedException extends RuntimeException
     public function __construct(
         private mixed $value,
         private ConstraintViolationListInterface $violations,
+        ?\Throwable $previous = null,
     ) {
-        parent::__construct((string) $violations);
+        parent::__construct($violations, 0, $previous);
     }
 
     public function getValue(): mixed
@@ -34,4 +35,6 @@ class ValidationFailedException extends RuntimeException
     {
         return $this->violations;
     }
+
+
 }

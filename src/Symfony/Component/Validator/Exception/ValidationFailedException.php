@@ -35,6 +35,4 @@ class ValidationFailedException extends RuntimeException
     {
         return $this->violations;
     }
-
-
 }

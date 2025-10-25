@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2025-10-25T08:15:39Z
+
+Indeed, @GromNaN, tests are missing for that, I'm going to add them ASAP.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-10-25T11:14:05Z
+
+@mtarld I rebased your branch and reverted the commit adding tests in 7.4

@@ -35,6 +35,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Mailer\Envelope\RecipientFetcherInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
@@ -2305,6 +2306,20 @@ class Configuration implements ConfigurationInterface
                                         ->then(static fn ($v) => array_values(array_filter($v)))
                                     ->end()
                                     ->prototype('scalar')->end()
+                                ->end()
+                                ->scalarNode('recipient_fetcher')
+                                    ->info('A service that fetch the recipients.')
+                                    ->defaultNull()
+                                    ->validate()
+                                        ->ifFalse(static function ($v) {
+                                            if (!$v) {
+                                                return true;
+                                            }
+
+                                            return is_a($v, RecipientFetcherInterface::class, true);
+                                        })
+                                        ->thenInvalid('The %s class must implement the "'.RecipientFetcherInterface::class.'" interface.')
+                                    ->end()
                                 ->end()
                                 ->arrayNode('allowed_recipients', 'allowed_recipient')
                                     ->info('A list of regular expressions that allow recipients when "recipients" option is defined.')

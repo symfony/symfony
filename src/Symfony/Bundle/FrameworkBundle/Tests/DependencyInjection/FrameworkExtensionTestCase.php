@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Mailer\RecipientFetcher;
 use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Validator\DefinitionValidator;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -67,6 +68,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Mailer\Envelope\RecipientFetcherInterface;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
@@ -2385,10 +2387,25 @@ abstract class FrameworkExtensionTestCase extends TestCase
             ['redirected@example.org', 'redirected1@example.org'],
             ['foobar@example\.org', '.*@example\.com'],
         ];
+
+        if (interface_exists(RecipientFetcherInterface::class)) {
+            yield [
+                'mailer_with_recipient_fetcher',
+                ['main' => 'smtp://example.com'],
+                new Reference(RecipientFetcher::class),
+                [],
+            ];
+            yield [
+                'mailer_with_recipient_fetcher_and_recipients',
+                ['main' => 'smtp://example.com'],
+                new Reference(RecipientFetcher::class),
+                [],
+            ];
+        }
     }
 
     #[DataProvider('provideMailer')]
-    public function testMailer(string $configFile, array $expectedTransports, array $expectedRecipients, array $expectedAllowedRecipients)
+    public function testMailer(string $configFile, array $expectedTransports, Reference|array $expectedRecipients, array $expectedAllowedRecipients)
     {
         $container = $this->createContainerFromFile($configFile);
 
@@ -2399,7 +2416,11 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('mailer.envelope_listener'));
         $l = $container->getDefinition('mailer.envelope_listener');
         $this->assertSame('sender@example.org', $l->getArgument(0));
-        $this->assertSame($expectedRecipients, $l->getArgument(1));
+
+        \is_array($expectedRecipients)
+            ? $this->assertSame($expectedRecipients, $l->getArgument(1))
+            : $this->assertEquals($expectedRecipients, $l->getArgument(1));
+
         $this->assertSame($expectedAllowedRecipients, $l->getArgument(2));
         $this->assertEquals(new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('mailer.mailer')->getArgument(1));
 

@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Mailer\InvalidRecipientFetcher;
 use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Places;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
@@ -27,6 +28,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Mailer\Envelope\RecipientFetcherInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
@@ -376,6 +378,36 @@ class ConfigurationTest extends TestCase
         yield [['enabled' => false, 'resource' => ['redis://default', ['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['default' => 'redis://default', 'foo' => 'redis://default']]];
         yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['foo' => 'redis://default']]];
         yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://foo'], ['name' => 'bar', 'value' => 'redis://bar']]], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
+    }
+
+    #[DataProvider('provideInvalidMailerRecipientFetchers')]
+    public function testInvalidMailerRecipientFetcher(string $class, string $recipientFetcher)
+    {
+        if (!interface_exists(RecipientFetcherInterface::class)) {
+            $this->markTestSkipped('This test requires symfony/mailer 8.1 or superior.');
+        }
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid configuration for path "framework.mailer.envelope.recipient_fetcher": The "%s" class must implement the "Symfony\Component\Mailer\Envelope\RecipientFetcherInterface" interface.', $class));
+
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processor->processConfiguration($configuration, [
+            'framework' => [
+                'mailer' => [
+                    'envelope' => [
+                        'recipient_fetcher' => $recipientFetcher,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public static function provideInvalidMailerRecipientFetchers(): iterable
+    {
+        yield ['invalid', 'invalid'];
+        yield ['Symfony\\\Bundle\\\FrameworkBundle\\\Tests\\\DependencyInjection\\\Fixtures\\\Mailer\\\InvalidRecipientFetcher', InvalidRecipientFetcher::class];
     }
 
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()

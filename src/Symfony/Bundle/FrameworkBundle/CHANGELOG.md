@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `mailer.envelope.recipient_fetcher` option that allows fetching global recipients from a service
+
 8.0
 ---
 

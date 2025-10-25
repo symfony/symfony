@@ -114,6 +114,7 @@ use Symfony\Component\Lock\Serializer\LockKeyNormalizer;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Mailer\Bridge as MailerBridge;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
+use Symfony\Component\Mailer\Envelope\RecipientFetcherInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessage;
@@ -2874,6 +2875,8 @@ class FrameworkExtension extends Extension
             throw new LogicException('Mailer support cannot be enabled as the component is not installed. Try running "composer require symfony/mailer".');
         }
 
+        $container->registerForAutoconfiguration(RecipientFetcherInterface::class);
+
         $loader->load('mailer.php');
         $loader->load('mailer_transports.php');
         if (!\count($config['transports']) && null === $config['dsn']) {
@@ -2947,7 +2950,13 @@ class FrameworkExtension extends Extension
 
         $envelopeListener = $container->getDefinition('mailer.envelope_listener');
         $envelopeListener->setArgument(0, $config['envelope']['sender'] ?? null);
-        $envelopeListener->setArgument(1, $config['envelope']['recipients'] ?? null);
+
+        $recipients = $config['envelope']['recipients'] ?? null;
+        if (isset($config['envelope']['recipient_fetcher'])) {
+            $recipients = new Reference($config['envelope']['recipient_fetcher']);
+        }
+
+        $envelopeListener->setArgument(1, $recipients);
         $envelopeListener->setArgument(2, $config['envelope']['allowed_recipients'] ?? []);
 
         if ($config['headers']) {

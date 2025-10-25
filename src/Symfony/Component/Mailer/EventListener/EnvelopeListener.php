@@ -12,6 +12,8 @@
 namespace Symfony\Component\Mailer\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Mailer\Envelope\AssignRecipients;
+use Symfony\Component\Mailer\Envelope\RecipientFetcherInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Message;
@@ -26,10 +28,7 @@ class EnvelopeListener implements EventSubscriberInterface
 {
     private ?Address $sender = null;
 
-    /**
-     * @var Address[]|null
-     */
-    private ?array $recipients = null;
+    private RecipientFetcherInterface $recipientFetcher;
 
     /**
      * @param array<Address|string> $recipients
@@ -37,14 +36,14 @@ class EnvelopeListener implements EventSubscriberInterface
      */
     public function __construct(
         Address|string|null $sender = null,
-        ?array $recipients = null,
+        private RecipientFetcherInterface|array|null $recipients = null,
         private array $allowedRecipients = [],
     ) {
         if (null !== $sender) {
             $this->sender = Address::create($sender);
         }
         if (null !== $recipients) {
-            $this->recipients = Address::createArray($recipients);
+            $this->recipientFetcher = \is_array($recipients) ? new AssignRecipients($recipients) : $recipients;
         }
     }
 
@@ -62,7 +61,7 @@ class EnvelopeListener implements EventSubscriberInterface
         }
 
         if ($this->recipients) {
-            $recipients = $this->recipients;
+            $recipients = Address::createArray($this->recipientFetcher->fetchRecipients());
             if ($this->allowedRecipients) {
                 foreach ($event->getEnvelope()->getRecipients() as $recipient) {
                     foreach ($this->allowedRecipients as $allowedRecipient) {

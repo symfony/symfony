@@ -14,15 +14,17 @@ namespace Symfony\Component\Mailer\Tests\EventListener;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Envelope\RecipientFetcherInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\EventListener\EnvelopeListener;
+use Symfony\Component\Mailer\Tests\Fixtures\RecipientFetcher;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
 
 class EnvelopeListenerTest extends TestCase
 {
     #[DataProvider('provideRecipientsTests')]
-    public function testRecipients(array $expected, ?array $recipients = null, array $allowedRecipients = [])
+    public function testRecipients(array $expected, RecipientFetcherInterface|array|null $recipients = null, array $allowedRecipients = [])
     {
         $listener = new EnvelopeListener(null, $recipients, $allowedRecipients);
         $message = new RawMessage('message');
@@ -39,6 +41,7 @@ class EnvelopeListenerTest extends TestCase
     {
         yield [['r1@example.com', 'r2@symfony.com'], null, []];
         yield [['admin@admin.com'], ['admin@admin.com'], []];
+        yield [['fetched@example.com', 'fetched@symfony.com'], new RecipientFetcher()];
         yield [['admin@admin.com', 'r1@example.com'], ['admin@admin.com'], ['.*@example\.com']];
         yield [['admin@admin.com', 'r1@example.com', 'r2@symfony.com'], ['admin@admin.com'], ['.*@example\.com', '.*@symfony\.com']];
         yield [['r1@example.com', 'r2@symfony.com'], ['r1@example.com'], ['.*@example\.com', '.*@symfony\.com']];

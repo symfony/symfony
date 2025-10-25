@@ -122,7 +122,7 @@ final class ArrayMapperTest extends TestCase
                 }
             },
         ];
-        
+
         $targetCollection = [
             new class('value5', 'value6') {
                 public function __construct(public string $foo, public string $bar)
@@ -168,7 +168,7 @@ final class ArrayMapperTest extends TestCase
                 }
             },
         ];
-        
+
         $targetCollection = [
             new class('value5', 'value6') {
                 public function __construct(public string $foo, public string $bar)

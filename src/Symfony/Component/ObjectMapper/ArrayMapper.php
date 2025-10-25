@@ -31,19 +31,15 @@ final class ArrayMapper
 
     public function map(array $source, array $target): void
     {
-        if (\array_keys($source) !== \array_keys($target)) {
+        if (array_keys($source) !== array_keys($target)) {
             throw new \InvalidArgumentException('Source and target array must have the same keys.');
         }
 
         match ($this->throwPolicy) {
-            CollectionMapperThrowPolicy::FAIL_EARLY
-                => $this->mapFailEarly($source, $target),
-            CollectionMapperThrowPolicy::FAIL_SAFE
-                => $this->mapFailSafe($source, $target),
-            CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS
-                => $this->mapIgnoreMappingErrors($source, $target),
-            default
-                => throw new \Exception(\sprintf('Throw policy "%s" is not yet supported!', $this->throwPolicy))
+            CollectionMapperThrowPolicy::FAIL_EARLY => $this->mapFailEarly($source, $target),
+            CollectionMapperThrowPolicy::FAIL_SAFE => $this->mapFailSafe($source, $target),
+            CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS => $this->mapIgnoreMappingErrors($source, $target),
+            default => throw new \Exception(\sprintf('Throw policy "%s" is not yet supported!', $this->throwPolicy)),
         };
     }
 

@@ -22,7 +22,7 @@ class SanitizeDummyWithArrayOfString
     public function __construct(
         public string $id,
         /** @var string[] */
-        #[Context(denormalizationContext: [SanitizeDenormalizer::SANITIZER_KEY => SanitizeDenormalizer::DEFAULT_SANITIZER])]
+        #[Context(denormalizationContext: [ SanitizeDenormalizer::SANITIZE_HTML => true ])]
         public array $strings,
     ) {}
 }

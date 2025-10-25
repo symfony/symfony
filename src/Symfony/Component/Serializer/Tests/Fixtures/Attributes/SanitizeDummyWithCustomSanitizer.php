@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\SanitizeDenormalizer;
 class SanitizeDummyWithCustomSanitizer
 {
     public function __construct(
-        #[Context(denormalizationContext: [SanitizeDenormalizer::SANITIZER_KEY => 'custom'])]
+        #[Context(denormalizationContext: [ SanitizeDenormalizer::SANITIZE_HTML => true, SanitizeDenormalizer::SANITIZER => 'custom' ])]
         public string $foo
     ) {}
 }

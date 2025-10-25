@@ -26,7 +26,8 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
 {
     use DenormalizerAwareTrait;
 
-    public const SANITIZER_KEY = 'sanitizer';
+    public const SANITIZER = 'sanitizer';
+    public const SANITIZE_HTML = 'sanitize_html';
     public const DEFAULT_SANITIZER = 'default';
 
     public function __construct(
@@ -60,10 +61,10 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
 
             foreach ($property->getAttributes(Context::class) as $attribute) {
                 $attributeContext = $attribute->newInstance();
-                if (!isset($attributeContext->denormalizationContext[self::SANITIZER_KEY])) {
+                if (($attributeContext->denormalizationContext[self::SANITIZE_HTML] ?? false) !== true) {
                     continue;
                 }
-                $sanitizer = $this->getSanitizer($attributeContext->denormalizationContext[self::SANITIZER_KEY]);
+                $sanitizer = $this->getSanitizer($attributeContext->denormalizationContext[self::SANITIZER] ?? self::DEFAULT_SANITIZER);
                 $sanitizedData[$name] = $this->sanitizeValue($data[$name], $sanitizer, $name);
                 $context['sanitized'] = true;
             }
@@ -89,8 +90,8 @@ final class SanitizeDenormalizer implements DenormalizerInterface, DenormalizerA
         $reflection = new \ReflectionClass($type);
         foreach ($reflection->getProperties() as $property) {
             foreach ($property->getAttributes(Context::class) as $attribute) {
-                $attrContext = $attribute->newInstance();
-                if (isset($attrContext->denormalizationContext[self::SANITIZER_KEY])) {
+                $attributeContext = $attribute->newInstance();
+                if (($attributeContext->denormalizationContext[self::SANITIZE_HTML] ?? false) === true) {
                     return true;
                 }
             }

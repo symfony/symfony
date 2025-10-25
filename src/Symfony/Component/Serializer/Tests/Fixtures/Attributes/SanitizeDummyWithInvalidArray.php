@@ -23,7 +23,7 @@ class SanitizeDummyWithInvalidArray
         /**
          * @var int[]
          */
-        #[Context(denormalizationContext: [SanitizeDenormalizer::SANITIZER_KEY => SanitizeDenormalizer::DEFAULT_SANITIZER])]
+        #[Context(denormalizationContext: [ SanitizeDenormalizer::SANITIZE_HTML => true ])]
         public array $foo
     ) {}
 }

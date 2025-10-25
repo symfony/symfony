@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Normalizer\SanitizeDenormalizer;
 class SanitizeDummyWithUnknownSanitizer
 {
     public function __construct(
-        #[Context(denormalizationContext: [SanitizeDenormalizer::SANITIZER_KEY => 'unknown'])]
+        #[Context(denormalizationContext: [ SanitizeDenormalizer::SANITIZE_HTML => true, SanitizeDenormalizer::SANITIZER => 'unknown' ])]
         public string $foo
     ) {}
 }

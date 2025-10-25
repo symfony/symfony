@@ -24,7 +24,7 @@ class SanitizeDummy
         public string $firstName,
         public string $lastName,
         #[Context(
-            denormalizationContext: [ SanitizeDenormalizer::SANITIZER_KEY => SanitizeDenormalizer::DEFAULT_SANITIZER ]
+            denormalizationContext: [ SanitizeDenormalizer::SANITIZE_HTML => true ],
         )]
         public string $bio
     ) {}

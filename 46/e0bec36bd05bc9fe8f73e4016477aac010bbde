@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-10-23T14:14:09Z
+
+This change is wrong. By default, the HttpClient cache is a *private* cache (as it is a cache on the client-side) and so has different semantic than HttpCache (which is a reverse proxy cache).
+
+Maybe those headers should be used in `isServerResponseCacheable` for the case where the cache is configured as a shared cache.
+but they should not be added to the list of headers that always forbids caching in the RFC 9111 Section 3.1.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2025-10-23T14:46:33Z
+
+@stof should be better now.

@@ -29,6 +29,13 @@ final class ArrayMapper
     ) {
     }
 
+    /**
+     * @template T of object
+     * @template U of object
+     *
+     * @param array<T> $source The objects to map from
+     * @param array<U> $target The objects to map to
+     */
     public function map(array $source, array $target): void
     {
         if (array_keys($source) !== array_keys($target)) {
@@ -43,6 +50,10 @@ final class ArrayMapper
         };
     }
 
+    /**
+     * @param array<T> $source The objects to map from
+     * @param array<U> $target The objects to map to
+     */
     private function mapFailEarly(array $source, array $target): void
     {
         for ($i = 0; $i < \count($source); ++$i) {
@@ -52,6 +63,10 @@ final class ArrayMapper
         }
     }
 
+    /**
+     * @param array<T> $source The objects to map from
+     * @param array<U> $target The objects to map to
+     */
     private function mapFailSafe(array $source, array $target): void
     {
         $exceptions = [];
@@ -71,6 +86,10 @@ final class ArrayMapper
         }
     }
 
+    /**
+     * @param array<T> $source The objects to map from
+     * @param array<U> $target The objects to map to
+     */
     private function mapIgnoreMappingErrors(array $source, array $target): void
     {
         for ($i = 0; $i < \count($source); ++$i) {

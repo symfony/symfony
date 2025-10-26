@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by wickedOne at 2025-04-16T14:39:57Z
+
+> Can this be tested?
+
+i'm not entirely sure as the plugin uses a lot of built in functions with regards to directory / file locations and a static method to retrieve a composer config.... would you guys even be open to have a dev depdency like vfsStream?
+
+> Note that this should target 7.3 as it's an improvement, not a bugfix
+
+check

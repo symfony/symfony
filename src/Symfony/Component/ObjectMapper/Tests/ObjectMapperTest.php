@@ -35,6 +35,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\RecursiveDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\Relation;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\RelationDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultValueStdClass\TargetDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DepthProxy;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\TargetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\User;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\UserProfile;
@@ -562,5 +563,28 @@ final class ObjectMapperTest extends TestCase
         $transformed = $mapper->map($u, TransformCollectionB::class);
 
         $this->assertEquals([new TransformCollectionD('a'), new TransformCollectionD('b')], $transformed->foo);
+    }
+
+    public function testTransformAllPropertiesWithDepthStopsRecursion()
+    {
+        $user = new DepthProxy\User(
+            'User',
+            new DepthProxy\Post(
+                'Post',
+                new DepthProxy\MockLazyProxy('Proxy (Comment) should not be initialized')
+            )
+        );
+
+        $container = $this->createMock(ContainerInterface::class);
+
+        $mapper = new ObjectMapper(transformCallableLocator: $container);
+        $dto = $mapper->map($user, DepthProxy\UserDto::class);
+
+        $this->assertInstanceOf(DepthProxy\UserDto::class, $dto);
+        $this->assertSame('User', $dto->name);
+        $this->assertInstanceOf(DepthProxy\PostDto::class, $dto->post);
+        $this->assertSame('Post', $dto->post->title);
+
+        $this->assertNull($dto->post->comments);
     }
 }

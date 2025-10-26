@@ -27,12 +27,13 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInterface
+final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInterface, DepthAwareInterface
 {
     /**
      * Tracks recursive references.
      */
     private ?\SplObjectStorage $objectMap = null;
+    private int $depth = 0;
 
     public function __construct(
         private readonly ObjectMapperMetadataFactoryInterface $metadataFactory = new ReflectionObjectMapperMetadataFactory(),
@@ -41,6 +42,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         private readonly ?ContainerInterface $conditionCallableLocator = null,
         private ?ObjectMapperInterface $objectMapper = null,
     ) {
+    }
+
+    public function setDepth(int $depth): void
+    {
+        $this->depth = $depth;
     }
 
     public function map(object $source, object|string|null $target = null): object
@@ -237,7 +243,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             } elseif ($objectMap->offsetExists($value)) {
                 $value = $objectMap[$value];
             } else {
-                $value = ($this->objectMapper ?? $this)->map($value, $mapTo->target);
+                $mapper = $this->objectMapper ?? $this;
+                if ($mapper instanceof DepthAwareInterface) {
+                    $mapper->setDepth($this->depth + 1);
+                }
+                $value = $mapper->map($value, $mapTo->target);
             }
         }
 
@@ -317,11 +327,20 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     private function getCallable(string|callable $fn, ?ContainerInterface $locator = null): ?callable
     {
         if (\is_callable($fn)) {
+            if ($fn instanceof DepthAwareInterface) {
+                $fn->setDepth($this->depth);
+            }
+
             return $fn;
         }
 
         if ($locator?->has($fn)) {
-            return $locator->get($fn);
+            $callable = $locator->get($fn);
+            if ($callable instanceof DepthAwareInterface) {
+                $callable->setDepth($this->depth);
+            }
+
+            return $callable;
         }
 
         return null;

@@ -46,13 +46,12 @@ final class ArrayMapper
             CollectionMapperThrowPolicy::FAIL_EARLY => $this->mapFailEarly($source, $target),
             CollectionMapperThrowPolicy::FAIL_SAFE => $this->mapFailSafe($source, $target),
             CollectionMapperThrowPolicy::IGNORE_MAPPING_ERRORS => $this->mapIgnoreMappingErrors($source, $target),
-            default => throw new \Exception(\sprintf('Throw policy "%s" is not yet supported!', $this->throwPolicy)),
         };
     }
 
     /**
-     * @param array<T> $source The objects to map from
-     * @param array<U> $target The objects to map to
+     * @param array<object> $source The objects to map from
+     * @param array<object> $target The objects to map to
      */
     private function mapFailEarly(array $source, array $target): void
     {
@@ -64,8 +63,8 @@ final class ArrayMapper
     }
 
     /**
-     * @param array<T> $source The objects to map from
-     * @param array<U> $target The objects to map to
+     * @param array<object> $source The objects to map from
+     * @param array<object> $target The objects to map to
      */
     private function mapFailSafe(array $source, array $target): void
     {
@@ -87,8 +86,8 @@ final class ArrayMapper
     }
 
     /**
-     * @param array<T> $source The objects to map from
-     * @param array<U> $target The objects to map to
+     * @param array<object> $source The objects to map from
+     * @param array<object> $target The objects to map to
      */
     private function mapIgnoreMappingErrors(array $source, array $target): void
     {

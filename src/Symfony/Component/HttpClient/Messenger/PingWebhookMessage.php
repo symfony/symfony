@@ -14,13 +14,13 @@ namespace Symfony\Component\HttpClient\Messenger;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PingWebhookMessage implements \Stringable
+final readonly class PingWebhookMessage implements \Stringable
 {
     public function __construct(
-        public readonly string $method,
-        public readonly string $url,
-        public readonly array $options = [],
-        public readonly bool $throw = true,
+        public string $method,
+        public string $url,
+        public array $options = [],
+        public bool $throw = true,
     ) {
     }
 

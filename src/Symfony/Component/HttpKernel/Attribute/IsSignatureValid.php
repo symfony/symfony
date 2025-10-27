@@ -25,10 +25,10 @@ namespace Symfony\Component\HttpKernel\Attribute;
  * @author Santiago San Martin <sanmartindev@gmail.com>
  */
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
-final class IsSignatureValid
+final readonly class IsSignatureValid
 {
     /** @var string[] */
-    public readonly array $methods;
+    public array $methods;
 
     /**
      * @param string[]|string $methods HTTP methods that require signature validation. An empty array means that no method filtering is done

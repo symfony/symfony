@@ -16,13 +16,13 @@ use Symfony\Component\Messenger\Envelope;
 /**
  * Marker stamp for messages that can be ack/nack'ed.
  */
-final class AckStamp implements NonSendableStampInterface
+final readonly class AckStamp implements NonSendableStampInterface
 {
     /**
      * @param \Closure(Envelope, \Throwable|null) $ack
      */
     public function __construct(
-        private readonly \Closure $ack,
+        private \Closure $ack,
     ) {
     }
 

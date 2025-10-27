@@ -19,11 +19,11 @@ use Symfony\Component\Webhook\Exception\LogicException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class HeaderSignatureConfigurator implements RequestConfiguratorInterface
+final readonly class HeaderSignatureConfigurator implements RequestConfiguratorInterface
 {
     public function __construct(
-        private readonly string $algo = 'sha256',
-        private readonly string $signatureHeaderName = 'Webhook-Signature',
+        private string $algo = 'sha256',
+        private string $signatureHeaderName = 'Webhook-Signature',
     ) {
     }
 

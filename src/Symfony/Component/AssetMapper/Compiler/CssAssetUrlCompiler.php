@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Path;
  *
  * Originally sourced from https://github.com/rails/propshaft/blob/main/lib/propshaft/compiler/css_asset_urls.rb
  */
-final class CssAssetUrlCompiler implements AssetCompilerInterface
+final readonly class CssAssetUrlCompiler implements AssetCompilerInterface
 {
     // https://regex101.com/r/BOJ3vG/2
     public const ASSET_URL_PATTERN = <<<'REGEX'
@@ -36,8 +36,8 @@ final class CssAssetUrlCompiler implements AssetCompilerInterface
         REGEX;
 
     public function __construct(
-        private readonly string $missingImportMode = self::MISSING_IMPORT_WARN,
-        private readonly ?LoggerInterface $logger = null,
+        private string $missingImportMode = self::MISSING_IMPORT_WARN,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 

@@ -18,13 +18,13 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  */
-final class ChainAccessTokenExtractor implements AccessTokenExtractorInterface
+final readonly class ChainAccessTokenExtractor implements AccessTokenExtractorInterface
 {
     /**
      * @param AccessTokenExtractorInterface[] $accessTokenExtractors
      */
     public function __construct(
-        private readonly iterable $accessTokenExtractors,
+        private iterable $accessTokenExtractors,
     ) {
     }
 

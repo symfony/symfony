@@ -21,7 +21,7 @@ use Symfony\Component\Scheduler\Exception\LogicException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class CronExpressionTrigger implements TriggerInterface
+final readonly class CronExpressionTrigger implements TriggerInterface
 {
     private const HASH_ALIAS_MAP = [
         '#hourly' => '# * * * *',
@@ -44,10 +44,10 @@ final class CronExpressionTrigger implements TriggerInterface
         [0, 6],
     ];
 
-    private readonly ?string $timezone;
+    private ?string $timezone;
 
     public function __construct(
-        private readonly CronExpression $expression = new CronExpression('* * * * *'),
+        private CronExpression $expression = new CronExpression('* * * * *'),
         \DateTimeZone|string|null $timezone = null,
     ) {
         $this->timezone = $timezone instanceof \DateTimeZone ? $timezone->getName() : $timezone;

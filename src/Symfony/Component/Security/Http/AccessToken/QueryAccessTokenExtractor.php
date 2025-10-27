@@ -26,12 +26,12 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @see https://datatracker.ietf.org/doc/html/rfc6750#section-2.3
  */
-final class QueryAccessTokenExtractor implements AccessTokenExtractorInterface
+final readonly class QueryAccessTokenExtractor implements AccessTokenExtractorInterface
 {
     public const PARAMETER = 'access_token';
 
     public function __construct(
-        private readonly string $parameter = self::PARAMETER,
+        private string $parameter = self::PARAMETER,
     ) {
     }
 

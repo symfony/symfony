@@ -16,13 +16,13 @@ namespace Symfony\Component\JsonPath;
  *
  * @immutable
  */
-final class JsonPath
+final readonly class JsonPath
 {
     /**
      * @param non-empty-string $path
      */
     public function __construct(
-        private readonly string $path = '$',
+        private string $path = '$',
     ) {
     }
 

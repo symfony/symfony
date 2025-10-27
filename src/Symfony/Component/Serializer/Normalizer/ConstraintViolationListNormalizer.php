@@ -22,7 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ConstraintViolationListNormalizer implements NormalizerInterface
+final readonly class ConstraintViolationListNormalizer implements NormalizerInterface
 {
     public const INSTANCE = 'instance';
     public const STATUS = 'status';
@@ -31,8 +31,8 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
     public const PAYLOAD_FIELDS = 'payload_fields';
 
     public function __construct(
-        private readonly array $defaultContext = [],
-        private readonly ?NameConverterInterface $nameConverter = null,
+        private array $defaultContext = [],
+        private ?NameConverterInterface $nameConverter = null,
     ) {
     }
 

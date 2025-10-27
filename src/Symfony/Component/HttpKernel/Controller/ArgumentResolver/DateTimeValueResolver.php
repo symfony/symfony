@@ -24,10 +24,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Tim Goudriaan <tim@codedmonkey.com>
  */
-final class DateTimeValueResolver implements ValueResolverInterface
+final readonly class DateTimeValueResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly ?ClockInterface $clock = null,
+        private ?ClockInterface $clock = null,
     ) {
     }
 

@@ -29,13 +29,13 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DoctrineLoader implements LoaderInterface
+final readonly class DoctrineLoader implements LoaderInterface
 {
     use AutoMappingTrait;
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly ?string $classValidatorRegexp = null,
+        private EntityManagerInterface $entityManager,
+        private ?string $classValidatorRegexp = null,
     ) {
     }
 

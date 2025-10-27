@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyInfo;
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-final class PropertyReadInfo
+final readonly class PropertyReadInfo
 {
     public const TYPE_METHOD = 'method';
     public const TYPE_PROPERTY = 'property';
@@ -26,11 +26,11 @@ final class PropertyReadInfo
     public const VISIBILITY_PRIVATE = 'private';
 
     public function __construct(
-        private readonly string $type,
-        private readonly string $name,
-        private readonly string $visibility,
-        private readonly bool $static,
-        private readonly bool $byRef,
+        private string $type,
+        private string $name,
+        private string $visibility,
+        private bool $static,
+        private bool $byRef,
     ) {
     }
 

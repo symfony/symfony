@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
-final class PackageVersionProblem
+final readonly class PackageVersionProblem
 {
     public function __construct(
-        public readonly string $packageName,
-        public readonly string $dependencyPackageName,
-        public readonly string $requiredVersionConstraint,
-        public readonly ?string $installedVersion,
+        public string $packageName,
+        public string $dependencyPackageName,
+        public string $requiredVersionConstraint,
+        public ?string $installedVersion,
     ) {
     }
 }

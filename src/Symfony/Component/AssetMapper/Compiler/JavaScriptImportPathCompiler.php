@@ -26,7 +26,7 @@ use Symfony\Component\Filesystem\Path;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-final class JavaScriptImportPathCompiler implements AssetCompilerInterface
+final readonly class JavaScriptImportPathCompiler implements AssetCompilerInterface
 {
     /**
      * @see https://regex101.com/r/1iBAIb/2
@@ -54,9 +54,9 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
     /mxu';
 
     public function __construct(
-        private readonly ImportMapConfigReader $importMapConfigReader,
-        private readonly string $missingImportMode = self::MISSING_IMPORT_WARN,
-        private readonly ?LoggerInterface $logger = null,
+        private ImportMapConfigReader $importMapConfigReader,
+        private string $missingImportMode = self::MISSING_IMPORT_WARN,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 

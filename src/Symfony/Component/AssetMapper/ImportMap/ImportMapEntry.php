@@ -16,24 +16,24 @@ namespace Symfony\Component\AssetMapper\ImportMap;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-final class ImportMapEntry
+final readonly class ImportMapEntry
 {
     private function __construct(
-        public readonly string $importName,
-        public readonly ImportMapType $type,
+        public string $importName,
+        public ImportMapType $type,
         /**
          * A logical path, relative path or absolute path to the file.
          */
-        public readonly string $path,
-        public readonly bool $isEntrypoint,
+        public string $path,
+        public bool $isEntrypoint,
         /**
          * The version of the package (remote only).
          */
-        public readonly ?string $version,
+        public ?string $version,
         /**
          * The full "package-name/path" (remote only).
          */
-        public readonly ?string $packageModuleSpecifier,
+        public ?string $packageModuleSpecifier,
     ) {
     }
 

@@ -22,10 +22,10 @@ use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class RunCommandMessageHandler
+final readonly class RunCommandMessageHandler
 {
     public function __construct(
-        private readonly Application $application,
+        private Application $application,
     ) {
     }
 

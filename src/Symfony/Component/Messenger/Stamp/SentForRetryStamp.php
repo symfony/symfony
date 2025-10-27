@@ -14,10 +14,10 @@ namespace Symfony\Component\Messenger\Stamp;
 /**
  * Stamp indicating whether a failed message has been sent for retry.
  */
-final class SentForRetryStamp implements NonSendableStampInterface
+final readonly class SentForRetryStamp implements NonSendableStampInterface
 {
     public function __construct(
-        public readonly bool $isSent,
+        public bool $isSent,
     ) {
     }
 }

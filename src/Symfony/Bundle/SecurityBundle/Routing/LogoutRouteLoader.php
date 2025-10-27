@@ -15,15 +15,15 @@ use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-final class LogoutRouteLoader
+final readonly class LogoutRouteLoader
 {
     /**
      * @param array<string, string> $logoutUris    Logout URIs indexed by the corresponding firewall name
      * @param string                $parameterName Name of the container parameter containing {@see $logoutUris} value
      */
     public function __construct(
-        private readonly array $logoutUris,
-        private readonly string $parameterName,
+        private array $logoutUris,
+        private string $parameterName,
     ) {
     }
 

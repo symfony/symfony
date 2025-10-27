@@ -28,11 +28,11 @@ use function Symfony\Component\String\u;
  *
  * @internal
  */
-final class Oauth2TokenHandler implements AccessTokenHandlerInterface
+final readonly class Oauth2TokenHandler implements AccessTokenHandlerInterface
 {
     public function __construct(
-        private readonly HttpClientInterface $client,
-        private readonly ?LoggerInterface $logger = null,
+        private HttpClientInterface $client,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 

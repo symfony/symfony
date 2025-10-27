@@ -12,10 +12,10 @@
 namespace Symfony\Bridge\PhpUnit\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-final class DnsSensitive
+final readonly class DnsSensitive
 {
     public function __construct(
-        public readonly ?string $class = null,
+        public ?string $class = null,
     ) {
     }
 }

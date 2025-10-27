@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
-final class ImportMapPackageAudit
+final readonly class ImportMapPackageAudit
 {
     public function __construct(
-        public readonly string $package,
-        public readonly ?string $version,
+        public string $package,
+        public ?string $version,
         /** @var array<ImportMapPackageAuditVulnerability> */
-        public readonly array $vulnerabilities = [],
+        public array $vulnerabilities = [],
     ) {
     }
 

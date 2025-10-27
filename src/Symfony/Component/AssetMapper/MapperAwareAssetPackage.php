@@ -18,11 +18,11 @@ use Symfony\Component\Asset\PackageInterface;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-final class MapperAwareAssetPackage implements PackageInterface
+final readonly class MapperAwareAssetPackage implements PackageInterface
 {
     public function __construct(
-        private readonly PackageInterface $innerPackage,
-        private readonly AssetMapperInterface $assetMapper,
+        private PackageInterface $innerPackage,
+        private AssetMapperInterface $assetMapper,
     ) {
     }
 

@@ -16,15 +16,15 @@ namespace Symfony\Component\Console\Helper;
  *
  * @author Simon André <smn.andre@gmail.com>
  */
-final class TreeStyle
+final readonly class TreeStyle
 {
     public function __construct(
-        private readonly string $prefixEndHasNext,
-        private readonly string $prefixEndLast,
-        private readonly string $prefixLeft,
-        private readonly string $prefixMidHasNext,
-        private readonly string $prefixMidLast,
-        private readonly string $prefixRight,
+        private string $prefixEndHasNext,
+        private string $prefixEndLast,
+        private string $prefixLeft,
+        private string $prefixMidHasNext,
+        private string $prefixMidLast,
+        private string $prefixRight,
     ) {
     }
 

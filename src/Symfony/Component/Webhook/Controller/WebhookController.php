@@ -24,12 +24,12 @@ use Symfony\Component\Webhook\Client\RequestParserInterface;
  *
  * @internal
  */
-final class WebhookController
+final readonly class WebhookController
 {
     public function __construct(
         /** @var array<string, array{parser: RequestParserInterface, secret: string}> $parsers */
-        private readonly array $parsers,
-        private readonly MessageBusInterface $bus,
+        private array $parsers,
+        private MessageBusInterface $bus,
     ) {
     }
 

@@ -19,12 +19,12 @@ use Psr\Log\LogLevel;
  * @author Dejan Angelov <angelovdejan@protonmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class WithLogLevel
+final readonly class WithLogLevel
 {
     /**
      * @param LogLevel::* $level The level to use to log the exception
      */
-    public function __construct(public readonly string $level)
+    public function __construct(public string $level)
     {
         if (!\defined('Psr\Log\LogLevel::'.strtoupper($this->level))) {
             throw new \InvalidArgumentException(\sprintf('Invalid log level "%s".', $this->level));

@@ -22,9 +22,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
  */
-final class SecurityTokenValueResolver implements ValueResolverInterface
+final readonly class SecurityTokenValueResolver implements ValueResolverInterface
 {
-    public function __construct(private readonly TokenStorageInterface $tokenStorage)
+    public function __construct(private TokenStorageInterface $tokenStorage)
     {
     }
 

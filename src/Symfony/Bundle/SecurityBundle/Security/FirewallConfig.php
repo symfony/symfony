@@ -14,22 +14,22 @@ namespace Symfony\Bundle\SecurityBundle\Security;
 /**
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-final class FirewallConfig
+final readonly class FirewallConfig
 {
     public function __construct(
-        private readonly string $name,
-        private readonly string $userChecker,
-        private readonly ?string $requestMatcher = null,
-        private readonly bool $securityEnabled = true,
-        private readonly bool $stateless = false,
-        private readonly ?string $provider = null,
-        private readonly ?string $context = null,
-        private readonly ?string $entryPoint = null,
-        private readonly ?string $accessDeniedHandler = null,
-        private readonly ?string $accessDeniedUrl = null,
-        private readonly array $authenticators = [],
-        private readonly ?array $switchUser = null,
-        private readonly ?array $logout = null,
+        private string $name,
+        private string $userChecker,
+        private ?string $requestMatcher = null,
+        private bool $securityEnabled = true,
+        private bool $stateless = false,
+        private ?string $provider = null,
+        private ?string $context = null,
+        private ?string $entryPoint = null,
+        private ?string $accessDeniedHandler = null,
+        private ?string $accessDeniedUrl = null,
+        private array $authenticators = [],
+        private ?array $switchUser = null,
+        private ?array $logout = null,
     ) {
     }
 

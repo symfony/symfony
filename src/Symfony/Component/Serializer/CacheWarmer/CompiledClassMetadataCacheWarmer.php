@@ -23,13 +23,13 @@ trigger_deprecation('symfony/serializer', '7.3', 'The "%s" class is deprecated.'
  *
  * @deprecated since Symfony 7.3
  */
-final class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
+final readonly class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
 {
     public function __construct(
-        private readonly array $classesToCompile,
-        private readonly ClassMetadataFactoryInterface $classMetadataFactory,
-        private readonly ClassMetadataFactoryCompiler $classMetadataFactoryCompiler,
-        private readonly Filesystem $filesystem,
+        private array $classesToCompile,
+        private ClassMetadataFactoryInterface $classMetadataFactory,
+        private ClassMetadataFactoryCompiler $classMetadataFactoryCompiler,
+        private Filesystem $filesystem,
     ) {
     }
 

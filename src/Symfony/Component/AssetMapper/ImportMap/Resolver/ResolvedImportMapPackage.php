@@ -14,12 +14,12 @@ namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 
-final class ResolvedImportMapPackage
+final readonly class ResolvedImportMapPackage
 {
     public function __construct(
-        public readonly PackageRequireOptions $requireOptions,
-        public readonly string $version,
-        public readonly ImportMapType $type,
+        public PackageRequireOptions $requireOptions,
+        public string $version,
+        public ImportMapType $type,
     ) {
     }
 }

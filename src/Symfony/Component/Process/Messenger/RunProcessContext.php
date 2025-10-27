@@ -16,14 +16,14 @@ use Symfony\Component\Process\Process;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class RunProcessContext
+final readonly class RunProcessContext
 {
-    public readonly ?int $exitCode;
-    public readonly ?string $output;
-    public readonly ?string $errorOutput;
+    public ?int $exitCode;
+    public ?string $output;
+    public ?string $errorOutput;
 
     public function __construct(
-        public readonly RunProcessMessage $message,
+        public RunProcessMessage $message,
         Process $process,
     ) {
         $this->exitCode = $process->getExitCode();

@@ -402,6 +402,62 @@ class ConnectionTest extends TestCase
     }
 
     #[Group('integration')]
+    public function testSentinelSuccessfulAuthentication()
+    {
+        if (!$hosts = getenv('REDIS_SENTINEL_AUTHENTICATED_HOSTS')) {
+            $this->markTestSkipped('REDIS_SENTINEL_AUTHENTICATED_HOSTS env var is not defined.');
+        }
+
+        if (!$password = getenv('REDIS_SENTINEL_PASSWORD')) {
+            $this->markTestSkipped('REDIS_SENTINEL_PASSWORD env var is not defined.');
+        }
+
+        if (!$master = getenv('MESSENGER_REDIS_SENTINEL_MASTER')) {
+            $this->markTestSkipped('MESSENGER_REDIS_SENTINEL_MASTER env var is not defined.');
+        }
+
+        $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', $hosts));
+        $dsn = 'redis:?'.implode('&', $hosts).'&auth='.urlencode($password);
+
+        $redis = $this->createRedisMock();
+        $redis->expects($this->once())
+            ->method('auth')
+            ->with($password)
+            ->willReturn(true);
+
+        try {
+            Connection::fromDsn($dsn, ['sentinel' => $master, 'lazy' => false], $redis);
+        } catch (\Exception $e) {
+            $this->fail('Failed to connect to redis sentinel. Reason: '.$e->getMessage());
+        }
+    }
+
+    #[Group('integration')]
+    public function testSentinelFailedAuthentication()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/Failed to retrieve master information from sentinel/');
+
+        if (!$hosts = getenv('REDIS_SENTINEL_AUTHENTICATED_HOSTS')) {
+            $this->markTestSkipped('REDIS_SENTINEL_AUTHENTICATED_HOSTS env var is not defined.');
+        }
+
+        if (!$master = getenv('MESSENGER_REDIS_SENTINEL_MASTER')) {
+            $this->markTestSkipped('MESSENGER_REDIS_SENTINEL_MASTER env var is not defined.');
+        }
+
+        $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', $hosts));
+        $password = 'wr0ngpassword';
+        $dsn = 'redis:?'.implode('&', $hosts).'&auth='.urlencode($password);
+
+        $redis = $this->createRedisMock();
+        $redis->expects($this->never())
+            ->method('auth');
+
+        Connection::fromDsn($dsn, ['sentinel' => $master, 'lazy' => false], $redis);
+    }
+
+    #[Group('integration')]
     public function testInvalidSentinelMasterName()
     {
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {

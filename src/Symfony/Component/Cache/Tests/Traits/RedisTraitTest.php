@@ -54,13 +54,18 @@ class RedisTraitTest extends TestCase
             self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
         }
 
+        if (!getenv('REDIS_PASSWORD')) {
+            self::markTestSkipped('REDIS_PASSWORD env var is not defined.');
+        }
+
         $mock = new class {
             use RedisTrait;
         };
-        $connection = $mock::createConnection('redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST'));
+        $password = getenv('REDIS_PASSWORD');
+        $connection = $mock::createConnection('redis://:'.urlencode($password).'@'.getenv('REDIS_AUTHENTICATED_HOST'));
 
         self::assertInstanceOf(\Redis::class, $connection);
-        self::assertSame('p@ssword', $connection->getAuth());
+        self::assertSame($password, $connection->getAuth());
     }
 
     public static function provideCreateConnection(): array

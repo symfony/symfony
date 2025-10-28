@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-10-28T11:21:51Z
+
+I guess we should also update the config here: https://github.com/alexander-schranz/symfony/blob/879af6e1cc3a6809ff9056f7b13eb98dcdcab007/src/Symfony/Bundle/FrameworkBundle/Resources/config/services.php#L119

@@ -81,6 +81,15 @@ jobs:
           REDIS_MASTER_HOST: redis
           REDIS_MASTER_SET: redis_sentinel
           REDIS_SENTINEL_QUORUM: 1
+      redis-sentinel-authenticated:
+        image: bitnamilegacy/redis-sentinel:6.2.8
+        ports:
+          - 26380:26379
+        env:
+          REDIS_MASTER_HOST: redis-authenticated
+          REDIS_MASTER_SET: redis_sentinel
+          REDIS_SENTINEL_PASSWORD: p@ssword
+          REDIS_SENTINEL_QUORUM: 1
       redis-primary:
         image: bitnamilegacy/redis:latest
         ports:
@@ -258,7 +267,9 @@ jobs:
           REDIS_AUTHENTICATED_HOST: 'localhost:16380'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
           REDIS_SENTINEL_HOSTS: 'unreachable-host:26379 localhost:26379 localhost:26379'
+          REDIS_SENTINEL_AUTHENTICATED_HOSTS: 'unreachable-host:26380 localhost:26380 localhost:26380'
           REDIS_SENTINEL_SERVICE: redis_sentinel
+          REDIS_SENTINEL_PASSWORD: p@ssword
           REDIS_REPLICATION_HOSTS: 'localhost:16382 localhost:16381'
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
           MESSENGER_REDIS_SENTINEL_MASTER: redis_sentinel

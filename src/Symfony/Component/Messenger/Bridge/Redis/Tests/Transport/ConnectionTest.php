@@ -152,6 +152,8 @@ class ConnectionTest extends TestCase
         yield 'User and colon' => ['user', 'redis://user:@localhost/queue'];
         yield 'Colon and password' => ['password', 'redis://:password@localhost/queue'];
         yield 'Colon and falsy password' => ['0', 'redis://:0@localhost/queue'];
+        yield 'Password from auth' => ['password', 'redis://'];
+        $dsn = 'redis:?host['.str_replace(' ', ']&host[', getenv('')).']&auth='.getenv('REDIS_SENTINEL_PASSWORD');
     }
 
     public function testAuthFromOptions()
@@ -402,6 +404,56 @@ class ConnectionTest extends TestCase
         yield 'No delay' => ['/^THE_MESSAGE_ID$/', 0, 'xadd', 'THE_MESSAGE_ID'];
 
         yield '100ms delay' => ['/^[A-Z\d\/+]+$/i', 100, 'rawCommand', '1'];
+    }
+
+    /**
+     * @group integration
+     */
+    public function testSentinelSuccessfulAuthentication()
+    {
+        if (!$hosts = getenv('REDIS_SENTINEL_AUTHENTICATED_HOSTS')) {
+            $this->markTestSkipped('REDIS_SENTINEL_AUTHENTICATED_HOSTS env var is not defined.');
+        }
+
+        if (!$password = getenv('REDIS_SENTINEL_PASSWORD')) {
+            $this->markTestSkipped('REDIS_SENTINEL_PASSWORD env var is not defined.');
+        }
+
+        if (!$master = getenv('MESSENGER_REDIS_SENTINEL_MASTER')) {
+            $this->markTestSkipped('MESSENGER_REDIS_SENTINEL_MASTER env var is not defined.');
+        }
+
+        $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', $hosts));
+        $dsn = 'redis://?'.implode('&', $hosts).'&auth='.$password;
+
+        try {
+            Connection::fromDsn($dsn, ['sentinel' => $master, 'lazy' => false]);
+        } catch (\Exception $e) {
+            $this->fail('Failed to Redis Sentinel authentication: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * @group integration
+     */
+    public function testSentinelFailedAuthentication()
+    {
+        if (!$hosts = getenv('REDIS_SENTINEL_AUTHENTICATED_HOSTS')) {
+            $this->markTestSkipped('REDIS_SENTINEL_AUTHENTICATED_HOSTS env var is not defined.');
+        }
+
+        if (!$master = getenv('MESSENGER_REDIS_SENTINEL_MASTER')) {
+            $this->markTestSkipped('MESSENGER_REDIS_SENTINEL_MASTER env var is not defined.');
+        }
+
+        $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', $hosts));
+        $password = 'wr0ngpassword';
+        $dsn = 'redis://?'.implode('&', $hosts).'&auth='.$password;
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/Redis connection failed/');
+
+        Connection::fromDsn($dsn, ['sentinel' => $master, 'lazy' => false]);
     }
 
     /**

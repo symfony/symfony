@@ -115,6 +115,7 @@ class Connection
                     $sentinelClass = \extension_loaded('redis') ? \RedisSentinel::class : Sentinel::class;
                     $hostIndex = 0;
                     $hosts = \is_array($host) ? $host : [['scheme' => 'tcp', 'host' => $host, 'port' => $port]];
+                    $passAuth = isset($auth) && (!\extension_loaded('redis') || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
                     do {
                         $host = $hosts[$hostIndex]['host'];
                         $port = $hosts[$hostIndex]['port'] ?? 0;
@@ -136,9 +137,15 @@ class Connection
                                     'readTimeout' => $options['read_timeout'],
                                 ];
 
+                                if ($passAuth) {
+                                    $params['auth'] = $auth;
+                                }
+
                                 $sentinel = @new \RedisSentinel($params);
                             } else {
-                                $sentinel = @new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+                                $extra = $passAuth ? [$auth] : [];
+
+                                $sentinel = @new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout'], ...$extra);
                             }
 
                             if ($address = @$sentinel->getMasterAddrByName($sentinelMaster)) {

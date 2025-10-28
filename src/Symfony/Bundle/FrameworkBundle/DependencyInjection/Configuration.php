@@ -1344,7 +1344,7 @@ class Configuration implements ConfigurationInterface
                             ->info('System related cache pools configuration.')
                             ->defaultValue('cache.adapter.system')
                         ->end()
-                        ->scalarNode('directory')->defaultValue('%kernel.share_dir%/pools/app')->end()
+                        ->scalarNode('directory')->defaultValue('%kernel.share_dir%/cache/pools/app')->end()
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
                         ->scalarNode('default_valkey_provider')->defaultValue('valkey://localhost')->end()

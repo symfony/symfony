@@ -235,13 +235,12 @@ class Connection
                 $params['host'] = 'tls://'.$params['host'];
             }
         } else {
-            $dsns = explode(',', $dsn);
-            $paramss = array_map(function ($dsn) use (&$options) {
+            $dsnParams = array_map(function ($dsn) use (&$options) {
                 return self::parseDsn($dsn, $options);
-            }, $dsns);
+            }, explode(',', $dsn));
 
             // Merge all the URLs, the last one overrides the previous ones
-            $params = array_merge(...$paramss);
+            $params = array_merge(...$dsnParams);
             $tls = 'rediss' === $params['scheme'] || 'valkeys' === $params['scheme'];
 
             // Regroup all the hosts in an array interpretable by RedisCluster
@@ -254,7 +253,7 @@ class Connection
                 }
 
                 return $params['host'].':'.($params['port'] ?? 6379);
-            }, $paramss, $dsns);
+            }, $dsnParams);
         }
 
         if (isset($options['sentinel']) && isset($options['redis_sentinel']) && $options['sentinel'] !== $options['redis_sentinel']) {

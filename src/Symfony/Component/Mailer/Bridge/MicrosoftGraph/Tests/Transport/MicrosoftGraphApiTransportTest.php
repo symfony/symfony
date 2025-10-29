@@ -160,7 +160,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
             $message = json_decode($options['body'], true)['message'];
 
             $attachment = $message['attachments'][0];
-            $this->assertSame('Embedded content', $attachment['contentId']);
+            $this->assertStringEndsWith('@symfony', $attachment['contentId']);
             $this->assertTrue($attachment['isInline']);
 
             return new MockResponse('', ['http_code' => 202]);

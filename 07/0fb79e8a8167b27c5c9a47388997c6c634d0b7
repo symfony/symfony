@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-10-29T01:09:43Z
+
+could you add a test covering this behavior to avoid regressions ?
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-10-29T03:12:29Z
+
+Hi @stof, I've added a new test that simulates deprecations on various lines, which tests that they are all correctly caught and converted into a `ParseException`.

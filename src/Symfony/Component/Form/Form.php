@@ -651,7 +651,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             return true;
         }
 
-        return 0 === \count($this->getErrors(true));
+        $errors = $this->getErrors(true);
+        $errorCount = \count($errors);
+
+        if (0 === $errorCount) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

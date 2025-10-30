@@ -41,6 +41,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Exception\RuntimeException;
+use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -999,6 +1000,43 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validatePropertyValue($entity, 'lastName', 'foo');
 
         $this->assertCount(0, $violations, '->validatePropertyValue() returns no violations if no constraints have been configured for the property being validated');
+    }
+
+    /**
+     * https://github.com/symfony/symfony/issues/62198.
+     */
+    public function testValidatePropertyThrowsExceptionWhenPropertyDoesNotExist()
+    {
+        $entity = new Entity();
+
+        $this->expectException(ValidatorException::class);
+        $this->expectExceptionMessage('The property "propertyThatDoesNotExist" does not exist.');
+
+        $this->validateProperty($entity, 'propertyThatDoesNotExist');
+    }
+
+    /**
+     * https://github.com/symfony/symfony/issues/62198.
+     */
+    public function testValidatePropertyValueThrowsExceptionWhenPropertyDoesNotExist()
+    {
+        $entity = new Entity();
+
+        $this->expectException(ValidatorException::class);
+        $this->expectExceptionMessage('The property "propertyThatDoesNotExist" does not exist.');
+
+        $this->validatePropertyValue($entity, 'propertyThatDoesNotExist', 'test');
+    }
+
+    /**
+     * https://github.com/symfony/symfony/issues/62198.
+     */
+    public function testValidatePropertyValueThrowsExceptionWhenPropertyDoesNotExistWithClassName()
+    {
+        $this->expectException(ValidatorException::class);
+        $this->expectExceptionMessage('The property "propertyThatDoesNotExist" does not exist.');
+
+        $this->validatePropertyValue(Entity::class, 'propertyThatDoesNotExist', 'test');
     }
 
     public function testValidateObjectOnlyOncePerGroup()

@@ -165,6 +165,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             throw new ValidatorException(\sprintf('The metadata factory should return instances of "\Symfony\Component\Validator\Mapping\ClassMetadataInterface", got: "%s".', get_debug_type($classMetadata)));
         }
 
+        if (!$classMetadata->hasPropertyMetadata($propertyName)) {
+            throw new ValidatorException(\sprintf('The property "%s" does not exist.', $propertyName));
+        }
+
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
         $cacheKey = $this->generateCacheKey($object);
@@ -204,6 +208,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
             throw new ValidatorException(\sprintf('The metadata factory should return instances of "\Symfony\Component\Validator\Mapping\ClassMetadataInterface", got: "%s".', get_debug_type($classMetadata)));
+        }
+
+        if (!$classMetadata->hasPropertyMetadata($propertyName)) {
+            throw new ValidatorException(\sprintf('The property "%s" does not exist.', $propertyName));
         }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);

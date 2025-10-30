@@ -78,7 +78,7 @@ enum AnsiColorMode
 
     private function degradeHexColorToAnsi4(int $r, int $g, int $b): int
     {
-        return round($b / 255) << 2 | (round($g / 255) << 1) | round($r / 255);
+        return round($b / 255) << 2 | (round($g / 255) << 1) | (int) round($r / 255);
     }
 
     /**

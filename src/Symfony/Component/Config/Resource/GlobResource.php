@@ -194,7 +194,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 
         yield from (new Finder())
             ->followLinks()
-            ->filter(function (\SplFileInfo $info) use ($regex, $prefixLen, $prefix) {
+            ->filter(function (\SplFileInfo $info) use ($regex, $prefixLen, $prefix): bool {
                 $normalizedPath = str_replace('\\', '/', $info->getPathname());
                 if (!preg_match($regex, substr($normalizedPath, $prefixLen)) || !$info->isFile()) {
                     return false;
@@ -206,6 +206,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
                         }
                     } while ($prefix !== $dirPath && $dirPath !== $normalizedPath = \dirname($dirPath));
                 }
+                return true;
             })
             ->sortByName()
             ->in($prefix)

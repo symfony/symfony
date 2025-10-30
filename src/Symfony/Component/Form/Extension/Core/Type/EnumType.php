@@ -31,8 +31,21 @@ final class EnumType extends AbstractType
             ->setAllowedValues('class', enum_exists(...))
             ->setDefault('choices', static fn (Options $options): array => $options['class']::cases())
             ->setDefault('choice_label', static function (Options $options) {
-                if (\is_array($options['choices']) && !array_is_list($options['choices'])) {
-                    return null;
+                $choices = $options['choices'];
+
+                if (\is_array($choices) && !array_is_list($choices)) {
+                    // Check for grouped choices
+                    $isGrouped = false;
+                    foreach ($choices as $value) {
+                        if (\is_array($value)) {
+                            $isGrouped = true;
+                            break;
+                        }
+                    }
+                    if (!$isGrouped) {
+                        // Associative array = custom labels
+                        return null;
+                    }
                 }
 
                 return static fn (\UnitEnum $choice) => $choice instanceof TranslatableInterface ? $choice : $choice->name;

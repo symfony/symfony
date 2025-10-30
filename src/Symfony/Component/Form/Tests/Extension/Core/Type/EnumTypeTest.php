@@ -311,6 +311,41 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame('no', $view->children[1]->vars['label']);
     }
 
+    public function testGroupedEnumChoices()
+    {
+        $form = $this->factory->create($this->getTestedType(), null, [
+            'multiple' => false,
+            'expanded' => true,
+            'class' => Answer::class,
+            'choices' => [
+                'Group 1' => [Answer::Yes, Answer::No],
+                'Group 2' => [Answer::FourtyTwo],
+            ],
+        ]);
+        $view = $form->createView();
+        $this->assertCount(2, $view->vars['choices']['Group 1']->choices);
+        $this->assertSame('Yes', $view->vars['choices']['Group 1']->choices[0]->label);
+        $this->assertSame('No', $view->vars['choices']['Group 1']->choices[1]->label);
+        $this->assertCount(1, $view->vars['choices']['Group 2']->choices);
+        $this->assertSame('FourtyTwo', $view->vars['choices']['Group 2']->choices[2]->label);
+    }
+
+    public function testEnumChoicesWithCustomLabels()
+    {
+        $form = $this->factory->create($this->getTestedType(), null, [
+            'multiple' => false,
+            'expanded' => true,
+            'class' => Answer::class,
+            'choices' => [
+                'Custom Yes' => Answer::Yes,
+                'Custom No' => Answer::No,
+            ],
+        ]);
+        $view = $form->createView();
+        $this->assertSame('Custom Yes', $view->children[0]->vars['label']);
+        $this->assertSame('Custom No', $view->children[1]->vars['label']);
+    }
+
     protected function getTestOptions(): array
     {
         return ['class' => Suit::class];

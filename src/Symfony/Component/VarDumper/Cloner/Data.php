@@ -417,8 +417,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
 
         $stub = new Stub();
         $stub->type = Stub::TYPE_ARRAY;
-        foreach ($item as $stub->class => $stub->position) {
-        }
         if (isset($item[0])) {
             $stub->cut = $item[0];
         }

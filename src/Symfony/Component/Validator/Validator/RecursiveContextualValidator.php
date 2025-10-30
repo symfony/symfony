@@ -166,7 +166,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         }
 
         if (!$classMetadata->hasPropertyMetadata($propertyName)) {
-            throw new ValidatorException(\sprintf('The property "%s" does not exist.', $propertyName));
+            $className = \is_object($object) ? $object::class : $object;
+            if (!property_exists($className, $propertyName) && !method_exists($className, 'get'.ucfirst($propertyName)) && !method_exists($className, 'is'.ucfirst($propertyName)) && !method_exists($className, 'has'.ucfirst($propertyName))) {
+                throw new ValidatorException(\sprintf('The property "%s" does not exist.', $propertyName));
+            }
         }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
@@ -211,7 +214,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         }
 
         if (!$classMetadata->hasPropertyMetadata($propertyName)) {
-            throw new ValidatorException(\sprintf('The property "%s" does not exist.', $propertyName));
+            $className = \is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass;
+            if (!property_exists($className, $propertyName) && !method_exists($className, 'get'.ucfirst($propertyName)) && !method_exists($className, 'is'.ucfirst($propertyName)) && !method_exists($className, 'has'.ucfirst($propertyName))) {
+                throw new ValidatorException(\sprintf('The property "%s" does not exist.', $propertyName));
+            }
         }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);

@@ -206,6 +206,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
                         }
                     } while ($prefix !== $dirPath && $dirPath !== $normalizedPath = \dirname($dirPath));
                 }
+
                 return true;
             })
             ->sortByName()

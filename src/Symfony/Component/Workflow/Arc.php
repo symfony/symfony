@@ -16,6 +16,10 @@ namespace Symfony\Component\Workflow;
  */
 final class Arc
 {
+    /**
+     * @param non-empty-string $place  The place name
+     * @param int<1, max>      $weight The weight of the arc (must be greater than 0)
+     */
     public function __construct(
         public readonly string $place,
         public readonly int $weight,

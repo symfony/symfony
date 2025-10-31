@@ -33,7 +33,8 @@ final class MethodMarkingStore implements MarkingStoreInterface
 {
     /** @var array<class-string, \Closure(object): mixed> */
     private array $getters = [];
-    /** @var array<class-string, \Closure(object, mixed, array)> */
+
+    /** @var array<class-string, \Closure(object, mixed, array): void> */
     private array $setters = [];
 
     /**
@@ -111,16 +112,18 @@ final class MethodMarkingStore implements MarkingStoreInterface
 
     private static function getType(object $subject, string $property, string $method, ?string &$type = null): MarkingStoreMethod
     {
+        $reflectionType = null;
+
         try {
             if (method_exists($subject, $method) && ($r = new \ReflectionMethod($subject, $method))->isPublic()) {
-                $type = 0 < $r->getNumberOfRequiredParameters() ? $r->getParameters()[0]->getType() : null;
+                $reflectionType = 0 < $r->getNumberOfRequiredParameters() ? $r->getParameters()[0]->getType() : null;
 
                 return MarkingStoreMethod::METHOD;
             }
 
             try {
                 if (($r = new \ReflectionProperty($subject, $property))->isPublic()) {
-                    $type = $r->getType();
+                    $reflectionType = $r->getType();
 
                     return MarkingStoreMethod::PROPERTY;
                 }
@@ -129,7 +132,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
 
             throw new LogicException(\sprintf('Cannot store marking: class "%s" should have either a public method named "%s()" or a public property named "$%s"; none found.', get_debug_type($subject), $method, $property));
         } finally {
-            $type = $type instanceof \ReflectionNamedType && is_subclass_of($type->getName(), \BackedEnum::class) ? $type->getName() : null;
+            $type = $reflectionType instanceof \ReflectionNamedType && is_subclass_of($reflectionType->getName(), \BackedEnum::class) ? $reflectionType->getName() : null;
         }
     }
 }

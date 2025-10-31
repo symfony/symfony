@@ -26,7 +26,7 @@ class Marking
     private ?array $context = null;
 
     /**
-     * @param int[] $representation Keys are the place name and values should be superior or equals to 1
+     * @param array<string, int<1, max>> $representation Keys are the place name and values should be superior or equals to 1
      */
     public function __construct(array $representation = [])
     {

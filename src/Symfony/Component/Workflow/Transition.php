@@ -28,8 +28,8 @@ class Transition
     private array $toArcs;
 
     /**
-     * @param string|string[]|Arc[] $froms
-     * @param string|string[]|Arc[] $tos
+     * @param string|array<string|Arc> $froms
+     * @param string|array<string|Arc> $tos
      */
     public function __construct(
         private string $name,
@@ -46,7 +46,7 @@ class Transition
     }
 
     /**
-     * @return $asArc is true ? array<Arc> : array<string>
+     * @return ($asArc is true ? array<Arc> : array<string>)
      */
     public function getFroms(bool $asArc = false): array
     {
@@ -58,7 +58,7 @@ class Transition
     }
 
     /**
-     * @return $asArc is true ? array<Arc> : array<string>
+     * @return ($asArc is true ? array<Arc> : array<string>)
      */
     public function getTos(bool $asArc = false): array
     {

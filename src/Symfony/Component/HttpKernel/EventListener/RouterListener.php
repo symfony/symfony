@@ -169,6 +169,7 @@ class RouterListener implements EventSubscriberInterface
 
         if ($e->getPrevious() instanceof NoConfigurationException) {
             $event->setResponse($this->createWelcomeResponse());
+            $event->allowCustomResponseCode();
         }
     }
 
@@ -190,6 +191,6 @@ class RouterListener implements EventSubscriberInterface
         ob_start();
         include \dirname(__DIR__).'/Resources/welcome.html.php';
 
-        return new Response(ob_get_clean(), Response::HTTP_NOT_FOUND);
+        return new Response(ob_get_clean(), Response::HTTP_OK);
     }
 }

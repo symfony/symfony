@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-10-31T11:39:35Z
+
+Isn't this affecting older branches as well ?
+
+Bug fixes must be submitted to the lowest affected branch.
+
+---------------------------------------------------------------------------
+
+by SerheyDolgushev at 2025-10-31T11:50:12Z
+
+> Isn't this affecting older branches as well ?
+>
+> Bug fixes must be submitted to the lowest affected branch.
+
+Thanks for calling it out. Switched base branch to `6.4`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-10-31T12:26:24Z
+
+I don't understand why moving the `catch` after the catch for `TableNotFoundException` should make a difference.
+
+---------------------------------------------------------------------------
+
+by longwave at 2025-10-31T12:30:54Z
+
+The more specific exception has to come first:
+```
+class TableNotFoundException extends DatabaseObjectNotFoundException
+class DatabaseObjectNotFoundException extends ServerException
+class ServerException extends DriverException
+```
+
+---------------------------------------------------------------------------
+
+by SerheyDolgushev at 2025-10-31T12:52:13Z
+
+```php
+<?php
+
+class DriverException extends Exception {}
+class TableNotFoundException extends DriverException {}
+
+try {
+	throw new TableNotFoundException();
+} catch (DriverException $_e) {
+	var_dump('driver #1');
+} catch (TableNotFoundException $_e) {
+	var_dump('table not found #1');
+}
+
+try {
+	throw new TableNotFoundException();
+} catch (TableNotFoundException $_e) {
+	var_dump('table not found #2');
+} catch (DriverException $_e) {
+	var_dump('driver #2');
+}
+```
+Outputs
+```
+string(9) "driver #1"
+string(18) "table not found #2"
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-31T13:25:36Z
+
+@xabbuh multiple `catch` statements are matched in order (think about them as `if ($e instanceof ...) elseif ($e instanceof ...)`. So the order matters.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-10-31T13:25:46Z
+
+Can you please add a test that prevents us from reintroducing this in the future?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-10-31T13:28:05Z
+
+> @xabbuh multiple `catch` statements are matched in order (think about them as `if ($e instanceof ...) elseif ($e instanceof ...)`. So the order matters.
+
+I know. I got confused by us having an alias for the `DriverException` and by DBAL's exception hierarchy.
+
+---------------------------------------------------------------------------
+
+by SerheyDolgushev at 2025-10-31T14:45:45Z
+
+@xabbuh @stof can someone please re-run [
+Unit Tests / Unit Tests (8.4, high-deps) (pull_request)](https://github.com/symfony/symfony/actions/runs/18975828678/job/54195074042?pr=62250)? As this failure does not seem to be related to the updates in this PR:
+```
+There was 1 failure:
+
+1) Symfony\Component\Clock\Tests\MonotonicClockTest::testSleep
+Failed asserting that 1761921431.003584 is equal to 1761921431.0035841 or is greater than 1761921431.0035841.
+
+/home/runner/work/symfony/symfony/src/Symfony/Component/Clock/Tests/MonotonicClockTest.php:59
+```

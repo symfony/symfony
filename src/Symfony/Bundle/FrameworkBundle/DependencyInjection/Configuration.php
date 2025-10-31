@@ -61,10 +61,12 @@ use Symfony\Component\Workflow\WorkflowEvents;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * @param bool $debug Whether debugging is enabled or not
+     * @param bool $debug             Whether debugging is enabled or not
+     * @param bool $hasKernelShareDir Whether the share dir was defined
      */
     public function __construct(
         private bool $debug,
+        private bool $hasKernelShareDir,
     ) {
     }
 
@@ -1385,7 +1387,9 @@ class Configuration implements ConfigurationInterface
                             ->info('System related cache pools configuration.')
                             ->defaultValue('cache.adapter.system')
                         ->end()
-                        ->scalarNode('directory')->defaultValue('%kernel.share_dir%/pools/app')->end()
+                        ->scalarNode('directory')->defaultValue(
+                            ($this->hasKernelShareDir ? '%kernel.share_dir%' : '%kernel.cache_dir%').'/pools/app'
+                        )->end()
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
                         ->scalarNode('default_valkey_provider')->defaultValue('valkey://localhost')->end()

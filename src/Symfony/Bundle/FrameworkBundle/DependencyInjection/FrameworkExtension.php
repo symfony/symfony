@@ -891,7 +891,7 @@ class FrameworkExtension extends Extension
 
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
-        return new Configuration($container->getParameter('kernel.debug'));
+        return new Configuration($container->getParameter('kernel.debug'), $container->hasParameter('kernel.share_dir'));
     }
 
     protected function hasConsole(): bool
@@ -2943,7 +2943,7 @@ class FrameworkExtension extends Extension
 
         $container
             ->register($name.'.caching', CachingHttpClient::class)
-            ->setDecoratedService($name, null,  15)
+            ->setDecoratedService($name, null, 15)
             ->setArguments([
                 new Reference('.inner'),
                 new Reference($options['cache_pool']),

@@ -43,7 +43,7 @@ class ConfigurationTest extends TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [[
+        $config = $processor->processConfiguration(new Configuration(true, true), [[
             'http_method_override' => false,
             'handle_all_throwables' => true,
             'php_errors' => ['log' => true],
@@ -72,7 +72,7 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
 
         $processor->processConfiguration(
-            new Configuration(true),
+            new Configuration(true, true),
             [[
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
@@ -97,7 +97,7 @@ class ConfigurationTest extends TestCase
     public function testAssetsCanBeEnabled()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
         $config = $processor->processConfiguration($configuration, [[
             'http_method_override' => false,
             'handle_all_throwables' => true,
@@ -123,7 +123,7 @@ class ConfigurationTest extends TestCase
     public function testAssetMapperCanBeEnabled()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
         $config = $processor->processConfiguration($configuration, [[
             'http_method_override' => false,
             'handle_all_throwables' => true,
@@ -158,7 +158,7 @@ class ConfigurationTest extends TestCase
     public function testAssetMapperPolyfillValue(mixed $polyfillValue, bool $isValid, mixed $expected)
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
 
         if (!$isValid) {
             $this->expectException(InvalidConfigurationException::class);
@@ -192,7 +192,7 @@ class ConfigurationTest extends TestCase
     public function testValidAssetsPackageNameConfiguration($packageName)
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
@@ -222,7 +222,7 @@ class ConfigurationTest extends TestCase
     public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
@@ -274,7 +274,7 @@ class ConfigurationTest extends TestCase
     public function testValidLockConfiguration($lockConfig, $processedConfig)
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
@@ -337,7 +337,7 @@ class ConfigurationTest extends TestCase
     public function testLockMergeConfigs()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
@@ -372,7 +372,7 @@ class ConfigurationTest extends TestCase
     public function testValidSemaphoreConfiguration($semaphoreConfig, $processedConfig)
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
@@ -426,7 +426,7 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
 
         $processor->processConfiguration($configuration, [
             'framework' => [
@@ -447,7 +447,7 @@ class ConfigurationTest extends TestCase
     public function testBusMiddlewareDontMerge()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
         $config = $processor->processConfiguration($configuration, [
             [
                 'http_method_override' => false,
@@ -511,7 +511,7 @@ class ConfigurationTest extends TestCase
     public function testItErrorsWhenDefaultBusDoesNotExist()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The specified default bus "foo" is not configured. Available buses are "bar", "baz".');
@@ -535,7 +535,7 @@ class ConfigurationTest extends TestCase
     public function testLockCanBeDisabled()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
 
         $config = $processor->processConfiguration($configuration, [
             [
@@ -552,7 +552,7 @@ class ConfigurationTest extends TestCase
     public function testEnabledLockNeedsResources()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
@@ -570,7 +570,7 @@ class ConfigurationTest extends TestCase
     public function testSerializerJsonDetailedErrorMessagesEnabledWhenDefaultContextIsConfigured()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [
+        $config = $processor->processConfiguration(new Configuration(true, true), [
             [
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
@@ -589,7 +589,7 @@ class ConfigurationTest extends TestCase
     public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabled()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [
+        $config = $processor->processConfiguration(new Configuration(true, true), [
             [
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
@@ -609,7 +609,7 @@ class ConfigurationTest extends TestCase
     public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabledWithSeveralConfigsBeingMerged()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [
+        $config = $processor->processConfiguration(new Configuration(true, true), [
             [
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
@@ -636,7 +636,7 @@ class ConfigurationTest extends TestCase
     public function testScopedHttpClientsInheritRateLimiterAndRetryFailedConfiguration()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
 
         $config = $processor->processConfiguration($configuration, [[
             'http_client' => [
@@ -676,7 +676,7 @@ class ConfigurationTest extends TestCase
     public function testSerializerJsonDetailedErrorMessagesEnabledByDefaultWithDebugEnabled()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [
+        $config = $processor->processConfiguration(new Configuration(true, true), [
             [
                 'serializer' => null,
             ],
@@ -700,7 +700,7 @@ class ConfigurationTest extends TestCase
     public function testWorkflowEnumArcsNormalization()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
 
         $config = $processor->processConfiguration($configuration, [[
             'http_method_override' => false,
@@ -767,7 +767,7 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage('The HTTP methods "GET", "HEAD", "CONNECT", and "TRACE" cannot be overridden.');
 
         $processor->processConfiguration(
-            new Configuration(true),
+            new Configuration(true, true),
             [[
                 'allowed_http_method_override' => [$method],
             ]]
@@ -936,7 +936,7 @@ class ConfigurationTest extends TestCase
                 'pools' => [],
                 'app' => 'cache.adapter.filesystem',
                 'system' => 'cache.adapter.system',
-                'directory' => '%kernel.share_dir%/pools/app',
+                'directory' => '%kernel.share_dir%/cache/%kernel.environment%/pools/app',
                 'default_redis_provider' => 'redis://localhost',
                 'default_valkey_provider' => 'valkey://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
@@ -1074,7 +1074,7 @@ class ConfigurationTest extends TestCase
     public function testNamedSerializersReservedName()
     {
         $processor = new Processor();
-        $configuration = new Configuration(true);
+        $configuration = new Configuration(true, true);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid configuration for path "framework.serializer.named_serializers": "default" is a reserved name.');

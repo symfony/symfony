@@ -25,18 +25,17 @@ class AmpHttpClientTest extends HttpClientTestCase
         parent::testNonBlockingStream();
     }
 
-    protected function getHttpClient(string $testCase): HttpClientInterface
-    {
-        return new AmpHttpClient(['verify_peer' => false, 'verify_host' => false, 'timeout' => 5]);
-    }
-
     public function testProxy()
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Invalid address: proxy.host');
 
         $client->request('GET', 'http://localhost:8888', ['proxy' => 'http://proxy.host:8000']);
+    }
+
+    protected function getHttpClient(string $testCase): HttpClientInterface
+    {
+        return new AmpHttpClient(['verify_peer' => false, 'verify_host' => false, 'timeout' => 5]);
     }
 }

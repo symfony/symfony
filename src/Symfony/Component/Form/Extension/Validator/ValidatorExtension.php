@@ -29,7 +29,6 @@ class ValidatorExtension extends AbstractExtension
 {
     public function __construct(
         private ValidatorInterface $validator,
-        private bool $legacyErrorMessages = true,
         private ?FormRendererInterface $formRenderer = null,
         private ?TranslatorInterface $translator = null,
     ) {
@@ -53,7 +52,7 @@ class ValidatorExtension extends AbstractExtension
     protected function loadTypeExtensions(): array
     {
         return [
-            new Type\FormTypeValidatorExtension($this->validator, $this->legacyErrorMessages, $this->formRenderer, $this->translator),
+            new Type\FormTypeValidatorExtension($this->validator, $this->formRenderer, $this->translator),
             new Type\RepeatedTypeValidatorExtension(),
             new Type\SubmitTypeValidatorExtension(),
         ];

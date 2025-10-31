@@ -36,6 +36,6 @@ trait ValidatorExtensionTrait
         $this->validator->expects($this->any())->method('getMetadataFor')->willReturn($metadata);
         $this->validator->expects($this->any())->method('validate')->willReturn(new ConstraintViolationList());
 
-        return new ValidatorExtension($this->validator, false);
+        return new ValidatorExtension($this->validator);
     }
 }

@@ -46,7 +46,7 @@ class HttpCache extends BaseHttpCache
         if ($cache instanceof StoreInterface) {
             $this->store = $cache;
         } else {
-            $cache ??= null !== ($dir = $kernel->getShareDir()) ? $dir.'/http_cache/'.$kernel->getEnvironment() : $kernel->getCacheDir().'/http_cache',
+            $cache ??= null !== ($dir = $kernel->getShareDir()) ? $dir.'/http_cache/'.$kernel->getEnvironment() : $kernel->getCacheDir().'/http_cache';
             $this->cacheDir = $cache;
         }
 

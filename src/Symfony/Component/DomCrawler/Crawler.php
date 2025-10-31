@@ -1111,11 +1111,10 @@ class Crawler implements \Countable, \IteratorAggregate
         $internalErrors = libxml_use_internal_errors(true);
 
         $document = \Dom\HTMLDocument::createFromString($htmlContent, \Dom\HTML_NO_DEFAULT_NS, $charset);
-
-        libxml_use_internal_errors($internalErrors);
-
         $dom = new \DOMDocument('1.0', $document->inputEncoding);
         $this->copyFromHtml5ToDom($document->documentElement, $dom);
+
+        libxml_use_internal_errors($internalErrors);
 
         return $dom;
     }
@@ -1276,7 +1275,7 @@ class Crawler implements \Countable, \IteratorAggregate
                     $element = $target->createElement($source->tagName);
                 } catch (\DOMException) {
                     $dom = new \DOMDocument('1.0', $target->encoding);
-                    @$dom->loadHTML('<'.$source->tagName.'>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                    $dom->loadHTML('<'.$source->tagName.'>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
                     $element = $target->importNode($dom->firstChild);
                 }
 

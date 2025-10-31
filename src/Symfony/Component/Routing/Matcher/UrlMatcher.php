@@ -84,8 +84,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     public function match(string $pathinfo)
     {
         $this->allow = $this->allowSchemes = [];
+        $pathinfo = '' === ($pathinfo = rawurldecode($pathinfo)) ? '/' : $pathinfo;
 
-        if ($ret = $this->matchCollection(rawurldecode($pathinfo) ?: '/', $this->routes)) {
+        if ($ret = $this->matchCollection($pathinfo, $this->routes)) {
             return $ret;
         }
 
@@ -133,7 +134,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             $method = 'GET';
         }
         $supportsTrailingSlash = 'GET' === $method && $this instanceof RedirectableUrlMatcherInterface;
-        $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
+        $trimmedPathinfo = '' === ($trimmedPathinfo = rtrim($pathinfo, '/')) ? '/' : $trimmedPathinfo;
 
         foreach ($routes as $name => $route) {
             $compiledRoute = $route->compile();

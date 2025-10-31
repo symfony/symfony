@@ -1384,7 +1384,7 @@ class CrawlerTest extends TestCase
     {
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent('<script&>');
-        self::assertEquals('<head></head><body></body>', $crawler->html());
+        self::assertEquals('<head></head><body><script></script></body>', $crawler->html());
     }
 
     public function testAlpineJs()

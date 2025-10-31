@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-30T18:46:16Z
+
+Thanks. The updated behavior makes sense. There's no reason a `<script&>` should become a `<script>`. That even looks dangerous.
+
+The test should be added to CrawlerTest.php I think, and have proper skips.
+
+---------------------------------------------------------------------------
+
+by longwave at 2025-10-31T09:22:04Z
+
+Ah I didn't see how the tests extended each other before, I understand now. I think this is the right thing to do? The parsers do act differently but I also think it's worth explicitly asserting what each of them do with this edge case, and we might find similar edge cases in the future.

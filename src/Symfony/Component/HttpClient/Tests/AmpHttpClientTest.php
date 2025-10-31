@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpClient\Tests;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Component\HttpClient\Exception\TransportException;
-use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[Group('dns-sensitive')]

@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\AmpHttpClient;
+use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[Group('dns-sensitive')]
@@ -31,6 +33,11 @@ class AmpHttpClientTest extends HttpClientTestCase
 
     public function testProxy()
     {
-        $this->markTestSkipped('A real proxy server would be needed.');
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Invalid address: proxy.host');
+
+        $client->request('GET', 'http://localhost:8888', ['proxy' => 'http://proxy.host:8000']);
     }
 }

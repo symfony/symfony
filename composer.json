@@ -127,8 +127,8 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
-        "amphp/http-client": "^4.2.1|^5.0",
-        "amphp/http-tunnel": "^1.0|^2.0",
+        "amphp/http-client": "^5.0",
+        "amphp/http-tunnel": "^2.0",
         "async-aws/dynamo-db": "^3.0",
         "async-aws/ses": "^1.0",
         "async-aws/sqs": "^1.0|^2.0",

@@ -28,7 +28,7 @@ use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\Connector;
 use Amp\Socket\DnsConnector;
-use Amp\Socket\SocketAddress;
+use Amp\Socket\InternetAddress;
 use Amp\Success;
 use Psr\Log\LoggerInterface;
 
@@ -173,13 +173,13 @@ final class AmpClientStateV4 extends ClientState
 
         if ($options['proxy']) {
             $proxyUrl = parse_url($options['proxy']['url']);
-            $proxySocket = new SocketAddress($proxyUrl['host'], $proxyUrl['port']);
+            $proxySocket = new InternetAddress($proxyUrl['host'], $proxyUrl['port']);
             $proxyHeaders = $options['proxy']['auth'] ? ['Proxy-Authorization' => $options['proxy']['auth']] : [];
 
             if ('ssl' === $proxyUrl['scheme']) {
-                $connector = new Https1TunnelConnector($proxySocket, $context->getTlsContext(), $proxyHeaders, $connector);
+                $connector = new Https1TunnelConnector($proxySocket->toString(), $context->getTlsContext(), $proxyHeaders, $connector);
             } else {
-                $connector = new Http1TunnelConnector($proxySocket, $proxyHeaders, $connector);
+                $connector = new Http1TunnelConnector($proxySocket->toString(), $proxyHeaders, $connector);
             }
         }
 

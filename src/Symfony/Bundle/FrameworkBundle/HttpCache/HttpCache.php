@@ -83,6 +83,9 @@ class HttpCache extends BaseHttpCache
 
     protected function createStore(): StoreInterface
     {
-        return $this->store ?? new Store($this->cacheDir ?: ($this->kernel->getShareDir() ?? $this->kernel->getCacheDir()).'/http_cache');
+        return $this->store ?? new Store($this->cacheDir ?: (match (true) {
+            null !== $this->kernel->getShareDir() => $this->kernel->getShareDir().'/cache/'.$this->kernel->getEnvironment().'/http_cache',
+            default => $this->kernel->getCacheDir().'/http_cache',
+        }));
     }
 }

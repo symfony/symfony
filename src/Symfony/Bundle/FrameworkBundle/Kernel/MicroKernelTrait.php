@@ -131,7 +131,7 @@ trait MicroKernelTrait
                 return null;
             }
             if (\is_string($dir)) {
-                return $dir.'/'.$this->environment;
+                return $dir;
             }
         }
 

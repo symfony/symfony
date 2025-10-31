@@ -1275,7 +1275,7 @@ class Crawler implements \Countable, \IteratorAggregate
                     $element = $target->createElement($source->tagName);
                 } catch (\DOMException) {
                     $dom = new \DOMDocument('1.0', $target->encoding);
-                    $dom->loadHTML('<'.$source->tagName.'>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                    $dom->loadHTML('<'.$source->tagName.'>', \LIBXML_HTML_NOIMPLIED | \LIBXML_HTML_NODEFDTD);
                     $element = $target->importNode($dom->firstChild);
                 }
 

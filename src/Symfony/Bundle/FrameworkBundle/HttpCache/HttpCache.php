@@ -46,7 +46,10 @@ class HttpCache extends BaseHttpCache
         if ($cache instanceof StoreInterface) {
             $this->store = $cache;
         } else {
-            $this->cacheDir = $cache;
+            $this->cacheDir = $cache ?? (match (true) {
+                null !== $this->kernel->getShareDir() => $this->kernel->getShareDir().'/http_cache/'.$this->kernel->getEnvironment(),
+                default => $this->kernel->getCacheDir().'/http_cache',
+            });
         }
 
         if (null === $options && $kernel->isDebug()) {
@@ -83,9 +86,6 @@ class HttpCache extends BaseHttpCache
 
     protected function createStore(): StoreInterface
     {
-        return $this->store ?? new Store($this->cacheDir ?: (match (true) {
-            null !== $this->kernel->getShareDir() => $this->kernel->getShareDir().'/cache/'.$this->kernel->getEnvironment().'/http_cache',
-            default => $this->kernel->getCacheDir().'/http_cache',
-        }));
+        return $this->store ?? new Store($this->cacheDir);
     }
 }

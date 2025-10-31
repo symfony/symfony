@@ -22,7 +22,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 final class CacheItem implements ItemInterface
 {
-    private const METADATA_EXPIRY_OFFSET = 1527506807;
+    public const METADATA_EXPIRY_OFFSET = 1527506807;
     private const VALUE_WRAPPER = "\xA9";
 
     protected string $key;

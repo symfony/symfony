@@ -1383,7 +1383,7 @@ class CrawlerTest extends TestCase
     public function testHtml5MalformedContent()
     {
         $crawler = $this->createCrawler();
-        $crawler->addHtmlContent('<script&>');
+        $crawler->addHtmlContent('<html><head></head><body><script&>');
         self::assertEquals('<head></head><body><script></script></body>', $crawler->html());
     }
 

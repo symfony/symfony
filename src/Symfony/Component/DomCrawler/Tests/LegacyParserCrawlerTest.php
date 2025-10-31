@@ -95,11 +95,4 @@ class LegacyParserCrawlerTest extends CrawlerTest
     public function testHtml5ParserParseContentStartingWithValidHeading(string $content)
     {
     }
-
-    public function testHtml5MalformedContent()
-    {
-        $crawler = $this->createCrawler();
-        $crawler->addHtmlContent('<script&>');
-        self::assertEquals('<head><script></script></head>', $crawler->html());
-    }
 }

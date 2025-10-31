@@ -75,7 +75,7 @@ class MicroKernelTraitTest extends TestCase
         try {
             $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
 
-            $expected = rtrim(sys_get_temp_dir(), '/').'/test';
+            $expected = rtrim(sys_get_temp_dir(), '/');
             $this->assertSame($expected, $kernel->getShareDir());
 
             $parameters = $kernel->getKernelParameters();

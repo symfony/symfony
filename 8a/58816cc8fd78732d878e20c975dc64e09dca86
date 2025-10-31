@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-10-29T11:10:41Z
+
+> This allows specifying explicitly when the app has no share dir.
+
+In that case, app cache directory have to be set [back](https://github.com/symfony/symfony/pull/62170/files#diff-041b166c698c254a3f61cfc6390785d4f5097794b77a4b2f3f888996729cbce4L1388) to `%kernel.cache_dir%/pools/app`.
+Using a non-shared for app cache is not always an issue.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-10-29T11:21:26Z
+
+the changes from #62191 also need to be addressed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-29T11:25:11Z
+
+> In that case, app cache directory have to be set [back](https://github.com/symfony/symfony/pull/62170/files#diff-041b166c698c254a3f61cfc6390785d4f5097794b77a4b2f3f888996729cbce4L1388) to %kernel.cache_dir%/pools/app.
+
+nope: that's exactly the kind of config you want to spot early on: if you go with no share dir, your app cache pools have to be configured to use eg Redis by default (or you might be fine with using the cache-dir, but it shouldn't be our call by default)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-29T11:36:38Z
+
+> the changes from https://github.com/symfony/symfony/pull/62191 also need to be addressed
+
+indeed, PR updated
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-10-29T13:32:30Z
+
+> nope: that's exactly the kind of config you want to spot early on: if you go with no share dir, your app cache pools have to be configured to use eg Redis by default (or you might be fine with using the cache-dir, but it shouldn't be our call by default)
+
+Ok, I understand the intention better now. The fallback on `cache_dir` is a bit strange in that we only get an error only if we explicitly indicate that we don't have a `share_dir`, which is the default for multi-server deployments. There is no way to know if we are running on a single server or a cluster of servers without nfs.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-29T13:40:57Z
+
+Sure. We don't want to disrupt the defaults.
+What's nice about this is that it's opt-in: ppl that care will now be able to spot when some subsytem relies on a share dir and need to be reconfigured.

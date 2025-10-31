@@ -936,7 +936,7 @@ class ConfigurationTest extends TestCase
                 'pools' => [],
                 'app' => 'cache.adapter.filesystem',
                 'system' => 'cache.adapter.system',
-                'directory' => '%kernel.share_dir%/cache/%kernel.environment%/pools/app',
+                'directory' => '%kernel.share_dir%/app_cache/%kernel.environment%',
                 'default_redis_provider' => 'redis://localhost',
                 'default_valkey_provider' => 'valkey://localhost',
                 'default_memcached_provider' => 'memcached://localhost',

@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-04-05T10:01:45Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by frankdekker at 2025-04-05T12:08:31Z
+
+Possibility of lowering complexity:
+
+There are currently 2 similar blocks of code for `$dateTimeFormat` and `$defaultDateTimeFormat`. The first with a bit more error handling. These blocks could be combined with using the dateTimeFormat in something like `$dateTimeFormat ?? $defaultDateTimeFormat ?? null`.
+
+I was hesistant to do this immediately because i have no idea why there is different error handling for the context $dateTimeFormat.
+
+---------------------------------------------------------------------------
+
+by mdriessen at 2025-10-31T23:12:35Z
+
+Is there anything I can do to help this being merged in Symfony 7.4?
+
+---------------------------------------------------------------------------
+
+by frankdekker at 2025-11-01T10:36:27Z
+
+@nicolas-grekas Thanks for the feedback. The branch is now up-to-date again with 7.4. There are 3 failings tests but I don't see the relation to my changes though.

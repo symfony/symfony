@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by longwave at 2025-10-31T10:00:27Z
+
+Psalm failed because $format is nullable, but why is this allowed? What does it mean to pass null?
+
+Perhaps this was a mistake in https://github.com/symfony/symfony/pull/33088/files#diff-779a02ff90f6fc60228d531d684382d3b585b3c823ba53028ff8d2a9e03a2ea0R1314
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-31T14:06:32Z
+
+I have no idea why `setFormat` supports `null` as format. This should probably be deprecated (in a separate PR as we cannot deprecate things in 6.4)
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-31T14:19:29Z
+
+This looks like a mistake when adding the native type, as the old code was using `@param string $format`: https://github.com/symfony/symfony/blob/9fec71ea34c069c582c24878f0e1499789b8bf81/src/Symfony/Component/HttpFoundation/Request.php#L1327-L1330

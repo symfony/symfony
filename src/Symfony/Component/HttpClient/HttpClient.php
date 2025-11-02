@@ -29,7 +29,7 @@ final class HttpClient
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public static function create(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50): HttpClientInterface
+    public static function create(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 0): HttpClientInterface
     {
         if ($amp = class_exists(ConnectionLimitingPool::class) && interface_exists(Promise::class)) {
             if (!\extension_loaded('curl')) {
@@ -70,7 +70,7 @@ final class HttpClient
     /**
      * Creates a client that adds options (e.g. authentication headers) only when the request URL matches the provided base URI.
      */
-    public static function createForBaseUri(string $baseUri, array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50): HttpClientInterface
+    public static function createForBaseUri(string $baseUri, array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 0): HttpClientInterface
     {
         $client = self::create([], $maxHostConnections, $maxPendingPushes);
 

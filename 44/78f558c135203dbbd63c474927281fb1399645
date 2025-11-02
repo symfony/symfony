@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by santysisi at 2025-11-01T20:43:19Z
+
+status: needs work
+
+The installed versions seem to vary between CI jobs, which might be causing inconsistencies
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-11-01T20:58:56Z
+
+status: needs review
+
+The new versions removed support for PHP 8.1. I have two possible solutions and would love your opinion:
+
+1. Use two `proxy-implem.php` files and switch based on the installed PHP version or package.
+2. Add a conflict to the `composer.json` to prevent the new versions from being installed.
+
+I think option 1 is better but more verbose. What do you think? Any other suggestions?
+
+Edit: third option, maybe only add a conflict in the dev dependencies 🤔
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-11-01T21:03:41Z
+
+There is no much difference. You can normalize the output of proxy manager by replacing `() : bool` with `(): bool` and get consistent output to check.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-11-01T21:08:07Z
+
+> There is no much difference. You can normalize the output of proxy manager by replacing `() : bool` with `(): bool` and get consistent output to check.
+
+I like this idea, thanks! I’ll go ahead and implement that solution!
+
+Edit: I replace `(): bool` with `() : bool` to avoid modifying `proxy-implem.php`. Is that okay, or would you prefer I modify the file and use the original replacement?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-11-01T21:26:24Z
+
+> Edit: I replace `(): bool` with `() : bool` to avoid modifying `proxy-implem.php`. Is that okay, or would you prefer I modify the file and use the original replacement?
+
+The replacement in the previous line changes to the modernized version of the code. I would do the same and update the expected code to the latest version.
+
+I don't get why you get a failing job, while it works locally.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-11-01T22:51:14Z
+
+> I don't get why you get a failing job, while it works locally.
+
+It seems that the failure job does not consider the changes in the `proxy-implem.php` file 🤔

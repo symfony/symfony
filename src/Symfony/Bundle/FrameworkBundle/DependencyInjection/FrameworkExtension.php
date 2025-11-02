@@ -142,6 +142,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
+use Symfony\Component\Messenger\Retry\DynamicRetryStrategy;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory;
 use Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -2425,6 +2426,10 @@ class FrameworkExtension extends Extension
 
         $loader->load('messenger.php');
 
+        if (!class_exists(DynamicRetryStrategy::class)) {
+            $container->removeDefinition('messenger.retry.abstract_dynamic_retry_strategy');
+        }
+
         if (!interface_exists(DenormalizerInterface::class)) {
             $container->removeDefinition('serializer.normalizer.flatten_exception');
         }
@@ -2576,7 +2581,7 @@ class FrameworkExtension extends Extension
             $serializerIds[$transportId] = $serializerId;
 
             if (null !== $transport['retry_strategy']['service']) {
-                $transportRetryReferences[$name] = new Reference($transport['retry_strategy']['service']);
+                $retryServiceId = $transport['retry_strategy']['service'];
             } else {
                 $retryServiceId = \sprintf('messenger.retry.multiplier_retry_strategy.%s', $name);
                 $retryDefinition = new ChildDefinition('messenger.retry.abstract_multiplier_retry_strategy');
@@ -2587,7 +2592,11 @@ class FrameworkExtension extends Extension
                     ->replaceArgument(3, $transport['retry_strategy']['max_delay'])
                     ->replaceArgument(4, $transport['retry_strategy']['jitter']);
                 $container->setDefinition($retryServiceId, $retryDefinition);
+            }
 
+            if ($container->hasDefinition('messenger.retry.abstract_dynamic_retry_strategy')) {
+                $transportRetryReferences[$name] = (new ChildDefinition('messenger.retry.abstract_dynamic_retry_strategy'))->setDecoratedService($retryServiceId);
+            } else {
                 $transportRetryReferences[$name] = new Reference($retryServiceId);
             }
 

@@ -10,6 +10,7 @@ CHANGELOG
  * Add the possibility to configure exchange to exchange bindings in AMQP transport
  * Add `MessageSentToTransportsEvent` that is dispatched only after the message was sent to at least one transport
  * Support signing messages per handler
+ * Add `RetryStrategyStamp` to dynamically control retry behavior
 
 7.3
 ---

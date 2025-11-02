@@ -37,6 +37,7 @@ use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
+use Symfony\Component\Messenger\Retry\DynamicRetryStrategy;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory;
@@ -191,6 +192,12 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('multiplier'),
                 abstract_arg('max delay ms'),
                 abstract_arg('jitter'),
+            ])
+
+        ->set('messenger.retry.abstract_dynamic_retry_strategy', DynamicRetryStrategy::class)
+            ->abstract()
+            ->args([
+                abstract_arg('fallback strategy'),
             ])
 
         // rate limiter

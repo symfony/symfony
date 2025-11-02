@@ -13,6 +13,7 @@ namespace Symfony\Component\ObjectMapper\Transform;
 
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\ObjectMapper;
+use Symfony\Component\ObjectMapper\ObjectMapperAwareInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\TransformCallableInterface;
 
@@ -21,10 +22,10 @@ use Symfony\Component\ObjectMapper\TransformCallableInterface;
  *
  * @implements TransformCallableInterface<object, T>
  */
-class MapCollection implements TransformCallableInterface
+class MapCollection implements TransformCallableInterface, ObjectMapperAwareInterface
 {
     public function __construct(
-        private ObjectMapperInterface $objectMapper = new ObjectMapper(),
+        private ?ObjectMapperInterface $objectMapper = null,
     ) {
     }
 
@@ -40,5 +41,11 @@ class MapCollection implements TransformCallableInterface
         }
 
         return $values;
+    }
+
+    public function withObjectMapper(ObjectMapperInterface $objectMapper): static
+    {
+        $this->objectMapper = $objectMapper;
+        return $this;
     }
 }

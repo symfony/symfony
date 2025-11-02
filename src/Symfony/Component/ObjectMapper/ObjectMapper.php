@@ -312,16 +312,26 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     }
 
     /**
-     * @param (string|callable(mixed $value, object $object): mixed) $fn
+     * @param string|callable(mixed $value, object $object): mixed) $fn
      */
     private function getCallable(string|callable $fn, ?ContainerInterface $locator = null): ?callable
     {
         if (\is_callable($fn)) {
+            if ($fn instanceof ObjectMapperAwareInterface) {
+                $fn = $fn->withObjectMapper($this->objectMapper ?? $this);
+            }
+
             return $fn;
         }
 
         if ($locator?->has($fn)) {
-            return $locator->get($fn);
+            $fn = $locator->get($fn);
+
+            if ($fn instanceof ObjectMapperAwareInterface) {
+                $fn = $fn->withObjectMapper($this->objectMapper ?? $this);
+            }
+
+            return \is_callable($fn) ? $fn : null;
         }
 
         return null;

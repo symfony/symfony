@@ -40,16 +40,6 @@ class NativeHttpClientTest extends HttpClientTestCase
         $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
     }
 
-    public function testHttp2PushVulcain()
-    {
-        $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
-    }
-
-    public function testHttp2PushVulcainWithUnusedResponse()
-    {
-        $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
-    }
-
     public function testIPv6Resolve()
     {
         TestHttpServer::start(-8087);

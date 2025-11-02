@@ -225,12 +225,9 @@ final class AmpResponseV4 implements ResponseInterface, StreamableInterface
         });
 
         try {
-            /** @var Response $response */
-            if (null === $response = yield from self::getPushedResponse($request, $multi, $info, $headers, $options, $logger)) {
-                $logger?->info(\sprintf('Request: "%s %s"', $info['http_method'], $info['url']));
+            $logger?->info(\sprintf('Request: "%s %s"', $info['http_method'], $info['url']));
 
-                $response = yield from self::followRedirects($request, $multi, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause);
-            }
+            $response = yield from self::followRedirects($request, $multi, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause);
 
             $options = null;
 
@@ -382,69 +379,6 @@ final class AmpResponseV4 implements ResponseInterface, StreamableInterface
         }
 
         $info['debug'] .= "< \r\n";
-    }
-
-    /**
-     * Accepts pushed responses only if their headers related to authentication match the request.
-     */
-    private static function getPushedResponse(Request $request, AmpClientStateV4 $multi, array &$info, array &$headers, array $options, ?LoggerInterface $logger): \Generator
-    {
-        if ('' !== $options['body']) {
-            return null;
-        }
-
-        $authority = $request->getUri()->getAuthority();
-
-        foreach ($multi->pushedResponses[$authority] ?? [] as $i => [$pushedUrl, $pushDeferred, $pushedRequest, $pushedResponse, $parentOptions]) {
-            if ($info['url'] !== $pushedUrl || $info['http_method'] !== $pushedRequest->getMethod()) {
-                continue;
-            }
-
-            foreach ($parentOptions as $k => $v) {
-                if ($options[$k] !== $v) {
-                    continue 2;
-                }
-            }
-
-            foreach (['authorization', 'cookie', 'range', 'proxy-authorization'] as $k) {
-                if ($pushedRequest->getHeaderArray($k) !== $request->getHeaderArray($k)) {
-                    continue 2;
-                }
-            }
-
-            $response = yield $pushedResponse;
-
-            foreach ($response->getHeaderArray('vary') as $vary) {
-                foreach (preg_split('/\s*+,\s*+/', $vary) as $v) {
-                    if ('*' === $v || ($pushedRequest->getHeaderArray($v) !== $request->getHeaderArray($v) && 'accept-encoding' !== strtolower($v))) {
-                        $logger?->debug(\sprintf('Skipping pushed response: "%s"', $info['url']));
-                        continue 3;
-                    }
-                }
-            }
-
-            $info += [
-                'connect_time' => 0.0,
-                'pretransfer_time' => 0.0,
-                'starttransfer_time' => 0.0,
-                'total_time' => 0.0,
-                'namelookup_time' => 0.0,
-                'primary_ip' => '',
-                'primary_port' => 0,
-                'start_time' => microtime(true),
-            ];
-
-            $pushDeferred->resolve();
-            $logger?->debug(\sprintf('Accepting pushed response: "%s %s"', $info['http_method'], $info['url']));
-            self::addResponseHeaders($response, $info, $headers);
-            unset($multi->pushedResponses[$authority][$i]);
-
-            if (!$multi->pushedResponses[$authority]) {
-                unset($multi->pushedResponses[$authority]);
-            }
-
-            return $response;
-        }
     }
 
     private static function stopLoop(): void

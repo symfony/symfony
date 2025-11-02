@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
-use Symfony\Component\HttpClient\Internal\PushedResponse;
 use Symfony\Component\HttpClient\Response\CurlResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -27,8 +26,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * A performant implementation of the HttpClientInterface contracts based on the curl extension.
  *
- * This provides fully concurrent HTTP requests, with transparent
- * HTTP/2 push when a curl version that supports it is installed.
+ * This provides fully concurrent HTTP requests and support for HTTP/2.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -52,7 +50,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     private ?LoggerInterface $logger = null;
 
     private int $maxHostConnections;
-    private int $maxPendingPushes;
 
     /**
      * An internal object to share state between the client and its responses.
@@ -62,19 +59,16 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     /**
      * @param array $defaultOptions     Default request's options
      * @param int   $maxHostConnections The maximum number of connections to a single host
-     * @param int   $maxPendingPushes   The maximum number of pushed responses to accept in the queue
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 0)
+    public function __construct(array $defaultOptions = [], int $maxHostConnections = 6)
     {
         if (!\extension_loaded('curl')) {
             throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\CurlHttpClient" as the "curl" extension is not installed.');
         }
 
         $this->maxHostConnections = $maxHostConnections;
-        $this->maxPendingPushes = $maxPendingPushes;
-
         $this->defaultOptions['buffer'] ??= self::shouldBuffer(...);
 
         if ($defaultOptions) {
@@ -299,27 +293,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts += $options['extra']['curl'];
         }
 
-        if ($pushedResponse = $multi->pushedResponses[$url] ?? null) {
-            unset($multi->pushedResponses[$url]);
-
-            if (self::acceptPushForRequest($method, $options, $pushedResponse)) {
-                $this->logger?->debug(\sprintf('Accepting pushed response: "%s %s"', $method, $url));
-
-                // Reinitialize the pushed response with request's options
-                $ch = $pushedResponse->handle;
-                $pushedResponse = $pushedResponse->response;
-                $pushedResponse->__construct($multi, $url, $options, $this->logger);
-            } else {
-                $this->logger?->debug(\sprintf('Rejecting pushed response: "%s"', $url));
-                $pushedResponse = null;
-            }
-        }
-
-        if (!$pushedResponse) {
-            $ch = curl_init();
-            $this->logger?->info(\sprintf('Request: "%s %s"', $method, $url));
-            $curlopts += [\CURLOPT_SHARE => $multi->share];
-        }
+        $ch = curl_init();
+        $this->logger?->info(\sprintf('Request: "%s %s"', $method, $url));
+        $curlopts += [\CURLOPT_SHARE => $multi->share];
 
         foreach ($curlopts as $opt => $value) {
             if (\PHP_INT_SIZE === 8 && \defined('CURLOPT_INFILESIZE_LARGE') && \CURLOPT_INFILESIZE === $opt && $value >= 1 << 31) {
@@ -331,7 +307,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return $pushedResponse ?? new CurlResponse($multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $authority), CurlClientState::$curlVersion['version_number'], $url);
+        return new CurlResponse($multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $authority), CurlClientState::$curlVersion['version_number'], $url);
     }
 
     public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
@@ -356,35 +332,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         if (isset($this->multi)) {
             $this->multi->reset();
         }
-    }
-
-    /**
-     * Accepts pushed responses only if their headers related to authentication match the request.
-     */
-    private static function acceptPushForRequest(string $method, array $options, PushedResponse $pushedResponse): bool
-    {
-        if ('' !== $options['body'] || $method !== $pushedResponse->requestHeaders[':method'][0]) {
-            return false;
-        }
-
-        foreach (['proxy', 'no_proxy', 'bindto', 'local_cert', 'local_pk'] as $k) {
-            if ($options[$k] !== $pushedResponse->parentOptions[$k]) {
-                return false;
-            }
-        }
-
-        foreach (['authorization', 'cookie', 'range', 'proxy-authorization'] as $k) {
-            $normalizedHeaders = $options['normalized_headers'][$k] ?? [];
-            foreach ($normalizedHeaders as $i => $v) {
-                $normalizedHeaders[$i] = substr($v, \strlen($k) + 2);
-            }
-
-            if (($pushedResponse->requestHeaders[$k] ?? []) !== $normalizedHeaders) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -455,7 +402,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     private function ensureState(): CurlClientState
     {
         if (!isset($this->multi)) {
-            $this->multi = new CurlClientState($this->maxHostConnections, $this->maxPendingPushes);
+            $this->multi = new CurlClientState($this->maxHostConnections);
             $this->multi->logger = $this->logger;
         }
 

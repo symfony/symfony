@@ -42,26 +42,21 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
      */
     public function __construct(
         private CurlClientState $multi,
-        \CurlHandle|string $ch,
-        ?array $options = null,
-        ?LoggerInterface $logger = null,
-        string $method = 'GET',
-        ?callable $resolveRedirect = null,
-        ?int $curlVersion = null,
-        ?string $originalUrl = null,
+        \CurlHandle $ch,
+        array $options,
+        ?LoggerInterface $logger,
+        string $method,
+        callable $resolveRedirect,
+        int $curlVersion,
+        string $originalUrl,
     ) {
-        if ($ch instanceof \CurlHandle) {
-            $this->handle = $ch;
-            $this->debugBuffer = fopen('php://temp', 'w+');
-            if (0x074000 === $curlVersion) {
-                fwrite($this->debugBuffer, 'Due to a bug in curl 7.64.0, the debug log is disabled; use another version to work around the issue.');
-            } else {
-                curl_setopt($ch, \CURLOPT_VERBOSE, true);
-                curl_setopt($ch, \CURLOPT_STDERR, $this->debugBuffer);
-            }
+        $this->handle = $ch;
+        $this->debugBuffer = fopen('php://temp', 'w+');
+        if (0x074000 === $curlVersion) {
+            fwrite($this->debugBuffer, 'Due to a bug in curl 7.64.0, the debug log is disabled; use another version to work around the issue.');
         } else {
-            $this->info['url'] = $ch;
-            $ch = $this->handle;
+            curl_setopt($ch, \CURLOPT_VERBOSE, true);
+            curl_setopt($ch, \CURLOPT_STDERR, $this->debugBuffer);
         }
 
         $this->id = $id = (int) $ch;
@@ -72,7 +67,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->info['user_data'] = $options['user_data'] ?? null;
         $this->info['max_duration'] = $options['max_duration'] ?? null;
         $this->info['start_time'] ??= microtime(true);
-        $this->info['original_url'] = $originalUrl ?? $this->info['url'] ?? curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL);
+        $this->info['original_url'] = $originalUrl;
         $info = &$this->info;
         $headers = &$this->headers;
         $debugBuffer = $this->debugBuffer;
@@ -85,18 +80,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         curl_setopt($ch, \CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect, $logger): int {
             return self::parseHeaderLine($ch, $data, $info, $headers, $options, $multi, $id, $location, $resolveRedirect, $logger);
         });
-
-        if (null === $options) {
-            // Pushed response: buffer until requested
-            curl_setopt($ch, \CURLOPT_WRITEFUNCTION, static function ($ch, string $data) use ($multi, $id): int {
-                $multi->handlesActivity[$id][] = $data;
-                curl_pause($ch, \CURLPAUSE_RECV);
-
-                return \strlen($data);
-            });
-
-            return;
-        }
 
         $execCounter = $multi->execCounter;
         $this->info['pause_handler'] = static function (float $duration) use ($ch, $multi, $execCounter) {
@@ -207,12 +190,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             $info = array_merge($this->info, curl_getinfo($this->handle));
             $info['redirect_url'] = $this->info['redirect_url'] ?? null;
 
-            // workaround curl not subtracting the time offset for pushed responses
-            if (isset($this->info['url']) && $info['start_time'] / 1000 < $info['total_time']) {
-                $info['total_time'] -= $info['starttransfer_time'] ?: $info['total_time'];
-                $info['starttransfer_time'] = 0.0;
-            }
-
             $info['debug'] ??= '';
             rewind($this->debugBuffer);
             if (fstat($this->debugBuffer)['size']) {
@@ -247,10 +224,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     public function __destruct()
     {
         try {
-            if (null === $this->timeout) {
-                return; // Unused pushed response
-            }
-
             $this->doDestruct();
         } finally {
             if ($this->handle instanceof \CurlHandle) {
@@ -374,7 +347,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     /**
      * Parses header lines as curl yields them to us.
      */
-    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, CurlClientState $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger): int
+    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, array $options, CurlClientState $multi, int $id, ?string &$location, callable $resolveRedirect, ?LoggerInterface $logger): int
     {
         if (!str_ends_with($data, "\r\n")) {
             return 0;

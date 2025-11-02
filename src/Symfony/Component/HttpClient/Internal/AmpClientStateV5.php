@@ -45,7 +45,6 @@ final class AmpClientStateV5 extends ClientState
 {
     public array $dnsCache = [];
     public int $responseCount = 0;
-    public array $pushedResponses = [];
 
     private array $clients = [];
     private \Closure $clientConfigurator;
@@ -53,7 +52,6 @@ final class AmpClientStateV5 extends ClientState
     public function __construct(
         ?callable $clientConfigurator,
         private int $maxHostConnections,
-        private int $maxPendingPushes,
         private ?LoggerInterface &$logger,
     ) {
         $clientConfigurator ??= static fn (PooledHttpClient $client) => new InterceptedHttpClient($client, new RetryRequests(2), []);
@@ -88,7 +86,6 @@ final class AmpClientStateV5 extends ClientState
         }
 
         $request->addEventListener(new AmpListenerV5($info, $options['peer_fingerprint']['pin-sha256'] ?? [], $onProgress, $handle));
-        $request->setPushHandler(fn ($request, $response) => $this->handlePush($request, $response, $options));
 
         if (0 <= $bodySize = $request->hasHeader('content-length') ? (int) $request->getHeader('content-length') : $request->getBody()->getContentLength() ?? -1) {
             $info['upload_content_length'] = ((1 + $info['upload_content_length']) ?? 1) - 1 + $bodySize;
@@ -176,28 +173,5 @@ final class AmpClientStateV5 extends ClientState
         $pool = ConnectionLimitingPool::byAuthority($maxHostConnections, $pool);
 
         return $this->clients[$key] = [($this->clientConfigurator)(new PooledHttpClient($pool)), $handleConnector];
-    }
-
-    private function handlePush(Request $request, Future $response, array $options): void
-    {
-        $deferred = new DeferredFuture();
-        $authority = $request->getUri()->getAuthority();
-
-        if ($this->maxPendingPushes <= \count($this->pushedResponses[$authority] ?? [])) {
-            $fifoUrl = key($this->pushedResponses[$authority]);
-            unset($this->pushedResponses[$authority][$fifoUrl]);
-            $this->logger?->debug(\sprintf('Evicting oldest pushed response: "%s"', $fifoUrl));
-        }
-
-        $url = (string) $request->getUri();
-        $this->logger?->debug(\sprintf('Queueing pushed response: "%s"', $url));
-        $this->pushedResponses[$authority][] = [$url, $deferred, $request, $response, [
-            'proxy' => $options['proxy'],
-            'bindto' => $options['bindto'],
-            'local_cert' => $options['local_cert'],
-            'local_pk' => $options['local_pk'],
-        ]];
-
-        $deferred->getFuture()->await();
     }
 }

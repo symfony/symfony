@@ -63,11 +63,10 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
      * @param callable|null $clientConfigurator A callable that builds a {@see DelegateHttpClient} from a {@see PooledHttpClient};
      *                                          passing null builds an {@see InterceptedHttpClient} with 2 retries on failures
      * @param int           $maxHostConnections The maximum number of connections to a single host
-     * @param int           $maxPendingPushes   The maximum number of pushed responses to accept in the queue
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(array $defaultOptions = [], ?callable $clientConfigurator = null, int $maxHostConnections = 6, int $maxPendingPushes = 50)
+    public function __construct(array $defaultOptions = [], ?callable $clientConfigurator = null, int $maxHostConnections = 6)
     {
         $this->defaultOptions['buffer'] ??= self::shouldBuffer(...);
 
@@ -76,12 +75,12 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         }
 
         if (is_subclass_of(Request::class, HttpMessage::class)) {
-            $this->multi = new AmpClientStateV5($clientConfigurator, $maxHostConnections, $maxPendingPushes, $this->logger);
+            $this->multi = new AmpClientStateV5($clientConfigurator, $maxHostConnections, $this->logger);
         } else {
             if (\PHP_VERSION_ID >= 80400) {
                 trigger_deprecation('symfony/http-client', '7.4', 'Using amphp/http-client < 5 is deprecated. Try running "composer require amphp/http-client:^5".');
             }
-            $this->multi = new AmpClientStateV4($clientConfigurator, $maxHostConnections, $maxPendingPushes, $this->logger);
+            $this->multi = new AmpClientStateV4($clientConfigurator, $maxHostConnections, $this->logger);
         }
     }
 
@@ -180,19 +179,5 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
     public function reset(): void
     {
         $this->multi->dnsCache = [];
-
-        foreach ($this->multi->pushedResponses as $pushedResponses) {
-            foreach ($pushedResponses as [$pushedUrl, $pushDeferred]) {
-                if ($pushDeferred instanceof DeferredFuture) {
-                    $pushDeferred->error(new CancelledException());
-                } else {
-                    $pushDeferred->fail(new CancelledException());
-                }
-
-                $this->logger?->debug(\sprintf('Unused pushed response: "%s"', $pushedUrl));
-            }
-        }
-
-        $this->multi->pushedResponses = [];
     }
 }

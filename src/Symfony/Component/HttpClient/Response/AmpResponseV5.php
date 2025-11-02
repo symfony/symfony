@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpClient\Response;
 use Amp\ByteStream\StreamException;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
-use Amp\Future;
 use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
@@ -216,11 +215,9 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
         });
 
         try {
-            if (null === $response = self::getPushedResponse($request, $multi, $info, $headers, $canceller, $options, $logger)) {
-                $logger?->info(\sprintf('Request: "%s %s"', $info['http_method'], $info['url']));
+            $logger?->info(\sprintf('Request: "%s %s"', $info['http_method'], $info['url']));
 
-                $response = self::followRedirects($request, $multi, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause);
-            }
+            $response = self::followRedirects($request, $multi, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause);
 
             $options = null;
 
@@ -382,79 +379,5 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
         }
 
         $info['debug'] .= "< \r\n";
-    }
-
-    /**
-     * Accepts pushed responses only if their headers related to authentication match the request.
-     */
-    private static function getPushedResponse(Request $request, AmpClientStateV5 $multi, array &$info, array &$headers, DeferredCancellation $canceller, array $options, ?LoggerInterface $logger): ?Response
-    {
-        if ('' !== $options['body']) {
-            return null;
-        }
-
-        $authority = $request->getUri()->getAuthority();
-        $cancellation = $canceller->getCancellation();
-
-        foreach ($multi->pushedResponses[$authority] ?? [] as $i => [$pushedUrl, $pushDeferred, $pushedRequest, $pushedResponse, $parentOptions]) {
-            if ($info['url'] !== $pushedUrl || $info['http_method'] !== $pushedRequest->getMethod()) {
-                continue;
-            }
-
-            foreach ($parentOptions as $k => $v) {
-                if ($options[$k] !== $v) {
-                    continue 2;
-                }
-            }
-
-            /** @var DeferredFuture $pushDeferred */
-            $id = $cancellation->subscribe(static fn ($e) => $pushDeferred->error($e));
-
-            try {
-                /** @var Future $pushedResponse */
-                $response = $pushedResponse->await($cancellation);
-            } finally {
-                $cancellation->unsubscribe($id);
-            }
-
-            foreach (['authorization', 'cookie', 'range', 'proxy-authorization'] as $k) {
-                if ($response->getHeaderArray($k) !== $request->getHeaderArray($k)) {
-                    continue 2;
-                }
-            }
-
-            foreach ($response->getHeaderArray('vary') as $vary) {
-                foreach (preg_split('/\s*+,\s*+/', $vary) as $v) {
-                    if ('*' === $v || ($pushedRequest->getHeaderArray($v) !== $request->getHeaderArray($v) && 'accept-encoding' !== strtolower($v))) {
-                        $logger?->debug(\sprintf('Skipping pushed response: "%s"', $info['url']));
-                        continue 3;
-                    }
-                }
-            }
-
-            $info += [
-                'connect_time' => 0.0,
-                'pretransfer_time' => 0.0,
-                'starttransfer_time' => 0.0,
-                'total_time' => 0.0,
-                'namelookup_time' => 0.0,
-                'primary_ip' => '',
-                'primary_port' => 0,
-                'start_time' => microtime(true),
-            ];
-
-            $pushDeferred->complete();
-            $logger?->debug(\sprintf('Accepting pushed response: "%s %s"', $info['http_method'], $info['url']));
-            self::addResponseHeaders($response, $info, $headers);
-            unset($multi->pushedResponses[$authority][$i]);
-
-            if (!$multi->pushedResponses[$authority]) {
-                unset($multi->pushedResponses[$authority]);
-            }
-
-            return $response;
-        }
-
-        return null;
     }
 }

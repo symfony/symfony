@@ -60,6 +60,7 @@ return static function (ContainerConfigurator $container) {
                 null,
                 null,
                 null,
+                null,
             ])
 
         ->set('security.authenticator.access_token.chain_extractor', ChainAccessTokenExtractor::class)

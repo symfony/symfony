@@ -726,6 +726,25 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertSame('(?:^/register$|^/documentation$)', $container->getDefinition($requestMatcherId)->getArgument(0));
     }
 
+    /**
+     * @dataProvider provideAccessTokenDefaultRoles
+     */
+    public function testAccessTokenWithDefaultRoles(string $firewallName, array $expected)
+    {
+        $container = $this->getContainer('access_token_with_default_roles');
+
+        $this->assertTrue($container->hasDefinition("security.authenticator.access_token.$firewallName"));
+
+        $definition = $container->getDefinition("security.authenticator.access_token.$firewallName");
+        $this->assertEquals($expected, $definition->getArgument(6));
+    }
+
+    public static function provideAccessTokenDefaultRoles(): iterable
+    {
+        yield ['with_string', ['ROLE_FOO']];
+        yield ['with_array', ['ROLE_FOO', 'ROLE_BAR']];
+    }
+
     public function testAccessTokenOidc()
     {
         $container = $this->getContainer('access_token_oidc');

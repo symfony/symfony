@@ -296,6 +296,7 @@
         </xsd:choice>
         <xsd:attribute name="token-handler" type="xsd:string" />
         <xsd:attribute name="realm" type="xsd:string" />
+        <xsd:attribute name="default-roles" type="xsd:string" />
         <xsd:attribute name="success-handler" type="xsd:string" />
         <xsd:attribute name="failure-handler" type="xsd:string" />
         <xsd:attribute name="provider" type="xsd:string" />

@@ -36,6 +36,9 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
 {
     private ?TranslatorInterface $translator = null;
 
+    /**
+     * @param ?array<string> $defaultRoles
+     */
     public function __construct(
         private readonly AccessTokenHandlerInterface $accessTokenHandler,
         private readonly AccessTokenExtractorInterface $accessTokenExtractor,
@@ -43,6 +46,7 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
         private readonly ?AuthenticationSuccessHandlerInterface $successHandler = null,
         private readonly ?AuthenticationFailureHandlerInterface $failureHandler = null,
         private readonly ?string $realm = null,
+        private readonly ?array $defaultRoles = null,
     ) {
     }
 
@@ -68,7 +72,9 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
 
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        return new PostAuthenticationToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
+        $defaultRoles = $this->defaultRoles ?? $passport->getUser()->getRoles();
+
+        return new PostAuthenticationToken($passport->getUser(), $firewallName, $defaultRoles);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

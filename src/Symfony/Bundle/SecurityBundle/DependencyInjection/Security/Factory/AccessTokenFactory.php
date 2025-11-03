@@ -46,6 +46,21 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         $builder = $node->children();
         $builder
             ->scalarNode('realm')->defaultNull()->end()
+            ->variableNode('default_roles')
+                ->defaultNull()
+                ->beforeNormalization()
+                    ->ifString()
+                    ->then(static fn ($defaultRoles) => preg_split('/\s*,\s*/', $defaultRoles))
+                ->end()
+                ->beforeNormalization()
+                    ->always()
+                    ->then(static fn ($defaultRoles) => \is_array($defaultRoles) ? $defaultRoles : [$defaultRoles])
+                ->end()
+                ->validate()
+                    ->ifTrue(static fn ($defaultRoles) => array_filter($defaultRoles, static fn ($r) => !\is_string($r)))
+                    ->thenInvalid('The "default_roles" value must be either a string or an array of strings.')
+                ->end()
+            ->end()
             ->arrayNode('token_extractors', 'token_extractor')
                 ->acceptAndWrap(['string'])
                 ->cannotBeEmpty()
@@ -107,6 +122,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             ->replaceArgument(3, $successHandler)
             ->replaceArgument(4, $failureHandler)
             ->replaceArgument(5, $config['realm'])
+            ->replaceArgument(6, $config['default_roles'])
         ;
 
         return $authenticatorId;

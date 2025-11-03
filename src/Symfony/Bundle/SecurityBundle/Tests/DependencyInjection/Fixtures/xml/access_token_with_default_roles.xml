@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                               http://symfony.com/schema/dic/security http://symfony.com/schema/dic/security/security-1.0.xsd">
+    <services>
+        <service id="Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\AccessToken\AccessTokenHandler" public="true" />
+    </services>
+
+    <config xmlns="http://symfony.com/schema/dic/security">
+        <firewall name="with_string">
+            <access-token token-handler="Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\AccessToken\AccessTokenHandler" default-roles="ROLE_FOO" />
+        </firewall>
+
+        <firewall name="with_array">
+            <access-token token-handler="Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\AccessToken\AccessTokenHandler" default-roles="ROLE_FOO, ROLE_BAR" />
+        </firewall>
+    </config>
+</container>
+

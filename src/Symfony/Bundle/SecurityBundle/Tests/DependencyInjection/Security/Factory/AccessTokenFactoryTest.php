@@ -633,6 +633,64 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
+    /**
+     * @dataProvider provideDefaultRoles
+     */
+    public function testDefaultRoles(array|string $actual, ?array $expected)
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => 'in_memory_token_handler_service_id',
+            'default_roles' => $actual,
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        // When
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        // Then
+        $arguments = $container->getDefinition('security.authenticator.access_token.firewall1')->getArguments();
+        $this->assertEquals($expected, $arguments['index_6']);
+    }
+
+    public static function provideDefaultRoles(): iterable
+    {
+        yield [[], []];
+        yield ['ROLE_FOO', ['ROLE_FOO']];
+        yield [['ROLE_FOO', 'ROLE_BAR'], ['ROLE_FOO', 'ROLE_BAR']];
+    }
+
+    /**
+     * @dataProvider provideInvalidDefaultRoles
+     */
+    public function testInvalidDefaultRoles(array|bool|int|null $invalidDefaultRoles)
+    {
+        $config = [
+            'token_handler' => 'in_memory_token_handler_service_id',
+            'default_roles' => $invalidDefaultRoles,
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "default_roles" value must be either a string or an array of strings.');
+
+        $this->processConfig($config, $factory);
+    }
+
+    public static function provideInvalidDefaultRoles(): iterable
+    {
+        yield [null];
+        yield [true];
+        yield [0];
+        yield [['ROLE_FOO', null]];
+        yield [['ROLE_FOO', true]];
+        yield [['ROLE_FOO', 0]];
+    }
+
     private function processConfig(array $config, AccessTokenFactory $factory)
     {
         $nodeDefinition = new ArrayNodeDefinition('access_token');

@@ -1,0 +1,15 @@
+services:
+    Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\AccessToken\AccessTokenHandler:
+        public: true
+
+security:
+    firewalls:
+        with_string:
+            access_token:
+                token_handler: Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\AccessToken\AccessTokenHandler
+                default_roles: 'ROLE_FOO'
+
+        with_array:
+            access_token:
+                token_handler: Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\AccessToken\AccessTokenHandler
+                default_roles: ['ROLE_FOO', 'ROLE_BAR']

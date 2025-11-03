@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\FrameworkBundle\CacheWarmer\CachedObjectMapperCacheWarmer;
+use Symfony\Component\ObjectMapper\CachedObjectMapper;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -22,12 +23,23 @@ return static function (ContainerConfigurator $container) {
         ->alias(ObjectMapperMetadataFactoryInterface::class, 'object_mapper.metadata_factory')
 
         ->set('object_mapper', ObjectMapper::class)
-            ->args([
-                service('object_mapper.metadata_factory'),
-                service('property_accessor')->ignoreOnInvalid(),
-                tagged_locator('object_mapper.transform_callable'),
-                tagged_locator('object_mapper.condition_callable'),
-            ])
-        ->alias(ObjectMapperInterface::class, 'object_mapper')
+        ->args([
+            service('object_mapper.metadata_factory'),
+            service('property_accessor')->ignoreOnInvalid(),
+            tagged_locator('object_mapper.transform_callable'),
+            tagged_locator('object_mapper.condition_callable'),
+        ])
+
+        ->set('object_mapper.cached', CachedObjectMapper::class)
+        ->args([
+            param('.object_mapper.cache_dir'),
+            service('object_mapper.metadata_factory'),
+            service('property_accessor')->ignoreOnInvalid(),
+            tagged_locator('object_mapper.transform_callable'),
+            tagged_locator('object_mapper.condition_callable'),
+        ])
+
+        ->set('object_mapper.cached.cache_warmer', CachedObjectMapperCacheWarmer::class)
+        ->args([null, 'object_mapper.cached'])
     ;
 };

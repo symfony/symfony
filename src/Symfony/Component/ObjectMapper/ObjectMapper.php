@@ -15,12 +15,12 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchPropertyException;
+use Symfony\Component\ObjectMapper\Internal\ObjectMapperTrait;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException as PropertyAccessorNoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\VarExporter\LazyObjectInterface;
 
 /**
  * Object to object mapper.
@@ -29,26 +29,33 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
  */
 final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInterface
 {
+    use ObjectMapperAwareTrait;
+    use ObjectMapperTrait;
+
     /**
      * Tracks recursive references.
      */
     private ?\SplObjectStorage $objectMap = null;
 
     public function __construct(
-        private readonly ObjectMapperMetadataFactoryInterface $metadataFactory = new ReflectionObjectMapperMetadataFactory(),
-        private readonly ?PropertyAccessorInterface $propertyAccessor = null,
-        private readonly ?ContainerInterface $transformCallableLocator = null,
-        private readonly ?ContainerInterface $conditionCallableLocator = null,
-        private ?ObjectMapperInterface $objectMapper = null,
+        ObjectMapperMetadataFactoryInterface $metadataFactory = new ReflectionObjectMapperMetadataFactory(),
+        ?PropertyAccessorInterface $propertyAccessor = null,
+        ?ContainerInterface $transformCallableLocator = null,
+        ?ContainerInterface $conditionCallableLocator = null,
+        ?ObjectMapperInterface $objectMapper = null,
     ) {
+        $this->metadataFactory = $metadataFactory;
+        $this->propertyAccessor = $propertyAccessor;
+        $this->transformCallableLocator = $transformCallableLocator;
+        $this->conditionCallableLocator = $conditionCallableLocator;
+        $this->objectMapper = $objectMapper;
     }
 
     public function map(object $source, object|string|null $target = null): object
     {
-        $objectMapInitialized = false;
-        if (null === $this->objectMap) {
+        $objectMapInitialized = null === $this->objectMap;
+        if ($objectMapInitialized) {
             $this->objectMap = new \SplObjectStorage();
-            $objectMapInitialized = true;
         }
 
         $metadata = $this->metadataFactory->create($source);
@@ -90,95 +97,93 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         $this->objectMap[$source] = $mappedTarget;
+
         $ctorArguments = [];
+        $ctorValues = [];
         $targetConstructor = $targetRefl->getConstructor();
+        $sourceRefl = $this->getSourceReflectionClass($source);
+
         foreach ($targetConstructor?->getParameters() ?? [] as $parameter) {
             $parameterName = $parameter->getName();
+            $hasDefault = $parameter->isDefaultValueAvailable();
+            $defaultValue = $hasDefault ? $parameter->getDefaultValue() : null;
+            $sourceIsMappable = $this->isReadable($source, $parameterName);
 
-            if ($targetRefl->hasProperty($parameterName)) {
-                $property = $targetRefl->getProperty($parameterName);
-
-                if ($property->isReadOnly() && $property->isInitialized($mappedTarget)) {
+            if (
+                $targetRefl->hasProperty($parameterName) &&
+                ($property = $targetRefl->getProperty($parameterName)) &&
+                $property->isReadOnly() &&
+                $property->isInitialized($mappedTarget)
+            ) {
+                    $ctorArguments[$parameterName] = [
+                        'name' => $parameterName,
+                        'hasDefault' => $hasDefault,
+                        'defaultValue' => $defaultValue,
+                        'propertyIsMappable' => $this->propertyIsMappable($targetRefl, $parameterName),
+                        'sourceIsMappable' => $sourceIsMappable,
+                    ];
                     continue;
-                }
             }
 
-            if ($this->isReadable($source, $parameterName)) {
-                $ctorArguments[$parameterName] = $this->getRawValue($source, $parameterName);
+            if ($sourceIsMappable) {
+                $ctorValues[$parameterName] = $this->getRawValue($source, $parameterName);
             } else {
-                $ctorArguments[$parameterName] = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
+                $ctorValues[$parameterName] = $defaultValue;
             }
+
+            $ctorArguments[$parameterName] = [
+                'name' => $parameterName,
+                'hasDefault' => $hasDefault,
+                'defaultValue' => $defaultValue,
+                'propertyIsMappable' => $this->propertyIsMappable($targetRefl, $parameterName),
+                'sourceIsMappable' => $sourceIsMappable,
+            ];
         }
 
         $readMetadataFrom = $source;
-        $refl = $this->getSourceReflectionClass($source) ?? $targetRefl;
+        $refl = $sourceRefl ?? $targetRefl;
 
         // When source contains no metadata, we read metadata on the target instead
         if ($refl === $targetRefl) {
             $readMetadataFrom = $mappedTarget;
         }
 
+        $properties = $this->analyzeProperties($refl, $readMetadataFrom, $sourceRefl, $targetRefl, $source, $ctorArguments);
         $mapToProperties = [];
-        foreach ($refl->getProperties() as $property) {
-            if ($property->isStatic()) {
+
+        foreach ($properties as ['source' => $sourceProperty, 'target' => $targetProperty, 'mapping' => $mapping]) {
+            if ($sourceRefl?->hasProperty($sourceProperty) && !$sourceRefl->getProperty($sourceProperty)->isInitialized($source)) {
                 continue;
             }
 
-            $propertyName = $property->getName();
-            $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName);
-            foreach ($mappings as $mapping) {
-                $sourcePropertyName = $propertyName;
-                if ($mapping->source && (!$refl->hasProperty($propertyName) || !isset($source->$propertyName))) {
-                    $sourcePropertyName = $mapping->source;
-                }
+            $value = $this->getRawValue($source, $sourceProperty);
 
-                if (false === $if = $mapping->if) {
-                    continue;
-                }
-
-                $value = $this->getRawValue($source, $sourcePropertyName);
-                if ($if && ($fn = $this->getCallable($if, $this->conditionCallableLocator)) && !$this->call($fn, $value, $source, $mappedTarget)) {
-                    continue;
-                }
-
-                $targetPropertyName = $mapping->target ?? $propertyName;
-                if (!$targetRefl->hasProperty($targetPropertyName)) {
-                    continue;
-                }
-
-                $value = $this->getSourceValue($source, $mappedTarget, $value, $this->objectMap, $mapping);
-                $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value);
+            if ($mapping && false === $this->checkCondition($mapping, $value, $source, $mappedTarget)) {
+                continue;
             }
 
-            if (!$mappings && $targetRefl->hasProperty($propertyName)) {
-                $sourceProperty = $refl->getProperty($propertyName);
-                if ($refl->isInstance($source) && !$sourceProperty->isInitialized($source)) {
-                    continue;
-                }
-
-                $value = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $this->objectMap);
-                $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value);
-            }
+            $value = $this->getSourceValue($source, $mappedTarget, $value, $this->objectMap, $mapping);
+            $this->storeValue($targetProperty, $mapToProperties, $ctorValues, $value);
         }
 
         if (!$mappingToObject && !$map?->transform && $targetConstructor) {
             try {
-                $mappedTarget->__construct(...$ctorArguments);
+                $mappedTarget->__construct(...$ctorValues);
             } catch (\ReflectionException $e) {
                 throw new MappingException($e->getMessage(), $e->getCode(), $e);
             }
         }
 
-        if ($mappingToObject && $ctorArguments) {
-            foreach ($ctorArguments as $property => $value) {
-                if ($this->propertyIsMappable($refl, $property) && $this->propertyIsMappable($targetRefl, $property)) {
+        if ($mappingToObject && $ctorValues) {
+            foreach ($ctorValues as $property => $value) {
+                if ($ctorArguments[$property]['propertyIsMappable'] && $ctorArguments[$property]['sourceIsMappable']) {
                     $mapToProperties[$property] = $value;
                 }
             }
         }
 
         foreach ($mapToProperties as $property => $value) {
-            $this->propertyAccessor ? $this->propertyAccessor->setValue($mappedTarget, $property, $value) : ($mappedTarget->{$property} = $value);
+            MappingHelper::setValue($mappedTarget, $property, $value, $this->propertyAccessor);
         }
 
         if ($objectMapInitialized) {
@@ -260,114 +265,5 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
         $mapToProperties[$propertyName] = $value;
     }
-
-    /**
-     * @param callable(): mixed $fn
-     */
-    private function call(callable $fn, mixed $value, object $source, ?object $target = null): mixed
-    {
-        if (\is_string($fn)) {
-            return \call_user_func($fn, $value);
-        }
-
-        return $fn($value, $source, $target);
-    }
-
-    /**
-     * @param Mapping[] $metadata
-     */
-    private function getMapTarget(array $metadata, mixed $value, object $source, ?object $target): ?Mapping
-    {
-        $mapTo = null;
-        foreach ($metadata as $mapAttribute) {
-            if (($if = $mapAttribute->if) && ($fn = $this->getCallable($if, $this->conditionCallableLocator)) && !$this->call($fn, $value, $source, $target)) {
-                continue;
-            }
-
-            $mapTo = $mapAttribute;
-        }
-
-        return $mapTo;
-    }
-
-    private function applyTransforms(Mapping $map, mixed $value, object $source, ?object $target): mixed
-    {
-        if (!$transforms = $map->transform) {
-            return $value;
-        }
-
-        if (\is_callable($transforms)) {
-            $transforms = [$transforms];
-        } elseif (!\is_array($transforms)) {
-            $transforms = [$transforms];
-        }
-
-        foreach ($transforms as $transform) {
-            if ($fn = $this->getCallable($transform, $this->transformCallableLocator)) {
-                $value = $this->call($fn, $value, $source, $target);
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param (string|callable(mixed $value, object $object): mixed) $fn
-     */
-    private function getCallable(string|callable $fn, ?ContainerInterface $locator = null): ?callable
-    {
-        if (\is_callable($fn)) {
-            return $fn;
-        }
-
-        if ($locator?->has($fn)) {
-            return $locator->get($fn);
-        }
-
-        return null;
-    }
-
-    /**
-     * @return ?\ReflectionClass<object|T>
-     */
-    private function getSourceReflectionClass(object $source): ?\ReflectionClass
-    {
-        $metadata = $this->metadataFactory->create($source);
-        try {
-            $refl = new \ReflectionClass($source);
-        } catch (\ReflectionException $e) {
-            throw new MappingException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        if ($source instanceof LazyObjectInterface) {
-            $source->initializeLazyObject();
-        } elseif ($refl->isUninitializedLazyObject($source)) {
-            $refl->initializeLazyObject($source);
-        }
-
-        if ($metadata) {
-            return $refl;
-        }
-
-        foreach ($refl->getProperties() as $property) {
-            if ($this->metadataFactory->create($source, $property->getName())) {
-                return $refl;
-            }
-        }
-
-        return null;
-    }
-
-    private function propertyIsMappable(\ReflectionClass $targetRefl, int|string $property): bool
-    {
-        return $targetRefl->hasProperty($property) && $targetRefl->getProperty($property)->isPublic();
-    }
-
-    public function withObjectMapper(ObjectMapperInterface $objectMapper): static
-    {
-        $clone = clone $this;
-        $clone->objectMapper = $objectMapper;
-
-        return $clone;
-    }
 }
+

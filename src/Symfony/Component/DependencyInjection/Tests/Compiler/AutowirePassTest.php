@@ -1464,4 +1464,51 @@ class AutowirePassTest extends TestCase
         $this->assertSame('%env(bool:ENABLED)%', $container->resolveEnvPlaceholders($definition->getArguments()[0]));
         $this->assertSame('%env(default::OPTIONAL)%', $container->resolveEnvPlaceholders($definition->getArguments()[1]));
     }
+
+    /**
+     * @requires PHP < 8.4
+     */
+    public function testLazyProxyForInterfaceWithFinalImplementation()
+    {
+        $container = new ContainerBuilder();
+        $container->register('final_impl', FinalLazyProxyImplementation::class);
+        $container->setAlias(LazyProxyTestInterface::class, 'final_impl');
+
+        $container->register(LazyProxyInterfaceConsumer::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $service = $container->get(LazyProxyInterfaceConsumer::class);
+        $this->assertInstanceOf(LazyProxyInterfaceConsumer::class, $service);
+
+        // Trigger lazy load
+        $dep = $service->getDep()->getSelf();
+        $this->assertInstanceOf(FinalLazyProxyImplementation::class, $dep);
+    }
+
+    /**
+     * @requires PHP >= 8.4
+     */
+    public function testLazyProxyWithClassInheritance()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BaseLazyProxyClass::class, ExtendedLazyProxyClass::class);
+
+        $container->register(LazyProxyInheritanceConsumer::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $service = $container->get(LazyProxyInheritanceConsumer::class);
+        $this->assertInstanceOf(LazyProxyInheritanceConsumer::class, $service);
+
+        // Trigger lazy load
+        $dep = $service->getDependency()->getSelf();
+        $this->assertInstanceOf(ExtendedLazyProxyClass::class, $dep);
+    }
 }

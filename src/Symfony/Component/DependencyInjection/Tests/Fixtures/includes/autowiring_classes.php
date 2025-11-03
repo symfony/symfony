@@ -524,3 +524,56 @@ class MyFactory
         return new MyInlineService($someParam);
     }
 }
+
+interface LazyProxyTestInterface
+{
+    public function getSelf(): self;
+}
+
+final class FinalLazyProxyImplementation implements LazyProxyTestInterface
+{
+    public function getSelf(): self
+    {
+        return $this;
+    }
+}
+
+class BaseLazyProxyClass
+{
+    public function getSelf(): self
+    {
+        return $this;
+    }
+}
+
+class ExtendedLazyProxyClass extends BaseLazyProxyClass
+{
+    public function getSelf(): self
+    {
+        return $this;
+    }
+}
+
+class LazyProxyInterfaceConsumer
+{
+    public function __construct(#[Autowire(lazy: true)] private readonly LazyProxyTestInterface $dep)
+    {
+    }
+
+    public function getDep(): LazyProxyTestInterface
+    {
+        return $this->dep;
+    }
+}
+
+class LazyProxyInheritanceConsumer
+{
+    public function __construct(#[Autowire(lazy: true)] private readonly BaseLazyProxyClass $dep)
+    {
+    }
+
+    public function getDependency(): BaseLazyProxyClass
+    {
+        return $this->dep;
+    }
+}

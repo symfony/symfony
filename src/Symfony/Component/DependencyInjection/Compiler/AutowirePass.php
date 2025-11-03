@@ -335,7 +335,7 @@ class AutowirePass extends AbstractRecursivePass
                         $value = $this->doProcessValue($value);
                     } elseif ($lazy = $attribute->lazy) {
                         $value ??= $getValue();
-                        if ($this->container->has($value->getType())) {
+                        if (\PHP_VERSION_ID >= 80400 && $this->container->has($value->getType())) {
                             $type = $this->container->findDefinition($value->getType())->getClass();
                         }
                         $definition = (new Definition($type))

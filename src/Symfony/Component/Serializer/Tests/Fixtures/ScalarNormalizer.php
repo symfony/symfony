@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class ScalarNormalizer implements NormalizerInterface
 {
-    public function normalize(mixed $object, ?string $format = null, array $context = [])
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         $data = $object;
 
@@ -26,7 +26,7 @@ class ScalarNormalizer implements NormalizerInterface
         return strtoupper($data);
     }
 
-    public function supportsNormalization(mixed $data, ?string $format = null, array $context = [])
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return \is_scalar($data);
     }

@@ -15,12 +15,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class StdClassNormalizer implements NormalizerInterface
 {
-    public function normalize(mixed $object, ?string $format = null, array $context = [])
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         return 'string_object';
     }
 
-    public function supportsNormalization(mixed $data, ?string $format = null, array $context = [])
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof \stdClass;
     }

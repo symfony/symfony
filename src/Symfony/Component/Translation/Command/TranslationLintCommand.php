@@ -70,7 +70,7 @@ class TranslationLintCommand extends Command
     {
         $locales = $input->getOption('locale');
 
-        /** @var array<string, array<string, array<string, \Throwable>> $errors */
+        /** @var array<string, array<string, array<string, \Throwable>>> $errors */
         $errors = [];
         $domainsByLocales = [];
 

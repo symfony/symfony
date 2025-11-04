@@ -240,7 +240,7 @@ trait TypeFactoryTrait
      * @param T      $className
      * @param U|null $backingType
      *
-     * @return ($className is class-string<\BackedEnum> ? ($backingType is U ? BackedEnumType<T, U> : BackedEnumType<T, BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>>) : EnumType<T>))
+     * @return ($className is class-string<\BackedEnum> ? ($backingType is U ? BackedEnumType<T, U> : BackedEnumType<T, BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>>) : EnumType<T>)
      */
     public static function enum(string $className, ?BuiltinType $backingType = null): EnumType
     {

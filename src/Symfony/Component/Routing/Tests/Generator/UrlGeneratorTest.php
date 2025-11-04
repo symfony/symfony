@@ -1133,7 +1133,7 @@ class UrlGeneratorTest extends TestCase
     }
 }
 
-class StringableObject
+class StringableObject implements \Stringable
 {
     public function __toString(): string
     {
@@ -1141,7 +1141,7 @@ class StringableObject
     }
 }
 
-class StringableObjectWithPublicProperty
+class StringableObjectWithPublicProperty implements \Stringable
 {
     public $foo = 'property';
 

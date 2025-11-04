@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class PostmarkApiTransport extends AbstractApiTransport
+class PostmarkApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = 'api.postmarkapp.com';
     private const CODE_INACTIVE_RECIPIENT = 406;

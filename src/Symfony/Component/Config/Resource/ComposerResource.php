@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @final
  */
-class ComposerResource implements SelfCheckingResourceInterface
+class ComposerResource implements \Stringable, SelfCheckingResourceInterface
 {
     private array $vendors;
 

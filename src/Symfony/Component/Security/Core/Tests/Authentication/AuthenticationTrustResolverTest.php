@@ -76,7 +76,7 @@ class AuthenticationTrustResolverTest extends TestCase
     }
 }
 
-class FakeCustomToken implements TokenInterface
+class FakeCustomToken implements \Stringable, TokenInterface
 {
     public function __serialize(): array
     {

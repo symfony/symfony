@@ -190,7 +190,7 @@ class ConsoleLoggerTest extends TestCase
     }
 }
 
-class DummyTest
+class DummyTest implements \Stringable
 {
     public function __toString(): string
     {

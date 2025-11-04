@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @author Edouard Lescot <edouard.lescot@gmail.com>
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class MicrosoftTeamsTransport extends AbstractTransport
+final class MicrosoftTeamsTransport extends AbstractTransport implements \Stringable
 {
     protected const ENDPOINT = 'outlook.office.com';
 

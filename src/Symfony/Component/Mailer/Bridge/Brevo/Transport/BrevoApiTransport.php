@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Pierre TANGUY
  */
-final class BrevoApiTransport extends AbstractApiTransport
+final class BrevoApiTransport extends AbstractApiTransport implements \Stringable
 {
     public function __construct(
         #[\SensitiveParameter] private string $key,

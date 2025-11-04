@@ -396,7 +396,7 @@ class OutputFormatterTest extends TestCase
     }
 }
 
-class TableCell
+class TableCell implements \Stringable
 {
     public function __toString(): string
     {

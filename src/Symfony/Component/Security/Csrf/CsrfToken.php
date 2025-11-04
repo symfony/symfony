@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Csrf;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CsrfToken
+class CsrfToken implements \Stringable
 {
     private string $value;
 

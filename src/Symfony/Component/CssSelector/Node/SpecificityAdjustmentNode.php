@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Node;
  *
  * @internal
  */
-class SpecificityAdjustmentNode extends AbstractNode
+class SpecificityAdjustmentNode extends AbstractNode implements \Stringable
 {
     /**
      * @param array<NodeInterface> $arguments

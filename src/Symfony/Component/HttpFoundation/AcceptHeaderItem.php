@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class AcceptHeaderItem
+class AcceptHeaderItem implements \Stringable
 {
     private float $quality = 1.0;
     private int $index = 0;

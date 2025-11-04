@@ -147,7 +147,7 @@ class ChoiceQuestionTest extends TestCase
     }
 }
 
-class StringChoice
+class StringChoice implements \Stringable
 {
     private string $string;
 

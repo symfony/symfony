@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author gnito-org <https://github.com/gnito-org>
  */
-final class SimpleTextinTransport extends AbstractTransport
+final class SimpleTextinTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api-app2.simpletexting.com';
 

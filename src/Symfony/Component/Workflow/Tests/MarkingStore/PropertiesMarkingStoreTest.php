@@ -144,7 +144,7 @@ class PropertiesMarkingStoreTest extends TestCase
 
     private function createValueObject(string $markingValue): object
     {
-        return new class($markingValue) {
+        return new class($markingValue) implements \Stringable {
             public function __construct(
                 private string $markingValue,
             ) {

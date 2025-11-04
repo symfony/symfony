@@ -16,7 +16,7 @@ namespace Symfony\Component\Stopwatch;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class StopwatchPeriod
+class StopwatchPeriod implements \Stringable
 {
     private int|float $start;
     private int|float $end;

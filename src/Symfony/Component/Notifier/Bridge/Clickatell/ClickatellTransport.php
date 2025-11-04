@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Kevin Auvinet <k.auvinet@gmail.com>
  */
-final class ClickatellTransport extends AbstractTransport
+final class ClickatellTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.clickatell.com';
 

@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Adrian Nguyen <vuphuong87@gmail.com>
  */
-final class MessageMediaTransport extends AbstractTransport
+final class MessageMediaTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.messagemedia.com';
 

@@ -1149,7 +1149,7 @@ class ResponseTest extends ResponseTestCase
     }
 }
 
-class StringableObject
+class StringableObject implements \Stringable
 {
     public function __toString(): string
     {

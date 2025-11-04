@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Pierre Tanguy
  */
-final class BrevoTransport extends AbstractTransport
+final class BrevoTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.brevo.com';
 

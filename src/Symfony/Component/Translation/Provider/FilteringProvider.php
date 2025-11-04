@@ -19,7 +19,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
  *
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
-class FilteringProvider implements ProviderInterface
+class FilteringProvider implements \Stringable, ProviderInterface
 {
     public function __construct(
         private ProviderInterface $provider,

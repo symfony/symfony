@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class FakeChatEmailTransport extends AbstractTransport
+final class FakeChatEmailTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'default';
 

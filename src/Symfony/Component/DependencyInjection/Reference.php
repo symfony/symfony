@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Reference
+class Reference implements \Stringable
 {
     public function __construct(
         private string $id,

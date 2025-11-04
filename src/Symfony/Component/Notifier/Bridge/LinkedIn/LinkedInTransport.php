@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @see https://docs.microsoft.com/en-us/linkedin/marketing/integrations/community-management/shares/ugc-post-api#sharecontent
  */
-final class LinkedInTransport extends AbstractTransport
+final class LinkedInTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.linkedin.com';
 

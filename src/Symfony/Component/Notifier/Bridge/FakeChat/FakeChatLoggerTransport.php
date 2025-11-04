@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Antoine Makdessi <amakdessi@me.com>
  */
-final class FakeChatLoggerTransport extends AbstractTransport
+final class FakeChatLoggerTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'default';
 

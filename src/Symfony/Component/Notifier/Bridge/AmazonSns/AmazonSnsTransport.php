@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Adrien Chinour <github@chinour.fr>
  */
-final class AmazonSnsTransport extends AbstractTransport
+final class AmazonSnsTransport extends AbstractTransport implements \Stringable
 {
     public function __construct(
         private SnsClient $snsClient,

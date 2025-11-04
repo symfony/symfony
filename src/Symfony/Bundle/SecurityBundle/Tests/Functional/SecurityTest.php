@@ -179,7 +179,7 @@ class SecurityTest extends AbstractWebTestCase
     }
 }
 
-final class UserWithoutEquatable implements UserInterface, PasswordAuthenticatedUserInterface
+final class UserWithoutEquatable implements \Stringable, UserInterface, PasswordAuthenticatedUserInterface
 {
     private ?string $username;
     private ?string $password;

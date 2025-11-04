@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Imad ZAIRIG <https://github.com/zairigimad>
  */
-final class ExpoTransport extends AbstractTransport
+final class ExpoTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'exp.host/--/api/v2/push/send';
 

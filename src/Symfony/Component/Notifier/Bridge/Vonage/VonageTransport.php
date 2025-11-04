@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class VonageTransport extends AbstractTransport
+final class VonageTransport extends AbstractTransport implements \Stringable
 {
     // see https://developer.vonage.com/messaging/sms/overview
     protected const HOST = 'rest.nexmo.com';

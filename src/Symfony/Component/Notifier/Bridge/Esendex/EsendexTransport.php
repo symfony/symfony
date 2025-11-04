@@ -22,7 +22,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class EsendexTransport extends AbstractTransport
+final class EsendexTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.esendex.com';
 

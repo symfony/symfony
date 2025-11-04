@@ -16,7 +16,7 @@ namespace Symfony\Component\ExpressionLanguage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Token
+class Token implements \Stringable
 {
     public const EOF_TYPE = 'end of expression';
     public const NAME_TYPE = 'name';

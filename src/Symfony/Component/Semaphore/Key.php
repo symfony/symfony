@@ -19,7 +19,7 @@ use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-final class Key
+final class Key implements \Stringable
 {
     private ?float $expiringTime = null;
     private array $state = [];

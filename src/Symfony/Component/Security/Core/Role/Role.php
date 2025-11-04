@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Core\Role;
  *
  * @internal
  */
-class Role
+class Role implements \Stringable
 {
     private $role;
 

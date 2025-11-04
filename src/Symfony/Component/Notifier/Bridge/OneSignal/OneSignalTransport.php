@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>
  */
-final class OneSignalTransport extends AbstractTransport
+final class OneSignalTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'onesignal.com';
 

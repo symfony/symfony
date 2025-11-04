@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @see https://turbosms.ua/api.html
  */
-final class TurboSmsTransport extends AbstractTransport
+final class TurboSmsTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.turbosms.ua';
 

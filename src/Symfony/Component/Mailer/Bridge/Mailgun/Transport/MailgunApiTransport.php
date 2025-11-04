@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class MailgunApiTransport extends AbstractApiTransport
+class MailgunApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = 'api.%region_dot%mailgun.net';
 

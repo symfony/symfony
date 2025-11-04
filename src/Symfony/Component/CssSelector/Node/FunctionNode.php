@@ -23,7 +23,7 @@ use Symfony\Component\CssSelector\Parser\Token;
  *
  * @internal
  */
-class FunctionNode extends AbstractNode
+class FunctionNode extends AbstractNode implements \Stringable
 {
     private string $name;
 

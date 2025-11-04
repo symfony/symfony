@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Node;
  *
  * @internal
  */
-class NegationNode extends AbstractNode
+class NegationNode extends AbstractNode implements \Stringable
 {
     public function __construct(
         private NodeInterface $selector,

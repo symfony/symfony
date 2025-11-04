@@ -16,7 +16,7 @@ namespace Symfony\Component\JsonPath;
  *
  * @immutable
  */
-final class JsonPath
+final class JsonPath implements \Stringable
 {
     /**
      * @param non-empty-string $path

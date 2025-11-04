@@ -25,7 +25,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @implements WrappingTypeInterface<T>
  */
-final class GenericType extends Type implements WrappingTypeInterface
+final class GenericType extends Type implements \Stringable, WrappingTypeInterface
 {
     /**
      * @var list<Type>

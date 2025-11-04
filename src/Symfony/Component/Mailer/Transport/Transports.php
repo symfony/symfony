@@ -21,7 +21,7 @@ use Symfony\Component\Mime\RawMessage;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class Transports implements TransportInterface
+final class Transports implements \Stringable, TransportInterface
 {
     /**
      * @var array<string, TransportInterface>

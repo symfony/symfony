@@ -14,7 +14,7 @@ namespace Symfony\Component\Scheduler\Trigger;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class JitterTrigger extends AbstractDecoratedTrigger
+final class JitterTrigger extends AbstractDecoratedTrigger implements \Stringable
 {
     /**
      * @param positive-int $maxSeconds

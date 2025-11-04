@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  *
  * @final
  */
-class ReflectionClassResource implements SelfCheckingResourceInterface
+class ReflectionClassResource implements \Stringable, SelfCheckingResourceInterface
 {
     private array $files = [];
     private string $className;

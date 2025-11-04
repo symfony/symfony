@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Paul Oms <support@mailpace.com>
  */
-final class MailPaceApiTransport extends AbstractApiTransport
+final class MailPaceApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = 'app.mailpace.com/api/v1';
 

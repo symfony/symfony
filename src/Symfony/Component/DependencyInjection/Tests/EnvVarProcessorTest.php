@@ -832,7 +832,7 @@ class EnvVarProcessorTest extends TestCase
                     return [
                         'FOO_ENV_LOADER' => '123',
                         'BAZ_ENV_LOADER' => '',
-                        'LAZY_ENV_LOADER' => new class {
+                        'LAZY_ENV_LOADER' => new class implements \Stringable {
                             public function __toString(): string
                             {
                                 return '';
@@ -849,7 +849,7 @@ class EnvVarProcessorTest extends TestCase
                         'FOO_ENV_LOADER' => '234',
                         'BAR_ENV_LOADER' => '456',
                         'BAZ_ENV_LOADER' => '567',
-                        'LAZY_ENV_LOADER' => new class {
+                        'LAZY_ENV_LOADER' => new class implements \Stringable {
                             public function __toString(): string
                             {
                                 return '678';

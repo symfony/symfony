@@ -336,7 +336,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     }
 }
 
-class BicComparisonTestClass
+class BicComparisonTestClass implements \Stringable
 {
     protected $value;
 

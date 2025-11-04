@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mateusz Żyła <https://github.com/plotkabytes>
  */
-final class RedlinkTransport extends AbstractTransport
+final class RedlinkTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.redlink.pl';
 

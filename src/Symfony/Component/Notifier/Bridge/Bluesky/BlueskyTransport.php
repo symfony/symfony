@@ -31,7 +31,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-final class BlueskyTransport extends AbstractTransport
+final class BlueskyTransport extends AbstractTransport implements \Stringable
 {
     private array $authSession = [];
     private ClockInterface $clock;

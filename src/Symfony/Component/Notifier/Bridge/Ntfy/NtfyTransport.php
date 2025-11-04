@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mickael Perraud <mikaelkael.fr@gmail.com>
  */
-final class NtfyTransport extends AbstractTransport
+final class NtfyTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'ntfy.sh';
     private ?string $user = null;

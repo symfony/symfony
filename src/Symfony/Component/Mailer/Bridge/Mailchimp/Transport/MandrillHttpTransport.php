@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class MandrillHttpTransport extends AbstractHttpTransport
+class MandrillHttpTransport extends AbstractHttpTransport implements \Stringable
 {
     use MandrillHeadersTrait;
 

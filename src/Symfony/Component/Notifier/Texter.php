@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class Texter implements TexterInterface
+final class Texter implements \Stringable, TexterInterface
 {
     public function __construct(
         private TransportInterface $transport,

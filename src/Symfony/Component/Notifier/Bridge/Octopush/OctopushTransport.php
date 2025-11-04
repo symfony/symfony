@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Aurélien Martin <pro@aurelienmartin.com>
  */
-final class OctopushTransport extends AbstractTransport
+final class OctopushTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'www.octopush-dm.com';
 

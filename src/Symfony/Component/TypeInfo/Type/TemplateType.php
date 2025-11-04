@@ -23,7 +23,7 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @implements WrappingTypeInterface<T>
  */
-final class TemplateType extends Type implements WrappingTypeInterface
+final class TemplateType extends Type implements \Stringable, WrappingTypeInterface
 {
     /**
      * @param T $bound

@@ -20,7 +20,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @final
  */
-class ContainerParametersResource implements ResourceInterface
+class ContainerParametersResource implements \Stringable, ResourceInterface
 {
     /**
      * @param array $parameters The container parameters to track

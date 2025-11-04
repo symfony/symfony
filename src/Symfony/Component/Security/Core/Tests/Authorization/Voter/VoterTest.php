@@ -126,7 +126,7 @@ class TypeErrorVoterTest_Voter extends Voter
     }
 }
 
-class StringableAttribute
+class StringableAttribute implements \Stringable
 {
     public function __toString(): string
     {

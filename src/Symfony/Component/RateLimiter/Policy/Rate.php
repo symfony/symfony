@@ -18,7 +18,7 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-final class Rate
+final class Rate implements \Stringable
 {
     public function __construct(
         private \DateInterval $refillTime,

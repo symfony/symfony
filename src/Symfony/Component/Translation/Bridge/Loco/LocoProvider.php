@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *  * Assets refers to Symfony's translation keys
  *  * Translations refers to Symfony's translated messages
  */
-final class LocoProvider implements ProviderInterface
+final class LocoProvider implements \Stringable, ProviderInterface
 {
     public function __construct(
         private HttpClientInterface $client,

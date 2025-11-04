@@ -22,7 +22,7 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @implements CompositeTypeInterface<T>
  */
-final class IntersectionType extends Type implements CompositeTypeInterface
+final class IntersectionType extends Type implements \Stringable, CompositeTypeInterface
 {
     /**
      * @var list<T>

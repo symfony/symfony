@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Frank Nägler <frank@naegler.hamburg>
  */
-final class SevenIoTransport extends AbstractTransport
+final class SevenIoTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'gateway.seven.io';
 

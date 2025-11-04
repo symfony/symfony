@@ -19,7 +19,7 @@ class_exists(ResponseHeaderBag::class);
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Response
+class Response implements \Stringable
 {
     public const HTTP_CONTINUE = 100;
     public const HTTP_SWITCHING_PROTOCOLS = 101;

@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author gnito-org <https://github.com/gnito-org>
  */
-final class RingCentralTransport extends AbstractTransport
+final class RingCentralTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'platform.ringcentral.com';
 

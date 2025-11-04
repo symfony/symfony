@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Valentin Barbu <jimiero@gmail.com>
  */
-final class SmsenseTransport extends AbstractTransport
+final class SmsenseTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'rest.smsense.com';
 

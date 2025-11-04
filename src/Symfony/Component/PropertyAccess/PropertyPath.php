@@ -22,7 +22,7 @@ use Symfony\Component\PropertyAccess\Exception\OutOfBoundsException;
  *
  * @implements \IteratorAggregate<int, string>
  */
-class PropertyPath implements \IteratorAggregate, PropertyPathInterface
+class PropertyPath implements \Stringable, \IteratorAggregate, PropertyPathInterface
 {
     /**
      * Character used for separating between plural and singular of an element.

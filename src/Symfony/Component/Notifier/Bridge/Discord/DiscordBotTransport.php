@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @author Mathieu Piot <math.piot@gmail.com>
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>
  */
-final class DiscordBotTransport extends AbstractTransport
+final class DiscordBotTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'discord.com';
 

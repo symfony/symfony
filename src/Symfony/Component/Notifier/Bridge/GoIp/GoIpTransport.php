@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Ahmed Ghanem <ahmedghanem7361@gmail.com>
  */
-final class GoIpTransport extends AbstractTransport
+final class GoIpTransport extends AbstractTransport implements \Stringable
 {
     public function __construct(
         private readonly string $username,

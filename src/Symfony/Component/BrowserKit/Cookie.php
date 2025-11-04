@@ -19,7 +19,7 @@ use Symfony\Component\BrowserKit\Exception\UnexpectedValueException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Cookie
+class Cookie implements \Stringable
 {
     /**
      * Handles dates as defined by RFC 2616 section 3.3.1, and also some other

@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class MailomatApiTransport extends AbstractApiTransport
+final class MailomatApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = 'api.mailomat.swiss';
 

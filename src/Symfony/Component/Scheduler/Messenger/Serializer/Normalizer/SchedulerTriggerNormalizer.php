@@ -40,7 +40,7 @@ final class SchedulerTriggerNormalizer implements DenormalizerInterface, Normali
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): TriggerInterface
     {
-        return new class($data) implements TriggerInterface {
+        return new class($data) implements \Stringable, TriggerInterface {
             public function __construct(private readonly string $description)
             {
             }

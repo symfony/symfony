@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Farhad Safarov <farhad.safarov@gmail.com>
  */
-final class UnifonicTransport extends AbstractTransport
+final class UnifonicTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'el.cloud.unifonic.com';
 

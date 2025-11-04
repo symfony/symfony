@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class ScalewayApiTransport extends AbstractApiTransport
+final class ScalewayApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = 'api.scaleway.com';
 

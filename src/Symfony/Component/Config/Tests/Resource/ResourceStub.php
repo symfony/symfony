@@ -13,7 +13,7 @@ namespace Symfony\Component\Config\Tests\Resource;
 
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 
-class ResourceStub implements SelfCheckingResourceInterface
+class ResourceStub implements \Stringable, SelfCheckingResourceInterface
 {
     private bool $fresh = true;
 

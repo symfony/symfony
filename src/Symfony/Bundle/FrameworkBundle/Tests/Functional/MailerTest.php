@@ -40,7 +40,7 @@ class MailerTest extends AbstractWebTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         $logger = self::getContainer()->get('logger');
 
-        $testTransport = new class($eventDispatcher, $logger, $onDoSend) extends AbstractTransport {
+        $testTransport = new class($eventDispatcher, $logger, $onDoSend) extends AbstractTransport implements \Stringable {
             private \Closure $onDoSend;
 
             public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, \Closure $onDoSend)

@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Node
+class Node implements \Stringable
 {
     public array $nodes = [];
     public array $attributes = [];

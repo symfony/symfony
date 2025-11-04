@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Mathieu Santostefano <msantostefano@proton.me>
  */
-final class SweegoApiTransport extends AbstractApiTransport
+final class SweegoApiTransport extends AbstractApiTransport implements \Stringable
 {
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiKey,

@@ -22,7 +22,7 @@ class_exists(AcceptHeaderItem::class);
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class AcceptHeader
+class AcceptHeader implements \Stringable
 {
     /**
      * @var array<string, AcceptHeaderItem>

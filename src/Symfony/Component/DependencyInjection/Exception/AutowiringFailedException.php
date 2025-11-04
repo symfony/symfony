@@ -37,7 +37,7 @@ class AutowiringFailedException extends RuntimeException
         $this->messageCallback = $message;
         parent::__construct('', $code, $previous);
 
-        $this->message = new class($this->message, $this->messageCallback) {
+        $this->message = new class($this->message, $this->messageCallback) implements \Stringable {
             private string|self $message;
             private ?\Closure $messageCallback;
 

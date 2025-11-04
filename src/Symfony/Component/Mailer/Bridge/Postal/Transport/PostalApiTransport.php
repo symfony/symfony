@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class PostalApiTransport extends AbstractApiTransport
+final class PostalApiTransport extends AbstractApiTransport implements \Stringable
 {
     public function __construct(
         #[\SensitiveParameter] private string $apiToken,

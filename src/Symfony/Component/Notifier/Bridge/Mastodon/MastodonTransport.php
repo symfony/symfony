@@ -31,7 +31,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  *
  * @see https://docs.joinmastodon.org
  */
-final class MastodonTransport extends AbstractTransport
+final class MastodonTransport extends AbstractTransport implements \Stringable
 {
     public function __construct(
         #[\SensitiveParameter] private readonly string $accessToken,

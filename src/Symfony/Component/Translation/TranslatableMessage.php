@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @author Nate Wiebe <nate@northern.co>
  */
-class TranslatableMessage implements TranslatableInterface
+class TranslatableMessage implements \Stringable, TranslatableInterface
 {
     public function __construct(
         private string $message,

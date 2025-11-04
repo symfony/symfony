@@ -31,7 +31,7 @@ use Symfony\Component\Mime\RawMessage;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Chris Corbyn
  */
-class SmtpTransport extends AbstractTransport
+class SmtpTransport extends AbstractTransport implements \Stringable
 {
     private bool $started = false;
     private int $restartThreshold = 100;

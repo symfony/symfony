@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Thibault Buathier <thibault.buathier@gmail.com>
  */
-final class SmsFactorTransport extends AbstractTransport
+final class SmsFactorTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.smsfactor.com';
 

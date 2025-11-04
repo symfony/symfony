@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Thomas Ferney <thomas.ferney@gmail.com>
  */
-final class OvhCloudTransport extends AbstractTransport
+final class OvhCloudTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'eu.api.ovh.com';
 

@@ -315,7 +315,7 @@ class TranslatorCacheTest extends TestCase
     }
 }
 
-class StaleResource implements SelfCheckingResourceInterface
+class StaleResource implements \Stringable, SelfCheckingResourceInterface
 {
     public function isFresh(int $timestamp): bool
     {

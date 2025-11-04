@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\OutOfBoundsException;
  *
  * @implements \IteratorAggregate<int, ConstraintViolationInterface>
  */
-class ConstraintViolationList implements \IteratorAggregate, ConstraintViolationListInterface
+class ConstraintViolationList implements \Stringable, \IteratorAggregate, ConstraintViolationListInterface
 {
     /**
      * @var list<ConstraintViolationInterface>

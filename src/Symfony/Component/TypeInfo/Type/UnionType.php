@@ -23,7 +23,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @implements CompositeTypeInterface<T>
  */
-class UnionType extends Type implements CompositeTypeInterface
+class UnionType extends Type implements \Stringable, CompositeTypeInterface
 {
     /**
      * @var list<T>

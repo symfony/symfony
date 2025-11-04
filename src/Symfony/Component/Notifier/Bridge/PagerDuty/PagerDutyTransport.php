@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Joseph Bielawski <stloyd@gmail.com>
  */
-final class PagerDutyTransport extends AbstractTransport
+final class PagerDutyTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'events.pagerduty.com';
 

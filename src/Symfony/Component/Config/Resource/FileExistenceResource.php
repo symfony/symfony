@@ -21,7 +21,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @final
  */
-class FileExistenceResource implements SelfCheckingResourceInterface
+class FileExistenceResource implements \Stringable, SelfCheckingResourceInterface
 {
     private bool $exists;
 

@@ -621,7 +621,7 @@ class TranslatorTest extends TestCase
     }
 }
 
-class StringClass
+class StringClass implements \Stringable
 {
     public function __construct(
         protected string $str,

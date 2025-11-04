@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Frank Schulze <frank@akiber.de>
  */
-final class MatrixTransport extends AbstractTransport
+final class MatrixTransport extends AbstractTransport implements \Stringable
 {
     // not all Message Types are supported by Matrix API
     private const SUPPORTED_MSG_TYPES_BY_API = ['m.text', 'm.emote', 'm.notice', 'm.image', 'm.file', 'm.audio', 'm.video', 'm.key.verification'];

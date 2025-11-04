@@ -325,7 +325,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 }
 
-class EmptyEmailObject
+class EmptyEmailObject implements \Stringable
 {
     public function __toString(): string
     {

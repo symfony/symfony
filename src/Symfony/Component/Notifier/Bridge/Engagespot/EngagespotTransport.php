@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Daniel GORGAN <https://github.com/danut007ro>
  */
-final class EngagespotTransport extends AbstractTransport
+final class EngagespotTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.engagespot.co/2/campaigns';
 

@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  *  * Identifiers refer to Symfony's translation keys;
  *  * Translations refer to Symfony's translated messages
  */
-final class CrowdinProvider implements ProviderInterface
+final class CrowdinProvider implements \Stringable, ProviderInterface
 {
     public function __construct(
         private HttpClientInterface $client,

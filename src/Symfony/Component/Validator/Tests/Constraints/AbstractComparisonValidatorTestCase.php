@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class ComparisonTest_Class
+class ComparisonTest_Class implements \Stringable
 {
     protected $value;
 

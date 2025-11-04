@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Joseph Bielawski <stloyd@gmail.com>
  */
-final class PushyTransport extends AbstractTransport
+final class PushyTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.pushy.me';
 

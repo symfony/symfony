@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class MandrillApiTransport extends AbstractApiTransport
+class MandrillApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = 'mandrillapp.com';
 

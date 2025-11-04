@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class AzureApiTransport extends AbstractApiTransport
+final class AzureApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = '%s.communication.azure.com';
 

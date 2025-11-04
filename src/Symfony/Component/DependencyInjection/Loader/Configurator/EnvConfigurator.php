@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
 
-class EnvConfigurator extends ParamConfigurator
+class EnvConfigurator extends ParamConfigurator implements \Stringable
 {
     /**
      * @var string[]

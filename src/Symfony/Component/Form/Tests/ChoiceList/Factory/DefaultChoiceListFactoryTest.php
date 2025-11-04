@@ -1015,7 +1015,7 @@ class DefaultChoiceListFactoryTest extends TestCase
     }
 }
 
-class DefaultChoiceListFactoryTest_Castable
+class DefaultChoiceListFactoryTest_Castable implements \Stringable
 {
     private string $property;
 

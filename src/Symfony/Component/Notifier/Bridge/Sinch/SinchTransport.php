@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Iliya Miroslavov Iliev <i.miroslavov@gmail.com>
  */
-final class SinchTransport extends AbstractTransport
+final class SinchTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'sms.api.sinch.com';
 

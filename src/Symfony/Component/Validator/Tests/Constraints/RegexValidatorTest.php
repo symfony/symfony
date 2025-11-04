@@ -82,7 +82,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
             ['0'],
             ['090909'],
             [90909],
-            [new class {
+            [new class implements \Stringable {
                 public function __toString(): string
                 {
                     return '090909';
@@ -141,7 +141,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
         return [
             ['abcd'],
             ['090foo'],
-            [new class {
+            [new class implements \Stringable {
                 public function __toString(): string
                 {
                     return 'abcd';

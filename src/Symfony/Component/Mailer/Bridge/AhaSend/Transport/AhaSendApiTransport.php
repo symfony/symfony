@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Farhad Hedayatifard <farhad@ahasend.com>
  */
-final class AhaSendApiTransport extends AbstractApiTransport
+final class AhaSendApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = 'send.ahasend.com';
 

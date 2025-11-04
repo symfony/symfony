@@ -40,7 +40,7 @@ class_exists(ServerBag::class);
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Request
+class Request implements \Stringable
 {
     public const HEADER_FORWARDED = 0b000001; // When using RFC 7239
     public const HEADER_X_FORWARDED_FOR = 0b000010;

@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class SlackTransport extends AbstractTransport
+final class SlackTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'slack.com';
 

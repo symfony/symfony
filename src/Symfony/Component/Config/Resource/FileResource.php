@@ -20,7 +20,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @final
  */
-class FileResource implements SelfCheckingResourceInterface
+class FileResource implements \Stringable, SelfCheckingResourceInterface
 {
     private string $resource;
 

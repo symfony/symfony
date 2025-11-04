@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class TwitterTransport extends AbstractTransport
+final class TwitterTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.twitter.com';
 

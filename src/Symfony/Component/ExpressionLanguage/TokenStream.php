@@ -16,7 +16,7 @@ namespace Symfony\Component\ExpressionLanguage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TokenStream
+class TokenStream implements \Stringable
 {
     public Token $current;
 

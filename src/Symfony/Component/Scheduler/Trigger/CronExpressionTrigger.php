@@ -21,7 +21,7 @@ use Symfony\Component\Scheduler\Exception\LogicException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class CronExpressionTrigger implements TriggerInterface
+final class CronExpressionTrigger implements \Stringable, TriggerInterface
 {
     private const HASH_ALIAS_MAP = [
         '#hourly' => '# * * * *',

@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class MicrosoftGraphApiTransport extends AbstractApiTransport
+class MicrosoftGraphApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const USER_ENDPOINT = '%s/v1.0/users/%s/sendMail';
 

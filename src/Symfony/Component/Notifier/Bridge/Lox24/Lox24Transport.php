@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Andrei Lebedev <andrew.lebedev@gmail.com>
  */
-final class Lox24Transport extends AbstractTransport
+final class Lox24Transport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.lox24.eu';
 

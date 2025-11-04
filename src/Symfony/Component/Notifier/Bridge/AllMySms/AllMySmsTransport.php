@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Quentin Dequippe <quentin@dequippe.tech>
  */
-final class AllMySmsTransport extends AbstractTransport
+final class AllMySmsTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.allmysms.com';
 

@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
-final class MercureTransport extends AbstractTransport
+final class MercureTransport extends AbstractTransport implements \Stringable
 {
     private string|array $topics;
 

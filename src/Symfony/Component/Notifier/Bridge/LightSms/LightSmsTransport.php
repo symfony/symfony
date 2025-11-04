@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Vasilij Duško <vasilij@prado.lt>
  */
-final class LightSmsTransport extends AbstractTransport
+final class LightSmsTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'www.lightsms.com';
 

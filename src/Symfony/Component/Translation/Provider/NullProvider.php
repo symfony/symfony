@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
-class NullProvider implements ProviderInterface
+class NullProvider implements \Stringable, ProviderInterface
 {
     public function __toString(): string
     {

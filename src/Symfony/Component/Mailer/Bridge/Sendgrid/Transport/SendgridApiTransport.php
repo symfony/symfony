@@ -31,7 +31,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class SendgridApiTransport extends AbstractApiTransport
+class SendgridApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = 'api.%region_dot%sendgrid.com';
 

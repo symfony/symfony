@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class OrangeSmsTransport extends AbstractTransport
+final class OrangeSmsTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.orange.com';
 

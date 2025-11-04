@@ -25,7 +25,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Ahmed Ghanem <ahmedghanem7361@gmail.com>
  */
-final class JoliNotifTransport extends AbstractTransport
+final class JoliNotifTransport extends AbstractTransport implements \Stringable
 {
     public function __construct(
         private readonly JoliNotifier $joliNotifier,

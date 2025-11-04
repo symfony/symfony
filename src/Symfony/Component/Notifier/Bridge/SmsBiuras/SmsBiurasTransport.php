@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Vasilij Duško <vasilij@prado.lt>
  */
-final class SmsBiurasTransport extends AbstractTransport
+final class SmsBiurasTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'savitarna.smsbiuras.lt';
 

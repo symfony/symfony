@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
-final class SweegoTransport extends AbstractTransport
+final class SweegoTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.sweego.io';
 

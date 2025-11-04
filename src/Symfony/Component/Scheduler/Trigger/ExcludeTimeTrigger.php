@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Trigger;
 
-final class ExcludeTimeTrigger extends AbstractDecoratedTrigger
+final class ExcludeTimeTrigger extends AbstractDecoratedTrigger implements \Stringable
 {
     public function __construct(
         private readonly TriggerInterface $inner,

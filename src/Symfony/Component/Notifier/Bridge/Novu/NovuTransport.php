@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Wouter van der Loop <woutervdl@toppy.nl>
  */
-class NovuTransport extends AbstractTransport
+class NovuTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'web.novu.co';
 

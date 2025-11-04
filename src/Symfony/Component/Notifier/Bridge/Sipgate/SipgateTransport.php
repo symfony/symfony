@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Lukas Kaltenbach <lk@wikanet.de>
  */
-final class SipgateTransport extends AbstractTransport
+final class SipgateTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.sipgate.com';
 

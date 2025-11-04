@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Oleksandr Barabolia <alexandrbarabolya@gmail.com>
  */
-final class IqsmsTransport extends AbstractTransport
+final class IqsmsTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.iqsms.ru';
 

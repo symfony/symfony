@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author gnito-org <https://github.com/gnito-org>
  */
-final class SmsmodeTransport extends AbstractTransport
+final class SmsmodeTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'rest.smsmode.com';
 

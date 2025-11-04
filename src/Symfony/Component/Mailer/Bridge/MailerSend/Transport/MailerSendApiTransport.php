@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @see https://developers.mailersend.com/api/v1/email.html
  */
-final class MailerSendApiTransport extends AbstractApiTransport
+final class MailerSendApiTransport extends AbstractApiTransport implements \Stringable
 {
     public function __construct(
         #[\SensitiveParameter] private string $key,

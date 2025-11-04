@@ -88,7 +88,7 @@ class AbstractTransportTest extends TestCase
         $dispatcher->addListener(MessageEvent::class, fn (MessageEvent $event) => $event->reject(), 255);
         $dispatcher->addListener(MessageEvent::class, fn () => throw new \RuntimeException('Should never be called.'));
 
-        $transport = new class($dispatcher, $this) extends AbstractTransport {
+        $transport = new class($dispatcher, $this) extends AbstractTransport implements \Stringable {
             public function __construct(EventDispatcherInterface $dispatcher, private TestCase $test)
             {
                 parent::__construct($dispatcher);

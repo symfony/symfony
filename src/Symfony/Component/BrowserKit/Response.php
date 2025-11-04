@@ -16,7 +16,7 @@ use Symfony\Component\BrowserKit\Exception\JsonException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class Response
+final class Response implements \Stringable
 {
     private array $jsonData;
 

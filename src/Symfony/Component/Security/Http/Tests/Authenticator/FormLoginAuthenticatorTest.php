@@ -162,7 +162,7 @@ class FormLoginAuthenticatorTest extends TestCase
     #[DataProvider('postOnlyDataProvider')]
     public function testHandleNonStringPasswordWithToString(bool $postOnly)
     {
-        $passwordObject = new class {
+        $passwordObject = new class implements \Stringable {
             public function __toString(): string
             {
                 return 's$cr$t';
@@ -282,7 +282,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 }
 
-class DummyUserClass
+class DummyUserClass implements \Stringable
 {
     public function __toString(): string
     {

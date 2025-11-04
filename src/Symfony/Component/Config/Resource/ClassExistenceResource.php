@@ -21,7 +21,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @final
  */
-class ClassExistenceResource implements SelfCheckingResourceInterface
+class ClassExistenceResource implements \Stringable, SelfCheckingResourceInterface
 {
     private ?array $exists = null;
 

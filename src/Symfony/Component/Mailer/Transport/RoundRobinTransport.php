@@ -24,7 +24,7 @@ use Symfony\Component\Mime\RawMessage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RoundRobinTransport implements TransportInterface
+class RoundRobinTransport implements \Stringable, TransportInterface
 {
     /**
      * @var \SplObjectStorage<TransportInterface, float>

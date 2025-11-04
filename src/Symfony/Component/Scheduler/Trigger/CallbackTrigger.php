@@ -14,7 +14,7 @@ namespace Symfony\Component\Scheduler\Trigger;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class CallbackTrigger implements TriggerInterface
+final class CallbackTrigger implements \Stringable, TriggerInterface
 {
     private \Closure $callback;
     private string $description;

@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Emanuele Panzeri <thepanz@gmail.com>
  */
-final class MattermostTransport extends AbstractTransport
+final class MattermostTransport extends AbstractTransport implements \Stringable
 {
     public function __construct(
         #[\SensitiveParameter] private string $token,

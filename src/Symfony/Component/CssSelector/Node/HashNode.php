@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Node;
  *
  * @internal
  */
-class HashNode extends AbstractNode
+class HashNode extends AbstractNode implements \Stringable
 {
     public function __construct(
         private NodeInterface $selector,

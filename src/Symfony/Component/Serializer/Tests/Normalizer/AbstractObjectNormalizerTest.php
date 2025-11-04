@@ -577,7 +577,7 @@ class AbstractObjectNormalizerTest extends TestCase
      */
     public static function provideInvalidDiscriminatorTypes(): iterable
     {
-        $toStringObject = new class {
+        $toStringObject = new class implements \Stringable {
             public function __toString()
             {
                 return 'first';

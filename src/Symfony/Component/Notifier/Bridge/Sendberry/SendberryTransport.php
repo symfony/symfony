@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Vasilij Duško <vasilij@prado.lt>
  */
-final class SendberryTransport extends AbstractTransport
+final class SendberryTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.sendberry.com';
 

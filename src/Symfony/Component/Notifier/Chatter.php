@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class Chatter implements ChatterInterface
+final class Chatter implements \Stringable, ChatterInterface
 {
     public function __construct(
         private TransportInterface $transport,

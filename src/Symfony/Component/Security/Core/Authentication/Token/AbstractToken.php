@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-abstract class AbstractToken implements TokenInterface, \Serializable
+abstract class AbstractToken implements \Stringable, TokenInterface, \Serializable
 {
     private ?UserInterface $user = null;
     private array $roleNames;

@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @see https://www.infobip.com/docs/api#channels/email/send-email
  */
-final class InfobipApiTransport extends AbstractApiTransport
+final class InfobipApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const API_VERSION = '3';
 

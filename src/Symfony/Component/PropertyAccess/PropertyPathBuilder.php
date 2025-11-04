@@ -16,7 +16,7 @@ use Symfony\Component\PropertyAccess\Exception\OutOfBoundsException;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class PropertyPathBuilder
+class PropertyPathBuilder implements \Stringable
 {
     private array $elements = [];
     private array $isIndex = [];

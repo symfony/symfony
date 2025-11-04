@@ -26,7 +26,7 @@ use Symfony\Component\Mime\Message;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class SesHttpAsyncAwsTransport extends AbstractTransport
+class SesHttpAsyncAwsTransport extends AbstractTransport implements \Stringable
 {
     public function __construct(
         protected SesClient $sesClient,

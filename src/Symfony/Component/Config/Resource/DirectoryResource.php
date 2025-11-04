@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @final
  */
-class DirectoryResource implements SelfCheckingResourceInterface
+class DirectoryResource implements \Stringable, SelfCheckingResourceInterface
 {
     private string $resource;
 

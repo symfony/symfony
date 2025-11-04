@@ -20,7 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @implements \IteratorAggregate<int, string>
  */
-class ViolationPath implements \IteratorAggregate, PropertyPathInterface
+class ViolationPath implements \Stringable, \IteratorAggregate, PropertyPathInterface
 {
     /** @var list<string> */
     private array $elements = [];

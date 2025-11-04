@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Yi-Jyun Pan <me@pan93.com>
  */
-final class LineBotTransport extends AbstractTransport
+final class LineBotTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.line.me';
 

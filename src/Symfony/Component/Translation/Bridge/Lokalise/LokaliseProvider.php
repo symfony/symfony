@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *  * Keys refers to Symfony's translation keys;
  *  * Translations refers to Symfony's translated messages
  */
-final class LokaliseProvider implements ProviderInterface
+final class LokaliseProvider implements \Stringable, ProviderInterface
 {
     private const LOKALISE_GET_KEYS_LIMIT = 5000;
     private const PROJECT_TOO_BIG_STATUS_CODE = 413;

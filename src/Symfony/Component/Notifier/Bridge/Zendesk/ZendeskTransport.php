@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Joseph Bielawski <stloyd@gmail.com>
  */
-final class ZendeskTransport extends AbstractTransport
+final class ZendeskTransport extends AbstractTransport implements \Stringable
 {
     public function __construct(
         private string $email,

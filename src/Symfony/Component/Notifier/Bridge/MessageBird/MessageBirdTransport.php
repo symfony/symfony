@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Vasilij Duško <vasilij@prado.lt>
  */
-final class MessageBirdTransport extends AbstractTransport
+final class MessageBirdTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'rest.messagebird.com';
 

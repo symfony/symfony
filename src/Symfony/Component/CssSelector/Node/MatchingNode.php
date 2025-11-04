@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Node;
  *
  * @internal
  */
-class MatchingNode extends AbstractNode
+class MatchingNode extends AbstractNode implements \Stringable
 {
     /**
      * @param array<NodeInterface> $arguments

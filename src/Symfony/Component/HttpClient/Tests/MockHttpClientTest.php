@@ -519,7 +519,7 @@ class MockHttpClientTest extends HttpClientTestCase
     {
         $client = new MockHttpClient();
 
-        $param = new class {
+        $param = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'bar';

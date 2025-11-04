@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
-final class GoogleChatTransport extends AbstractTransport
+final class GoogleChatTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'chat.googleapis.com';
 

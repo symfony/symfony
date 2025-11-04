@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author gnito-org <https://github.com/gnito-org>
  */
-final class TermiiTransport extends AbstractTransport
+final class TermiiTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.ng.termii.com';
 

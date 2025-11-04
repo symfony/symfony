@@ -549,7 +549,7 @@ class SupportingUserProvider implements UserProviderInterface
     }
 }
 
-class CustomToken implements TokenInterface
+class CustomToken implements \Stringable, TokenInterface
 {
     private UserInterface $user;
     private array $roles;

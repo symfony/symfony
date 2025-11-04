@@ -20,7 +20,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @template T of class-string
  */
-class ObjectType extends Type
+class ObjectType extends Type implements \Stringable
 {
     /**
      * @param T $className

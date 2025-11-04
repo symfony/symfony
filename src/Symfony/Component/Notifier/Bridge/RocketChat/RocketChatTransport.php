@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
  */
-final class RocketChatTransport extends AbstractTransport
+final class RocketChatTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'rocketchat.com';
 

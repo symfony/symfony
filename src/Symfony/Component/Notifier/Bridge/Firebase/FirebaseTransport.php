@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
  */
-final class FirebaseTransport extends AbstractTransport
+final class FirebaseTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'fcm.googleapis.com/fcm/send';
 

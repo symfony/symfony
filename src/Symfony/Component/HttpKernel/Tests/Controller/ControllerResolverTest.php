@@ -259,7 +259,7 @@ function some_controller_function($foo, $foobar)
 {
 }
 
-class ControllerTest
+class ControllerTest implements \Stringable
 {
     public function __construct()
     {

@@ -469,7 +469,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 }
 
-class EmailProvider
+class EmailProvider implements \Stringable
 {
     public function __toString(): string
     {

@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Jon Gotlin <jon@jon.se>
  */
-final class FortySixElksTransport extends AbstractTransport
+final class FortySixElksTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.46elks.com';
 

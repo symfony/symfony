@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Marcin Szepczynski <szepczynski@gmail.com>
  */
-final class SmsapiTransport extends AbstractTransport
+final class SmsapiTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.smsapi.pl';
 

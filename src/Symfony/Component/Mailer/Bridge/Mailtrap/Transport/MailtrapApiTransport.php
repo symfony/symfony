@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class MailtrapApiTransport extends AbstractApiTransport
+final class MailtrapApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const LIVE_API_HOST = 'send.api.mailtrap.io';
     private const SANDBOX_API_HOST = 'sandbox.api.mailtrap.io';

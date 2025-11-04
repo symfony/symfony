@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Antoine Makdessi <amakdessi@me.com>
  */
-final class FreeMobileTransport extends AbstractTransport
+final class FreeMobileTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'smsapi.free-mobile.fr/sendmsg';
 

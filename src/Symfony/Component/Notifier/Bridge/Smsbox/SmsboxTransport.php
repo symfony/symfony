@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @author Alan Zarli <azarli@smsbox.fr>
  * @author Farid Touil <ftouil@smsbox.fr>
  */
-final class SmsboxTransport extends AbstractTransport
+final class SmsboxTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.smsbox.pro';
 

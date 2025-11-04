@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class MailjetApiTransport extends AbstractApiTransport
+class MailjetApiTransport extends AbstractApiTransport implements \Stringable
 {
     private const HOST = 'api.mailjet.com';
     private const API_VERSION = '3.1';

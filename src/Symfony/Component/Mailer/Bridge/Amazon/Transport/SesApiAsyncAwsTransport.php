@@ -26,7 +26,7 @@ use Symfony\Component\Mime\MessageConverter;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
+class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport implements \Stringable
 {
     public function __toString(): string
     {

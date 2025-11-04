@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Parser;
  *
  * @internal
  */
-class Token
+class Token implements \Stringable
 {
     public const TYPE_FILE_END = 'eof';
     public const TYPE_DELIMITER = 'delimiter';

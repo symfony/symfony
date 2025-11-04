@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Ippei Sumida <ippey.s@gmail.com>
  */
-class ChatworkTransport extends AbstractTransport
+class ChatworkTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.chatwork.com';
 

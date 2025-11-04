@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mohammad Emran Hasan <phpfour@gmail.com>
  */
-final class ZulipTransport extends AbstractTransport
+final class ZulipTransport extends AbstractTransport implements \Stringable
 {
     public function __construct(
         private string $email,

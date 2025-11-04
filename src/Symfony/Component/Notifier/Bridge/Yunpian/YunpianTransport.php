@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
-class YunpianTransport extends AbstractTransport
+class YunpianTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'sms.yunpian.com';
 

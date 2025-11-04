@@ -24,7 +24,7 @@ namespace Symfony\Component\DependencyInjection;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Variable
+class Variable implements \Stringable
 {
     public function __construct(
         private string $name,

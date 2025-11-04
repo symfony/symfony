@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Akira Kurozumi <info@a-zumi.net>
  */
-final class LineNotifyTransport extends AbstractTransport
+final class LineNotifyTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'notify-api.line.me';
 

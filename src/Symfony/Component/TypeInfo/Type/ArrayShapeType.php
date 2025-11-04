@@ -22,7 +22,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @extends CollectionType<GenericType<BuiltinType<TypeIdentifier::ARRAY>>>
  */
-final class ArrayShapeType extends CollectionType
+final class ArrayShapeType extends CollectionType implements \Stringable
 {
     /**
      * @var array<array{type: Type, optional: bool}>

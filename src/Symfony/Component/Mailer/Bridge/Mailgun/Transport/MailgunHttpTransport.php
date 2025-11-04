@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class MailgunHttpTransport extends AbstractHttpTransport
+class MailgunHttpTransport extends AbstractHttpTransport implements \Stringable
 {
     use MailgunHeadersTrait;
 

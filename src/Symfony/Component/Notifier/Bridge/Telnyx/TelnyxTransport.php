@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Vasilij Duško <vasilij@prado.lt>
  */
-final class TelnyxTransport extends AbstractTransport
+final class TelnyxTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.telnyx.com';
 

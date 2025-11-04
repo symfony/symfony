@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Loader;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ParamConfigurator
+class ParamConfigurator implements \Stringable
 {
     public function __construct(
         private string $name,

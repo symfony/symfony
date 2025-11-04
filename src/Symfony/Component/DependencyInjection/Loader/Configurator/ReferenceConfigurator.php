@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ReferenceConfigurator extends AbstractConfigurator
+class ReferenceConfigurator extends AbstractConfigurator implements \Stringable
 {
     /** @internal */
     protected string $id;

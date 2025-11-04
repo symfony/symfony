@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Samaël Tomas <samael.tomas@gmail.com>
  */
-final class PrimotextoTransport extends AbstractTransport
+final class PrimotextoTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.primotexto.com';
 

@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Cookie
+class Cookie implements \Stringable
 {
     public const SAMESITE_NONE = 'none';
     public const SAMESITE_LAX = 'lax';

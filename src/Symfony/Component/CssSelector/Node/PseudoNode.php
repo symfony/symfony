@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Node;
  *
  * @internal
  */
-class PseudoNode extends AbstractNode
+class PseudoNode extends AbstractNode implements \Stringable
 {
     private string $identifier;
 

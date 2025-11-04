@@ -345,7 +345,7 @@ class MessageGeneratorTest extends TestCase
                 '22:12:01' => [],
             ],
             'schedule' => [
-                RecurringMessage::trigger(new class implements TriggerInterface {
+                RecurringMessage::trigger(new class implements \Stringable, TriggerInterface {
                     public function __toString(): string
                     {
                         return 'foo';

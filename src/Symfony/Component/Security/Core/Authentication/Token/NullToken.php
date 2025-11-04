@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class NullToken implements TokenInterface
+class NullToken implements \Stringable, TokenInterface
 {
     public function __toString(): string
     {

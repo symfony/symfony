@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Valentin Nazarov <i.kozlice@protonmail.com>
  */
-final class SmscTransport extends AbstractTransport
+final class SmscTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'smsc.ru';
 

@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class IsendproTransport extends AbstractTransport
+final class IsendproTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'apirest.isendpro.com';
 

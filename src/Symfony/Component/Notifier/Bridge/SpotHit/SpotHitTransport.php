@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author James Hemery <james@yieldstudio.fr>
  */
-final class SpotHitTransport extends AbstractTransport
+final class SpotHitTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'spot-hit.fr';
 

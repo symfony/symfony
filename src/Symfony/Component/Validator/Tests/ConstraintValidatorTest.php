@@ -69,7 +69,7 @@ final class TestFormatValueConstraintValidator extends ConstraintValidator
     }
 }
 
-final class TestToStringObject
+final class TestToStringObject implements \Stringable
 {
     public function __toString(): string
     {

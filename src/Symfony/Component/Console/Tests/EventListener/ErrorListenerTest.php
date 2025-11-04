@@ -113,7 +113,7 @@ class ErrorListenerTest extends TestCase
     }
 }
 
-class NonStringInput extends Input
+class NonStringInput extends Input implements \Stringable
 {
     public function getFirstArgument(): ?string
     {

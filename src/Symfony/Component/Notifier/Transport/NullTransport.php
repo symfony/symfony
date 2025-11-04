@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class NullTransport implements TransportInterface
+class NullTransport implements \Stringable, TransportInterface
 {
     public function __construct(
         private ?EventDispatcherInterface $dispatcher = null,

@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author gnito-org <https://github.com/gnito-org>
  */
-final class PlivoTransport extends AbstractTransport
+final class PlivoTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.plivo.com';
 

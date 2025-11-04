@@ -49,7 +49,7 @@ class FailedMessageEventTest extends TestCase
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $clientMock = $this->createMock(HttpClientInterface::class);
 
-        $transport = new class($clientMock, $eventDispatcherMock) extends AbstractTransport {
+        $transport = new class($clientMock, $eventDispatcherMock) extends AbstractTransport implements \Stringable {
             public NullTransportException $exception;
 
             public function __construct($client, ?EventDispatcherInterface $dispatcher = null)

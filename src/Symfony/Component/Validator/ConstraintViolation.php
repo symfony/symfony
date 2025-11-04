@@ -16,7 +16,7 @@ namespace Symfony\Component\Validator;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ConstraintViolation implements ConstraintViolationInterface
+class ConstraintViolation implements \Stringable, ConstraintViolationInterface
 {
     /**
      * Creates a new constraint violation.

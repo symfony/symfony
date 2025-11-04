@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jérémy Romey <jeremy@free-agent.fr>
  */
-final class InfobipTransport extends AbstractTransport
+final class InfobipTransport extends AbstractTransport implements \Stringable
 {
     public function __construct(
         #[\SensitiveParameter] private string $authToken,

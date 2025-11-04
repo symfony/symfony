@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Jérôme Nadaud <jerome@nadaud.io>
  */
-final class MailjetTransport extends AbstractTransport
+final class MailjetTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.mailjet.com';
 

@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\LoginLink;
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-class LoginLinkDetails
+class LoginLinkDetails implements \Stringable
 {
     public function __construct(
         private string $url,

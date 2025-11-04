@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Basien Durand <bdurand-dev@outlook.com>
  */
-final class MobytTransport extends AbstractTransport
+final class MobytTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'app.mobyt.fr';
 

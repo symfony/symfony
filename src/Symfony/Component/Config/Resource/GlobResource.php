@@ -25,7 +25,7 @@ use Symfony\Component\Finder\Glob;
  *
  * @implements \IteratorAggregate<string, \SplFileInfo>
  */
-class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
+class GlobResource implements \Stringable, \IteratorAggregate, SelfCheckingResourceInterface
 {
     private string $prefix;
     private string $hash;

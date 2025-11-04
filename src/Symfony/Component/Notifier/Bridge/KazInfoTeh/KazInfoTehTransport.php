@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Egor Taranov <dev@taranovegor.com>
  */
-class KazInfoTehTransport extends AbstractTransport
+class KazInfoTehTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'kazinfoteh.org';
 

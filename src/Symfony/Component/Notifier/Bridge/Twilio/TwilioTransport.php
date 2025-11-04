@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class TwilioTransport extends AbstractTransport
+final class TwilioTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.twilio.com';
 

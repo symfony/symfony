@@ -25,7 +25,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @implements WrappingTypeInterface<T>
  */
-class CollectionType extends Type implements WrappingTypeInterface
+class CollectionType extends Type implements \Stringable, WrappingTypeInterface
 {
     /**
      * @param T $type

@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Mathieu Santostefano <msantostefano@proton.me>
  */
-final class ResendApiTransport extends AbstractApiTransport
+final class ResendApiTransport extends AbstractApiTransport implements \Stringable
 {
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiKey,

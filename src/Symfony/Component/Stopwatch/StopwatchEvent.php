@@ -16,7 +16,7 @@ namespace Symfony\Component\Stopwatch;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class StopwatchEvent
+class StopwatchEvent implements \Stringable
 {
     /**
      * @var StopwatchPeriod[]

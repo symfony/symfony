@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author mocodo <https://github.com/mocodo>
  */
-final class PushoverTransport extends AbstractTransport
+final class PushoverTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'api.pushover.net';
 

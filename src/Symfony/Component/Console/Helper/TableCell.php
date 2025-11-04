@@ -16,7 +16,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class TableCell
+class TableCell implements \Stringable
 {
     private array $options = [
         'rowspan' => 1,

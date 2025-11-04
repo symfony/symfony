@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Franck Ranaivo-Harisoa <franckranaivo@gmail.com>
  */
-final class ContactEveryoneTransport extends AbstractTransport
+final class ContactEveryoneTransport extends AbstractTransport implements \Stringable
 {
     protected const HOST = 'contact-everyone.orange-business.com';
 

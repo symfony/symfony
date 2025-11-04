@@ -31,7 +31,7 @@ use Symfony\Component\Mime\RawMessage;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Chris Corbyn
  */
-class SendmailTransport extends AbstractTransport
+class SendmailTransport extends AbstractTransport implements \Stringable
 {
     private string $command = '/usr/sbin/sendmail -bs';
     private ProcessStream $stream;

@@ -16,7 +16,7 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
-final class TranslationProviderCollection
+final class TranslationProviderCollection implements \Stringable
 {
     /**
      * @var array<string, ProviderInterface>

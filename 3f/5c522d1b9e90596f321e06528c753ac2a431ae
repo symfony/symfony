@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-11-04T09:50:40Z
+
+This fix is still incomplete, as you now return `string|null`
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-04T09:51:17Z
+
+Hi @stof thank you, fixed now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-04T14:18:10Z
+
+Let's add a test case? I suppose the current code (before this change) throws an exception?
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-04T15:50:50Z
+
+Hi @nicolas-grekas, thanks for the review.
+
+I didn't test this at runtime. I found it because `PhpStorm` flagged it as a return type violation.
+
+You're right, it would likely cause a fatal `Error` (`Object of class Symfony\Component\Mime\Address could not be converted to string`) because the method is type-hinted as `string`

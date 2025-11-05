@@ -43,12 +43,12 @@ final class TypeContextFactory
     private static array $reflectionClassCache = [];
 
     /**
-     * @var array<string,array<string,TypeContext>
+     * @var array<string,array<string,TypeContext>>
      */
     private array $intermediateTypeContextCache = [];
 
     /**
-     * @var array<string,array<string,TypeContext>
+     * @var array<string,array<string,TypeContext>>
      */
     private array $typeContextCache = [];
 

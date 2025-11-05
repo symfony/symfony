@@ -41,7 +41,7 @@ class LazyObjectRegistry
     public static array $classAccessors = [];
 
     /**
-     * @var array<class-string, int}>
+     * @var array<class-string, int>
      */
     public static array $parentGet = [];
 

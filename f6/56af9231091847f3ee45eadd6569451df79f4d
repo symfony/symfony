@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-11-04T15:18:18Z
+
+Nice!
+
+> config/routes.yaml
+> the file can be just empty from any config, and only have a comment saying what it's for
+
+I'd even vote for removing it from the recipe
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2025-11-05T10:16:08Z
+
+> I'd even vote for removing it from the recipe
+
+I'd keep it for now because it's not that rare to have to add some manual config in this file.

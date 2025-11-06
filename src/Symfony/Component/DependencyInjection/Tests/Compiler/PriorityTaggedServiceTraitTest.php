@@ -256,6 +256,46 @@ class PriorityTaggedServiceTraitTest extends TestCase
         (new PriorityTaggedServiceTraitImplementation())->test($tag, $container);
     }
 
+    public function testIgnoreAttributesIsRespected()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('service1', SingleTaggedItemService::class)
+            ->setAutoconfigured(true)
+            ->addTag('my_custom_tag')
+            ->addTag('container.ignore_attributes');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+        $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
+
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
+
+        $this->assertArrayHasKey('service1', $services);
+        $this->assertArrayNotHasKey('single_hello', $services);
+        $this->assertCount(1, $services);
+    }
+
+    public function testSingleAsTaggedItemDoesNotDuplicate()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('service1', SingleTaggedItemService::class)
+            ->setAutoconfigured(true)
+            ->addTag('my_custom_tag');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+        $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
+
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
+
+        $this->assertArrayHasKey('single_hello', $services);
+        $this->assertCount(1, $services);
+    }
+
     public function testResolveIndexedTags()
     {
         $container = new ContainerBuilder();
@@ -314,6 +354,11 @@ class MultiTagHelloNamedService
 #[AsTaggedItem(priority: 1)]
 #[AsTaggedItem(priority: 2)]
 class MultiNoNameTagHelloNamedService
+{
+}
+
+#[AsTaggedItem(index: 'single_hello', priority: 5)]
+class SingleTaggedItemService
 {
 }
 

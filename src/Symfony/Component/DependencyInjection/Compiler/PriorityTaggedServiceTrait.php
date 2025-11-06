@@ -67,44 +67,43 @@ trait PriorityTaggedServiceTrait
             $reflector = null !== $class ? $container->getReflectionClass($class) : null;
             $checkTaggedItem = !$definition->hasTag($definition->isAutoconfigured() ? 'container.ignore_attributes' : $tagName);
 
-            foreach ($attributes as $attribute) {
-                $index = $priority = null;
+            $asTaggedItemAttributes = $reflector && $checkTaggedItem ? $reflector->getAttributes(AsTaggedItem::class) : [];
 
-                if (isset($attribute['priority'])) {
-                    $priority = $attribute['priority'];
-                } elseif (null === $defaultPriority && $defaultPriorityMethod && $reflector) {
-                    $defaultPriority = PriorityTaggedServiceUtil::getDefault($serviceId, $reflector, $defaultPriorityMethod, $tagName, 'priority', $checkTaggedItem);
-                }
-                $priority ??= $defaultPriority ??= 0;
-
-                if (null === $indexAttribute && !$defaultIndexMethod && !$needsIndexes) {
-                    $services[] = [$priority, ++$i, null, $serviceId, null];
-                    continue 2;
-                }
-
-                if (null !== $indexAttribute && isset($attribute[$indexAttribute])) {
-                    $index = $parameterBag->resolveValue($attribute[$indexAttribute]);
-                }
-                if (null === $index && null === $defaultIndex && $defaultPriorityMethod && $reflector) {
-                    $defaultIndex = PriorityTaggedServiceUtil::getDefault($serviceId, $reflector, $defaultIndexMethod ?? 'getDefaultName', $tagName, $indexAttribute, $checkTaggedItem);
-                }
-                $index ??= $defaultIndex ??= $definition->getTag('container.decorator')[0]['id'] ?? $serviceId;
-
-                $services[] = [$priority, ++$i, $index, $serviceId, $class];
-            }
-
-            if ($reflector) {
-                $attributes = $reflector->getAttributes(AsTaggedItem::class);
-                $attributeCount = \count($attributes);
-
-                foreach ($attributes as $attribute) {
+            if (1 < \count($asTaggedItemAttributes)) {
+                foreach ($asTaggedItemAttributes as $attribute) {
                     $instance = $attribute->newInstance();
 
-                    if (!$instance->index && 1 < $attributeCount) {
+                    if (!$instance->index) {
                         throw new InvalidArgumentException(\sprintf('Attribute "%s" on class "%s" cannot have an empty index when repeated.', AsTaggedItem::class, $class));
                     }
 
-                    $services[] = [$instance->priority ?? 0, ++$i, $instance->index ?? $serviceId, $serviceId, $class];
+                    $services[] = [$instance->priority ?? 0, ++$i, $instance->index, $serviceId, $class];
+                }
+            } else {
+                foreach ($attributes as $attribute) {
+                    $index = $priority = null;
+
+                    if (isset($attribute['priority'])) {
+                        $priority = $attribute['priority'];
+                    } elseif (null === $defaultPriority && $defaultPriorityMethod && $reflector) {
+                        $defaultPriority = PriorityTaggedServiceUtil::getDefault($serviceId, $reflector, $defaultPriorityMethod, $tagName, 'priority', $checkTaggedItem);
+                    }
+                    $priority ??= $defaultPriority ??= 0;
+
+                    if (null === $indexAttribute && !$defaultIndexMethod && !$needsIndexes) {
+                        $services[] = [$priority, ++$i, null, $serviceId, null];
+                        continue 2;
+                    }
+
+                    if (null !== $indexAttribute && isset($attribute[$indexAttribute])) {
+                        $index = $parameterBag->resolveValue($attribute[$indexAttribute]);
+                    }
+                    if (null === $index && null === $defaultIndex && $defaultPriorityMethod && $reflector) {
+                        $defaultIndex = PriorityTaggedServiceUtil::getDefault($serviceId, $reflector, $defaultIndexMethod ?? 'getDefaultName', $tagName, $indexAttribute, $checkTaggedItem);
+                    }
+                    $index ??= $defaultIndex ??= $definition->getTag('container.decorator')[0]['id'] ?? $serviceId;
+
+                    $services[] = [$priority, ++$i, $index, $serviceId, $class];
                 }
             }
         }

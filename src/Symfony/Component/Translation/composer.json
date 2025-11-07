@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.4",
         "symfony/polyfill-mbstring": "^1.0",
-        "symfony/translation-contracts": "^3.6.1"
+        "symfony/translation-contracts": "^2.5.3|^3.4.2"
     },
     "require-dev": {
         "nikic/php-parser": "^5.0",

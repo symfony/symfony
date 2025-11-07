@@ -12,7 +12,11 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Attribute\AsVoter;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
+use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\Voter\AsVoterDefaultPriority;
+use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\Voter\AsVoterHighPriority;
+use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\Voter\AsVoterMediumPriority;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -71,6 +75,92 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertEquals(new Reference('highest_prio_service'), $refs[0]);
         $this->assertEquals(new Reference('lowest_prio_service'), $refs[1]);
         $this->assertCount(4, $refs);
+    }
+
+    public function testThatSecurityVotersWithAsVoterAttributeAreProcessedInPriorityOrder()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $container
+            ->register('security.access.decision_manager', AccessDecisionManager::class)
+            ->addArgument([])
+        ;
+
+        // Register voters - attributes are read and applied as tags
+        $this->registerVoterWithAttribute($container, 'attribute_highest_prio', AsVoterHighPriority::class);
+        $this->registerVoterWithAttribute($container, 'attribute_medium_prio', AsVoterMediumPriority::class);
+        $this->registerVoterWithAttribute($container, 'attribute_default_prio', AsVoterDefaultPriority::class);
+
+        // Manual voter with explicit priority tag
+        $container
+            ->register('manual_tag_voter', Voter::class)
+            ->addTag('security.voter', ['priority' => 150])
+        ;
+
+        // Process
+        $compilerPass = new AddSecurityVotersPass();
+        $compilerPass->process($container);
+
+        // Verify order
+        $definition = $container->getDefinition('security.access.decision_manager');
+        $argument = $definition->getArgument(0);
+        $refs = $argument->getValues();
+
+        $this->assertEquals(new Reference('attribute_highest_prio'), $refs[0]);
+        $this->assertEquals(new Reference('manual_tag_voter'), $refs[1]);
+        $this->assertEquals(new Reference('attribute_medium_prio'), $refs[2]);
+        $this->assertEquals(new Reference('attribute_default_prio'), $refs[3]);
+        $this->assertCount(4, $refs);
+    }
+
+    public function testThatAsVoterAttributeOverridesOtherAutoConfigurations()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $container
+            ->register('security.access.decision_manager', AccessDecisionManager::class)
+            ->addArgument([])
+        ;
+
+        $this->registerVoterWithAttribute($container, 'voter_with_attribute', AsVoterHighPriority::class);
+
+        $container->register('voter_with_both', AsVoterMediumPriority::class)
+            ->addTag('security.voter', ['priority' => 250]);
+
+        // override the manual tag
+        $this->registerVoterWithAttribute($container, 'voter_with_both', AsVoterMediumPriority::class);
+
+        // Process
+        $compilerPass = new AddSecurityVotersPass();
+        $compilerPass->process($container);
+
+        // Verify order
+        $definition = $container->getDefinition('security.access.decision_manager');
+        $argument = $definition->getArgument(0);
+        $refs = $argument->getValues();
+
+        $this->assertEquals(new Reference('voter_with_attribute'), $refs[0]);
+        $this->assertEquals(new Reference('voter_with_both'), $refs[1]);
+        $this->assertCount(2, $refs);
+    }
+
+    /**
+     * Simulates attribute autoconfiguration
+     * Reads the AsVoter attribute and adds the 'security.voter' tag.
+     */
+    private function registerVoterWithAttribute(ContainerBuilder $container, string $id, string $class): void
+    {
+        $container->register($id, $class);
+
+        $reflectionClass = new \ReflectionClass($class);
+        $attributes = $reflectionClass->getAttributes(AsVoter::class);
+
+        if (!empty($attributes)) {
+            $asVoter = $attributes[0]->newInstance();
+            $container->getDefinition($id)->addTag('security.voter', ['priority' => $asVoter->priority]);
+        }
     }
 
     public function testThatVotersAreTraceableInDebugMode()

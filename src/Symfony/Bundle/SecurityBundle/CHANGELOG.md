@@ -26,6 +26,7 @@ CHANGELOG
     }
     ```
  * Deprecate `LazyFirewallContext::__invoke()`
+ * Add `#[AsVoter]` attribute to configure voter priority
 
 7.3
 ---

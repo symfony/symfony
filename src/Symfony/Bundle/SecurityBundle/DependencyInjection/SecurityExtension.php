@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
 use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
+use Symfony\Bundle\SecurityBundle\Attribute\AsVoter;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
@@ -189,6 +190,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if ($container->hasDefinition('security.role_hierarchy')) {
             $loader->load('security_role_hierarchy_dump_command.php');
         }
+
+        $container->registerAttributeForAutoconfiguration(
+            AsVoter::class,
+            static function (ChildDefinition $definition, AsVoter $attribute): void {
+                $definition->addTag('security.voter', ['priority' => $attribute->priority]);
+            }
+        );
 
         $container->registerForAutoconfiguration(VoterInterface::class)
             ->addTag('security.voter');

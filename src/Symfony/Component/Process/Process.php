@@ -29,6 +29,8 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
  * @author Romain Neutron <imprec@gmail.com>
  *
  * @implements \IteratorAggregate<string, string>
+ *
+ * @psalm-type psalmEnv = array<string, array<string|\Stringable|false>
  */
 class Process implements \IteratorAggregate
 {
@@ -51,12 +53,12 @@ class Process implements \IteratorAggregate
     public const ITER_SKIP_OUT = 4;     // Use this flag to skip STDOUT while iterating
     public const ITER_SKIP_ERR = 8;     // Use this flag to skip STDERR while iterating
 
-    /**
-     * @var \Closure('out'|'err', string):bool|null
-     */
+    /** @var \Closure('out'|'err', string):bool|null */
     private ?\Closure $callback = null;
+    /** @var list<string>|string  */
     private array|string $commandline;
     private ?string $cwd;
+    /** @var psalmEnv */
     private array $env = [];
     /** @var resource|string|\Iterator|null */
     private $input;
@@ -138,9 +140,9 @@ class Process implements \IteratorAggregate
     ];
 
     /**
-     * @param array          $command The command to run and its arguments listed as separate entries
+     * @param list<string>          $command The command to run and its arguments listed as separate entries
      * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
-     * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
+     * @param psalmEnv|null     $env     The environment variables or null to use the same environment as the current PHP process
      * @param mixed          $input   The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout The timeout in seconds or null to disable
      *
@@ -186,7 +188,7 @@ class Process implements \IteratorAggregate
      *
      * @param string         $command The command line to pass to the shell of the OS
      * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
-     * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
+     * @param psalmEnv|null     $env     The environment variables or null to use the same environment as the current PHP process
      * @param mixed          $input   The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout The timeout in seconds or null to disable
      *
@@ -236,6 +238,7 @@ class Process implements \IteratorAggregate
      *
      * @param (callable('out'|'err', string):void)|null $callback A PHP callback to run whenever there is some
      *                                                            output available on STDOUT or STDERR
+     * @param psalmEnv $env
      *
      * @return int The exit status code
      *
@@ -262,6 +265,7 @@ class Process implements \IteratorAggregate
      *
      * @param (callable('out'|'err', string):void)|null $callback A PHP callback to run whenever there is some
      *                                                            output available on STDOUT or STDERR
+     * @param psalmEnv $env
      *
      * @return $this
      *
@@ -292,6 +296,7 @@ class Process implements \IteratorAggregate
      *
      * @param (callable('out'|'err', string):void)|null $callback A PHP callback to run whenever there is some
      *                                                            output available on STDOUT or STDERR
+     * @param psalmEnv $env
      *
      * @throws ProcessStartFailedException When process can't be launched
      * @throws RuntimeException            When process is already running
@@ -1119,6 +1124,8 @@ class Process implements \IteratorAggregate
 
     /**
      * Gets the environment variables.
+     *
+     * @return psalmEnv
      */
     public function getEnv(): array
     {
@@ -1128,7 +1135,7 @@ class Process implements \IteratorAggregate
     /**
      * Sets the environment variables.
      *
-     * @param array<string|\Stringable> $env The new environment variables
+     * @param psalmEnv $env The new environment variables
      *
      * @return $this
      */
@@ -1535,6 +1542,9 @@ class Process implements \IteratorAggregate
         return true;
     }
 
+    /**
+     * @param string|list<string> $commandline
+     */
     private function buildShellCommandline(string|array $commandline): string
     {
         if (\is_string($commandline)) {
@@ -1550,6 +1560,10 @@ class Process implements \IteratorAggregate
         return implode(' ', array_map($this->escapeArgument(...), $commandline));
     }
 
+    /**
+     * @param string|list<string> $cmd
+     * @param psalmEnv $env
+     */
     private function prepareWindowsCommandLine(string|array $cmd, array &$env): string
     {
         $cmd = $this->buildShellCommandline($cmd);
@@ -1650,6 +1664,9 @@ class Process implements \IteratorAggregate
         return '"'.str_replace(['"', '^', '%', '!', "\n"], ['""', '"^^"', '"^%"', '"^!"', '!LF!'], $argument).'"';
     }
 
+    /**
+     * @param psalmEnv $env
+     */
     private function replacePlaceholders(string $commandline, array $env): string
     {
         return preg_replace_callback('/"\$\{:([_a-zA-Z]++[_a-zA-Z0-9]*+)\}"/', function ($matches) use ($commandline, $env) {

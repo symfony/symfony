@@ -2566,4 +2566,42 @@ class OptionsResolverTest extends TestCase
 
         $this->assertSame($expectedOptions, $actualOptions);
     }
+
+    public function testDeprecationCanBeOverriddenWithEmptyString()
+    {
+        // 1. Base configuration (e.g., parent class) deprecates "hostname"
+        $this->resolver
+            ->setDefined(['hostname', 'host'])
+            ->setDeprecated(
+                'hostname',
+                'acme/package',
+                '1.2',
+                'The option "%name%" is deprecated, use "host" instead.'
+            );
+
+        // 2. Child configuration cancel this deprecation
+        $this->resolver
+            ->setDeprecated('hostname', 'acme/package', '1.3', '');
+
+        $this->assertFalse($this->resolver->isDeprecated('hostname'));
+
+        $count = 0;
+        set_error_handler(function (int $type) use (&$count) {
+            if (\E_USER_DEPRECATED === $type) {
+                ++$count;
+            }
+
+            return false;
+        });
+        $e = error_reporting(0);
+
+        try {
+            $this->resolver->resolve(['hostname' => 'localhost']);
+        } finally {
+            error_reporting($e);
+            restore_error_handler();
+        }
+
+        $this->assertSame(0, $count, 'No \E_USER_DEPRECATED error should have been triggered.');
+    }
 }

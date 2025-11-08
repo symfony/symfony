@@ -447,6 +447,8 @@ class OptionsResolver implements Options
 
         // ignore if empty string
         if ('' === $message) {
+            unset($this->deprecated[$option]);
+
             return $this;
         }
 

@@ -47,7 +47,7 @@ final class Cas2HandlerTest extends TestCase
         $this->assertEquals(new UserBadge('lobster', null, [
             'email' => 'lobster@example.com',
             'role' => 'ROLE_USER',
-        ]), $userbadge);        
+        ]), $userbadge);
     }
 
     public function testWithNoAttributes()

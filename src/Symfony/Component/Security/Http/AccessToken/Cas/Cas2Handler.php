@@ -65,7 +65,7 @@ final class Cas2Handler implements AccessTokenHandlerInterface
                         $attributes[$key] = (string) $child;
                     }
                 }
-            }        
+            }
             return new UserBadge($userIdentifier, null, $attributes);
         }
 

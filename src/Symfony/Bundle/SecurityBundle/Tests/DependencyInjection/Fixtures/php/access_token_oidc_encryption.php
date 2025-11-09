@@ -16,6 +16,7 @@ $container->loadFromExtension('security', [
                         'issuers' => ['https://www.example.com'],
                         'audience' => 'audience',
                         'keyset' => '{"keys":[{"kty":"RSA","n":"abc","e":"AQAB"}]}',
+                        'refresh_jwks_on_kid_mismatch' => true,
                         'encryption' => [
                             'enabled' => true,
                             'keyset' => '{"keys":[{"kty":"RSA","n":"abc","e":"AQAB","d":"def"}]}',

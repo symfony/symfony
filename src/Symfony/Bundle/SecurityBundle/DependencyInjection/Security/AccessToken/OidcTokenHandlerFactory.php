@@ -67,6 +67,10 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
         $tokenHandlerDefinition->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwkset'))
             ->replaceArgument(0, $config['keyset']));
 
+        if (!empty($config['refresh_jwks_on_kid_mismatch'])) {
+            $tokenHandlerDefinition->addMethodCall('enableRefreshJwksOnKidMismatch', [true]);
+        }
+
         if ($config['encryption']['enabled']) {
             $algorithmManager = (new ChildDefinition('security.access_token_handler.oidc.encryption'))
                 ->replaceArgument(0, $config['encryption']['algorithms']);
@@ -204,6 +208,10 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                     ->end()
                     ->scalarNode('keyset')
                         ->info('JSON-encoded JWKSet used to sign the token (must contain a list of valid public keys).')
+                    ->end()
+                    ->booleanNode('refresh_jwks_on_kid_mismatch')
+                        ->info('When true, automatically refreshes the JWKS if the token\'s key ID (kid) is not found in the cached set.')
+                        ->defaultFalse()
                     ->end()
                     ->arrayNode('encryption')
                         ->canBeEnabled()

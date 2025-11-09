@@ -55,6 +55,8 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
      */
     private array $discoveryClients = [];
 
+    private bool $refreshJwksOnKidMismatch = false;
+
     public function __construct(
         private Algorithm|AlgorithmManager $signatureAlgorithm,
         private JWK|JWKSet|null $signatureKeyset,
@@ -79,6 +81,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         $this->decryptionKeyset = $decryptionKeyset;
         $this->decryptionAlgorithms = $decryptionAlgorithms;
         $this->enforceEncryption = $enforceEncryption;
+    }
+
+    public function enableRefreshJwksOnKidMismatch(bool $refreshJwksOnKidMismatch): void
+    {
+        $this->refreshJwksOnKidMismatch = $refreshJwksOnKidMismatch;
     }
 
     /**
@@ -107,42 +114,8 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
         $jwkset = $this->signatureKeyset;
         if ($this->discoveryClients) {
-            $clients = $this->discoveryClients;
-            $logger = $this->logger;
-            $keys = $this->discoveryCache->get($this->oidcConfigurationCacheKey, static function () use ($clients, $logger): array {
-                try {
-                    $configResponses = [];
-                    foreach ($clients as $client) {
-                        $configResponses[] = $client->request('GET', '.well-known/openid-configuration', [
-                            'user_data' => $client,
-                        ]);
-                    }
-
-                    $jwkSetResponses = [];
-                    foreach ($client->stream($configResponses) as $response => $chunk) {
-                        if ($chunk->isLast()) {
-                            $jwkSetResponses[] = $response->getInfo('user_data')->request('GET', $response->toArray()['jwks_uri']);
-                        }
-                    }
-
-                    $keys = [];
-                    foreach ($jwkSetResponses as $response) {
-                        foreach ($response->toArray()['keys'] as $key) {
-                            if ('sig' === $key['use']) {
-                                $keys[] = $key;
-                            }
-                        }
-                    }
-
-                    return $keys;
-                } catch (\Exception $e) {
-                    $logger?->error('An error occurred while requesting OIDC certs.', [
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
-
-                    throw new BadCredentialsException('Invalid credentials.', $e->getCode(), $e);
-                }
+            $keys = $this->discoveryCache->get($this->oidcConfigurationCacheKey, function () {
+                return $this->doFetchOidcSigningKeys();
             });
 
             $jwkset = JWKSet::createFromKeyData(['keys' => $keys]);
@@ -180,7 +153,18 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         $serializerManager = new JWSSerializerManager([new JwsCompactSerializer()]);
         $jws = $serializerManager->unserialize($accessToken);
 
-        // Verify the signature
+        // Rotation-safe: if discovery and kid verification are enabled, ensure the token's kid exists in the current JWK set.
+        if ($this->refreshJwksOnKidMismatch && $this->discoveryCache && $this->discoveryClients) {
+            $kid = $jws->getSignature(0)->getProtectedHeader()['kid'] ?? null;
+            if (null !== $kid && !$this->jwksetHasKid($jwkset, $kid)) {
+                $this->discoveryCache->delete($this->oidcConfigurationCacheKey);
+                $freshKeys = $this->discoveryCache->get($this->oidcConfigurationCacheKey, function () {
+                    return $this->doFetchOidcSigningKeys();
+                });
+                $jwkset = JWKSet::createFromKeyData(['keys' => $freshKeys]);
+            }
+        }
+
         if (!$jwsVerifier->verifyWithKeySet($jws, $jwkset, 0)) {
             throw new InvalidSignatureException();
         }
@@ -258,6 +242,60 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             $this->logger?->debug('The token decryption failed. Skipping as not mandatory.');
 
             return $accessToken;
+        }
+    }
+
+    private function jwksetHasKid(JWKSet $set, string $kid): bool
+    {
+        foreach ($set->all() as $jwk) {
+            if (($jwk->has('kid') ? $jwk->get('kid') : null) === $kid) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array<int,array<string,mixed>>
+     */
+    private function doFetchOidcSigningKeys(): array
+    {
+        $clients = $this->discoveryClients;
+        $logger = $this->logger;
+
+        try {
+            $configResponses = [];
+            foreach ($clients as $client) {
+                $configResponses[] = $client->request('GET', '.well-known/openid-configuration', [
+                    'user_data' => $client,
+                ]);
+            }
+
+            $jwkSetResponses = [];
+            foreach ($client->stream($configResponses) as $response => $chunk) {
+                if ($chunk->isLast()) {
+                    $jwkSetResponses[] = $response->getInfo('user_data')->request('GET', $response->toArray()['jwks_uri']);
+                }
+            }
+
+            $keys = [];
+            foreach ($jwkSetResponses as $response) {
+                foreach ($response->toArray()['keys'] as $key) {
+                    if ('sig' === ($key['use'] ?? null)) {
+                        $keys[] = $key;
+                    }
+                }
+            }
+
+            return $keys;
+        } catch (\Exception $e) {
+            $logger?->error('An error occurred while requesting OIDC certs.', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw new BadCredentialsException('Invalid credentials.', $e->getCode(), $e);
         }
     }
 }

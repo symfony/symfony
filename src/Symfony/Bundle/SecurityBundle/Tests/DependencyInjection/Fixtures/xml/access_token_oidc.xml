@@ -13,7 +13,7 @@
         <firewall name="firewall1" provider="default">
             <access-token>
                 <token-handler>
-                    <oidc audience="audience" keyset='{"keys":[{"kty":"RSA","n":"abc","e":"AQAB"}]}' >
+                    <oidc audience="audience" keyset='{"keys":[{"kty":"RSA","n":"abc","e":"AQAB"}]}' refresh-jwks-on-kid-mismatch="true">
                         <issuer>https://www.example.com</issuer>
                         <algorithm>RS256</algorithm>
                     </oidc>

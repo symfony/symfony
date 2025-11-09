@@ -341,6 +341,7 @@
         <xsd:attribute name="algorithm" type="xsd:string" />
         <xsd:attribute name="key" type="xsd:string" />
         <xsd:attribute name="keyset" type="xsd:string" />
+        <xsd:attribute name="refresh-jwks-on-kid-mismatch" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="oidc_encryption">

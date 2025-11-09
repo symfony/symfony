@@ -301,14 +301,72 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertTrue($cache->hasItem('oidc_config'));
     }
 
-    private static function buildJWSWithKey(string $payload, JWK $jwk): string
+    private static function buildJWSWithKey(string $payload, JWK $jwk, ?string $kid = null): string
     {
+        $header = ['alg' => 'ES256'];
+        if ($kid) {
+            $header['kid'] = $kid;
+        }
+
         return (new CompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([
             new ES256(),
         ])))->create()
             ->withPayload($payload)
-            ->addSignature($jwk, ['alg' => 'ES256'])
+            ->addSignature($jwk, $header)
             ->build()
         );
+    }
+
+    public function testRefreshesJwksOnKidMismatch()
+    {
+        $time = time();
+        // Simulate an old JWK (cached) and a new JWK (rotated)
+        $oldKey = array_merge(self::getJWK()->all(), ['use' => 'sig', 'kid' => 'old-key']);
+        $newKey = array_merge(self::getSecondJWK()->all(), ['use' => 'sig', 'kid' => 'new-key']);
+
+        // Mock sequential responses: discovery config, old keyset, then refreshed keyset
+        $httpClient = new MockHttpClient(function ($method, $url) use ($oldKey, $newKey) {
+            static $callCount = 0;
+            ++$callCount;
+
+            return match ($callCount) {
+                1 => new JsonMockResponse(['jwks_uri' => 'https://www.example.com/.well-known/jwks.json']),
+                2 => new JsonMockResponse(['keys' => [$oldKey]]),
+                3 => new JsonMockResponse(['jwks_uri' => 'https://www.example.com/.well-known/jwks.json']),
+                4 => new JsonMockResponse(['keys' => [$newKey]]),
+                default => throw new \RuntimeException('Unexpected call #'.$callCount),
+            };
+        });
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com']
+        );
+
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_config');
+        $handler->enableRefreshJwksOnKidMismatch(true);
+
+        // Token signed with the new key (not present in cache)
+        $claims = [
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'user-rotated',
+            'email' => 'user@example.com',
+        ];
+        $token = self::buildJWSWithKey(json_encode($claims), self::getSecondJWK(), 'new-key');
+
+        $userBadge = $handler->getUserBadgeFrom($token);
+
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame('user-rotated', $userBadge->getUserIdentifier());
+
+        $cachedKeys = $cache->getItem('oidc_config')->get();
+        $this->assertSame('new-key', $cachedKeys[0]['kid']);
     }
 }

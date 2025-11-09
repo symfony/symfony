@@ -559,6 +559,31 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
     }
 
+    public function testOidcTokenHandlerConfigurationWithRefreshJwksOnKidMismatch()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'algorithms' => ['RS256'],
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => 'audience',
+                    'keyset' => '{"keys":[{"kty":"RSA","n":"abc","e":"AQAB"}]}',
+                    'refresh_jwks_on_kid_mismatch' => true,
+                ],
+            ],
+        ];
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+        $def = $container->getDefinition('security.access_token_handler.firewall1');
+        $calls = $def->getMethodCalls();
+        $this->assertTrue(
+            \in_array(['enableRefreshJwksOnKidMismatch', [true]], $calls, true),
+            'Expected enableRefreshJwksOnKidMismatch(true) to be called when refresh_jwks_on_kid_mismatch is enabled.'
+        );
+    }
+
     public function testMultipleTokenHandlersSet()
     {
         $config = [

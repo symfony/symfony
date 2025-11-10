@@ -30,9 +30,13 @@ use function Symfony\Component\String\u;
  */
 final class Oauth2TokenHandler implements AccessTokenHandlerInterface
 {
+    /**
+     * @param array<string>|null $defaultRoles
+     */
     public function __construct(
         private readonly HttpClientInterface $client,
         private readonly ?LoggerInterface $logger = null,
+        private readonly ?array $defaultRoles = null,
     ) {
     }
 
@@ -95,6 +99,8 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
             $claims['phoneNumberVerified'] = (bool) $claims['phoneNumberVerified'];
         }
 
-        return new OAuth2User(...$claims);
+        return $this->defaultRoles
+            ? new OAuth2User(...$claims, roles: $this->defaultRoles)
+            : new OAuth2User(...$claims);
     }
 }

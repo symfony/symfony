@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\AccessToken\OAuth2;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -49,5 +50,39 @@ class OAuth2TokenHandlerTest extends TestCase
         $this->assertInstanceOf(OAuth2User::class, $actualUser);
         $this->assertSame($claims, $userBadge->getAttributes());
         $this->assertSame($claims['sub'], $actualUser->getUserIdentifier());
+    }
+
+    #[DataProvider('provideDefaultRoles')]
+    public function testDefaultRoles(array $actual, array $expected)
+    {
+        $accessToken = 'a-secret-token';
+        $claims = [
+            'active' => true,
+            'client_id' => 'l238j323ds-23ij4',
+            'username' => 'jdoe',
+            'scope' => 'read write dolphin',
+            'sub' => 'Z5O3upPC88QrAjx00dis',
+            'aud' => 'https://protected.example.net/resource',
+            'iss' => 'https://server.example.com/',
+            'exp' => 1419356238,
+            'iat' => 1419350238,
+            'extension_field' => 'twenty-seven',
+        ];
+
+        $client = new MockHttpClient([
+            new MockResponse(json_encode($claims, \JSON_THROW_ON_ERROR)),
+        ]);
+
+        $actualUserBadge = (new Oauth2TokenHandler($client, defaultRoles: $actual))->getUserBadgeFrom($accessToken);
+        $actualUser = $actualUserBadge->getUserLoader()();
+
+        $this->assertEquals($expected, $actualUser->getRoles());
+    }
+
+    public static function provideDefaultRoles(): iterable
+    {
+        yield [[], ['ROLE_USER']];
+        yield [['ROLE_FOO'], ['ROLE_FOO']];
+        yield [['ROLE_FOO', 'ROLE_BAR'], ['ROLE_FOO', 'ROLE_BAR']];
     }
 }

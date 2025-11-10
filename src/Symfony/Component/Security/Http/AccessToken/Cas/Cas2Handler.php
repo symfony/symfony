@@ -14,7 +14,9 @@ namespace Symfony\Component\Security\Http\AccessToken\Cas;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\CasUser;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
+use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -25,11 +27,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class Cas2Handler implements AccessTokenHandlerInterface
 {
+    /**
+     * @param array<string>|null $defaultRoles
+     */
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly string $validationUrl,
         private readonly string $prefix = 'cas',
         private ?HttpClientInterface $client = null,
+        private readonly ?array $defaultRoles = null,
     ) {
         if (null === $client) {
             if (!class_exists(HttpClient::class)) {
@@ -50,7 +56,13 @@ final class Cas2Handler implements AccessTokenHandlerInterface
         $xml = new \SimpleXMLElement($response->getContent(), 0, false, $this->prefix, true);
 
         if (isset($xml->authenticationSuccess)) {
-            return new UserBadge((string) $xml->authenticationSuccess->user);
+            $userIdentifier = $xml->authenticationSuccess->user;
+
+            $user = $this->defaultRoles
+                ? new CasUser($userIdentifier, roles: $this->defaultRoles)
+                : new CasUser($userIdentifier);
+
+            return new UserBadge((string) $userIdentifier, new FallbackUserLoader(fn () => $user));
         }
 
         if (isset($xml->authenticationFailure)) {

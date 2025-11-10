@@ -11,24 +11,22 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\AccessToken\AccessTokenHandler;
-
 return static function (ContainerConfigurator $container) {
-    $container->services()
-        ->set(AccessTokenHandler::class)
-        ->public();
-
     $container->extension('security', [
         'firewalls' => [
             'with_string' => [
                 'access_token' => [
-                    'token_handler' => AccessTokenHandler::class,
+                    'token_handler' => [
+                        'oauth2' => true,
+                    ],
                     'default_roles' => 'ROLE_FOO',
                 ],
             ],
             'with_array' => [
                 'access_token' => [
-                    'token_handler' => AccessTokenHandler::class,
+                    'token_handler' => [
+                        'oauth2' => true,
+                    ],
                     'default_roles' => ['ROLE_FOO', 'ROLE_BAR'],
                 ],
             ],

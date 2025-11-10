@@ -112,7 +112,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         $failureHandler = isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null;
         $authenticatorId = \sprintf('security.authenticator.access_token.%s', $firewallName);
         $extractorId = $this->createExtractor($container, $firewallName, $config['token_extractors']);
-        $tokenHandlerId = $this->createTokenHandler($container, $firewallName, $config['token_handler'], $userProviderId);
+        $tokenHandlerId = $this->createTokenHandler($container, $firewallName, $config['token_handler'], $config['default_roles']);
 
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.access_token'))
@@ -122,7 +122,6 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             ->replaceArgument(3, $successHandler)
             ->replaceArgument(4, $failureHandler)
             ->replaceArgument(5, $config['realm'])
-            ->replaceArgument(6, $config['default_roles'])
         ;
 
         return $authenticatorId;
@@ -152,7 +151,10 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         return $extractorId;
     }
 
-    private function createTokenHandler(ContainerBuilder $container, string $firewallName, array $config, ?string $userProviderId): string
+    /**
+     * @param array<string>|null $defaultRoles
+     */
+    private function createTokenHandler(ContainerBuilder $container, string $firewallName, array $config, ?array $defaultRoles = null): string
     {
         $key = array_keys($config)[0];
         $id = \sprintf('security.access_token_handler.%s', $firewallName);
@@ -162,7 +164,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                 continue;
             }
 
-            $factory->create($container, $id, $config[$key], $userProviderId);
+            $factory->create($container, $id, $config[$key], $defaultRoles);
         }
 
         return $id;

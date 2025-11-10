@@ -22,9 +22,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class OAuth2TokenHandlerFactory implements TokenHandlerFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array|string $config): void
+    public function create(ContainerBuilder $container, string $id, array|string $config, ?array $defaultRoles = null): void
     {
-        $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oauth2'));
+        $container->setDefinition($id, (new ChildDefinition('security.access_token_handler.oauth2'))
+            ->replaceArgument(2, $defaultRoles)
+        );
     }
 
     public function getKey(): string

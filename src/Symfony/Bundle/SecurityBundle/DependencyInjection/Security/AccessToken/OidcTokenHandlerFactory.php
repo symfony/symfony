@@ -26,12 +26,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array|string $config): void
+    public function create(ContainerBuilder $container, string $id, array|string $config, ?array $defaultRoles = null): void
     {
         $tokenHandlerDefinition = $container->setDefinition($id, (new ChildDefinition('security.access_token_handler.oidc'))
             ->replaceArgument(2, $config['audience'])
             ->replaceArgument(3, $config['issuers'])
             ->replaceArgument(4, $config['claim'])
+            ->replaceArgument(7, $defaultRoles)
         );
 
         if (!ContainerBuilder::willBeAvailable('web-token/jwt-library', Algorithm::class, ['symfony/security-bundle'])) {

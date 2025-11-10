@@ -78,6 +78,40 @@ class OidcTokenHandlerTest extends TestCase
         yield ['email', 'foo@example.com'];
     }
 
+    #[DataProvider('provideDefaultRoles')]
+    public function testDefaultRoles(array $actual, array $expected)
+    {
+        $time = time();
+        $claims = [
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'email' => 'foo@example.com',
+        ];
+        $token = $this->buildJWS(json_encode($claims));
+
+        $actualUserBadge = (new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            $this->getJWKSet(),
+            self::AUDIENCE,
+            ['https://www.example.com'],
+            defaultRoles: $actual
+        ))->getUserBadgeFrom($token);
+        $actualUser = $actualUserBadge->getUserLoader()();
+
+        $this->assertEquals($expected, $actualUser->getRoles());
+    }
+
+    public static function provideDefaultRoles(): iterable
+    {
+        yield [[], ['ROLE_USER']];
+        yield [['ROLE_FOO'], ['ROLE_FOO']];
+        yield [['ROLE_FOO', 'ROLE_BAR'], ['ROLE_FOO', 'ROLE_BAR']];
+    }
+
     #[DataProvider('getInvalidTokens')]
     public function testThrowsAnErrorIfTokenIsInvalid(string $token)
     {

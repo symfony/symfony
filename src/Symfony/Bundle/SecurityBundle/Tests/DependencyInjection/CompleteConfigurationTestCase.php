@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -726,23 +727,62 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertSame('(?:^/register$|^/documentation$)', $container->getDefinition($requestMatcherId)->getArgument(0));
     }
 
-    /**
-     * @dataProvider provideAccessTokenDefaultRoles
-     */
-    public function testAccessTokenWithDefaultRoles(string $firewallName, array $expected)
+    #[DataProvider('provideAccessTokenDefaultRolesProtocols')]
+    public function testAccessTokenWithDefaultRolesAsString(string $protocol, int $index)
     {
-        $container = $this->getContainer('access_token_with_default_roles');
+        $isXml = 'xml' === $this->getFileExtension();
 
-        $this->assertTrue($container->hasDefinition("security.authenticator.access_token.$firewallName"));
+        if ($isXml && 'cas' === $protocol) {
+            $this->markTestSkipped('CAS protocol is not supported by the XML configuration format.');
+        }
 
-        $definition = $container->getDefinition("security.authenticator.access_token.$firewallName");
-        $this->assertEquals($expected, $definition->getArgument(6));
+        if ($isXml && 'oauth2' === $protocol) {
+            $this->markTestSkipped('OAuth 2.0 Token Introspection protocol is not supported by the XML configuration format.');
+        }
+
+        // Given
+        $container = $this->getContainer("access_token_{$protocol}_with_default_roles");
+
+        // When
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.with_string'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.with_string'));
+
+        // Then
+        $definition = $container->getDefinition('security.access_token_handler.with_string');
+        $this->assertEquals(['ROLE_FOO'], $definition->getArgument($index));
     }
 
-    public static function provideAccessTokenDefaultRoles(): iterable
+    #[DataProvider('provideAccessTokenDefaultRolesProtocols')]
+    public function testAccessTokenWithDefaultRolesAsArray(string $protocol, int $index)
     {
-        yield ['with_string', ['ROLE_FOO']];
-        yield ['with_array', ['ROLE_FOO', 'ROLE_BAR']];
+        $isXml = 'xml' === $this->getFileExtension();
+
+        if ($isXml && 'cas' === $protocol) {
+            $this->markTestSkipped('CAS protocol is not supported by the XML configuration format.');
+        }
+
+        if ($isXml && 'oauth2' === $protocol) {
+            $this->markTestSkipped('OAuth 2.0 Token Introspection protocol is not supported by the XML configuration format.');
+        }
+
+        // Given
+        $container = $this->getContainer("access_token_{$protocol}_with_default_roles");
+
+        // When
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.with_array'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.with_array'));
+
+        // Then
+        $definition = $container->getDefinition('security.access_token_handler.with_array');
+        $this->assertEquals(['ROLE_FOO', 'ROLE_BAR'], $definition->getArgument($index));
+    }
+
+    public static function provideAccessTokenDefaultRolesProtocols(): iterable
+    {
+        yield ['cas', 4];
+        yield ['oauth2', 2];
+        yield ['oidc', 7];
+        yield ['oidc_user_info', 3];
     }
 
     public function testAccessTokenOidc()

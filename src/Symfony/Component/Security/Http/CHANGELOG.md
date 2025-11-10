@@ -37,6 +37,7 @@ CHANGELOG
  * Add `$tokenSource` argument to `#[IsCsrfTokenValid]` to support reading tokens from the query string or headers
  * Deprecate `RememberMeDetails::getUserFqcn()`, the user FQCN will be removed from the remember-me cookie in 8.0
  * Allow configuring multiple OIDC discovery base URIs
+ * Add `access_token.default_roles` option that allows overwriting user's default roles
 
 7.3
 ---

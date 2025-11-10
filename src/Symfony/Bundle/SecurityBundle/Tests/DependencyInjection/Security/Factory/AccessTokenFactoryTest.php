@@ -103,6 +103,64 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertNull($arguments[3]);
     }
 
+    #[DataProvider('provideDefaultRoles')]
+    public function testCasTokenHandlerConfigurationWithDefaultRoles(array|string $actual, ?array $expected)
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'cas' => [
+                    'validation_url' => 'https://www.example.com/cas/serviceValidate',
+                ],
+            ],
+            'default_roles' => $actual,
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        // When
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        // Then
+        $arguments = $container->getDefinition('security.access_token_handler.firewall1')->getArguments();
+        $this->assertEquals($expected, $arguments['index_4']);
+    }
+
+    public static function provideDefaultRoles(): iterable
+    {
+        yield [[], []];
+        yield ['ROLE_FOO', ['ROLE_FOO']];
+        yield [['ROLE_FOO', 'ROLE_BAR'], ['ROLE_FOO', 'ROLE_BAR']];
+    }
+
+    #[DataProvider('provideInvalidDefaultRoles')]
+    public function testInvalidDefaultRoles(array|bool|int|null $invalidDefaultRoles)
+    {
+        $config = [
+            'token_handler' => 'in_memory_token_handler_service_id',
+            'default_roles' => $invalidDefaultRoles,
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "default_roles" value must be either a string or an array of strings.');
+
+        $this->processConfig($config, $factory);
+    }
+
+    public static function provideInvalidDefaultRoles(): iterable
+    {
+        yield [null];
+        yield [true];
+        yield [0];
+        yield [['ROLE_FOO', null]];
+        yield [['ROLE_FOO', true]];
+        yield [['ROLE_FOO', 0]];
+    }
+
     public function testInvalidOidcTokenHandlerConfigurationKeyMissing()
     {
         $config = [
@@ -222,6 +280,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_2' => 'audience',
             'index_3' => ['https://www.example.com'],
             'index_4' => 'sub',
+            'index_7' => null,
         ];
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
     }
@@ -257,6 +316,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_2' => 'audience',
             'index_3' => ['https://www.example.com'],
             'index_4' => 'sub',
+            'index_7' => null,
         ];
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
     }
@@ -377,6 +437,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_2' => 'audience',
             'index_3' => ['https://www.example.com'],
             'index_4' => 'sub',
+            'index_7' => null,
         ];
         $expectedCalls = [
             [
@@ -432,6 +493,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_2' => 'audience',
             'index_3' => ['https://www.example.com'],
             'index_4' => 'sub',
+            'index_7' => null,
         ];
         $expectedCalls = [
             [
@@ -450,6 +512,34 @@ class AccessTokenFactoryTest extends TestCase
         ];
         $this->assertEquals($expectedArgs, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
+    }
+
+    #[DataProvider('provideDefaultRoles')]
+    public function testOidcTokenHandlerConfigurationWithDefaultRoles(array|string $actual, ?array $expected)
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'algorithms' => ['RS256'],
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => 'audience',
+                    'keyset' => '{"keys":[{"kty":"RSA","n":"abc","e":"AQAB"}]}',
+                ],
+            ],
+            'default_roles' => $actual,
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        // When
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        // Then
+        $arguments = $container->getDefinition('security.access_token_handler.firewall1')->getArguments();
+        $this->assertEquals($expected, $arguments['index_7']);
     }
 
     public function testOidcUserInfoTokenHandlerConfigurationWithExistingClient()
@@ -477,6 +567,7 @@ class AccessTokenFactoryTest extends TestCase
                 ->setFactory([new Reference('oidc.client'), 'withOptions'])
                 ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']),
             'index_2' => 'sub',
+            'index_3' => null,
         ];
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
     }
@@ -501,6 +592,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_0' => (new ChildDefinition('security.access_token_handler.oidc_user_info.http_client'))
                 ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']),
             'index_2' => 'sub',
+            'index_3' => null,
         ];
 
         if (!interface_exists(HttpClientInterface::class)) {
@@ -545,6 +637,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_0' => (new ChildDefinition('security.access_token_handler.oidc_user_info.http_client'))
                 ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo']),
             'index_2' => 'sub',
+            'index_3' => null,
         ];
         $expectedCalls = [
             [
@@ -557,6 +650,29 @@ class AccessTokenFactoryTest extends TestCase
         ];
         $this->assertEquals($expectedArgs, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
+    }
+
+    #[DataProvider('provideDefaultRoles')]
+    public function testOidcUserInfoTokenHandlerConfigurationWithDefaultRoles(array|string $actual, ?array $expected)
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc_user_info' => 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo',
+            ],
+            'default_roles' => $actual,
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        // When
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        // Then
+        $arguments = $container->getDefinition('security.access_token_handler.firewall1')->getArguments();
+        $this->assertEquals($expected, $arguments['index_3']);
     }
 
     public function testMultipleTokenHandlersSet()
@@ -590,6 +706,29 @@ class AccessTokenFactoryTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
         $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+    }
+
+    #[DataProvider('provideDefaultRoles')]
+    public function testOAuth2TokenHandlerConfigurationWithDefaultRoles(array|string $actual, ?array $expected)
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oauth2' => true,
+            ],
+            'default_roles' => $actual,
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        // When
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        // Then
+        $arguments = $container->getDefinition('security.access_token_handler.firewall1')->getArguments();
+        $this->assertEquals($expected, $arguments['index_2']);
     }
 
     public function testNoTokenHandlerSet()
@@ -631,64 +770,6 @@ class AccessTokenFactoryTest extends TestCase
 
         $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
         $this->processConfig($config, $factory);
-    }
-
-    /**
-     * @dataProvider provideDefaultRoles
-     */
-    public function testDefaultRoles(array|string $actual, ?array $expected)
-    {
-        // Given
-        $container = new ContainerBuilder();
-        $config = [
-            'token_handler' => 'in_memory_token_handler_service_id',
-            'default_roles' => $actual,
-        ];
-
-        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
-        $finalizedConfig = $this->processConfig($config, $factory);
-
-        // When
-        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
-
-        // Then
-        $arguments = $container->getDefinition('security.authenticator.access_token.firewall1')->getArguments();
-        $this->assertEquals($expected, $arguments['index_6']);
-    }
-
-    public static function provideDefaultRoles(): iterable
-    {
-        yield [[], []];
-        yield ['ROLE_FOO', ['ROLE_FOO']];
-        yield [['ROLE_FOO', 'ROLE_BAR'], ['ROLE_FOO', 'ROLE_BAR']];
-    }
-
-    /**
-     * @dataProvider provideInvalidDefaultRoles
-     */
-    public function testInvalidDefaultRoles(array|bool|int|null $invalidDefaultRoles)
-    {
-        $config = [
-            'token_handler' => 'in_memory_token_handler_service_id',
-            'default_roles' => $invalidDefaultRoles,
-        ];
-
-        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The "default_roles" value must be either a string or an array of strings.');
-
-        $this->processConfig($config, $factory);
-    }
-
-    public static function provideInvalidDefaultRoles(): iterable
-    {
-        yield [null];
-        yield [true];
-        yield [0];
-        yield [['ROLE_FOO', null]];
-        yield [['ROLE_FOO', true]];
-        yield [['ROLE_FOO', 0]];
     }
 
     private function processConfig(array $config, AccessTokenFactory $factory)

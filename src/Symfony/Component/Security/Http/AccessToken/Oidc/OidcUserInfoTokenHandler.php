@@ -30,10 +30,14 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
     private ?CacheInterface $discoveryCache = null;
     private ?string $oidcConfigurationCacheKey = null;
 
+    /**
+     * @param array<string>|null $defaultRoles
+     */
     public function __construct(
         private HttpClientInterface $client,
         private ?LoggerInterface $logger = null,
         private string $claim = 'sub',
+        private readonly ?array $defaultRoles = null,
     ) {
     }
 
@@ -79,7 +83,7 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
             return new UserBadge($claims[$this->claim], new FallbackUserLoader(function () use ($claims) {
                 $claims['user_identifier'] = $claims[$this->claim];
 
-                return $this->createUser($claims);
+                return $this->createUser($claims, $this->defaultRoles);
             }), $claims);
         } catch (\Exception $e) {
             $this->logger?->error('An error occurred on OIDC server.', [

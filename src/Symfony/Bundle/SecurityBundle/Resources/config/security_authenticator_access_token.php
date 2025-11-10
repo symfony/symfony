@@ -42,7 +42,6 @@ use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\QueryAccessTokenExtractor;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
-use Symfony\Component\Security\Http\Command\OidcTokenGenerateCommand;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -56,7 +55,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('access token handler'),
                 abstract_arg('access token extractor'),
-                null,
                 null,
                 null,
                 null,
@@ -81,6 +79,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('http client'),
                 service('logger')->nullOnInvalid(),
                 abstract_arg('claim'),
+                abstract_arg('default_roles'),
             ])
 
         ->set('security.access_token_handler.oidc', OidcTokenHandler::class)
@@ -93,6 +92,7 @@ return static function (ContainerConfigurator $container) {
                 'sub',
                 service('logger')->nullOnInvalid(),
                 service('clock'),
+                abstract_arg('default_roles'),
             ])
 
         ->set('security.access_token_handler.oidc_discovery.http_client', HttpClientInterface::class)
@@ -202,6 +202,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('http_client'),
                 service('logger')->nullOnInvalid(),
+                abstract_arg('default_roles'),
             ])
 
         ->set('security.access_token_handler.oidc.generator', OidcTokenGenerator::class)

@@ -26,6 +26,7 @@ CHANGELOG
     }
     ```
  * Deprecate `LazyFirewallContext::__invoke()`
+ * Add `access_token.default_roles` option that allows overwriting user's default roles
 
 7.3
 ---

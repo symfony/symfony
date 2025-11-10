@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Security\Http\Tests\AccessToken\Cas;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\CasUser;
 use Symfony\Component\Security\Http\AccessToken\Cas\Cas2Handler;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
@@ -24,6 +26,10 @@ final class Cas2HandlerTest extends TestCase
 {
     public function testWithValidTicket()
     {
+        if (!class_exists(CasUser::class)) {
+            $this->markTestSkipped('This test requires symfony/security 7.4 or superior.');
+        }
+
         $response = new MockResponse(<<<BODY
                 <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
                     <cas:authenticationSuccess>
@@ -39,8 +45,13 @@ final class Cas2HandlerTest extends TestCase
         $requestStack->push(new Request(['ticket' => 'PGTIOU-84678-8a9d']));
 
         $cas2Handler = new Cas2Handler(requestStack: $requestStack, validationUrl: 'https://www.example.com/cas', client: $httpClient);
-        $userbadge = $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
-        $this->assertEquals(new UserBadge('lobster'), $userbadge);
+        $userBadge = $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
+        $user = $userBadge->getUserLoader()();
+
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame('lobster', $userBadge->getUserIdentifier());
+        $this->assertNull($userBadge->getAttributes());
+        $this->assertInstanceOf(CasUser::class, $user);
     }
 
     public function testWithInvalidTicket()
@@ -119,5 +130,45 @@ final class Cas2HandlerTest extends TestCase
         $cas2Handler = new Cas2Handler(requestStack: $requestStack, validationUrl: 'https://www.example.com/cas', prefix: 'invalid-one', client: $httpClient);
         $username = $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
         $this->assertEquals('lobster', $username);
+    }
+
+    #[DataProvider('provideDefaultRoles')]
+    public function testWithDefaultRoles(array $actual, array $expected)
+    {
+        if (!class_exists(CasUser::class)) {
+            $this->markTestSkipped('This test requires symfony/security 7.4 or superior.');
+        }
+
+        $accessToken = 'PGTIOU-84678-8a9d';
+
+        $response = new MockResponse(<<<BODY
+                <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                    <cas:authenticationSuccess>
+                        <cas:user>lobster</cas:user>
+                        <cas:proxyGrantingTicket>$accessToken</cas:proxyGrantingTicket>
+                    </cas:authenticationSuccess>
+                </cas:serviceResponse>
+            BODY);
+
+        $httpClient = new MockHttpClient([$response]);
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['ticket' => $accessToken]));
+
+        $actualUserBadge = (new Cas2Handler(
+            requestStack: $requestStack,
+            validationUrl: 'https://www.example.com/cas',
+            client: $httpClient,
+            defaultRoles: $actual
+        ))->getUserBadgeFrom($accessToken);
+        $actualUser = $actualUserBadge->getUserLoader()();
+
+        $this->assertEquals($expected, $actualUser->getRoles());
+    }
+
+    public static function provideDefaultRoles(): iterable
+    {
+        yield [[], ['ROLE_USER']];
+        yield [['ROLE_FOO'], ['ROLE_FOO']];
+        yield [['ROLE_FOO', 'ROLE_BAR'], ['ROLE_FOO', 'ROLE_BAR']];
     }
 }

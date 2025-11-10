@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array|string $config): void
+    public function create(ContainerBuilder $container, string $id, array|string $config, ?array $defaultRoles = null): void
     {
         $clientDefinition = (new ChildDefinition('security.access_token_handler.oidc_user_info.http_client'))
             ->replaceArgument(0, ['base_uri' => $config['base_uri']]);
@@ -37,7 +37,8 @@ class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
 
         $tokenHandlerDefinition = $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oidc_user_info'))
             ->replaceArgument(0, $clientDefinition)
-            ->replaceArgument(2, $config['claim']);
+            ->replaceArgument(2, $config['claim'])
+            ->replaceArgument(3, $defaultRoles);
 
         if (isset($config['discovery'])) {
             if (!ContainerBuilder::willBeAvailable('symfony/cache', CacheInterface::class, ['symfony/security-bundle'])) {

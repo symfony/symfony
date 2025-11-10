@@ -55,6 +55,9 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
      */
     private array $discoveryClients = [];
 
+    /**
+     * @param array<string>|null $defaultRoles
+     */
     public function __construct(
         private Algorithm|AlgorithmManager $signatureAlgorithm,
         private JWK|JWKSet|null $signatureKeyset,
@@ -63,6 +66,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         private string $claim = 'sub',
         private ?LoggerInterface $logger = null,
         private ClockInterface $clock = new Clock(),
+        private readonly ?array $defaultRoles = null,
     ) {
         if ($signatureAlgorithm instanceof Algorithm) {
             trigger_deprecation('symfony/security-http', '7.1', 'First argument must be instance of %s, %s given.', AlgorithmManager::class, Algorithm::class);
@@ -161,7 +165,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             return new UserBadge($claims[$this->claim], new FallbackUserLoader(function () use ($claims) {
                 $claims['user_identifier'] = $claims[$this->claim];
 
-                return $this->createUser($claims);
+                return $this->createUser($claims, $this->defaultRoles);
             }), $claims);
         } catch (\Exception $e) {
             $this->logger?->error('An error occurred while decoding and validating the token.', [

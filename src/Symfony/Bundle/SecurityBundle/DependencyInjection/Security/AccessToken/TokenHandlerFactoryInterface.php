@@ -21,8 +21,10 @@ interface TokenHandlerFactoryInterface
 {
     /**
      * Creates a generic token handler service.
+     *
+     * @param array<string>|null $defaultRoles
      */
-    public function create(ContainerBuilder $container, string $id, array|string $config): void;
+    public function create(ContainerBuilder $container, string $id, array|string $config, ?array $defaultRoles): void;
 
     /**
      * Gets a generic token handler configuration key.

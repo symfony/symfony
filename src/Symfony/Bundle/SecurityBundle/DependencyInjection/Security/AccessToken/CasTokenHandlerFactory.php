@@ -19,9 +19,11 @@ use Symfony\Component\Security\Http\AccessToken\Cas\Cas2Handler;
 
 class CasTokenHandlerFactory implements TokenHandlerFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array|string $config): void
+    public function create(ContainerBuilder $container, string $id, array|string $config, ?array $defaultRoles = null): void
     {
-        $container->setDefinition($id, new ChildDefinition('security.access_token_handler.cas'));
+        $container->setDefinition($id, (new ChildDefinition('security.access_token_handler.cas'))
+            ->replaceArgument(4, $defaultRoles)
+        );
 
         $container
             ->register('security.access_token_handler.cas', Cas2Handler::class)
@@ -30,6 +32,7 @@ class CasTokenHandlerFactory implements TokenHandlerFactoryInterface
                 $config['validation_url'],
                 $config['prefix'],
                 $config['http_client'] ? new Reference($config['http_client']) : null,
+                $defaultRoles,
             ]);
     }
 

@@ -22,7 +22,10 @@ use function Symfony\Component\String\u;
  */
 trait OidcTrait
 {
-    private function createUser(array $claims): OidcUser
+    /**
+     * @param array<string>|null $defaultRoles
+     */
+    private function createUser(array $claims, ?array $defaultRoles = null): OidcUser
     {
         if (!\function_exists('Symfony\Component\String\u')) {
             throw new \LogicException('You cannot use the "OidcUserInfoTokenHandler" since the String component is not installed. Try running "composer require symfony/string".');
@@ -48,6 +51,8 @@ trait OidcTrait
             $claims['phoneNumberVerified'] = (bool) $claims['phoneNumberVerified'];
         }
 
-        return new OidcUser(...$claims);
+        return $defaultRoles
+            ? new OidcUser(...$claims, roles: $defaultRoles)
+            : new OidcUser(...$claims);
     }
 }

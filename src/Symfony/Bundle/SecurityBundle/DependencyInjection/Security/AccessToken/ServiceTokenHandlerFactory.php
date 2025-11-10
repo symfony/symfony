@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ServiceTokenHandlerFactory implements TokenHandlerFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array|string $config): void
+    public function create(ContainerBuilder $container, string $id, array|string $config, ?array $defaultRoles = null): void
     {
         $container->setDefinition($id, new ChildDefinition($config));
     }

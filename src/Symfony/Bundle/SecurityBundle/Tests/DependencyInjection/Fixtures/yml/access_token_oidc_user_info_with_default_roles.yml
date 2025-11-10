@@ -1,0 +1,13 @@
+security:
+    firewalls:
+        with_string:
+            access_token:
+                token_handler:
+                    oidc_user_info: 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo'
+                default_roles: 'ROLE_FOO'
+
+        with_array:
+            access_token:
+                token_handler:
+                    oidc_user_info: 'https://www.example.com/realms/demo/protocol/openid-connect/userinfo'
+                default_roles: ['ROLE_FOO', 'ROLE_BAR']

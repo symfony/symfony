@@ -61,6 +61,38 @@ class OidcUserInfoTokenHandlerTest extends TestCase
         yield ['email', 'foo@example.com'];
     }
 
+    #[DataProvider('provideDefaultRoles')]
+    public function testDefaultRoles(array $actual, array $expected)
+    {
+        $accessToken = 'a-secret-token';
+        $claims = [
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'email' => 'foo@example.com',
+        ];
+
+        $responseMock = $this->createMock(ResponseInterface::class);
+        $responseMock->expects($this->once())
+            ->method('toArray')
+            ->willReturn($claims);
+
+        $clientMock = $this->createMock(HttpClientInterface::class);
+        $clientMock->expects($this->once())
+            ->method('request')->with('GET', '', ['auth_bearer' => $accessToken])
+            ->willReturn($responseMock);
+
+        $actualUserBadge = (new OidcUserInfoTokenHandler($clientMock, defaultRoles: $actual))->getUserBadgeFrom($accessToken);
+        $actualUser = $actualUserBadge->getUserLoader()();
+
+        $this->assertEquals($expected, $actualUser->getRoles());
+    }
+
+    public static function provideDefaultRoles(): iterable
+    {
+        yield [[], ['ROLE_USER']];
+        yield [['ROLE_FOO'], ['ROLE_FOO']];
+        yield [['ROLE_FOO', 'ROLE_BAR'], ['ROLE_FOO', 'ROLE_BAR']];
+    }
+
     public function testThrowsAnExceptionIfUserPropertyIsMissing()
     {
         $responseMock = $this->createMock(ResponseInterface::class);

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2025-11-03T13:27:47Z
+
+Hi @yoeunes,
+
+From what I understand, this looks more like an enhancement of the existing behaviour rather than a bug fix. Is that correct?
+If it is indeed a bug fix, it should probably target 6.4 instead of 7.4.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-03T13:46:10Z
+
+Hi @Spomky, I consider this a bug fix because the current implementation incorrectly overwrites header items (e.g., `text/plain;format=flowed` (q=1.0) is lost if `text/plain;format=fixed` (q=0.4) is also present) which breaks content negotiation
+
+If it's confirmed as a bug fix, should I rebase this onto 6.4 instead? Let me know your thoughts or if more details are needed
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-03T19:54:33Z
+
+Hi @andesk, I'm consolidating my responses to your comments here to keep the thread tidy.
+
+Thanks for the detailed review. I've pushed a full refactor that applies your suggestions, makes the code more readable, and adds explanatory comments.
+
+Regarding case-insensitivity, you are correct. I'm now normalizing parameter names using `strtolower()` when building the canonical key. This aligns with RFC 9110 (Section 5.6.6) and correctly handles duplicates (e.g., `Charset` vs `charset`).
+[https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.6](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.6)
+
+The PR should be ready for another look. Thanks!
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-05T13:12:01Z
+
+Hi @derrabus, thank you for your review and feedback!
+
+I've just pushed an update to add the requested tests for `Request::getAcceptableContentTypes()` and `Request::getPreferredFormat()`, covering scenarios with parameters, quality sorting, wildcards, case-insensitivity
+
+Let me know if anything else is needed.

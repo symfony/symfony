@@ -1,0 +1,110 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-10-06T19:42:33Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-10-06T19:43:10Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "7.2 for features / 5.4, 6.4, and 7.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-10-06T19:43:12Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2024-10-06T19:46:15Z
+
+ "Allow edits from maintainer" doesn't work because that is a Group Repository
+
+---------------------------------------------------------------------------
+
+by andreybotanic at 2024-10-09T07:40:38Z
+
+Your fix is very specific. Why ScalarNormalizer allows only booleans? You probably should create BooleanNormalizer instead. And it also mast supports denormalization, so you have to add appropriate methods and fix demormalization method in AbstractObjectNormalizer
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2024-10-09T07:47:23Z
+
+@andreybotanic because this is only the start, for #58429 I wanted to add something to format numeric/float/int too,
+but I first need to think what the best way would be. Probably "sprintf" Format Strings?
+
+Yeah, denormalization might need to be done too. My use-case was for normalizing into stuff that can be denormalized too. (like "true/false" for boolean.)
+
+I will try to update the denormalize way soon. (for example, "yes/no" for boolean)
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-01-29T08:12:40Z
+
+@nicolas-grekas similar to #59501 can you look into this MR?
+
+I need to find a way to normalize boolean into "true" and "false" instead of "1" and "0"
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-10-02T13:00:06Z
+
+hm, I need to think about the test cases.
+
+For example: `testChildContextKeepsOriginalContextCacheKey`
+thanks to the change, it creates a new child-context for the scalar attributes
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-10-06T09:07:12Z
+
+@stof is this MR ready? The Fabbot changes look like false-positive
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-10-17T08:29:37Z
+
+Ping @stof again, because I have done the "Requested change"
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-10-17T08:55:34Z
+
+@stof rebased and fixed the Fabbot thing
+
+just Redis is failing sometimes
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-10-17T13:11:03Z
+
+Finally, the tests are green again 😂
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2025-10-30T06:05:05Z
+
+for reference, @stof said this in Slack:
+
+> looking at a git blame, I suspect that this was working between 2.7 (when serializer added support for normalizing scalars) and 6.1, and got broken in 6.2 (when the handling of scalars was changed in AbstractObjectNormalizer to fix an issue in https://github.com/symfony/symfony/pull/49525)

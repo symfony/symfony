@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-04T18:22:51Z
+
+Hi @stof, thanks for the review!
+
+I've updated the PR to always resolve aliases for lazy proxies when possible, but fallback to the original type (e.g., interface) for final classes on PHP < 8.4 to avoid proxy errors.
+
+Tests now pass on PHP 8.2 and 8.4 without restrictions. (cc @nicolas-grekas)
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-06T02:52:53Z
+
+I've just pushed an update to refactor the logic to simplify the `processValue` method by extracting the proxy resolution into `resolveProxyType`. It should be cleaner and ready for review now.

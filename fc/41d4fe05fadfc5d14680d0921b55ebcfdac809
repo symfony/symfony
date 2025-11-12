@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by frozenbrain at 2025-10-27T09:19:35Z
+
+I would suggest limiting the property lookup to the class the getter was declared in (`$reflMethod->getDeclaringClass()`) and _maybe_ its parents.
+
+Otherwise the results could change by introducing new properties in child classes, which could cause confusion:
+```php
+class Base
+{
+    private bool $test = false;
+
+    public function isTest(): bool
+    {
+        return $this->test;
+    }
+
+    public function setTest(bool $test): void
+    {
+        $this->test = $test;
+    }
+}
+
+class Child extends Base {
+    private bool $isTest = true;
+}
+
+$serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
+echo $serializer->serialize(new Base(), 'json') . PHP_EOL;  // {"test":false}
+echo $serializer->serialize(new Child(), 'json') . PHP_EOL; // {"isTest":false}
+```
+This is, of course, just a theoretical example, but I can't think of a case in which this behavior could be useful and starting at the most likely correct class would reduce the number of checks/iterations necessary considerably for classes with many inherited properties.
+
+Another thing: I think for consistency's sake the check in [line 115](https://github.com/symfony/symfony/pull/62007/files#diff-397b4689ce56cc95e54911f6d78639bb3258a9ee9b36bfa06ec719e9635e6b1dR115) should behave the same way.
+
+---------------------------------------------------------------------------
+
+by Link1515 at 2025-11-07T05:21:59Z
+
+> I would suggest limiting the property lookup to the class the getter was declared in (`$reflMethod->getDeclaringClass()`) and _maybe_ its parents.
+>
+> Otherwise the results could change by introducing new properties in child classes, which could cause confusion:
+> ```php
+> class Base
+> {
+>     private bool $test = false;
+>
+>     public function isTest(): bool
+>     {
+>         return $this->test;
+>     }
+>
+>     public function setTest(bool $test): void
+>     {
+>         $this->test = $test;
+>     }
+> }
+>
+> class Child extends Base {
+>     private bool $isTest = true;
+> }
+>
+> $serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
+> echo $serializer->serialize(new Base(), 'json') . PHP_EOL;  // {"test":false}
+> echo $serializer->serialize(new Child(), 'json') . PHP_EOL; // {"isTest":false}
+> ```
+> This is, of course, just a theoretical example, but I can't think of a case in which this behavior could be useful and starting at the most likely correct class would reduce the number of checks/iterations necessary considerably for classes with many inherited properties.
+>
+> Another thing: I think for consistency's sake the check in [line 115](https://github.com/symfony/symfony/pull/62007/files#diff-397b4689ce56cc95e54911f6d78639bb3258a9ee9b36bfa06ec719e9635e6b1dR115) should behave the same way.
+
+@frozenbrain, thank you for the feedback, I've made the changes.

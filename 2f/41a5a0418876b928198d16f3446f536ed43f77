@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-11-08T21:53:24Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-11-08T22:22:13Z
+
+Status: needs work
+
+Its necessary add new tests for the new request.
+
+I tested this solution with a test account and a very simple example.
+
+I will wait for @bastien70's confirmation that it works in his environment before add the new tests.
+
+---------------------------------------------------------------------------
+
+by bastien70 at 2025-11-10T07:25:58Z
+
+Hello, it works! Congratulations et thank you! :)
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-11-11T00:48:00Z
+
+Status: needs review
+
+Bastien has already checked this solution in his environment (Thanks Bastien for the check!), and the test has been added.
+
+Edit: I believe the errors are not relevant in the context of the PR

@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-10-14T09:38:37Z
+
+Thanks for looking into this! Unfortunately this didn’t solve the issue, maybe because the target object is not necessarily a resource?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-10-14T09:56:06Z
+
+Indeed, I registered objects as `ReflectionClassResource` so that objects are tracked no matter where they come from, let me know if it solves the issue :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-10-14T09:59:14Z
+
+But to work, the object needs, of course, to be marked with `#[JsonStreamable]` (which is what's written in the documentation).
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-10-14T10:14:42Z
+
+The documentation says it’s optional?
+
+I’m still not seeing any difference though.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-14T10:36:59Z
+
+see my comment on the issue. Making the cache warmer required *and* invalidating the whole *container* cache when the streamable class gets edited is overkill IMO.
+In dev, we should rather keep generating the streamable classes on demand (there will be tons of cases where you will edit something in your project without running code for all your streamable classes, where a required class warmer would slow down your dev env for nothing), but with proper cache invalidation.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-10-14T15:01:17Z
+
+@stof, the PR has been updated to leverage config cache factories (like in translator and router).
+
+Let me know if it's the right approach (I'm not used to that).
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-10-14T15:32:40Z
+
+This is better but it seems the cache won’t be refreshed if a nested class changes.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-10-25T07:47:03Z
+
+Low deps tests should be fixed once merged.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-25T11:33:15Z
+
+> Low deps tests should be fixed once merged.
+
+let me doubt about this: merging up won't change anything to lowest deps
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-10-25T14:50:59Z
+
+My thought was:
+- `FrameworkBundle` is failing with a too low version on `JsonStreamer` (`<=7.3.4` which is without config cache)
+- If `FrameworkBundle` is requiring `JsonStreamer` at the next version (`^7.3.5`), it should work again
+
+Thinking to this again, I'm indeed wrong, because `FrameworkBundle:^7.3.5` can still require `JsonStreamer:^7.3.2` for example. Therefore:
+- maybe we need to add something like a conflict to `symfony/json-streamer: <7.3.5`?
+- or maybe I update the test with a `class_exists` on `StreamerDumper` in the test to make it dependent of that fix?
+
+WDYT?

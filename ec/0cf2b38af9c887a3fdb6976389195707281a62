@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-03T08:47:38Z
+
+preparation for the upcoming 6.3 release, let's wait for the final tag before merging
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-11-03T19:16:57Z
+
+im wondering if can we can rely on magic __call for the wrapper, and skip this maintenance/coupling
+
+the alternative to me is listing supported ext-redis in composer.json
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-03T19:18:37Z
+
+`__call()` does not help here as it will not be called for known methods
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2025-11-03T19:20:13Z
+
+i see :+1: `Redis6Proxy extends \Redis`
+
+it feels slippery slope implementation-wise, but on our side we're pinned to ext-redis-6.2.0 now :')
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-03T19:23:48Z
+
+@ro0NL you're looking for https://github.com/phpredis/phpredis/pull/2753

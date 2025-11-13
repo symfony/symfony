@@ -30,6 +30,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummyWithDocblock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
@@ -1062,6 +1063,23 @@ class ReflectionExtractorTest extends TestCase
         yield ['dateObject', null];
         yield ['dateTime', Type::object(\DateTimeImmutable::class)];
         yield ['ddd', null];
+    }
+
+    /**
+     * @dataProvider constructorPromotedPropertyWithDocblockProvider
+     */
+    public function testExtractConstructorPromotedPropertyWithDocblock(string $property, ?Type $type)
+    {
+        $this->assertEquals($type, $this->extractor->getTypeFromConstructor(Php80PromotedDummyWithDocblock::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: ?Type}>
+     */
+    public static function constructorPromotedPropertyWithDocblockProvider(): iterable
+    {
+        // ReflectionExtractor can only extract native PHP types, not generic types from docblocks
+        yield ['dates', Type::array()];
     }
 
     /**

@@ -182,7 +182,10 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
         trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getTypeFromConstructor()" instead.', __METHOD__, self::class);
 
         if (null === $tagDocNode = $this->getDocBlockFromConstructor($class, $property)) {
-            return null;
+            // If no @param found in constructor docblock, try the promoted property's @var docblock
+            if (null === $tagDocNode = $this->getDocBlockFromPromotedProperty($class, $property)) {
+                return null;
+            }
         }
 
         $types = [];
@@ -247,7 +250,10 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     {
         $declaringClass = $class;
         if (!$tagDocNode = $this->getDocBlockFromConstructor($declaringClass, $property)) {
-            return null;
+            // If no @param found in constructor docblock, try the promoted property's @var docblock
+            if (!$tagDocNode = $this->getDocBlockFromPromotedProperty($class, $property)) {
+                return null;
+            }
         }
 
         $typeContext = $this->typeContextFactory->createFromClassName($class, $declaringClass);
@@ -400,6 +406,38 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     private function filterDocBlockParams(PhpDocNode $docNode, string $allowedParam): ?ParamTagValueNode
     {
         $tags = array_values(array_filter($docNode->getTagsByName('@param'), fn ($tagNode) => $tagNode instanceof PhpDocTagNode && ('$'.$allowedParam) === $tagNode->value->parameterName));
+
+        if (!$tags) {
+            return null;
+        }
+
+        return $tags[0]->value;
+    }
+
+    private function getDocBlockFromPromotedProperty(string $class, string $property): ?VarTagValueNode
+    {
+        try {
+            $reflectionProperty = new \ReflectionProperty($class, $property);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        if (!$reflectionProperty->isPromoted()) {
+            return null;
+        }
+
+        if (!$this->canAccessMemberBasedOnItsVisibility($reflectionProperty)) {
+            return null;
+        }
+
+        $rawDocNode = $reflectionProperty->getDocComment();
+        if (!$rawDocNode) {
+            return null;
+        }
+
+        $phpDocNode = $this->getPhpDocNode($rawDocNode);
+
+        $tags = array_values(array_filter($phpDocNode->getTagsByName('@var'), fn ($tagNode) => $tagNode->value instanceof VarTagValueNode));
 
         if (!$tags) {
             return null;

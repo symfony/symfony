@@ -35,6 +35,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummyWithDocblock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\PhpStanPseudoTypesDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyInAnotherNamespace;
@@ -945,6 +946,23 @@ class PhpStanExtractorTest extends TestCase
         yield ['dateObject', Type::object(\DateTimeInterface::class)];
         yield ['dateTime', null];
         yield ['ddd', null];
+    }
+
+    /**
+     * @dataProvider constructorPromotedPropertyWithDocblockProvider
+     */
+    public function testExtractConstructorPromotedPropertyWithDocblock(string $property, ?Type $type)
+    {
+        $this->assertEquals($type, $this->extractor->getTypeFromConstructor(Php80PromotedDummyWithDocblock::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: ?Type}>
+     */
+    public static function constructorPromotedPropertyWithDocblockProvider(): iterable
+    {
+        // Test that promoted properties with @var docblock are recognized
+        yield ['dates', Type::list(Type::object(\DateTimeImmutable::class))];
     }
 
     /**

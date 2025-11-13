@@ -21,19 +21,26 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class SerializerTest extends AbstractWebTestCase
 {
-    public function testDeserializeArrayOfObject()
+    /**
+     * @dataProvider provideDeserializeArrayOfObjectData
+     */
+    public function testDeserializeArrayOfObject(string $expectedClass, bool $usePromotedProperties, bool $withConstructorExtractor)
     {
-        static::bootKernel(['test_case' => 'Serializer']);
+        static::bootKernel(['test_case' => 'Serializer', 'root_config' => $withConstructorExtractor ? 'config.yml' : 'config_without_constructor_extractor.yml']);
 
-        $result = static::getContainer()->get('serializer.alias')->deserialize('{"bars": [{"id": 1}, {"id": 2}]}', Foo::class, 'json');
+        $result = static::getContainer()->get('serializer.alias')->deserialize('{"bars": [{"id": 1}, {"id": 2}]}', $expectedClass, 'json');
 
         $bar1 = new Bar();
         $bar1->id = 1;
         $bar2 = new Bar();
         $bar2->id = 2;
 
-        $expected = new Foo();
-        $expected->bars = [$bar1, $bar2];
+        if ($usePromotedProperties) {
+            $expected = new ($expectedClass)([$bar1, $bar2]);
+        } else {
+            $expected = new $expectedClass();
+            $expected->bars = [$bar1, $bar2];
+        }
 
         $this->assertEquals($expected, $result);
     }
@@ -63,6 +70,18 @@ class SerializerTest extends AbstractWebTestCase
     protected static function getKernelClass(): string
     {
         return SerializerKernel::class;
+    }
+
+    public function provideDeserializeArrayOfObjectData(): array
+    {
+        return [
+            ['expectedClass' => Foo::class, 'usePromotedProperties' => false, 'withConstructorExtractor' => false],
+            ['expectedClass' => FooVar::class, 'usePromotedProperties' => true, 'withConstructorExtractor' => false],
+            ['expectedClass' => FooParam::class, 'usePromotedProperties' => true, 'withConstructorExtractor' => false],
+            ['expectedClass' => Foo::class, 'usePromotedProperties' => false, 'withConstructorExtractor' => true],
+            ['expectedClass' => FooVar::class, 'usePromotedProperties' => true, 'withConstructorExtractor' => true],
+            ['expectedClass' => FooParam::class, 'usePromotedProperties' => true, 'withConstructorExtractor' => true],
+        ];
     }
 }
 
@@ -116,4 +135,26 @@ class Bar
      * @var int
      */
     public $id;
+}
+
+class FooVar
+{
+    public function __construct(
+        /**
+         * @var Bar[]
+         */
+        public array $bars,
+    ) {
+    }
+}
+
+class FooParam
+{
+    /**
+     * @param Bar[] $bars
+     */
+    public function __construct(
+        public array $bars,
+    ) {
+    }
 }

@@ -186,12 +186,20 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $docBlock = $this->getDocBlockFromConstructor($class, $property);
 
         if (!$docBlock) {
-            return null;
+            // If no @param found in constructor docblock, try the promoted property's @var docblock
+            if (!$docBlock = $this->getDocBlockFromPromotedProperty($class, $property)) {
+                return null;
+            }
+
+            // For promoted properties, use @var tag instead of @param
+            $tags = $docBlock->getTagsByName('var');
+        } else {
+            $tags = $docBlock->getTagsByName('param');
         }
 
         $types = [];
         /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
-        foreach ($docBlock->getTagsByName('param') as $tag) {
+        foreach ($tags as $tag) {
             if ($tag && null !== $tag->getType()) {
                 $types[] = $this->phpDocTypeHelper->getTypes($tag->getType());
             }
@@ -266,12 +274,20 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public function getTypeFromConstructor(string $class, string $property): ?Type
     {
         if (!$docBlock = $this->getDocBlockFromConstructor($class, $property)) {
-            return null;
+            // If no @param found in constructor docblock, try the promoted property's @var docblock
+            if (!$docBlock = $this->getDocBlockFromPromotedProperty($class, $property)) {
+                return null;
+            }
+
+            // For promoted properties, use @var tag instead of @param
+            $tags = $docBlock->getTagsByName('var');
+        } else {
+            $tags = $docBlock->getTagsByName('param');
         }
 
         $types = [];
         /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
-        foreach ($docBlock->getTagsByName('param') as $tag) {
+        foreach ($tags as $tag) {
             if ($tag instanceof InvalidTag || !$tagType = $tag->getType()) {
                 continue;
             }
@@ -306,6 +322,25 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
             return $this->filterDocBlockParams($docBlock, $property);
         } catch (\InvalidArgumentException) {
+            return null;
+        }
+    }
+
+    private function getDocBlockFromPromotedProperty(string $class, string $property): ?DocBlock
+    {
+        try {
+            $reflectionProperty = new \ReflectionProperty($class, $property);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        if (!$reflectionProperty->isPromoted()) {
+            return null;
+        }
+
+        try {
+            return $this->docBlockFactory->create($reflectionProperty, $this->createFromReflector($reflectionProperty->getDeclaringClass()));
+        } catch (\InvalidArgumentException|\RuntimeException) {
             return null;
         }
     }

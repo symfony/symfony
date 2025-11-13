@@ -22,6 +22,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummyWithDocblock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypeDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypesDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
@@ -885,6 +886,23 @@ class PhpDocExtractorTest extends TestCase
         yield ['dateTime', null];
         yield ['ddd', null];
         yield ['mixed', Type::mixed()];
+    }
+
+    /**
+     * @dataProvider constructorPromotedPropertyWithDocblockProvider
+     */
+    public function testExtractConstructorPromotedPropertyWithDocblock(string $property, ?Type $type)
+    {
+        $this->assertEquals($type, $this->extractor->getTypeFromConstructor(Php80PromotedDummyWithDocblock::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: ?Type}>
+     */
+    public static function constructorPromotedPropertyWithDocblockProvider(): iterable
+    {
+        // Test that promoted properties with @var docblock are recognized
+        yield ['dates', Type::list(Type::object(\DateTimeImmutable::class))];
     }
 
     /**

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Runtime\Runner\FrankenPhpWorkerRunner;
 use Symfony\Component\Runtime\SymfonyRuntime;
+use Symfony\Component\Runtime\Tests\Support\FrankenPhpCustomWorkerRunner;
 
 class SymfonyRuntimeTest extends TestCase
 {
@@ -49,5 +50,29 @@ class SymfonyRuntimeTest extends TestCase
         $this->expectExceptionMessage('The "worker_loop_max" runtime option must be an integer, "bool" given.');
 
         new SymfonyRuntime(['worker_loop_max' => false]);
+    }
+
+    public function testWithCustomWorkerRunner(){
+        $application = $this->createStub(HttpKernelInterface::class);
+
+        $runtime = new SymfonyRuntime(['frankenphp_worker_runner'=> FrankenPhpCustomWorkerRunner::class]);
+
+        try {
+            $this->assertInstanceOf(FrankenPhpCustomWorkerRunner::class, $runtime->getRunner($application));
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+
+        $_SERVER['FRANKENPHP_WORKER'] = 1;
+        $_SERVER['FRANKENPHP_WORKER_RUNNER'] = FrankenPhpCustomWorkerRunner::class;
+        $runtime = new SymfonyRuntime();
+
+        try {
+            $this->assertInstanceOf(FrankenPhpCustomWorkerRunner::class, $runtime->getRunner($application));
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
     }
 }

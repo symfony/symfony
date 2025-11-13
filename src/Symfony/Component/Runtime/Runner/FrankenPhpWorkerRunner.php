@@ -37,20 +37,7 @@ class FrankenPhpWorkerRunner implements RunnerInterface
         $server = array_filter($_SERVER, static fn (string $key) => !str_starts_with($key, 'HTTP_'), \ARRAY_FILTER_USE_KEY);
         $server['APP_RUNTIME_MODE'] = 'web=1&worker=1';
 
-        $handler = function () use ($server, &$sfRequest, &$sfResponse): void {
-            // Connect to the Xdebug client if it's available
-            if (\extension_loaded('xdebug') && \function_exists('xdebug_connect_to_client')) {
-                xdebug_connect_to_client();
-            }
-
-            // Merge the environment variables coming from DotEnv with the ones tied to the current request
-            $_SERVER += $server;
-
-            $sfRequest = Request::createFromGlobals();
-            $sfResponse = $this->kernel->handle($sfRequest);
-
-            $sfResponse->send();
-        };
+        $handler = $this->getHandler($server, $sfRequest,$sfResponse);
 
         $loops = 0;
         do {
@@ -64,5 +51,23 @@ class FrankenPhpWorkerRunner implements RunnerInterface
         } while ($ret && (0 >= $this->loopMax || ++$loops < $this->loopMax));
 
         return 0;
+    }
+
+    protected function getHandler($server, &$sfRequest, &$sfResponse):callable
+    {
+        return function () use ($server, &$sfRequest, &$sfResponse): void {
+            // Connect to the Xdebug client if it's available
+            if (\extension_loaded('xdebug') && \function_exists('xdebug_connect_to_client')) {
+                xdebug_connect_to_client();
+            }
+
+            // Merge the environment variables coming from DotEnv with the ones tied to the current request
+            $_SERVER += $server;
+
+            $sfRequest = Request::createFromGlobals();
+            $sfResponse = $this->kernel->handle($sfRequest);
+
+            $sfResponse->send();
+        };
     }
 }

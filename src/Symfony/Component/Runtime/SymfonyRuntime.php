@@ -91,6 +91,7 @@ class SymfonyRuntime extends GenericRuntime
      *   dotenv_overload?: ?bool,
      *   dotenv_extra_paths?: ?string[],
      *   worker_loop_max?: int, // Use 0 or a negative integer to never restart the worker. Default: 500
+     *   frankenphp_worker_runner_class?: class-string<FrankenPhpWorkerRunner>,
      * } $options
      */
     public function __construct(array $options = [])
@@ -153,6 +154,13 @@ class SymfonyRuntime extends GenericRuntime
 
         $options['worker_loop_max'] = (int) ($workerLoopMax ?? 500);
 
+        $frankenphpWorkerRunner= $options['frankenphp_worker_runner'] ?? $_SERVER['FRANKENPHP_WORKER_RUNNER'] ?? $_ENV['FRANKENPHP_WORKER_RUNNER'] ?? FrankenPhpWorkerRunner::class;
+
+        if(!is_a($frankenphpWorkerRunner, FrankenPhpWorkerRunner::class, true)) {
+            throw new \LogicException(\sprintf('The "frankenphp_worker_runner" runtime option must be a class-string of "%s", "%s" given.', FrankenPhpWorkerRunner::class, $frankenphpWorkerRunner));
+        }
+        $options['frankenphp_worker_runner'] = $frankenphpWorkerRunner;
+
         parent::__construct($options);
     }
 
@@ -160,7 +168,7 @@ class SymfonyRuntime extends GenericRuntime
     {
         if ($application instanceof HttpKernelInterface) {
             if ($_SERVER['FRANKENPHP_WORKER'] ?? false) {
-                return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max']);
+                return new $this->options['frankenphp_worker_runner']($application, $this->options['worker_loop_max']);
             }
 
             return new HttpKernelRunner($application, Request::createFromGlobals(), $this->options['debug'] ?? false);

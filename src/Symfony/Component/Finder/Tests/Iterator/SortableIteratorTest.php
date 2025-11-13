@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Finder\Iterator\SortableIterator;
 
 class SortableIteratorTest extends RealIteratorTestCase
@@ -25,9 +26,7 @@ class SortableIteratorTest extends RealIteratorTestCase
         }
     }
 
-    /**
-     * @dataProvider getAcceptData
-     */
+    #[DataProvider('getAcceptData')]
     public function testAccept($mode, $expected)
     {
         if (!\is_callable($mode)) {

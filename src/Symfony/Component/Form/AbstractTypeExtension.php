@@ -18,9 +18,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractTypeExtension implements FormTypeExtensionInterface
 {
-    /**
-     * @return void
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
     }

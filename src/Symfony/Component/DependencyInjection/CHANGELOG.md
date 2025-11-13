@@ -1,6 +1,43 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Allow adding resource tags using any config format
+ * Allow `#[AsAlias]` to be extended
+ * Parse attributes found on abstract classes for resource definitions
+ * Add argument `$target` to `ContainerBuilder::registerAliasForArgument()`
+ * Deprecate registering a service without a class when its id is a non-existing FQCN
+ * Allow multiple `#[AsDecorator]` attributes
+ * Handle declaring services using PHP arrays that follow the same shape as corresponding yaml files
+ * Add `AppReference` to help writing PHP configs using yaml-like array-shapes
+ * Deprecate using `$this` or its internal scope from PHP config files; use the `$loader` variable instead
+ * Deprecate XML configuration format, use YAML or PHP instead
+ * Deprecate `ExtensionInterface::getXsdValidationBasePath()` and `getNamespace()`
+ * Deprecate the fluent PHP format for semantic configuration, use `$container->extension()` or return an array instead
+
+7.3
+---
+
+ * Make `#[AsTaggedItem]` repeatable
+ * Support `@>` as a shorthand for `!service_closure` in yaml files
+ * Don't skip classes with private constructor when autodiscovering
+ * Add `Definition::addResourceTag()` and `ContainerBuilder::findTaggedResourceIds()`
+   for auto-configuration of classes excluded from the service container
+ * Accept multiple auto-configuration callbacks for the same attribute class
+ * Leverage native lazy objects when possible for lazy services
+ * Add `when` argument to `#[AsAlias]`
+
+7.2
+---
+
+ * Deprecate `!tagged` tag, use `!tagged_iterator` instead
+ * Add a `ContainerBuilder::registerChild()` shortcut method for registering child definitions
+ * Add support for `key-type` in `XmlFileLoader`
+ * Enable non-empty parameters with `ParameterBag::cannotBeEmpty()` and `ContainerBuilder::parameterCannotBeEmpty()` methods
+ * Resolve parameters found in index attribute of service tags
+
 7.1
 ---
 
@@ -8,6 +45,13 @@ CHANGELOG
  * Add argument `$prepend` to `ContainerConfigurator::extension()` to prepend the configuration instead of appending it
  * Have `ServiceLocator` implement `ServiceCollectionInterface`
  * Add `#[Lazy]` attribute as shortcut for `#[Autowire(lazy: [bool|string])]` and `#[Autoconfigure(lazy: [bool|string])]`
+ * Add `#[AutowireMethodOf]` attribute to autowire a method of a service as a callable
+ * Make `ContainerBuilder::registerAttributeForAutoconfiguration()` propagate to attribute classes that extend the registered class
+ * Add argument `$prepend` to `FileLoader::construct()` to prepend loaded configuration instead of appending it
+ * [BC BREAK] When used in the `prependExtension()` method, the `ContainerConfigurator::import()` method now prepends the configuration instead of appending it
+ * Cast env vars to null or bool when referencing them using `#[Autowire(env: '...')]` depending on the signature of the corresponding parameter
+ * Add `#[AutowireInline]` attribute to allow service definition at the class level
+ * Add `StaticEnvVarLoader`
 
 7.0
 ---

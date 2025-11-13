@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -30,10 +31,9 @@ class ImportMapGeneratorTest extends TestCase
     private AssetMapperInterface&MockObject $assetMapper;
     private CompiledAssetMapperConfigReader&MockObject $compiledConfigReader;
     private ImportMapConfigReader&MockObject $configReader;
-    private ImportMapGenerator $importMapGenerator;
 
     private Filesystem $filesystem;
-    private static string $writableRoot = __DIR__.'/../Fixtures/importmaps_for_writing';
+    private static string $writableRoot = __DIR__.'/../Fixtures/importmap_generator';
 
     protected function setUp(): void
     {
@@ -255,9 +255,7 @@ class ImportMapGeneratorTest extends TestCase
         ], array_keys($actualImportMapData));
     }
 
-    /**
-     * @dataProvider getRawImportMapDataTests
-     */
+    #[DataProvider('getRawImportMapDataTests')]
     public function testGetRawImportMapData(array $importMapEntries, array $mappedAssets, array $expectedData)
     {
         $manager = $this->createImportMapGenerator();
@@ -276,7 +274,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($expectedData, $manager->getRawImportMapData());
     }
 
-    public function getRawImportMapDataTests(): iterable
+    public static function getRawImportMapDataTests(): iterable
     {
         yield 'it returns remote downloaded entry' => [
             [
@@ -596,9 +594,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($importmapData, $manager->getRawImportMapData());
     }
 
-    /**
-     * @dataProvider getEagerEntrypointImportsTests
-     */
+    #[DataProvider('getEagerEntrypointImportsTests')]
     public function testFindEagerEntrypointImports(MappedAsset $entryAsset, array $expected, array $mappedAssets = [])
     {
         $manager = $this->createImportMapGenerator();
@@ -611,7 +607,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($expected, $manager->findEagerEntrypointImports('the_entrypoint_name'));
     }
 
-    public function getEagerEntrypointImportsTests(): iterable
+    public static function getEagerEntrypointImportsTests(): iterable
     {
         yield 'an entry with no dependencies' => [
             new MappedAsset(
@@ -725,7 +721,7 @@ class ImportMapGeneratorTest extends TestCase
                 return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
             });
 
-        return $this->importMapGenerator = new ImportMapGenerator(
+        return new ImportMapGenerator(
             $this->assetMapper,
             $this->compiledConfigReader,
             $this->configReader,
@@ -747,8 +743,8 @@ class ImportMapGeneratorTest extends TestCase
 
     private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
-        $packageSpecifier = $packageSpecifier ?? $importName;
-        $path = $path ?? '/vendor/any-path.js';
+        $packageSpecifier ??= $importName;
+        $path ??= '/vendor/any-path.js';
 
         return ImportMapEntry::createRemote($importName, $type, path: $path, version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
     }

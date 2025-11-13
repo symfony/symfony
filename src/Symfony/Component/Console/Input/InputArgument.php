@@ -62,7 +62,7 @@ class InputArgument
         if (null === $mode) {
             $mode = self::OPTIONAL;
         } elseif ($mode >= (self::IS_ARRAY << 1) || $mode < 1) {
-            throw new InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
+            throw new InvalidArgumentException(\sprintf('Argument mode "%s" is not valid.', $mode));
         }
 
         $this->mode = $mode;
@@ -143,7 +143,7 @@ class InputArgument
     {
         $values = $this->suggestedValues;
         if ($values instanceof \Closure && !\is_array($values = $values($input))) {
-            throw new LogicException(sprintf('Closure for argument "%s" must return an array. Got "%s".', $this->name, get_debug_type($values)));
+            throw new LogicException(\sprintf('Closure for argument "%s" must return an array. Got "%s".', $this->name, get_debug_type($values)));
         }
         if ($values) {
             $suggestions->suggestValues($values);

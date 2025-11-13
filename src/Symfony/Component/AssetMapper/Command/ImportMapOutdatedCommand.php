@@ -15,6 +15,8 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
 use Symfony\Component\AssetMapper\ImportMap\PackageUpdateInfo;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -46,20 +48,24 @@ final class ImportMapOutdatedCommand extends Command
             ->addOption(
                 name: 'format',
                 mode: InputOption::VALUE_REQUIRED,
-                description: sprintf('The output format ("%s")', implode(', ', $this->getAvailableFormatOptions())),
+                description: \sprintf('The output format ("%s")', implode(', ', $this->getAvailableFormatOptions())),
                 default: 'txt',
             )
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command will list the latest updates available for the 3rd party packages in <comment>importmap.php</comment>.
-Versions showing in <fg=red>red</> are semver compatible versions and you should upgrading.
-Versions showing in <fg=yellow>yellow</> are major updates that include backward compatibility breaks according to semver.
+                The <info>%command.name%</info> command will list the latest updates available for the 3rd party packages in <comment>importmap.php</comment>.
+                Versions showing in <fg=red>red</> are semver compatible versions and you should upgrading.
+                Versions showing in <fg=yellow>yellow</> are major updates that include backward compatibility breaks according to semver.
 
-   <info>php %command.full_name%</info>
+                   <info>php %command.full_name%</info>
 
-Or specific packages only:
+                Or specific packages only:
 
-   <info>php %command.full_name% <packages></info>
-EOT
+                   <info>php %command.full_name% <packages></info>
+
+                The <info>--format</info> option specifies the format of the command output:
+
+                  <info>php %command.full_name% --format=json</info>
+                EOT
             );
     }
 
@@ -70,6 +76,12 @@ EOT
         $packagesUpdateInfos = $this->updateChecker->getAvailableUpdates($packages);
         $packagesUpdateInfos = array_filter($packagesUpdateInfos, fn ($packageUpdateInfo) => $packageUpdateInfo->hasUpdate());
         if (0 === \count($packagesUpdateInfos)) {
+            if ('json' === $input->getOption('format')) {
+                $io->writeln('[]');
+            } else {
+                $io->writeln('No updates found.');
+            }
+
             return Command::SUCCESS;
         }
 
@@ -88,9 +100,9 @@ EOT
             foreach ($displayData as $datum) {
                 $color = self::COLOR_MAPPING[$datum['latest-status']] ?? 'default';
                 $table->addRow([
-                    sprintf('<fg=%s>%s</>', $color, $datum['name']),
+                    \sprintf('<fg=%s>%s</>', $color, $datum['name']),
                     $datum['current'],
-                    sprintf('<fg=%s>%s</>', $color, $datum['latest']),
+                    \sprintf('<fg=%s>%s</>', $color, $datum['latest']),
                 ]);
             }
             $table->render();
@@ -99,6 +111,14 @@ EOT
         return Command::FAILURE;
     }
 
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
+        }
+    }
+
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return ['txt', 'json'];

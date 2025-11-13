@@ -11,20 +11,26 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\RequestMatcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 
 class MethodRequestMatcherTest extends TestCase
 {
-    /**
-     * @dataProvider getData
-     */
+    #[DataProvider('getData')]
     public function test(string $requestMethod, array|string $matcherMethod, bool $isMatch)
     {
         $matcher = new MethodRequestMatcher($matcherMethod);
         $request = Request::create('', $requestMethod);
         $this->assertSame($isMatch, $matcher->matches($request));
+    }
+
+    public function testAlwaysMatchesOnEmptyMethod()
+    {
+        $matcher = new MethodRequestMatcher([]);
+        $request = Request::create('https://example.com', 'POST');
+        $this->assertTrue($matcher->matches($request));
     }
 
     public static function getData()

@@ -23,7 +23,7 @@ return function (ContainerConfigurator $c) {
         ->tag('foo', ['foo' => 'foo'])
         ->tag('foo', ['bar' => 'bar', 'baz' => 'baz'])
         ->tag('foo', ['name' => 'bar', 'baz' => 'baz'])
-        ->factory([FooClass::class, 'getInstance'])
+        ->factory(FooClass::getInstance(...))
         ->property('foo', 'bar')
         ->property('moo', service('foo.baz'))
         ->property('qux', ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'])

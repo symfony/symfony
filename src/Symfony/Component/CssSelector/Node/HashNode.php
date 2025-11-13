@@ -46,6 +46,6 @@ class HashNode extends AbstractNode
 
     public function __toString(): string
     {
-        return sprintf('%s[%s#%s]', $this->getNodeName(), $this->selector, $this->id);
+        return \sprintf('%s[%s#%s]', $this->getNodeName(), $this->selector, $this->id);
     }
 }

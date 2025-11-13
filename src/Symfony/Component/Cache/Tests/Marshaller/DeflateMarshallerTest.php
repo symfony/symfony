@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Marshaller;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
 
-/**
- * @requires extension zlib
- */
+#[RequiresPhpExtension('zlib')]
 class DeflateMarshallerTest extends TestCase
 {
     public function testMarshall()

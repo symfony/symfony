@@ -461,7 +461,7 @@ final class Dotenv
             try {
                 $process->mustRun();
             } catch (ProcessException) {
-                throw $this->createFormatException(sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
+                throw $this->createFormatException(\sprintf('Issue expanding a command (%s)', $process->getErrorOutput()));
             }
 
             return rtrim($process->getOutput(), "\n\r");
@@ -481,11 +481,11 @@ final class Dotenv
             (?!\()                             # no opening parenthesis
             (?P<opening_brace>\{)?             # optional brace
             (?P<name>'.self::VARNAME_REGEX.')? # var name
-            (?P<default_value>:[-=][^\}]++)?   # optional default value
+            (?P<default_value>:[-=][^\}]*+)?   # optional default value
             (?P<closing_brace>\})?             # optional closing brace
         /x';
 
-        $value = preg_replace_callback($regex, function ($matches) use ($loadedVars) {
+        return preg_replace_callback($regex, function ($matches) use ($loadedVars) {
             // odd number of backslashes means the $ character is escaped
             if (1 === \strlen($matches['backslashes']) % 2) {
                 return substr($matches[0], 1);
@@ -516,7 +516,7 @@ final class Dotenv
             if ('' === $value && isset($matches['default_value']) && '' !== $matches['default_value']) {
                 $unsupportedChars = strpbrk($matches['default_value'], '\'"{$');
                 if (false !== $unsupportedChars) {
-                    throw $this->createFormatException(sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));
+                    throw $this->createFormatException(\sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));
                 }
 
                 $value = substr($matches['default_value'], 2);
@@ -532,8 +532,6 @@ final class Dotenv
 
             return $matches['backslashes'].$value;
         }, $value);
-
-        return $value;
     }
 
     private function moveCursor(string $text): void
@@ -554,7 +552,13 @@ final class Dotenv
                 throw new PathException($path);
             }
 
-            $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
+            $data = file_get_contents($path);
+
+            if ("\xEF\xBB\xBF" === substr($data, 0, 3)) {
+                throw new FormatException('Loading files starting with a byte-order-mark (BOM) is not supported.', new FormatExceptionContext($data, $path, 1, 0));
+            }
+
+            $this->populate($this->parse($data, $path), $overrideExistingVars);
         }
     }
 

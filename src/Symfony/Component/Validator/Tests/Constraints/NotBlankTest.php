@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -24,7 +26,7 @@ class NotBlankTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $notBlank = new NotBlank(['normalizer' => 'trim']);
+        $notBlank = new NotBlank(normalizer: 'trim');
 
         $this->assertEquals('trim', $notBlank->normalizer);
     }
@@ -35,16 +37,18 @@ class NotBlankTest extends TestCase
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertFalse($aConstraint->allowNull);
         self::assertNull($aConstraint->normalizer);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertTrue($bConstraint->allowNull);
         self::assertSame('trim', $bConstraint->normalizer);
         self::assertSame('myMessage', $bConstraint->message);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testInvalidNormalizerThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -52,6 +56,8 @@ class NotBlankTest extends TestCase
         new NotBlank(['normalizer' => 'Unknown Callable']);
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testInvalidNormalizerObjectThrowsException()
     {
         $this->expectException(InvalidArgumentException::class);

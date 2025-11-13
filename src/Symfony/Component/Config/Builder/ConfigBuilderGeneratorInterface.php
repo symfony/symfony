@@ -17,6 +17,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * Generates ConfigBuilders to help create valid config.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @deprecated since Symfony 7.4
  */
 interface ConfigBuilderGeneratorInterface
 {

@@ -11,22 +11,275 @@
 
 namespace Symfony\Component\Intl\Tests;
 
-use Symfony\Component\Intl\Countries;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Timezones;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
-/**
- * @group intl-data
- */
+#[Group('intl-data')]
 class TimezonesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
+
+    private const COUNTRIES = [
+        ['AD'],
+        ['AE'],
+        ['AF'],
+        ['AG'],
+        ['AI'],
+        ['AL'],
+        ['AM'],
+        ['AO'],
+        ['AQ'],
+        ['AR'],
+        ['AS'],
+        ['AT'],
+        ['AU'],
+        ['AW'],
+        ['AX'],
+        ['AZ'],
+        ['BA'],
+        ['BB'],
+        ['BD'],
+        ['BE'],
+        ['BF'],
+        ['BG'],
+        ['BH'],
+        ['BI'],
+        ['BJ'],
+        ['BL'],
+        ['BM'],
+        ['BN'],
+        ['BO'],
+        ['BQ'],
+        ['BR'],
+        ['BS'],
+        ['BT'],
+        ['BV'],
+        ['BW'],
+        ['BY'],
+        ['BZ'],
+        ['CA'],
+        ['CC'],
+        ['CD'],
+        ['CF'],
+        ['CG'],
+        ['CH'],
+        ['CI'],
+        ['CK'],
+        ['CL'],
+        ['CM'],
+        ['CN'],
+        ['CO'],
+        ['CR'],
+        ['CU'],
+        ['CV'],
+        ['CW'],
+        ['CX'],
+        ['CY'],
+        ['CZ'],
+        ['DE'],
+        ['DJ'],
+        ['DK'],
+        ['DM'],
+        ['DO'],
+        ['DZ'],
+        ['EC'],
+        ['EE'],
+        ['EG'],
+        ['EH'],
+        ['ER'],
+        ['ES'],
+        ['ET'],
+        ['FI'],
+        ['FJ'],
+        ['FK'],
+        ['FM'],
+        ['FO'],
+        ['FR'],
+        ['GA'],
+        ['GB'],
+        ['GD'],
+        ['GE'],
+        ['GF'],
+        ['GG'],
+        ['GH'],
+        ['GI'],
+        ['GL'],
+        ['GM'],
+        ['GN'],
+        ['GP'],
+        ['GQ'],
+        ['GR'],
+        ['GS'],
+        ['GT'],
+        ['GU'],
+        ['GW'],
+        ['GY'],
+        ['HK'],
+        ['HM'],
+        ['HN'],
+        ['HR'],
+        ['HT'],
+        ['HU'],
+        ['ID'],
+        ['IE'],
+        ['IL'],
+        ['IM'],
+        ['IN'],
+        ['IO'],
+        ['IQ'],
+        ['IR'],
+        ['IS'],
+        ['IT'],
+        ['JE'],
+        ['JM'],
+        ['JO'],
+        ['JP'],
+        ['KE'],
+        ['KG'],
+        ['KH'],
+        ['KI'],
+        ['KM'],
+        ['KN'],
+        ['KP'],
+        ['KR'],
+        ['KW'],
+        ['KY'],
+        ['KZ'],
+        ['LA'],
+        ['LB'],
+        ['LC'],
+        ['LI'],
+        ['LK'],
+        ['LR'],
+        ['LS'],
+        ['LT'],
+        ['LU'],
+        ['LV'],
+        ['LY'],
+        ['MA'],
+        ['MC'],
+        ['MD'],
+        ['ME'],
+        ['MF'],
+        ['MG'],
+        ['MH'],
+        ['MK'],
+        ['ML'],
+        ['MM'],
+        ['MN'],
+        ['MO'],
+        ['MP'],
+        ['MQ'],
+        ['MR'],
+        ['MS'],
+        ['MT'],
+        ['MU'],
+        ['MV'],
+        ['MW'],
+        ['MX'],
+        ['MY'],
+        ['MZ'],
+        ['NA'],
+        ['NC'],
+        ['NE'],
+        ['NF'],
+        ['NG'],
+        ['NI'],
+        ['NL'],
+        ['NO'],
+        ['NP'],
+        ['NR'],
+        ['NU'],
+        ['NZ'],
+        ['OM'],
+        ['PA'],
+        ['PE'],
+        ['PF'],
+        ['PG'],
+        ['PH'],
+        ['PK'],
+        ['PL'],
+        ['PM'],
+        ['PN'],
+        ['PR'],
+        ['PS'],
+        ['PT'],
+        ['PW'],
+        ['PY'],
+        ['QA'],
+        ['RE'],
+        ['RO'],
+        ['RS'],
+        ['RU'],
+        ['RW'],
+        ['SA'],
+        ['SB'],
+        ['SC'],
+        ['SD'],
+        ['SE'],
+        ['SG'],
+        ['SH'],
+        ['SI'],
+        ['SJ'],
+        ['SK'],
+        ['SL'],
+        ['SM'],
+        ['SN'],
+        ['SO'],
+        ['SR'],
+        ['SS'],
+        ['ST'],
+        ['SV'],
+        ['SX'],
+        ['SY'],
+        ['SZ'],
+        ['TC'],
+        ['TD'],
+        ['TF'],
+        ['TG'],
+        ['TH'],
+        ['TJ'],
+        ['TK'],
+        ['TL'],
+        ['TM'],
+        ['TN'],
+        ['TO'],
+        ['TR'],
+        ['TT'],
+        ['TV'],
+        ['TW'],
+        ['TZ'],
+        ['UA'],
+        ['UG'],
+        ['UM'],
+        ['US'],
+        ['UY'],
+        ['UZ'],
+        ['VA'],
+        ['VC'],
+        ['VE'],
+        ['VG'],
+        ['VI'],
+        ['VN'],
+        ['VU'],
+        ['WF'],
+        ['WS'],
+        ['YE'],
+        ['YT'],
+        ['ZA'],
+        ['ZM'],
+        ['ZW'],
+    ];
 
     private const ZONES = [
         'Africa/Abidjan',
         'Africa/Accra',
         'Africa/Addis_Ababa',
         'Africa/Algiers',
+        'Africa/Asmara',
         'Africa/Asmera',
         'Africa/Bamako',
         'Africa/Bangui',
@@ -80,7 +333,12 @@ class TimezonesTest extends ResourceBundleTestCase
         'America/Anguilla',
         'America/Antigua',
         'America/Araguaina',
+        'America/Argentina/Buenos_Aires',
+        'America/Argentina/Catamarca',
+        'America/Argentina/Cordoba',
+        'America/Argentina/Jujuy',
         'America/Argentina/La_Rioja',
+        'America/Argentina/Mendoza',
         'America/Argentina/Rio_Gallegos',
         'America/Argentina/Salta',
         'America/Argentina/San_Juan',
@@ -89,6 +347,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'America/Argentina/Ushuaia',
         'America/Aruba',
         'America/Asuncion',
+        'America/Atikokan',
         'America/Bahia',
         'America/Bahia_Banderas',
         'America/Barbados',
@@ -138,6 +397,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'America/Halifax',
         'America/Havana',
         'America/Hermosillo',
+        'America/Indiana/Indianapolis',
         'America/Indiana/Knox',
         'America/Indiana/Marengo',
         'America/Indiana/Petersburg',
@@ -151,6 +411,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'America/Jamaica',
         'America/Jujuy',
         'America/Juneau',
+        'America/Kentucky/Louisville',
         'America/Kentucky/Monticello',
         'America/Kralendijk',
         'America/La_Paz',
@@ -182,6 +443,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'America/North_Dakota/Beulah',
         'America/North_Dakota/Center',
         'America/North_Dakota/New_Salem',
+        'America/Nuuk',
         'America/Ojinaga',
         'America/Panama',
         'America/Paramaribo',
@@ -248,7 +510,6 @@ class TimezonesTest extends ResourceBundleTestCase
         'Asia/Brunei',
         'Asia/Calcutta',
         'Asia/Chita',
-        'Asia/Choibalsan',
         'Asia/Colombo',
         'Asia/Damascus',
         'Asia/Dhaka',
@@ -258,6 +519,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Asia/Famagusta',
         'Asia/Gaza',
         'Asia/Hebron',
+        'Asia/Ho_Chi_Minh',
         'Asia/Hong_Kong',
         'Asia/Hovd',
         'Asia/Irkutsk',
@@ -267,8 +529,10 @@ class TimezonesTest extends ResourceBundleTestCase
         'Asia/Kabul',
         'Asia/Kamchatka',
         'Asia/Karachi',
+        'Asia/Kathmandu',
         'Asia/Katmandu',
         'Asia/Khandyga',
+        'Asia/Kolkata',
         'Asia/Krasnoyarsk',
         'Asia/Kuala_Lumpur',
         'Asia/Kuching',
@@ -311,6 +575,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Asia/Vientiane',
         'Asia/Vladivostok',
         'Asia/Yakutsk',
+        'Asia/Yangon',
         'Asia/Yekaterinburg',
         'Asia/Yerevan',
         'Atlantic/Azores',
@@ -318,6 +583,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Atlantic/Canary',
         'Atlantic/Cape_Verde',
         'Atlantic/Faeroe',
+        'Atlantic/Faroe',
         'Atlantic/Madeira',
         'Atlantic/Reykjavik',
         'Atlantic/South_Georgia',
@@ -334,8 +600,6 @@ class TimezonesTest extends ResourceBundleTestCase
         'Australia/Melbourne',
         'Australia/Perth',
         'Australia/Sydney',
-        'CST6CDT',
-        'EST5EDT',
         'Etc/GMT',
         'Etc/UTC',
         'Europe/Amsterdam',
@@ -361,6 +625,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Europe/Kaliningrad',
         'Europe/Kiev',
         'Europe/Kirov',
+        'Europe/Kyiv',
         'Europe/Lisbon',
         'Europe/Ljubljana',
         'Europe/London',
@@ -407,12 +672,11 @@ class TimezonesTest extends ResourceBundleTestCase
         'Indian/Mauritius',
         'Indian/Mayotte',
         'Indian/Reunion',
-        'MST7MDT',
-        'PST8PDT',
         'Pacific/Apia',
         'Pacific/Auckland',
         'Pacific/Bougainville',
         'Pacific/Chatham',
+        'Pacific/Chuuk',
         'Pacific/Easter',
         'Pacific/Efate',
         'Pacific/Enderbury',
@@ -424,6 +688,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Pacific/Guadalcanal',
         'Pacific/Guam',
         'Pacific/Honolulu',
+        'Pacific/Kanton',
         'Pacific/Kiritimati',
         'Pacific/Kosrae',
         'Pacific/Kwajalein',
@@ -437,6 +702,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Pacific/Pago_Pago',
         'Pacific/Palau',
         'Pacific/Pitcairn',
+        'Pacific/Pohnpei',
         'Pacific/Ponape',
         'Pacific/Port_Moresby',
         'Pacific/Rarotonga',
@@ -463,42 +729,50 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->assertEquals(self::ZONES, Timezones::getIds());
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetNames($displayLocale)
     {
+        if ('en' !== $displayLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         $zones = array_keys(Timezones::getNames($displayLocale));
 
         sort($zones);
 
         $this->assertNotEmpty($zones);
-        $this->assertEmpty(array_diff($zones, self::ZONES));
+        $this->assertSame([], array_diff($zones, self::ZONES));
     }
 
     public function testGetNamesDefaultLocale()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('de_AT');
 
         $this->assertSame(Timezones::getNames('de_AT'), Timezones::getNames());
     }
 
-    /**
-     * @dataProvider provideLocaleAliases
-     */
+    #[DataProvider('provideLocaleAliases')]
     public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
+        if ('en' !== $ofLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
         $this->assertEquals(Timezones::getNames($ofLocale), Timezones::getNames($alias));
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetName($displayLocale)
     {
+        if ('en' !== $displayLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         $names = Timezones::getNames($displayLocale);
 
         foreach ($names as $language => $name) {
@@ -508,6 +782,8 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetNameDefaultLocale()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('de_AT');
 
         $names = Timezones::getNames('de_AT');
@@ -598,11 +874,15 @@ class TimezonesTest extends ResourceBundleTestCase
         Timezones::getCountryCode('foobar');
     }
 
-    /**
-     * @dataProvider provideTimezones
-     */
+    #[DataProvider('provideTimezones')]
     public function testGetGmtOffsetAvailability(string $timezone)
     {
+        try {
+            new \DateTimeZone($timezone);
+        } catch (\Exception $e) {
+            $this->markTestSkipped(\sprintf('The timezone "%s" is not available.', $timezone));
+        }
+
         // ensure each timezone identifier has a corresponding GMT offset
         Timezones::getRawOffset($timezone);
         Timezones::getGmtOffset($timezone);
@@ -610,9 +890,7 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @dataProvider provideTimezones
-     */
+    #[DataProvider('provideTimezones')]
     public function testGetCountryCodeAvailability(string $timezone)
     {
         try {
@@ -634,9 +912,7 @@ class TimezonesTest extends ResourceBundleTestCase
         return array_map(fn ($timezone) => [$timezone], self::ZONES);
     }
 
-    /**
-     * @dataProvider provideCountries
-     */
+    #[DataProvider('provideCountries')]
     public function testForCountryCodeAvailability(string $country)
     {
         // ensure each country code has a list of timezone identifiers (possibly empty)
@@ -647,7 +923,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public static function provideCountries(): iterable
     {
-        return array_map(fn ($country) => [$country], Countries::getCountryCodes());
+        return self::COUNTRIES;
     }
 
     public function testGetRawOffsetChangeTimeCountry()

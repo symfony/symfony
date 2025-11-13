@@ -38,11 +38,9 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
      */
     private string $prefix = '';
 
-    private Environment $twig;
-
-    public function __construct(Environment $twig)
-    {
-        $this->twig = $twig;
+    public function __construct(
+        private Environment $twig,
+    ) {
     }
 
     public function extract($resource, MessageCatalogue $catalogue): void

@@ -37,17 +37,17 @@ class CompiledUrlMatcherDumper extends MatcherDumper
     public function dump(array $options = []): string
     {
         return <<<EOF
-<?php
+            <?php
 
-/**
- * This file has been auto-generated
- * by the Symfony Routing Component.
- */
+            /**
+             * This file has been auto-generated
+             * by the Symfony Routing Component.
+             */
 
-return [
-{$this->generateCompiledRoutes()}];
+            return [
+            {$this->generateCompiledRoutes()}];
 
-EOF;
+            EOF;
     }
 
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
@@ -112,12 +112,12 @@ EOF;
             }
 
             $checkConditionCode = <<<EOF
-    static function (\$condition, \$context, \$request, \$params) { // \$checkCondition
-        switch (\$condition) {
-{$this->indent(implode("\n", $conditions), 3)}
-        }
-    }
-EOF;
+                    static function (\$condition, \$context, \$request, \$params) { // \$checkCondition
+                        switch (\$condition) {
+                {$this->indent(implode("\n", $conditions), 3)}
+                        }
+                    }
+                EOF;
             $compiledRoutes[4] = $forDump ? $checkConditionCode.",\n" : eval('return '.$checkConditionCode.';');
         } else {
             $compiledRoutes[4] = $forDump ? "    null, // \$checkCondition\n" : null;
@@ -134,7 +134,7 @@ EOF;
 
         $code .= '[ // $staticRoutes'."\n";
         foreach ($staticRoutes as $path => $routes) {
-            $code .= sprintf("    %s => [\n", self::export($path));
+            $code .= \sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
                 $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
@@ -142,11 +142,11 @@ EOF;
         }
         $code .= "],\n";
 
-        $code .= sprintf("[ // \$regexpList%s\n],\n", $regexpCode);
+        $code .= \sprintf("[ // \$regexpList%s\n],\n", $regexpCode);
 
         $code .= '[ // $dynamicRoutes'."\n";
         foreach ($dynamicRoutes as $path => $routes) {
-            $code .= sprintf("    %s => [\n", self::export($path));
+            $code .= \sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
                 $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
@@ -399,7 +399,7 @@ EOF;
 
             $state->mark += 3 + $state->markTail + \strlen($regex) - $prefixLen;
             $state->markTail = 2 + \strlen($state->mark);
-            $rx = sprintf('|%s(*:%s)', substr($regex, $prefixLen), $state->mark);
+            $rx = \sprintf('|%s(*:%s)', substr($regex, $prefixLen), $state->mark);
             $code .= "\n            .".self::export($rx);
             $state->regex .= $rx;
 
@@ -465,11 +465,10 @@ EOF;
         if (null === $value) {
             return 'null';
         }
+        if (\is_object($value)) {
+            throw new \InvalidArgumentException(\sprintf('Symfony\Component\Routing\Route cannot contain objects, but "%s" given.', get_debug_type($value)));
+        }
         if (!\is_array($value)) {
-            if (\is_object($value)) {
-                throw new \InvalidArgumentException('Symfony\Component\Routing\Route cannot contain objects.');
-            }
-
             return str_replace("\n", '\'."\n".\'', var_export($value, true));
         }
         if (!$value) {

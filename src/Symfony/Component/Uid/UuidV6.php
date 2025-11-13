@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Uid;
 
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
+
 /**
  * A v6 UUID is lexicographically sortable and contains a 60-bit timestamp and 62 extra unique bits.
  *
@@ -48,7 +50,7 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
         $uuid = $this->uid;
         $time = BinaryUtil::hexToNumericString('0'.substr($uuid, 0, 8).substr($uuid, 9, 4).substr($uuid, 15, 3));
         if ('-' === $time[0]) {
-            throw new \InvalidArgumentException('Cannot convert UUID to v7: its timestamp is before the Unix epoch.');
+            throw new InvalidArgumentException('Cannot convert UUID to v7: its timestamp is before the Unix epoch.');
         }
 
         $ms = \strlen($time) > 4 ? substr($time, 0, -4) : '0';
@@ -59,7 +61,7 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
             $time = substr($time, 1);
         }
 
-        return new UuidV7(substr_replace(sprintf(
+        return new UuidV7(substr_replace(\sprintf(
             '%012s-7%s-%s%s-%s%06s',
             \PHP_INT_SIZE >= 8 ? dechex($ms) : bin2hex(BinaryUtil::fromBase($ms, BinaryUtil::BASE10)),
             substr($uuid, -6, 3),
@@ -85,7 +87,7 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
         if (!isset(self::$node)) {
             $seed = [random_int(0, 0xFFFFFF), random_int(0, 0xFFFFFF)];
             $node = unpack('N2', hex2bin('00'.substr($uuidV1, 24, 6)).hex2bin('00'.substr($uuidV1, 30)));
-            self::$node = sprintf('%06x%06x', ($seed[0] ^ $node[1]) | 0x010000, $seed[1] ^ $node[2]);
+            self::$node = \sprintf('%06x%06x', ($seed[0] ^ $node[1]) | 0x010000, $seed[1] ^ $node[2]);
         }
 
         return $uuid.self::$node;

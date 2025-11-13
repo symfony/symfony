@@ -27,8 +27,6 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterface
 {
-    private ChoiceListFactoryInterface $decoratedFactory;
-
     /**
      * @var ChoiceListInterface[]
      */
@@ -64,9 +62,9 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return hash('sha256', $namespace.':'.serialize($value));
     }
 
-    public function __construct(ChoiceListFactoryInterface $decoratedFactory)
-    {
-        $this->decoratedFactory = $decoratedFactory;
+    public function __construct(
+        private ChoiceListFactoryInterface $decoratedFactory,
+    ) {
     }
 
     /**

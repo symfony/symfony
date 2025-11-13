@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsbox\Tests;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Charset;
@@ -130,27 +131,23 @@ class SmsboxOptionsTest extends TestCase
             ->dateTime(new \DateTimeImmutable('-1 day'));
     }
 
-    /**
-     * @testWith [0]
-     *           [9]
-     */
+    #[TestWith([0])]
+    #[TestWith([9])]
     public function testMaxPartIsInvalid(int $maxPart)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "max_parts" option must be an integer between 1 and 8, got "%d".', $maxPart));
+        $this->expectExceptionMessage(\sprintf('The "max_parts" option must be an integer between 1 and 8, got "%d".', $maxPart));
 
         (new SmsboxOptions())
             ->maxParts($maxPart);
     }
 
-    /**
-     * @testWith [4]
-     *           [1441]
-     */
+    #[TestWith([4])]
+    #[TestWith([1441])]
     public function testValidityIsInvalid(int $validity)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "validity" option must be an integer between 5 and 1440, got "%d".', $validity));
+        $this->expectExceptionMessage(\sprintf('The "validity" option must be an integer between 5 and 1440, got "%d".', $validity));
 
         (new SmsboxOptions())
             ->validity($validity);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Locale;
 use Symfony\Component\Validator\Constraints\LocaleValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -43,9 +44,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Locale());
     }
 
-    /**
-     * @dataProvider getValidLocales
-     */
+    #[DataProvider('getValidLocales')]
     public function testValidLocales($locale)
     {
         $this->validator->validate($locale, new Locale());
@@ -66,14 +65,10 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidLocales
-     */
+    #[DataProvider('getInvalidLocales')]
     public function testInvalidLocales($locale)
     {
-        $constraint = new Locale([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Locale(message: 'myMessage');
 
         $this->validator->validate($locale, $constraint);
 
@@ -91,44 +86,49 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getUncanonicalizedLocales
-     */
+    public function testTooLongLocale()
+    {
+        $constraint = new Locale(message: 'myMessage');
+
+        $locale = str_repeat('a', (\defined('INTL_MAX_LOCALE_LEN') ? \INTL_MAX_LOCALE_LEN : 85) + 1);
+        $this->validator->validate($locale, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$locale.'"')
+            ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getUncanonicalizedLocales')]
     public function testValidLocalesWithCanonicalization(string $locale)
     {
-        $constraint = new Locale([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Locale(message: 'myMessage');
 
         $this->validator->validate($locale, $constraint);
 
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidLocales
-     */
+    #[DataProvider('getValidLocales')]
     public function testValidLocalesWithoutCanonicalization(string $locale)
     {
-        $constraint = new Locale([
-            'message' => 'myMessage',
-            'canonicalize' => false,
-        ]);
+        $constraint = new Locale(
+            message: 'myMessage',
+            canonicalize: false,
+        );
 
         $this->validator->validate($locale, $constraint);
 
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getUncanonicalizedLocales
-     */
+    #[DataProvider('getUncanonicalizedLocales')]
     public function testInvalidLocalesWithoutCanonicalization(string $locale)
     {
-        $constraint = new Locale([
-            'message' => 'myMessage',
-            'canonicalize' => false,
-        ]);
+        $constraint = new Locale(
+            message: 'myMessage',
+            canonicalize: false,
+        );
 
         $this->validator->validate($locale, $constraint);
 

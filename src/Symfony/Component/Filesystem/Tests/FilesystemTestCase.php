@@ -59,13 +59,13 @@ class FilesystemTestCase extends TestCase
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
         $this->workspace = sys_get_temp_dir().'/'.microtime(true).'.'.mt_rand();
-        mkdir($this->workspace, 0777, true);
+        mkdir($this->workspace, 0o777, true);
         $this->workspace = realpath($this->workspace);
     }
 
     protected function tearDown(): void
     {
-        if (!empty($this->longPathNamesWindows)) {
+        if ($this->longPathNamesWindows) {
             foreach ($this->longPathNamesWindows as $path) {
                 exec('DEL '.$path);
             }
@@ -82,11 +82,11 @@ class FilesystemTestCase extends TestCase
      */
     protected function assertFilePermissions($expectedFilePerms, $filePath)
     {
-        $actualFilePerms = (int) substr(sprintf('%o', fileperms($filePath)), -3);
+        $actualFilePerms = (int) substr(\sprintf('%o', fileperms($filePath)), -3);
         $this->assertEquals(
             $expectedFilePerms,
             $actualFilePerms,
-            sprintf('File permissions for %s must be %s. Actual %s', $filePath, $expectedFilePerms, $actualFilePerms)
+            \sprintf('File permissions for %s must be %s. Actual %s', $filePath, $expectedFilePerms, $actualFilePerms)
         );
     }
 
@@ -103,7 +103,7 @@ class FilesystemTestCase extends TestCase
     {
         $this->markAsSkippedIfPosixIsMissing();
 
-        return ($datas = posix_getpwuid($this->getFileOwnerId($filepath))) ? $datas['name'] : null;
+        return ($data = posix_getpwuid($this->getFileOwnerId($filepath))) ? $data['name'] : null;
     }
 
     protected function getFileGroupId($filepath)
@@ -119,8 +119,8 @@ class FilesystemTestCase extends TestCase
     {
         $this->markAsSkippedIfPosixIsMissing();
 
-        if ($datas = posix_getgrgid($this->getFileGroupId($filepath))) {
-            return $datas['name'];
+        if ($data = posix_getgrgid($this->getFileGroupId($filepath))) {
+            return $data['name'];
         }
 
         $this->markTestSkipped('Unable to retrieve file group name');

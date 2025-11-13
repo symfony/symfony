@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -41,22 +42,22 @@ class Range extends Constraint
     public string $minMessage = 'This value should be {{ limit }} or more.';
     public string $maxMessage = 'This value should be {{ limit }} or less.';
     public string $invalidMessage = 'This value should be a valid number.';
-    public string $invalidDateTimeMessage = 'This value should be a valid datetime.';
+    public string $invalidDateTimeMessage = 'This value is not a valid datetime.';
     public mixed $min = null;
     public ?string $minPropertyPath = null;
     public mixed $max = null;
     public ?string $maxPropertyPath = null;
 
     /**
-     * @param array<string,mixed>|null $options
-     * @param string|null              $invalidMessage         The message if min and max values are numeric but the given value is not
-     * @param string|null              $invalidDateTimeMessage The message if min and max values are PHP datetimes but the given value is not
-     * @param int|float|string|null    $min                    The minimum value, either numeric or a datetime string representation
-     * @param string|null              $minPropertyPath        Property path to the min value
-     * @param int|float|string|null    $max                    The maximum value, either numeric or a datetime string representation
-     * @param string|null              $maxPropertyPath        Property path to the max value
-     * @param string[]|null            $groups
+     * @param string|null                     $invalidMessage         The message if min and max values are numeric but the given value is not
+     * @param string|null                     $invalidDateTimeMessage The message if min and max values are PHP datetimes but the given value is not
+     * @param int|float|non-empty-string|null $min                    The minimum value, either numeric or a datetime string representation
+     * @param non-empty-string|null           $minPropertyPath        Property path to the min value
+     * @param int|float|non-empty-string|null $max                    The maximum value, either numeric or a datetime string representation
+     * @param non-empty-string|null           $maxPropertyPath        Property path to the max value
+     * @param string[]|null                   $groups
      */
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $notInRangeMessage = null,
@@ -71,6 +72,10 @@ class Range extends Constraint
         ?array $groups = null,
         mixed $payload = null,
     ) {
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->notInRangeMessage = $notInRangeMessage ?? $this->notInRangeMessage;
@@ -84,23 +89,23 @@ class Range extends Constraint
         $this->maxPropertyPath = $maxPropertyPath ?? $this->maxPropertyPath;
 
         if (null === $this->min && null === $this->minPropertyPath && null === $this->max && null === $this->maxPropertyPath) {
-            throw new MissingOptionsException(sprintf('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given for constraint "%s".', __CLASS__), ['min', 'minPropertyPath', 'max', 'maxPropertyPath']);
+            throw new MissingOptionsException(\sprintf('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given for constraint "%s".', __CLASS__), ['min', 'minPropertyPath', 'max', 'maxPropertyPath']);
         }
 
         if (null !== $this->min && null !== $this->minPropertyPath) {
-            throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "min" or "minPropertyPath" options to be set, not both.', static::class));
+            throw new ConstraintDefinitionException(\sprintf('The "%s" constraint requires only one of the "min" or "minPropertyPath" options to be set, not both.', static::class));
         }
 
         if (null !== $this->max && null !== $this->maxPropertyPath) {
-            throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "max" or "maxPropertyPath" options to be set, not both.', static::class));
+            throw new ConstraintDefinitionException(\sprintf('The "%s" constraint requires only one of the "max" or "maxPropertyPath" options to be set, not both.', static::class));
         }
 
         if ((null !== $this->minPropertyPath || null !== $this->maxPropertyPath) && !class_exists(PropertyAccess::class)) {
-            throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option. Try running "composer require symfony/property-access".', static::class));
+            throw new LogicException(\sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option. Try running "composer require symfony/property-access".', static::class));
         }
 
-        if (null !== $this->min && null !== $this->max && ($minMessage || $maxMessage)) {
-            throw new ConstraintDefinitionException(sprintf('The "%s" constraint can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.', static::class));
+        if (null !== $this->min && null !== $this->max && ($minMessage || $maxMessage || isset($options['minMessage']) || isset($options['maxMessage']))) {
+            throw new ConstraintDefinitionException(\sprintf('The "%s" constraint can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.', static::class));
         }
     }
 }

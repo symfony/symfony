@@ -45,7 +45,7 @@ final class SmsboxTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        $dsn = sprintf('smsbox://%s?mode=%s&strategy=%s', $this->getEndpoint(), $this->mode->value, $this->strategy->value);
+        $dsn = \sprintf('smsbox://%s?mode=%s&strategy=%s', $this->getEndpoint(), $this->mode->value, $this->strategy->value);
 
         if (Mode::Expert === $this->mode) {
             $dsn .= '&sender='.$this->sender;
@@ -66,7 +66,7 @@ final class SmsboxTransport extends AbstractTransport
         }
 
         $phoneCleaned = preg_replace('/[^0-9+]+/', '', $message->getPhone());
-        if (!preg_match("/^(\+|)[0-9]{7,14}$/", $phoneCleaned)) {
+        if (!preg_match('/^(\+|)[0-9]{7,14}$/', $phoneCleaned)) {
             throw new InvalidArgumentException('Invalid phone number.');
         }
 
@@ -106,7 +106,7 @@ final class SmsboxTransport extends AbstractTransport
             $occurrenceValMsgMax = (int) max($occurrenceValMsg);
 
             if ($occurrenceValMsgMax !== \count($options['variable'])) {
-                throw new InvalidArgumentException(sprintf('You must have the same amount of index in your array as you have variable. Expected %d variable, got %d.', $occurrenceValMsgMax, \count($options['variable'])));
+                throw new InvalidArgumentException(\sprintf('You must have the same amount of index in your array as you have variable. Expected %d variable, got %d.', $occurrenceValMsgMax, \count($options['variable'])));
             }
 
             $t = str_replace([',', ';'], ['%d44%', '%d59%'], $options['variable']);
@@ -117,7 +117,7 @@ final class SmsboxTransport extends AbstractTransport
             unset($options['variable']);
         }
 
-        $response = $this->client->request('POST', sprintf('https://%s/1.1/api.php', $this->getEndpoint()), [
+        $response = $this->client->request('POST', \sprintf('https://%s/1.1/api.php', $this->getEndpoint()), [
             'headers' => [
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Authorization' => 'App '.$this->apiKey,
@@ -134,16 +134,16 @@ final class SmsboxTransport extends AbstractTransport
         if (200 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);
         }
 
         $body = $response->getContent(false);
         if (!preg_match('/^OK .*/', $body)) {
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $body, 400), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $body, 400), $response);
         }
 
         if (!preg_match('/^OK (\d+)/', $body, $reference)) {
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $body, 400), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $body, 400), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

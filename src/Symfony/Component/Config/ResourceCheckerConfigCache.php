@@ -107,7 +107,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      */
     public function write(string $content, ?array $metadata = null): void
     {
-        $mode = 0666;
+        $mode = 0o666;
         $umask = umask();
         $filesystem = new Filesystem();
         $filesystem->dumpFile($this->file, $content);
@@ -118,9 +118,23 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         }
 
         if (null !== $metadata) {
-            $filesystem->dumpFile($this->metaFile, serialize($metadata));
+            $filesystem->dumpFile($this->metaFile, $ser = serialize($metadata));
             try {
                 $filesystem->chmod($this->metaFile, $mode, $umask);
+            } catch (IOException) {
+                // discard chmod failure (some filesystem may not support it)
+            }
+
+            $ser = preg_replace_callback('/;O:(\d+):"/', static fn ($m) => ';O:'.(9 + $m[1]).':"Tracking\\', $ser);
+            $ser = preg_replace_callback('/s:(\d+):"(\0[^\0]++\0)/', static fn ($m) => 's:'.($m[1] - \strlen($m[2])).':"', $ser);
+            $ser = unserialize($ser, ['allowed_classes' => false]);
+            $ser = @json_encode($ser, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE) ?: [];
+            $ser = str_replace('"__PHP_Incomplete_Class_Name":"Tracking\\\\', '"@type":"', $ser);
+            $ser = \sprintf('{"resources":%s}', $ser);
+
+            $filesystem->dumpFile($this->metaFile.'.json', $ser);
+            try {
+                $filesystem->chmod($this->metaFile.'.json', $mode, $umask);
             } catch (IOException) {
                 // discard chmod failure (some filesystem may not support it)
             }
@@ -134,7 +148,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     private function safelyUnserialize(string $file): mixed
     {
         $meta = false;
-        $content = file_get_contents($file);
+        $content = (new Filesystem())->readFile($file);
         $signalingException = new \UnexpectedValueException();
         $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
         $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {

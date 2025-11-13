@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\TypeInfo;
 
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -148,10 +150,10 @@ trait TypeFactoryTrait
      *
      * @return CollectionType<T>
      */
-    public static function collection(BuiltinType|ObjectType|GenericType $type, Type $value = null, Type $key = null, bool $asList = false): CollectionType
+    public static function collection(BuiltinType|ObjectType|GenericType $type, ?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
     {
         if (!$type instanceof GenericType && (null !== $value || null !== $key)) {
-            $type = self::generic($type, $key ?? self::union(self::int(), self::string()), $value ?? self::mixed());
+            $type = self::generic($type, $key ?? self::arrayKey(), $value ?? self::mixed());
         }
 
         return new CollectionType($type, $asList);
@@ -160,7 +162,7 @@ trait TypeFactoryTrait
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ARRAY>>
      */
-    public static function array(Type $value = null, Type $key = null, bool $asList = false): CollectionType
+    public static function array(?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
     {
         return self::collection(self::builtin(TypeIdentifier::ARRAY), $value, $key, $asList);
     }
@@ -168,15 +170,19 @@ trait TypeFactoryTrait
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ITERABLE>>
      */
-    public static function iterable(Type $value = null, Type $key = null, bool $asList = false): CollectionType
+    public static function iterable(?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
     {
+        if ($asList) {
+            trigger_deprecation('symfony/type-info', '7.3', 'The third argument of "%s()" is deprecated. Use the "%s::list()" method to create a list instead.', __METHOD__, self::class);
+        }
+
         return self::collection(self::builtin(TypeIdentifier::ITERABLE), $value, $key, $asList);
     }
 
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ARRAY>>
      */
-    public static function list(Type $value = null): CollectionType
+    public static function list(?Type $value = null): CollectionType
     {
         return self::array($value, self::int(), asList: true);
     }
@@ -184,9 +190,35 @@ trait TypeFactoryTrait
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ARRAY>>
      */
-    public static function dict(Type $value = null): CollectionType
+    public static function dict(?Type $value = null): CollectionType
     {
         return self::array($value, self::string());
+    }
+
+    /**
+     * @param array<array{type: Type, optional?: bool}|Type> $shape
+     */
+    public static function arrayShape(array $shape, bool $sealed = true, ?Type $extraKeyType = null, ?Type $extraValueType = null): ArrayShapeType
+    {
+        $shape = array_map(static function (array|Type $item): array {
+            return $item instanceof Type
+                ? ['type' => $item, 'optional' => false]
+                : ['type' => $item['type'], 'optional' => $item['optional'] ?? false];
+        }, $shape);
+
+        if ($extraKeyType || $extraValueType) {
+            $sealed = false;
+        }
+
+        $extraKeyType ??= !$sealed ? Type::arrayKey() : null;
+        $extraValueType ??= !$sealed ? Type::mixed() : null;
+
+        return new ArrayShapeType($shape, $extraKeyType, $extraValueType);
+    }
+
+    public static function arrayKey(): UnionType
+    {
+        return self::union(self::int(), self::string());
     }
 
     /**
@@ -196,7 +228,7 @@ trait TypeFactoryTrait
      *
      * @return ($className is class-string ? ObjectType<T> : BuiltinType<TypeIdentifier::OBJECT>)
      */
-    public static function object(string $className = null): BuiltinType|ObjectType
+    public static function object(?string $className = null): BuiltinType|ObjectType
     {
         return null !== $className ? new ObjectType($className) : new BuiltinType(TypeIdentifier::OBJECT);
     }
@@ -208,9 +240,9 @@ trait TypeFactoryTrait
      * @param T      $className
      * @param U|null $backingType
      *
-     * @return ($className is class-string<\BackedEnum> ? ($backingType is U ? BackedEnumType<T,U> : BackedEnumType<T,BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>>) : EnumType<T>))
+     * @return ($className is class-string<\BackedEnum> ? ($backingType is U ? BackedEnumType<T, U> : BackedEnumType<T, BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>>) : EnumType<T>))
      */
-    public static function enum(string $className, BuiltinType $backingType = null): EnumType
+    public static function enum(string $className, ?BuiltinType $backingType = null): EnumType
     {
         if (is_subclass_of($className, \BackedEnum::class)) {
             if (null === $backingType) {
@@ -232,12 +264,19 @@ trait TypeFactoryTrait
      *
      * @return GenericType<T>
      */
-    public static function generic(Type $mainType, Type ...$variableTypes): GenericType
+    public static function generic(BuiltinType|ObjectType $mainType, Type ...$variableTypes): GenericType
     {
         return new GenericType($mainType, ...$variableTypes);
     }
 
-    public static function template(string $name, Type $bound = null): TemplateType
+    /**
+     * @template T of Type
+     *
+     * @param T|null $bound
+     *
+     * @return ($bound is null ? TemplateType<BuiltinType<TypeIdentifier::MIXED>> : TemplateType<T>)
+     */
+    public static function template(string $name, ?Type $bound = null): TemplateType
     {
         return new TemplateType($name, $bound ?? Type::mixed());
     }
@@ -247,34 +286,60 @@ trait TypeFactoryTrait
      *
      * @param list<T> $types
      *
-     * @return UnionType<Type>
+     * @return UnionType<T>|NullableType<T>
      */
     public static function union(Type ...$types): UnionType
     {
         /** @var list<T> $unionTypes */
         $unionTypes = [];
 
+        $nullableUnion = false;
+        $isNullable = fn (Type $type): bool => $type instanceof BuiltinType && TypeIdentifier::NULL === $type->getTypeIdentifier();
+
         foreach ($types as $type) {
-            if (!$type instanceof UnionType) {
-                $unionTypes[] = $type;
+            if ($type instanceof NullableType) {
+                $nullableUnion = true;
+                $type = $type->getWrappedType();
+            }
+
+            if ($type instanceof UnionType) {
+                foreach ($type->getTypes() as $unionType) {
+                    if ($isNullable($type)) {
+                        $nullableUnion = true;
+
+                        continue;
+                    }
+
+                    $unionTypes[] = $unionType;
+                }
 
                 continue;
             }
 
-            foreach ($type->getTypes() as $unionType) {
-                $unionTypes[] = $unionType;
+            if ($isNullable($type)) {
+                $nullableUnion = true;
+
+                continue;
             }
+
+            $unionTypes[] = $type;
         }
 
-        return new UnionType(...$unionTypes);
+        if (1 === \count($unionTypes)) {
+            return self::nullable($unionTypes[0]);
+        }
+
+        $unionType = new UnionType(...$unionTypes);
+
+        return $nullableUnion ? self::nullable($unionType) : $unionType;
     }
 
     /**
-     * @template T of Type
+     * @template T of ObjectType|GenericType<ObjectType>|CollectionType<GenericType<ObjectType>>
      *
-     * @param list<T> $types
+     * @param list<T|IntersectionType<T>> $types
      *
-     * @return IntersectionType<Type>
+     * @return IntersectionType<T>
      */
     public static function intersection(Type ...$types): IntersectionType
     {
@@ -301,14 +366,88 @@ trait TypeFactoryTrait
      *
      * @param T $type
      *
-     * @return (T is UnionType ? T : UnionType<T|BuiltinType<TypeIdentifier::NULL>>)
+     * @return T|NullableType<T>
      */
-    public static function nullable(Type $type): UnionType
+    public static function nullable(Type $type): Type
     {
-        if ($type instanceof UnionType) {
-            return Type::union(Type::null(), ...$type->getTypes());
+        if ($type->isNullable()) {
+            return $type;
         }
 
-        return Type::union($type, Type::null());
+        return new NullableType($type);
+    }
+
+    public static function fromValue(mixed $value): Type
+    {
+        $type = match ($value) {
+            null => self::null(),
+            true => self::true(),
+            false => self::false(),
+            default => null,
+        };
+
+        if (null !== $type) {
+            return $type;
+        }
+
+        if (\is_callable($value)) {
+            return Type::callable();
+        }
+
+        if (\is_resource($value)) {
+            return Type::resource();
+        }
+
+        $type = match (get_debug_type($value)) {
+            TypeIdentifier::INT->value => self::int(),
+            TypeIdentifier::FLOAT->value => self::float(),
+            TypeIdentifier::STRING->value => self::string(),
+            default => null,
+        };
+
+        if (null !== $type) {
+            return $type;
+        }
+
+        $type = match (true) {
+            $value instanceof \UnitEnum => Type::enum($value::class),
+            \is_object($value) => \stdClass::class === $value::class ? self::object() : self::object($value::class),
+            \is_array($value) => self::builtin(TypeIdentifier::ARRAY),
+            default => null,
+        };
+
+        if (null === $type) {
+            return Type::mixed();
+        }
+
+        if (is_iterable($value)) {
+            /** @var list<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>> $keyTypes */
+            $keyTypes = [];
+
+            /** @var list<Type> $valueTypes */
+            $valueTypes = [];
+
+            foreach ($value as $k => $v) {
+                $keyTypes[] = self::fromValue($k);
+                $valueTypes[] = self::fromValue($v);
+            }
+
+            if ($keyTypes) {
+                $keyTypes = array_values(array_unique($keyTypes));
+                $keyType = \count($keyTypes) > 1 ? self::union(...$keyTypes) : $keyTypes[0];
+            } else {
+                $keyType = Type::arrayKey();
+            }
+
+            $valueType = $valueTypes ? CollectionType::mergeCollectionValueTypes($valueTypes) : Type::mixed();
+
+            return self::collection($type, $valueType, $keyType, \is_array($value) && [] !== $value && array_is_list($value));
+        }
+
+        if ($value instanceof \ArrayAccess) {
+            return self::collection($type);
+        }
+
+        return $type;
     }
 }

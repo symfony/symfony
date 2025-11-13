@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\ExpressionSyntax;
 use Symfony\Component\Validator\Constraints\ExpressionSyntaxValidator;
@@ -26,9 +29,7 @@ class ExpressionSyntaxTest extends TestCase
         self::assertSame(ExpressionSyntaxValidator::class, $constraint->validatedBy());
     }
 
-    /**
-     * @dataProvider provideServiceValidatedConstraints
-     */
+    #[DataProvider('provideServiceValidatedConstraints')]
     public function testValidatedByService(ExpressionSyntax $constraint)
     {
         self::assertSame('my_service', $constraint->validatedBy());
@@ -36,14 +37,21 @@ class ExpressionSyntaxTest extends TestCase
 
     public static function provideServiceValidatedConstraints(): iterable
     {
-        yield 'Doctrine style' => [new ExpressionSyntax(['service' => 'my_service'])];
-
         yield 'named arguments' => [new ExpressionSyntax(service: 'my_service')];
 
         $metadata = new ClassMetadata(ExpressionSyntaxDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
-        yield 'attribute' => [$metadata->properties['b']->constraints[0]];
+        yield 'attribute' => [$metadata->getPropertyMetadata('b')[0]->getConstraints()[0]];
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testValidatedByServiceDoctrineStyle()
+    {
+        $constraint = new ExpressionSyntax(['service' => 'my_service']);
+
+        self::assertSame('my_service', $constraint->validatedBy());
     }
 
     public function testAttributes()
@@ -51,16 +59,16 @@ class ExpressionSyntaxTest extends TestCase
         $metadata = new ClassMetadata(ExpressionSyntaxDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertNull($aConstraint->service);
         self::assertNull($aConstraint->allowedVariables);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame('my_service', $bConstraint->service);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'ExpressionSyntaxDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['foo', 'bar'], $cConstraint->allowedVariables);
         self::assertSame(['my_group'], $cConstraint->groups);
     }

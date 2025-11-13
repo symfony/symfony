@@ -47,12 +47,13 @@ class MapEntity extends ValueResolver
         public ?string $message = null,
     ) {
         parent::__construct($resolver, $disabled);
+        $this->selfValidate();
     }
 
     public function withDefaults(self $defaults, ?string $class): static
     {
         $clone = clone $this;
-        $clone->class ??= class_exists($class ?? '') ? $class : null;
+        $clone->class ??= class_exists($class ?? '') || interface_exists($class ?? '', false) ? $class : null;
         $clone->objectManager ??= $defaults->objectManager;
         $clone->expr ??= $defaults->expr;
         $clone->mapping ??= $defaults->mapping;
@@ -62,6 +63,22 @@ class MapEntity extends ValueResolver
         $clone->evictCache ??= $defaults->evictCache ?? false;
         $clone->message ??= $defaults->message;
 
+        $clone->selfValidate();
+
         return $clone;
+    }
+
+    private function selfValidate(): void
+    {
+        if (!$this->id) {
+            return;
+        }
+        if ($this->mapping) {
+            throw new \LogicException('The "id" and "mapping" options cannot be used together on #[MapEntity] attributes.');
+        }
+        if ($this->exclude) {
+            throw new \LogicException('The "id" and "exclude" options cannot be used together on #[MapEntity] attributes.');
+        }
+        $this->mapping = [];
     }
 }

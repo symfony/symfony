@@ -26,8 +26,6 @@ class MemcachedStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private \Memcached $memcached;
-    private int $initialTtl;
     private bool $useExtendedReturn;
 
     public static function isSupported(): bool
@@ -38,18 +36,17 @@ class MemcachedStore implements PersistingStoreInterface
     /**
      * @param int $initialTtl the expiration delay of locks in seconds
      */
-    public function __construct(\Memcached $memcached, int $initialTtl = 300)
-    {
+    public function __construct(
+        private \Memcached $memcached,
+        private int $initialTtl = 300,
+    ) {
         if (!static::isSupported()) {
             throw new InvalidArgumentException('Memcached extension is required.');
         }
 
         if ($initialTtl < 1) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects a strictly positive TTL. Got %d.', __METHOD__, $initialTtl));
+            throw new InvalidArgumentException(\sprintf('"%s()" expects a strictly positive TTL. Got %d.', __METHOD__, $initialTtl));
         }
-
-        $this->memcached = $memcached;
-        $this->initialTtl = $initialTtl;
     }
 
     public function save(Key $key): void
@@ -67,7 +64,7 @@ class MemcachedStore implements PersistingStoreInterface
     public function putOffExpiration(Key $key, float $ttl): void
     {
         if ($ttl < 1) {
-            throw new InvalidTtlException(sprintf('"%s()" expects a TTL greater or equals to 1 second. Got %s.', __METHOD__, $ttl));
+            throw new InvalidTtlException(\sprintf('"%s()" expects a TTL greater or equals to 1 second. Got %s.', __METHOD__, $ttl));
         }
 
         // Interface defines a float value but Store required an integer.

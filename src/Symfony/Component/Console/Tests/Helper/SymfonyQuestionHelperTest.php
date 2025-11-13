@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -20,9 +21,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 
-/**
- * @group tty
- */
+#[Group('tty')]
 class SymfonyQuestionHelperTest extends AbstractQuestionHelperTestCase
 {
     public function testAskChoice()
@@ -155,13 +154,15 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTestCase
         );
 
         $this->assertOutputContains(<<<EOT
- qqq:
-  [foo   ] foo
-  [żółw  ] bar
-  [łabądź] baz
- >
-EOT
-            , $output, true);
+             qqq:
+              [foo   ] foo
+              [żółw  ] bar
+              [łabądź] baz
+             >
+            EOT,
+            $output,
+            true
+        );
     }
 
     public function testChoiceQuestionCustomPrompt()
@@ -176,11 +177,13 @@ EOT
         );
 
         $this->assertOutputContains(<<<EOT
- qqq:
-  [0] foo
- >ccc>
-EOT
-            , $output, true);
+             qqq:
+              [0] foo
+             >ccc>
+            EOT,
+            $output,
+            true
+        );
     }
 
     protected function getInputStream($input)

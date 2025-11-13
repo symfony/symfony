@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class FragmentTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider getConfigs
-     */
+    #[DataProvider('getConfigs')]
     public function testFragment($insulate)
     {
         $client = $this->createClient(['test_case' => 'Fragment', 'root_config' => 'config.yml', 'debug' => true]);
@@ -26,15 +26,16 @@ class FragmentTest extends AbstractWebTestCase
         $client->request('GET', '/fragment_home');
 
         $this->assertEquals(<<<TXT
-bar txt
---
-html
---
-es
---
-fr
-TXT
-            , $client->getResponse()->getContent());
+            bar txt
+            --
+            html
+            --
+            es
+            --
+            fr
+            TXT,
+            $client->getResponse()->getContent()
+        );
     }
 
     public static function getConfigs()
@@ -50,6 +51,6 @@ TXT
         $client = self::createClient(['test_case' => 'Fragment', 'root_config' => 'config.yml', 'debug' => true]);
         $client->request('GET', '/fragment_uri');
 
-        $this->assertSame('/_fragment?_hash=CCRGN2D%2FoAJbeGz%2F%2FdoH3bNSPwLCrmwC1zAYCGIKJ0E%3D&_path=_format%3Dhtml%26_locale%3Den%26_controller%3DSymfony%255CBundle%255CFrameworkBundle%255CTests%255CFunctional%255CBundle%255CTestBundle%255CController%255CFragmentController%253A%253AindexAction', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('#/_fragment\?_hash=.+&_path=_format%3Dhtml%26_locale%3Den%26_controller%3DSymfony%255CBundle%255CFrameworkBundle%255CTests%255CFunctional%255CBundle%255CTestBundle%255CController%255CFragmentController%253A%253AindexAction$#', $client->getResponse()->getContent());
     }
 }

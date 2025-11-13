@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -33,7 +33,7 @@ class AttributeDirectoryLoader extends AttributeFileLoader
         }
 
         $collection = new RouteCollection();
-        $collection->addResource(new DirectoryResource($dir, '/\.php$/'));
+        $collection->addResource(new GlobResource($dir, '/*.php', true));
         $files = iterator_to_array(new \RecursiveIteratorIterator(
             new \RecursiveCallbackFilterIterator(
                 new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),

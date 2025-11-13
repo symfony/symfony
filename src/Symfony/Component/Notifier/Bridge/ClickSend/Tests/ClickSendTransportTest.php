@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\ClickSend\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\ClickSend\ClickSendOptions;
 use Symfony\Component\Notifier\Bridge\ClickSend\ClickSendTransport;
@@ -24,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ClickSendTransportTest extends TransportTestCase
 {
-    public static function createTransport(?HttpClientInterface $client = null, string $from = 'test_from', string $source = 'test_source', int $listId = 99, string $fromEmail = 'foo@bar.com'): ClickSendTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $from = 'test_from', ?string $source = 'test_source', ?int $listId = 99, ?string $fromEmail = 'foo@bar.com'): ClickSendTransport
     {
         return new ClickSendTransport('test_username', 'test_key', $from, $source, $listId, $fromEmail, $client ?? new MockHttpClient());
     }
@@ -41,35 +42,62 @@ final class ClickSendTransportTest extends TransportTestCase
         yield [new SmsMessage('0611223344', 'Hello!', 'from', new ClickSendOptions(['custom_string' => 'test_custom_string']))];
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
     {
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
-    /**
-     * @dataProvider validFromProvider
-     */
+    #[DataProvider('validFromProvider')]
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
         $response = $this->createMock(ResponseInterface::class);
         $response->expects(self::exactly(2))->method('getStatusCode')->willReturn(200);
         $response->expects(self::once())->method('getContent')->willReturn('');
-        $client = new MockHttpClient(function (string $method, string $url) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options) use ($response): ResponseInterface {
             self::assertSame('POST', $method);
             self::assertSame('https://rest.clicksend.com/v3/sms/send', $url);
+
+            $body = json_decode($options['body'], true);
+            self::assertIsArray($body);
+            self::assertArrayHasKey('messages', $body);
+            $message = reset($body['messages']);
+            self::assertArrayHasKey('from_email', $message);
+            self::assertArrayHasKey('list_id', $message);
+            self::assertArrayNotHasKey('to', $message);
 
             return $response;
         });
         $transport = $this->createTransport($client, $from);
+        $transport->send($message);
+    }
+
+    public function testNoInvalidArgumentExceptionIsThrownIfFromIsValidWithoutOptionalParameters()
+    {
+        $message = new SmsMessage('+33612345678', 'Hello!');
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))->method('getStatusCode')->willReturn(200);
+        $response->expects(self::once())->method('getContent')->willReturn('');
+        $client = new MockHttpClient(function (string $method, string $url, array $options) use ($response): ResponseInterface {
+            self::assertSame('POST', $method);
+            self::assertSame('https://rest.clicksend.com/v3/sms/send', $url);
+
+            $body = json_decode($options['body'], true);
+            self::assertIsArray($body);
+            self::assertArrayHasKey('messages', $body);
+            $message = reset($body['messages']);
+            self::assertArrayNotHasKey('list_id', $message);
+            self::assertArrayHasKey('to', $message);
+
+            return $response;
+        });
+        $transport = $this->createTransport($client, null, null, null, null);
         $transport->send($message);
     }
 

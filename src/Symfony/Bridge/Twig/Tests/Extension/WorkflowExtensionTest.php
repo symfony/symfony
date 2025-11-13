@@ -36,7 +36,7 @@ class WorkflowExtensionTest extends TestCase
         ];
 
         $transitionsMetadata = new \SplObjectStorage();
-        $transitionsMetadata->attach($this->t1, ['title' => 't1 title']);
+        $transitionsMetadata[$this->t1] = ['title' => 't1 title'];
         $metadataStore = new InMemoryMetadataStore(
             ['title' => 'workflow title'],
             ['orderer' => ['title' => 'ordered title']],

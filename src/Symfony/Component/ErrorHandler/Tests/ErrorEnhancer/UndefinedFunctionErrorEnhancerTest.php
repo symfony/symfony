@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\ErrorHandler\Tests\ErrorEnhancer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Error\UndefinedFunctionError;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedFunctionErrorEnhancer;
 
 class UndefinedFunctionErrorEnhancerTest extends TestCase
 {
-    /**
-     * @dataProvider provideUndefinedFunctionData
-     */
+    #[DataProvider('provideUndefinedFunctionData')]
     public function testEnhance(string $originalMessage, string $enhancedMessage)
     {
         $enhancer = new UndefinedFunctionErrorEnhancer();
@@ -39,19 +38,19 @@ class UndefinedFunctionErrorEnhancerTest extends TestCase
         return [
             [
                 'Call to undefined function test_namespaced_function()',
-                "Attempted to call function \"test_namespaced_function\" from the global namespace.\nDid you mean to call \"\\symfony\\component\\errorhandler\\tests\\errorenhancer\\test_namespaced_function\"?",
+                "Attempted to call undefined function \"test_namespaced_function\" from the global namespace.\nDid you mean to call \"\\symfony\\component\\errorhandler\\tests\\errorenhancer\\test_namespaced_function\"?",
             ],
             [
                 'Call to undefined function Foo\\Bar\\Baz\\test_namespaced_function()',
-                "Attempted to call function \"test_namespaced_function\" from namespace \"Foo\\Bar\\Baz\".\nDid you mean to call \"\\symfony\\component\\errorhandler\\tests\\errorenhancer\\test_namespaced_function\"?",
+                "Attempted to call undefined function \"test_namespaced_function\" from namespace \"Foo\\Bar\\Baz\".\nDid you mean to call \"\\symfony\\component\\errorhandler\\tests\\errorenhancer\\test_namespaced_function\"?",
             ],
             [
                 'Call to undefined function foo()',
-                'Attempted to call function "foo" from the global namespace.',
+                'Attempted to call undefined function "foo" from the global namespace.',
             ],
             [
                 'Call to undefined function Foo\\Bar\\Baz\\foo()',
-                'Attempted to call function "foo" from namespace "Foo\Bar\Baz".',
+                'Attempted to call undefined function "foo" from namespace "Foo\Bar\Baz".',
             ],
         ];
     }

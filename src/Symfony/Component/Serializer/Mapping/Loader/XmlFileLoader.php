@@ -29,7 +29,7 @@ class XmlFileLoader extends FileLoader
     /**
      * An array of {@class \SimpleXMLElement} instances.
      *
-     * @var \SimpleXMLElement[]|null
+     * @var array<class-string, \SimpleXMLElement>|null
      */
     private ?array $classes = null;
 
@@ -70,7 +70,7 @@ class XmlFileLoader extends FileLoader
                     try {
                         $attributeMetadata->setSerializedPath(new PropertyPath((string) $attribute['serialized-path']));
                     } catch (InvalidPropertyPathException) {
-                        throw new MappingException(sprintf('The "serialized-path" value must be a valid property path for the attribute "%s" of the class "%s".', $attributeName, $classMetadata->getName()));
+                        throw new MappingException(\sprintf('The "serialized-path" value must be a valid property path for the attribute "%s" of the class "%s".', $attributeName, $classMetadata->getName()));
                     }
                 }
 
@@ -107,7 +107,8 @@ class XmlFileLoader extends FileLoader
 
                 $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
                     (string) $xml->{'discriminator-map'}->attributes()->{'type-property'},
-                    $mapping
+                    $mapping,
+                    $xml->{'discriminator-map'}->attributes()->{'default-type'} ?? null
                 ));
             }
 
@@ -120,7 +121,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[]
+     * @return class-string[]
      */
     public function getMappedClasses(): array
     {
@@ -143,6 +144,9 @@ class XmlFileLoader extends FileLoader
         return simplexml_import_dom($dom);
     }
 
+    /**
+     * @return array<class-string, \SimpleXMLElement>
+     */
     private function getClassesFromXml(): array
     {
         $xml = $this->parseFile($this->file);

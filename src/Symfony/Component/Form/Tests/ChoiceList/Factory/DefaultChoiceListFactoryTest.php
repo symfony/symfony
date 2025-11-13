@@ -20,6 +20,7 @@ use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Tests\ChoiceList\ChoiceListAssertionTrait;
 use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -27,6 +28,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultChoiceListFactoryTest extends TestCase
 {
+    use ChoiceListAssertionTrait;
+
     private \stdClass $obj1;
     private \stdClass $obj2;
     private \stdClass $obj3;
@@ -159,9 +162,9 @@ class DefaultChoiceListFactoryTest extends TestCase
     {
         $list = $this->factory->createListFromChoices(
             new \ArrayIterator([
-                    'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
-                    'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
-                ])
+                'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
+                'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
+            ])
         );
 
         $this->assertObjectListWithGeneratedValues($list);
@@ -261,7 +264,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
         $list = $this->factory->createListFromLoader(new ArrayChoiceLoader(), null, $filter);
 
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $filter)), $list);
+        $this->assertEqualsLazyChoiceList(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $filter)), $list);
     }
 
     public function testCreateViewFlat()
@@ -728,7 +731,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testPassTranslatableInterfaceAsLabelDoesntCastItToString()
     {
-        $message = new class() implements TranslatableInterface {
+        $message = new class implements TranslatableInterface {
             public function trans(TranslatorInterface $translator, ?string $locale = null): string
             {
                 return 'my_message';
@@ -941,7 +944,7 @@ class DefaultChoiceListFactoryTest extends TestCase
                     'C',
                     ['attr2' => 'value2']
                 ),
-                ]
+            ]
         ), $view);
     }
 
@@ -987,7 +990,7 @@ class DefaultChoiceListFactoryTest extends TestCase
                     'Group 2',
                     [2 => new ChoiceView($this->obj3, '2', 'C')]
                 ),
-                ]
+            ]
         ), $view);
     }
 

@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
-use Doctrine\DBAL\Cache\ArrayResult;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -29,7 +30,7 @@ class PostgreSqlConnectionTest extends TestCase
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Cannot serialize '.PostgreSqlConnection::class);
 
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = $this->createMock(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
 
         $connection = new PostgreSqlConnection([], $driverConnection);
@@ -41,16 +42,16 @@ class PostgreSqlConnectionTest extends TestCase
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Cannot unserialize '.PostgreSqlConnection::class);
 
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = $this->createMock(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
 
         $connection = new PostgreSqlConnection([], $driverConnection);
-        $connection->__wakeup();
+        $connection->__unserialize([]);
     }
 
     public function testListenOnConnection()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = $this->createMock(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
 
         $driverConnection
@@ -63,7 +64,7 @@ class PostgreSqlConnectionTest extends TestCase
             ->method('createQueryBuilder')
             ->willReturn(new QueryBuilder($driverConnection));
 
-        $wrappedConnection = new class() {
+        $wrappedConnection = new class {
             private int $notifyCalls = 0;
 
             public function pgsqlGetNotify()
@@ -84,10 +85,13 @@ class PostgreSqlConnectionTest extends TestCase
             ->method('getNativeConnection')
             ->willReturn($wrappedConnection);
 
+        $driverResult = $this->createMock(DriverResult::class);
+        $driverResult->method('fetchAssociative')
+            ->willReturn(false);
         $driverConnection
             ->expects(self::any())
             ->method('executeQuery')
-            ->willReturn(new Result(new ArrayResult([]), $driverConnection));
+            ->willReturn(new Result($driverResult, $driverConnection));
 
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
@@ -100,7 +104,7 @@ class PostgreSqlConnectionTest extends TestCase
 
     public function testGetExtraSetupSql()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = $this->createMock(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
@@ -117,7 +121,7 @@ class PostgreSqlConnectionTest extends TestCase
 
     public function testTransformTableNameWithSchemaToValidProcedureName()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = $this->createMock(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
         $connection = new PostgreSqlConnection(['table_name' => 'schema.queue_table'], $driverConnection);
 
@@ -131,7 +135,7 @@ class PostgreSqlConnectionTest extends TestCase
 
     public function testGetExtraSetupSqlWrongTable()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = $this->createMock(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 

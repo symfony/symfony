@@ -22,12 +22,12 @@ trait FactoryTrait
      *
      * @return $this
      */
-    final public function factory(string|array|ReferenceConfigurator|Expression $factory): static
+    final public function factory(string|array|\Closure|ReferenceConfigurator|Expression $factory): static
     {
         if (\is_string($factory) && 1 === substr_count($factory, ':')) {
             $factoryParts = explode(':', $factory);
 
-            throw new InvalidArgumentException(sprintf('Invalid factory "%s": the "service:method" notation is not available when using PHP-based DI configuration. Use "[service(\'%s\'), \'%s\']" instead.', $factory, $factoryParts[0], $factoryParts[1]));
+            throw new InvalidArgumentException(\sprintf('Invalid factory "%s": the "service:method" notation is not available when using PHP-based DI configuration. Use "[service(\'%s\'), \'%s\']" instead.', $factory, $factoryParts[0], $factoryParts[1]));
         }
 
         if ($factory instanceof Expression) {

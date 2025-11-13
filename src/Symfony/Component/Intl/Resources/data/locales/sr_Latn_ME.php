@@ -11,6 +11,7 @@ return [
         'bn_IN' => 'bangla (Indija)',
         'cs_CZ' => 'češki (Češka Republika)',
         'de_DE' => 'nemački (Njemačka)',
+        'en_CZ' => 'engleski (Češka Republika)',
         'en_DE' => 'engleski (Njemačka)',
         'en_KN' => 'engleski (Sveti Kits i Nevis)',
         'en_UM' => 'engleski (Manja udaljena ostrva SAD)',

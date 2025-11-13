@@ -17,6 +17,6 @@ return static function (ContainerConfigurator $container) {
     $container
         ->services()
             ->set('process.messenger.process_message_handler', RunProcessMessageHandler::class)
-                ->tag('messenger.message_handler')
+                ->tag('messenger.message_handler', ['sign' => true])
     ;
 };

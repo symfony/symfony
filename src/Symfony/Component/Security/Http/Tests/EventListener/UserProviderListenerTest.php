@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -42,9 +43,7 @@ class UserProviderListenerTest extends TestCase
         $this->assertTrue($user->isEqualTo($passport->getUser()));
     }
 
-    /**
-     * @dataProvider provideCompletePassports
-     */
+    #[DataProvider('provideCompletePassports')]
     public function testNotOverrideUserLoader($passport)
     {
         $badgeBefore = $passport->hasBadge(UserBadge::class) ? $passport->getBadge(UserBadge::class) : null;

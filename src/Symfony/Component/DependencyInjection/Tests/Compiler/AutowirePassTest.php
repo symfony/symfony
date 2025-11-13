@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -34,6 +37,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\OptionalParameter;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAnonymous;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -173,7 +177,7 @@ class AutowirePassTest extends TestCase
             $pass->process($container);
             $this->fail('AutowirePass should have thrown an exception');
         } catch (AutowiringFailedException $e) {
-            $this->assertSame('Invalid service "private_service": constructor of class "Symfony\Component\DependencyInjection\Tests\Compiler\PrivateConstructor" must be public.', (string) $e->getMessage());
+            $this->assertSame('Invalid service "private_service": constructor of class "Symfony\Component\DependencyInjection\Tests\Compiler\PrivateConstructor" must be public. Did you miss configuring a factory or a static constructor? Try using the "#[Autoconfigure(constructor: ...)]" attribute for the latter.', (string) $e->getMessage());
         }
     }
 
@@ -244,7 +248,7 @@ class AutowirePassTest extends TestCase
             $pass->process($container);
             $this->fail('AutowirePass should have thrown an exception');
         } catch (AutowiringFailedException $e) {
-            $this->assertSame('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\CannotBeAutowired::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. Did you create a class that implements this interface?', (string) $e->getMessage());
+            $this->assertSame('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\CannotBeAutowired::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. Did you create an instantiable class that implements this interface?', (string) $e->getMessage());
         }
     }
 
@@ -399,6 +403,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, $container->getDefinition('bar')->getArgument(0));
     }
 
+    #[IgnoreDeprecations]
     public function testOptionalParameter()
     {
         $container = new ContainerBuilder();
@@ -815,7 +820,7 @@ class AutowirePassTest extends TestCase
             $pass->process($container);
             $this->fail('AutowirePass should have thrown an exception');
         } catch (AutowiringFailedException $e) {
-            $this->assertSame('Cannot autowire service "my_service": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\K::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" but no such service exists. Did you create a class that implements this interface?', (string) $e->getMessage());
+            $this->assertSame('Cannot autowire service "my_service": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\K::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" but no such service exists. Did you create an instantiable class that implements this interface?', (string) $e->getMessage());
         }
     }
 
@@ -870,9 +875,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals([new TypedReference(Foo::class, Foo::class)], $definition->getArguments());
     }
 
-    /**
-     * @dataProvider provideNotWireableCalls
-     */
+    #[DataProvider('provideNotWireableCalls')]
     public function testNotWireableCalls($method, $expectedMsg)
     {
         $container = new ContainerBuilder();
@@ -985,8 +988,12 @@ class AutowirePassTest extends TestCase
         }
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testInlineServicesAreNotCandidates()
     {
+        $this->expectUserDeprecationMessage('Since symfony/dependency-injection 7.4: XML configuration format is deprecated, use YAML or PHP instead.');
+
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures/xml')));
         $loader->load('services_inline_not_candidate.xml');
@@ -1118,6 +1125,20 @@ class AutowirePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register(BarInterface::class, BarInterface::class);
+        $container->register('.'.BarInterface::class.' $image.storage', BarInterface::class);
+        $container->register('with_target', WithTarget::class)
+            ->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $this->assertSame('.'.BarInterface::class.' $image.storage', (string) $container->getDefinition('with_target')->getArgument(0));
+    }
+
+    public function testArgumentWithParsedTarget()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(BarInterface::class, BarInterface::class);
         $container->register(BarInterface::class.' $imageStorage', BarInterface::class);
         $container->register('with_target', WithTarget::class)
             ->setAutowired(true);
@@ -1155,6 +1176,20 @@ class AutowirePassTest extends TestCase
         $this->expectExceptionMessage('Cannot autowire service "with_target": argument "$baz" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAnonymous::__construct()" has "#[Target(\'baz\')]" but no such target exists. Did you mean to target "bar" instead?');
 
         (new AutowirePass())->process($container);
+    }
+
+    public function testArgumentWithIdTarget()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('image.storage', BarInterface::class);
+        $container->registerAliasForArgument('image.storage', BarInterface::class, 'image');
+        $container->register('with_target', WithTarget::class)
+            ->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $this->assertSame('image.storage', (string) $container->getDefinition('with_target')->getArgument(0));
     }
 
     public function testDecorationWithServiceAndAliasedInterface()
@@ -1314,11 +1349,33 @@ class AutowirePassTest extends TestCase
         $this->assertSame(2, $container->getDefinition(AsDecoratorBaz::class)->getArgument(0)->getInvalidBehavior());
     }
 
+    public function testMultipleAsDecoratorAttribute()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AsDecoratorMultipleFoo::class);
+        $container->register(AsDecoratorMultipleBar::class);
+        $container->register(AsDecoratorMultiple::class)->setAutowired(true)->setArgument(0, 'arg1');
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireAsDecoratorPass())->process($container);
+        (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $fooDecoratorName = '.decorator.'.AsDecoratorMultipleFoo::class.'.'.AsDecoratorMultiple::class;
+        $this->assertSame($fooDecoratorName, (string) $container->getAlias(AsDecoratorMultipleFoo::class));
+        $this->assertSame($fooDecoratorName.'.inner', (string) $container->getDefinition($fooDecoratorName)->getArgument(1));
+
+        $barDecoratorName = '.decorator.'.AsDecoratorMultipleBar::class.'.'.AsDecoratorMultiple::class;
+        $this->assertSame($barDecoratorName, (string) $container->getAlias(AsDecoratorMultipleBar::class));
+        $this->assertSame($barDecoratorName.'.inner', (string) $container->getDefinition($barDecoratorName)->getArgument(1));
+    }
+
     public function testTypeSymbolExcluded()
     {
         $container = new ContainerBuilder();
 
-        $container->register(Foo::class)->setAbstract(true)->addTag('container.excluded', ['source' => 'for tests']);
+        $container->register(Foo::class)->addTag('container.excluded', ['source' => 'for tests']);
         $aDefinition = $container->register('a', NotGuessableArgument::class);
         $aDefinition->setAutowired(true);
 
@@ -1335,7 +1392,7 @@ class AutowirePassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register(__NAMESPACE__)->setAbstract(true)->addTag('container.excluded');
+        $container->register(__NAMESPACE__)->addTag('container.excluded');
         $aDefinition = $container->register('a', NotGuessableArgument::class);
         $aDefinition->setAutowired(true);
 
@@ -1392,5 +1449,60 @@ class AutowirePassTest extends TestCase
         } catch (AutowiringFailedException $e) {
             $this->assertSame('Using both attributes #[Lazy] and #[Autowire] on an argument is not allowed; use the "lazy" parameter of #[Autowire] instead.', $e->getMessage());
         }
+    }
+
+    public function testAutowireAttributeWithEnvVar()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', AutowireAttributeEnv::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('foo');
+
+        $this->assertSame('%env(bool:ENABLED)%', $container->resolveEnvPlaceholders($definition->getArguments()[0]));
+        $this->assertSame('%env(default::OPTIONAL)%', $container->resolveEnvPlaceholders($definition->getArguments()[1]));
+    }
+
+    public function testLazyProxyForInterfaceWithFinalImplementation()
+    {
+        $container = new ContainerBuilder();
+        $container->register('final_impl', FinalLazyProxyImplementation::class);
+        $container->setAlias(LazyProxyTestInterface::class, 'final_impl');
+
+        $container->register(LazyProxyInterfaceConsumer::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $service = $container->get(LazyProxyInterfaceConsumer::class);
+        $this->assertInstanceOf(LazyProxyInterfaceConsumer::class, $service);
+
+        // Trigger lazy load
+        $dep = $service->getDep()->getSelf();
+        $this->assertInstanceOf(FinalLazyProxyImplementation::class, $dep);
+    }
+
+    public function testLazyProxyWithClassInheritance()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BaseLazyProxyClass::class, ExtendedLazyProxyClass::class);
+
+        $container->register(LazyProxyInheritanceConsumer::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $service = $container->get(LazyProxyInheritanceConsumer::class);
+        $this->assertInstanceOf(LazyProxyInheritanceConsumer::class, $service);
+
+        // Trigger lazy load
+        $dep = $service->getDependency()->getSelf();
+        $this->assertInstanceOf(ExtendedLazyProxyClass::class, $dep);
     }
 }

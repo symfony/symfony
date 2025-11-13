@@ -23,7 +23,7 @@ class ValidTest extends TestCase
 {
     public function testGroupsCanBeSet()
     {
-        $constraint = new Valid(['groups' => 'foo']);
+        $constraint = new Valid(groups: ['foo']);
 
         $this->assertSame(['foo'], $constraint->groups);
     }
@@ -37,15 +37,15 @@ class ValidTest extends TestCase
 
     public function testAttributes()
     {
-        $metadata = new ClassMetaData(ValidDummy::class);
+        $metadata = new ClassMetadata(ValidDummy::class);
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertFalse($bConstraint->traverse);
         self::assertSame(['traverse_group'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

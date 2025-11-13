@@ -17,19 +17,27 @@ namespace Symfony\Component\Workflow;
  */
 class Transition
 {
-    private string $name;
-    private array $froms;
-    private array $tos;
+    /**
+     * @var Arc[]
+     */
+    private array $fromArcs;
 
     /**
-     * @param string|string[] $froms
-     * @param string|string[] $tos
+     * @var Arc[]
      */
-    public function __construct(string $name, string|array $froms, string|array $tos)
-    {
-        $this->name = $name;
-        $this->froms = (array) $froms;
-        $this->tos = (array) $tos;
+    private array $toArcs;
+
+    /**
+     * @param string|string[]|Arc[] $froms
+     * @param string|string[]|Arc[] $tos
+     */
+    public function __construct(
+        private string $name,
+        string|array $froms,
+        string|array $tos,
+    ) {
+        $this->fromArcs = array_map($this->normalize(...), (array) $froms);
+        $this->toArcs = array_map($this->normalize(...), (array) $tos);
     }
 
     public function getName(): string
@@ -38,18 +46,44 @@ class Transition
     }
 
     /**
-     * @return string[]
+     * @param bool $asArc
+     *
+     * @return $asArc is true ? array<Arc> : array<string>
      */
-    public function getFroms(): array
+    public function getFroms(/* bool $asArc = false */): array
     {
-        return $this->froms;
+        if (1 <= \func_num_args() && func_get_arg(0)) {
+            return $this->fromArcs;
+        }
+
+        return array_column($this->fromArcs, 'place');
     }
 
     /**
-     * @return string[]
+     * @param bool $asArc
+     *
+     * @return $asArc is true ? array<Arc> : array<string>
      */
-    public function getTos(): array
+    public function getTos(/* bool $asArc = false */): array
     {
-        return $this->tos;
+        if (1 <= \func_num_args() && func_get_arg(0)) {
+            return $this->toArcs;
+        }
+
+        return array_column($this->toArcs, 'place');
+    }
+
+    // No type hint for $arc to avoid implicit cast
+    private function normalize(mixed $arc): Arc
+    {
+        if ($arc instanceof Arc) {
+            return $arc;
+        }
+
+        if (\is_string($arc)) {
+            return new Arc($arc, 1);
+        }
+
+        throw new \TypeError(\sprintf('The type of arc is invalid. Expected string or Arc, got "%s".', get_debug_type($arc)));
     }
 }

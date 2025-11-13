@@ -35,24 +35,29 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
     public function __construct($varDir, $testCase, $rootConfig, $environment, $debug)
     {
         if (!is_dir(__DIR__.'/'.$testCase)) {
-            throw new \InvalidArgumentException(sprintf('The test case "%s" does not exist.', $testCase));
+            throw new \InvalidArgumentException(\sprintf('The test case "%s" does not exist.', $testCase));
         }
         $this->varDir = $varDir;
         $this->testCase = $testCase;
 
         $fs = new Filesystem();
         if (!$fs->isAbsolutePath($rootConfig) && !file_exists($rootConfig = __DIR__.'/'.$testCase.'/'.$rootConfig)) {
-            throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $rootConfig));
+            throw new \InvalidArgumentException(\sprintf('The root config "%s" does not exist.', $rootConfig));
         }
         $this->rootConfig = $rootConfig;
 
         parent::__construct($environment, $debug);
     }
 
+    protected function getContainerClass(): string
+    {
+        return parent::getContainerClass().substr(md5($this->rootConfig), -16);
+    }
+
     public function registerBundles(): iterable
     {
         if (!file_exists($filename = $this->getProjectDir().'/'.$this->testCase.'/bundles.php')) {
-            throw new \RuntimeException(sprintf('The bundles file "%s" does not exist.', $filename));
+            throw new \RuntimeException(\sprintf('The bundles file "%s" does not exist.', $filename));
         }
 
         return include $filename;
@@ -84,14 +89,16 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         $container->registerExtension(new TestDumpExtension());
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        return ['varDir', 'testCase', 'rootConfig', 'environment', 'debug'];
+        return [$this->varDir, $this->testCase, $this->rootConfig, $this->environment, $this->debug];
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
-        foreach ($this as $k => $v) {
+        [$this->varDir, $this->testCase, $this->rootConfig, $this->environment, $this->debug] = $data;
+
+        foreach ($this as $v) {
             if (\is_object($v)) {
                 throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
             }
@@ -121,11 +128,17 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
     {
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getNamespace(): string
     {
         return '';
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getXsdValidationBasePath(): string|false
     {
         return false;

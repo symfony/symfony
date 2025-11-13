@@ -11,20 +11,30 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Mailer\Bridge\AhaSend\RemoteEvent\AhaSendPayloadConverter;
+use Symfony\Component\Mailer\Bridge\AhaSend\Webhook\AhaSendRequestParser;
 use Symfony\Component\Mailer\Bridge\Brevo\RemoteEvent\BrevoPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
+use Symfony\Component\Mailer\Bridge\Mailchimp\RemoteEvent\MailchimpPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Mailchimp\Webhook\MailchimpRequestParser;
 use Symfony\Component\Mailer\Bridge\MailerSend\RemoteEvent\MailerSendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\MailerSend\Webhook\MailerSendRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailgun\RemoteEvent\MailgunPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailjet\RemoteEvent\MailjetPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailjet\Webhook\MailjetRequestParser;
+use Symfony\Component\Mailer\Bridge\Mailomat\RemoteEvent\MailomatPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Mailomat\Webhook\MailomatRequestParser;
+use Symfony\Component\Mailer\Bridge\Mailtrap\RemoteEvent\MailtrapPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Mailtrap\Webhook\MailtrapRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\RemoteEvent\PostmarkPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Mailer\Bridge\Resend\RemoteEvent\ResendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Resend\Webhook\ResendRequestParser;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
+use Symfony\Component\Mailer\Bridge\Sweego\RemoteEvent\SweegoPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Sweego\Webhook\SweegoRequestParser;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -48,10 +58,20 @@ return static function (ContainerConfigurator $container) {
             ->args([service('mailer.payload_converter.mailjet')])
         ->alias(MailjetRequestParser::class, 'mailer.webhook.request_parser.mailjet')
 
+        ->set('mailer.payload_converter.mailomat', MailomatPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.mailomat', MailomatRequestParser::class)
+            ->args([service('mailer.payload_converter.mailomat')])
+        ->alias(MailomatRequestParser::class, 'mailer.webhook.request_parser.mailomat')
+
         ->set('mailer.payload_converter.postmark', PostmarkPayloadConverter::class)
         ->set('mailer.webhook.request_parser.postmark', PostmarkRequestParser::class)
             ->args([service('mailer.payload_converter.postmark')])
         ->alias(PostmarkRequestParser::class, 'mailer.webhook.request_parser.postmark')
+
+        ->set('mailer.payload_converter.mailtrap', MailtrapPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.mailtrap', MailtrapRequestParser::class)
+            ->args([service('mailer.payload_converter.mailtrap')])
+        ->alias(MailtrapRequestParser::class, 'mailer.webhook.request_parser.mailtrap')
 
         ->set('mailer.payload_converter.resend', ResendPayloadConverter::class)
         ->set('mailer.webhook.request_parser.resend', ResendRequestParser::class)
@@ -62,5 +82,20 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.sendgrid', SendgridRequestParser::class)
             ->args([service('mailer.payload_converter.sendgrid')])
         ->alias(SendgridRequestParser::class, 'mailer.webhook.request_parser.sendgrid')
+
+        ->set('mailer.payload_converter.sweego', SweegoPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.sweego', SweegoRequestParser::class)
+            ->args([service('mailer.payload_converter.sweego')])
+        ->alias(SweegoRequestParser::class, 'mailer.webhook.request_parser.sweego')
+
+        ->set('mailer.payload_converter.ahasend', AhaSendPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.ahasend', AhaSendRequestParser::class)
+            ->args([service('mailer.payload_converter.ahasend')])
+        ->alias(AhaSendRequestParser::class, 'mailer.webhook.request_parser.ahasend')
+
+        ->set('mailer.payload_converter.mailchimp', MailchimpPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.mailchimp', MailchimpRequestParser::class)
+            ->args([service('mailer.payload_converter.mailchimp')])
+        ->alias(MailchimpRequestParser::class, 'mailer.webhook.request_parser.mailchimp')
     ;
 };

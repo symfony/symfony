@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Twig\Environment;
@@ -18,12 +19,14 @@ use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
-use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\Node;
+use Twig\Node\Nodes;
+use Twig\TwigFilter;
 
 class TranslationNodeVisitorTest extends TestCase
 {
-    /** @dataProvider getMessagesExtractionTestData */
+    #[DataProvider('getMessagesExtractionTestData')]
     public function testMessagesExtraction(Node $node, array $expectedMessages)
     {
         $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
@@ -38,13 +41,15 @@ class TranslationNodeVisitorTest extends TestCase
     {
         $message = 'new key';
 
+        $n = new Nodes([
+            new ArrayExpression([], 0),
+            new ContextVariable('variable', 0),
+        ]);
+
         $node = new FilterExpression(
             new ConstantExpression($message, 0),
-            new ConstantExpression('trans', 0),
-            new Node([
-                new ArrayExpression([], 0),
-                new NameExpression('variable', 0),
-            ]),
+            new TwigFilter('trans'),
+            $n,
             0
         );
 

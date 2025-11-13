@@ -38,7 +38,7 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
         $decimalSeparator = $this->getNumberFormatter()->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
 
         if (\is_string($value) && str_contains($value, $decimalSeparator)) {
-            throw new TransformationFailedException(sprintf('The value "%s" is not a valid integer.', $value));
+            throw new TransformationFailedException(\sprintf('The value "%s" is not a valid integer.', $value));
         }
 
         $result = parent::reverseTransform($value);

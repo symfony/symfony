@@ -35,7 +35,7 @@ class CachePoolPrunerPass implements CompilerPassInterface
             $class = $container->getParameterBag()->resolveValue($container->getDefinition($id)->getClass());
 
             if (!$reflection = $container->getReflectionClass($class)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
             }
 
             if ($reflection->implementsInterface(PruneableInterface::class)) {

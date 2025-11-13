@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -20,7 +22,8 @@ use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NullExtractor;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -54,9 +57,16 @@ class AbstractPropertyInfoExtractorTest extends TestCase
         $this->assertSame('long', $this->propertyInfo->getLongDescription('Foo', 'bar', []));
     }
 
+    public function testGetType()
+    {
+        $this->assertEquals(Type::int(), $this->propertyInfo->getType('Foo', 'bar', []));
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testGetTypes()
     {
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_INT)], $this->propertyInfo->getTypes('Foo', 'bar', []));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_INT)], $this->propertyInfo->getTypes('Foo', 'bar', []));
     }
 
     public function testIsReadable()

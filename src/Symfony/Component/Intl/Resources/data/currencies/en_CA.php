@@ -10,10 +10,6 @@ return [
             'BYB',
             'Belarusian New Rouble (1994–1999)',
         ],
-        'BYN' => [
-            'BYN',
-            'Belarusian Rouble',
-        ],
         'BYR' => [
             'BYR',
             'Belarusian Rouble (2000–2016)',
@@ -29,10 +25,6 @@ return [
         'LVR' => [
             'LVR',
             'Latvian Rouble',
-        ],
-        'RUB' => [
-            'RUB',
-            'Russian Rouble',
         ],
         'RUR' => [
             'RUR',

@@ -1,0 +1,39 @@
+Firewall "main"
+===============
+
+ ----------------------- ------------------------------- 
+  Option                  Value                          
+ ----------------------- ------------------------------- 
+  Name                    main                           
+  Context                 main                           
+  Lazy                    No                             
+  Stateless               No                             
+  User Checker            user_checker_service           
+  Provider                user_provider_service          
+  Entry Point             entry_point_service            
+  Access Denied URL       /access-denied                 
+  Access Denied Handler   access_denied_handler_service  
+ ----------------------- ------------------------------- 
+
+Event listeners for firewall "main"
+===================================
+
+"security.event" event
+----------------------
+
+ ------- ----------- ---------- 
+  Order   Callable    Priority  
+ ------- ----------- ---------- 
+  #1      Closure()   42        
+  #2      Closure()   42        
+ ------- ----------- ---------- 
+
+Authenticators for firewall "main"
+==================================
+
+ ----------------------------------------------------------------- 
+  Classname                                                        
+ ----------------------------------------------------------------- 
+  Symfony\Bundle\SecurityBundle\Tests\Fixtures\DummyAuthenticator  
+  Symfony\Bundle\SecurityBundle\Tests\Fixtures\DummyAuthenticator  
+ -----------------------------------------------------------------

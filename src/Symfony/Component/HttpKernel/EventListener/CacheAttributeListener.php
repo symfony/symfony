@@ -51,7 +51,7 @@ class CacheAttributeListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if (!\is_array($attributes = $request->attributes->get('_cache') ?? $event->getAttributes()[Cache::class] ?? null)) {
+        if (!$attributes = $request->attributes->get('_cache') ?? $event->getAttributes(Cache::class)) {
             return;
         }
 
@@ -102,7 +102,7 @@ class CacheAttributeListener implements EventSubscriberInterface
         $response = $event->getResponse();
 
         // http://tools.ietf.org/html/draft-ietf-httpbis-p4-conditional-12#section-3.1
-        if (!\in_array($response->getStatusCode(), [200, 203, 300, 301, 302, 304, 404, 410])) {
+        if (!\in_array($response->getStatusCode(), [200, 203, 300, 301, 302, 304, 404, 410], true)) {
             unset($this->lastModified[$request]);
             unset($this->etags[$request]);
 
@@ -119,7 +119,9 @@ class CacheAttributeListener implements EventSubscriberInterface
 
         unset($this->lastModified[$request]);
         unset($this->etags[$request]);
-        $hasVary = $response->headers->has('Vary');
+        // Check if the response has a Vary header that should be considered, ignoring cases where
+        // it's only 'Accept-Language' and the request has the '_vary_by_language' attribute
+        $hasVary = ['Accept-Language'] === $response->getVary() ? !$request->attributes->get('_vary_by_language') : $response->hasVary();
 
         foreach (array_reverse($attributes) as $cache) {
             if (null !== $cache->smaxage && !$response->headers->hasCacheControlDirective('s-maxage')) {
@@ -163,6 +165,14 @@ class CacheAttributeListener implements EventSubscriberInterface
             if (false === $cache->public) {
                 $response->setPrivate();
             }
+
+            if (true === $cache->noStore) {
+                $response->headers->addCacheControlDirective('no-store');
+            }
+
+            if (false === $cache->noStore) {
+                $response->headers->removeCacheControlDirective('no-store');
+            }
         }
     }
 
@@ -172,6 +182,12 @@ class CacheAttributeListener implements EventSubscriberInterface
             KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', 10],
             KernelEvents::RESPONSE => ['onKernelResponse', -10],
         ];
+    }
+
+    public function reset(): void
+    {
+        $this->lastModified = new \SplObjectStorage();
+        $this->etags = new \SplObjectStorage();
     }
 
     private function getExpressionLanguage(): ExpressionLanguage

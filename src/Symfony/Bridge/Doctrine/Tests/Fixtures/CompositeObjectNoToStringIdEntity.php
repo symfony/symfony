@@ -22,12 +22,12 @@ class CompositeObjectNoToStringIdEntity
     public function __construct(
         #[ORM\Id]
         #[ORM\ManyToOne(cascade: ['persist'])]
-        #[ORM\JoinColumn(name: 'object_one_id', nullable: false)]
+        #[ORM\JoinColumn(name: 'object_one_id')]
         protected SingleIntIdNoToStringEntity $objectOne,
 
         #[ORM\Id]
         #[ORM\ManyToOne(cascade: ['persist'])]
-        #[ORM\JoinColumn(name: 'object_two_id', nullable: false)]
+        #[ORM\JoinColumn(name: 'object_two_id')]
         protected SingleIntIdNoToStringEntity $objectTwo,
     ) {
     }

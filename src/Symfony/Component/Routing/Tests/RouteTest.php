@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\CompiledRoute;
 use Symfony\Component\Routing\Route;
@@ -65,7 +66,7 @@ class RouteTest extends TestCase
         $route = new Route('/{foo}');
         $route->setOptions(['foo' => 'bar']);
         $this->assertEquals(array_merge([
-        'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
+            'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
         ], ['foo' => 'bar']), $route->getOptions(), '->setOptions() sets the options');
         $this->assertEquals($route, $route->setOptions([]), '->setOptions() implements a fluent interface');
 
@@ -141,9 +142,7 @@ class RouteTest extends TestCase
         $this->assertTrue($route->hasRequirement('foo'));
     }
 
-    /**
-     * @dataProvider getInvalidRequirements
-     */
+    #[DataProvider('getInvalidRequirements')]
     public function testSetInvalidRequirement($req)
     {
         $route = new Route('/{foo}');
@@ -156,13 +155,13 @@ class RouteTest extends TestCase
     public static function getInvalidRequirements()
     {
         return [
-           [''],
-           ['^$'],
-           ['^'],
-           ['$'],
-           ['\A\z'],
-           ['\A'],
-           ['\z'],
+            [''],
+            ['^$'],
+            ['^'],
+            ['$'],
+            ['\A\z'],
+            ['\A'],
+            ['\z'],
         ];
     }
 
@@ -226,37 +225,46 @@ class RouteTest extends TestCase
         $this->assertNotSame($route, $unserialized);
     }
 
-    public function testInlineDefaultAndRequirement()
+    #[DataProvider('provideInlineDefaultAndRequirementCases')]
+    public function testInlineDefaultAndRequirement(Route $route, string $expectedPath, string $expectedHost, array $expectedDefaults, array $expectedRequirements)
     {
-        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', null), new Route('/foo/{bar?}'));
-        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', 'baz'), new Route('/foo/{bar?baz}'));
-        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', 'baz<buz>'), new Route('/foo/{bar?baz<buz>}'));
-        $this->assertEquals((new Route('/foo/{!bar}'))->setDefault('bar', 'baz<buz>'), new Route('/foo/{!bar?baz<buz>}'));
-        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', 'baz'), new Route('/foo/{bar?}', ['bar' => 'baz']));
+        self::assertSame($expectedPath, $route->getPath());
+        self::assertSame($expectedHost, $route->getHost());
+        self::assertSame($expectedDefaults, $route->getDefaults());
+        self::assertSame($expectedRequirements, $route->getRequirements());
+    }
 
-        $this->assertEquals((new Route('/foo/{bar}'))->setRequirement('bar', '.*'), new Route('/foo/{bar<.*>}'));
-        $this->assertEquals((new Route('/foo/{bar}'))->setRequirement('bar', '>'), new Route('/foo/{bar<>>}'));
-        $this->assertEquals((new Route('/foo/{bar}'))->setRequirement('bar', '\d+'), new Route('/foo/{bar<.*>}', [], ['bar' => '\d+']));
-        $this->assertEquals((new Route('/foo/{bar}'))->setRequirement('bar', '[a-z]{2}'), new Route('/foo/{bar<[a-z]{2}>}'));
-        $this->assertEquals((new Route('/foo/{!bar}'))->setRequirement('bar', '\d+'), new Route('/foo/{!bar<\d+>}'));
+    public static function provideInlineDefaultAndRequirementCases(): iterable
+    {
+        yield [new Route('/foo/{bar?}'), '/foo/{bar}', '', ['bar' => null], []];
+        yield [new Route('/foo/{bar?baz}'), '/foo/{bar}', '', ['bar' => 'baz'], []];
+        yield [new Route('/foo/{bar?baz<buz>}'), '/foo/{bar}', '', ['bar' => 'baz<buz>'], []];
+        yield [new Route('/foo/{!bar?baz<buz>}'), '/foo/{!bar}', '', ['bar' => 'baz<buz>'], []];
+        yield [new Route('/foo/{bar?}', ['bar' => 'baz']), '/foo/{bar}', '', ['bar' => 'baz'], []];
 
-        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', null)->setRequirement('bar', '.*'), new Route('/foo/{bar<.*>?}'));
-        $this->assertEquals((new Route('/foo/{bar}'))->setDefault('bar', '<>')->setRequirement('bar', '>'), new Route('/foo/{bar<>>?<>}'));
+        yield [new Route('/foo/{bar<.*>}'), '/foo/{bar}', '', [], ['bar' => '.*']];
+        yield [new Route('/foo/{bar<>>}'), '/foo/{bar}', '', [], ['bar' => '>']];
+        yield [new Route('/foo/{bar<.*>}', [], ['bar' => '\d+']), '/foo/{bar}', '', [], ['bar' => '\d+']];
+        yield [new Route('/foo/{bar<[a-z]{2}>}'), '/foo/{bar}', '', [], ['bar' => '[a-z]{2}']];
+        yield [new Route('/foo/{!bar<\d+>}'), '/foo/{!bar}', '', [], ['bar' => '\d+']];
 
-        $this->assertEquals((new Route('/{foo}/{!bar}'))->setDefaults(['bar' => '<>', 'foo' => '\\'])->setRequirements(['bar' => '\\', 'foo' => '.']), new Route('/{foo<.>?\}/{!bar<\>?<>}'));
+        yield [new Route('/foo/{bar<.*>?}'), '/foo/{bar}', '', ['bar' => null], ['bar' => '.*']];
+        yield [new Route('/foo/{bar<>>?<>}'), '/foo/{bar}', '', ['bar' => '<>'], ['bar' => '>']];
 
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', null), (new Route('/'))->setHost('{bar?}'));
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', 'baz'), (new Route('/'))->setHost('{bar?baz}'));
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', 'baz<buz>'), (new Route('/'))->setHost('{bar?baz<buz>}'));
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', null), (new Route('/', ['bar' => 'baz']))->setHost('{bar?}'));
+        yield [new Route('/{foo<.>?\}/{!bar<\>?<>}'), '/{foo}/{!bar}', '', ['foo' => '\\', 'bar' => '<>'], ['foo' => '.', 'bar' => '\\']];
 
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setRequirement('bar', '.*'), (new Route('/'))->setHost('{bar<.*>}'));
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setRequirement('bar', '>'), (new Route('/'))->setHost('{bar<>>}'));
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setRequirement('bar', '.*'), (new Route('/', [], ['bar' => '\d+']))->setHost('{bar<.*>}'));
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setRequirement('bar', '[a-z]{2}'), (new Route('/'))->setHost('{bar<[a-z]{2}>}'));
+        yield [new Route('/', host: '{bar?}'), '/', '{bar}', ['bar' => null], []];
+        yield [new Route('/', host: '{bar?baz}'), '/', '{bar}', ['bar' => 'baz'], []];
+        yield [new Route('/', host: '{bar?baz<buz>}'), '/', '{bar}', ['bar' => 'baz<buz>'], []];
+        yield [new Route('/', ['bar' => 'baz'], host: '{bar?}'), '/', '{bar}', ['bar' => null], []];
 
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', null)->setRequirement('bar', '.*'), (new Route('/'))->setHost('{bar<.*>?}'));
-        $this->assertEquals((new Route('/'))->setHost('{bar}')->setDefault('bar', '<>')->setRequirement('bar', '>'), (new Route('/'))->setHost('{bar<>>?<>}'));
+        yield [new Route('/', host: '{bar<.*>}'), '/', '{bar}', [], ['bar' => '.*']];
+        yield [new Route('/', host: '{bar<>>}'), '/', '{bar}', [], ['bar' => '>']];
+        yield [new Route('/', [], ['bar' => '\d+'], host: '{bar<.*>}'), '/', '{bar}', [], ['bar' => '.*']];
+        yield [new Route('/', host: '{bar<[a-z]{2}>}'), '/', '{bar}', [], ['bar' => '[a-z]{2}']];
+
+        yield [new Route('/', host: '{bar<.*>?}'), '/', '{bar}', ['bar' => null], ['bar' => '.*']];
+        yield [new Route('/', host: '{bar<>>?<>}'), '/', '{bar}', ['bar' => '<>'], ['bar' => '>']];
     }
 
     /**
@@ -312,9 +320,7 @@ class RouteTest extends TestCase
         $this->assertNotSame($route, $unserialized);
     }
 
-    /**
-     * @dataProvider provideNonLocalizedRoutes
-     */
+    #[DataProvider('provideNonLocalizedRoutes')]
     public function testLocaleDefaultWithNonLocalizedRoutes(Route $route)
     {
         $this->assertNotSame('fr', $route->getDefault('_locale'));
@@ -322,9 +328,7 @@ class RouteTest extends TestCase
         $this->assertSame('fr', $route->getDefault('_locale'));
     }
 
-    /**
-     * @dataProvider provideLocalizedRoutes
-     */
+    #[DataProvider('provideLocalizedRoutes')]
     public function testLocaleDefaultWithLocalizedRoutes(Route $route)
     {
         $expected = $route->getDefault('_locale');
@@ -334,9 +338,7 @@ class RouteTest extends TestCase
         $this->assertSame($expected, $route->getDefault('_locale'));
     }
 
-    /**
-     * @dataProvider provideNonLocalizedRoutes
-     */
+    #[DataProvider('provideNonLocalizedRoutes')]
     public function testLocaleRequirementWithNonLocalizedRoutes(Route $route)
     {
         $this->assertNotSame('fr', $route->getRequirement('_locale'));
@@ -344,9 +346,7 @@ class RouteTest extends TestCase
         $this->assertSame('fr', $route->getRequirement('_locale'));
     }
 
-    /**
-     * @dataProvider provideLocalizedRoutes
-     */
+    #[DataProvider('provideLocalizedRoutes')]
     public function testLocaleRequirementWithLocalizedRoutes(Route $route)
     {
         $expected = $route->getRequirement('_locale');

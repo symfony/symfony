@@ -22,7 +22,7 @@ class Groups
     /**
      * @var string[]
      */
-    private readonly array $groups;
+    public readonly array $groups;
 
     /**
      * @param string|string[] $groups The groups to define on the attribute target
@@ -32,12 +32,12 @@ class Groups
         $this->groups = (array) $groups;
 
         if (!$this->groups) {
-            throw new InvalidArgumentException(sprintf('Parameter given to "%s" cannot be empty.', static::class));
+            throw new InvalidArgumentException(\sprintf('Parameter given to "%s" cannot be empty.', static::class));
         }
 
         foreach ($this->groups as $group) {
             if (!\is_string($group) || '' === $group) {
-                throw new InvalidArgumentException(sprintf('Parameter given to "%s" must be a string or an array of non-empty strings.', static::class));
+                throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a string or an array of non-empty strings.', static::class));
             }
         }
     }
@@ -45,6 +45,7 @@ class Groups
     /**
      * @return string[]
      */
+    #[\Deprecated('Use the "groups" property instead', 'symfony/serializer:7.4')]
     public function getGroups(): array
     {
         return $this->groups;

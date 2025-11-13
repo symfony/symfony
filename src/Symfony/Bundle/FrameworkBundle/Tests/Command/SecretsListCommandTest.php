@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsListCommand;
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
@@ -19,9 +20,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class SecretsListCommandTest extends TestCase
 {
-    /**
-     * @backupGlobals enabled
-     */
+    #[BackupGlobals(true)]
     public function testExecute()
     {
         $vault = $this->createMock(AbstractVault::class);

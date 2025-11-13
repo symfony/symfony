@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,7 +24,9 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 {
-    use MicroKernelTrait;
+    use MicroKernelTrait {
+        getKernelParameters as public;
+    }
 
     private string $cacheDir;
 
@@ -46,13 +47,6 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         throw new Danger();
     }
 
-    public function registerBundles(): iterable
-    {
-        return [
-            new FrameworkBundle(),
-        ];
-    }
-
     public function getCacheDir(): string
     {
         return $this->cacheDir = sys_get_temp_dir().'/sf_micro_kernel';
@@ -63,12 +57,17 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         return $this->cacheDir;
     }
 
-    public function __sleep(): array
+    public function getConfigDir(): string
+    {
+        return $this->getCacheDir().'/config';
+    }
+
+    public function __serialize(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }

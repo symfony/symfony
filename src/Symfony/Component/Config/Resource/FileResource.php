@@ -34,7 +34,7 @@ class FileResource implements SelfCheckingResourceInterface
         $resolvedResource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
 
         if (false === $resolvedResource) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" does not exist.', $resource));
+            throw new \InvalidArgumentException(\sprintf('The file "%s" does not exist.', $resource));
         }
 
         $this->resource = $resolvedResource;
@@ -56,5 +56,12 @@ class FileResource implements SelfCheckingResourceInterface
     public function isFresh(int $timestamp): bool
     {
         return false !== ($filemtime = @filemtime($this->resource)) && $filemtime <= $timestamp;
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            'resource' => $this->resource,
+        ];
     }
 }

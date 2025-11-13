@@ -70,7 +70,7 @@ final class ControllerEvent extends KernelEvent
         if (\is_array($controller) && method_exists(...$controller)) {
             $this->controllerReflector = new \ReflectionMethod(...$controller);
         } elseif (\is_string($controller) && str_contains($controller, '::')) {
-            $this->controllerReflector = new \ReflectionMethod($controller);
+            $this->controllerReflector = new \ReflectionMethod(...explode('::', $controller, 2));
         } else {
             $this->controllerReflector = new \ReflectionFunction($controller(...));
         }
@@ -79,13 +79,11 @@ final class ControllerEvent extends KernelEvent
     }
 
     /**
-     * @template T of class-string|null
+     * @template T of object
      *
-     * @param T $className
+     * @param class-string<T>|null $className
      *
-     * @return array<class-string, list<object>>|list<object>
-     *
-     * @psalm-return (T is null ? array<class-string, list<object>> : list<object>)
+     * @return ($className is null ? array<class-string, list<object>> : list<T>)
      */
     public function getAttributes(?string $className = null): array
     {

@@ -22,6 +22,6 @@ class UndefinedTransitionException extends TransitionException
 {
     public function __construct(object $subject, string $transitionName, WorkflowInterface $workflow, array $context = [])
     {
-        parent::__construct($subject, $transitionName, $workflow, sprintf('Transition "%s" is not defined for workflow "%s".', $transitionName, $workflow->getName()), $context);
+        parent::__construct($subject, $transitionName, $workflow, \sprintf('Transition "%s" is not defined for workflow "%s".', $transitionName, $workflow->getName()), $context);
     }
 }

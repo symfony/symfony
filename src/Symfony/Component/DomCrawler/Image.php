@@ -29,7 +29,7 @@ class Image extends AbstractUriElement
     protected function setNode(\DOMElement $node): void
     {
         if ('img' !== $node->nodeName) {
-            throw new \LogicException(sprintf('Unable to visualize a "%s" tag.', $node->nodeName));
+            throw new \LogicException(\sprintf('Unable to visualize a "%s" tag.', $node->nodeName));
         }
 
         $this->node = $node;

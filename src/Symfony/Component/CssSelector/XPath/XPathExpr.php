@@ -44,7 +44,7 @@ class XPathExpr
      */
     public function addCondition(string $condition, string $operator = 'and'): static
     {
-        $this->condition = $this->condition ? sprintf('(%s) %s (%s)', $this->condition, $operator, $condition) : $condition;
+        $this->condition = $this->condition ? \sprintf('(%s) %s (%s)', $this->condition, $operator, $condition) : $condition;
 
         return $this;
     }

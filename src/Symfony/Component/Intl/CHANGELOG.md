@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Allow Kosovo as a component region, controlled by the `SYMFONY_INTL_WITH_USER_ASSIGNED` env var
+ * Generate legal and validity metadata for currencies
+ * Add `isValidInAnyCountry`, `isValidInCountry`, `forCountry` methods in `Symfony\Component\Intl\Currencies`
+
 7.1
 ---
 

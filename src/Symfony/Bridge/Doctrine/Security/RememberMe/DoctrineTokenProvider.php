@@ -13,6 +13,9 @@ namespace Symfony\Bridge\Doctrine\Security\RememberMe;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Schema\Name\Identifier;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
@@ -35,9 +38,11 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  *         `series`   char(88)     UNIQUE PRIMARY KEY NOT NULL,
  *         `value`    char(88)     NOT NULL,
  *         `lastUsed` datetime     NOT NULL,
- *         `class`    varchar(100) NOT NULL,
+ *         `class`    varchar(100) DEFAULT '' NOT NULL,
  *         `username` varchar(200) NOT NULL
  *     );
+ *
+ * (the `class` column is for BC with tables created with before Symfony 8)
  */
 final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
 {
@@ -48,14 +53,21 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
 
     public function loadTokenBySeries(string $series): PersistentTokenInterface
     {
-        // the alias for lastUsed works around case insensitivity in PostgreSQL
-        $sql = 'SELECT class, username, value, lastUsed AS last_used FROM rememberme_token WHERE series=:series';
+        $sql = 'SELECT class, username, value, lastUsed FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => ParameterType::STRING];
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
-        $row = $stmt->fetchAssociative() ?: throw new TokenNotFoundException('No token found.');
 
-        return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTimeImmutable($row['last_used']));
+        // fetching numeric because column name casing depends on platform, eg. Oracle converts all not quoted names to uppercase
+        $row = $stmt->fetchNumeric() ?: throw new TokenNotFoundException('No token found.');
+
+        [$class, $username, $value, $last_used] = $row;
+
+        if (method_exists(PersistentToken::class, 'getClass')) {
+            return new PersistentToken($class, $username, $series, $value, new \DateTimeImmutable($last_used), false);
+        }
+
+        return new PersistentToken($username, $series, $value, new \DateTimeImmutable($last_used));
     }
 
     public function deleteTokenBySeries(string $series): void
@@ -89,7 +101,7 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
     {
         $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';
         $paramValues = [
-            'class' => $token->getClass(),
+            'class' => method_exists($token, 'getClass') ? $token->getClass(false) : '',
             'username' => $token->getUserIdentifier(),
             'series' => $token->getSeries(),
             'value' => $token->getTokenValue(),
@@ -158,7 +170,14 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
         try {
             $this->deleteTokenBySeries($tmpSeries);
             $lastUsed = \DateTime::createFromInterface($lastUsed);
-            $this->createNewToken(new PersistentToken($token->getClass(), $token->getUserIdentifier(), $tmpSeries, $token->getTokenValue(), $lastUsed));
+
+            if (method_exists(PersistentToken::class, 'getClass')) {
+                $persistentToken = new PersistentToken($token->getClass(false), $token->getUserIdentifier(), $tmpSeries, $token->getTokenValue(), $lastUsed, false);
+            } else {
+                $persistentToken = new PersistentToken($token->getUserIdentifier(), $tmpSeries, $token->getTokenValue(), $lastUsed);
+            }
+
+            $this->createNewToken($persistentToken);
 
             $this->conn->commit();
         } catch (\Exception $e) {
@@ -189,8 +208,13 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
         $table->addColumn('series', Types::STRING, ['length' => 88]);
         $table->addColumn('value', Types::STRING, ['length' => 88]);
         $table->addColumn('lastUsed', Types::DATETIME_IMMUTABLE);
-        $table->addColumn('class', Types::STRING, ['length' => 100]);
+        $table->addColumn('class', Types::STRING, ['length' => 100, 'default' => '']);
         $table->addColumn('username', Types::STRING, ['length' => 200]);
-        $table->setPrimaryKey(['series']);
+
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('series'))], true));
+        } else {
+            $table->setPrimaryKey(['series']);
+        }
     }
 }

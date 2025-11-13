@@ -36,82 +36,91 @@ class XmlReferenceDumperTest extends TestCase
     private function getConfigurationAsString()
     {
         return str_replace("\n", \PHP_EOL, <<<'EOL'
-<!-- Namespace: http://example.org/schema/dic/acme_root -->
-<!-- scalar-required: Required -->
-<!-- scalar-deprecated: Deprecated (Since vendor/package 1.1: The child node "scalar_deprecated" at path "acme_root" is deprecated.) -->
-<!-- scalar-deprecated-with-message: Deprecated (Since vendor/package 1.1: Deprecation custom message for "scalar_deprecated_with_message" at "acme_root") -->
-<!-- enum-with-default: One of "this"; "that" -->
-<!-- enum: One of "this"; "that"; Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc -->
-<!-- variable: Example: foo, bar -->
-<config
-    boolean="true"
-    scalar-empty=""
-    scalar-null="null"
-    scalar-true="true"
-    scalar-false="false"
-    scalar-default="default"
-    scalar-array-empty=""
-    scalar-array-defaults="elem1,elem2"
-    scalar-required=""
-    scalar-deprecated=""
-    scalar-deprecated-with-message=""
-    node-with-a-looong-name=""
-    enum-with-default="this"
-    enum=""
-    variable=""
-    custom-node="true"
->
+            <!-- Namespace: http://example.org/schema/dic/acme_root -->
+            <!-- scalar-required: Required -->
+            <!-- scalar-deprecated: Deprecated (Since vendor/package 1.1: The child node "scalar_deprecated" at path "acme_root" is deprecated.) -->
+            <!-- scalar-deprecated-with-message: Deprecated (Since vendor/package 1.1: Deprecation custom message for "scalar_deprecated_with_message" at "acme_root") -->
+            <!-- enum-with-default: One of "this"; "that" -->
+            <!-- enum: One of "this"; "that"; Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc -->
+            <!-- enum-with-class: One of foo; bar -->
+            <!-- unit-enum-with-class: One of Symfony\Component\Config\Tests\Fixtures\TestEnum::Foo; Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar; Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc -->
+            <!-- variable: Example: foo, bar -->
+            <config
+                boolean="true"
+                scalar-empty=""
+                scalar-null="null"
+                scalar-true="true"
+                scalar-false="false"
+                scalar-default="default"
+                scalar-array-empty=""
+                scalar-array-defaults="elem1,elem2"
+                scalar-required=""
+                scalar-deprecated=""
+                scalar-deprecated-with-message=""
+                node-with-a-looong-name=""
+                enum-with-default="this"
+                enum=""
+                enum-with-class=""
+                unit-enum-with-class=""
+                variable=""
+                custom-node="true"
+            >
 
-    <!-- some info -->
-    <!--
-        child3: this is a long
-                multi-line info text
-                which should be indented;
-                Example: example setting
-    -->
-    <array
-        child1=""
-        child2=""
-        child3=""
-    />
+                <!-- some info -->
+                <!--
+                    child3: this is a long
+                            multi-line info text
+                            which should be indented;
+                            Example: example setting
+                -->
+                <array
+                    child1=""
+                    child2=""
+                    child3=""
+                />
 
-    <!-- prototype -->
-    <scalar-prototyped>scalar value</scalar-prototyped>
+                <!-- prototype -->
+                <scalar-prototyped>scalar value</scalar-prototyped>
 
-    <!-- prototype: Parameter name -->
-    <parameter name="parameter name">scalar value</parameter>
+                <!-- prototype -->
+                <string-list-default-null>value</string-list-default-null>
 
-    <!-- prototype -->
-    <connection
-        user=""
-        pass=""
-    />
+                <!-- prototype: Parameter name -->
+                <parameter name="parameter name">scalar value</parameter>
 
-    <!-- prototype -->
-    <cms-page page="cms page page">
+                <!-- prototype -->
+                <connection
+                    user=""
+                    pass=""
+                />
 
-        <!-- prototype -->
-        <!-- title: Required -->
-        <!-- path: Required -->
-        <page
-            locale="page locale"
-            title=""
-            path=""
-        />
+                <!-- prototype -->
+                <cms-page page="cms page page">
 
-    </cms-page>
+                    <!-- prototype -->
+                    <!-- title: Required -->
+                    <!-- path: Required -->
+                    <page
+                        locale="page locale"
+                        title=""
+                        path=""
+                    />
 
-    <!-- prototype -->
-    <pipou name="pipou name">
+                </cms-page>
 
-        <!-- prototype -->
-        <name didou="" />
+                <!-- prototype -->
+                <pipou name="pipou name">
 
-    </pipou>
+                    <!-- prototype -->
+                    <name didou="" />
 
-</config>
+                </pipou>
 
-EOL
+                <array-with-array-example-and-no-default-value />
+
+            </config>
+
+            EOL
         );
     }
 }

@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Smsense\Tests;
 
 use Symfony\Component\Notifier\Bridge\Smsense\SmsenseTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-class SmsenseTransportFactoryTest extends TransportFactoryTestCase
+class SmsenseTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): SmsenseTransportFactory
     {
         return new SmsenseTransportFactory();
@@ -38,5 +41,10 @@ class SmsenseTransportFactoryTest extends TransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://api_key@default'];
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['smsense://default'];
     }
 }

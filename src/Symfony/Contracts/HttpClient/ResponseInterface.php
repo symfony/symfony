@@ -13,7 +13,6 @@ namespace Symfony\Contracts\HttpClient;
 
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -37,7 +36,7 @@ interface ResponseInterface
      *
      * @param bool $throw Whether an exception should be thrown on 3/4/5xx status codes
      *
-     * @return string[][] The headers of the response keyed by header names in lowercase
+     * @return array<string, list<string>> The headers of the response keyed by header names in lowercase
      *
      * @throws TransportExceptionInterface   When a network error occurs
      * @throws RedirectionExceptionInterface On a 3xx when $throw is true and the "max_redirects" option has been reached

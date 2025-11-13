@@ -16,46 +16,24 @@ namespace Symfony\Component\HtmlSanitizer\TextSanitizer;
  */
 final class StringSanitizer
 {
-    private const LOWERCASE = [
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        'abcdefghijklmnopqrstuvwxyz',
-    ];
-
     private const REPLACEMENTS = [
-        [
-            // "&#34;" is shorter than "&quot;"
-            '&quot;',
+        // "&#34;" is shorter than "&quot;"
+        '&quot;' => '&#34;',
 
-            // Fix several potential issues in how browsers interpret attributes values
-            '+',
-            '=',
-            '@',
-            '`',
+        // Fix several potential issues in how browsers interpret attribute values
+        '+' => '&#43;',
+        '=' => '&#61;',
+        '@' => '&#64;',
+        '`' => '&#96;',
 
-            // Some DB engines will transform UTF8 full-width characters their classical version
-            // if the data is saved in a non-UTF8 field
-            '＜',
-            '＞',
-            '＋',
-            '＝',
-            '＠',
-            '｀',
-        ],
-        [
-            '&#34;',
-
-            '&#43;',
-            '&#61;',
-            '&#64;',
-            '&#96;',
-
-            '&#xFF1C;',
-            '&#xFF1E;',
-            '&#xFF0B;',
-            '&#xFF1D;',
-            '&#xFF20;',
-            '&#xFF40;',
-        ],
+        // Some DB engines will transform UTF8 full-width characters with
+        // their classical version if the data is saved in a non-UTF8 field
+        '＜' => '&#xFF1C;',
+        '＞' => '&#xFF1E;',
+        '＋' => '&#xFF0B;',
+        '＝' => '&#xFF1D;',
+        '＠' => '&#xFF20;',
+        '｀' => '&#xFF40;',
     ];
 
     /**
@@ -65,7 +43,7 @@ final class StringSanitizer
      */
     public static function htmlLower(string $string): string
     {
-        return strtr($string, self::LOWERCASE[0], self::LOWERCASE[1]);
+        return strtolower($string);
     }
 
     /**
@@ -73,10 +51,6 @@ final class StringSanitizer
      */
     public static function encodeHtmlEntities(string $string): string
     {
-        return str_replace(
-            self::REPLACEMENTS[0],
-            self::REPLACEMENTS[1],
-            htmlspecialchars($string, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8')
-        );
+        return strtr(htmlspecialchars($string, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8'), self::REPLACEMENTS);
     }
 }

@@ -26,10 +26,7 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $receiverName = 'my_receiver';
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->once())->method('send')->with($this->callback(function ($envelope) use ($receiverName) {
-            /* @var Envelope $envelope */
             $this->assertInstanceOf(Envelope::class, $envelope);
-
-            /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
             $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
             $this->assertNotNull($sentToFailureTransportStamp);
             $this->assertSame($receiverName, $sentToFailureTransportStamp->getOriginalReceiverName());
@@ -101,10 +98,7 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $receiverName = 'my_receiver';
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->once())->method('send')->with($this->callback(function ($envelope) use ($receiverName) {
-            /* @var Envelope $envelope */
             $this->assertInstanceOf(Envelope::class, $envelope);
-
-            /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
             $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
             $this->assertNotNull($sentToFailureTransportStamp);
             $this->assertSame($receiverName, $sentToFailureTransportStamp->getOriginalReceiverName());

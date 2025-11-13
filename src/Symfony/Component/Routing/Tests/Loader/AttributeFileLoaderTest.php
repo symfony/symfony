@@ -33,8 +33,6 @@ class AttributeFileLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->classLoader = new TraceableAttributeClassLoader();
         $this->loader = new AttributeFileLoader(new FileLocator(), $this->classLoader);
     }
@@ -54,7 +52,7 @@ class AttributeFileLoaderTest extends TestCase
     public function testLoadFileWithoutStartTag()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Did you forgot to add the "<?php" start tag at the beginning of the file?');
+        $this->expectExceptionMessage('Did you forget to add the "<?php" start tag at the beginning of the file?');
         $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/NoStartTagClass.php');
     }
 

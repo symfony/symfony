@@ -136,7 +136,7 @@ class Definition
     public function setDecoratedService(?string $id, ?string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): static
     {
         if ($renamedId && $id === $renamedId) {
-            throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
+            throw new InvalidArgumentException(\sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
         }
 
         $this->changes['decorated_service'] = true;
@@ -180,8 +180,6 @@ class Definition
 
     /**
      * Gets the service class.
-     *
-     * @return class-string|null
      */
     public function getClass(): ?string
     {
@@ -254,11 +252,11 @@ class Definition
     public function replaceArgument(int|string $index, mixed $argument): static
     {
         if (0 === \count($this->arguments)) {
-            throw new OutOfBoundsException(sprintf('Cannot replace arguments for class "%s" if none have been configured yet.', $this->class));
+            throw new OutOfBoundsException(\sprintf('Cannot replace arguments for class "%s" if none have been configured yet.', $this->class));
         }
 
         if (!\array_key_exists($index, $this->arguments)) {
-            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
+            throw new OutOfBoundsException(\sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
         }
 
         $this->arguments[$index] = $argument;
@@ -294,7 +292,7 @@ class Definition
     public function getArgument(int|string $index): mixed
     {
         if (!\array_key_exists($index, $this->arguments)) {
-            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
+            throw new OutOfBoundsException(\sprintf('The argument "%s" doesn\'t exist in class "%s".', $index, $this->class));
         }
 
         return $this->arguments[$index];
@@ -328,7 +326,7 @@ class Definition
      */
     public function addMethodCall(string $method, array $arguments = [], bool $returnsClone = false): static
     {
-        if (empty($method)) {
+        if (!$method) {
             throw new InvalidArgumentException('Method name cannot be empty.');
         }
         $this->calls[] = $returnsClone ? [$method, $arguments, true] : [$method, $arguments];
@@ -455,6 +453,19 @@ class Definition
         $this->tags[$name][] = $attributes;
 
         return $this;
+    }
+
+    /**
+     * Adds a "resource" tag to the definition and marks it as excluded.
+     *
+     * These definitions should be processed using {@see ContainerBuilder::findTaggedResourceIds()}
+     *
+     * @return $this
+     */
+    public function addResourceTag(string $name, array $attributes = []): static
+    {
+        return $this->addTag($name, $attributes)
+            ->addTag('container.excluded', ['source' => \sprintf('by tag "%s"', $name)]);
     }
 
     /**
@@ -807,5 +818,21 @@ class Definition
     public function hasErrors(): bool
     {
         return (bool) $this->errors;
+    }
+
+    public function __serialize(): array
+    {
+        $data = [];
+        foreach ((array) $this as $k => $v) {
+            if (false !== $i = strrpos($k, "\0")) {
+                $k = substr($k, 1 + $i);
+            }
+            if (!$v xor 'shared' === $k) {
+                continue;
+            }
+            $data[$k] = $v;
+        }
+
+        return $data;
     }
 }

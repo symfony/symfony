@@ -147,4 +147,40 @@ class XliffFileDumperTest extends TestCase
             $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR'])
         );
     }
+
+    public function testEmptyMetadataNotes()
+    {
+        $catalogue = new MessageCatalogue('en_US');
+        $catalogue->add([
+            'empty' => 'notes',
+            'full' => 'notes',
+        ]);
+        $catalogue->setMetadata('empty', ['notes' => []]);
+        $catalogue->setMetadata('full', ['notes' => [['category' => 'file-source', 'priority' => 1, 'content' => 'test/path/to/translation/Example.1.html.twig:27']]]);
+
+        $dumper = new XliffFileDumper();
+
+        $this->assertStringEqualsFile(
+            __DIR__.'/../Fixtures/resources-2.0-empty-notes.xlf',
+            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
+        );
+    }
+
+    public function testFormatCatalogueXliff2WithSegmentAttributes()
+    {
+        $catalogue = new MessageCatalogue('en_US');
+        $catalogue->add([
+            'foo' => 'bar',
+            'key' => '',
+        ]);
+        $catalogue->setMetadata('foo', ['segment-attributes' => ['state' => 'translated']]);
+        $catalogue->setMetadata('key', ['segment-attributes' => ['state' => 'translated', 'subState' => 'My Value']]);
+
+        $dumper = new XliffFileDumper();
+
+        $this->assertStringEqualsFile(
+            __DIR__.'/../Fixtures/resources-2.0-segment-attributes.xlf',
+            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
+        );
+    }
 }

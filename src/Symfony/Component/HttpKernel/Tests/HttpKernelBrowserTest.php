@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -18,11 +19,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
+use Symfony\Component\HttpKernel\Tests\Fixtures\MockableUploadFileWithClientSize;
 use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class HttpKernelBrowserTest extends TestCase
 {
     public function testDoRequest()
@@ -83,6 +83,19 @@ class HttpKernelBrowserTest extends TestCase
         $response = new StreamedResponse(function () {
             echo 'foo';
         });
+
+        $domResponse = $m->invoke($client, $response);
+        $this->assertEquals('foo', $domResponse->getContent());
+    }
+
+    public function testFilterResponseSupportsStreamedResponsesWithChunks()
+    {
+        $client = new HttpKernelBrowser(new TestHttpKernel());
+
+        $r = new \ReflectionObject($client);
+        $m = $r->getMethod('filterResponse');
+
+        $response = new StreamedResponse(new \ArrayIterator(['foo']));
 
         $domResponse = $m->invoke($client, $response);
         $this->assertEquals('foo', $domResponse->getContent());
@@ -151,10 +164,9 @@ class HttpKernelBrowserTest extends TestCase
         $client = new HttpKernelBrowser($kernel);
 
         $file = $this
-            ->getMockBuilder(UploadedFile::class)
+            ->getMockBuilder(MockableUploadFileWithClientSize::class)
             ->setConstructorArgs([$source, 'original', 'mime/original', \UPLOAD_ERR_OK, true])
-            ->onlyMethods(['getSize'])
-            ->addMethods(['getClientSize'])
+            ->onlyMethods(['getSize', 'getClientSize'])
             ->getMock()
         ;
         /* should be modified when the getClientSize will be removed */

@@ -71,12 +71,18 @@ class LengthValidator extends ConstraintValidator
         if (null !== $constraint->max && $length > $constraint->max) {
             $exactlyOptionEnabled = $constraint->min == $constraint->max;
 
-            $this->context->buildViolation($exactlyOptionEnabled ? $constraint->exactMessage : $constraint->maxMessage)
+            $builder = $this->context->buildViolation($exactlyOptionEnabled ? $constraint->exactMessage : $constraint->maxMessage);
+            if (null !== $constraint->min) {
+                $builder->setParameter('{{ min }}', $constraint->min);
+            }
+
+            $builder
                 ->setParameter('{{ value }}', $this->formatValue($stringValue))
                 ->setParameter('{{ limit }}', $constraint->max)
+                ->setParameter('{{ max }}', $constraint->max) // To be consistent with the min error message
                 ->setParameter('{{ value_length }}', $length)
                 ->setInvalidValue($value)
-                ->setPlural((int) $constraint->max)
+                ->setPlural($constraint->max)
                 ->setCode($exactlyOptionEnabled ? Length::NOT_EQUAL_LENGTH_ERROR : Length::TOO_LONG_ERROR)
                 ->addViolation();
 
@@ -86,12 +92,18 @@ class LengthValidator extends ConstraintValidator
         if (null !== $constraint->min && $length < $constraint->min) {
             $exactlyOptionEnabled = $constraint->min == $constraint->max;
 
-            $this->context->buildViolation($exactlyOptionEnabled ? $constraint->exactMessage : $constraint->minMessage)
+            $builder = $this->context->buildViolation($exactlyOptionEnabled ? $constraint->exactMessage : $constraint->minMessage);
+            if (null !== $constraint->max) {
+                $builder->setParameter('{{ max }}', $constraint->max);
+            }
+
+            $builder
                 ->setParameter('{{ value }}', $this->formatValue($stringValue))
                 ->setParameter('{{ limit }}', $constraint->min)
+                ->setParameter('{{ min }}', $constraint->min) // To be consistent with the max error message
                 ->setParameter('{{ value_length }}', $length)
                 ->setInvalidValue($value)
-                ->setPlural((int) $constraint->min)
+                ->setPlural($constraint->min)
                 ->setCode($exactlyOptionEnabled ? Length::NOT_EQUAL_LENGTH_ERROR : Length::TOO_SHORT_ERROR)
                 ->addViolation();
         }

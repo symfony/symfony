@@ -156,14 +156,32 @@ class Application extends BaseApplication
 
     public function getLongVersion(): string
     {
-        return parent::getLongVersion().sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
+        return parent::getLongVersion().\sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
+    /**
+     * @deprecated since Symfony 7.4, use Application::addCommand() instead
+     */
     public function add(Command $command): ?Command
+    {
+        trigger_deprecation('symfony/framework-bundle', '7.4', 'The "%s()" method is deprecated and will be removed in Symfony 8.0, use "%s::addCommand()" instead.', __METHOD__, self::class);
+
+        return $this->addCommand($command);
+    }
+
+    public function addCommand(callable|Command $command): ?Command
     {
         $this->registerCommands();
 
-        return parent::add($command);
+        if (!method_exists(BaseApplication::class, 'addCommand')) {
+            if (!$command instanceof Command) {
+                throw new \LogicException('Using callables as commands requires symfony/console 7.4 or higher.');
+            }
+
+            return parent::add($command);
+        }
+
+        return parent::addCommand($command);
     }
 
     protected function registerCommands(): void
@@ -197,7 +215,7 @@ class Application extends BaseApplication
             foreach ($container->getParameter('console.command.ids') as $id) {
                 if (!isset($lazyCommandIds[$id])) {
                     try {
-                        $this->add($container->get($id));
+                        $this->addCommand($container->get($id));
                     } catch (\Throwable $e) {
                         $this->registrationErrors[] = $e;
                     }

@@ -20,16 +20,16 @@ namespace Symfony\Component\Scheduler\Attribute;
 class AsCronTask
 {
     /**
-     * @param string                              $expression The cron expression to define the task schedule (i.e. "5 * * * *")
-     * @param string|null                         $timezone   The timezone used with the cron expression
-     * @param int|null                            $jitter     The cron jitter, in seconds; for example, if set to 60, the cron
-     *                                                        will randomly wait for a number of seconds between 0 and 60 before
-     *                                                        executing which allows to avoid load spikes that can happen when many tasks
-     *                                                        run at the same time
-     * @param array<array-key, mixed>|string|null $arguments  The arguments to pass to the cron task
-     * @param string                              $schedule   The name of the schedule responsible for triggering the task
-     * @param string|null                         $method     The method to run as the task when the attribute target is a class
-     * @param string[]|string|null                $transports One or many transports through which the message scheduling the task will go
+     * @param string                   $expression The cron expression to define the task schedule (i.e. "5 * * * *")
+     * @param string|null              $timezone   The timezone used with the cron expression
+     * @param int|null                 $jitter     The cron jitter, in seconds; for example, if set to 60, the cron
+     *                                             will randomly wait for a number of seconds between 0 and 60 before
+     *                                             executing which allows to avoid load spikes that can happen when many tasks
+     *                                             run at the same time
+     * @param array<mixed>|string|null $arguments  The arguments to pass to the cron task
+     * @param string                   $schedule   The name of the schedule responsible for triggering the task
+     * @param string|null              $method     The method to run as the task when the attribute target is a class
+     * @param string[]|string|null     $transports One or many transports through which the message scheduling the task will go
      */
     public function __construct(
         public readonly string $expression,

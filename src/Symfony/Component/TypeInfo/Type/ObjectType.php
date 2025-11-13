@@ -43,9 +43,32 @@ class ObjectType extends Type
         return $this->className;
     }
 
-    public function asNonNullable(): static
+    public function isIdentifiedBy(TypeIdentifier|string ...$identifiers): bool
     {
-        return $this;
+        foreach ($identifiers as $identifier) {
+            if ($identifier instanceof TypeIdentifier) {
+                if (TypeIdentifier::OBJECT === $identifier) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (TypeIdentifier::OBJECT->value === $identifier) {
+                return true;
+            }
+
+            if (is_a($this->className, $identifier, allow_string: true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function accepts(mixed $value): bool
+    {
+        return $value instanceof $this->className;
     }
 
     public function __toString(): string

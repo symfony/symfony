@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Tests\Action;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\OpenUriAction;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -38,9 +39,7 @@ final class OpenUriActionTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider operatingSystems
-     */
+    #[DataProvider('operatingSystems')]
     public function testTarget(string $os)
     {
         $action = (new OpenUriAction())

@@ -24,17 +24,17 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  */
-final readonly class TypeResolver implements TypeResolverInterface
+final class TypeResolver implements TypeResolverInterface
 {
     /**
      * @param ContainerInterface $resolvers Locator of type resolvers, keyed by supported subject type
      */
     public function __construct(
-        private ContainerInterface $resolvers,
+        private readonly ContainerInterface $resolvers,
     ) {
     }
 
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         $subjectType = match (\is_object($subject)) {
             true => match (true) {
@@ -50,7 +50,7 @@ final readonly class TypeResolver implements TypeResolverInterface
                 throw new UnsupportedException('Cannot find any resolver for "string" type. Try running "composer require phpstan/phpdoc-parser".', $subject);
             }
 
-            throw new UnsupportedException(sprintf('Cannot find any resolver for "%s" type.', $subjectType), $subject);
+            throw new UnsupportedException(\sprintf('Cannot find any resolver for "%s" type.', $subjectType), $subject);
         }
 
         /** @param TypeResolverInterface $resolver */
@@ -59,29 +59,35 @@ final readonly class TypeResolver implements TypeResolverInterface
         return $resolver->resolve($subject, $typeContext);
     }
 
-    public static function create(): self
+    /**
+     * @param array<string, TypeResolverInterface>|null $resolvers
+     */
+    public static function create(?array $resolvers = null): self
     {
-        $resolvers = new class() implements ContainerInterface {
-            private readonly array $resolvers;
+        if (null === $resolvers) {
+            $stringTypeResolver = class_exists(PhpDocParser::class) ? new StringTypeResolver() : null;
+            $typeContextFactory = new TypeContextFactory($stringTypeResolver);
+            $reflectionTypeResolver = new ReflectionTypeResolver();
 
-            public function __construct()
-            {
-                $stringTypeResolver = class_exists(PhpDocParser::class) ? new StringTypeResolver() : null;
-                $typeContextFactory = new TypeContextFactory($stringTypeResolver);
-                $reflectionTypeResolver = new ReflectionTypeResolver();
+            $resolvers = [
+                \ReflectionType::class => $reflectionTypeResolver,
+                \ReflectionParameter::class => new ReflectionParameterTypeResolver($reflectionTypeResolver, $typeContextFactory),
+                \ReflectionProperty::class => new ReflectionPropertyTypeResolver($reflectionTypeResolver, $typeContextFactory),
+                \ReflectionFunctionAbstract::class => new ReflectionReturnTypeResolver($reflectionTypeResolver, $typeContextFactory),
+            ];
 
-                $resolvers = [
-                    \ReflectionType::class => $reflectionTypeResolver,
-                    \ReflectionParameter::class => new ReflectionParameterTypeResolver($reflectionTypeResolver, $typeContextFactory),
-                    \ReflectionProperty::class => new ReflectionPropertyTypeResolver($reflectionTypeResolver, $typeContextFactory),
-                    \ReflectionFunctionAbstract::class => new ReflectionReturnTypeResolver($reflectionTypeResolver, $typeContextFactory),
-                ];
+            if (null !== $stringTypeResolver) {
+                $resolvers['string'] = $stringTypeResolver;
+                $resolvers[\ReflectionParameter::class] = new PhpDocAwareReflectionTypeResolver($resolvers[\ReflectionParameter::class], $stringTypeResolver, $typeContextFactory);
+                $resolvers[\ReflectionProperty::class] = new PhpDocAwareReflectionTypeResolver($resolvers[\ReflectionProperty::class], $stringTypeResolver, $typeContextFactory);
+                $resolvers[\ReflectionFunctionAbstract::class] = new PhpDocAwareReflectionTypeResolver($resolvers[\ReflectionFunctionAbstract::class], $stringTypeResolver, $typeContextFactory);
+            }
+        }
 
-                if (null !== $stringTypeResolver) {
-                    $resolvers['string'] = $stringTypeResolver;
-                }
-
-                $this->resolvers = $resolvers;
+        $resolversContainer = new class($resolvers) implements ContainerInterface {
+            public function __construct(
+                private readonly array $resolvers,
+            ) {
             }
 
             public function has(string $id): bool
@@ -95,6 +101,6 @@ final readonly class TypeResolver implements TypeResolverInterface
             }
         };
 
-        return new self($resolvers);
+        return new self($resolversContainer);
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +28,11 @@ class FileLinkFormatterTest extends TestCase
 
     public function testAfterUnserialize()
     {
+        if (get_cfg_var('xdebug.file_link_format')) {
+            // There is no way to override "xdebug.file_link_format" option in a test.
+            $this->markTestSkipped('php.ini has a custom option for "xdebug.file_link_format".');
+        }
+
         $ide = $_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? null;
         $_ENV['SYMFONY_IDE'] = $_SERVER['SYMFONY_IDE'] = null;
         $sut = unserialize(serialize(new FileLinkFormatter()));
@@ -81,9 +87,7 @@ class FileLinkFormatterTest extends TestCase
         $this->assertInstanceOf(FileLinkFormatter::class, unserialize(serialize(new FileLinkFormatter())));
     }
 
-    /**
-     * @dataProvider providePathMappings
-     */
+    #[DataProvider('providePathMappings')]
     public function testIdeFileLinkFormatWithPathMappingParameters($mappings)
     {
         $params = array_reduce($mappings, function ($c, $m) {

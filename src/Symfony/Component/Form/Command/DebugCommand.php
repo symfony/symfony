@@ -53,36 +53,36 @@ class DebugCommand extends Command
                 new InputArgument('class', InputArgument::OPTIONAL, 'The form type class'),
                 new InputArgument('option', InputArgument::OPTIONAL, 'The form type option'),
                 new InputOption('show-deprecated', null, InputOption::VALUE_NONE, 'Display deprecated options in form types'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command displays information about form types.
+                The <info>%command.name%</info> command displays information about form types.
 
-  <info>php %command.full_name%</info>
+                  <info>php %command.full_name%</info>
 
-The command lists all built-in types, services types, type extensions and
-guessers currently available.
+                The command lists all built-in types, services types, type extensions and
+                guessers currently available.
 
-  <info>php %command.full_name% Symfony\Component\Form\Extension\Core\Type\ChoiceType</info>
-  <info>php %command.full_name% ChoiceType</info>
+                  <info>php %command.full_name% Symfony\Component\Form\Extension\Core\Type\ChoiceType</info>
+                  <info>php %command.full_name% ChoiceType</info>
 
-The command lists all defined options that contains the given form type,
-as well as their parents and type extensions.
+                The command lists all defined options that contains the given form type,
+                as well as their parents and type extensions.
 
-  <info>php %command.full_name% ChoiceType choice_value</info>
+                  <info>php %command.full_name% ChoiceType choice_value</info>
 
-Use the <info>--show-deprecated</info> option to display form types with
-deprecated options or the deprecated options of the given form type:
+                Use the <info>--show-deprecated</info> option to display form types with
+                deprecated options or the deprecated options of the given form type:
 
-  <info>php %command.full_name% --show-deprecated</info>
-  <info>php %command.full_name% ChoiceType --show-deprecated</info>
+                  <info>php %command.full_name% --show-deprecated</info>
+                  <info>php %command.full_name% ChoiceType --show-deprecated</info>
 
-The command displays the definition of the given option name.
+                The command displays the definition of the given option name.
 
-  <info>php %command.full_name% --format=json</info>
+                  <info>php %command.full_name% --format=json</info>
 
-The command lists everything in a machine readable json format.
-EOF
+                The command lists everything in a machine readable json format.
+                EOF
             )
         ;
     }
@@ -114,7 +114,7 @@ EOF
                 $object = $resolvedType->getOptionsResolver();
 
                 if (!$object->isDefined($option)) {
-                    $message = sprintf('Option "%s" is not defined in "%s".', $option, $resolvedType->getInnerType()::class);
+                    $message = \sprintf('Option "%s" is not defined in "%s".', $option, $resolvedType->getInnerType()::class);
 
                     if ($alternatives = $this->findAlternatives($option, $object->getDefinedOptions())) {
                         if (1 === \count($alternatives)) {
@@ -148,7 +148,7 @@ EOF
         $classes = $this->getFqcnTypeClasses($shortClassName);
 
         if (0 === $count = \count($classes)) {
-            $message = sprintf("Could not find type \"%s\" into the following namespaces:\n    %s", $shortClassName, implode("\n    ", $this->namespaces));
+            $message = \sprintf("Could not find type \"%s\" into the following namespaces:\n    %s", $shortClassName, implode("\n    ", $this->namespaces));
 
             $allTypes = array_merge($this->getCoreTypes(), $this->types);
             if ($alternatives = $this->findAlternatives($shortClassName, $allTypes)) {
@@ -166,10 +166,10 @@ EOF
             return $classes[0];
         }
         if (!$input->isInteractive()) {
-            throw new InvalidArgumentException(sprintf("The type \"%s\" is ambiguous.\n\nDid you mean one of these?\n    %s.", $shortClassName, implode("\n    ", $classes)));
+            throw new InvalidArgumentException(\sprintf("The type \"%s\" is ambiguous.\n\nDid you mean one of these?\n    %s.", $shortClassName, implode("\n    ", $classes)));
         }
 
-        return $io->choice(sprintf("The type \"%s\" is ambiguous.\n\nSelect one of the following form types to display its information:", $shortClassName), $classes, $classes[0]);
+        return $io->choice(\sprintf("The type \"%s\" is ambiguous.\n\nSelect one of the following form types to display its information:", $shortClassName), $classes, $classes[0]);
     }
 
     private function getFqcnTypeClasses(string $shortClassName): array
@@ -272,6 +272,7 @@ EOF
         $suggestions->suggestValues($resolvedType->getOptionsResolver()->getDefinedOptions());
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return (new DescriptorHelper())->getFormats();

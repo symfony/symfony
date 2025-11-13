@@ -11,13 +11,16 @@
 
 namespace Symfony\Component\Console\Tests\Style;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\TreeHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -45,9 +48,7 @@ class SymfonyStyleTest extends TestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
-    /**
-     * @dataProvider inputCommandToOutputFilesProvider
-     */
+    #[DataProvider('inputCommandToOutputFilesProvider')]
     public function testOutputs($inputCommandFilepath, $outputFilepath)
     {
         $code = require $inputCommandFilepath;
@@ -56,9 +57,7 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
-    /**
-     * @dataProvider inputInteractiveCommandToOutputFilesProvider
-     */
+    #[DataProvider('inputInteractiveCommandToOutputFilesProvider')]
     public function testInteractiveOutputs($inputCommandFilepath, $outputFilepath)
     {
         $code = require $inputCommandFilepath;
@@ -154,6 +153,105 @@ class SymfonyStyleTest extends TestCase
         $style->createTable()->appendRow(['row']);
     }
 
+    public function testCreateTree()
+    {
+        $output = $this->createMock(OutputInterface::class);
+        $output
+            ->method('getFormatter')
+            ->willReturn(new OutputFormatter());
+
+        $style = new SymfonyStyle($this->createMock(InputInterface::class), $output);
+
+        $tree = $style->createTree([]);
+        $this->assertInstanceOf(TreeHelper::class, $tree);
+    }
+
+    public function testTree()
+    {
+        $input = $this->createMock(InputInterface::class);
+        $output = new BufferedOutput();
+        $style = new SymfonyStyle($input, $output);
+
+        $tree = $style->createTree(['A', 'B' => ['B1' => ['B11', 'B12'], 'B2'], 'C'], 'root');
+        $tree->render();
+
+        $this->assertSame(<<<TREE
+            root
+            ├── A
+            ├── B
+            │   ├── B1
+            │   │   ├── B11
+            │   │   └── B12
+            │   └── B2
+            └── C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
+    }
+
+    public function testCreateTreeWithArray()
+    {
+        $input = $this->createMock(InputInterface::class);
+        $output = new BufferedOutput();
+        $style = new SymfonyStyle($input, $output);
+
+        $tree = $style->createTree(['A', 'B' => ['B1' => ['B11', 'B12'], 'B2'], 'C'], 'root');
+        $tree->render();
+
+        $this->assertSame($tree = <<<TREE
+            root
+            ├── A
+            ├── B
+            │   ├── B1
+            │   │   ├── B11
+            │   │   └── B12
+            │   └── B2
+            └── C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
+    }
+
+    public function testCreateTreeWithIterable()
+    {
+        $input = $this->createMock(InputInterface::class);
+        $output = new BufferedOutput();
+        $style = new SymfonyStyle($input, $output);
+
+        $tree = $style->createTree(new \ArrayIterator(['A', 'B' => ['B1' => ['B11', 'B12'], 'B2'], 'C']), 'root');
+        $tree->render();
+
+        $this->assertSame(<<<TREE
+            root
+            ├── A
+            ├── B
+            │   ├── B1
+            │   │   ├── B11
+            │   │   └── B12
+            │   └── B2
+            └── C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
+    }
+
+    public function testCreateTreeWithConsoleOutput()
+    {
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(ConsoleOutputInterface::class);
+        $output
+            ->method('getFormatter')
+            ->willReturn(new OutputFormatter());
+        $output
+            ->expects($this->once())
+            ->method('section')
+            ->willReturn($this->createMock(ConsoleSectionOutput::class));
+
+        $style = new SymfonyStyle($input, $output);
+
+        $style->createTree([]);
+    }
+
     public function testGetErrorStyleUsesTheCurrentOutputIfNoErrorOutputIsAvailable()
     {
         $output = $this->createMock(OutputInterface::class);
@@ -218,5 +316,10 @@ class SymfonyStyleTest extends TestCase
             "\033[9A\033[0J"), // clear 9 lines (8 output lines and one from the answer input return)
             escapeshellcmd(stream_get_contents($output->getStream()))
         );
+    }
+
+    private static function normalizeLineBreaks($text)
+    {
+        return str_replace(\PHP_EOL, "\n", $text);
     }
 }

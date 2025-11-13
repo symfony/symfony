@@ -9,7 +9,7 @@
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:profiler enabled="true" />
+        <framework:profiler enabled="true" collect-serializer-data="true" />
         <framework:serializer enabled="true" />
     </framework:config>
 </container>

@@ -19,11 +19,9 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  */
 class MessageHandler
 {
-    private TransportInterface $transport;
-
-    public function __construct(TransportInterface $transport)
-    {
-        $this->transport = $transport;
+    public function __construct(
+        private TransportInterface $transport,
+    ) {
     }
 
     public function __invoke(SendEmailMessage $message): ?SentMessage

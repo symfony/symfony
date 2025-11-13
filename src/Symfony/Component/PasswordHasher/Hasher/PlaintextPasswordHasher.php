@@ -64,7 +64,7 @@ class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
 
     private function mergePasswordAndSalt(#[\SensitiveParameter] string $password, ?string $salt): string
     {
-        if (empty($salt)) {
+        if (!$salt) {
             return $password;
         }
 

@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
@@ -39,8 +40,8 @@ class AccessDecisionManagerTest extends TestCase
             $this->getUnexpectedVoter(),
         ];
 
-        $strategy = new class() implements AccessDecisionStrategyInterface {
-            public function decide(\Traversable $results): bool
+        $strategy = new class implements AccessDecisionStrategyInterface {
+            public function decide(\Traversable $results, ?AccessDecision $accessDecision = null): bool
             {
                 $i = 0;
                 foreach ($results as $result) {
@@ -68,7 +69,8 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVoters()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
+
         $voter
             ->expects($this->once())
             ->method('supportsAttribute')
@@ -92,7 +94,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersIgnoresNonStringAttributes()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->never())
             ->method('supportsAttribute');
@@ -114,7 +116,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersWithMultipleAttributes()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->exactly(2))
             ->method('supportsAttribute')
@@ -147,7 +149,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersWithEmptyAttributes()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->never())
             ->method('supportsAttribute');
@@ -169,7 +171,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersSupportsMethodsCalledOnce()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->once())
             ->method('supportsAttribute')
@@ -194,7 +196,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersNotCalled()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->once())
             ->method('supportsAttribute')
@@ -214,7 +216,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testCacheableVotersWithMultipleAttributesAndNonString()
     {
         $token = $this->createMock(TokenInterface::class);
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->once())
             ->method('supportsAttribute')

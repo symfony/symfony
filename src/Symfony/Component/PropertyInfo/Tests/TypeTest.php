@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[IgnoreDeprecations]
+#[Group('legacy')]
 class TypeTest extends TestCase
 {
     public function testConstruct()
@@ -75,7 +79,7 @@ class TypeTest extends TestCase
         $this->assertTrue($firstValueType->isCollection());
         $this->assertEquals(Type::BUILTIN_TYPE_ARRAY, $secondValueType->getBuiltinType());
         $this->assertFalse($secondValueType->isNullable());
-        $this->assertTrue($firstValueType->isCollection());
+        $this->assertTrue($secondValueType->isCollection());
     }
 
     public function testInvalidCollectionValueArgument()

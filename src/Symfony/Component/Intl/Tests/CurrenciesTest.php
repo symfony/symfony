@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Intl\Currencies;
 use Symfony\Component\Intl\Exception\MissingResourceException;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
-/**
- * @group intl-data
- */
+#[Group('intl-data')]
 class CurrenciesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
@@ -293,6 +294,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         'WST',
         'XAF',
         'XCD',
+        'XCG',
         'XEU',
         'XFO',
         'XFU',
@@ -312,6 +314,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         'ZRN',
         'ZRZ',
         'ZWD',
+        'ZWG',
         'ZWL',
         'ZWR',
     ];
@@ -529,6 +532,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         'CSD' => 891,
         'ZMK' => 894,
         'TWD' => 901,
+        'ZWG' => 924,
         'SLE' => 925,
         'VED' => 926,
         'UYW' => 927,
@@ -594,11 +598,13 @@ class CurrenciesTest extends ResourceBundleTestCase
         $this->assertSame(self::CURRENCIES, Currencies::getCurrencyCodes());
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetNames($displayLocale)
     {
+        if ('en' !== $displayLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         $names = Currencies::getNames($displayLocale);
 
         $keys = array_keys($names);
@@ -617,27 +623,33 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public function testGetNamesDefaultLocale()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('de_AT');
 
         $this->assertSame(Currencies::getNames('de_AT'), Currencies::getNames());
     }
 
-    /**
-     * @dataProvider provideLocaleAliases
-     */
+    #[DataProvider('provideLocaleAliases')]
     public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
+        if ('en' !== $ofLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
         $this->assertEquals(Currencies::getNames($ofLocale), Currencies::getNames($alias));
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetName($displayLocale)
     {
+        if ('en' !== $displayLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         $expected = Currencies::getNames($displayLocale);
         $actual = [];
 
@@ -650,6 +662,8 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public function testGetNameDefaultLocale()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('de_AT');
 
         $expected = Currencies::getNames('de_AT');
@@ -662,9 +676,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetSymbol($displayLocale)
     {
         $currencies = Currencies::getCurrencyCodes();
@@ -682,9 +694,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         );
     }
 
-    /**
-     * @dataProvider provideCurrencies
-     */
+    #[DataProvider('provideCurrencies')]
     public function testGetFractionDigits($currency)
     {
         // ensure each currency code has a corresponding fraction digit
@@ -693,9 +703,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @dataProvider provideCurrencies
-     */
+    #[DataProvider('provideCurrencies')]
     public function testGetRoundingIncrement($currency)
     {
         $this->assertIsNumeric(Currencies::getRoundingIncrement($currency));
@@ -709,9 +717,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         );
     }
 
-    /**
-     * @dataProvider provideCurrenciesWithNumericEquivalent
-     */
+    #[DataProvider('provideCurrenciesWithNumericEquivalent')]
     public function testGetNumericCode($currency)
     {
         $this->assertSame(self::ALPHA3_TO_NUMERIC[$currency], Currencies::getNumericCode($currency));
@@ -725,9 +731,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         );
     }
 
-    /**
-     * @dataProvider provideCurrenciesWithoutNumericEquivalent
-     */
+    #[DataProvider('provideCurrenciesWithoutNumericEquivalent')]
     public function testGetNumericCodeFailsIfNoNumericEquivalent($currency)
     {
         $this->expectException(MissingResourceException::class);
@@ -745,9 +749,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         );
     }
 
-    /**
-     * @dataProvider provideValidNumericCodes
-     */
+    #[DataProvider('provideValidNumericCodes')]
     public function testForNumericCode($numeric, $expected)
     {
         $actual = Currencies::forNumericCode($numeric);
@@ -770,9 +772,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         );
     }
 
-    /**
-     * @dataProvider provideInvalidNumericCodes
-     */
+    #[DataProvider('provideInvalidNumericCodes')]
     public function testForNumericCodeFailsIfInvalidNumericCode($currency)
     {
         $this->expectException(MissingResourceException::class);
@@ -804,5 +804,100 @@ class CurrenciesTest extends ResourceBundleTestCase
         }
 
         return $numericToAlpha3;
+    }
+
+    public function testBefCurrencyNoLongerExistIn2025()
+    {
+        $this->assertFalse(Currencies::isValidInAnyCountry('BEF', date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testUsdCurrencyExistsInAtLeastOneCountryIn2025()
+    {
+        $this->assertTrue(Currencies::isValidInAnyCountry('USD', date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testCheCurrencyIsNotRecognizedLegallyAnywhere()
+    {
+        $this->assertTrue(Currencies::isValidInAnyCountry('CHE', null, active: null));
+    }
+
+    public function testEsbCurrencyIsNotLegalTenderSomewhere()
+    {
+        $this->assertFalse(Currencies::isValidInAnyCountry('ESB', active: null));
+    }
+
+    public function testCurrenciesOfSwitzerlandIn2025()
+    {
+        $this->assertSame(['CHF'], Currencies::forCountry('CH', date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testBefCurrencyExistedLegallyInTheHistory()
+    {
+        $this->assertContains('BEF', Currencies::forCountry('BE', active: null));
+    }
+
+    public function testBefCurrencyWasValidIn2001InBelgium()
+    {
+        $this->assertTrue(Currencies::isValidInCountry('BE', 'BEF', date: new \DateTimeImmutable('2001-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testEurCurrencyIsValidIn2025InFrance()
+    {
+        $this->assertTrue(Currencies::isValidInCountry('FR', 'EUR', date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testCheCurrencyIsValidInSwitzerland()
+    {
+        $this->assertTrue(Currencies::isValidInCountry('CH', 'CHE', false, null));
+    }
+
+    public function testInactiveCurrenciesOfChinaIn2025()
+    {
+        $this->assertSame(['CNX'], Currencies::forCountry('CN', null, false, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testUsdCurrencyDoesNotExistInFranceIn2025()
+    {
+        $this->assertFalse(Currencies::isValidInCountry('FR', 'USD', active: null, date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testChfCurrencyNotConsideredLegalTender()
+    {
+        $this->assertFalse(Currencies::isValidInCountry('CH', 'CHF', false, null));
+    }
+
+    public function testCheCurrencyIncluded()
+    {
+        $this->assertTrue(Currencies::isValidInCountry('CH', 'CHE', false, true, includeUndated: true));
+    }
+
+    public function testCheCurrencyExcluded()
+    {
+        $this->assertFalse(Currencies::isValidInCountry('CH', 'CHE', false, true, includeUndated: false));
+    }
+
+    /**
+     * Special case because the official dataset contains XXX to indicate that Antartica has no currency, but it is
+     * excluded from the generated data on purpose.
+     */
+    public function testAntarticaHasNoCurrenciesIn2025()
+    {
+        $this->assertSame([], Currencies::forCountry('AQ', null, true, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testIsValidInCountryWithUnknownCurrencyThrowsException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The currency UNKNOWN-CURRENCY-FROM-ISO-4217 does not exist.');
+
+        Currencies::isValidInCountry('CH', 'UNKNOWN-CURRENCY-FROM-ISO-4217');
+    }
+
+    public function testIsValidInAnyCountryWithUnknownCurrencyThrowsException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The currency UNKNOWN-CURRENCY-FROM-ISO-4217 does not exist.');
+
+        Currencies::isValidInAnyCountry('UNKNOWN-CURRENCY-FROM-ISO-4217');
     }
 }

@@ -52,7 +52,7 @@ class RequestParser extends AbstractRequestParser
 
         foreach ([$this->signatureHeaderName, $this->eventHeaderName, $this->idHeaderName] as $header) {
             if (!$request->headers->has($header)) {
-                throw new RejectWebhookException(406, sprintf('Missing "%s" HTTP request signature header.', $header));
+                throw new RejectWebhookException(406, \sprintf('Missing "%s" HTTP request signature header.', $header));
             }
         }
 

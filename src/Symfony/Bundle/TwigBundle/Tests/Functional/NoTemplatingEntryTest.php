@@ -64,7 +64,6 @@ class NoTemplatingEntryKernel extends Kernel
     {
         $loader->load(function (ContainerBuilder $container) {
             $config = [
-                'annotations' => false,
                 'http_method_override' => false,
                 'php_errors' => ['log' => true],
                 'secret' => '$ecret',

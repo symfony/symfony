@@ -12,10 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\EventListener\ConsoleProfilerListener;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\HttpKernel\Debug\VirtualRequestStack;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStateChecker;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -37,10 +39,11 @@ return static function (ContainerConfigurator $container) {
                 param('profiler_listener.only_main_requests'),
             ])
             ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => '?reset'])
 
         ->set('console_profiler_listener', ConsoleProfilerListener::class)
             ->args([
-                service('profiler'),
+                service('.lazy_profiler'),
                 service('.virtual_request_stack'),
                 service('debug.stopwatch'),
                 param('kernel.runtime_mode.cli'),
@@ -48,8 +51,23 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
 
+        ->set('.lazy_profiler', Profiler::class)
+            ->factory('current')
+            ->args([[service('profiler')]])
+            ->lazy()
+
         ->set('.virtual_request_stack', VirtualRequestStack::class)
             ->args([service('request_stack')])
             ->public()
+
+        ->set('profiler.state_checker', ProfilerStateChecker::class)
+            ->args([
+                service_locator(['profiler' => service('profiler')->ignoreOnUninitialized()]),
+                inline_service('bool')->factory([FrameworkBundle::class, 'considerProfilerEnabled']),
+            ])
+
+        ->set('profiler.is_disabled_state_checker', 'Closure')
+            ->factory(['Closure', 'fromCallable'])
+            ->args([[service('profiler.state_checker'), 'isProfilerDisabled']])
     ;
 };

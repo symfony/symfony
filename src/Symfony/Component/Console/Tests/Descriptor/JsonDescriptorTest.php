@@ -36,10 +36,9 @@ class JsonDescriptorTest extends AbstractDescriptorTestCase
             return array_map($this->normalizeOutputRecursively(...), $output);
         }
 
-        if (null === $output) {
-            return null;
-        }
-
-        return parent::normalizeOutput($output);
+        return match ($output) {
+            null, true, false => $output,
+            default => parent::normalizeOutput($output),
+        };
     }
 }

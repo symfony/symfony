@@ -131,11 +131,15 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             $type = \PHP_INT_SIZE === 8 ? \NumberFormatter::TYPE_INT64 : \NumberFormatter::TYPE_INT32;
         }
 
-        // replace normal spaces so that the formatter can read them
-        $result = $formatter->parse(str_replace(' ', "\xc2\xa0", $value), $type, $position);
+        try {
+            // replace normal spaces so that the formatter can read them
+            $result = @$formatter->parse(str_replace(' ', "\xc2\xa0", $value), $type, $position);
+        } catch (\IntlException $e) {
+            throw new TransformationFailedException($e->getMessage(), 0, $e);
+        }
 
         if (intl_is_failure($formatter->getErrorCode())) {
-            throw new TransformationFailedException($formatter->getErrorMessage());
+            throw new TransformationFailedException($formatter->getErrorMessage(), $formatter->getErrorCode());
         }
 
         if (self::FRACTIONAL == $this->type) {
@@ -158,7 +162,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             $remainder = trim($remainder, " \t\n\r\0\x0b\xc2\xa0");
 
             if ('' !== $remainder) {
-                throw new TransformationFailedException(sprintf('The number contains unrecognized characters: "%s".', $remainder));
+                throw new TransformationFailedException(\sprintf('The number contains unrecognized characters: "%s".', $remainder));
             }
         }
 
@@ -210,8 +214,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             \NumberFormatter::ROUND_HALFDOWN => round($number, 0, \PHP_ROUND_HALF_DOWN),
         };
 
-        $number = 1 === $roundingCoef ? (int) $number : $number / $roundingCoef;
-
-        return $number;
+        return 1 === $roundingCoef ? (int) $number : $number / $roundingCoef;
     }
 }

@@ -65,7 +65,7 @@ class UlidToStringTransformer implements DataTransformerInterface
         try {
             $ulid = new Ulid($value);
         } catch (\InvalidArgumentException $e) {
-            throw new TransformationFailedException(sprintf('The value "%s" is not a valid ULID.', $value), $e->getCode(), $e);
+            throw new TransformationFailedException(\sprintf('The value "%s" is not a valid ULID.', $value), $e->getCode(), $e);
         }
 
         return $ulid;

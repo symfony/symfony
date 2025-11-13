@@ -43,7 +43,7 @@ final class ResendApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('resend+api://%s', $this->getEndpoint());
+        return \sprintf('resend+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -59,13 +59,13 @@ final class ResendApiTransport extends AbstractApiTransport
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
         } catch (DecodingExceptionInterface) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Resend server.', $response, 0, $e);
         }
 
         if (200 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         }
 
         $sentMessage->setMessageId($result['id']);
@@ -82,7 +82,7 @@ final class ResendApiTransport extends AbstractApiTransport
     {
         $formattedAddresses = [];
         foreach ($addresses as $address) {
-            $formattedAddresses[] = $address->getEncodedAddress();
+            $formattedAddresses[] = $this->formatAddress($address);
         }
 
         if (\count($formattedAddresses) > 50) {
@@ -99,8 +99,8 @@ final class ResendApiTransport extends AbstractApiTransport
             'to' => $this->formatAddresses($this->getRecipients($email, $envelope)),
             'subject' => $email->getSubject(),
         ];
-        if ($attachements = $this->prepareAttachments($email)) {
-            $payload['attachments'] = $attachements;
+        if ($attachments = $this->prepareAttachments($email)) {
+            $payload['attachments'] = $attachments;
         }
         if ($emails = $email->getReplyTo()) {
             $payload['reply_to'] = current($this->formatAddresses($emails));
@@ -140,9 +140,8 @@ final class ResendApiTransport extends AbstractApiTransport
     private function prepareHeadersAndTags(Headers $headers): array
     {
         $headersAndTags = [];
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'reply_to'];
         foreach ($headers->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'reply_to'], true)) {
                 continue;
             }
 

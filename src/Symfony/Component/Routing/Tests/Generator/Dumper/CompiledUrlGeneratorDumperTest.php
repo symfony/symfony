@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Routing\Tests\Generator\Dumper;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
@@ -24,8 +24,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class CompiledUrlGeneratorDumperTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private RouteCollection $routeCollection;
     private CompiledUrlGeneratorDumper $generatorDumper;
     private string $testTmpFilepath;
@@ -33,21 +31,18 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->routeCollection = new RouteCollection();
         $this->generatorDumper = new CompiledUrlGeneratorDumper($this->routeCollection);
-        $this->testTmpFilepath = sys_get_temp_dir().'/php_generator.'.$this->getName().'.php';
-        $this->largeTestTmpFilepath = sys_get_temp_dir().'/php_generator.'.$this->getName().'.large.php';
+        $this->testTmpFilepath = sys_get_temp_dir().'/php_generator.php';
+        $this->largeTestTmpFilepath = sys_get_temp_dir().'/php_generator.large.php';
         @unlink($this->testTmpFilepath);
         @unlink($this->largeTestTmpFilepath);
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         @unlink($this->testTmpFilepath);
+        @unlink($this->largeTestTmpFilepath);
     }
 
     public function testDumpWithRoutes()
@@ -341,12 +336,10 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->generatorDumper->dump();
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testDeprecatedAlias()
     {
-        $this->expectDeprecation('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
+        $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
 
         $this->routeCollection->add('a', new Route('/foo'));
         $this->routeCollection->addAlias('b', 'a')
@@ -359,12 +352,10 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $compiledUrlGenerator->generate('b');
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testDeprecatedAliasWithCustomMessage()
     {
-        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
+        $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
 
         $this->routeCollection->add('a', new Route('/foo'));
         $this->routeCollection->addAlias('b', 'a')
@@ -377,12 +368,10 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $compiledUrlGenerator->generate('b');
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
     {
-        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
+        $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
 
         $this->routeCollection->add('a', new Route('/foo'));
         $this->routeCollection->addAlias('b', 'a')

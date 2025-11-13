@@ -19,12 +19,10 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\Workflow\Debug\ListenerExtractor;
 use Symfony\Component\Workflow\Debug\TraceableWorkflow;
 use Symfony\Component\Workflow\Dumper\MermaidDumper;
-use Symfony\Component\Workflow\EventListener\GuardExpression;
-use Symfony\Component\Workflow\EventListener\GuardListener;
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\WorkflowInterface;
 
@@ -33,11 +31,14 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 final class WorkflowDataCollector extends DataCollector implements LateDataCollectorInterface
 {
+    private readonly ListenerExtractor $listenerExtractor;
+
     public function __construct(
         private readonly iterable $workflows,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly FileLinkFormatter $fileLinkFormatter,
+        EventDispatcherInterface $eventDispatcher,
+        ?FileLinkFormatter $fileLinkFormatter = null,
     ) {
+        $this->listenerExtractor = new ListenerExtractor($eventDispatcher, $fileLinkFormatter);
     }
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
@@ -88,143 +89,63 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
         return $i;
     }
 
-    protected function getCasters(): array
-    {
-        $casters = [
-            ...parent::getCasters(),
-            TransitionBlocker::class => function ($v, array $a, Stub $s, $isNested) {
-                unset(
-                    $a[sprintf(Caster::PATTERN_PRIVATE, $v::class, 'code')],
-                    $a[sprintf(Caster::PATTERN_PRIVATE, $v::class, 'parameters')],
-                );
-
-                $s->cut += 2;
-
-                return $a;
-            },
-            Marking::class => function ($v, array $a, Stub $s, $isNested) {
-                $a[Caster::PREFIX_VIRTUAL.'.places'] = array_keys($v->getPlaces());
-
-                return $a;
-            },
-        ];
-
-        return $casters;
-    }
-
     public function hash(string $string): string
     {
         return hash('xxh128', $string);
     }
 
-    private function getEventListeners(WorkflowInterface $workflow): array
+    public function buildMermaidLiveLink(string $name): string
     {
-        $listeners = [];
-        $placeId = 0;
-        foreach ($workflow->getDefinition()->getPlaces() as $place) {
-            $eventNames = [];
-            $subEventNames = [
-                'leave',
-                'enter',
-                'entered',
-            ];
-            foreach ($subEventNames as $subEventName) {
-                $eventNames[] = sprintf('workflow.%s', $subEventName);
-                $eventNames[] = sprintf('workflow.%s.%s', $workflow->getName(), $subEventName);
-                $eventNames[] = sprintf('workflow.%s.%s.%s', $workflow->getName(), $subEventName, $place);
-            }
-            foreach ($eventNames as $eventName) {
-                foreach ($this->eventDispatcher->getListeners($eventName) as $listener) {
-                    $listeners["place{$placeId}"][$eventName][] = $this->summarizeListener($listener);
-                }
-            }
+        $payload = [
+            'code' => $this->data['workflows'][$name]['dump'],
+            'mermaid' => '{"theme": "default"}',
+            'autoSync' => false,
+        ];
 
-            ++$placeId;
-        }
+        $compressed = zlib_encode(json_encode($payload), \ZLIB_ENCODING_DEFLATE);
 
-        foreach ($workflow->getDefinition()->getTransitions() as $transitionId => $transition) {
-            $eventNames = [];
-            $subEventNames = [
-                'guard',
-                'transition',
-                'completed',
-                'announce',
-            ];
-            foreach ($subEventNames as $subEventName) {
-                $eventNames[] = sprintf('workflow.%s', $subEventName);
-                $eventNames[] = sprintf('workflow.%s.%s', $workflow->getName(), $subEventName);
-                $eventNames[] = sprintf('workflow.%s.%s.%s', $workflow->getName(), $subEventName, $transition->getName());
-            }
-            foreach ($eventNames as $eventName) {
-                foreach ($this->eventDispatcher->getListeners($eventName) as $listener) {
-                    $listeners["transition{$transitionId}"][$eventName][] = $this->summarizeListener($listener, $eventName, $transition);
-                }
-            }
-        }
+        $suffix = rtrim(strtr(base64_encode($compressed), '+/', '-_'), '=');
 
-        return $listeners;
+        return "https://mermaid.live/edit#pako:{$suffix}";
     }
 
-    private function summarizeListener(callable $callable, ?string $eventName = null, ?Transition $transition = null): array
+    protected function getCasters(): array
     {
-        $extra = [];
-
-        if ($callable instanceof \Closure) {
-            $r = new \ReflectionFunction($callable);
-            if ($r->isAnonymous()) {
-                $title = (string) $r;
-            } elseif ($class = $r->getClosureCalledClass()) {
-                $title = $class->name.'::'.$r->name.'()';
-            } else {
-                $title = $r->name;
-            }
-        } elseif (\is_string($callable)) {
-            $title = $callable.'()';
-            $r = new \ReflectionFunction($callable);
-        } elseif (\is_object($callable) && method_exists($callable, '__invoke')) {
-            $r = new \ReflectionMethod($callable, '__invoke');
-            $title = $callable::class.'::__invoke()';
-        } elseif (\is_array($callable)) {
-            if ($callable[0] instanceof GuardListener) {
-                if (null === $eventName || null === $transition) {
-                    throw new \LogicException('Missing event name or transition.');
-                }
-                $extra['guardExpressions'] = $this->extractGuardExpressions($callable[0], $eventName, $transition);
-            }
-            $r = new \ReflectionMethod($callable[0], $callable[1]);
-            $title = (\is_string($callable[0]) ? $callable[0] : \get_class($callable[0])).'::'.$callable[1].'()';
-        } else {
-            throw new \RuntimeException('Unknown callable type.');
-        }
-
-        $file = null;
-        if ($r->isUserDefined()) {
-            $file = $this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine());
-        }
-
         return [
-            'title' => $title,
-            'file' => $file,
-            ...$extra,
+            ...parent::getCasters(),
+            TransitionBlocker::class => static function ($v, array $a, Stub $s) {
+                unset($a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'code')]);
+                unset($a[\sprintf(Caster::PATTERN_PRIVATE, $v::class, 'parameters')]);
+
+                $s->cut += 2;
+
+                return $a;
+            },
+            Marking::class => static function ($v, array $a) {
+                $a[Caster::PREFIX_VIRTUAL.'.places'] = array_keys($v->getPlaces());
+
+                return $a;
+            },
         ];
     }
 
-    private function extractGuardExpressions(GuardListener $listener, string $eventName, Transition $transition): array
+    private function getEventListeners(WorkflowInterface $workflow): array
     {
-        $configuration = (new \ReflectionProperty(GuardListener::class, 'configuration'))->getValue($listener);
-
-        $expressions = [];
-        foreach ($configuration[$eventName] as $guard) {
-            if ($guard instanceof GuardExpression) {
-                if ($guard->getTransition() !== $transition) {
-                    continue;
-                }
-                $expressions[] = $guard->getExpression();
-            } else {
-                $expressions[] = $guard;
+        $listeners = $this->listenerExtractor->extractListeners($workflow->getName(), $workflow->getDefinition());
+        $normalizedListeners = [];
+        $placeId = 0;
+        foreach ($workflow->getDefinition()->getPlaces() as $k => $_) {
+            if (\array_key_exists('place__'.$k, $listeners)) {
+                $normalizedListeners["place{$placeId}"] = $listeners['place__'.$k];
+            }
+            ++$placeId;
+        }
+        foreach ($workflow->getDefinition()->getTransitions() as $k => $_) {
+            if (\array_key_exists('transition__'.$k, $listeners)) {
+                $normalizedListeners["transition$k"] = $listeners['transition__'.$k];
             }
         }
 
-        return $expressions;
+        return $normalizedListeners;
     }
 }

@@ -29,7 +29,7 @@ trait VfsIteratorTestTrait
 
         $this->vfsScheme = 'symfony-finder-vfs-test-'.++self::$vfsNextSchemeIndex;
 
-        $vfsWrapperClass = \get_class(new class() {
+        $vfsWrapperClass = \get_class(new class {
             /** @var array<string, \Closure(string, 'list_dir_open'|'list_dir_rewind'|'is_dir'): (list<string>|bool)> */
             public static array $vfsProviders = [];
 
@@ -108,7 +108,7 @@ trait VfsIteratorTestTrait
                 $isDir = $providerFx($path, 'is_dir');
                 \assert(\is_bool($isDir));
 
-                return ['mode' => $isDir ? 0040755 : 0100644];
+                return ['mode' => $isDir ? 0o040755 : 0o100644];
             }
         });
         self::$vfsProviders = &$vfsWrapperClass::$vfsProviders;

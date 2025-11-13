@@ -17,6 +17,7 @@ use Symfony\Component\AssetMapper\AssetMapperDevServerSubscriber;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
+use Symfony\Component\AssetMapper\Command\CompressAssetsCommand;
 use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapAuditCommand;
 use Symfony\Component\AssetMapper\Command\ImportMapInstallCommand;
@@ -28,6 +29,11 @@ use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
 use Symfony\Component\AssetMapper\Compiler\SourceMappingUrlsCompiler;
+use Symfony\Component\AssetMapper\Compressor\BrotliCompressor;
+use Symfony\Component\AssetMapper\Compressor\ChainCompressor;
+use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
+use Symfony\Component\AssetMapper\Compressor\GzipCompressor;
+use Symfony\Component\AssetMapper\Compressor\ZstandardCompressor;
 use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapAuditor;
@@ -53,6 +59,8 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper.compiled_asset_mapper_config_reader'),
             ])
         ->alias(AssetMapperInterface::class, 'asset_mapper')
+
+        ->alias('asset_mapper.http_client', 'http_client')
 
         ->set('asset_mapper.mapped_asset_factory', MappedAssetFactory::class)
             ->args([
@@ -197,7 +205,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('asset_mapper.importmap.resolver', JsDelivrEsmResolver::class)
-            ->args([service('http_client')])
+            ->args([service('asset_mapper.http_client')])
 
         ->set('asset_mapper.importmap.renderer', ImportMapRenderer::class)
             ->args([
@@ -212,18 +220,19 @@ return static function (ContainerConfigurator $container) {
         ->set('asset_mapper.importmap.auditor', ImportMapAuditor::class)
         ->args([
             service('asset_mapper.importmap.config_reader'),
-            service('http_client'),
+            service('asset_mapper.http_client'),
         ])
         ->set('asset_mapper.importmap.update_checker', ImportMapUpdateChecker::class)
         ->args([
             service('asset_mapper.importmap.config_reader'),
-            service('http_client'),
+            service('asset_mapper.http_client'),
         ])
 
         ->set('asset_mapper.importmap.command.require', ImportMapRequireCommand::class)
             ->args([
                 service('asset_mapper.importmap.manager'),
                 service('asset_mapper.importmap.version_checker'),
+                param('kernel.project_dir'),
             ])
             ->tag('console.command')
 
@@ -251,6 +260,21 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.importmap.command.outdated', ImportMapOutdatedCommand::class)
             ->args([service('asset_mapper.importmap.update_checker')])
+            ->tag('console.command')
+
+        ->set('asset_mapper.compressor.brotli', BrotliCompressor::class)
+        ->set('asset_mapper.compressor.zstandard', ZstandardCompressor::class)
+        ->set('asset_mapper.compressor.gzip', GzipCompressor::class)
+
+        ->set('asset_mapper.compressor', ChainCompressor::class)
+            ->args([
+                abstract_arg('compressor'),
+                service('logger'),
+            ])
+        ->alias(CompressorInterface::class, 'asset_mapper.compressor')
+
+        ->set('asset_mapper.assets.command.compress', CompressAssetsCommand::class)
+            ->args([service('asset_mapper.compressor')])
             ->tag('console.command')
     ;
 };

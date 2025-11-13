@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Uid\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
 use Symfony\Component\Uid\MaxUlid;
 use Symfony\Component\Uid\NilUlid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
@@ -20,9 +24,7 @@ use Symfony\Component\Uid\UuidV4;
 
 class UlidTest extends TestCase
 {
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testGenerate()
     {
         $a = new Ulid();
@@ -41,7 +43,7 @@ class UlidTest extends TestCase
 
     public function testWithInvalidUlid()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid ULID: "this is not a ulid".');
 
         new Ulid('this is not a ulid');
@@ -86,9 +88,7 @@ class UlidTest extends TestCase
         $this->assertTrue($ulid->equals(Ulid::fromString('YcVfxkQb6JRzqk5kF2tNLv')));
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testGetDateTime()
     {
         $time = microtime(false);
@@ -119,9 +119,7 @@ class UlidTest extends TestCase
         $this->assertFalse($a->equals((string) $a));
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testCompare()
     {
         $a = new Ulid();
@@ -146,12 +144,10 @@ class UlidTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideInvalidBinaryFormat
-     */
+    #[DataProvider('provideInvalidBinaryFormat')]
     public function testFromBinaryInvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Ulid::fromBinary($ulid);
     }
@@ -173,12 +169,10 @@ class UlidTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideInvalidBase58Format
-     */
+    #[DataProvider('provideInvalidBase58Format')]
     public function testFromBase58InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Ulid::fromBase58($ulid);
     }
@@ -200,12 +194,10 @@ class UlidTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideInvalidBase32Format
-     */
+    #[DataProvider('provideInvalidBase32Format')]
     public function testFromBase32InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Ulid::fromBase32($ulid);
     }
@@ -227,12 +219,10 @@ class UlidTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideInvalidRfc4122Format
-     */
+    #[DataProvider('provideInvalidRfc4122Format')]
     public function testFromRfc4122InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Ulid::fromRfc4122($ulid);
     }
@@ -256,11 +246,9 @@ class UlidTest extends TestCase
         $this->assertInstanceOf(Ulid::class, Ulid::fromString('111111111u9QRyVM94rdmZ'));
     }
 
-    /**
-     * @testWith    ["00000000-0000-0000-0000-000000000000"]
-     *              ["1111111111111111111111"]
-     *              ["00000000000000000000000000"]
-     */
+    #[TestWith(['00000000-0000-0000-0000-000000000000'])]
+    #[TestWith(['1111111111111111111111'])]
+    #[TestWith(['00000000000000000000000000'])]
     public function testNilUlid(string $ulid)
     {
         $ulid = Ulid::fromString($ulid);
@@ -274,10 +262,8 @@ class UlidTest extends TestCase
         $this->assertSame('00000000000000000000000000', (string) new NilUlid());
     }
 
-    /**
-     * @testWith    ["ffffffff-ffff-ffff-ffff-ffffffffffff"]
-     *              ["7zzzzzzzzzzzzzzzzzzzzzzzzz"]
-     */
+    #[TestWith(['ffffffff-ffff-ffff-ffff-ffffffffffff'])]
+    #[TestWith(['7zzzzzzzzzzzzzzzzzzzzzzzzz'])]
     public function testMaxUlid(string $ulid)
     {
         $ulid = Ulid::fromString($ulid);

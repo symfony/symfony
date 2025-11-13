@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeSms;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -20,6 +19,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -30,22 +30,19 @@ final class FakeSmsEmailTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private MailerInterface $mailer;
-    private string $to;
-    private string $from;
-
-    public function __construct(MailerInterface $mailer, string $to, string $from, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
-    {
-        $this->mailer = $mailer;
-        $this->to = $to;
-        $this->from = $from;
-
+    public function __construct(
+        private MailerInterface $mailer,
+        private string $to,
+        private string $from,
+        ?HttpClientInterface $client = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('fakesms+email://%s?to=%s&from=%s', $this->getEndpoint(), $this->to, $this->from);
+        return \sprintf('fakesms+email://%s?to=%s&from=%s', $this->getEndpoint(), $this->to, $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -67,7 +64,7 @@ final class FakeSmsEmailTransport extends AbstractTransport
         $email = (new Email())
             ->from($message->getFrom() ?: $this->from)
             ->to($this->to)
-            ->subject(sprintf('New SMS on phone number: %s', $message->getPhone()))
+            ->subject(\sprintf('New SMS on phone number: %s', $message->getPhone()))
             ->html($message->getSubject())
             ->text($message->getSubject());
 

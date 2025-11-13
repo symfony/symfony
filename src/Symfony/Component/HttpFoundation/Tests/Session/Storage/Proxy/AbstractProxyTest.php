@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Proxy;
 
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
@@ -23,11 +24,11 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  */
 class AbstractProxyTest extends TestCase
 {
-    protected MockObject&AbstractProxy $proxy;
+    protected AbstractProxy $proxy;
 
     protected function setUp(): void
     {
-        $this->proxy = $this->getMockForAbstractClass(AbstractProxy::class);
+        $this->proxy = new class extends AbstractProxy {};
     }
 
     public function testGetSaveHandlerName()
@@ -47,11 +48,8 @@ class AbstractProxyTest extends TestCase
         $this->assertFalse($this->proxy->isWrapper());
     }
 
-    /**
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
-     */
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testIsActive()
     {
         $this->assertFalse($this->proxy->isActive());
@@ -59,11 +57,8 @@ class AbstractProxyTest extends TestCase
         $this->assertTrue($this->proxy->isActive());
     }
 
-    /**
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
-     */
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testName()
     {
         $this->assertEquals(session_name(), $this->proxy->getName());
@@ -72,11 +67,8 @@ class AbstractProxyTest extends TestCase
         $this->assertEquals(session_name(), $this->proxy->getName());
     }
 
-    /**
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
-     */
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testNameException()
     {
         $this->expectException(\LogicException::class);
@@ -84,11 +76,8 @@ class AbstractProxyTest extends TestCase
         $this->proxy->setName('foo');
     }
 
-    /**
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
-     */
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testId()
     {
         $this->assertEquals(session_id(), $this->proxy->getId());
@@ -97,11 +86,8 @@ class AbstractProxyTest extends TestCase
         $this->assertEquals(session_id(), $this->proxy->getId());
     }
 
-    /**
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
-     */
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testIdException()
     {
         $this->expectException(\LogicException::class);

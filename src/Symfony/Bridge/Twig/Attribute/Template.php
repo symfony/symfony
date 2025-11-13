@@ -21,11 +21,13 @@ class Template
      * @param string        $template The name of the template to render
      * @param string[]|null $vars     The controller method arguments to pass to the template
      * @param bool          $stream   Enables streaming the template
+     * @param string|null   $block    The name of the block to use in the template
      */
     public function __construct(
         public string $template,
         public ?array $vars = null,
         public bool $stream = false,
+        public ?string $block = null,
     ) {
     }
 }

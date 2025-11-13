@@ -14,11 +14,13 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\BadMethodCallException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -29,7 +31,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
+class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, PruneableInterface, ResettableInterface
 {
     use ContractsTrait;
 
@@ -52,7 +54,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 
         foreach ($adapters as $adapter) {
             if (!$adapter instanceof CacheItemPoolInterface) {
-                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', get_debug_type($adapter), CacheItemPoolInterface::class));
+                throw new InvalidArgumentException(\sprintf('The class "%s" does not implement the "%s" interface.', get_debug_type($adapter), CacheItemPoolInterface::class));
             }
             if ('cli' === \PHP_SAPI && $adapter instanceof ApcuAdapter && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL)) {
                 continue; // skip putting APCu in the chain when the backend is disabled
@@ -76,7 +78,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $item->metadata = $item->newMetadata = $sourceItem->metadata = $sourceMetadata;
 
                 if (isset($item->metadata[CacheItem::METADATA_EXPIRY])) {
-                    $item->expiresAt(\DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $item->metadata[CacheItem::METADATA_EXPIRY])));
+                    $item->expiresAt(\DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $item->metadata[CacheItem::METADATA_EXPIRY])));
                 } elseif (0 < $defaultLifetime) {
                     $item->expiresAfter($defaultLifetime);
                 }
@@ -278,6 +280,23 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         }
 
         return $pruned;
+    }
+
+    public function withSubNamespace(string $namespace): static
+    {
+        $clone = clone $this;
+        $adapters = [];
+
+        foreach ($this->adapters as $adapter) {
+            if (!$adapter instanceof NamespacedPoolInterface) {
+                throw new BadMethodCallException('All adapters must implement NamespacedPoolInterface to support namespaces.');
+            }
+
+            $adapters[] = $adapter->withSubNamespace($namespace);
+        }
+        $clone->adapters = $adapters;
+
+        return $clone;
     }
 
     public function reset(): void

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsRevealCommand;
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
@@ -46,9 +47,20 @@ class SecretsRevealCommandTest extends TestCase
         $this->assertStringContainsString('The secret "undefinedKey" does not exist.', trim($tester->getDisplay(true)));
     }
 
-    /**
-     * @backupGlobals enabled
-     */
+    public function testFailedDecrypt()
+    {
+        $vault = $this->createMock(AbstractVault::class);
+        $vault->method('list')->willReturn(['secretKey' => null]);
+
+        $command = new SecretsRevealCommand($vault);
+
+        $tester = new CommandTester($command);
+        $this->assertSame(Command::INVALID, $tester->execute(['name' => 'secretKey']));
+
+        $this->assertStringContainsString('The secret "secretKey" could not be decrypted.', trim($tester->getDisplay(true)));
+    }
+
+    #[BackupGlobals(true)]
     public function testLocalVaultOverride()
     {
         $vault = $this->createMock(AbstractVault::class);
@@ -65,9 +77,7 @@ class SecretsRevealCommandTest extends TestCase
         $this->assertEquals('newSecretValue', trim($tester->getDisplay(true)));
     }
 
-    /**
-     * @backupGlobals enabled
-     */
+    #[BackupGlobals(true)]
     public function testOnlyLocalVaultContainsName()
     {
         $vault = $this->createMock(AbstractVault::class);

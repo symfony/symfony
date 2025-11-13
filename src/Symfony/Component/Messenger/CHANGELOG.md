@@ -1,13 +1,46 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `--exclude-receivers` option to the `messenger:consume command`
+ * Allow any `ServiceResetterInterface` implementation in `ResetServicesListener`
+ * Add `Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware` and `Symfony\Component\Messenger\Message\DefaultStampsProviderInterface`
+ * Add the possibility to configure exchange to exchange bindings in AMQP transport
+ * Add `MessageSentToTransportsEvent` that is dispatched only after the message was sent to at least one transport
+ * Support signing messages per handler
+
+7.3
+---
+
+ * Add `CloseableTransportInterface` to allow closing the transport
+ * Add `SentForRetryStamp` that identifies whether a failed message was sent for retry
+ * Add `Symfony\Component\Messenger\Middleware\DeduplicateMiddleware` and `Symfony\Component\Messenger\Stamp\DeduplicateStamp`
+ * Add `--class-filter` option to the `messenger:failed:remove` command
+ * Add `$stamps` parameter to `HandleTrait::handle`
+ * Add `Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener` to reset PHP's peak memory usage for each processed message
+
+7.2
+---
+
+ * Add `$previous` to the exception output at the `messenger:failed:show` command
+ * `WrappedExceptionsInterface` now extends PHP's `Throwable` interface
+ * Add `#[AsMessage]` attribute with `$transport` parameter for message routing
+ * Add `--format` option to the `messenger:stats` command
+ * Add `getRetryDelay()` method to `RecoverableExceptionInterface`
+ * Add `skip` option to `messenger:failed:retry` command when run interactively to skip message and requeue it
+ * Add the ability to asynchronously notify transports about which messages are still being processed by the worker, using `pcntl_alarm()`
+
 7.1
 ---
 
+ * `InMemoryTransportFactory` creates the `InMemoryTransport` with a clock (if configured in the factory)
  * Add option `redis_sentinel` as an alias for `sentinel_master`
  * Add `--all` option to the `messenger:consume` command
- * Make `#[AsMessageHandler]` final
  * Add parameter `$jitter` to `MultiplierRetryStrategy` in order to randomize delay and prevent the thundering herd effect
+ * Add `SIGQUIT` signal among list of signals that gracefully shut down `messenger:consume` and `messenger:failed:retry` commands
+ * Add `EnvelopeAwareExceptionInterface` for exceptions thrown from middlewares to prevent stamps added by previous middlewares being dropped
 
 7.0
 ---
@@ -30,7 +63,6 @@ CHANGELOG
  * Add `HandlerDescriptor::getOptions`
  * Add support for multiple Redis Sentinel hosts
  * Add `--all` option to the `messenger:failed:remove` command
- * `RejectRedeliveredMessageException` implements `UnrecoverableExceptionInterface` in order to not be retried
  * Add `WrappedExceptionsInterface` interface for exceptions that hold multiple individual exceptions
  * Deprecate `HandlerFailedException::getNestedExceptions()`, `HandlerFailedException::getNestedExceptionsOfClass()`
    and `DelayedMessageHandlingException::getExceptions()` which are replaced by a new `getWrappedExceptions()` method

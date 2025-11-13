@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\String\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\String\Exception\InvalidArgumentException;
 
 abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
@@ -50,11 +52,8 @@ END'],
         $this->assertSame('Dieser Wert sollte grOEsser oder gleich', (string) $s->ascii([$rule]));
     }
 
-    /**
-     * @dataProvider provideLocaleLower
-     *
-     * @requires extension intl
-     */
+    #[DataProvider('provideLocaleLower')]
+    #[RequiresPhpExtension('intl')]
     public function testLocaleLower(string $locale, string $expected, string $origin)
     {
         $instance = static::createFromString($origin)->localeLower($locale);
@@ -64,11 +63,8 @@ END'],
         $this->assertSame($expected, (string) $instance);
     }
 
-    /**
-     * @dataProvider provideLocaleUpper
-     *
-     * @requires extension intl
-     */
+    #[DataProvider('provideLocaleUpper')]
+    #[RequiresPhpExtension('intl')]
     public function testLocaleUpper(string $locale, string $expected, string $origin)
     {
         $instance = static::createFromString($origin)->localeUpper($locale);
@@ -78,11 +74,8 @@ END'],
         $this->assertSame($expected, (string) $instance);
     }
 
-    /**
-     * @dataProvider provideLocaleTitle
-     *
-     * @requires extension intl
-     */
+    #[DataProvider('provideLocaleTitle')]
+    #[RequiresPhpExtension('intl')]
     public function testLocaleTitle(string $locale, string $expected, string $origin)
     {
         $instance = static::createFromString($origin)->localeTitle($locale);
@@ -92,7 +85,7 @@ END'],
         $this->assertSame($expected, (string) $instance);
     }
 
-    public function provideCreateFromCodePoint(): array
+    public static function provideCreateFromCodePoint(): array
     {
         return [
             ['', []],
@@ -117,9 +110,7 @@ END'],
         );
     }
 
-    /**
-     * @dataProvider provideCodePointsAt
-     */
+    #[DataProvider('provideCodePointsAt')]
     public function testCodePointsAt(array $expected, string $string, int $offset, ?int $form = null)
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
@@ -582,10 +573,10 @@ END'],
         );
     }
 
-    public static function provideToFoldedCase(): array
+    public static function provideFolded(): array
     {
         return array_merge(
-            parent::provideToFoldedCase(),
+            parent::provideFolded(),
             [
                 ['déjà', 'DéjÀ'],
                 ['σσσ', 'Σσς'],
@@ -655,6 +646,17 @@ END'],
         );
     }
 
+    public static function providePascal(): array
+    {
+        return array_merge(
+            parent::providePascal(),
+            [
+                ['SymfonyIstÄußerstCool', 'symfonyIstÄußerstCool'],
+                ['SymfonyWithEmojis', 'Symfony with 😃 emojis'],
+            ]
+        );
+    }
+
     public static function provideSnake()
     {
         return array_merge(
@@ -663,6 +665,15 @@ END'],
                 ['symfony_ist_äußerst_cool', 'symfonyIstÄußerstCool'],
             ]
         );
+    }
+
+    public static function provideKebab(): array
+    {
+        return [
+            ...parent::provideKebab(),
+            ['symfony-ist-äußerst-cool', 'symfonyIstÄußerstCool'],
+            ['symfony-with-emojis', 'Symfony with 😃 emojis'],
+        ];
     }
 
     public static function provideEqualsTo()
@@ -731,7 +742,7 @@ END'],
             [
                 ['äuß⭐erst', 'tsre⭐ßuä'],
                 ['漢字ーユニコードéèΣσς', 'ςσΣèéドーコニユー字漢'],
-                ['नमस्ते', 'तेस्मन'],
+                // ['नमस्ते', 'तेस्मन'], this case requires a version of intl that supports Unicode 15.1
             ]
         );
     }

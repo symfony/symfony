@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Context;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Context\SerializerContextBuilder;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -29,10 +30,9 @@ class SerializerContextBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider withersDataProvider
-     *
      * @param array<string, mixed> $values
      */
+    #[DataProvider('withersDataProvider')]
     public function testWithers(array $values)
     {
         $context = $this->contextBuilder

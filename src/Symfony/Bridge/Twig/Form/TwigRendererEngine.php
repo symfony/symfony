@@ -21,20 +21,20 @@ use Twig\Template;
  */
 class TwigRendererEngine extends AbstractRendererEngine
 {
-    private Environment $environment;
     private Template $template;
 
-    public function __construct(array $defaultThemes, Environment $environment)
-    {
+    public function __construct(
+        array $defaultThemes,
+        private Environment $environment,
+    ) {
         parent::__construct($defaultThemes);
-        $this->environment = $environment;
     }
 
     public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
-        $context = $this->environment->mergeGlobals($variables);
+        $context = $variables + $this->environment->getGlobals();
 
         ob_start();
 
@@ -149,7 +149,7 @@ class TwigRendererEngine extends AbstractRendererEngine
         // theme is a reference and we don't want to change it.
         $currentTheme = $theme;
 
-        $context = $this->environment->mergeGlobals([]);
+        $context = $this->environment->getGlobals();
 
         // The do loop takes care of template inheritance.
         // Add blocks from all templates in the inheritance tree, but avoid

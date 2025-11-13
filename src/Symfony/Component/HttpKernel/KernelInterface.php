@@ -20,6 +20,10 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *
  * It manages an environment made of application kernel and bundles.
  *
+ * @method string|null getShareDir() Returns the share directory - not implementing it is deprecated since Symfony 7.4.
+ *                                   This directory should be used to store data that is shared between all front-end servers; this typically fits application caches.
+ *                                   `null` should be returned if the application shall not use a share directory.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface KernelInterface extends HttpKernelInterface
@@ -113,9 +117,9 @@ interface KernelInterface extends HttpKernelInterface
     /**
      * Gets the cache directory.
      *
-     * Since Symfony 5.2, the cache directory should be used for caches that are written at runtime.
+     * This directory should be used for caches that are written at runtime.
      * For caches and artifacts that can be warmed at compile-time and deployed as read-only,
-     * use the new "build directory" returned by the {@see getBuildDir()} method.
+     * use the "build directory" returned by the {@see getBuildDir()} method.
      */
     public function getCacheDir(): string;
 
@@ -123,7 +127,9 @@ interface KernelInterface extends HttpKernelInterface
      * Returns the build directory.
      *
      * This directory should be used to store build artifacts, and can be read-only at runtime.
-     * Caches written at runtime should be stored in the "cache directory" ({@see KernelInterface::getCacheDir()}).
+     * System caches written at runtime should be stored in the "cache directory" ({@see KernelInterface::getCacheDir()}).
+     * Application caches that are shared between all front-end servers should be stored
+     * in the "share directory" ({@see KernelInterface::getShareDir()}).
      */
     public function getBuildDir(): string;
 

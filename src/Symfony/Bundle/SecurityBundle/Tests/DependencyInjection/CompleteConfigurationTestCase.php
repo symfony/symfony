@@ -726,6 +726,41 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertSame('(?:^/register$|^/documentation$)', $container->getDefinition($requestMatcherId)->getArgument(0));
     }
 
+    public function testAccessTokenOidc()
+    {
+        $container = $this->getContainer('access_token_oidc');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+
+        $def = $container->getDefinition('security.access_token_handler.firewall1');
+        $this->assertSame('audience', $def->getArgument(2));
+        $this->assertSame(['https://www.example.com'], $def->getArgument(3));
+        $this->assertSame('sub', $def->getArgument(4));
+    }
+
+    public function testAccessTokenOidcWithEncryption()
+    {
+        $container = $this->getContainer('access_token_oidc_encryption');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+
+        $def = $container->getDefinition('security.access_token_handler.firewall1');
+        $this->assertSame(['RS256'], $def->getArgument(0)->getArgument(0));
+    }
+
+    public function testAccessTokenOidcUserInfoWithDiscovery()
+    {
+        if ('xml' === $this->getFileExtension()) {
+            $this->markTestSkipped('OIDC user info discovery is not supported by the XML schema.');
+        }
+        $container = $this->getContainer('access_token_oidc_user_info_discovery');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
+        $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
+    }
+
     protected function getContainer($file)
     {
         $file .= '.'.$this->getFileExtension();

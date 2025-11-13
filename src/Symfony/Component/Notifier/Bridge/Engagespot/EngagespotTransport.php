@@ -40,7 +40,7 @@ final class EngagespotTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('engagespot://%s?campaign_name=%s', $this->getEndpoint(), $this->campaignName);
+        return \sprintf('engagespot://%s?campaign_name=%s', $this->getEndpoint(), $this->campaignName);
     }
 
     public function supports(MessageInterface $message): bool
@@ -54,7 +54,7 @@ final class EngagespotTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s', $this->getEndpoint());
         $options = $message->getOptions()?->toArray() ?? [];
         $options['to'] ??= $message->getRecipientId();
 
@@ -64,7 +64,7 @@ final class EngagespotTransport extends AbstractTransport
             if (null !== $options['to']) {
                 $identifiers = [$options['to']];
             } elseif (!\is_array($options['identifiers'] ?? null)) {
-                throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" or "identifiers" option to be set when not sending to everyone.', __CLASS__));
+                throw new InvalidArgumentException(\sprintf('The "%s" transport required the "to" or "identifiers" option to be set when not sending to everyone.', __CLASS__));
             } else {
                 $identifiers = $options['identifiers'];
             }

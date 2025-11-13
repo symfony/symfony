@@ -24,13 +24,14 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @internal
+ * @final
  */
 class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, NormalizerAwareInterface, DenormalizerAwareInterface
 {
     public function __construct(
         private NormalizerInterface|DenormalizerInterface $normalizer,
         private SerializerDataCollector $dataCollector,
+        private readonly string $serializerName = 'default',
     ) {
     }
 
@@ -39,18 +40,18 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         return $this->normalizer->getSupportedTypes($format);
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!$this->normalizer instanceof NormalizerInterface) {
-            throw new \BadMethodCallException(sprintf('The "%s()" method cannot be called as nested normalizer doesn\'t implements "%s".', __METHOD__, NormalizerInterface::class));
+            throw new \BadMethodCallException(\sprintf('The "%s()" method cannot be called as nested normalizer doesn\'t implements "%s".', __METHOD__, NormalizerInterface::class));
         }
 
         $startTime = microtime(true);
-        $normalized = $this->normalizer->normalize($object, $format, $context);
+        $normalized = $this->normalizer->normalize($data, $format, $context);
         $time = microtime(true) - $startTime;
 
         if ($traceId = ($context[TraceableSerializer::DEBUG_TRACE_ID] ?? null)) {
-            $this->dataCollector->collectNormalization($traceId, $this->normalizer::class, $time);
+            $this->dataCollector->collectNormalization($traceId, $this->normalizer::class, $time, $this->serializerName);
         }
 
         return $normalized;
@@ -68,7 +69,7 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!$this->normalizer instanceof DenormalizerInterface) {
-            throw new \BadMethodCallException(sprintf('The "%s()" method cannot be called as nested normalizer doesn\'t implements "%s".', __METHOD__, DenormalizerInterface::class));
+            throw new \BadMethodCallException(\sprintf('The "%s()" method cannot be called as nested normalizer doesn\'t implements "%s".', __METHOD__, DenormalizerInterface::class));
         }
 
         $startTime = microtime(true);
@@ -76,7 +77,7 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $time = microtime(true) - $startTime;
 
         if ($traceId = ($context[TraceableSerializer::DEBUG_TRACE_ID] ?? null)) {
-            $this->dataCollector->collectDenormalization($traceId, $this->normalizer::class, $time);
+            $this->dataCollector->collectDenormalization($traceId, $this->normalizer::class, $time, $this->serializerName);
         }
 
         return $denormalized;

@@ -1,0 +1,36 @@
+Firewall "main"
+===============
+
+ ----------------------- ------------------------------------ 
+  Option                  Value                               
+ ----------------------- ------------------------------------ 
+  Name                    main                                
+  Context                 main                                
+  Lazy                    No                                  
+  Stateless               No                                  
+  User Checker            user_checker_service_test           
+  Provider                user_provider_service_test          
+  Entry Point             entry_point_service_test            
+  Access Denied URL       /access-denied-test                 
+  Access Denied Handler   access_denied_handler_service_test  
+ ----------------------- ------------------------------------ 
+
+User switching
+--------------
+
+ ----------- ------------------------ 
+  Option      Value                   
+ ----------- ------------------------ 
+  Parameter   _switch_user_test       
+  Provider    custom_provider_test    
+  User Role   ROLE_ALLOWED_TO_SWITCH  
+ ----------- ------------------------ 
+
+Authenticators for firewall "main"
+==================================
+
+ ----------------------------------------------------------------- 
+  Classname                                                        
+ ----------------------------------------------------------------- 
+  Symfony\Bundle\SecurityBundle\Tests\Fixtures\DummyAuthenticator  
+ -----------------------------------------------------------------

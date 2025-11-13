@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\DumpCompletionCommand;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 
 class DumpCompletionCommandTest extends TestCase
 {
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $tester = new CommandCompletionTester(new DumpCompletionCommand());

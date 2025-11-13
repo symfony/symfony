@@ -32,7 +32,7 @@ final class Target
     public function getParsedName(): string
     {
         if (null === $this->name) {
-            throw new LogicException(sprintf('Cannot parse the name of a #[Target] attribute that has not been resolved. Did you forget to call "%s::parseName()"?', __CLASS__));
+            throw new LogicException(\sprintf('Cannot parse the name of a #[Target] attribute that has not been resolved. Did you forget to call "%s::parseName()"?', __CLASS__));
         }
 
         return lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $this->name))));
@@ -58,7 +58,7 @@ final class Target
                 $function = $function->name;
             }
 
-            throw new InvalidArgumentException(sprintf('Invalid #[Target] name "%s" on parameter "$%s" of "%s()": the first character must be a letter.', $name, $parameter->name, $function));
+            throw new InvalidArgumentException(\sprintf('Invalid #[Target] name "%s" on parameter "$%s" of "%s()": the first character must be a letter.', $name, $parameter->name, $function));
         }
 
         return preg_match('/^[a-zA-Z0-9_\x7f-\xff]++$/', $name) ? $name : $parsedName;

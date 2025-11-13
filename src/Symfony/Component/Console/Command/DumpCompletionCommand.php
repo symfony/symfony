@@ -35,7 +35,7 @@ final class DumpCompletionCommand extends Command
         $commandName = basename($fullCommand);
         $fullCommand = @realpath($fullCommand) ?: $fullCommand;
 
-        $shell = $this->guessShell();
+        $shell = self::guessShell();
         [$rcFile, $completionFile] = match ($shell) {
             'fish' => ['~/.config/fish/config.fish', "/etc/fish/completions/$commandName.fish"],
             'zsh' => ['~/.zshrc', '$fpath[1]/_'.$commandName],
@@ -46,33 +46,33 @@ final class DumpCompletionCommand extends Command
 
         $this
             ->setHelp(<<<EOH
-The <info>%command.name%</> command dumps the shell completion script required
-to use shell autocompletion (currently, {$supportedShells} completion are supported).
+                The <info>%command.name%</> command dumps the shell completion script required
+                to use shell autocompletion (currently, {$supportedShells} completion are supported).
 
-<comment>Static installation
--------------------</>
+                <comment>Static installation
+                -------------------</>
 
-Dump the script to a global completion file and restart your shell:
+                Dump the script to a global completion file and restart your shell:
 
-    <info>%command.full_name% {$shell} | sudo tee {$completionFile}</>
+                    <info>%command.full_name% {$shell} | sudo tee {$completionFile}</>
 
-Or dump the script to a local file and source it:
+                Or dump the script to a local file and source it:
 
-    <info>%command.full_name% {$shell} > completion.sh</>
+                    <info>%command.full_name% {$shell} > completion.sh</>
 
-    <comment># source the file whenever you use the project</>
-    <info>source completion.sh</>
+                    <comment># source the file whenever you use the project</>
+                    <info>source completion.sh</>
 
-    <comment># or add this line at the end of your "{$rcFile}" file:</>
-    <info>source /path/to/completion.sh</>
+                    <comment># or add this line at the end of your "{$rcFile}" file:</>
+                    <info>source /path/to/completion.sh</>
 
-<comment>Dynamic installation
---------------------</>
+                <comment>Dynamic installation
+                --------------------</>
 
-Add this to the end of your shell configuration file (e.g. <info>"{$rcFile}"</>):
+                Add this to the end of your shell configuration file (e.g. <info>"{$rcFile}"</>):
 
-    <info>eval "$({$fullCommand} completion {$shell})"</>
-EOH
+                    <info>eval "$({$fullCommand} completion {$shell})"</>
+                EOH
             )
             ->addArgument('shell', InputArgument::OPTIONAL, 'The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given', null, $this->getSupportedShells(...))
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Tail the completion debug log')
@@ -98,9 +98,9 @@ EOH
                 $output = $output->getErrorOutput();
             }
             if ($shell) {
-                $output->writeln(sprintf('<error>Detected shell "%s", which is not supported by Symfony shell completion (supported shells: "%s").</>', $shell, implode('", "', $supportedShells)));
+                $output->writeln(\sprintf('<error>Detected shell "%s", which is not supported by Symfony shell completion (supported shells: "%s").</>', $shell, implode('", "', $supportedShells)));
             } else {
-                $output->writeln(sprintf('<error>Shell not detected, Symfony shell completion only supports "%s").</>', implode('", "', $supportedShells)));
+                $output->writeln(\sprintf('<error>Shell not detected, Symfony shell completion only supports "%s").</>', implode('", "', $supportedShells)));
             }
 
             return 2;

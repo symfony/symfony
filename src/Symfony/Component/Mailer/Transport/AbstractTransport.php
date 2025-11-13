@@ -30,14 +30,14 @@ use Symfony\Component\Mime\RawMessage;
  */
 abstract class AbstractTransport implements TransportInterface
 {
-    private ?EventDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
     private float $rate = 0;
     private float $lastSent = 0;
 
-    public function __construct(?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private ?EventDispatcherInterface $dispatcher = null,
+        ?LoggerInterface $logger = null,
+    ) {
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -81,7 +81,7 @@ abstract class AbstractTransport implements TransportInterface
             $message = $event->getMessage();
 
             if ($message instanceof TemplatedEmail && !$message->isRendered()) {
-                throw new LogicException(sprintf('You must configure a "%s" when a "%s" instance has a text or HTML template set.', BodyRendererInterface::class, get_debug_type($message)));
+                throw new LogicException(\sprintf('You must configure a "%s" when a "%s" instance has a text or HTML template set.', BodyRendererInterface::class, get_debug_type($message)));
             }
 
             $sentMessage = new SentMessage($message, $envelope);
@@ -128,7 +128,7 @@ abstract class AbstractTransport implements TransportInterface
 
         $sleep = (1 / $this->rate) - (microtime(true) - $this->lastSent);
         if (0 < $sleep) {
-            $this->logger->debug(sprintf('Email transport "%s" sleeps for %.2f seconds', __CLASS__, $sleep));
+            $this->logger->debug(\sprintf('Email transport "%s" sleeps for %.2f seconds', __CLASS__, $sleep));
             usleep((int) ($sleep * 1000000));
         }
         $this->lastSent = microtime(true);

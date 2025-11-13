@@ -28,35 +28,35 @@ class TraceableSerializerTest extends TestCase
         $serializer
             ->expects($this->once())
             ->method('serialize')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('serialized');
         $serializer
             ->expects($this->once())
             ->method('deserialize')
-            ->with('data', 'type', 'format', $this->isType('array'))
+            ->with('data', 'type', 'format', $this->isArray())
             ->willReturn('deserialized');
         $serializer
             ->expects($this->once())
             ->method('normalize')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('normalized');
         $serializer
             ->expects($this->once())
             ->method('denormalize')
-            ->with('data', 'type', 'format', $this->isType('array'))
+            ->with('data', 'type', 'format', $this->isArray())
             ->willReturn('denormalized');
         $serializer
             ->expects($this->once())
             ->method('encode')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('encoded');
         $serializer
             ->expects($this->once())
             ->method('decode')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('decoded');
 
-        $traceableSerializer = new TraceableSerializer($serializer, new SerializerDataCollector());
+        $traceableSerializer = new TraceableSerializer($serializer, new SerializerDataCollector(), 'default');
 
         $this->assertSame('serialized', $traceableSerializer->serialize('data', 'format'));
         $this->assertSame('deserialized', $traceableSerializer->deserialize('data', 'type', 'format'));
@@ -68,33 +68,35 @@ class TraceableSerializerTest extends TestCase
 
     public function testCollectData()
     {
+        $serializerName = uniqid('name', true);
+
         $dataCollector = $this->createMock(SerializerDataCollector::class);
         $dataCollector
             ->expects($this->once())
             ->method('collectSerialize')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isString(), 'data', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDeserialize')
-            ->with($this->isType('string'), 'data', 'type', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isString(), 'data', 'type', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectNormalize')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isString(), 'data', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDenormalize')
-            ->with($this->isType('string'), 'data', 'type', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isString(), 'data', 'type', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectEncode')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isString(), 'data', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDecode')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'));
+            ->with($this->isString(), 'data', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
 
-        $traceableSerializer = new TraceableSerializer(new Serializer(), $dataCollector);
+        $traceableSerializer = new TraceableSerializer(new Serializer(), $dataCollector, $serializerName);
 
         $traceableSerializer->serialize('data', 'format');
         $traceableSerializer->deserialize('data', 'type', 'format');
@@ -117,7 +119,7 @@ class TraceableSerializerTest extends TestCase
             });
         }
 
-        $traceableSerializer = new TraceableSerializer($serializer, new SerializerDataCollector());
+        $traceableSerializer = new TraceableSerializer($serializer, new SerializerDataCollector(), 'default');
 
         $traceableSerializer->serialize('data', 'format');
         $traceableSerializer->deserialize('data', 'format', 'type');
@@ -125,6 +127,40 @@ class TraceableSerializerTest extends TestCase
         $traceableSerializer->denormalize('data', 'format');
         $traceableSerializer->encode('data', 'format');
         $traceableSerializer->decode('data', 'format');
+    }
+
+    public function testCollectedCaller()
+    {
+        $serializer = new \Symfony\Component\Serializer\Serializer();
+
+        $collector = new SerializerDataCollector();
+        $traceableSerializer = new TraceableSerializer($serializer, $collector);
+
+        $traceableSerializer->normalize('data');
+        $collector->lateCollect();
+
+        $this->assertSame([
+            'name' => 'TraceableSerializerTest.php',
+            'file' => __FILE__,
+            'line' => __LINE__ - 6,
+        ], $collector->getData()['normalize'][0]['caller']);
+    }
+
+    public function testCollectedCallerFromArrayMap()
+    {
+        $serializer = new \Symfony\Component\Serializer\Serializer();
+
+        $collector = new SerializerDataCollector();
+        $traceableSerializer = new TraceableSerializer($serializer, $collector);
+
+        array_map([$traceableSerializer, 'normalize'], ['data']);
+        $collector->lateCollect();
+
+        $this->assertSame([
+            'name' => 'TraceableSerializerTest.php',
+            'file' => __FILE__,
+            'line' => __LINE__ - 6,
+        ], $collector->getData()['normalize'][0]['caller']);
     }
 }
 
@@ -140,7 +176,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         return 'deserialized';
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return 'normalized';
     }

@@ -1,11 +1,51 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `#[ExtendsSerializationFor]` to declare new serialization attributes for a class
+ * Add `AttributeMetadataPass` to declare compile-time constraint metadata using attributes
+ * Add `CDATA_WRAPPING_NAME_PATTERN` support to `XmlEncoder`
+ * Add support for `can*()` methods to `AttributeLoader`
+ * Make `AttributeMetadata` and `ClassMetadata` final
+ * Add `XmlEncoder::PRESERVE_NUMERIC_KEYS` context option
+ * Deprecate class aliases in the `Annotation` namespace, use attributes instead
+ * Deprecate getters in attribute classes in favor of public properties
+ * Deprecate `ClassMetadataFactoryCompiler`
+ * Add `FORCE_TIMEZONE_KEY` to `DateTimeNormalizer` to force the timezone during denormalization
+
+7.3
+---
+
+ * Deprecate the `CompiledClassMetadataFactory` and `CompiledClassMetadataCacheWarmer` classes
+ * Register `NormalizerInterface` and `DenormalizerInterface` aliases for named serializers
+ * Add `NumberNormalizer` to normalize `BcMath\Number` and `GMP` as `string`
+ * Add `defaultType` to `DiscriminatorMap`
+
+7.2
+---
+
+ * Deprecate the `csv_escape_char` context option of `CsvEncoder` and the `CsvEncoder::ESCAPE_CHAR_KEY` constant
+ * Deprecate `CsvEncoderContextBuilder::withEscapeChar()` method
+ * Add `SnakeCaseToCamelCaseNameConverter`
+ * Support subclasses of `\DateTime` and `\DateTimeImmutable` for denormalization
+ * Add the `UidNormalizer::NORMALIZATION_FORMAT_RFC9562` constant
+ * Add support for configuring multiple serializer instances with different
+   default contexts, name converters, sets of normalizers and encoders
+ * Add support for collection profiles of multiple serializer instances
+ * Deprecate `AdvancedNameConverterInterface`, use `NameConverterInterface` instead
+
 7.1
 ---
 
+ * Add arguments `$class`, `$format` and `$context` to `NameConverterInterface::normalize()` and `NameConverterInterface::denormalize()`
  * Add `DateTimeNormalizer::CAST_KEY` context option
  * Add `Default` and "class name" default groups
+ * Add `AbstractNormalizer::FILTER_BOOL` context option
+ * Add `CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES` context option
+ * Deprecate `AbstractNormalizerContextBuilder::withDefaultContructorArguments(?array $defaultContructorArguments)`, use `withDefaultConstructorArguments(?array $defaultConstructorArguments)` instead (note the missing `s` character in Constructor word in deprecated method)
+ * Add `XmlEncoder::CDATA_WRAPPING_PATTERN` context option
 
 7.0
 ---

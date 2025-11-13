@@ -37,25 +37,25 @@ class GenerateUlidCommand extends Command
             ->setDefinition([
                 new InputOption('time', null, InputOption::VALUE_REQUIRED, 'The ULID timestamp: a parsable date/time string'),
                 new InputOption('count', 'c', InputOption::VALUE_REQUIRED, 'The number of ULID to generate', 1),
-                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, sprintf('The ULID output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'base32'),
+                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, \sprintf('The ULID output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'base32'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command generates a ULID.
+                The <info>%command.name%</info> command generates a ULID.
 
-    <info>php %command.full_name%</info>
+                    <info>php %command.full_name%</info>
 
-To specify the timestamp:
+                To specify the timestamp:
 
-    <info>php %command.full_name% --time="2021-02-16 14:09:08"</info>
+                    <info>php %command.full_name% --time="2021-02-16 14:09:08"</info>
 
-To generate several ULIDs:
+                To generate several ULIDs:
 
-    <info>php %command.full_name% --count=10</info>
+                    <info>php %command.full_name% --count=10</info>
 
-To output a specific format:
+                To output a specific format:
 
-    <info>php %command.full_name% --format=rfc4122</info>
-EOF
+                    <info>php %command.full_name% --format=rfc4122</info>
+                EOF
             )
         ;
     }
@@ -68,7 +68,7 @@ EOF
             try {
                 $time = new \DateTimeImmutable($time);
             } catch (\Exception $e) {
-                $io->error(sprintf('Invalid timestamp "%s": %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
+                $io->error(\sprintf('Invalid timestamp "%s": %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
 
                 return 1;
             }
@@ -79,7 +79,7 @@ EOF
         if (\in_array($formatOption, $this->getAvailableFormatOptions(), true)) {
             $format = 'to'.ucfirst($formatOption);
         } else {
-            $io->error(sprintf('Invalid format "%s", supported formats are "%s".', $formatOption, implode('", "', $this->getAvailableFormatOptions())));
+            $io->error(\sprintf('Invalid format "%s", supported formats are "%s".', $formatOption, implode('", "', $this->getAvailableFormatOptions())));
 
             return 1;
         }
@@ -105,6 +105,7 @@ EOF
         }
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
         return [

@@ -101,23 +101,23 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
         return $this->exists[0] xor !$exists[0];
     }
 
-    /**
-     * @internal
-     */
-    public function __sleep(): array
+    public function __serialize(): array
     {
         if (null === $this->exists) {
             $this->isFresh(0);
         }
 
-        return ['resource', 'exists'];
+        return [
+            'resource' => $this->resource,
+            'exists' => $this->exists,
+        ];
     }
 
-    /**
-     * @internal
-     */
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
+        $this->resource = array_shift($data);
+        $this->exists = array_shift($data);
+
         if (\is_bool($this->exists)) {
             $this->exists = [$this->exists, null];
         }
@@ -158,10 +158,10 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             throw $previous;
         }
 
-        $message = sprintf('Class "%s" not found.', $class);
+        $message = \sprintf('Class "%s" not found.', $class);
 
         if ($class !== (self::$autoloadedClass ?? $class)) {
-            $message = substr_replace($message, sprintf(' while loading "%s"', self::$autoloadedClass), -1, 0);
+            $message = substr_replace($message, \sprintf(' while loading "%s"', self::$autoloadedClass), -1, 0);
         }
 
         if (null !== $previous) {

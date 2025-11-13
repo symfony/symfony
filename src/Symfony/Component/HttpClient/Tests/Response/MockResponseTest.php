@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests\Response;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\JsonException;
@@ -47,9 +48,7 @@ class MockResponseTest extends TestCase
         $this->assertSame($data, $response->toArray());
     }
 
-    /**
-     * @dataProvider toArrayErrors
-     */
+    #[DataProvider('toArrayErrors')]
     public function testToArrayError($content, $responseHeaders, $message)
     {
         $this->expectException(JsonException::class);

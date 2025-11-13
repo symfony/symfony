@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Cidr;
 use Symfony\Component\Validator\Constraints\CidrValidator;
 use Symfony\Component\Validator\Constraints\Ip;
@@ -55,9 +56,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(123456, new Cidr());
     }
 
-    /**
-     * @dataProvider getWithInvalidNetmask
-     */
+    #[DataProvider('getWithInvalidNetmask')]
     public function testInvalidNetmask(string $cidr)
     {
         $this->validator->validate($cidr, new Cidr());
@@ -68,9 +67,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getWithInvalidIps
-     */
+    #[DataProvider('getWithInvalidIps')]
     public function testInvalidIpValue(string $cidr)
     {
         $this->validator->validate($cidr, new Cidr());
@@ -81,19 +78,15 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getValid
-     */
+    #[DataProvider('getValid')]
     public function testValidCidr(string|\Stringable $cidr, string $version)
     {
-        $this->validator->validate($cidr, new Cidr(['version' => $version]));
+        $this->validator->validate($cidr, new Cidr(version: $version));
 
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getWithInvalidMasksAndIps
-     */
+    #[DataProvider('getWithInvalidMasksAndIps')]
     public function testInvalidIpAddressAndNetmask(string|\Stringable $cidr)
     {
         $this->validator->validate($cidr, new Cidr());
@@ -103,32 +96,28 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getOutOfRangeNetmask
-     */
-    public function testOutOfRangeNetmask(string $cidr, ?string $version = null, ?int $min = null, ?int $max = null)
+    #[DataProvider('getOutOfRangeNetmask')]
+    public function testOutOfRangeNetmask(string $cidr, int $maxExpected, ?string $version = null, ?int $min = null, ?int $max = null)
     {
-        $cidrConstraint = new Cidr([
-            'version' => $version,
-            'netmaskMin' => $min,
-            'netmaskMax' => $max,
-        ]);
+        $cidrConstraint = new Cidr(
+            version: $version,
+            netmaskMin: $min,
+            netmaskMax: $max,
+        );
         $this->validator->validate($cidr, $cidrConstraint);
 
         $this
             ->buildViolation('The value of the netmask should be between {{ min }} and {{ max }}.')
             ->setParameter('{{ min }}', $cidrConstraint->netmaskMin)
-            ->setParameter('{{ max }}', $cidrConstraint->netmaskMax)
+            ->setParameter('{{ max }}', $maxExpected)
             ->setCode(Cidr::OUT_OF_RANGE_ERROR)
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getWithWrongVersion
-     */
+    #[DataProvider('getWithWrongVersion')]
     public function testWrongVersion(string $cidr, string $version)
     {
-        $this->validator->validate($cidr, new Cidr(['version' => $version]));
+        $this->validator->validate($cidr, new Cidr(version: $version));
 
         $this
             ->buildViolation('This value is not a valid CIDR notation.')
@@ -240,9 +229,9 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     public static function getOutOfRangeNetmask(): array
     {
         return [
-            ['10.0.0.0/24', Ip::V4, 10, 20],
-            ['10.0.0.0/128'],
-            ['2001:0DB8:85A3:0000:0000:8A2E:0370:7334/24', Ip::V6, 10, 20],
+            ['10.0.0.0/24', 20, Ip::V4, 10, 20],
+            ['10.0.0.0/128', 32],
+            ['2001:0DB8:85A3:0000:0000:8A2E:0370:7334/24', 20, Ip::V6, 10, 20],
         ];
     }
 
@@ -254,5 +243,18 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ['10.0.0.0/24', Ip::V6],
             ['2001:0db8:85a3:0000:0000:8a2e:0370:7334/13', Ip::V4],
         ];
+    }
+
+    public function testDoesNotModifyContextBetweenValidations()
+    {
+        $constraint = new Cidr();
+
+        $this->validator->validate('1.2.3.4/28', $constraint);
+
+        $this->assertNoViolation();
+
+        $this->validator->validate('::1/64', $constraint);
+
+        $this->assertNoViolation();
     }
 }

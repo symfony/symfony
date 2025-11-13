@@ -11,12 +11,19 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Alias;
+use Symfony\Component\Routing\Exception\LogicException;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AbstractClassController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ActionPathController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasClassController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasInvokableController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\BazClass;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\DefaultValueController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\DeprecatedAliasCustomMessageRouteController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\DeprecatedAliasRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\EncodingClass;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ExplicitLocalizedActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ExtendedRouteOnClassController;
@@ -34,6 +41,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedPrefixWi
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodActionControllers;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodsAndSchemes;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MissingRouteNameController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MultipleDeprecatedAliasRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\NothingButNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PrefixedActionLocalizedRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PrefixedActionPathController;
@@ -49,14 +57,18 @@ class AttributeClassLoaderTest extends TestCase
 
     protected function setUp(?string $env = null): void
     {
-        parent::setUp();
-
         $this->loader = new TraceableAttributeClassLoader($env);
     }
 
-    /**
-     * @dataProvider provideTestSupportsChecksResource
-     */
+    public function testGetResolver()
+    {
+        $this->expectException(LogicException::class);
+
+        $loader = new TraceableAttributeClassLoader();
+        $loader->getResolver();
+    }
+
+    #[DataProvider('provideTestSupportsChecksResource')]
     public function testSupportsChecksResource($resource, $expectedSupports)
     {
         $this->assertSame($expectedSupports, $this->loader->supports($resource), '->supports() returns true if the resource is loadable');
@@ -158,12 +170,16 @@ class AttributeClassLoaderTest extends TestCase
     public function testDefaultValuesForMethods()
     {
         $routes = $this->loader->load(DefaultValueController::class);
-        $this->assertCount(5, $routes);
+        $this->assertCount(7, $routes);
         $this->assertEquals('/{default}/path', $routes->get('action')->getPath());
         $this->assertEquals('value', $routes->get('action')->getDefault('default'));
         $this->assertEquals('Symfony', $routes->get('hello_with_default')->getDefault('name'));
         $this->assertEquals('World', $routes->get('hello_without_default')->getDefault('name'));
         $this->assertEquals('diamonds', $routes->get('string_enum_action')->getDefault('default'));
+        $this->assertArrayHasKey('libelle', $routes->get('defaultMappedParam_default')->getDefaults());
+        $this->assertNull($routes->get('defaultMappedParam_default')->getDefault('libelle'));
+        $this->assertArrayHasKey('barLibelle', $routes->get('defaultAdvancedMappedParam_default')->getDefaults());
+        $this->assertNull($routes->get('defaultAdvancedMappedParam_default')->getDefault('barLibelle'));
         $this->assertEquals(20, $routes->get('int_enum_action')->getDefault('default'));
     }
 
@@ -177,7 +193,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(new Alias('put'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodActionControllers::put'));
     }
 
-    public function testInvokableClassRouteLoadWithMethodAnnotation()
+    public function testInvokableClassRouteLoadWithMethodAttribute()
     {
         $routes = $this->loader->load(LocalizedMethodActionControllers::class);
         $this->assertCount(4, $routes);
@@ -185,7 +201,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/the/path', $routes->get('post.en')->getPath());
     }
 
-    public function testGlobalDefaultsRoutesLoadWithAnnotation()
+    public function testGlobalDefaultsRoutesLoadWithAttribute()
     {
         $routes = $this->loader->load(GlobalDefaultsClass::class);
         $this->assertCount(4, $routes);
@@ -206,7 +222,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame(['https'], $routes->get('redundant_scheme')->getSchemes());
     }
 
-    public function testUtf8RoutesLoadWithAnnotation()
+    public function testUtf8RoutesLoadWithAttribute()
     {
         $routes = $this->loader->load(Utf8ActionControllers::class);
         $this->assertSame(['one', 'two'], array_keys($routes->all()));
@@ -318,8 +334,10 @@ class AttributeClassLoaderTest extends TestCase
 
         $this->setUp('some-env');
         $routes = $this->loader->load(RouteWithEnv::class);
-        $this->assertCount(1, $routes);
+        $this->assertCount(3, $routes);
         $this->assertSame('/path', $routes->get('action')->getPath());
+        $this->assertSame('/path4', $routes->get('action4')->getPath());
+        $this->assertSame('/path5', $routes->get('action5')->getPath());
     }
 
     public function testMethodsAndSchemes()
@@ -356,5 +374,99 @@ class AttributeClassLoaderTest extends TestCase
         $defaultName = array_keys($routeCollection->all())[0];
 
         $this->assertSame('symfony_component_routing_tests_fixtures_attributefixtures_encodingclass_routeàction', $defaultName);
+    }
+
+    public function testAliasesOnMethod()
+    {
+        $routes = $this->loader->load(AliasRouteController::class);
+        $route = $routes->get('action_with_alias');
+        $this->assertCount(1, $routes);
+        $this->assertSame('/path', $route->getPath());
+        $this->assertEquals(new Alias('action_with_alias'), $routes->getAlias('alias'));
+        $this->assertEquals(new Alias('action_with_alias'), $routes->getAlias('completely_different_name'));
+    }
+
+    public function testThrowsWithAliasesOnClass()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Route aliases cannot be used on non-invokable class "Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasClassController".');
+
+        $this->loader->load(AliasClassController::class);
+    }
+
+    public function testAliasesOnInvokableClass()
+    {
+        $routes = $this->loader->load(AliasInvokableController::class);
+        $route = $routes->get('invokable_path');
+        $this->assertCount(1, $routes);
+        $this->assertSame('/path', $route->getPath());
+        $this->assertEquals(new Alias('invokable_path'), $routes->getAlias('alias'));
+        $this->assertEquals(new Alias('invokable_path'), $routes->getAlias('completely_different_name'));
+    }
+
+    public function testDeprecatedAlias()
+    {
+        $routes = $this->loader->load(DeprecatedAliasRouteController::class);
+        $route = $routes->get('action_with_deprecated_alias');
+        $expected = (new Alias('action_with_deprecated_alias'))
+            ->setDeprecated(
+                'MyBundleFixture',
+                '1.0',
+                'The "%alias_id%" route alias is deprecated. You should stop using it, as it will be removed in the future.'
+            );
+        $actual = $routes->getAlias('my_other_alias_deprecated');
+        $this->assertCount(1, $routes);
+        $this->assertSame('/path', $route->getPath());
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testDeprecatedAliasWithCustomMessage()
+    {
+        $routes = $this->loader->load(DeprecatedAliasCustomMessageRouteController::class);
+        $route = $routes->get('action_with_deprecated_alias');
+        $expected = (new Alias('action_with_deprecated_alias'))
+            ->setDeprecated(
+                'MyBundleFixture',
+                '1.0',
+                '%alias_id% alias is deprecated.'
+            );
+        $actual = $routes->getAlias('my_other_alias_deprecated');
+        $this->assertCount(1, $routes);
+        $this->assertSame('/path', $route->getPath());
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testMultipleDeprecatedAlias()
+    {
+        $routes = $this->loader->load(MultipleDeprecatedAliasRouteController::class);
+        $route = $routes->get('action_with_multiple_deprecated_alias');
+        $this->assertCount(1, $routes);
+        $this->assertSame('/path', $route->getPath());
+
+        $dataset = [
+            'my_first_alias_deprecated' => [
+                'package' => 'MyFirstBundleFixture',
+                'version' => '1.0',
+            ],
+            'my_second_alias_deprecated' => [
+                'package' => 'MySecondBundleFixture',
+                'version' => '2.0',
+            ],
+            'my_third_alias_deprecated' => [
+                'package' => 'SurprisedThirdBundleFixture',
+                'version' => '3.0',
+            ],
+        ];
+
+        foreach ($dataset as $aliasName => $aliasData) {
+            $expected = (new Alias('action_with_multiple_deprecated_alias'))
+                ->setDeprecated(
+                    $aliasData['package'],
+                    $aliasData['version'],
+                    'The "%alias_id%" route alias is deprecated. You should stop using it, as it will be removed in the future.'
+                );
+            $actual = $routes->getAlias($aliasName);
+            $this->assertEquals($expected, $actual);
+        }
     }
 }

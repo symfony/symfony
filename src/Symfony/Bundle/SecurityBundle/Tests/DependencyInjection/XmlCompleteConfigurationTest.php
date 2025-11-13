@@ -11,10 +11,14 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
+#[IgnoreDeprecations]
+#[Group('legacy')]
 class XmlCompleteConfigurationTest extends CompleteConfigurationTestCase
 {
     public function testFirewallPatterns()

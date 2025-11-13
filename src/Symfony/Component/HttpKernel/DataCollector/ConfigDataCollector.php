@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Runtime\RunnerInterface;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 
@@ -40,10 +41,12 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         $eom = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE);
         $eol = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE);
 
+        $xdebugMode = getenv('XDEBUG_MODE') ?: \ini_get('xdebug.mode');
+
         $this->data = [
             'token' => $response->headers->get('X-Debug-Token'),
             'symfony_version' => Kernel::VERSION,
-            'symfony_minor_version' => sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION),
+            'symfony_minor_version' => \sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION),
             'symfony_lts' => 4 === Kernel::MINOR_VERSION,
             'symfony_state' => $this->determineSymfonyState(),
             'symfony_eom' => $eom->format('F Y'),
@@ -55,10 +58,14 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'php_intl_locale' => class_exists(\Locale::class, false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a',
             'php_timezone' => date_default_timezone_get(),
             'xdebug_enabled' => \extension_loaded('xdebug'),
+            'xdebug_status' => \extension_loaded('xdebug') ? ($xdebugMode && 'off' !== $xdebugMode ? 'Enabled ('.$xdebugMode.')' : 'Not enabled') : 'Not installed',
             'apcu_enabled' => \extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL),
+            'apcu_status' => \extension_loaded('apcu') ? (filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN) ? 'Enabled' : 'Not enabled') : 'Not installed',
             'zend_opcache_enabled' => \extension_loaded('Zend OPcache') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL),
+            'zend_opcache_status' => \extension_loaded('Zend OPcache') ? (filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN) ? 'Enabled' : 'Not enabled') : 'Not installed',
             'bundles' => [],
             'sapi_name' => \PHP_SAPI,
+            'runner_class' => $this->determineRunnerClass(),
         ];
 
         if (isset($this->kernel)) {
@@ -192,6 +199,11 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['xdebug_enabled'];
     }
 
+    public function getXdebugStatus(): string
+    {
+        return $this->data['xdebug_status'];
+    }
+
     /**
      * Returns true if the function xdebug_info is available.
      */
@@ -208,12 +220,22 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['apcu_enabled'];
     }
 
+    public function getApcuStatus(): string
+    {
+        return $this->data['apcu_status'];
+    }
+
     /**
      * Returns true if Zend OPcache is enabled.
      */
     public function hasZendOpcache(): bool
     {
         return $this->data['zend_opcache_enabled'];
+    }
+
+    public function getZendOpcacheStatus(): string
+    {
+        return $this->data['zend_opcache_status'];
     }
 
     public function getBundles(): array|Data
@@ -227,6 +249,11 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     public function getSapiName(): string
     {
         return $this->data['sapi_name'];
+    }
+
+    public function getRunnerClass(): ?string
+    {
+        return $this->data['runner_class'];
     }
 
     public function getName(): string
@@ -251,5 +278,20 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         }
 
         return $versionState;
+    }
+
+    private function determineRunnerClass(): ?string
+    {
+        $stack = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS);
+        for ($frame = end($stack); $frame; $frame = prev($stack)) {
+            if (!$class = $frame['class'] ?? null) {
+                continue;
+            }
+            if (is_a($class, RunnerInterface::class, true)) {
+                return $class;
+            }
+        }
+
+        return null;
     }
 }

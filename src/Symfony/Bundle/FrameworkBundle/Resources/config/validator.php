@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
@@ -28,7 +29,7 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 return static function (ContainerConfigurator $container) {
     $container->parameters()
-        ->set('validator.mapping.cache.file', param('kernel.cache_dir').'/validation.php');
+        ->set('validator.mapping.cache.file', '%kernel.build_dir%/validation.php');
 
     $validatorsDir = \dirname((new \ReflectionClass(EmailValidator::class))->getFileName());
 
@@ -127,5 +128,9 @@ return static function (ContainerConfigurator $container) {
                 service('property_info'),
             ])
             ->tag('validator.auto_mapper')
+
+        ->set('validator.form.attribute_metadata', Form::class)
+            ->tag('container.excluded')
+            ->tag('validator.attribute_metadata')
     ;
 };

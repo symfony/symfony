@@ -16,7 +16,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
- * Twig extension relate to PHP code and used by the profiler and the default exception templates.
+ * Twig extension related to PHP code and used by the profiler and the default exception templates.
  *
  * This extension should only be used for debugging tools code
  * that is never executed in a production environment.
@@ -26,14 +26,14 @@ use Twig\TwigFilter;
 final class CodeExtension extends AbstractExtension
 {
     private string|FileLinkFormatter|array|false $fileLinkFormat;
-    private string $charset;
-    private string $projectDir;
 
-    public function __construct(string|FileLinkFormatter $fileLinkFormat, string $projectDir, string $charset)
-    {
+    public function __construct(
+        string|FileLinkFormatter $fileLinkFormat,
+        private string $projectDir,
+        private string $charset,
+    ) {
         $this->fileLinkFormat = $fileLinkFormat ?: \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->projectDir = str_replace('\\', '/', $projectDir).'/';
-        $this->charset = $charset;
     }
 
     public function getFilters(): array
@@ -57,18 +57,18 @@ final class CodeExtension extends AbstractExtension
         $parts = explode('\\', $class);
         $short = array_pop($parts);
 
-        return sprintf('<abbr title="%s">%s</abbr>', $class, $short);
+        return \sprintf('<abbr title="%s">%s</abbr>', $class, $short);
     }
 
     public function abbrMethod(string $method): string
     {
         if (str_contains($method, '::')) {
             [$class, $method] = explode('::', $method, 2);
-            $result = sprintf('%s::%s()', $this->abbrClass($class), $method);
+            $result = \sprintf('%s::%s()', $this->abbrClass($class), $method);
         } elseif ('Closure' === $method) {
-            $result = sprintf('<abbr title="%s">%1$s</abbr>', $method);
+            $result = \sprintf('<abbr title="%s">%1$s</abbr>', $method);
         } else {
-            $result = sprintf('<abbr title="%s">%1$s</abbr>()', $method);
+            $result = \sprintf('<abbr title="%s">%1$s</abbr>()', $method);
         }
 
         return $result;
@@ -85,22 +85,22 @@ final class CodeExtension extends AbstractExtension
                 $item[1] = htmlspecialchars($item[1], \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
                 $parts = explode('\\', $item[1]);
                 $short = array_pop($parts);
-                $formattedValue = sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
+                $formattedValue = \sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
+                $formattedValue = \sprintf('<em>array</em>(%s)', \is_array($item[1]) ? $this->formatArgs($item[1]) : htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
                 $formattedValue = '<em>'.strtolower(htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset)).'</em>';
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
-            } elseif (preg_match('/[^\x07-\x0D\x1B\x20-\xFF]/', $item[1])) {
+            } elseif (\is_string($item[1]) && preg_match('/[^\x07-\x0D\x1B\x20-\xFF]/', $item[1])) {
                 $formattedValue = '<em>binary string</em>';
             } else {
                 $formattedValue = str_replace("\n", '', htmlspecialchars(var_export($item[1], true), \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset));
             }
 
-            $result[] = \is_int($key) ? $formattedValue : sprintf("'%s' => %s", htmlspecialchars($key, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $formattedValue);
+            $result[] = \is_int($key) ? $formattedValue : \sprintf("'%s' => %s", htmlspecialchars($key, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $formattedValue);
         }
 
         return implode(', ', $result);
@@ -119,39 +119,85 @@ final class CodeExtension extends AbstractExtension
      */
     public function fileExcerpt(string $file, int $line, int $srcContext = 3): ?string
     {
-        if (is_file($file) && is_readable($file)) {
-            // highlight_file could throw warnings
-            // see https://bugs.php.net/25725
-            $code = @highlight_file($file, true);
-            if (\PHP_VERSION_ID >= 80300) {
-                // remove main pre/code tags
-                $code = preg_replace('#^<pre.*?>\s*<code.*?>(.*)</code>\s*</pre>#s', '\\1', $code);
-                // split multiline code tags
-                $code = preg_replace_callback('#<code ([^>]++)>((?:[^<]*+\\n)++[^<]*+)</code>#', fn ($m) => "<code $m[1]>".str_replace("\n", "</code>\n<code $m[1]>", $m[2]).'</code>', $code);
-                // Convert spaces to html entities to preserve indentation when rendered
-                $code = str_replace(' ', '&nbsp;', $code);
-                $content = explode("\n", $code);
-            } else {
-                // remove main code/span tags
-                $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
-                // split multiline spans
-                $code = preg_replace_callback('#<span ([^>]++)>((?:[^<]*+<br \/>)++[^<]*+)</span>#', fn ($m) => "<span $m[1]>".str_replace('<br />', "</span><br /><span $m[1]>", $m[2]).'</span>', $code);
-                $content = explode('<br />', $code);
-            }
-
-            $lines = [];
-            if (0 > $srcContext) {
-                $srcContext = \count($content);
-            }
-
-            for ($i = max($line - $srcContext, 1), $max = min($line + $srcContext, \count($content)); $i <= $max; ++$i) {
-                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><a class="anchor" id="line'.$i.'"></a><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
-            }
-
-            return '<ol start="'.max($line - $srcContext, 1).'">'.implode("\n", $lines).'</ol>';
+        if (!is_file($file) || !is_readable($file)) {
+            return null;
         }
 
-        return null;
+        $contents = file_get_contents($file);
+
+        if (!str_contains($contents, '<?php') && !str_contains($contents, '<?=')) {
+            $lines = explode("\n", $contents);
+
+            if (0 > $srcContext) {
+                $srcContext = \count($lines);
+            }
+
+            return $this->formatFileExcerpt(
+                $this->extractExcerptLines($lines, $line, $srcContext),
+                $line,
+                $srcContext
+            );
+        }
+
+        // highlight_string could throw warnings
+        // see https://bugs.php.net/25725
+        $code = @highlight_string($contents, true);
+
+        if (\PHP_VERSION_ID >= 80300) {
+            // remove main pre/code tags
+            $code = preg_replace('#^<pre.*?>\s*<code.*?>(.*)</code>\s*</pre>#s', '\\1', $code);
+            // split multiline span tags
+            $code = preg_replace_callback(
+                '#<span ([^>]++)>((?:[^<\\n]*+\\n)++[^<]*+)</span>#',
+                static fn (array $m): string => "<span $m[1]>".str_replace("\n", "</span>\n<span $m[1]>", $m[2]).'</span>',
+                $code
+            );
+            $lines = explode("\n", $code);
+        } else {
+            // remove main code/span tags
+            $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
+            // split multiline spans
+            $code = preg_replace_callback(
+                '#<span ([^>]++)>((?:[^<]*+<br \/>)++[^<]*+)</span>#',
+                static fn (array $m): string => "<span $m[1]>".str_replace('<br />', "</span><br /><span $m[1]>", $m[2]).'</span>',
+                $code
+            );
+            $lines = explode('<br />', $code);
+        }
+
+        if (0 > $srcContext) {
+            $srcContext = \count($lines);
+        }
+
+        return $this->formatFileExcerpt(
+            array_map(
+                self::fixCodeMarkup(...),
+                $this->extractExcerptLines($lines, $line, $srcContext),
+            ),
+            $line,
+            $srcContext
+        );
+    }
+
+    private function extractExcerptLines(array $lines, int $selectedLine, int $srcContext): array
+    {
+        return \array_slice(
+            $lines,
+            max($selectedLine - $srcContext, 0),
+            min($srcContext * 2 + 1, \count($lines) - $selectedLine + $srcContext),
+            true
+        );
+    }
+
+    private function formatFileExcerpt(array $lines, int $selectedLine, int $srcContext): string
+    {
+        $start = max($selectedLine - $srcContext, 1);
+
+        return "<ol start=\"{$start}\">".implode("\n", array_map(
+            static fn (string $line, int $num): string => '<li'.(++$num === $selectedLine ? ' class="selected"' : '')."><a class=\"anchor\" id=\"line{$num}\"></a><code>{$line}</code></li>",
+            $lines,
+            array_keys($lines),
+        )).'</ol>';
     }
 
     /**
@@ -164,7 +210,7 @@ final class CodeExtension extends AbstractExtension
         if (null === $text) {
             if (null !== $rel = $this->getFileRelative($file)) {
                 $rel = explode('/', htmlspecialchars($rel, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), 2);
-                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', htmlspecialchars($this->projectDir, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $rel[0], '/'.($rel[1] ?? ''));
+                $text = \sprintf('<abbr title="%s%2$s">%s</abbr>%s', htmlspecialchars($this->projectDir, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $rel[0], '/'.($rel[1] ?? ''));
             } else {
                 $text = htmlspecialchars($file, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset);
             }
@@ -177,7 +223,7 @@ final class CodeExtension extends AbstractExtension
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $text);
+            return \sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, \ENT_COMPAT | \ENT_SUBSTITUTE, $this->charset), $text);
         }
 
         return $text;
@@ -241,7 +287,7 @@ final class CodeExtension extends AbstractExtension
         // missing </span> tag at the end of line
         $opening = strpos($line, '<span');
         $closing = strpos($line, '</span>');
-        if (false !== $opening && (false === $closing || $closing > $opening)) {
+        if (false !== $opening && (false === $closing || $closing < $opening)) {
             $line .= '</span>';
         }
 

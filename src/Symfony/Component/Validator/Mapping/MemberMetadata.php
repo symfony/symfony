@@ -29,26 +29,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 abstract class MemberMetadata extends GenericMetadata implements PropertyMetadataInterface
 {
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getClassName()} instead.
-     */
-    public string $class;
-
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getName()} instead.
-     */
-    public string $name;
-
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getPropertyName()} instead.
-     */
-    public string $property;
+    private string $class;
+    private string $name;
+    private string $property;
 
     /**
      * @var \ReflectionMethod[]|\ReflectionProperty[]
@@ -76,17 +59,53 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
         return $this;
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        return array_merge(parent::__sleep(), [
-            'class',
-            'name',
-            'property',
-        ]);
+        if (self::class === (new \ReflectionMethod($this, '__sleep'))->class || self::class !== (new \ReflectionMethod($this, '__serialize'))->class) {
+            return parent::__serialize() + [
+                'class' => $this->class,
+                'name' => $this->name,
+                'property' => $this->property,
+            ];
+        }
+
+        trigger_deprecation('symfony/validator', '7.4', 'Implementing "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
+
+        $data = [];
+        foreach ($this->__sleep() as $key) {
+            try {
+                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
+                    $data[$key] = $r->getValue($this);
+                }
+            } catch (\ReflectionException) {
+                $data[$key] = $this->$key;
+            }
+        }
+
+        return $data;
     }
 
     /**
-     * Returns the name of the member.
+     * @deprecated since Symfony 7.4, will be replaced by `__serialize()` in 8.0
+     */
+    public function __sleep(): array
+    {
+        trigger_deprecation('symfony/validator', '7.4', 'Calling "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
+
+        return [
+            'constraints',
+            'constraintsByGroup',
+            'cascadingStrategy',
+            'traversalStrategy',
+            'autoMappingStrategy',
+            'class',
+            'name',
+            'property',
+        ];
+    }
+
+    /**
+     * Returns the name of the property or its getter.
      */
     public function getName(): string
     {
@@ -103,33 +122,21 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
         return $this->property;
     }
 
-    /**
-     * Returns whether this member is public.
-     */
     public function isPublic(object|string $objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isPublic();
     }
 
-    /**
-     * Returns whether this member is protected.
-     */
     public function isProtected(object|string $objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isProtected();
     }
 
-    /**
-     * Returns whether this member is private.
-     */
     public function isPrivate(object|string $objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isPrivate();
     }
 
-    /**
-     * Returns the reflection instance for accessing the member's value.
-     */
     public function getReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
         $className = \is_string($objectOrClassName) ? $objectOrClassName : $objectOrClassName::class;
@@ -148,7 +155,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     private function checkConstraint(Constraint $constraint): void
     {
         if (!\in_array(Constraint::PROPERTY_CONSTRAINT, (array) $constraint->getTargets(), true)) {
-            throw new ConstraintDefinitionException(sprintf('The constraint "%s" cannot be put on properties or getters.', get_debug_type($constraint)));
+            throw new ConstraintDefinitionException(\sprintf('The constraint "%s" cannot be put on properties or getters.', get_debug_type($constraint)));
         }
 
         if ($constraint instanceof Composite) {

@@ -40,7 +40,7 @@ final class IqsmsTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('iqsms://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('iqsms://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -61,7 +61,7 @@ final class IqsmsTransport extends AbstractTransport
                         'phone' => $message->getPhone(),
                         'text' => $message->getSubject(),
                         'sender' => $message->getFrom() ?: $this->from,
-                        'clientId' => uniqid(),
+                        'clientId' => base64_encode(random_bytes(9)),
                     ],
                 ],
                 'login' => $this->login,
@@ -77,7 +77,7 @@ final class IqsmsTransport extends AbstractTransport
 
         foreach ($result['messages'] as $msg) {
             if ('accepted' !== $msg['status']) {
-                throw new TransportException(sprintf('Unable to send the SMS: "%s".', $msg['status']), $response);
+                throw new TransportException(\sprintf('Unable to send the SMS: "%s".', $msg['status']), $response);
             }
         }
 

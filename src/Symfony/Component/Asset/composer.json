@@ -19,9 +19,9 @@
         "php": ">=8.2"
     },
     "require-dev": {
-        "symfony/http-client": "^6.4|^7.0",
-        "symfony/http-foundation": "^6.4|^7.0",
-        "symfony/http-kernel": "^6.4|^7.0"
+        "symfony/http-client": "^6.4|^7.0|^8.0",
+        "symfony/http-foundation": "^6.4|^7.0|^8.0",
+        "symfony/http-kernel": "^6.4|^7.0|^8.0"
     },
     "conflict": {
         "symfony/http-foundation": "<6.4"

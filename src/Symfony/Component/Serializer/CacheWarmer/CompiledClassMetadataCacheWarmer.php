@@ -16,8 +16,12 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryCompiler;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
+trigger_deprecation('symfony/serializer', '7.3', 'The "%s" class is deprecated.', CompiledClassMetadataCacheWarmer::class);
+
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+ *
+ * @deprecated since Symfony 7.3
  */
 final class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
 {

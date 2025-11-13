@@ -23,6 +23,8 @@ return static function (ContainerConfigurator $container) {
                 service('translator')->nullOnInvalid(),
                 param('validator.translation_domain'),
                 service('form.server_params'),
+                param('form.type_extension.csrf.field_attr'),
+                param('.form.type_extension.csrf.token_id'),
             ])
             ->tag('form.type_extension')
     ;

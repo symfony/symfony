@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\HttpOptions;
 
@@ -27,9 +28,7 @@ class HttpOptionsTest extends TestCase
         yield ['user:0', 'user', '0'];
     }
 
-    /**
-     * @dataProvider provideSetAuthBasic
-     */
+    #[DataProvider('provideSetAuthBasic')]
     public function testSetAuthBasic(string $expected, string $user, string $password = '')
     {
         $this->assertSame($expected, (new HttpOptions())->setAuthBasic($user, $password)->toArray()['auth_basic']);

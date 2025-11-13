@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use Symfony\Bundle\FrameworkBundle\Test\TestContainer;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\NonPublicService;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService;
@@ -68,17 +70,13 @@ class TestServiceContainerTest extends AbstractWebTestCase
         $this->assertSame($service, $container->get('decorated')->inner);
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
+    #[DoesNotPerformAssertions]
     public function testBootKernel()
     {
         static::bootKernel(['test_case' => 'TestServiceContainer']);
     }
 
-    /**
-     * @depends testBootKernel
-     */
+    #[Depends('testBootKernel')]
     public function testKernelIsNotInitialized()
     {
         self::assertNull(self::$class);

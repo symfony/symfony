@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Event;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -22,9 +23,7 @@ use Symfony\Component\HttpKernel\Tests\TestHttpKernel;
 
 class ControllerEventTest extends TestCase
 {
-    /**
-     * @dataProvider provideGetAttributes
-     */
+    #[DataProvider('provideGetAttributes')]
     public function testGetAttributes(callable $controller)
     {
         $event = new ControllerEvent(new TestHttpKernel(), $controller, new Request(), HttpKernelInterface::MAIN_REQUEST);
@@ -42,9 +41,7 @@ class ControllerEventTest extends TestCase
         $this->assertEquals($expected, $event->getAttributes());
     }
 
-    /**
-     * @dataProvider provideGetAttributes
-     */
+    #[DataProvider('provideGetAttributes')]
     public function testGetAttributesByClassName(callable $controller)
     {
         $event = new ControllerEvent(new TestHttpKernel(), $controller, new Request(), HttpKernelInterface::MAIN_REQUEST);
@@ -57,9 +54,7 @@ class ControllerEventTest extends TestCase
         $this->assertEquals($expected, $event->getAttributes(Bar::class));
     }
 
-    /**
-     * @dataProvider provideGetAttributes
-     */
+    #[DataProvider('provideGetAttributes')]
     public function testGetAttributesByInvalidClassName(callable $controller)
     {
         $event = new ControllerEvent(new TestHttpKernel(), $controller, new Request(), HttpKernelInterface::MAIN_REQUEST);

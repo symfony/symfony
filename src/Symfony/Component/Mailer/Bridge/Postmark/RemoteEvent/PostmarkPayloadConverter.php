@@ -34,7 +34,7 @@ final class PostmarkPayloadConverter implements PayloadConverterInterface
                 'SubscriptionChange' => MailerEngagementEvent::UNSUBSCRIBE,
                 'Open' => MailerEngagementEvent::OPEN,
                 'SpamComplaint' => MailerEngagementEvent::SPAM,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['RecordType'])),
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['RecordType'])),
             };
             $event = new MailerEngagementEvent($name, $payload['MessageID'], $payload);
         }
@@ -45,7 +45,7 @@ final class PostmarkPayloadConverter implements PayloadConverterInterface
             'SubscriptionChange' => $payload['ChangedAt'],
             'Open' => $payload['ReceivedAt'],
             'SpamComplaint' => $payload['BouncedAt'],
-            default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['RecordType'])),
+            default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['RecordType'])),
         };
 
         $date = \DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, $payloadDate)
@@ -55,7 +55,7 @@ final class PostmarkPayloadConverter implements PayloadConverterInterface
             ?: \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u?P', $payloadDate);
 
         if (!$date) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payloadDate));
+            throw new ParseException(\sprintf('Invalid date "%s".', $payloadDate));
         }
         $event->setDate($date);
         $event->setRecipientEmail($payload['Recipient'] ?? $payload['Email']);

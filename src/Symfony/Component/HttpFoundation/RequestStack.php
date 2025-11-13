@@ -27,6 +27,16 @@ class RequestStack
     private array $requests = [];
 
     /**
+     * @param Request[] $requests
+     */
+    public function __construct(array $requests = [])
+    {
+        foreach ($requests as $request) {
+            $this->push($request);
+        }
+    }
+
+    /**
      * Pushes a Request on the stack.
      *
      * This method should generally not be called directly as the stack
@@ -103,5 +113,12 @@ class RequestStack
         }
 
         throw new SessionNotFoundException();
+    }
+
+    public function resetRequestFormats(): void
+    {
+        static $resetRequestFormats;
+        $resetRequestFormats ??= \Closure::bind(static fn () => self::$formats = null, null, Request::class);
+        $resetRequestFormats();
     }
 }

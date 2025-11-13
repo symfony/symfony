@@ -14,13 +14,12 @@ namespace Symfony\Component\HttpKernel\Profiler;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
 /**
- * Profile.
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 7.4
  */
 class Profile
 {
-
     /**
      * @var DataCollectorInterface[]
      */
@@ -207,7 +206,7 @@ class Profile
     public function getCollector(string $name): DataCollectorInterface
     {
         if (!isset($this->collectors[$name])) {
-            throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
+            throw new \InvalidArgumentException(\sprintf('Collector "%s" does not exist.', $name));
         }
 
         return $this->collectors[$name];
@@ -249,6 +248,9 @@ class Profile
         return isset($this->collectors[$name]);
     }
 
+    /**
+     * @internal since Symfony 7.4, will be replaced by `__serialize()` in 8.0
+     */
     public function __sleep(): array
     {
         return ['token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode', 'virtualType'];

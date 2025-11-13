@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator;
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
 class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
 {
-    /**
-     * @dataProvider getAcceptData
-     */
+    #[DataProvider('getAcceptData')]
     public function testAccept($directories, $expected)
     {
         $inner = new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->toAbsolute(), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);

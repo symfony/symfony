@@ -1,11 +1,25 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add support for `BackedEnum` in `MethodMarkingStore`
+ * Add support for weighted transitions
+ * Add a command to dump a workflow definition in different formats (dot, plantuml, mermaid)
+
+7.3
+---
+
+ * Deprecate `Event::getWorkflow()` method
+
 7.1
 ---
 
  * Add method `getEnabledTransition()` to `WorkflowInterface`
  * Automatically register places from transitions
+ * Add support for workflows that need to store many tokens in the marking
+ * Add method `getName()` in event classes to build event names in subscribers
 
 7.0
 ---

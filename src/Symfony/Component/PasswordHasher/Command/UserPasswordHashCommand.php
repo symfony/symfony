@@ -53,42 +53,42 @@ class UserPasswordHashCommand extends Command
             ->addOption('empty-salt', null, InputOption::VALUE_NONE, 'Do not generate a salt or let the hasher generate one.')
             ->setHelp(<<<EOF
 
-The <info>%command.name%</info> command hashes passwords according to your
-security configuration. This command is mainly used to generate passwords for
-the <comment>in_memory</comment> user provider type and for changing passwords
-in the database while developing the application.
+                The <info>%command.name%</info> command hashes passwords according to your
+                security configuration. This command is mainly used to generate passwords for
+                the <comment>in_memory</comment> user provider type and for changing passwords
+                in the database while developing the application.
 
-Suppose that you have the following security configuration in your application:
+                Suppose that you have the following security configuration in your application:
 
-<comment>
-# config/packages/security.yml
-security:
-    password_hashers:
-        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
-        App\Entity\User: auto
-</comment>
+                <comment>
+                # config/packages/security.yml
+                security:
+                    password_hashers:
+                        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+                        App\Entity\User: auto
+                </comment>
 
-If you execute the command non-interactively, the first available configured
-user class under the <comment>security.password_hashers</comment> key is used and a random salt is
-generated to hash the password:
+                If you execute the command non-interactively, the first available configured
+                user class under the <comment>security.password_hashers</comment> key is used and a random salt is
+                generated to hash the password:
 
-  <info>php %command.full_name% --no-interaction [password]</info>
+                  <info>php %command.full_name% --no-interaction [password]</info>
 
-Pass the full user class path as the second argument to hash passwords for
-your own entities:
+                Pass the full user class path as the second argument to hash passwords for
+                your own entities:
 
-  <info>php %command.full_name% --no-interaction [password] 'App\Entity\User'</info>
+                  <info>php %command.full_name% --no-interaction [password] 'App\Entity\User'</info>
 
-Executing the command interactively allows you to generate a random salt for
-hashing the password:
+                Executing the command interactively allows you to generate a random salt for
+                hashing the password:
 
-  <info>php %command.full_name% [password] 'App\Entity\User'</info>
+                  <info>php %command.full_name% [password] 'App\Entity\User'</info>
 
-In case your hasher doesn't require a salt, add the <comment>empty-salt</comment> option:
+                In case your hasher doesn't require a salt, add the <comment>empty-salt</comment> option:
 
-  <info>php %command.full_name% --empty-salt [password] 'App\Entity\User'</info>
+                  <info>php %command.full_name% --empty-salt [password] 'App\Entity\User'</info>
 
-EOF
+                EOF
             )
         ;
     }
@@ -148,7 +148,7 @@ EOF
         $io->table(['Key', 'Value'], $rows);
 
         if (!$emptySalt) {
-            $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', \strlen($salt)));
+            $errorIo->note(\sprintf('Make sure that your salt storage field fits the salt length: %s chars', \strlen($salt)));
         } elseif ($saltlessWithoutEmptySalt) {
             $errorIo->note('Self-salting hasher used: the hasher generated its own built-in salt.');
         }
@@ -162,8 +162,6 @@ EOF
     {
         if ($input->mustSuggestArgumentValuesFor('user-class')) {
             $suggestions->suggestValues($this->userClasses);
-
-            return;
         }
     }
 

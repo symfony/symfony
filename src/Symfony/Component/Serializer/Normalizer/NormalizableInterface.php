@@ -25,7 +25,7 @@ interface NormalizableInterface
      * Normalizes the object into an array of scalars|arrays.
      *
      * It is important to understand that the normalize() call should normalize
-     * recursively all child objects of the implementor.
+     * recursively all child objects of the implementer.
      *
      * @param NormalizerInterface $normalizer The normalizer is given so that you
      *                                        can use it to normalize objects contained within this object

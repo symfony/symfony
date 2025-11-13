@@ -11,24 +11,22 @@
 
 namespace Symfony\Component\Console\Tests\SignalRegistry;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 
-/**
- * @requires extension pcntl
- */
+#[RequiresPhpExtension('pcntl')]
 class SignalRegistryTest extends TestCase
 {
     protected function tearDown(): void
     {
         pcntl_async_signals(false);
         // We reset all signals to their default value to avoid side effects
-        for ($i = 1; $i <= 15; ++$i) {
-            if (9 === $i) {
-                continue;
-            }
-            pcntl_signal($i, \SIG_DFL);
-        }
+        pcntl_signal(\SIGINT, \SIG_DFL);
+        pcntl_signal(\SIGTERM, \SIG_DFL);
+        pcntl_signal(\SIGUSR1, \SIG_DFL);
+        pcntl_signal(\SIGUSR2, \SIG_DFL);
+        pcntl_signal(\SIGALRM, \SIG_DFL);
     }
 
     public function testOneCallbackForASignalSignalIsHandled()
@@ -130,5 +128,68 @@ class SignalRegistryTest extends TestCase
 
         $this->assertTrue($isHandled1);
         $this->assertTrue($isHandled2);
+    }
+
+    public function testPushPopIsolatesHandlers()
+    {
+        $registry = new SignalRegistry();
+
+        $signal = \SIGUSR1;
+
+        $handler1 = static function () {};
+        $handler2 = static function () {};
+
+        $registry->pushCurrentHandlers();
+        $registry->register($signal, $handler1);
+
+        $this->assertCount(1, $this->getHandlersForSignal($registry, $signal));
+
+        $registry->pushCurrentHandlers();
+        $registry->register($signal, $handler2);
+
+        $this->assertCount(1, $this->getHandlersForSignal($registry, $signal));
+        $this->assertSame([$handler2], $this->getHandlersForSignal($registry, $signal));
+
+        $registry->popPreviousHandlers();
+
+        $this->assertCount(1, $this->getHandlersForSignal($registry, $signal));
+        $this->assertSame([$handler1], $this->getHandlersForSignal($registry, $signal));
+
+        $registry->popPreviousHandlers();
+
+        $this->assertCount(0, $this->getHandlersForSignal($registry, $signal));
+    }
+
+    public function testRestoreOriginalOnEmptyAfterPop()
+    {
+        if (!\extension_loaded('pcntl')) {
+            $this->markTestSkipped('PCNTL extension required');
+        }
+
+        $registry = new SignalRegistry();
+
+        $signal = \SIGUSR2;
+
+        $original = pcntl_signal_get_handler($signal);
+
+        $handler = static function () {};
+
+        $registry->pushCurrentHandlers();
+        $registry->register($signal, $handler);
+
+        $this->assertNotEquals($original, pcntl_signal_get_handler($signal));
+
+        $registry->popPreviousHandlers();
+
+        $this->assertEquals($original, pcntl_signal_get_handler($signal));
+    }
+
+    private function getHandlersForSignal(SignalRegistry $registry, int $signal): array
+    {
+        $ref = new \ReflectionClass($registry);
+        $prop = $ref->getProperty('signalHandlers');
+        $handlers = $prop->getValue($registry);
+
+        return $handlers[$signal] ?? [];
     }
 }

@@ -22,11 +22,11 @@ abstract class CacheWarmer implements CacheWarmerInterface
     {
         $tmpFile = @tempnam(\dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
-            @chmod($file, 0666 & ~umask());
+            @chmod($file, 0o666 & ~umask());
 
             return;
         }
 
-        throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
+        throw new \RuntimeException(\sprintf('Failed to write cache file "%s".', $file));
     }
 }

@@ -38,10 +38,10 @@ final class SecretsEncryptFromLocalCommand extends Command
     {
         $this
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command encrypts all locally overridden secrets to the vault.
+                The <info>%command.name%</info> command encrypts all locally overridden secrets to the vault.
 
-    <info>%command.full_name%</info>
-EOF
+                    <info>%command.full_name%</info>
+                EOF
             )
         ;
     }
@@ -57,14 +57,13 @@ EOF
         }
 
         foreach ($this->vault->list(true) as $name => $value) {
-            $localValue = $this->localVault->reveal($name);
+            if (null === $localValue = $this->localVault->reveal($name)) {
+                continue;
+            }
 
-            if (null !== $localValue && $value !== $localValue) {
+            if ($value !== $localValue) {
                 $this->vault->seal($name, $localValue);
-            } elseif (null !== $message = $this->localVault->getLastMessage()) {
-                $io->error($message);
-
-                return 1;
+                $io->note($this->vault->getLastMessage());
             }
         }
 

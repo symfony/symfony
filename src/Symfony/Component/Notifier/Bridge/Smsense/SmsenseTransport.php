@@ -39,7 +39,7 @@ final class SmsenseTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('smsense://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('smsense://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -55,7 +55,7 @@ final class SmsenseTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
-        $endpoint = sprintf('https://%s/rest/send_sms?from=%s&message=%s&to=%s', $this->getEndpoint(), $from, $message->getSubject(), $message->getPhone());
+        $endpoint = \sprintf('https://%s/rest/send_sms?from=%s&message=%s&to=%s', $this->getEndpoint(), $from, $message->getSubject(), $message->getPhone());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'headers' => [

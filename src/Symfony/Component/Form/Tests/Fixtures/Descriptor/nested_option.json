@@ -1,0 +1,23 @@
+{
+    "required": false,
+    "default": [],
+    "is_lazy": false,
+    "has_normalizer": false,
+    "has_nested_options": true,
+    "nested_options": {
+        "foo": {
+            "required": true,
+            "default": true,
+            "is_lazy": false,
+            "has_normalizer": false,
+            "has_nested_options": false
+        },
+        "bar": {
+            "required": false,
+            "default": true,
+            "is_lazy": false,
+            "has_normalizer": false,
+            "has_nested_options": false
+        }
+    }
+}

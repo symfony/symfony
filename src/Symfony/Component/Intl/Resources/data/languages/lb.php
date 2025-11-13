@@ -181,7 +181,6 @@ return [
         'gmh' => 'Mëttelhéichdäitsch',
         'gn' => 'Guarani',
         'goh' => 'Alhéichdäitsch',
-        'gom' => 'Goan-Konkani',
         'gon' => 'Gondi-Sprooch',
         'gor' => 'Mongondou',
         'got' => 'Gotesch',

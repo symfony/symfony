@@ -49,7 +49,7 @@ class LimiterTest extends TestCase
     public function testWrongInterval()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot parse interval "1 minut", please use a valid unit as described on https://www.php.net/datetime.formats.relative.');
+        $this->expectExceptionMessage('Cannot parse interval "1 minut", please use a valid unit as described on https://php.net/datetime.formats#datetime.formats.relative');
 
         $this->createFactory([
             'id' => 'test',

@@ -21,6 +21,6 @@ class TestController
 {
     public function loginCheckAction(UserInterface $user)
     {
-        return new JsonResponse(['message' => sprintf('Welcome @%s!', $user->getUserIdentifier())]);
+        return new JsonResponse(['message' => \sprintf('Welcome @%s!', $user->getUserIdentifier())]);
     }
 }

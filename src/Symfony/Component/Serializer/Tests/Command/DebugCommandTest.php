@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Tests\Dummy\DummyClassOne;
+use Symfony\Component\Serializer\Tests\Dummy\DummyClassWithDiscriminatorMap;
 
 /**
  * @author Loïc Frémont <lc.fremont@gmail.com>
@@ -73,6 +74,41 @@ class DebugCommandTest extends TestCase
             |          |   "denormalizationContexts" => []     |
             |          | ]                                     |
             +----------+---------------------------------------+
+
+            TXT,
+            $tester->getDisplay(true),
+        );
+    }
+
+    public function testOutputWithDiscriminatorMapClass()
+    {
+        $command = new DebugCommand(new ClassMetadataFactory(new AttributeLoader()));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['class' => DummyClassWithDiscriminatorMap::class], ['decorated' => false]);
+
+        $this->assertSame(<<<TXT
+
+            Symfony\Component\Serializer\Tests\Dummy\DummyClassWithDiscriminatorMap
+            -----------------------------------------------------------------------
+
+            +----------+------------------------------------------------------------------------+
+            | Property | Options                                                                |
+            +----------+------------------------------------------------------------------------+
+            | type     | [                                                                      |
+            |          |   "groups" => [],                                                      |
+            |          |   "maxDepth" => null,                                                  |
+            |          |   "serializedName" => null,                                            |
+            |          |   "serializedPath" => null,                                            |
+            |          |   "ignore" => false,                                                   |
+            |          |   "normalizationContexts" => [],                                       |
+            |          |   "denormalizationContexts" => [],                                     |
+            |          |   "discriminatorMap" => [                                              |
+            |          |     "one" => "Symfony\Component\Serializer\Tests\Dummy\DummyClassOne", |
+            |          |     "two" => "Symfony\Component\Serializer\Tests\Dummy\DummyClassTwo"  |
+            |          |   ]                                                                    |
+            |          | ]                                                                      |
+            +----------+------------------------------------------------------------------------+
 
             TXT,
             $tester->getDisplay(true),

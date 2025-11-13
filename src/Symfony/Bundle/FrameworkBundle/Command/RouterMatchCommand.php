@@ -53,15 +53,15 @@ class RouterMatchCommand extends Command
                 new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Set the URI host'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
+                The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
 
-  <info>php %command.full_name% /foo</info>
+                  <info>php %command.full_name% /foo</info>
 
-or
+                or
 
-  <info>php %command.full_name% /foo --method POST --scheme https --host symfony.com --verbose</info>
+                  <info>php %command.full_name% /foo --method POST --scheme https --host symfony.com --verbose</info>
 
-EOF
+                EOF
             )
         ;
     }
@@ -93,21 +93,21 @@ EOF
         $matches = false;
         foreach ($traces as $trace) {
             if (TraceableUrlMatcher::ROUTE_ALMOST_MATCHES == $trace['level']) {
-                $io->text(sprintf('Route <info>"%s"</> almost matches but %s', $trace['name'], lcfirst($trace['log'])));
+                $io->text(\sprintf('Route <info>"%s"</> almost matches but %s', $trace['name'], lcfirst($trace['log'])));
             } elseif (TraceableUrlMatcher::ROUTE_MATCHES == $trace['level']) {
-                $io->success(sprintf('Route "%s" matches', $trace['name']));
+                $io->success(\sprintf('Route "%s" matches', $trace['name']));
 
                 $routerDebugCommand = $this->getApplication()->find('debug:router');
                 $routerDebugCommand->run(new ArrayInput(['name' => $trace['name']]), $output);
 
                 $matches = true;
             } elseif ($input->getOption('verbose')) {
-                $io->text(sprintf('Route "%s" does not match: %s', $trace['name'], $trace['log']));
+                $io->text(\sprintf('Route "%s" does not match: %s', $trace['name'], $trace['log']));
             }
         }
 
         if (!$matches) {
-            $io->error(sprintf('None of the routes match the path "%s"', $input->getArgument('path_info')));
+            $io->error(\sprintf('None of the routes match the path "%s"', $input->getArgument('path_info')));
 
             return 1;
         }

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
+use Symfony\Component\Form\EnumFormTypeGuesser;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -24,6 +25,7 @@ use Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
 use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
+use Symfony\Component\Form\Extension\HttpFoundation\Type\FormFlowTypeSessionDataStorageExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension;
@@ -76,6 +78,9 @@ return static function (ContainerConfigurator $container) {
             ->args([service('validator.mapping.class_metadata_factory')])
             ->tag('form.type_guesser')
 
+        ->set('form.type_guesser.enum_type', EnumFormTypeGuesser::class)
+            ->tag('form.type_guesser')
+
         ->alias('form.property_accessor', 'property_accessor')
 
         ->set('form.choice_list_factory.default', DefaultChoiceListFactory::class)
@@ -121,6 +126,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('form.type_extension.form.http_foundation', FormTypeHttpFoundationExtension::class)
             ->args([service('form.type_extension.form.request_handler')])
+            ->tag('form.type_extension')
+
+        ->set('form.type_extension.form.flow.session_data_storage', FormFlowTypeSessionDataStorageExtension::class)
+            ->args([service('request_stack')->ignoreOnInvalid()])
             ->tag('form.type_extension')
 
         ->set('form.type_extension.form.request_handler', HttpFoundationRequestHandler::class)

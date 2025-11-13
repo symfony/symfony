@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Argument;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 
@@ -57,9 +58,7 @@ class TaggedIteratorArgumentTest extends TestCase
         $this->assertSame('getDefaultQuxPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
     }
 
-    /**
-     * @dataProvider defaultIndexMethodProvider
-     */
+    #[DataProvider('defaultIndexMethodProvider')]
     public function testDefaultIndexMethod(?string $indexAttribute, ?string $defaultIndexMethod, ?string $expectedDefaultIndexMethod)
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', $indexAttribute, $defaultIndexMethod);
@@ -106,9 +105,7 @@ class TaggedIteratorArgumentTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider defaultPriorityMethodProvider
-     */
+    #[DataProvider('defaultPriorityMethodProvider')]
     public function testDefaultPriorityIndexMethod(?string $indexAttribute, ?string $defaultPriorityMethod, ?string $expectedDefaultPriorityMethod)
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', $indexAttribute, null, false, $defaultPriorityMethod);

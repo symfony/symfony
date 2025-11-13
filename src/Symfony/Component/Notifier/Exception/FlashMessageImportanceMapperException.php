@@ -18,7 +18,7 @@ class FlashMessageImportanceMapperException extends LogicException
 {
     public function __construct(string $importance, string $mappingClass)
     {
-        $message = sprintf('The "%s" Notifier flash message mapper does not support an importance value of "%s".', $mappingClass, $importance);
+        $message = \sprintf('The "%s" Notifier flash message mapper does not support an importance value of "%s".', $mappingClass, $importance);
 
         parent::__construct($message);
     }

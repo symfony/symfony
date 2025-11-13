@@ -44,6 +44,7 @@ class DateTimeValidator extends DateValidator
         if (0 < $errors['error_count']) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setParameter('{{ format }}', $this->formatValue($constraint->format))
                 ->setCode(DateTime::INVALID_FORMAT_ERROR)
                 ->addViolation();
 
@@ -58,16 +59,19 @@ class DateTimeValidator extends DateValidator
             if ('The parsed date was invalid' === $warning) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setParameter('{{ format }}', $this->formatValue($constraint->format))
                     ->setCode(DateTime::INVALID_DATE_ERROR)
                     ->addViolation();
             } elseif ('The parsed time was invalid' === $warning) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setParameter('{{ format }}', $this->formatValue($constraint->format))
                     ->setCode(DateTime::INVALID_TIME_ERROR)
                     ->addViolation();
             } else {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setParameter('{{ format }}', $this->formatValue($constraint->format))
                     ->setCode(DateTime::INVALID_FORMAT_ERROR)
                     ->addViolation();
             }

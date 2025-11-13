@@ -84,8 +84,8 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
             ->create(FormTypeTest::TESTED_TYPE, null, ['validation_groups' => new GroupSequence(['First', 'Second'])])
             ->add('field', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'groups' => ['First']]),
-                    new NotBlank(['groups' => ['Second']]),
+                    new Length(min: 10, groups: ['First']),
+                    new NotBlank(groups: ['Second']),
                 ],
             ])
         ;
@@ -102,7 +102,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $formMetadata = new ClassMetadata(Form::class);
         $authorMetadata = (new ClassMetadata(Author::class))
-            ->addPropertyConstraint('firstName', new NotBlank(['groups' => 'Second']))
+            ->addPropertyConstraint('firstName', new NotBlank(groups: ['Second']))
         ;
         $metadataFactory = $this->createMock(MetadataFactoryInterface::class);
         $metadataFactory->expects($this->any())
@@ -131,12 +131,12 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
             ->add('firstName', TextTypeTest::TESTED_TYPE)
             ->add('lastName', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'groups' => ['First']]),
+                    new Length(min: 10, groups: ['First']),
                 ],
             ])
             ->add('australian', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new NotBlank(['groups' => ['Second']]),
+                    new NotBlank(groups: ['Second']),
                 ],
             ])
         ;
@@ -257,7 +257,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $formMetadata = new ClassMetadata(Form::class);
         $authorMetadata = (new ClassMetadata(Author::class))
-            ->addPropertyConstraint('firstName', new NotBlank());
+            ->addPropertyConstraint('firstName', new Length(1));
         $organizationMetadata = (new ClassMetadata(Organization::class))
             ->addPropertyConstraint('authors', new Valid());
         $metadataFactory = $this->createMock(MetadataFactoryInterface::class);
@@ -301,22 +301,22 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         $form->submit([
             'authors' => [
                 0 => [
-                    'firstName' => '', // Fires a Not Blank Error
+                    'firstName' => 'foobar', // Fires a Length Error
                     'lastName' => 'lastName1',
                 ],
                 // key "1" could be missing if we add 4 blank form entries and then remove it.
                 2 => [
-                    'firstName' => '', // Fires a Not Blank Error
+                    'firstName' => 'barfoo', // Fires a Length Error
                     'lastName' => 'lastName3',
                 ],
                 3 => [
-                    'firstName' => '', // Fires a Not Blank Error
+                    'firstName' => 'barbaz', // Fires a Length Error
                     'lastName' => 'lastName3',
                 ],
             ],
         ]);
 
-        // Form does have 3 not blank errors
+        // Form does have 3 length errors
         $errors = $form->getErrors(true);
         $this->assertCount(3, $errors);
 
@@ -328,12 +328,15 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         ];
 
         $this->assertTrue($form->get('authors')->has('0'));
+        $this->assertSame('foobar', $form->get('authors')->get('0')->getData()->firstName);
         $this->assertContains('data.authors[0].firstName', $errorPaths);
 
         $this->assertTrue($form->get('authors')->has('1'));
+        $this->assertSame('barfoo', $form->get('authors')->get('1')->getData()->firstName);
         $this->assertContains('data.authors[1].firstName', $errorPaths);
 
         $this->assertTrue($form->get('authors')->has('2'));
+        $this->assertSame('barbaz', $form->get('authors')->get('2')->getData()->firstName);
         $this->assertContains('data.authors[2].firstName', $errorPaths);
 
         $this->assertFalse($form->get('authors')->has('3'));

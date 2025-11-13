@@ -11,15 +11,19 @@
 
 namespace Symfony\Component\Security\Http\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
@@ -58,9 +62,7 @@ class HttpUtilsTest extends TestCase
         $this->assertTrue($response->isRedirect('http://localhost/blog'));
     }
 
-    /**
-     * @dataProvider validRequestDomainUrls
-     */
+    #[DataProvider('validRequestDomainUrls')]
     public function testCreateRedirectResponse(?string $domainRegexp, string $path, string $expectedRedirectUri)
     {
         $utils = new HttpUtils($this->getUrlGenerator(), null, $domainRegexp);
@@ -106,9 +108,7 @@ class HttpUtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider badRequestDomainUrls
-     */
+    #[DataProvider('badRequestDomainUrls')]
     public function testCreateRedirectResponseWithBadRequestsDomain($url)
     {
         $utils = new HttpUtils($this->getUrlGenerator(), null, '#^https?://%s$#i');
@@ -210,9 +210,7 @@ class HttpUtilsTest extends TestCase
         $this->assertSame($session, $subRequest->getSession());
     }
 
-    /**
-     * @dataProvider provideSecurityRequestAttributes
-     */
+    #[DataProvider('provideSecurityRequestAttributes')]
     public function testCreateRequestPassesSecurityRequestAttributesToTheNewRequest($attribute)
     {
         $request = $this->getRequest();
@@ -231,6 +229,34 @@ class HttpUtilsTest extends TestCase
             [SecurityRequestAttributes::ACCESS_DENIED_ERROR],
             [SecurityRequestAttributes::LAST_USERNAME],
         ];
+    }
+
+    public function testCreateRequestFromPathHandlesTrustedHeaders()
+    {
+        Request::setTrustedProxies(['127.0.0.1'], Request::HEADER_X_FORWARDED_PREFIX);
+
+        $this->assertSame(
+            'http://localhost/foo/',
+            (new HttpUtils())->createRequest(Request::create('/', server: ['HTTP_X_FORWARDED_PREFIX' => '/foo']), '/')->getUri(),
+        );
+    }
+
+    public function testCreateRequestFromRouteHandlesTrustedHeaders()
+    {
+        Request::setTrustedProxies(['127.0.0.1'], Request::HEADER_X_FORWARDED_PREFIX);
+
+        $request = Request::create('/', server: ['HTTP_X_FORWARDED_PREFIX' => '/foo']);
+
+        $urlGenerator = new UrlGenerator(
+            $routeCollection = new RouteCollection(),
+            (new RequestContext())->fromRequest($request),
+        );
+        $routeCollection->add('root', new Route('/'));
+
+        $this->assertSame(
+            'http://localhost/foo/',
+            (new HttpUtils($urlGenerator))->createRequest($request, 'root')->getUri(),
+        );
     }
 
     public function testCheckRequestPath()

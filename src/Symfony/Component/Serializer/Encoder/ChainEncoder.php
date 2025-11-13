@@ -101,6 +101,6 @@ class ChainEncoder implements ContextAwareEncoderInterface
             }
         }
 
-        throw new RuntimeException(sprintf('No encoder found for format "%s".', $format));
+        throw new RuntimeException(\sprintf('No encoder found for format "%s".', $format));
     }
 }

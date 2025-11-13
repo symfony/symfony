@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
@@ -57,7 +58,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3Configurator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService4;
-use Symfony\Contracts\Service\Attribute\SubscribedService;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService5;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -245,9 +246,7 @@ class IntegrationTest extends TestCase
         $this->assertSame($container->get('service'), $container->get('decorator'));
     }
 
-    /**
-     * @dataProvider getYamlCompileTests
-     */
+    #[DataProvider('getYamlCompileTests')]
     public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ?ContainerBuilder $mainContainer = null)
     {
         // allow a container to be passed in, which might have autoconfigure settings
@@ -394,10 +393,6 @@ class IntegrationTest extends TestCase
 
     public function testLocatorConfiguredViaAttribute()
     {
-        if (!property_exists(SubscribedService::class, 'type')) {
-            $this->markTestSkipped('Requires symfony/service-contracts >= 3.2');
-        }
-
         $container = new ContainerBuilder();
         $container->setParameter('some.parameter', 'foo');
         $container->register(BarTagClass::class)
@@ -623,7 +618,7 @@ class IntegrationTest extends TestCase
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
 
-        self::assertSame([BarTagClass::class, FooTagClass::class], array_keys($factories->getValue($locator)));
+        self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
     }
 
     public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
@@ -652,7 +647,7 @@ class IntegrationTest extends TestCase
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
 
-        self::assertSame(['bar_tag_class', 'foo_tag_class'], array_keys($factories->getValue($locator)));
+        self::assertSame(['foo_tag_class', 'bar_tag_class'], array_keys($factories->getValue($locator)));
         self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }
@@ -750,7 +745,7 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, \sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $same = [
             'bar' => $serviceLocator->get('bar'),
@@ -783,7 +778,7 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, \sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $same = [
             'bar' => $serviceLocator->get('bar'),
@@ -815,7 +810,7 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, \sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $same = [
             'bar_tab_class_with_defaultmethod' => $serviceLocator->get('bar_tab_class_with_defaultmethod'),
@@ -842,7 +837,7 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, \sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $expected = [
             'bar_tag' => $container->get('bar_tag'),
@@ -868,7 +863,7 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, \sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $expected = [
             'baz' => $container->get('bar_tag'),
@@ -993,6 +988,10 @@ class IntegrationTest extends TestCase
             ->setPublic(true)
             ->setAutoconfigured(true);
 
+        $container->register(TaggedService5::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
         $container->register('failing_factory', \stdClass::class);
         $container->register('ccc', TaggedService4::class)
             ->setFactory([new Reference('failing_factory'), 'create'])
@@ -1017,6 +1016,12 @@ class IntegrationTest extends TestCase
                 ['someAttribute' => 'on barAction', 'priority' => 0, 'method' => 'barAction'],
                 ['property' => 'name'],
                 ['someAttribute' => 'on name', 'priority' => 0, 'property' => 'name'],
+            ],
+            TaggedService5::class => [
+                ['class' => TaggedService5::class],
+                ['parameter' => 'param1'],
+                ['method' => 'fooAction'],
+                ['property' => 'name'],
             ],
             'ccc' => [
                 ['class' => TaggedService4::class],

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests\DataCollector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -164,9 +165,7 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertEquals(0, $sut->getRequestCount());
     }
 
-    /**
-     * @dataProvider provideCurlRequests
-     */
+    #[DataProvider('provideCurlRequests')]
     public function testItGeneratesCurlCommandsAsExpected(array $request, string $expectedCurlCommand)
     {
         $sut = new HttpClientDataCollector();
@@ -177,7 +176,7 @@ class HttpClientDataCollectorTest extends TestCase
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
 
         $isWindows = '\\' === \DIRECTORY_SEPARATOR;
-        self::assertEquals(sprintf($expectedCurlCommand, $isWindows ? '"' : "'", $isWindows ? '' : "'"), $curlCommand);
+        self::assertEquals(\sprintf($expectedCurlCommand, $isWindows ? '"' : "'", $isWindows ? '' : "'"), $curlCommand);
     }
 
     public static function provideCurlRequests(): iterable
@@ -268,7 +267,7 @@ class HttpClientDataCollectorTest extends TestCase
                             'fooprop' => 'foopropval',
                             'barprop' => 'barpropval',
                         ],
-                        'tostring' => new class() {
+                        'tostring' => new class {
                             public function __toString(): string
                             {
                                 return 'tostringval';
@@ -358,7 +357,7 @@ class HttpClientDataCollectorTest extends TestCase
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
-        self::assertEquals(sprintf('curl \\
+        self::assertEquals(\sprintf('curl \\
   --compressed \\
   --request GET \\
   --url %1$shttp://localhost:8057/301%1$s \\

@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mailer\Event\SentMessageEvent;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
@@ -24,10 +27,9 @@ use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\RawMessage;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class SmtpTransportTest extends TestCase
 {
     public function testToString()
@@ -137,6 +139,37 @@ class SmtpTransportTest extends TestCase
         $this->assertContains("RCPT TO:<recipient2@example.org>\r\n", $stream->getCommands());
     }
 
+    public function testMessageIdFromServerIsEmbeddedInSentMessageEvent()
+    {
+        $calls = 0;
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->any())
+            ->method('dispatch')
+            ->with($this->callback(static function ($event) use (&$calls): bool {
+                ++$calls;
+
+                if (1 === $calls && $event instanceof MessageEvent) {
+                    return true;
+                }
+
+                if (2 === $calls && $event instanceof SentMessageEvent && '000501c4054c' === $event->getMessage()->getMessageId()) {
+                    return true;
+                }
+
+                return false;
+            }));
+        $transport = new SmtpTransport(new DummyStream(), $eventDispatcher);
+
+        $email = new Email();
+        $email->from('sender@example.com');
+        $email->to('recipient@example.com');
+        $email->text('.');
+
+        $transport->send($email);
+
+        $this->assertSame(2, $calls);
+    }
+
     public function testAssertResponseCodeNoCodes()
     {
         $this->expectException(LogicException::class);
@@ -160,7 +193,7 @@ class SmtpTransportTest extends TestCase
 
     private function invokeAssertResponseCode(string $response, array $codes): void
     {
-        $transport = new SmtpTransport($this->getMockForAbstractClass(AbstractStream::class));
+        $transport = new SmtpTransport($this->createStub(AbstractStream::class));
         $m = new \ReflectionMethod($transport, 'assertResponseCode');
         $m->invoke($transport, $response, $codes);
     }

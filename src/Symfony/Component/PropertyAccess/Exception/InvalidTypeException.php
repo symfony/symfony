@@ -25,7 +25,7 @@ class InvalidTypeException extends InvalidArgumentException
         ?\Throwable $previous = null,
     ) {
         parent::__construct(
-            sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $expectedType, 'NULL' === $actualType ? 'null' : $actualType, $propertyPath),
+            \sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $expectedType, 'NULL' === $actualType ? 'null' : $actualType, $propertyPath),
             previous: $previous,
         );
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -28,7 +29,7 @@ class StopWorkerOnCustomStopExceptionListenerTest extends TestCase
         yield 'it should not stop (1)' => [new \Exception(), false];
         yield 'it should not stop (2)' => [new HandlerFailedException(new Envelope(new \stdClass()), [new \Exception()]), false];
 
-        $t = new class() extends \Exception implements StopWorkerExceptionInterface {};
+        $t = new class extends \Exception implements StopWorkerExceptionInterface {};
         yield 'it should stop with custom exception' => [$t, true];
         yield 'it should stop with core exception' => [new StopWorkerException(), true];
 
@@ -38,7 +39,7 @@ class StopWorkerOnCustomStopExceptionListenerTest extends TestCase
         yield 'it should stop with core exception wrapped (2)' => [new HandlerFailedException(new Envelope(new \stdClass()), [new \Exception(), $t]), true];
     }
 
-    /** @dataProvider provideTests */
+    #[DataProvider('provideTests')]
     public function test(\Throwable $throwable, bool $shouldStop)
     {
         $listener = new StopWorkerOnCustomStopExceptionListener();

@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Sevenio\Tests;
 
 use Symfony\Component\Notifier\Bridge\Sevenio\SevenIoTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class SevenIoTransportFactoryTest extends TransportFactoryTestCase
+final class SevenIoTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): SevenIoTransportFactory
     {
         return new SevenIoTransportFactory();

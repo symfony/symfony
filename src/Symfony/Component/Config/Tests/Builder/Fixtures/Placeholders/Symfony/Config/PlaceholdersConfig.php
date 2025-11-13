@@ -14,14 +14,17 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
     private $favoriteFloat;
     private $goodIntegers;
     private $_usedProperties = [];
+    private $_hasDeprecatedCalls = false;
 
     /**
      * @default false
      * @param ParamConfigurator|bool $value
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function enabled($value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['enabled'] = true;
         $this->enabled = $value;
 
@@ -32,9 +35,11 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
      * @default null
      * @param ParamConfigurator|float $value
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function favoriteFloat($value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['favoriteFloat'] = true;
         $this->favoriteFloat = $value;
 
@@ -45,9 +50,11 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
      * @param ParamConfigurator|list<ParamConfigurator|int> $value
      *
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function goodIntegers(ParamConfigurator|array $value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['goodIntegers'] = true;
         $this->goodIntegers = $value;
 
@@ -59,28 +66,28 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         return 'placeholders';
     }
 
-    public function __construct(array $value = [])
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('enabled', $value)) {
+        if (array_key_exists('enabled', $config)) {
             $this->_usedProperties['enabled'] = true;
-            $this->enabled = $value['enabled'];
-            unset($value['enabled']);
+            $this->enabled = $config['enabled'];
+            unset($config['enabled']);
         }
 
-        if (array_key_exists('favorite_float', $value)) {
+        if (array_key_exists('favorite_float', $config)) {
             $this->_usedProperties['favoriteFloat'] = true;
-            $this->favoriteFloat = $value['favorite_float'];
-            unset($value['favorite_float']);
+            $this->favoriteFloat = $config['favorite_float'];
+            unset($config['favorite_float']);
         }
 
-        if (array_key_exists('good_integers', $value)) {
+        if (array_key_exists('good_integers', $config)) {
             $this->_usedProperties['goodIntegers'] = true;
-            $this->goodIntegers = $value['good_integers'];
-            unset($value['good_integers']);
+            $this->goodIntegers = $config['good_integers'];
+            unset($config['good_integers']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 
@@ -95,6 +102,9 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         }
         if (isset($this->_usedProperties['goodIntegers'])) {
             $output['good_integers'] = $this->goodIntegers;
+        }
+        if ($this->_hasDeprecatedCalls) {
+            trigger_deprecation('symfony/config', '7.4', 'Calling any fluent method on "%s" is deprecated; pass the configuration to the constructor instead.', $this::class);
         }
 
         return $output;

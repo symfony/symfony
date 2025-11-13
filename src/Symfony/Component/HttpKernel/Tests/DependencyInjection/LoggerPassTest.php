@@ -53,4 +53,15 @@ class LoggerPassTest extends TestCase
         $this->assertSame(Logger::class, $definition->getClass());
         $this->assertFalse($definition->isPublic());
     }
+
+    public function testAutowiringAliasIsPreserved()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setAlias(LoggerInterface::class, 'my_logger');
+
+        (new LoggerPass())->process($container);
+
+        $this->assertSame('my_logger', (string) $container->getAlias(LoggerInterface::class));
+    }
 }

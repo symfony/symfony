@@ -12,78 +12,30 @@
 namespace Symfony\Component\Translation\Bridge\Phrase\Tests;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Translation\Bridge\Phrase\PhraseProviderFactory;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
-use Symfony\Component\Translation\Exception\IncompleteDsnException;
 use Symfony\Component\Translation\Exception\MissingRequiredOptionException;
-use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\Dsn;
+use Symfony\Component\Translation\Test\AbstractProviderFactoryTestCase;
+use Symfony\Component\Translation\Test\IncompleteDsnTestTrait;
 
 /**
  * @author wicliff <wicliff.wolda@gmail.com>
  */
-class PhraseProviderFactoryTest extends TestCase
+class PhraseProviderFactoryTest extends AbstractProviderFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     private MockObject&MockHttpClient $httpClient;
     private MockObject&LoggerInterface $logger;
     private MockObject&LoaderInterface $loader;
     private MockObject&XliffFileDumper $xliffFileDumper;
     private MockObject&CacheItemPoolInterface $cache;
     private string $defaultLocale;
-
-    /**
-     * @dataProvider supportsProvider
-     */
-    public function testSupports(bool $expected, string $dsn)
-    {
-        $factory = $this->createFactory();
-
-        $this->assertSame($expected, $factory->supports(new Dsn($dsn)));
-    }
-
-    /**
-     * @dataProvider createProvider
-     */
-    public function testCreate(string $expected, string $dsn)
-    {
-        $factory = $this->createFactory();
-        $provider = $factory->create(new Dsn($dsn));
-
-        $this->assertSame($expected, (string) $provider);
-    }
-
-    /**
-     * @dataProvider unsupportedSchemeProvider
-     */
-    public function testUnsupportedSchemeException(string $dsn, string $message)
-    {
-        $factory = $this->createFactory();
-        $dsn = new Dsn($dsn);
-
-        $this->expectException(UnsupportedSchemeException::class);
-        $this->expectExceptionMessage($message);
-
-        $factory->create($dsn);
-    }
-
-    /**
-     * @dataProvider incompleteDsnProvider
-     */
-    public function testIncompleteDsnException(string $dsn, string $message)
-    {
-        $factory = $this->createFactory();
-        $dsn = new Dsn($dsn);
-
-        $this->expectException(IncompleteDsnException::class);
-        $this->expectExceptionMessage($message);
-
-        $factory->create($dsn);
-    }
 
     public function testRequiredUserAgentOption()
     {
@@ -144,7 +96,7 @@ class PhraseProviderFactoryTest extends TestCase
         yield 'not supported' => [false, 'unsupported://PROJECT_ID:API_TOKEN@default?userAgent=myProject'];
     }
 
-    private function createFactory(): PhraseProviderFactory
+    public function createFactory(): PhraseProviderFactory
     {
         return new PhraseProviderFactory(
             $this->getHttpClient(),

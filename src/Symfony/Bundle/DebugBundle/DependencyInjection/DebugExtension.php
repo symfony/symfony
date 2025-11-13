@@ -85,11 +85,17 @@ class DebugExtension extends Extension
         }
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/debug';

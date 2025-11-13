@@ -206,9 +206,10 @@ final class SmsboxTransportTest extends TransportTestCase
             return $response;
         });
 
+        $dateTime = new \DateTimeImmutable('+1 day');
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Either Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::dateTime() or Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::date() and Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::hour() must be called, but not both.");
-        $dateTime = \DateTimeImmutable::createFromFormat('d/m/Y H:i', '01/11/2024 18:00', new \DateTimeZone('UTC'));
         $message = new SmsMessage('+33612345678', 'Hello');
 
         $smsboxOptions = (new SmsboxOptions())
@@ -216,7 +217,7 @@ final class SmsboxTransportTest extends TransportTestCase
             ->sender('SENDER')
             ->strategy(Strategy::Marketing)
             ->dateTime($dateTime)
-            ->date('01/01/2024');
+            ->date($dateTime->format('d/m/Y'));
 
         $transport = $this->createTransport($client);
 

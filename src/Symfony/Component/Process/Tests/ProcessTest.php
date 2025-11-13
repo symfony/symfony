@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
-use Symfony\Component\Process\Exception\ProcessStartFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
@@ -67,21 +69,14 @@ class ProcessTest extends TestCase
         $cmd->run();
     }
 
-    /**
-     * @dataProvider invalidProcessProvider
-     */
+    #[DataProvider('invalidProcessProvider')]
     public function testInvalidCommand(Process $process)
     {
-        try {
-            $this->assertSame('\\' === \DIRECTORY_SEPARATOR ? 1 : 127, $process->run());
-        } catch (ProcessStartFailedException $e) {
-            // An invalid command might already fail during start since PHP 8.3 for platforms
-            // supporting posix_spawn(), see https://github.com/php/php-src/issues/12589
-            $this->assertStringContainsString('No such file or directory', $e->getMessage());
-        }
+        // An invalid command should not fail during start
+        $this->assertSame('\\' === \DIRECTORY_SEPARATOR ? 1 : 127, $process->run());
     }
 
-    public function invalidProcessProvider()
+    public static function invalidProcessProvider(): array
     {
         return [
             [new Process(['invalid'])],
@@ -89,9 +84,7 @@ class ProcessTest extends TestCase
         ];
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testThatProcessDoesNotThrowWarningDuringRun()
     {
         @trigger_error('Test Error', \E_USER_NOTICE);
@@ -129,9 +122,7 @@ class ProcessTest extends TestCase
         $this->assertNull($p->getTimeout());
     }
 
-    /**
-     * @requires extension pcntl
-     */
+    #[RequiresPhpExtension('pcntl')]
     public function testStopWithTimeoutIsActuallyWorking()
     {
         $p = $this->getProcess([self::$phpBin, __DIR__.'/NonStopableProcess.php', 30]);
@@ -153,9 +144,7 @@ class ProcessTest extends TestCase
         $this->assertLessThan(15, microtime(true) - $start);
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testWaitUntilSpecificOutput()
     {
         $p = $this->getProcess([self::$phpBin, __DIR__.'/KillableProcessWithOutput.php']);
@@ -191,7 +180,7 @@ class ProcessTest extends TestCase
         // another byte which will never be read.
         $expectedOutputSize = PipesInterface::CHUNK_SIZE * 2 + 2;
 
-        $code = sprintf('echo str_repeat(\'*\', %d);', $expectedOutputSize);
+        $code = \sprintf('echo str_repeat(\'*\', %d);', $expectedOutputSize);
         $p = $this->getProcessForCode($code);
 
         $p->start();
@@ -239,9 +228,8 @@ class ProcessTest extends TestCase
 
     /**
      * tests results from sub processes.
-     *
-     * @dataProvider responsesCodeProvider
      */
+    #[DataProvider('responsesCodeProvider')]
     public function testProcessResponses($expected, $getter, $code)
     {
         $p = $this->getProcessForCode($code);
@@ -252,9 +240,8 @@ class ProcessTest extends TestCase
 
     /**
      * tests results from sub processes.
-     *
-     * @dataProvider pipesCodeProvider
      */
+    #[DataProvider('pipesCodeProvider')]
     public function testProcessPipes($code, $size)
     {
         $expected = str_repeat(str_repeat('*', 1024), $size).'!';
@@ -268,9 +255,7 @@ class ProcessTest extends TestCase
         $this->assertEquals($expectedLength, \strlen($p->getErrorOutput()));
     }
 
-    /**
-     * @dataProvider pipesCodeProvider
-     */
+    #[DataProvider('pipesCodeProvider')]
     public function testSetStreamAsInput($code, $size)
     {
         $expected = str_repeat(str_repeat('*', 1024), $size).'!';
@@ -325,9 +310,7 @@ class ProcessTest extends TestCase
         throw $e;
     }
 
-    /**
-     * @dataProvider provideInvalidInputValues
-     */
+    #[DataProvider('provideInvalidInputValues')]
     public function testInvalidInput(array|object $value)
     {
         $process = $this->getProcess('foo');
@@ -346,9 +329,7 @@ class ProcessTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInputValues
-     */
+    #[DataProvider('provideInputValues')]
     public function testValidInput(?string $expected, float|string|null $value)
     {
         $process = $this->getProcess('foo');
@@ -379,12 +360,10 @@ class ProcessTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider chainedCommandsOutputProvider
-     */
+    #[DataProvider('chainedCommandsOutputProvider')]
     public function testChainedCommandsOutput($expected, $operator, $input)
     {
-        $process = $this->getProcess(sprintf('echo %s %s echo %s', $input, $operator, $input));
+        $process = $this->getProcess(\sprintf('echo %s %s echo %s', $input, $operator, $input));
         $process->run();
         $this->assertEquals($expected, $process->getOutput());
     }
@@ -428,12 +407,10 @@ class ProcessTest extends TestCase
 
         $p->run();
         $p->clearErrorOutput();
-        $this->assertEmpty($p->getErrorOutput());
+        $this->assertSame('', $p->getErrorOutput());
     }
 
-    /**
-     * @dataProvider provideIncrementalOutput
-     */
+    #[DataProvider('provideIncrementalOutput')]
     public function testIncrementalOutput($getOutput, $getIncrementalOutput, $uri)
     {
         $lock = tempnam(sys_get_temp_dir(), __FUNCTION__);
@@ -481,7 +458,7 @@ class ProcessTest extends TestCase
 
         $p->run();
         $p->clearOutput();
-        $this->assertEmpty($p->getOutput());
+        $this->assertSame('', $p->getOutput());
     }
 
     public function testZeroAsOutput()
@@ -563,6 +540,20 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('');
         $this->assertNull($process->getExitCodeText());
+    }
+
+    public function testStderrNotMixedWithStdout()
+    {
+        if (!Process::isPtySupported()) {
+            $this->markTestSkipped('PTY is not supported on this operating system.');
+        }
+
+        $process = $this->getProcess('echo "foo" && echo "bar" >&2');
+        $process->setPty(true);
+        $process->run();
+
+        $this->assertSame("foo\r\n", $process->getOutput());
+        $this->assertSame("bar\n", $process->getErrorOutput());
     }
 
     public function testPTYCommand()
@@ -737,6 +728,9 @@ class ProcessTest extends TestCase
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Windows does not support POSIX signals');
+        }
+        if (\PHP_VERSION_ID < 80300 && isset($_SERVER['GITHUB_ACTIONS'])) {
+            $this->markTestSkipped('Transient on GHA with PHP < 8.3');
         }
 
         $process = $this->getProcessForCode('sleep(32);');
@@ -938,9 +932,7 @@ class ProcessTest extends TestCase
         $this->assertNull($process->getPid());
     }
 
-    /**
-     * @requires extension pcntl
-     */
+    #[RequiresPhpExtension('pcntl')]
     public function testSignal()
     {
         $process = $this->getProcess([self::$phpBin, __DIR__.'/SignalListener.php']);
@@ -955,9 +947,7 @@ class ProcessTest extends TestCase
         $this->assertEquals('Caught SIGUSR1', $process->getOutput());
     }
 
-    /**
-     * @requires extension pcntl
-     */
+    #[RequiresPhpExtension('pcntl')]
     public function testExitCodeIsAvailableAfterSignal()
     {
         $process = $this->getProcess('sleep 4');
@@ -984,15 +974,13 @@ class ProcessTest extends TestCase
         $process->signal(1); // SIGHUP
     }
 
-    /**
-     * @dataProvider provideMethodsThatNeedARunningProcess
-     */
+    #[DataProvider('provideMethodsThatNeedARunningProcess')]
     public function testMethodsThatNeedARunningProcess($method)
     {
         $process = $this->getProcess('foo');
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('Process must be started before calling "%s()".', $method));
+        $this->expectExceptionMessage(\sprintf('Process must be started before calling "%s()".', $method));
 
         $process->{$method}();
     }
@@ -1008,9 +996,7 @@ class ProcessTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideMethodsThatNeedATerminatedProcess
-     */
+    #[DataProvider('provideMethodsThatNeedATerminatedProcess')]
     public function testMethodsThatNeedATerminatedProcess($method)
     {
         $this->expectException(LogicException::class);
@@ -1128,9 +1114,7 @@ class ProcessTest extends TestCase
         $this->assertSame($process, $process->setIdleTimeout(null));
     }
 
-    /**
-     * @dataProvider provideOutputFetchingMethods
-     */
+    #[DataProvider('provideOutputFetchingMethods')]
     public function testGetOutputWhileDisabled($fetchMethod)
     {
         $p = $this->getProcessForCode('sleep(41);');
@@ -1214,9 +1198,7 @@ class ProcessTest extends TestCase
         return $codes;
     }
 
-    /**
-     * @dataProvider provideVariousIncrementals
-     */
+    #[DataProvider('provideVariousIncrementals')]
     public function testIncrementalOutputDoesNotRequireAnotherCall($stream, $method)
     {
         $process = $this->getProcessForCode('$n = 0; while ($n < 3) { file_put_contents(\''.$stream.'\', $n, 1); $n++; usleep(1000); }', null, null, null, null);
@@ -1475,13 +1457,16 @@ class ProcessTest extends TestCase
     {
         $p = new Process(['/usr/bin/php']);
 
-        $expected = '\\' === \DIRECTORY_SEPARATOR ? '"/usr/bin/php"' : "'/usr/bin/php'";
+        $expected = '\\' === \DIRECTORY_SEPARATOR ? '/usr/bin/php' : "'/usr/bin/php'";
+        $this->assertSame($expected, $p->getCommandLine());
+
+        $p = new Process(['cd', '/d']);
+
+        $expected = '\\' === \DIRECTORY_SEPARATOR ? 'cd /d' : "'cd' '/d'";
         $this->assertSame($expected, $p->getCommandLine());
     }
 
-    /**
-     * @dataProvider provideEscapeArgument
-     */
+    #[DataProvider('provideEscapeArgument')]
     public function testEscapeArgument($arg)
     {
         $p = new Process([self::$phpBin, '-r', 'echo $argv[1];', $arg]);
@@ -1492,7 +1477,7 @@ class ProcessTest extends TestCase
 
     public function testRawCommandLine()
     {
-        $p = Process::fromShellCommandline(sprintf('"%s" -r %s "a" "" "b"', self::$phpBin, escapeshellarg('print_r($argv);')));
+        $p = Process::fromShellCommandline(\sprintf('"%s" -r %s "a" "" "b"', self::$phpBin, escapeshellarg('print_r($argv);')));
         $p->run();
 
         $expected = "Array\n(\n    [0] => -\n    [1] => a\n    [2] => \n    [3] => b\n)\n";
@@ -1620,9 +1605,7 @@ class ProcessTest extends TestCase
         $this->assertSame(123, $process->getExitCode());
     }
 
-    /**
-     * @group slow
-     */
+    #[Group('slow')]
     public function testLongRunningProcessWithMultipleCallsToProcGetStatus()
     {
         $process = $this->getProcess('sleep 1 && echo "done" && php -r "exit(0);"');
@@ -1635,9 +1618,7 @@ class ProcessTest extends TestCase
         $this->assertSame(0, $process->getExitCode());
     }
 
-    /**
-     * @group slow
-     */
+    #[Group('slow')]
     public function testLongRunningProcessWithMultipleCallsToProcGetStatusError()
     {
         $process = $this->getProcess('sleep 1 && echo "failure" && php -r "exit(123);"');
@@ -1650,9 +1631,7 @@ class ProcessTest extends TestCase
         $this->assertSame(123, $process->getExitCode());
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testNotTerminableInputPipe()
     {
         $process = $this->getProcess('echo foo');
@@ -1661,6 +1640,50 @@ class ProcessTest extends TestCase
         $process->setTimeout(2);
         $process->wait();
         $this->assertFalse($process->isRunning());
+    }
+
+    public function testIgnoringSignal()
+    {
+        if (!\function_exists('pcntl_signal')) {
+            $this->markTestSkipped('pnctl extension is required.');
+        }
+
+        $process = $this->getProcess(['sleep', '10']);
+        $process->setIgnoredSignals([\SIGTERM]);
+
+        $process->start();
+        $process->stop(timeout: 0.2);
+
+        $this->assertNotSame(\SIGTERM, $process->getTermSignal());
+    }
+
+    // This test ensure that the previous test is reliable, in case of the sleep command ignoring the SIGTERM signal
+    public function testNotIgnoringSignal()
+    {
+        if (!\function_exists('pcntl_signal')) {
+            $this->markTestSkipped('pnctl extension is required.');
+        }
+        if (\PHP_VERSION_ID < 80300 && isset($_SERVER['GITHUB_ACTIONS'])) {
+            $this->markTestSkipped('Transient on GHA with PHP < 8.3');
+        }
+
+        $process = $this->getProcess(['sleep', '10']);
+
+        $process->start();
+        $process->stop(timeout: 0.2);
+
+        $this->assertSame(\SIGTERM, $process->getTermSignal());
+    }
+
+    public function testPathResolutionOnWindows()
+    {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test is for Windows platform only');
+        }
+
+        $process = $this->getProcess(['where']);
+
+        $this->assertSame('C:\\Windows\\system32\\where.EXE', $process->getCommandLine());
     }
 
     private function getProcess(string|array $commandline, ?string $cwd = null, ?array $env = null, mixed $input = null, ?int $timeout = 60): Process

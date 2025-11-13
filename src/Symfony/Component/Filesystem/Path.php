@@ -351,45 +351,25 @@ final class Path
         }
 
         // No actual extension in path
-        if (empty($actualExtension)) {
+        if (!$actualExtension) {
             return $path.(str_ends_with($path, '.') ? '' : '.').$extension;
         }
 
         return substr($path, 0, -\strlen($actualExtension)).$extension;
     }
 
+    /**
+     * Returns whether the given path is absolute.
+     */
     public static function isAbsolute(string $path): bool
     {
-        if ('' === $path) {
-            return false;
-        }
-
-        // Strip scheme
-        if (false !== $schemeSeparatorPosition = strpos($path, '://')) {
-            $path = substr($path, $schemeSeparatorPosition + 3);
-        }
-
-        $firstCharacter = $path[0];
-
-        // UNIX root "/" or "\" (Windows style)
-        if ('/' === $firstCharacter || '\\' === $firstCharacter) {
-            return true;
-        }
-
-        // Windows root
-        if (\strlen($path) > 1 && ctype_alpha($firstCharacter) && ':' === $path[1]) {
-            // Special case: "C:"
-            if (2 === \strlen($path)) {
-                return true;
-            }
-
-            // Normal case: "C:/ or "C:\"
-            if ('/' === $path[2] || '\\' === $path[2]) {
-                return true;
-            }
-        }
-
-        return false;
+        return '' !== $path && (strspn($path, '/\\', 0, 1)
+            || (\strlen($path) > 3 && ctype_alpha($path[0])
+                && ':' === $path[1]
+                && strspn($path, '/\\', 2, 1)
+            )
+            || null !== parse_url($path, \PHP_URL_SCHEME)
+        );
     }
 
     public static function isRelative(string $path): bool
@@ -437,11 +417,11 @@ final class Path
     public static function makeAbsolute(string $path, string $basePath): string
     {
         if ('' === $basePath) {
-            throw new InvalidArgumentException(sprintf('The base path must be a non-empty string. Got: "%s".', $basePath));
+            throw new InvalidArgumentException(\sprintf('The base path must be a non-empty string. Got: "%s".', $basePath));
         }
 
         if (!self::isAbsolute($basePath)) {
-            throw new InvalidArgumentException(sprintf('The base path "%s" is not an absolute path.', $basePath));
+            throw new InvalidArgumentException(\sprintf('The base path "%s" is not an absolute path.', $basePath));
         }
 
         if (self::isAbsolute($path)) {
@@ -531,12 +511,12 @@ final class Path
         // If the passed path is absolute, but the base path is not, we
         // cannot generate a relative path
         if ('' !== $root && '' === $baseRoot) {
-            throw new InvalidArgumentException(sprintf('The absolute path "%s" cannot be made relative to the relative path "%s". You should provide an absolute base path instead.', $path, $basePath));
+            throw new InvalidArgumentException(\sprintf('The absolute path "%s" cannot be made relative to the relative path "%s". You should provide an absolute base path instead.', $path, $basePath));
         }
 
         // Fail if the roots of the two paths are different
         if ($baseRoot && $root !== $baseRoot) {
-            throw new InvalidArgumentException(sprintf('The path "%s" cannot be made relative to "%s", because they have different roots ("%s" and "%s").', $path, $basePath, $root, $baseRoot));
+            throw new InvalidArgumentException(\sprintf('The path "%s" cannot be made relative to "%s", because they have different roots ("%s" and "%s").', $path, $basePath, $root, $baseRoot));
         }
 
         if ('' === $relativeBasePath) {

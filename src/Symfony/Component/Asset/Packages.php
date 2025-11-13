@@ -65,7 +65,7 @@ class Packages
         }
 
         if (!isset($this->packages[$name])) {
-            throw new InvalidArgumentException(sprintf('There is no "%s" asset package.', $name));
+            throw new InvalidArgumentException(\sprintf('There is no "%s" asset package.', $name));
         }
 
         return $this->packages[$name];

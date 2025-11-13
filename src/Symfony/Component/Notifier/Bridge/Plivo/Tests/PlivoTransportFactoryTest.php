@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Plivo\Tests;
 
 use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class PlivoTransportFactoryTest extends TransportFactoryTestCase
+final class PlivoTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): PlivoTransportFactory
     {
         return new PlivoTransportFactory();

@@ -23,22 +23,22 @@ class GraphvizDumperTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$fixturesPath = __DIR__.'/../Fixtures/';
+        self::$fixturesPath = realpath(__DIR__.'/../Fixtures');
     }
 
     public function testDump()
     {
         $dumper = new GraphvizDumper($container = new ContainerBuilder());
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services1.dot', $dumper->dump(), '->dump() dumps an empty container as an empty dot file');
+        $this->assertStringEqualsGeneratedFile('services1.dot', $dumper->dump(), '->dump() dumps an empty container as an empty dot file');
 
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services9.dot', $dumper->dump(), '->dump() dumps services');
+        $this->assertStringEqualsGeneratedFile('services9.dot', $dumper->dump(), '->dump() dumps services');
 
         $container = include self::$fixturesPath.'/containers/container10.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services10.dot', $dumper->dump(), '->dump() dumps services');
+        $this->assertStringEqualsGeneratedFile('services10.dot', $dumper->dump(), '->dump() dumps services');
 
         $container = include self::$fixturesPath.'/containers/container10.php';
         $dumper = new GraphvizDumper($container);
@@ -56,14 +56,14 @@ class GraphvizDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container13.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services13.dot', $dumper->dump(), '->dump() dumps services');
+        $this->assertStringEqualsGeneratedFile('services13.dot', $dumper->dump(), '->dump() dumps services');
     }
 
     public function testDumpWithFrozenCustomClassContainer()
     {
         $container = include self::$fixturesPath.'/containers/container14.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services14.dot', $dumper->dump(), '->dump() dumps services');
+        $this->assertStringEqualsGeneratedFile('services14.dot', $dumper->dump(), '->dump() dumps services');
     }
 
     public function testDumpWithUnresolvedParameter()
@@ -71,7 +71,7 @@ class GraphvizDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container17.php';
         $dumper = new GraphvizDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services17.dot', $dumper->dump(), '->dump() dumps services');
+        $this->assertStringEqualsGeneratedFile('services17.dot', $dumper->dump(), '->dump() dumps services');
     }
 
     public function testDumpWithInlineDefinition()
@@ -83,6 +83,18 @@ class GraphvizDumperTest extends TestCase
         $container->register('bar', 'stdClass');
         $dumper = new GraphvizDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services_inline.dot', $dumper->dump(), '->dump() dumps nested references');
+        $this->assertStringEqualsGeneratedFile('services_inline.dot', $dumper->dump(), '->dump() dumps nested references');
+    }
+
+    private static function assertStringEqualsGeneratedFile(string $expectedFile, string $dumpedCode): void
+    {
+        $expectedFile = self::$fixturesPath.'/graphviz/'.$expectedFile;
+
+        if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
+            file_put_contents($expectedFile, $dumpedCode);
+            self::markTestIncomplete('TEST_GENERATE_FIXTURES is set');
+        }
+
+        self::assertStringEqualsFile($expectedFile, $dumpedCode);
     }
 }

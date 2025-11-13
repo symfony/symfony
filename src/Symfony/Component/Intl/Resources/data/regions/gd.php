@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'UserAssignedNames' => [
+        'XK' => 'A’ Chosobho',
+    ],
     'Names' => [
         'AD' => 'Andorra',
         'AE' => 'Na h-Iomaratan Arabach Aonaichte',
@@ -66,7 +69,7 @@ return [
         'DZ' => 'Aildiria',
         'EC' => 'Eacuador',
         'EE' => 'An Eastoin',
-        'EG' => 'An Èiphit',
+        'EG' => 'An Èipheit',
         'EH' => 'Sathara an Iar',
         'ER' => 'Eartra',
         'ES' => 'An Spàinnt',
@@ -97,7 +100,7 @@ return [
         'GW' => 'Gini-Bioso',
         'GY' => 'Guidheàna',
         'HK' => 'Hong Kong SAR na Sìne',
-        'HM' => 'Eilean Heard is MhicDhòmhnaill',
+        'HM' => 'Eilean Heard is Eileanan MhicDhòmhnaill',
         'HN' => 'Hondùras',
         'HR' => 'A’ Chròthais',
         'HT' => 'Haidhti',

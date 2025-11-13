@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests\Exception;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\HttpExceptionTrait;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -25,10 +26,10 @@ class HttpExceptionTraitTest extends TestCase
         $errorWithoutMessage = 'HTTP/1.1 400 Bad Request returned for "http://example.com".';
 
         $errorWithMessage = <<<ERROR
-An error occurred
+            An error occurred
 
-Some details
-ERROR;
+            Some details
+            ERROR;
 
         yield ['application/ld+json', '{"hydra:title": "An error occurred", "hydra:description": "Some details"}', $errorWithMessage];
         yield ['application/problem+json', '{"title": "An error occurred", "detail": "Some details"}', $errorWithMessage];
@@ -36,9 +37,7 @@ ERROR;
         yield ['application/json', '{"title": "An error occurred", "detail": {"field_name": ["Some details"]}}', $errorWithoutMessage];
     }
 
-    /**
-     * @dataProvider provideParseError
-     */
+    #[DataProvider('provideParseError')]
     public function testParseError(string $mimeType, string $json, string $expectedMessage)
     {
         $response = $this->createMock(ResponseInterface::class);

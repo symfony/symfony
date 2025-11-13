@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Error\Warning;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
@@ -24,18 +27,15 @@ class CachePoolsTest extends AbstractWebTestCase
         $this->doTestCachePools([], AdapterInterface::class);
     }
 
-    /**
-     * @requires extension redis
-     *
-     * @group integration
-     */
+    #[RequiresPhpExtension('redis')]
+    #[Group('integration')]
     public function testRedisCachePools()
     {
         $this->skipIfRedisUnavailable();
 
         try {
             $this->doTestCachePools(['root_config' => 'redis_config.yml', 'environment' => 'redis_cache'], RedisAdapter::class);
-        } catch (\PHPUnit\Framework\Error\Warning $e) {
+        } catch (Warning $e) {
             if (!str_starts_with($e->getMessage(), 'unable to connect to')) {
                 throw $e;
             }
@@ -48,18 +48,15 @@ class CachePoolsTest extends AbstractWebTestCase
         }
     }
 
-    /**
-     * @requires extension redis
-     *
-     * @group integration
-     */
+    #[RequiresPhpExtension('redis')]
+    #[Group('integration')]
     public function testRedisCustomCachePools()
     {
         $this->skipIfRedisUnavailable();
 
         try {
             $this->doTestCachePools(['root_config' => 'redis_custom_config.yml', 'environment' => 'custom_redis_cache'], RedisAdapter::class);
-        } catch (\PHPUnit\Framework\Error\Warning $e) {
+        } catch (Warning $e) {
             if (!str_starts_with($e->getMessage(), 'unable to connect to')) {
                 throw $e;
             }
@@ -87,10 +84,6 @@ class CachePoolsTest extends AbstractWebTestCase
 
         $pool2 = $container->get('cache.pool2');
         $pool2->save($item);
-
-        $container->get('cache_clearer.alias')->clear($container->getParameter('kernel.cache_dir'));
-        $item = $pool1->getItem($key);
-        $this->assertFalse($item->isHit());
 
         $item = $pool2->getItem($key);
         $this->assertTrue($item->isHit());

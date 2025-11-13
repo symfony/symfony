@@ -8,22 +8,22 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   choice_attr                     FormType             FormType                       FormTypeCsrfExtension  
   choice_filter                  -------------------- ------------------------------ ----------------------- 
   choice_label                    compound             action                         csrf_field_name        
-  choice_loader                   data_class           allow_file_upload              csrf_message           
-  choice_name                     empty_data           attr                           csrf_protection        
-  choice_translation_domain       error_bubbling       attr_translation_parameters    csrf_token_id          
-  choice_translation_parameters   invalid_message      auto_initialize                csrf_token_manager     
-  choice_value                    trim                 block_name                                            
-  choices                                              block_prefix                                          
-  duplicate_preferred_choices                          by_reference                                          
-  expanded                                             data                                                  
-  group_by                                             disabled                                              
-  multiple                                             form_attr                                             
-  placeholder                                          getter                                                
-  placeholder_attr                                     help                                                  
-  preferred_choices                                    help_attr                                             
-  separator                                            help_html                                             
-  separator_html                                       help_translation_parameters                           
-                                                       inherit_data                                          
+  choice_lazy                     data_class           allow_file_upload              csrf_message           
+  choice_loader                   empty_data           attr                           csrf_protection        
+  choice_name                     error_bubbling       attr_translation_parameters    csrf_token_id          
+  choice_translation_domain       invalid_message      auto_initialize                csrf_token_manager     
+  choice_translation_parameters   trim                 block_name                                            
+  choice_value                                         block_prefix                                          
+  choices                                              by_reference                                          
+  duplicate_preferred_choices                          data                                                  
+  expanded                                             disabled                                              
+  group_by                                             form_attr                                             
+  multiple                                             getter                                                
+  placeholder                                          help                                                  
+  placeholder_attr                                     help_attr                                             
+  preferred_choices                                    help_html                                             
+  separator                                            help_translation_parameters                           
+  separator_html                                       inherit_data                                          
                                                        invalid_message_parameters                            
                                                        is_empty_callback                                     
                                                        label                                                 

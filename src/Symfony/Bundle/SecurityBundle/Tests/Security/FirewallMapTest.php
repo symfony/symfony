@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Security;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -57,13 +58,13 @@ class FirewallMapTest extends TestCase
         $this->assertFalse($request->attributes->has('_stateless'));
     }
 
-    /** @dataProvider providesStatefulStatelessRequests */
+    #[DataProvider('providesStatefulStatelessRequests')]
     public function testGetListeners(Request $request, bool $expectedState)
     {
         $firewallContext = $this->createMock(FirewallContext::class);
 
         $firewallConfig = new FirewallConfig('main', 'user_checker', null, true, true);
-        $firewallContext->expects($this->exactly(2))->method('getConfig')->willReturn($firewallConfig);
+        $firewallContext->expects($this->once())->method('getConfig')->willReturn($firewallConfig);
 
         $listener = function () {};
         $firewallContext->expects($this->once())->method('getListeners')->willReturn([$listener]);
@@ -93,7 +94,7 @@ class FirewallMapTest extends TestCase
 
     public static function providesStatefulStatelessRequests(): \Generator
     {
-        yield [new Request(), true];
+        yield [new Request(), false];
         yield [new Request(attributes: ['_stateless' => false]), false];
         yield [new Request(attributes: ['_stateless' => true]), true];
     }

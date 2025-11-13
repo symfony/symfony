@@ -62,13 +62,15 @@ final class ParameterBagUtils
      */
     public static function getRequestParameterValue(Request $request, string $path, array $parameters = []): mixed
     {
+        $get = static fn ($path) => $request->attributes->get($path) ?? $request->query->all()[$path] ?? (!\in_array($request->getMethod(), ['GET', 'HEAD'], true) ? $request->request->all()[$path] ?? null : null);
+
         if (false === $pos = strpos($path, '[')) {
-            return $parameters[$path] ?? $request->get($path);
+            return $parameters[$path] ?? $get($path);
         }
 
         $root = substr($path, 0, $pos);
 
-        if (null === $value = $parameters[$root] ?? $request->get($root)) {
+        if (null === $value = $parameters[$root] ?? $get($root)) {
             return null;
         }
 
@@ -77,7 +79,7 @@ final class ParameterBagUtils
         try {
             $value = self::$propertyAccessor->getValue($value, substr($path, $pos));
 
-            if (null === $value && isset($parameters[$root]) && null !== $value = $request->get($root)) {
+            if (null === $value && isset($parameters[$root]) && null !== $value = $get($root)) {
                 $value = self::$propertyAccessor->getValue($value, substr($path, $pos));
             }
 

@@ -40,7 +40,7 @@ final class SmsmodeTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('smsmode://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        return \sprintf('smsmode://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -57,7 +57,7 @@ final class SmsmodeTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/sms/v1/messages', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/sms/v1/messages', $this->getEndpoint());
 
         $options = $message->getOptions()?->toArray() ?? [];
         $options['body']['text'] = $message->getSubject();
@@ -65,7 +65,7 @@ final class SmsmodeTransport extends AbstractTransport
         $options['from'] = $message->getFrom() ?: $this->from;
 
         if (!preg_match('/^[a-zA-Z0-9\s]{1,11}$/', $options['from'] ?? '')) {
-            throw new InvalidArgumentException(sprintf('The "From" value "%s" is not a valid sender ID.', $options['from']));
+            throw new InvalidArgumentException(\sprintf('The "From" value "%s" is not a valid sender ID.', $options['from']));
         }
 
         $response = $this->client->request('POST', $endpoint, [
@@ -84,7 +84,7 @@ final class SmsmodeTransport extends AbstractTransport
 
         if (201 !== $statusCode) {
             $error = $response->getContent(false);
-            throw new TransportException(sprintf('Unable to send the SMS - "%s".', $error ?: 'unknown failure'), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS - "%s".', $error ?: 'unknown failure'), $response);
         }
 
         $success = $response->toArray(false);

@@ -18,7 +18,6 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
@@ -71,7 +70,7 @@ class FormDataCollectorTest extends TestCase
             ],
             'errors' => [],
             'children' => [],
-         ];
+        ];
 
         $formData = [
             'id' => 'name',
@@ -87,11 +86,11 @@ class FormDataCollectorTest extends TestCase
                 'norm' => null,
             ],
             'errors' => [],
-             'has_children_error' => false,
-             'children' => [
-                 'child' => $childFormData,
-             ],
-         ];
+            'has_children_error' => false,
+            'children' => [
+                'child' => $childFormData,
+            ],
+        ];
 
         $this->assertEquals([
             'forms' => [
@@ -102,7 +101,7 @@ class FormDataCollectorTest extends TestCase
                 spl_object_hash($this->childForm) => $childFormData,
             ],
             'nb_errors' => 0,
-         ], $this->dataCollector->getData());
+        ], $this->dataCollector->getData());
     }
 
     public function testBuildMultiplePreliminaryFormTrees()

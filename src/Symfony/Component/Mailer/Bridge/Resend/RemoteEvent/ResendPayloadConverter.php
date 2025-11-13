@@ -35,13 +35,13 @@ final class ResendPayloadConverter implements PayloadConverterInterface
                 'email.clicked' => MailerEngagementEvent::CLICK,
                 'email.opened' => MailerEngagementEvent::OPEN,
                 'email.complained' => MailerEngagementEvent::SPAM,
-                default => throw new ParseException(sprintf('Unsupported event "%s".', $payload['type'])),
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['type'])),
             };
             $event = new MailerEngagementEvent($name, $payload['data']['email_id'], $payload);
         }
 
         if (!$date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', $payload['created_at'])) {
-            throw new ParseException(sprintf('Invalid date "%s".', $payload['created_at']));
+            throw new ParseException(\sprintf('Invalid date "%s".', $payload['created_at']));
         }
 
         $event->setDate($date);

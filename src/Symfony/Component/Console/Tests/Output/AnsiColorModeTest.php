@@ -11,23 +11,20 @@
 
 namespace Symfony\Component\Console\Tests\Output;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Output\AnsiColorMode;
 
 class AnsiColorModeTest extends TestCase
 {
-    /**
-     * @dataProvider provideColorsConversion
-     */
+    #[DataProvider('provideColorsConversion')]
     public function testColorsConversionToAnsi4(string $corlorHex, array $expected)
     {
         $this->assertSame((string) $expected[AnsiColorMode::Ansi4->name], AnsiColorMode::Ansi4->convertFromHexToAnsiColorCode($corlorHex));
     }
 
-    /**
-     * @dataProvider provideColorsConversion
-     */
+    #[DataProvider('provideColorsConversion')]
     public function testColorsConversionToAnsi8(string $corlorHex, array $expected)
     {
         $this->assertSame('8;5;'.$expected[AnsiColorMode::Ansi8->name], AnsiColorMode::Ansi8->convertFromHexToAnsiColorCode($corlorHex));

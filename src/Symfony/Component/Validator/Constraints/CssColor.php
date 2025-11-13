@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
@@ -62,46 +63,62 @@ class CssColor extends Constraint
     public array|string $formats;
 
     /**
-     * @param string[]|string|array<string,mixed> $formats The types of CSS colors allowed ({@see https://symfony.com/doc/current/reference/constraints/CssColor.html#formats})
+     * @param non-empty-string[]|non-empty-string $formats The types of CSS colors allowed ({@see https://symfony.com/doc/current/reference/constraints/CssColor.html#formats})
      * @param string[]|null                       $groups
-     * @param array<string,mixed>|null            $options
      */
+    #[HasNamedArguments]
     public function __construct(array|string $formats = [], ?string $message = null, ?array $groups = null, $payload = null, ?array $options = null)
     {
         $validationModesAsString = implode(', ', self::$validationModes);
 
         if (!$formats) {
-            $options['value'] = self::$validationModes;
+            $formats = self::$validationModes;
         } elseif (\is_array($formats) && \is_string(key($formats))) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
             $options = array_merge($formats, $options ?? []);
+            $formats = null;
         } elseif (\is_array($formats)) {
             if ([] === array_intersect(self::$validationModes, $formats)) {
-                throw new InvalidArgumentException(sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
+                throw new InvalidArgumentException(\sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
             }
-
-            $options['value'] = $formats;
         } elseif (\is_string($formats)) {
             if (!\in_array($formats, self::$validationModes, true)) {
-                throw new InvalidArgumentException(sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
+                throw new InvalidArgumentException(\sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
             }
 
-            $options['value'] = [$formats];
+            $formats = [$formats];
         } else {
             throw new InvalidArgumentException('The "formats" parameter type is not valid. It should be a string or an array.');
         }
 
         parent::__construct($options, $groups, $payload);
 
+        $this->formats = $formats ?? $this->formats;
         $this->message = $message ?? $this->message;
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getDefaultOption(): string
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return 'formats';
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getRequiredOptions(): array
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return ['formats'];
     }
 }

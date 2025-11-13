@@ -8,6 +8,7 @@ putenv($k.'='.$_SERVER[$k] = $_ENV[$k] = 'disabled');
 putenv('ANSICON');
 putenv('ConEmuANSI');
 putenv('TERM');
+putenv('SYMFONY_DEPRECATIONS_SERIALIZE');
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {

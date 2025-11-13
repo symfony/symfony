@@ -20,8 +20,6 @@ class UidTest extends AbstractWebTestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         self::deleteTmpDir();
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Postmark\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -29,9 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class PostmarkApiTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(PostmarkApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
@@ -69,6 +68,18 @@ class PostmarkApiTransportTest extends TestCase
         $this->assertCount(1, $payload['Headers']);
 
         $this->assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
+    }
+
+    public function testBypassHeaders()
+    {
+        $email = (new Email())->date(new \DateTimeImmutable());
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new PostmarkApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayNotHasKey('Headers', $payload);
     }
 
     public function testSend()
@@ -133,8 +144,7 @@ class PostmarkApiTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $expectedEvent = (new PostmarkDeliveryEvent('Inactive recipient', 406))
-            ->setHeaders($mail->getHeaders());
+        $expectedEvent = (new PostmarkDeliveryEvent('Inactive recipient', 406, $mail->getHeaders()));
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher

@@ -29,6 +29,6 @@ final class RedispatchMessage implements \Stringable
     {
         $message = $this->envelope instanceof Envelope ? $this->envelope->getMessage() : $this->envelope;
 
-        return sprintf('%s via %s', $message instanceof \Stringable ? (string) $message : $message::class, implode(', ', (array) $this->transportNames));
+        return \sprintf('%s via %s', $message instanceof \Stringable ? (string) $message : $message::class, implode(', ', (array) $this->transportNames));
     }
 }

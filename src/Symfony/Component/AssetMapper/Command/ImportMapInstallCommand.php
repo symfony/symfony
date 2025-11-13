@@ -63,7 +63,7 @@ final class ImportMapInstallCommand extends Command
             return Command::SUCCESS;
         }
 
-        $io->success(sprintf(
+        $io->success(\sprintf(
             'Downloaded %d package%s into %s.',
             \count($downloadedPackages),
             1 === \count($downloadedPackages) ? '' : 's',

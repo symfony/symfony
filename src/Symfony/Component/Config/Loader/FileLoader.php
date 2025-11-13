@@ -27,13 +27,12 @@ abstract class FileLoader extends Loader
 {
     protected static array $loading = [];
 
-    protected FileLocatorInterface $locator;
-
     private ?string $currentDir = null;
 
-    public function __construct(FileLocatorInterface $locator, ?string $env = null)
-    {
-        $this->locator = $locator;
+    public function __construct(
+        protected FileLocatorInterface $locator,
+        ?string $env = null,
+    ) {
         parent::__construct($env);
     }
 

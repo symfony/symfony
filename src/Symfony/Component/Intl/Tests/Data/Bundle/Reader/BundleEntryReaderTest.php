@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
@@ -194,9 +195,7 @@ class BundleEntryReaderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideMergeableValues
-     */
+    #[DataProvider('provideMergeableValues')]
     public function testMergeDataWithFallbackData($childData, $parentData, $result)
     {
         if (null === $childData || \is_array($childData)) {
@@ -224,9 +223,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', [], true));
     }
 
-    /**
-     * @dataProvider provideMergeableValues
-     */
+    #[DataProvider('provideMergeableValues')]
     public function testDontMergeDataIfFallbackDisabled($childData, $parentData, $result)
     {
         $this->readerImpl->expects($this->once())
@@ -237,9 +234,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame($childData, $this->reader->readEntry(self::RES_DIR, 'en_GB', [], false));
     }
 
-    /**
-     * @dataProvider provideMergeableValues
-     */
+    #[DataProvider('provideMergeableValues')]
     public function testMergeExistingEntryWithExistingFallbackEntry($childData, $parentData, $result)
     {
         if (null === $childData || \is_array($childData)) {
@@ -267,9 +262,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', ['Foo', 'Bar'], true));
     }
 
-    /**
-     * @dataProvider provideMergeableValues
-     */
+    #[DataProvider('provideMergeableValues')]
     public function testMergeNonExistingEntryWithExistingFallbackEntry($childData, $parentData, $result)
     {
         $series = [
@@ -289,9 +282,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame($parentData, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
     }
 
-    /**
-     * @dataProvider provideMergeableValues
-     */
+    #[DataProvider('provideMergeableValues')]
     public function testMergeExistingEntryWithNonExistingFallbackEntry($childData, $parentData, $result)
     {
         if (null === $childData || \is_array($childData)) {
@@ -339,9 +330,7 @@ class BundleEntryReaderTest extends TestCase
         $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true);
     }
 
-    /**
-     * @dataProvider provideMergeableValues
-     */
+    #[DataProvider('provideMergeableValues')]
     public function testMergeTraversables($childData, $parentData, $result)
     {
         $parentData = \is_array($parentData) ? new \ArrayObject($parentData) : $parentData;
@@ -371,9 +360,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
     }
 
-    /**
-     * @dataProvider provideMergeableValues
-     */
+    #[DataProvider('provideMergeableValues')]
     public function testFollowLocaleAliases($childData, $parentData, $result)
     {
         $this->reader->setLocaleAliases(['mo' => 'ro_MD']);

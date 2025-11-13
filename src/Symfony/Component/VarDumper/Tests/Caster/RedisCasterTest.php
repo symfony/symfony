@@ -11,42 +11,41 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Relay\Relay;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @group integration
  */
+#[Group('integration')]
 class RedisCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    /**
-     * @requires extension redis
-     */
+    #[RequiresPhpExtension('redis')]
     public function testNotConnected()
     {
         $redis = new \Redis();
 
         $xCast = <<<'EODUMP'
-Redis {
-  isConnected: false
-}
-EODUMP;
+            Redis {
+              isConnected: false
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xCast, $redis);
     }
 
-    /**
-     * @testWith ["Redis"]
-     *           ["Relay\\Relay"]
-     */
+    #[TestWith([\Redis::class])]
+    #[TestWith([Relay::class])]
     public function testConnected(string $class)
     {
         if (!class_exists($class)) {
-            self::markTestSkipped(sprintf('"%s" class required', $class));
+            self::markTestSkipped(\sprintf('"%s" class required', $class));
         }
 
         $redisHost = explode(':', getenv('REDIS_HOST')) + [1 => 6379];
@@ -58,26 +57,26 @@ EODUMP;
         }
 
         $xCast = <<<EODUMP
-%a {%A
-  isConnected: true
-  host: "{$redisHost[0]}"
-  port: {$redisHost[1]}
-  auth: null
-  mode: ATOMIC
-  dbNum: 0
-  timeout: 0.0
-  lastError: null
-  persistentId: %a
-  options: {
-    TCP_KEEPALIVE: %a
-    READ_TIMEOUT: 0.0
-    COMPRESSION: NONE
-    SERIALIZER: NONE
-    PREFIX: null
-    SCAN: NORETRY
-  }
-}
-EODUMP;
+            %a {%A
+              isConnected: true
+              host: "{$redisHost[0]}"
+              port: {$redisHost[1]}
+              auth: null
+              mode: ATOMIC
+              dbNum: 0
+              timeout: 0.0
+              lastError: null
+              persistentId: %a
+              options: {
+                TCP_KEEPALIVE: %a
+                READ_TIMEOUT: 0.0
+                COMPRESSION: NONE
+                SERIALIZER: NONE
+                PREFIX: null
+                SCAN: NORETRY
+              }
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xCast, $redis);
     }

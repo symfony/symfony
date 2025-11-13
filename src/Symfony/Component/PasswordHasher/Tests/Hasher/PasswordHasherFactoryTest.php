@@ -238,23 +238,7 @@ class PasswordHasherFactoryTest extends TestCase
 
 class SomeUser implements PasswordAuthenticatedUserInterface
 {
-    public function getRoles(): array
-    {
-    }
-
     public function getPassword(): ?string
-    {
-    }
-
-    public function getSalt(): ?string
-    {
-    }
-
-    public function getUserIdentifier(): string
-    {
-    }
-
-    public function eraseCredentials()
     {
     }
 }

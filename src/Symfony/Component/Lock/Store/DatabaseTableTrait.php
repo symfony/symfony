@@ -30,10 +30,10 @@ trait DatabaseTableTrait
     private function init(array $options, float $gcProbability, int $initialTtl): void
     {
         if ($gcProbability < 0 || $gcProbability > 1) {
-            throw new InvalidArgumentException(sprintf('"%s" requires gcProbability between 0 and 1, "%f" given.', __METHOD__, $gcProbability));
+            throw new InvalidArgumentException(\sprintf('"%s" requires gcProbability between 0 and 1, "%f" given.', __METHOD__, $gcProbability));
         }
         if ($initialTtl < 1) {
-            throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, "%d" given.', __METHOD__, $initialTtl));
+            throw new InvalidTtlException(\sprintf('"%s()" expects a strictly positive TTL, "%d" given.', __METHOD__, $initialTtl));
         }
 
         $this->table = $options['db_table'] ?? $this->table;

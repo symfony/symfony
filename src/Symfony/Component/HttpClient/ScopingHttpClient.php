@@ -28,18 +28,13 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
 {
     use HttpClientTrait;
 
-    private HttpClientInterface $client;
-    private array $defaultOptionsByRegexp;
-    private ?string $defaultRegexp;
-
-    public function __construct(HttpClientInterface $client, array $defaultOptionsByRegexp, ?string $defaultRegexp = null)
-    {
-        $this->client = $client;
-        $this->defaultOptionsByRegexp = $defaultOptionsByRegexp;
-        $this->defaultRegexp = $defaultRegexp;
-
+    public function __construct(
+        private HttpClientInterface $client,
+        private array $defaultOptionsByRegexp,
+        private ?string $defaultRegexp = null,
+    ) {
         if (null !== $defaultRegexp && !isset($defaultOptionsByRegexp[$defaultRegexp])) {
-            throw new InvalidArgumentException(sprintf('No options are mapped to the provided "%s" default regexp.', $defaultRegexp));
+            throw new InvalidArgumentException(\sprintf('No options are mapped to the provided "%s" default regexp.', $defaultRegexp));
         }
     }
 
@@ -100,8 +95,13 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
         }
     }
 
+    /**
+     * @deprecated since Symfony 7.1, configure the logger on the wrapped HTTP client directly instead
+     */
     public function setLogger(LoggerInterface $logger): void
     {
+        trigger_deprecation('symfony/http-client', '7.1', 'Configure the logger on the wrapped HTTP client directly instead.');
+
         if ($this->client instanceof LoggerAwareInterface) {
             $this->client->setLogger($logger);
         }

@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Context
 {
-    private array $groups;
+    public readonly array $groups;
 
     /**
      * @param array<string, mixed> $context                The common context to use when serializing or deserializing
@@ -30,39 +30,43 @@ class Context
      * @throws InvalidArgumentException
      */
     public function __construct(
-        private readonly array $context = [],
-        private readonly array $normalizationContext = [],
-        private readonly array $denormalizationContext = [],
+        public readonly array $context = [],
+        public readonly array $normalizationContext = [],
+        public readonly array $denormalizationContext = [],
         string|array $groups = [],
     ) {
         if (!$context && !$normalizationContext && !$denormalizationContext) {
-            throw new InvalidArgumentException(sprintf('At least one of the "context", "normalizationContext", or "denormalizationContext" options must be provided as a non-empty array to "%s".', static::class));
+            throw new InvalidArgumentException(\sprintf('At least one of the "context", "normalizationContext", or "denormalizationContext" options must be provided as a non-empty array to "%s".', static::class));
         }
 
         $this->groups = (array) $groups;
 
         foreach ($this->groups as $group) {
             if (!\is_string($group)) {
-                throw new InvalidArgumentException(sprintf('Parameter "groups" given to "%s" must be a string or an array of strings, "%s" given.', static::class, get_debug_type($group)));
+                throw new InvalidArgumentException(\sprintf('Parameter "groups" given to "%s" must be a string or an array of strings, "%s" given.', static::class, get_debug_type($group)));
             }
         }
     }
 
+    #[\Deprecated('Use the "context" property instead', 'symfony/serializer:7.4')]
     public function getContext(): array
     {
         return $this->context;
     }
 
+    #[\Deprecated('Use the "normalizationContext" property instead', 'symfony/serializer:7.4')]
     public function getNormalizationContext(): array
     {
         return $this->normalizationContext;
     }
 
+    #[\Deprecated('Use the "denormalizationContext" property instead', 'symfony/serializer:7.4')]
     public function getDenormalizationContext(): array
     {
         return $this->denormalizationContext;
     }
 
+    #[\Deprecated('Use the "groups" property instead', 'symfony/serializer:7.4')]
     public function getGroups(): array
     {
         return $this->groups;

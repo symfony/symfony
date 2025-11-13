@@ -45,15 +45,22 @@ final class ServerSentEvent extends DataChunk implements ChunkInterface
             $i += 1 + (' ' === ($line[1 + $i] ?? ''));
 
             switch ($field) {
-                case 'id': $this->id = substr($line, $i); break;
-                case 'event': $this->type = substr($line, $i); break;
-                case 'data': $this->data .= ('' === $this->data ? '' : "\n").substr($line, $i); break;
+                case 'id':
+                    $this->id = substr($line, $i);
+                    break;
+                case 'event':
+                    $this->type = substr($line, $i);
+                    break;
+                case 'data':
+                    $this->data .= ('' === $this->data ? '' : "\n").substr($line, $i);
+                    break;
                 case 'retry':
                     $retry = substr($line, $i);
 
                     if ('' !== $retry && \strlen($retry) === strspn($retry, '0123456789')) {
                         $this->retry = $retry / 1000.0;
                     }
+
                     break;
             }
         }
@@ -89,17 +96,17 @@ final class ServerSentEvent extends DataChunk implements ChunkInterface
         }
 
         if ('' === $this->data) {
-            throw new JsonException(sprintf('Server-Sent Event%s data is empty.', '' !== $this->id ? sprintf(' "%s"', $this->id) : ''));
+            throw new JsonException(\sprintf('Server-Sent Event%s data is empty.', '' !== $this->id ? \sprintf(' "%s"', $this->id) : ''));
         }
 
         try {
             $jsonData = json_decode($this->data, true, 512, \JSON_BIGINT_AS_STRING | \JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new JsonException(sprintf('Decoding Server-Sent Event%s failed: ', '' !== $this->id ? sprintf(' "%s"', $this->id) : '').$e->getMessage(), $e->getCode());
+            throw new JsonException(\sprintf('Decoding Server-Sent Event%s failed: ', '' !== $this->id ? \sprintf(' "%s"', $this->id) : '').$e->getMessage(), $e->getCode());
         }
 
         if (!\is_array($jsonData)) {
-            throw new JsonException(sprintf('JSON content was expected to decode to an array, "%s" returned in Server-Sent Event%s.', get_debug_type($jsonData), '' !== $this->id ? sprintf(' "%s"', $this->id) : ''));
+            throw new JsonException(\sprintf('JSON content was expected to decode to an array, "%s" returned in Server-Sent Event%s.', get_debug_type($jsonData), '' !== $this->id ? \sprintf(' "%s"', $this->id) : ''));
         }
 
         return $this->jsonData = $jsonData;

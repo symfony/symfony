@@ -41,7 +41,7 @@ class Token
      */
     public function __toString(): string
     {
-        return sprintf('%3d %-11s %s', $this->cursor, strtoupper($this->type), $this->value);
+        return \sprintf('%3d %-11s %s', $this->cursor, strtoupper($this->type), $this->value);
     }
 
     /**

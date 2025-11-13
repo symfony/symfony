@@ -59,7 +59,7 @@ class TranslationWriterTest extends TestCase
         file_put_contents($path, '');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(sprintf('Translation Writer was not able to create directory "%s".', $path));
+        $this->expectExceptionMessage(\sprintf('Translation Writer was not able to create directory "%s".', $path));
 
         $writer->write(new MessageCatalogue('en'), 'foo', ['path' => $path]);
     }

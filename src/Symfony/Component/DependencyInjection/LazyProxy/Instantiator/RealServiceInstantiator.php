@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class RealServiceInstantiator implements InstantiatorInterface
 {
+    /**
+     * @return object The real service instance
+     */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object
     {
         return $realInstantiator();

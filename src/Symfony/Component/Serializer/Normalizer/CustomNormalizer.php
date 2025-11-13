@@ -30,9 +30,9 @@ final class CustomNormalizer implements NormalizerInterface, DenormalizerInterfa
         ];
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        return $object->normalize($this->serializer, $format, $context);
+        return $data->normalize($this->serializer, $format, $context);
     }
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed

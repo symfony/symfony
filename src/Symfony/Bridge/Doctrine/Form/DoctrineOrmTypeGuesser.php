@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\ORM\Mapping\JoinColumnMapping;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,13 +38,11 @@ use Symfony\Component\Form\Guess\ValueGuess;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
-    protected ManagerRegistry $registry;
-
     private array $cache = [];
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        protected ManagerRegistry $registry,
+    ) {
     }
 
     public function guessType(string $class, string $property): ?TypeGuess
@@ -126,14 +125,16 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     public function guessMaxLength(string $class, string $property): ?ValueGuess
     {
         $ret = $this->getMetadata($class);
-        if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
+        if ($ret && isset($ret[0]->fieldMappings[$property])) {
             $mapping = $ret[0]->getFieldMapping($property);
 
-            if (isset($mapping['length'])) {
-                return new ValueGuess($mapping['length'], Guess::HIGH_CONFIDENCE);
+            $length = $mapping instanceof FieldMapping ? $mapping->length : ($mapping['length'] ?? null);
+
+            if (null !== $length) {
+                return new ValueGuess($length, Guess::HIGH_CONFIDENCE);
             }
 
-            if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT])) {
+            if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT], true)) {
                 return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }
@@ -144,8 +145,8 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     public function guessPattern(string $class, string $property): ?ValueGuess
     {
         $ret = $this->getMetadata($class);
-        if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
-            if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT])) {
+        if ($ret && isset($ret[0]->fieldMappings[$property])) {
+            if (\in_array($ret[0]->getTypeOfField($property), [Types::DECIMAL, Types::FLOAT], true)) {
                 return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }

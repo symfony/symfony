@@ -29,9 +29,9 @@ class SerializerErrorRenderer implements ErrorRendererInterface
     private bool|\Closure $debug;
 
     /**
-     * @param string|callable(FlattenException) $format The format as a string or a callable that should return it
-     *                                                  formats not supported by Request::getMimeTypes() should be given as mime types
-     * @param bool|callable                     $debug  The debugging mode as a boolean or a callable that should return it
+     * @param string|callable(FlattenException): string $format The format as a string or a callable that should return it
+     *                                                          formats not supported by Request::getMimeTypes() should be given as mime types
+     * @param bool|callable                             $debug  The debugging mode as a boolean or a callable that should return it
      */
     public function __construct(
         private SerializerInterface $serializer,
@@ -49,7 +49,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
         $headers = ['Vary' => 'Accept'];
         $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($exception);
         if ($debug) {
-            $headers['X-Debug-Exception'] = rawurlencode($exception->getMessage());
+            $headers['X-Debug-Exception'] = rawurlencode(substr($exception->getMessage(), 0, 2000));
             $headers['X-Debug-Exception-File'] = rawurlencode($exception->getFile()).':'.$exception->getLine();
         }
 

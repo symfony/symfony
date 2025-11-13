@@ -159,7 +159,7 @@ class ResponseHeaderBag extends HeaderBag
 
     public function setCookie(Cookie $cookie): void
     {
-        $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
+        $this->cookies[$cookie->getDomain() ?? ''][$cookie->getPath()][$cookie->getName()] = $cookie;
         $this->headerNames['set-cookie'] = 'Set-Cookie';
     }
 
@@ -170,17 +170,17 @@ class ResponseHeaderBag extends HeaderBag
     {
         $path ??= '/';
 
-        unset($this->cookies[$domain][$path][$name]);
+        unset($this->cookies[$domain ?? ''][$path][$name]);
 
-        if (empty($this->cookies[$domain][$path])) {
-            unset($this->cookies[$domain][$path]);
+        if (empty($this->cookies[$domain ?? ''][$path])) {
+            unset($this->cookies[$domain ?? ''][$path]);
 
-            if (empty($this->cookies[$domain])) {
-                unset($this->cookies[$domain]);
+            if (empty($this->cookies[$domain ?? ''])) {
+                unset($this->cookies[$domain ?? '']);
             }
         }
 
-        if (empty($this->cookies)) {
+        if (!$this->cookies) {
             unset($this->headerNames['set-cookie']);
         }
     }
@@ -194,8 +194,8 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function getCookies(string $format = self::COOKIES_FLAT): array
     {
-        if (!\in_array($format, [self::COOKIES_FLAT, self::COOKIES_ARRAY])) {
-            throw new \InvalidArgumentException(sprintf('Format "%s" invalid (%s).', $format, implode(', ', [self::COOKIES_FLAT, self::COOKIES_ARRAY])));
+        if (!\in_array($format, [self::COOKIES_FLAT, self::COOKIES_ARRAY], true)) {
+            throw new \InvalidArgumentException(\sprintf('Format "%s" invalid (%s).', $format, implode(', ', [self::COOKIES_FLAT, self::COOKIES_ARRAY])));
         }
 
         if (self::COOKIES_ARRAY === $format) {
@@ -221,7 +221,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function clearCookie(string $name, ?string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true, ?string $sameSite = null /* , bool $partitioned = false */): void
     {
-        $partitioned = 6 < \func_num_args() ? \func_get_arg(6) : false;
+        $partitioned = 6 < \func_num_args() ? func_get_arg(6) : false;
 
         $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly, false, $sameSite, $partitioned));
     }

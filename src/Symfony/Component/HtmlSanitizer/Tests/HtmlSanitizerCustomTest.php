@@ -25,8 +25,8 @@ class HtmlSanitizerCustomTest extends TestCase
         ;
 
         $this->assertSame(
-            ' world',
-            (new HtmlSanitizer($config))->sanitizeFor('head', '<div style="width: 100px">Hello</div> world')
+            '',
+            (new HtmlSanitizer($config))->sanitizeFor('head', '<div style="width: 100px">Hello world</div>')
         );
     }
 
@@ -65,8 +65,8 @@ class HtmlSanitizerCustomTest extends TestCase
 
     public function testSanitizeNullByte()
     {
-        $this->assertSame('Null byte', $this->sanitize(new HtmlSanitizerConfig(), "Null byte\0"));
-        $this->assertSame('Null byte', $this->sanitize(new HtmlSanitizerConfig(), 'Null byte&#0;'));
+        $this->assertSame('Null byte�', $this->sanitize(new HtmlSanitizerConfig(), "Null byte\0"));
+        $this->assertSame('Null byte�', $this->sanitize(new HtmlSanitizerConfig(), 'Null byte&#0;'));
     }
 
     public function testSanitizeDefaultBody()
@@ -232,9 +232,16 @@ class HtmlSanitizerCustomTest extends TestCase
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
+            ->allowElement('img', '*')
             ->allowElement('a', ['href'])
             ->forceAttribute('a', 'rel', 'noopener noreferrer')
+            ->forceAttribute('img', 'loading', 'lazy')
         ;
+
+        $this->assertSame(
+            '<img title="My image" src="https://example.com/image.png" loading="lazy" />',
+            $this->sanitize($config, '<img title="My image" src="https://example.com/image.png" loading="eager" onerror="alert(\'1234\')" />')
+        );
 
         $this->assertSame(
             '<a rel="noopener noreferrer">Hello</a> world',
@@ -249,6 +256,11 @@ class HtmlSanitizerCustomTest extends TestCase
         $this->assertSame(
             '<div>Hello</div> world',
             $this->sanitize($config, '<div style="width: 100px">Hello</div> world')
+        );
+
+        $this->assertSame(
+            '<a href="https://symfony.com" rel="noopener noreferrer">Hello</a> world',
+            $this->sanitize($config, '<a href="https://symfony.com" rel="noopener">Hello</a> world')
         );
     }
 
@@ -397,7 +409,7 @@ class HtmlSanitizerCustomTest extends TestCase
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div', ['data-attr'])
-            ->withAttributeSanitizer(new class() implements AttributeSanitizerInterface {
+            ->withAttributeSanitizer(new class implements AttributeSanitizerInterface {
                 public function getSupportedElements(): ?array
                 {
                     return ['div'];

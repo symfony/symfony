@@ -26,16 +26,16 @@ class MessengerConfig
         return $this->transports[$name];
     }
 
-    public function __construct(array $value = [])
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('transports', $value)) {
+        if (array_key_exists('transports', $config)) {
             $this->_usedProperties['transports'] = true;
-            $this->transports = array_map(fn ($v) => new \Symfony\Config\NodeInitialValues\Messenger\TransportsConfig($v), $value['transports']);
-            unset($value['transports']);
+            $this->transports = array_map(fn ($v) => new \Symfony\Config\NodeInitialValues\Messenger\TransportsConfig($v), $config['transports']);
+            unset($config['transports']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

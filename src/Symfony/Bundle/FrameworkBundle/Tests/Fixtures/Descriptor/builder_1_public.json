@@ -10,6 +10,67 @@
             "autowire": false,
             "autoconfigure": false,
             "deprecated": false,
+            "arguments": [
+                {
+                    "type": "service",
+                    "id": ".definition_2"
+                },
+                "%parameter%",
+                {
+                    "class": "inline_service",
+                    "public": false,
+                    "synthetic": false,
+                    "lazy": false,
+                    "shared": true,
+                    "abstract": false,
+                    "autowire": false,
+                    "autoconfigure": false,
+                    "deprecated": false,
+                    "arguments": [
+                        "arg1",
+                        "arg2"
+                    ],
+                    "file": null,
+                    "tags": [],
+                    "usages": []
+                },
+                [
+                    "foo",
+                    {
+                        "type": "service",
+                        "id": ".definition_2"
+                    },
+                    {
+                        "class": "inline_service",
+                        "public": false,
+                        "synthetic": false,
+                        "lazy": false,
+                        "shared": true,
+                        "abstract": false,
+                        "autowire": false,
+                        "autoconfigure": false,
+                        "deprecated": false,
+                        "arguments": [],
+                        "file": null,
+                        "tags": [],
+                        "usages": []
+                    }
+                ],
+                [
+                    {
+                        "type": "service",
+                        "id": "definition_1"
+                    },
+                    {
+                        "type": "service",
+                        "id": ".definition_2"
+                    }
+                ],
+                {
+                    "type": "abstract",
+                    "text": "placeholder"
+                }
+            ],
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
@@ -26,6 +87,7 @@
             "autowire": false,
             "autoconfigure": false,
             "deprecated": false,
+            "arguments": [],
             "file": null,
             "tags": [],
             "usages": []
@@ -41,6 +103,7 @@
             "autoconfigure": false,
             "deprecated": false,
             "description": "ContainerInterface is the interface implemented by service container classes.",
+            "arguments": [],
             "file": null,
             "tags": [],
             "usages": []

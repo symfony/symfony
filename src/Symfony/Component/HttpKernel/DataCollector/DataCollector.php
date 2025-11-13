@@ -57,12 +57,24 @@ abstract class DataCollector implements DataCollectorInterface
      */
     protected function getCasters(): array
     {
-        $casters = [
+        return [
             '*' => function ($v, array $a, Stub $s, $isNested) {
                 if (!$v instanceof Stub) {
+                    $b = $a;
                     foreach ($a as $k => $v) {
-                        if (\is_object($v) && !$v instanceof \DateTimeInterface && !$v instanceof Stub) {
-                            $a[$k] = new CutStub($v);
+                        if (!\is_object($v) || $v instanceof \DateTimeInterface || $v instanceof Stub) {
+                            continue;
+                        }
+
+                        try {
+                            $a[$k] = $s = new CutStub($v);
+
+                            if ($b[$k] === $s) {
+                                // we've hit a non-typed reference
+                                $a[$k] = $v;
+                            }
+                        } catch (\TypeError $e) {
+                            // we've hit a typed reference
                         }
                     }
                 }
@@ -70,31 +82,75 @@ abstract class DataCollector implements DataCollectorInterface
                 return $a;
             },
         ] + ReflectionCaster::UNSET_CLOSURE_FILE_INFO;
-
-        return $casters;
     }
 
+    public function __serialize(): array
+    {
+        if (self::class === (new \ReflectionMethod($this, '__sleep'))->class || self::class !== (new \ReflectionMethod($this, '__serialize'))->class) {
+            return ['data' => $this->data];
+        }
+
+        trigger_deprecation('symfony/http-kernel', '7.4', 'Implementing "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
+
+        $data = [];
+        foreach ($this->__sleep() as $key) {
+            try {
+                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
+                    $data[$key] = $r->getValue($this);
+                }
+            } catch (\ReflectionException) {
+                $data[$key] = $this->$key;
+            }
+        }
+
+        return $data;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        if ($wakeup = self::class !== (new \ReflectionMethod($this, '__wakeup'))->class && self::class === (new \ReflectionMethod($this, '__unserialize'))->class) {
+            trigger_deprecation('symfony/http-kernel', '7.4', 'Implementing "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
+        }
+
+        if (\in_array(array_keys($data), [['data'], ["\0*\0data"]], true)) {
+            $this->data = $data['data'] ?? $data["\0*\0data"];
+
+            if ($wakeup) {
+                $this->__wakeup();
+            }
+
+            return;
+        }
+
+        trigger_deprecation('symfony/http-kernel', '7.4', 'Passing more than just key "data" to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
+
+        \Closure::bind(function ($data) use ($wakeup) {
+            foreach ($data as $key => $value) {
+                $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
+            }
+
+            if ($wakeup) {
+                $this->__wakeup();
+            }
+        }, $this, static::class)($data);
+    }
+
+    /**
+     * @deprecated since Symfony 7.4, will be replaced by `__serialize()` in 8.0
+     */
     public function __sleep(): array
     {
+        trigger_deprecation('symfony/http-kernel', '7.4', 'Calling "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
+
         return ['data'];
     }
 
+    /**
+     * @deprecated since Symfony 7.4, will be replaced by `__unserialize()` in 8.0
+     */
     public function __wakeup(): void
     {
-    }
-
-    /**
-     * @internal to prevent implementing \Serializable
-     */
-    final protected function serialize(): void
-    {
-    }
-
-    /**
-     * @internal to prevent implementing \Serializable
-     */
-    final protected function unserialize(string $data): void
-    {
+        trigger_deprecation('symfony/http-kernel', '7.4', 'Calling "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
     }
 
     /**

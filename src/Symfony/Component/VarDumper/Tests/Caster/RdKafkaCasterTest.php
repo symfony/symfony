@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use RdKafka\Conf;
 use RdKafka\KafkaConsumer;
@@ -18,11 +20,8 @@ use RdKafka\Producer;
 use RdKafka\TopicConf;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
- * @requires extension rdkafka
- *
- * @group integration
- */
+#[RequiresPhpExtension('rdkafka')]
+#[Group('integration')]
 class RdKafkaCasterTest extends TestCase
 {
     use VarDumperTestTrait;
@@ -56,13 +55,14 @@ class RdKafkaCasterTest extends TestCase
         }
 
         $expectedDump = <<<EODUMP
-RdKafka\Conf {
-  builtin.features: "gzip,snappy,ssl,sasl,regex,lz4,sasl_gssapi,sasl_plain,sasl_scram,plugins%S"
-  client.id: "rdkafka"
-%A
-  dr_msg_cb: "0x%x"
-}
-EODUMP;
+            RdKafka\Conf {
+              builtin.features: "gzip,snappy,ssl,sasl,regex,lz4,sasl_gssapi,sasl_plain,sasl_scram,plugins%S"
+              client.id: "rdkafka"
+            %A
+              dr_msg_cb: "0x%x"
+            %A
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $conf);
     }
@@ -77,31 +77,31 @@ EODUMP;
         $producer->addBrokers($this->broker);
 
         $expectedDump = <<<EODUMP
-RdKafka\Producer {
-%Aout_q_len: %d
-  orig_broker_id: 1001
-  orig_broker_name: "$this->broker/1001"
-  brokers: RdKafka\Metadata\Collection {
-    +0: RdKafka\Metadata\Broker {
-      id: 1001
-      host: "%s"
-      port: %d
-    }
-  }
-  topics: RdKafka\Metadata\Collection {
-    +0: RdKafka\Metadata\Topic {
-      name: "%s"
-      partitions: RdKafka\Metadata\Collection {
-        +0: RdKafka\Metadata\Partition {
-          id: 0
-          err: 0
-          leader: 1001
-        }%A
-      }
-    }%A
-  }
-}
-EODUMP;
+            RdKafka\Producer {
+            %Aout_q_len: %d
+              orig_broker_id: 1001
+              orig_broker_name: "$this->broker/1001"
+              brokers: RdKafka\Metadata\Collection {
+                +0: RdKafka\Metadata\Broker {
+                  id: 1001
+                  host: "%s"
+                  port: %d
+                }
+              }
+              topics: RdKafka\Metadata\Collection {
+                +0: RdKafka\Metadata\Topic {
+                  name: "%s"
+                  partitions: RdKafka\Metadata\Collection {
+                    +0: RdKafka\Metadata\Partition {
+                      id: 0
+                      err: 0
+                      leader: 1001
+                    }%A
+                  }
+                }%A
+              }
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $producer);
     }
@@ -112,20 +112,20 @@ EODUMP;
         $topicConf->set('auto.offset.reset', 'smallest');
 
         $expectedDump = <<<EODUMP
-RdKafka\TopicConf {
-  request.required.acks: "%i"
-  request.timeout.ms: "5000"
-  message.timeout.ms: "300000"
-%A
-  auto.commit.enable: "true"
-  auto.commit.interval.ms: "60000"
-  auto.offset.reset: "smallest"
-  offset.store.path: "."
-  offset.store.sync.interval.ms: "-1"
-  offset.store.method: "broker"
-  consume.callback.max.messages: "0"
-}
-EODUMP;
+            RdKafka\TopicConf {
+              request.required.acks: "%i"
+              request.timeout.ms: "%d"
+              message.timeout.ms: "300000"
+            %A
+              auto.commit.enable: "true"
+              auto.commit.interval.ms: "60000"
+              auto.offset.reset: "smallest"
+              offset.store.path: "."
+              offset.store.sync.interval.ms: "-1"
+              offset.store.method: "broker"
+              consume.callback.max.messages: "0"
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $topicConf);
     }
@@ -144,34 +144,34 @@ EODUMP;
         $consumer->subscribe([self::TOPIC]);
 
         $expectedDump = <<<EODUMP
-RdKafka\KafkaConsumer {
-%Asubscription: array:1 [
-    0 => "test-topic"
-  ]
-  assignment: []
-  orig_broker_id: %i
-  orig_broker_name: "$this->broker/%s"
-  brokers: RdKafka\Metadata\Collection {
-    +0: RdKafka\Metadata\Broker {
-      id: 1001
-      host: "%s"
-      port: %d
-    }
-  }
-  topics: RdKafka\Metadata\Collection {
-    +0: RdKafka\Metadata\Topic {
-      name: "%s"
-      partitions: RdKafka\Metadata\Collection {
-        +0: RdKafka\Metadata\Partition {
-          id: 0
-          err: 0
-          leader: 1001
-        }%A
-      }
-    }%A
-  }
-}
-EODUMP;
+            RdKafka\KafkaConsumer {
+            %Asubscription: array:1 [
+                0 => "test-topic"
+              ]
+              assignment: []
+              orig_broker_id: %i
+              orig_broker_name: "$this->broker/%s"
+              brokers: RdKafka\Metadata\Collection {
+                +0: RdKafka\Metadata\Broker {
+                  id: 1001
+                  host: "%s"
+                  port: %d
+                }
+              }
+              topics: RdKafka\Metadata\Collection {
+                +0: RdKafka\Metadata\Topic {
+                  name: "%s"
+                  partitions: RdKafka\Metadata\Collection {
+                    +0: RdKafka\Metadata\Partition {
+                      id: 0
+                      err: 0
+                      leader: 1001
+                    }%A
+                  }
+                }%A
+              }
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $consumer);
     }
@@ -185,10 +185,10 @@ EODUMP;
         $topic->produce(\RD_KAFKA_PARTITION_UA, 0, '{}');
 
         $expectedDump = <<<EODUMP
-RdKafka\ProducerTopic {
-  name: "test"
-}
-EODUMP;
+            RdKafka\ProducerTopic {
+              name: "test"
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $topic);
     }
@@ -206,18 +206,18 @@ EODUMP;
         $message = $consumer->consume(0);
 
         $expectedDump = <<<EODUMP
-RdKafka\Message {
-  +err: -185
-  +topic_name: null
-  +timestamp: null
-  +partition: 0
-  +payload: null
-  +len: null
-  +key: null
-  +offset: 0%A
-  errstr: "Local: Timed out"
-}
-EODUMP;
+            RdKafka\Message {
+              +err: -185
+              +topic_name: null
+              +timestamp: null
+              +partition: 0
+              +payload: null
+              +len: null
+              +key: null
+              +offset: 0%A
+              errstr: "Local: Timed out"
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $message);
     }

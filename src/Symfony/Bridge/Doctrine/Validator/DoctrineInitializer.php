@@ -21,11 +21,9 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
  */
 class DoctrineInitializer implements ObjectInitializerInterface
 {
-    protected ManagerRegistry $registry;
-
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        protected ManagerRegistry $registry,
+    ) {
     }
 
     public function initialize(object $object): void

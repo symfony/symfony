@@ -11,16 +11,18 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class CountryTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CountryType';
+    public const TESTED_TYPE = CountryType::class;
 
     protected function setUp(): void
     {
-        IntlTestHelper::requireIntl($this, false);
+        IntlTestHelper::requireIntl($this);
 
         parent::setUp();
     }
@@ -38,9 +40,7 @@ class CountryTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('MY', 'MY', 'Malaysia'), $choices);
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testChoiceTranslationLocaleOption()
     {
         $choices = $this->factory
@@ -73,9 +73,7 @@ class CountryTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('MYS', 'MYS', 'Malaysia'), $choices);
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testChoiceTranslationLocaleAndAlpha3Option()
     {
         $choices = $this->factory

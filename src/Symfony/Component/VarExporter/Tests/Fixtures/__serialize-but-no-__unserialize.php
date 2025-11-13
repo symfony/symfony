@@ -6,9 +6,19 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     ],
     null,
     [
-        'stdClass' => [
+        'Symfony\\Component\\VarExporter\\Tests\\ParentOf__SerializeButNo__Unserialize' => [
             'foo' => [
+                'foo',
+            ],
+        ],
+        'stdClass' => [
+            'baz' => [
                 'ccc',
+            ],
+        ],
+        'Symfony\\Component\\VarExporter\\Tests\\__SerializeButNo__Unserialize' => [
+            'bar' => [
+                'ddd',
             ],
         ],
     ],

@@ -19,6 +19,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @final
+ *
+ * @internal since Symfony 7.3
  */
 class SplCaster
 {
@@ -126,7 +128,7 @@ class SplCaster
         }
 
         if (isset($a[$prefix.'perms'])) {
-            $a[$prefix.'perms'] = new ConstStub(sprintf('0%o', $a[$prefix.'perms']), $a[$prefix.'perms']);
+            $a[$prefix.'perms'] = new ConstStub(\sprintf('0%o', $a[$prefix.'perms']), $a[$prefix.'perms']);
         }
 
         static $mapDate = ['aTime', 'mTime', 'cTime'];
@@ -187,7 +189,7 @@ class SplCaster
             $storage[] = new EnumStub([
                 'object' => $obj,
                 'info' => $clone->getInfo(),
-             ]);
+            ]);
         }
 
         $a += [
@@ -219,7 +221,7 @@ class SplCaster
             $map[] = new EnumStub([
                 'object' => $obj,
                 'data' => $data,
-             ]);
+            ]);
         }
 
         $a += [

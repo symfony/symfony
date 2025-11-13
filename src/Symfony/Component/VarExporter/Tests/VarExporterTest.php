@@ -11,16 +11,46 @@
 
 namespace Symfony\Component\VarExporter\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\Tests\Fixtures\BackedProperty;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooReadonly;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooSerializable;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\VarExporter\Tests\Fixtures\GoodNight;
 use Symfony\Component\VarExporter\Tests\Fixtures\MySerializable;
+use Symfony\Component\VarExporter\Tests\Fixtures\MyWakeup;
+use Symfony\Component\VarExporter\Tests\Fixtures\Php74Serializable;
+use Symfony\Component\VarExporter\Tests\Fixtures\PrivateFCC;
 use Symfony\Component\VarExporter\VarExporter;
+
+$errorHandler = set_error_handler(static function (int $errno, string $errstr) use (&$errorHandler) {
+    if (\E_DEPRECATED === $errno && str_contains($errstr, 'serialize()')) {
+        // We're testing if the component handles deprecated Serializable and __sleep/wakeup implementations well.
+        // This kind of implementation triggers a deprecation warning that we explicitly want to ignore here.
+        return true;
+    }
+
+    return $errorHandler ? $errorHandler(...\func_get_args()) : false;
+});
+
+try {
+    foreach ([
+        MySerializable::class,
+        FooSerializable::class,
+        GoodNight::class,
+        Php74Serializable::class,
+        MyWakeup::class,
+    ] as $class) {
+        class_exists($class);
+    }
+} finally {
+    restore_error_handler();
+}
 
 class VarExporterTest extends TestCase
 {
@@ -38,9 +68,7 @@ class VarExporterTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideFailingSerialization
-     */
+    #[DataProvider('provideFailingSerialization')]
     public function testFailingSerialization($value)
     {
         $this->expectException(NotInstantiableTypeException::class);
@@ -65,7 +93,7 @@ class VarExporterTest extends TestCase
         yield [$h = fopen(__FILE__, 'r')];
         yield [[$h]];
 
-        $a = new class() {
+        $a = new class {
         };
 
         yield [$a];
@@ -76,13 +104,11 @@ class VarExporterTest extends TestCase
         yield [$a];
     }
 
-    /**
-     * @dataProvider provideExport
-     */
+    #[DataProvider('provideExport')]
     public function testExport(string $testName, $value, bool $staticValueExpected = false)
     {
         $dumpedValue = $this->getDump($value);
-        $isStaticValue = true;
+        $isStaticValue = null;
         $marshalledValue = VarExporter::export($value, $isStaticValue);
 
         $this->assertSame($staticValueExpected, $isStaticValue);
@@ -101,7 +127,7 @@ class VarExporterTest extends TestCase
         }
         $marshalledValue = include $fixtureFile;
 
-        if (!$isStaticValue) {
+        if (!$isStaticValue || 'named-closure-static' === $testName || 'private-fcc' === $testName) {
             if ($value instanceof MyWakeup) {
                 $value->bis = null;
             }
@@ -137,23 +163,8 @@ class VarExporterTest extends TestCase
         yield ['array-iterator', new \ArrayIterator([123], 1)];
         yield ['array-object-custom', new MyArrayObject([234])];
 
-        $errorHandler = set_error_handler(static function (int $errno, string $errstr) use (&$errorHandler) {
-            if (\E_DEPRECATED === $errno && str_contains($errstr, 'implements the Serializable interface, which is deprecated. Implement __serialize() and __unserialize() instead')) {
-                // We're testing if the component handles deprecated Serializable implementations well.
-                // This kind of implementation triggers a deprecation warning since PHP 8.1 that we explicitly want to
-                // ignore here. We probably need to reevaluate this piece of code for PHP 9.
-                return true;
-            }
-
-            return $errorHandler ? $errorHandler(...\func_get_args()) : false;
-        });
-
-        try {
-            $mySerializable = new MySerializable();
-            $fooSerializable = new FooSerializable('bar');
-        } finally {
-            restore_error_handler();
-        }
+        $mySerializable = new MySerializable();
+        $fooSerializable = new FooSerializable('bar');
 
         yield ['serializable', [$mySerializable, $mySerializable]];
         yield ['foo-serializable', $fooSerializable];
@@ -235,32 +246,26 @@ class VarExporterTest extends TestCase
 
         yield ['unit-enum', [FooUnitEnum::Bar], true];
         yield ['readonly', new FooReadonly('k', 'v')];
+
+        yield ['named-closure-method', (new TestClass())->testMethod(...)];
+        yield ['named-closure-static', TestClass::testStaticMethod(...), true];
+
+        if (\PHP_VERSION_ID < 80400) {
+            return;
+        }
+
+        yield ['backed-property', new BackedProperty('name')];
+
+        if (\PHP_VERSION_ID < 80500) {
+            return;
+        }
+
+        yield ['private-fcc', (new \ReflectionClass(PrivateFCC::class))->getAttributes(PrivateFCC::class)[0]->getArguments()[0], true];
     }
 
     public function testUnicodeDirectionality()
     {
         $this->assertSame('"\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"', VarExporter::export("\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"));
-    }
-}
-
-class MyWakeup
-{
-    public $sub;
-    public $bis;
-    public $baz;
-    public $def = 234;
-
-    public function __sleep(): array
-    {
-        return ['sub', 'baz'];
-    }
-
-    public function __wakeup(): void
-    {
-        if (123 === $this->sub) {
-            $this->bis = 123;
-            $this->baz = 123;
-        }
     }
 }
 
@@ -295,6 +300,19 @@ class PrivateConstructor
     }
 }
 
+class TestClass
+{
+    public function testMethod()
+    {
+        return 'test';
+    }
+
+    public static function testStaticMethod()
+    {
+        return 'test';
+    }
+}
+
 class MyPrivateValue
 {
     protected $prot;
@@ -323,27 +341,6 @@ class MyArrayObject extends \ArrayObject
     public function setFlags($flags): void
     {
         throw new \BadMethodCallException('Calling MyArrayObject::setFlags() is forbidden');
-    }
-}
-
-class GoodNight
-{
-    public $good;
-    protected $foo;
-    private $bar;
-
-    public function __construct()
-    {
-        unset($this->good);
-        $this->foo = 'afternoon';
-        $this->bar = 'morning';
-    }
-
-    public function __sleep(): array
-    {
-        $this->good = 'night';
-
-        return ['good', 'foo', "\0*\0foo", "\0".__CLASS__."\0bar"];
     }
 }
 
@@ -402,41 +399,6 @@ class ConcreteClass extends AbstractClass
     }
 }
 
-class Php74Serializable implements \Serializable
-{
-    public $foo;
-
-    public function __serialize(): array
-    {
-        return [$this->foo = new \stdClass()];
-    }
-
-    public function __unserialize(array $data): void
-    {
-        [$this->foo] = $data;
-    }
-
-    public function __sleep(): array
-    {
-        throw new \BadMethodCallException();
-    }
-
-    public function __wakeup(): void
-    {
-        throw new \BadMethodCallException();
-    }
-
-    public function serialize(): string
-    {
-        throw new \BadMethodCallException();
-    }
-
-    public function unserialize($ser)
-    {
-        throw new \BadMethodCallException();
-    }
-}
-
 #[\AllowDynamicProperties]
 class ArrayObject extends \ArrayObject
 {
@@ -457,19 +419,33 @@ class __UnserializeButNo__Serialize
     }
 }
 
-class __SerializeButNo__Unserialize
+class ParentOf__SerializeButNo__Unserialize
 {
-    public $foo;
+    private $foo = 'foo';
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+}
+
+class __SerializeButNo__Unserialize extends ParentOf__SerializeButNo__Unserialize
+{
+    public $baz;
+    private $bar;
 
     public function __construct()
     {
-        $this->foo = 'ccc';
+        $this->baz = 'ccc';
+        $this->bar = 'ddd';
     }
 
     public function __serialize(): array
     {
         return [
-            'foo' => $this->foo,
+            'foo' => $this->getFoo(),
+            'baz' => $this->baz,
+            'bar' => $this->bar,
         ];
     }
 }

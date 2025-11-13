@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\ConstStub;
 use Symfony\Component\VarDumper\Caster\EnumStub;
@@ -25,9 +26,7 @@ class PdoCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    /**
-     * @requires extension pdo_sqlite
-     */
+    #[RequiresPhpExtension('pdo_sqlite')]
     public function testCastPdo()
     {
         $pdo = new \PDO('sqlite::memory:');
@@ -45,43 +44,43 @@ class PdoCasterTest extends TestCase
 
         if (\PHP_VERSION_ID >= 80215 && \PHP_VERSION_ID < 80300 || \PHP_VERSION_ID >= 80302) {
             $xDump = <<<'EODUMP'
-array:2 [
-  "\x00~\x00inTransaction" => false
-  "\x00~\x00attributes" => array:10 [
-    "CASE" => NATURAL
-    "ERRMODE" => EXCEPTION
-    "PERSISTENT" => false
-    "DRIVER_NAME" => "sqlite"
-    "ORACLE_NULLS" => NATURAL
-    "CLIENT_VERSION" => "%s"
-    "SERVER_VERSION" => "%s"
-    "STATEMENT_CLASS" => array:%d [
-      0 => "PDOStatement"%A
-    ]
-    "STRINGIFY_FETCHES" => false
-    "DEFAULT_FETCH_MODE" => BOTH
-  ]
-]
-EODUMP;
+                array:2 [
+                  "\x00~\x00inTransaction" => false
+                  "\x00~\x00attributes" => array:10 [
+                    "CASE" => NATURAL
+                    "ERRMODE" => EXCEPTION
+                    "PERSISTENT" => false
+                    "DRIVER_NAME" => "sqlite"
+                    "ORACLE_NULLS" => NATURAL
+                    "CLIENT_VERSION" => "%s"
+                    "SERVER_VERSION" => "%s"
+                    "STATEMENT_CLASS" => array:%d [
+                      0 => "PDOStatement"%A
+                    ]
+                    "STRINGIFY_FETCHES" => false
+                    "DEFAULT_FETCH_MODE" => BOTH
+                  ]
+                ]
+                EODUMP;
         } else {
             $xDump = <<<'EODUMP'
-array:2 [
-  "\x00~\x00inTransaction" => false
-  "\x00~\x00attributes" => array:9 [
-    "CASE" => NATURAL
-    "ERRMODE" => EXCEPTION
-    "PERSISTENT" => false
-    "DRIVER_NAME" => "sqlite"
-    "ORACLE_NULLS" => NATURAL
-    "CLIENT_VERSION" => "%s"
-    "SERVER_VERSION" => "%s"
-    "STATEMENT_CLASS" => array:%d [
-      0 => "PDOStatement"%A
-    ]
-    "DEFAULT_FETCH_MODE" => BOTH
-  ]
-]
-EODUMP;
+                array:2 [
+                  "\x00~\x00inTransaction" => false
+                  "\x00~\x00attributes" => array:9 [
+                    "CASE" => NATURAL
+                    "ERRMODE" => EXCEPTION
+                    "PERSISTENT" => false
+                    "DRIVER_NAME" => "sqlite"
+                    "ORACLE_NULLS" => NATURAL
+                    "CLIENT_VERSION" => "%s"
+                    "SERVER_VERSION" => "%s"
+                    "STATEMENT_CLASS" => array:%d [
+                      0 => "PDOStatement"%A
+                    ]
+                    "DEFAULT_FETCH_MODE" => BOTH
+                  ]
+                ]
+                EODUMP;
         }
 
         $this->assertDumpMatchesFormat($xDump, $cast);

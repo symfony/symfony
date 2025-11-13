@@ -11,6 +11,9 @@
 
 namespace Symfony\Bridge\Twig\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Command\LintCommand;
 use Symfony\Component\Console\Application;
@@ -18,6 +21,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Twig\DeprecatedCallableInfo;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
@@ -70,10 +74,9 @@ class LintCommandTest extends TestCase
     }
 
     /**
-     * When deprecations are not reported by the command, the testsuite reporter will catch them so we need to mark the test as legacy.
-     *
-     * @group legacy
+     * When deprecations are not reported by the command, the testsuite reporter will catch them so we need to mark the test as ignoring deprecations.
      */
+    #[IgnoreDeprecations]
     public function testLintFileWithNotReportedDeprecation()
     {
         $tester = $this->createCommandTester();
@@ -93,13 +96,24 @@ class LintCommandTest extends TestCase
         $ret = $tester->execute(['filename' => [$filename], '--show-deprecations' => true], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertMatchesRegularExpression('/ERROR  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/DEPRECATION  in \S+ \(line 1\)/', trim($tester->getDisplay()));
         $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
     }
 
-    /**
-     * @group tty
-     */
+    public function testLintFileWithMultipleReportedDeprecation()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile("{{ foo|deprecated_filter }}\n{{ bar|deprecated_filter }}");
+
+        $ret = $tester->execute(['filename' => [$filename], '--show-deprecations' => true], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+
+        $this->assertEquals(1, $ret, 'Returns 1 in case of error');
+        $this->assertMatchesRegularExpression('/DEPRECATION  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        $this->assertMatchesRegularExpression('/DEPRECATION  in \S+ \(line 2\)/', trim($tester->getDisplay()));
+        $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
+    }
+
+    #[Group('tty')]
     public function testLintDefaultPaths()
     {
         $tester = $this->createCommandTester();
@@ -136,9 +150,7 @@ class LintCommandTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $tester = new CommandCompletionTester($this->createCommand());
@@ -159,12 +171,17 @@ class LintCommandTest extends TestCase
     private function createCommand(): Command
     {
         $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));
-        $environment->addFilter(new TwigFilter('deprecated_filter', fn ($v) => $v, ['deprecated' => true]));
+        $options = ['deprecation_info' => new DeprecatedCallableInfo('foo/bar', '1.1')];
+        $environment->addFilter(new TwigFilter('deprecated_filter', fn ($v) => $v, $options));
 
         $command = new LintCommand($environment);
 
         $application = new Application();
-        $application->add($command);
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
 
         return $application->find('lint:twig');
     }

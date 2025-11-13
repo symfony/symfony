@@ -34,13 +34,10 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  */
 class RememberMeListener implements EventSubscriberInterface
 {
-    private RememberMeHandlerInterface $rememberMeHandler;
-    private ?LoggerInterface $logger;
-
-    public function __construct(RememberMeHandlerInterface $rememberMeHandler, ?LoggerInterface $logger = null)
-    {
-        $this->rememberMeHandler = $rememberMeHandler;
-        $this->logger = $logger;
+    public function __construct(
+        private RememberMeHandlerInterface $rememberMeHandler,
+        private ?LoggerInterface $logger = null,
+    ) {
     }
 
     public function onSuccessfulLogin(LoginSuccessEvent $event): void

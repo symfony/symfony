@@ -31,18 +31,17 @@ final class OrangeSmsTransport extends AbstractTransport
         private ?string $senderName = null,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-    )
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
         if (null !== $this->senderName) {
-            return sprintf('orange-sms://%s?from=%s&sender_name=%s', $this->getEndpoint(), $this->from, $this->senderName);
+            return \sprintf('orange-sms://%s?from=%s&sender_name=%s', $this->getEndpoint(), $this->from, $this->senderName);
         }
 
-        return sprintf('orange-sms://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('orange-sms://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -82,7 +81,7 @@ final class OrangeSmsTransport extends AbstractTransport
             $errorMessage = $content['requestError']['serviceException']['messageId'] ?? '';
             $errorInfo = $content['requestError']['serviceException']['text'] ?? '';
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $errorMessage, $errorInfo), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $errorMessage, $errorInfo), $response);
         }
 
         return new SentMessage($message, (string) $this);

@@ -7,7 +7,6 @@ return [
         'bho' => 'bhojpuri',
         'eu' => 'euskera',
         'grc' => 'griego antiguo',
-        'lo' => 'lao',
         'nso' => 'sotho septentrional',
         'pa' => 'punyabí',
         'ss' => 'siswati',

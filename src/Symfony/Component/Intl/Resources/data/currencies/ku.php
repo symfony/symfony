@@ -8,7 +8,7 @@ return [
         ],
         'AFN' => [
             'AFN',
-            'efxaniyê efxanistanî',
+            'efxanîyê efxanistanî',
         ],
         'ALL' => [
             'ALL',
@@ -64,7 +64,7 @@ return [
         ],
         'BIF' => [
             'BIF',
-            'frenkê birûndiyî',
+            'frankê birûndîyî',
         ],
         'BMD' => [
             'BMD',
@@ -116,7 +116,7 @@ return [
         ],
         'CLP' => [
             'CLP',
-            'pesoyê şîliyê',
+            'pesoyê şîlîyê',
         ],
         'CNH' => [
             'CNH',
@@ -128,7 +128,7 @@ return [
         ],
         'COP' => [
             'COP',
-            'pesoyê kolombiyayî',
+            'pesoyê kolombîyayî',
         ],
         'CRC' => [
             'CRC',
@@ -152,7 +152,7 @@ return [
         ],
         'DJF' => [
             'DJF',
-            'frankê cîbûtiyî',
+            'frankê cîbûtîyî',
         ],
         'DKK' => [
             'DKK',
@@ -184,7 +184,7 @@ return [
         ],
         'FJD' => [
             'FJD',
-            'dolarê fîjiyî',
+            'dolarê fîjîyî',
         ],
         'FKP' => [
             'FKP',
@@ -196,11 +196,11 @@ return [
         ],
         'GEL' => [
             'GEL',
-            'lariyê gurcistanî',
+            'larîyê gurcistanî',
         ],
         'GHS' => [
             'GHS',
-            'cediyê ganayî',
+            'cedîyê ganayî',
         ],
         'GIP' => [
             'GIP',
@@ -208,7 +208,7 @@ return [
         ],
         'GMD' => [
             'GMD',
-            'dalasiyê gambiyayî',
+            'dalasîyê gambîyayî',
         ],
         'GNF' => [
             'GNF',
@@ -236,7 +236,7 @@ return [
         ],
         'HTG' => [
             'HTG',
-            'gûrdeyê haîtiyî',
+            'gûrdeyê haîtîyî',
         ],
         'HUF' => [
             'HUF',
@@ -244,7 +244,7 @@ return [
         ],
         'IDR' => [
             'IDR',
-            'rûpiyê endonezî',
+            'rûpîyê endonezî',
         ],
         'ILS' => [
             '₪',
@@ -252,7 +252,7 @@ return [
         ],
         'INR' => [
             '₹',
-            'rûpiyê hindistanî',
+            'rûpîyê hindistanî',
         ],
         'IQD' => [
             'IQD',
@@ -260,7 +260,7 @@ return [
         ],
         'IRR' => [
             'IRR',
-            'riyalê îranî',
+            'rîyalê îranî',
         ],
         'ISK' => [
             'ISK',
@@ -324,7 +324,7 @@ return [
         ],
         'LKR' => [
             'LKR',
-            'rûpiyê srî lankayî',
+            'rûpîyê srî lankayî',
         ],
         'LRD' => [
             'LRD',
@@ -332,7 +332,7 @@ return [
         ],
         'LSL' => [
             'LSL',
-            'lotiyê lesothoyî',
+            'lotîyê lesothoyî',
         ],
         'LYD' => [
             'LYD',
@@ -372,15 +372,15 @@ return [
         ],
         'MUR' => [
             'MUR',
-            'rûpiyê maûrîtîûsê',
+            'rûpîyê maûrîtîûsê',
         ],
         'MVR' => [
             'MVR',
-            'rûfiyaayê maldîvayî',
+            'rûfîyaayê maldîvayî',
         ],
         'MWK' => [
             'MWK',
-            'kwaçayê malawiyê',
+            'kwaçayê malawîyê',
         ],
         'MXN' => [
             'MX$',
@@ -412,7 +412,7 @@ return [
         ],
         'NPR' => [
             'NPR',
-            'rûpiyê nepalî',
+            'rûpîyê nepalî',
         ],
         'NZD' => [
             'NZ$',
@@ -420,7 +420,7 @@ return [
         ],
         'OMR' => [
             'OMR',
-            'riyalê umanî',
+            'rîyalê umanî',
         ],
         'PAB' => [
             'PAB',
@@ -440,19 +440,19 @@ return [
         ],
         'PKR' => [
             'PKR',
-            'rûpiyê pakistanî',
+            'rûpîyê pakistanî',
         ],
         'PLN' => [
             'PLN',
-            'zlotiyê polonyayî',
+            'zlotîyê polonyayî',
         ],
         'PYG' => [
             'PYG',
-            'gûaraniyê paragûayî',
+            'gûaranîyê paragûayî',
         ],
         'QAR' => [
             'QAR',
-            'riyalê qeterî',
+            'rîyalê qeterî',
         ],
         'RON' => [
             'RON',
@@ -472,7 +472,7 @@ return [
         ],
         'SAR' => [
             'SAR',
-            'riyalê siûdî',
+            'rîyalê siûdî',
         ],
         'SBD' => [
             'SBD',
@@ -480,7 +480,7 @@ return [
         ],
         'SCR' => [
             'SCR',
-            'rûpiyê seyşelerî',
+            'rûpîyê seyşelerî',
         ],
         'SDG' => [
             'SDG',
@@ -528,7 +528,7 @@ return [
         ],
         'SZL' => [
             'SZL',
-            'lîlangeniyê swazîlî',
+            'lîlangenîyê swazîlî',
         ],
         'THB' => [
             'THB',
@@ -620,7 +620,7 @@ return [
         ],
         'YER' => [
             'YER',
-            'riyalê yemenî',
+            'rîyalê yemenî',
         ],
         'ZAR' => [
             'ZAR',
@@ -628,7 +628,7 @@ return [
         ],
         'ZMW' => [
             'ZMW',
-            'kwaçayê zambiyayî',
+            'kwaçayê zambîyayî',
         ],
     ],
 ];

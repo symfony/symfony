@@ -49,8 +49,8 @@ final class CurlClientState extends ClientState
         if (\defined('CURLPIPE_MULTIPLEX')) {
             curl_multi_setopt($this->handle, \CURLMOPT_PIPELINING, \CURLPIPE_MULTIPLEX);
         }
-        if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS')) {
-            $maxHostConnections = curl_multi_setopt($this->handle, \CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : \PHP_INT_MAX) ? 0 : $maxHostConnections;
+        if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS') && 0 < $maxHostConnections) {
+            $maxHostConnections = curl_multi_setopt($this->handle, \CURLMOPT_MAX_HOST_CONNECTIONS, $maxHostConnections) ? min(50 * $maxHostConnections, 4294967295) : $maxHostConnections;
         }
         if (\defined('CURLMOPT_MAXCONNECTS') && 0 < $maxHostConnections) {
             curl_multi_setopt($this->handle, \CURLMOPT_MAXCONNECTS, $maxHostConnections);
@@ -81,9 +81,8 @@ final class CurlClientState extends ClientState
     public function reset(): void
     {
         foreach ($this->pushedResponses as $url => $response) {
-            $this->logger?->debug(sprintf('Unused pushed response: "%s"', $url));
+            $this->logger?->debug(\sprintf('Unused pushed response: "%s"', $url));
             curl_multi_remove_handle($this->handle, $response->handle);
-            curl_close($response->handle);
         }
 
         $this->pushedResponses = [];
@@ -112,7 +111,7 @@ final class CurlClientState extends ClientState
         }
 
         if (!isset($headers[':method']) || !isset($headers[':scheme']) || !isset($headers[':authority']) || !isset($headers[':path'])) {
-            $this->logger?->debug(sprintf('Rejecting pushed response from "%s": pushed headers are invalid', $origin));
+            $this->logger?->debug(\sprintf('Rejecting pushed response from "%s": pushed headers are invalid', $origin));
 
             return \CURL_PUSH_DENY;
         }
@@ -123,7 +122,7 @@ final class CurlClientState extends ClientState
         // but this is a MUST in the HTTP/2 RFC; let's restrict pushes to the original host,
         // ignoring domains mentioned as alt-name in the certificate for now (same as curl).
         if (!str_starts_with($origin, $url.'/')) {
-            $this->logger?->debug(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
+            $this->logger?->debug(\sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
 
             return \CURL_PUSH_DENY;
         }
@@ -131,11 +130,11 @@ final class CurlClientState extends ClientState
         if ($maxPendingPushes <= \count($this->pushedResponses)) {
             $fifoUrl = key($this->pushedResponses);
             unset($this->pushedResponses[$fifoUrl]);
-            $this->logger?->debug(sprintf('Evicting oldest pushed response: "%s"', $fifoUrl));
+            $this->logger?->debug(\sprintf('Evicting oldest pushed response: "%s"', $fifoUrl));
         }
 
         $url .= $headers[':path'][0];
-        $this->logger?->debug(sprintf('Queueing pushed response: "%s"', $url));
+        $this->logger?->debug(\sprintf('Queueing pushed response: "%s"', $url));
 
         $this->pushedResponses[$url] = new PushedResponse(new CurlResponse($this, $pushed), $headers, $this->openHandles[(int) $parent][1] ?? [], $pushed);
 

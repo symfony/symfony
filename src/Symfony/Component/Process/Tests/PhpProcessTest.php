@@ -22,8 +22,8 @@ class PhpProcessTest extends TestCase
     {
         $expected = 'hello world!';
         $process = new PhpProcess(<<<PHP
-<?php echo '$expected';
-PHP
+            <?php echo '$expected';
+            PHP
         );
         $process->start();
         $process->wait();
@@ -33,8 +33,8 @@ PHP
     public function testCommandLine()
     {
         $process = new PhpProcess(<<<'PHP'
-<?php echo phpversion().PHP_SAPI;
-PHP
+            <?php echo phpversion().PHP_SAPI;
+            PHP
         );
 
         $commandLine = $process->getCommandLine();
@@ -55,8 +55,8 @@ PHP
 
         $expected = 'hello world!';
         $script = <<<PHP
-<?php echo '$expected';
-PHP;
+            <?php echo '$expected';
+            PHP;
         $process = new PhpProcess($script, null, null, 60, $php);
         $process->run();
         $this->assertEquals($expected, $process->getOutput());
@@ -67,8 +67,8 @@ PHP;
         static::expectException(LogicException::class);
         static::expectExceptionMessage('The "Symfony\Component\Process\PhpProcess::fromShellCommandline()" method cannot be called when using "Symfony\Component\Process\PhpProcess".');
         PhpProcess::fromShellCommandline(<<<PHP
-<?php echo 'Hello World!';
-PHP
+            <?php echo 'Hello World!';
+            PHP
         );
     }
 }

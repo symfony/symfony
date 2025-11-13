@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 
 class BaseNodeTest extends TestCase
 {
-    /**
-     * @dataProvider providePath
-     */
+    #[DataProvider('providePath')]
     public function testGetPathForChildNode(string $expected, array $params)
     {
         $constructorArgs = [];
@@ -36,7 +35,36 @@ class BaseNodeTest extends TestCase
             }
         }
 
-        $node = $this->getMockForAbstractClass(BaseNode::class, $constructorArgs);
+        $node = new class(...$constructorArgs) extends BaseNode {
+            protected function validateType($value): void
+            {
+            }
+
+            protected function normalizeValue($value): mixed
+            {
+                return null;
+            }
+
+            protected function mergeValues($leftSide, $rightSide): mixed
+            {
+                return null;
+            }
+
+            protected function finalizeValue($value): mixed
+            {
+                return null;
+            }
+
+            public function hasDefaultValue(): bool
+            {
+                return true;
+            }
+
+            public function getDefaultValue(): mixed
+            {
+                return null;
+            }
+        };
 
         $this->assertSame($expected, $node->getPath());
     }

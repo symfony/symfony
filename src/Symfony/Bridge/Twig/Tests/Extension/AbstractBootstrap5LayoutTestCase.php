@@ -1842,8 +1842,6 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
 
     public function testWeekChoices()
     {
-        $this->requiresFeatureSet(404);
-
         $data = ['year' => (int) date('Y'), 'week' => 1];
 
         $form = $this->factory->createNamed('name', WeekType::class, $data, [

@@ -16,7 +16,7 @@ use Twig\Compiler;
 use Twig\Node\Expression\AbstractExpression;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
-use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\Node;
 use Twig\Node\TextNode;
 
@@ -26,7 +26,7 @@ use Twig\Node\TextNode;
 #[YieldReady]
 final class TransNode extends Node
 {
-    public function __construct(Node $body, ?Node $domain = null, ?AbstractExpression $count = null, ?AbstractExpression $vars = null, ?AbstractExpression $locale = null, int $lineno = 0, ?string $tag = null)
+    public function __construct(Node $body, ?Node $domain = null, ?AbstractExpression $count = null, ?AbstractExpression $vars = null, ?AbstractExpression $locale = null, int $lineno = 0)
     {
         $nodes = ['body' => $body];
         if (null !== $domain) {
@@ -42,7 +42,7 @@ final class TransNode extends Node
             $nodes['locale'] = $locale;
         }
 
-        parent::__construct($nodes, [], $lineno, $tag);
+        parent::__construct($nodes, [], $lineno);
     }
 
     public function compile(Compiler $compiler): void
@@ -55,10 +55,8 @@ final class TransNode extends Node
             $vars = null;
         }
         [$msg, $defaults] = $this->compileString($this->getNode('body'), $defaults, (bool) $vars);
-        $display = class_exists(YieldReady::class) ? 'yield' : 'echo';
-
         $compiler
-            ->write($display.' $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans(')
+            ->write('yield $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans(')
             ->subcompile($msg)
         ;
 
@@ -121,7 +119,7 @@ final class TransNode extends Node
                 if ('count' === $var && $this->hasNode('count')) {
                     $vars->addElement($this->getNode('count'), $key);
                 } else {
-                    $varExpr = new NameExpression($var, $body->getTemplateLine());
+                    $varExpr = new ContextVariable($var, $body->getTemplateLine());
                     $varExpr->setAttribute('ignore_strict_check', $ignoreStrictCheck);
                     $vars->addElement($varExpr, $key);
                 }

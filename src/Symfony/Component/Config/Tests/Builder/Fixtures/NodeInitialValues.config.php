@@ -11,14 +11,22 @@
 
 use Symfony\Config\NodeInitialValuesConfig;
 
-return static function (NodeInitialValuesConfig $config) {
-    $config->someCleverName(['second' => 'foo', 'third' => null])->first('bar');
-    $config->messenger()
-        ->transports('fast_queue', ['dsn' => 'sync://'])
-        ->serializer('acme');
-
-    $config->messenger()
-        ->transports('slow_queue')
-        ->dsn('doctrine://')
-        ->options(['table' => 'my_messages']);
-};
+return new NodeInitialValuesConfig([
+    'some_clever_name' => [
+        'first' => 'bar',
+        'second' => 'foo',
+        'third' => null,
+    ],
+    'messenger' => [
+        'transports' => [
+            'fast_queue' => [
+                'dsn' => 'sync://',
+                'serializer' => 'acme',
+            ],
+            'slow_queue' => [
+                'dsn' => 'doctrine://',
+                'options' => ['table' => 'my_messages'],
+            ],
+        ],
+    ],
+]);

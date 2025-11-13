@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
@@ -25,9 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MockHttpClientTest extends HttpClientTestCase
 {
-    /**
-     * @dataProvider mockingProvider
-     */
+    #[DataProvider('mockingProvider')]
     public function testMocking($factory, array $expectedResponses)
     {
         $client = new MockHttpClient($factory);
@@ -96,9 +95,7 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider validResponseFactoryProvider
-     */
+    #[DataProvider('validResponseFactoryProvider')]
     public function testValidResponseFactory($responseFactory)
     {
         (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
@@ -118,9 +115,7 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider transportExceptionProvider
-     */
+    #[DataProvider('transportExceptionProvider')]
     public function testTransportExceptionThrowsIfPerformedMoreRequestsThanConfigured($factory)
     {
         $client = new MockHttpClient($factory);
@@ -158,9 +153,7 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidResponseFactoryProvider
-     */
+    #[DataProvider('invalidResponseFactoryProvider')]
     public function testInvalidResponseFactory($responseFactory, string $expectedExceptionMessage)
     {
         $this->expectException(TransportException::class);
@@ -313,8 +306,8 @@ class MockHttpClientTest extends HttpClientTestCase
         $responses = [];
 
         $headers = [
-          'Host: localhost:8057',
-          'Content-Type: application/json',
+            'Host: localhost:8057',
+            'Content-Type: application/json',
         ];
 
         $body = '{
@@ -331,7 +324,7 @@ class MockHttpClientTest extends HttpClientTestCase
 
         switch ($testCase) {
             default:
-                return new MockHttpClient(function (string $method, string $url, array $options) use ($client) {
+                return new MockHttpClient(function (string $method, string $url, array $options) use ($client, $testCase) {
                     try {
                         // force the request to be completed so that we don't test side effects of the transport
                         $response = $client->request($method, $url, ['buffer' => false] + $options);
@@ -339,6 +332,9 @@ class MockHttpClientTest extends HttpClientTestCase
 
                         return new MockResponse($content, $response->getInfo());
                     } catch (\Throwable $e) {
+                        if (str_starts_with($testCase, 'testNoPrivateNetwork')) {
+                            throw $e;
+                        }
                         $this->fail($e->getMessage());
                     }
                 });
@@ -387,9 +383,9 @@ class MockHttpClientTest extends HttpClientTestCase
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
 
                 $headers = [
-                  'Host: localhost:8057',
-                  'Content-Length: 1000',
-                  'Content-Type: application/json',
+                    'Host: localhost:8057',
+                    'Content-Length: 1000',
+                    'Content-Type: application/json',
                 ];
 
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
@@ -471,11 +467,21 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testNonBlockingStream':
             case 'testSeekAsyncStream':
-                $responses[] = new MockResponse((function () { yield '<1>'; yield ''; yield '<2>'; })(), ['response_headers' => $headers]);
+                $responses[] = new MockResponse(
+                    (function () {
+                        yield '<1>';
+                        yield '';
+                        yield '<2>';
+                    })(),
+                    ['response_headers' => $headers]
+                );
                 break;
 
             case 'testMaxDuration':
-                $responses[] = new MockResponse('', ['error' => 'Max duration was reached.']);
+                $responses[] = new MockResponse(
+                    '',
+                    ['error' => 'Max duration was reached.']
+                );
                 break;
         }
 
@@ -492,9 +498,14 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
     }
 
+    public function testUnixSocket()
+    {
+        $this->markTestSkipped('MockHttpClient doesn\'t support binding to unix sockets.');
+    }
+
     public function testChangeResponseFactory()
     {
-        /* @var MockHttpClient $client */
+        /** @var MockHttpClient $client */
         $client = $this->getHttpClient(__METHOD__);
         $expectedBody = '{"foo": "bar"}';
         $client->setResponseFactory(new MockResponse($expectedBody));
@@ -508,8 +519,8 @@ class MockHttpClientTest extends HttpClientTestCase
     {
         $client = new MockHttpClient();
 
-        $param = new class() {
-            public function __toString()
+        $param = new class {
+            public function __toString(): string
             {
                 return 'bar';
             }

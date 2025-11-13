@@ -32,15 +32,21 @@ final class DatePoint extends \DateTimeImmutable
 
             if (\PHP_VERSION_ID < 80300) {
                 try {
-                    $timezone = (new parent($datetime, $timezone ?? $now->getTimezone()))->getTimezone();
+                    $builtInDate = new parent($datetime, $timezone ?? $now->getTimezone());
+                    $timezone = $builtInDate->getTimezone();
                 } catch (\Exception $e) {
                     throw new \DateMalformedStringException($e->getMessage(), $e->getCode(), $e);
                 }
             } else {
-                $timezone = (new parent($datetime, $timezone ?? $now->getTimezone()))->getTimezone();
+                $builtInDate = new parent($datetime, $timezone ?? $now->getTimezone());
+                $timezone = $builtInDate->getTimezone();
             }
 
             $now = $now->setTimezone($timezone)->modify($datetime);
+
+            if ('00:00:00.000000' === $builtInDate->format('H:i:s.u')) {
+                $now = $now->setTime(0, 0);
+            }
         } elseif (null !== $timezone) {
             $now = $now->setTimezone($timezone);
         }
@@ -66,6 +72,27 @@ final class DatePoint extends \DateTimeImmutable
         return parent::createFromMutable($object);
     }
 
+    public static function createFromTimestamp(int|float $timestamp): static
+    {
+        if (\PHP_VERSION_ID >= 80400) {
+            return parent::createFromTimestamp($timestamp);
+        }
+
+        if (\is_int($timestamp) || !$ms = (int) $timestamp - $timestamp) {
+            return static::createFromFormat('U', (string) $timestamp);
+        }
+
+        if (!is_finite($timestamp) || \PHP_INT_MAX + 1.0 <= $timestamp || \PHP_INT_MIN > $timestamp) {
+            throw new \DateRangeError(\sprintf('DateTimeImmutable::createFromTimestamp(): Argument #1 ($timestamp) must be a finite number between %s and %s.999999, %s given', \PHP_INT_MIN, \PHP_INT_MAX, $timestamp));
+        }
+
+        if ($timestamp < 0) {
+            $timestamp = (int) $timestamp - 2.0 + $ms;
+        }
+
+        return static::createFromFormat('U.u', \sprintf('%.6F', $timestamp));
+    }
+
     public function add(\DateInterval $interval): static
     {
         return parent::add($interval);
@@ -82,7 +109,7 @@ final class DatePoint extends \DateTimeImmutable
     public function modify(string $modifier): static
     {
         if (\PHP_VERSION_ID < 80300) {
-            return @parent::modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? sprintf('Invalid modifier: "%s".', $modifier));
+            return @parent::modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? \sprintf('Invalid modifier: "%s".', $modifier));
         }
 
         return parent::modify($modifier);
@@ -118,23 +145,23 @@ final class DatePoint extends \DateTimeImmutable
         return parent::getTimezone() ?: throw new \DateInvalidTimeZoneException('The DatePoint object has no timezone.');
     }
 
-    public function setMicroseconds(int $microseconds): static
+    public function setMicrosecond(int $microsecond): static
     {
-        if ($microseconds < 0 || $microseconds > 999999) {
-            throw new \DateRangeError('DatePoint::setMicroseconds(): Argument #1 ($microseconds) must be between 0 and 999999, '.$microseconds.' given');
+        if ($microsecond < 0 || $microsecond > 999999) {
+            throw new \DateRangeError('DatePoint::setMicrosecond(): Argument #1 ($microsecond) must be between 0 and 999999, '.$microsecond.' given');
         }
 
         if (\PHP_VERSION_ID < 80400) {
-            return $this->setTime(...explode('.', $this->format('H.i.s.'.$microseconds)));
+            return $this->setTime(...explode('.', $this->format('H.i.s.'.$microsecond)));
         }
 
-        return parent::setMicroseconds($microseconds);
+        return parent::setMicrosecond($microsecond);
     }
 
-    public function getMicroseconds(): int
+    public function getMicrosecond(): int
     {
         if (\PHP_VERSION_ID >= 80400) {
-            return parent::getMicroseconds();
+            return parent::getMicrosecond();
         }
 
         return $this->format('u');

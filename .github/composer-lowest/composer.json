@@ -1,0 +1,7 @@
+{
+    "name": "symfony/composer-lowest",
+    "type": "metapackage",
+    "conflict": {
+        "symfony/polyfill-php83": "<1.30"
+    }
+}

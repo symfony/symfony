@@ -12,11 +12,14 @@
 namespace Symfony\Component\Notifier\Bridge\Novu\Tests;
 
 use Symfony\Component\Notifier\Bridge\Novu\NovuTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-class NovuTransportFactoryTest extends TransportFactoryTestCase
+class NovuTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): TransportFactoryInterface
     {
         return new NovuTransportFactory();

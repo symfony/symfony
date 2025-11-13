@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Mime\Tests\Crypto;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Message;
 
-/**
- * @requires extension openssl
- */
+#[RequiresPhpExtension('openssl')]
 class SMimeEncrypterTest extends SMimeTestCase
 {
     public function testEncryptMessage()
@@ -103,7 +102,7 @@ class SMimeEncrypterTest extends SMimeTestCase
                 'file://'.$this->samplesDir.'encrypt.crt',
                 'file://'.$this->samplesDir.'encrypt.key'
             ),
-            sprintf('Decryption of the message failed. Internal error "%s".', openssl_error_string())
+            \sprintf('Decryption of the message failed. Internal error "%s".', openssl_error_string())
         );
         $this->assertEquals(str_replace("\r", '', $originalMessage->toString()), str_replace("\r", '', file_get_contents($outputFile)));
     }

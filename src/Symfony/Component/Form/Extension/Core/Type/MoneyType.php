@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -35,9 +36,13 @@ class MoneyType extends AbstractType
                 $options['rounding_mode'],
                 $options['divisor'],
                 $options['html5'] ? 'en' : null,
-                $options['model_type'],
+                $options['input'],
             ))
         ;
+
+        if ('string' === $options['input']) {
+            $builder->addModelTransformer(new StringToFloatTransformer($options['scale']));
+        }
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
@@ -60,7 +65,7 @@ class MoneyType extends AbstractType
             'compound' => false,
             'html5' => false,
             'invalid_message' => 'Please enter a valid money amount.',
-            'model_type' => 'float',
+            'input' => 'float',
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [
@@ -77,19 +82,11 @@ class MoneyType extends AbstractType
 
         $resolver->setAllowedTypes('html5', 'bool');
 
-        $resolver->setAllowedValues('model_type', ['float', 'integer']);
+        $resolver->setAllowedValues('input', ['float', 'integer', 'string']);
 
         $resolver->setNormalizer('grouping', static function (Options $options, $value) {
             if ($value && $options['html5']) {
                 throw new LogicException('Cannot use the "grouping" option when the "html5" option is enabled.');
-            }
-
-            return $value;
-        });
-
-        $resolver->setNormalizer('model_type', static function (Options $options, $value) {
-            if ('integer' === $value && 1 === $options['divisor']) {
-                throw new LogicException('When the "model_type" option is set to "integer", the "divisor" option should not be set to "1".');
             }
 
             return $value;

@@ -18,11 +18,16 @@
     "require": {
         "php": ">=8.2",
         "ext-redis": "*",
-        "symfony/messenger": "^6.4|^7.0"
+        "symfony/messenger": "^7.3|^8.0"
     },
     "require-dev": {
-        "symfony/property-access": "^6.4|^7.0",
-        "symfony/serializer": "^6.4|^7.0"
+        "symfony/property-access": "^6.4|^7.0|^8.0",
+        "symfony/serializer": "^6.4|^7.0|^8.0",
+        "symfony/var-dumper": "^6.4|^7.0|^8.0"
+    },
+    "conflict": {
+        "ext-redis": "<6.1",
+        "ext-relay": "<0.12"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\Redis\\": "" },

@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\SpotHit\Tests;
 
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class SpotHitTransportFactoryTest extends TransportFactoryTestCase
+final class SpotHitTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): SpotHitTransportFactory
     {
         return new SpotHitTransportFactory();
@@ -49,5 +52,10 @@ final class SpotHitTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['foobar://api_token@default?from=MyCompany'];
         yield ['foobar://api_token@default'];
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['spothit://default?from=MyCompany'];
     }
 }

@@ -34,7 +34,7 @@ class CramMd5Authenticator implements AuthenticatorInterface
         $challenge = $client->executeCommand("AUTH CRAM-MD5\r\n", [334]);
         $challenge = base64_decode(substr($challenge, 4));
         $message = base64_encode($client->getUsername().' '.$this->getResponse($client->getPassword(), $challenge));
-        $client->executeCommand(sprintf("%s\r\n", $message), [235]);
+        $client->executeCommand(\sprintf("%s\r\n", $message), [235]);
     }
 
     /**
@@ -58,8 +58,7 @@ class CramMd5Authenticator implements AuthenticatorInterface
         $kopad = substr($secret, 0, 64) ^ str_repeat(\chr(0x5C), 64);
 
         $inner = pack('H32', md5($kipad.$challenge));
-        $digest = md5($kopad.$inner);
 
-        return $digest;
+        return md5($kopad.$inner);
     }
 }

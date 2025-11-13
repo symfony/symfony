@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
@@ -53,5 +55,15 @@ class CsvFileLoaderTest extends TestCase
         $this->expectException(InvalidResourceException::class);
 
         (new CsvFileLoader())->load('http://example.com/resources.csv', 'en', 'domain1');
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testEscapeCharInCsvControlIsDeprecated()
+    {
+        $loader = new CsvFileLoader();
+
+        $this->expectUserDeprecationMessage('Since symfony/translation 7.2: The "escape" parameter of the "Symfony\Component\Translation\Loader\CsvFileLoader::setCsvControl" method is deprecated. It will be removed in 8.0.');
+        $loader->setCsvControl(';', '"', '\\');
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Image;
 
@@ -44,13 +45,11 @@ class ImageTest extends TestCase
         $image->getUri();
     }
 
-    /**
-     * @dataProvider getGetUriTests
-     */
+    #[DataProvider('getGetUriTests')]
     public function testGetUri($url, $currentUri, $expected)
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML(sprintf('<html><img alt="foo" src="%s" /></html>', $url));
+        $dom->loadHTML(\sprintf('<html><img alt="foo" src="%s" /></html>', $url));
         $image = new Image($dom->getElementsByTagName('img')->item(0), $currentUri);
 
         $this->assertEquals($expected, $image->getUri());

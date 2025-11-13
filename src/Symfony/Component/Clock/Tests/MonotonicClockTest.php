@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Clock\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MonotonicClock;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class MonotonicClockTest extends TestCase
 {
     public function testConstruct()

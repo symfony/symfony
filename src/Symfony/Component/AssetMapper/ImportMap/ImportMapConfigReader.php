@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\VarExporter\VarExporter;
 
@@ -23,11 +24,13 @@ use Symfony\Component\VarExporter\VarExporter;
 class ImportMapConfigReader
 {
     private ImportMapEntries $rootImportMapEntries;
+    private readonly Filesystem $filesystem;
 
     public function __construct(
         private readonly string $importMapConfigPath,
         private readonly RemotePackageStorage $remotePackageStorage,
     ) {
+        $this->filesystem = new Filesystem();
     }
 
     public function getEntries(): ImportMapEntries
@@ -43,18 +46,18 @@ class ImportMapConfigReader
         foreach ($importMapConfig ?? [] as $importName => $data) {
             $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
-                throw new \InvalidArgumentException(sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
+                throw new \InvalidArgumentException(\sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
             }
 
-            $type = isset($data['type']) ? ImportMapType::tryFrom($data['type']) : ImportMapType::JS;
+            $type = ImportMapType::tryFrom($data['type'] ?? 'js') ?? ImportMapType::JS;
             $isEntrypoint = $data['entrypoint'] ?? false;
 
             if (isset($data['path'])) {
                 if (isset($data['version'])) {
-                    throw new RuntimeException(sprintf('The importmap entry "%s" cannot have both a "path" and "version" option.', $importName));
+                    throw new RuntimeException(\sprintf('The importmap entry "%s" cannot have both a "path" and "version" option.', $importName));
                 }
                 if (isset($data['package_specifier'])) {
-                    throw new RuntimeException(sprintf('The importmap entry "%s" cannot have both a "path" and "package_specifier" option.', $importName));
+                    throw new RuntimeException(\sprintf('The importmap entry "%s" cannot have both a "path" and "package_specifier" option.', $importName));
                 }
 
                 $entries->add(ImportMapEntry::createLocal($importName, $type, $data['path'], $isEntrypoint));
@@ -65,7 +68,7 @@ class ImportMapConfigReader
             $version = $data['version'] ?? null;
 
             if (null === $version) {
-                throw new RuntimeException(sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
+                throw new RuntimeException(\sprintf('The importmap entry "%s" must have either a "path" or "version" option.', $importName));
             }
 
             $packageModuleSpecifier = $data['package_specifier'] ?? $importName;
@@ -101,23 +104,23 @@ class ImportMapConfigReader
         }
 
         $map = class_exists(VarExporter::class) ? VarExporter::export($importMapConfig) : var_export($importMapConfig, true);
-        file_put_contents($this->importMapConfigPath, <<<EOF
-        <?php
+        $this->filesystem->dumpFile($this->importMapConfigPath, <<<EOF
+            <?php
 
-        /**
-         * Returns the importmap for this application.
-         *
-         * - "path" is a path inside the asset mapper system. Use the
-         *     "debug:asset-map" command to see the full list of paths.
-         *
-         * - "entrypoint" (JavaScript only) set to true for any module that will
-         *     be used as an "entrypoint" (and passed to the importmap() Twig function).
-         *
-         * The "importmap:require" command can be used to add new entries to this file.
-         */
-        return $map;
+            /**
+             * Returns the importmap for this application.
+             *
+             * - "path" is a path inside the asset mapper system. Use the
+             *     "debug:asset-map" command to see the full list of paths.
+             *
+             * - "entrypoint" (JavaScript only) set to true for any module that will
+             *     be used as an "entrypoint" (and passed to the importmap() Twig function).
+             *
+             * The "importmap:require" command can be used to add new entries to this file.
+             */
+            return $map;
 
-        EOF);
+            EOF);
     }
 
     public function findRootImportMapEntry(string $moduleName): ?ImportMapEntry

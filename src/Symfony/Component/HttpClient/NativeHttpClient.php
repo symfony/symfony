@@ -80,6 +80,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             if (str_starts_with($options['bindto'], 'host!')) {
                 $options['bindto'] = substr($options['bindto'], 5);
             }
+            if ((\PHP_VERSION_ID < 80223 || 80300 <= \PHP_VERSION_ID && 80311 < \PHP_VERSION_ID) && '\\' === \DIRECTORY_SEPARATOR && '[' === $options['bindto'][0]) {
+                $options['bindto'] = preg_replace('{^\[[^\]]++\]}', '[$0]', $options['bindto']);
+            }
         }
 
         $hasContentLength = isset($options['normalized_headers']['content-length']);
@@ -139,7 +142,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $maxDuration = 0 < $options['max_duration'] ? $options['max_duration'] : \INF;
             $onProgress = static function (...$progress) use ($onProgress, &$info, $maxDuration) {
                 if ($info['total_time'] >= $maxDuration) {
-                    throw new TransportException(sprintf('Max duration was reached for "%s".', implode('', $info['url'])));
+                    throw new TransportException(\sprintf('Max duration was reached for "%s".', implode('', $info['url'])));
                 }
 
                 $progressInfo = $info;
@@ -162,7 +165,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $maxDuration = $options['max_duration'];
             $onProgress = static function () use (&$info, $maxDuration): void {
                 if ($info['total_time'] >= $maxDuration) {
-                    throw new TransportException(sprintf('Max duration was reached for "%s".', implode('', $info['url'])));
+                    throw new TransportException(\sprintf('Max duration was reached for "%s".', implode('', $info['url'])));
                 }
             };
         }
@@ -192,7 +195,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $this->multi->dnsCache = $options['resolve'] + $this->multi->dnsCache;
         }
 
-        $this->logger?->info(sprintf('Request: "%s %s"', $method, implode('', $url)));
+        $this->logger?->info(\sprintf('Request: "%s %s"', $method, implode('', $url)));
 
         if (!isset($options['normalized_headers']['user-agent'])) {
             $options['headers'][] = 'User-Agent: Symfony HttpClient (Native)';
@@ -250,6 +253,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         $context = stream_context_create($context, ['notification' => $notification]);
 
         $resolver = static function ($multi) use ($context, $options, $url, &$info, $onProgress) {
+            $authority = $url['authority'];
             [$host, $port] = self::parseHostPort($url, $info);
 
             if (!isset($options['normalized_headers']['host'])) {
@@ -263,7 +267,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 $url['authority'] = substr_replace($url['authority'], $ip, -\strlen($host) - \strlen($port), \strlen($host));
             }
 
-            return [self::createRedirectResolver($options, $host, $port, $proxy, $info, $onProgress), implode('', $url)];
+            return [self::createRedirectResolver($options, $authority, $proxy, $info, $onProgress), implode('', $url)];
         };
 
         return new NativeResponse($this->multi, $context, implode('', $url), $options, $info, $resolver, $onProgress, $this->logger);
@@ -297,7 +301,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         while ('' !== $data = $body(self::$CHUNK_SIZE)) {
             if (!\is_string($data)) {
-                throw new TransportException(sprintf('Return value of the "body" option callback must be string, "%s" returned.', get_debug_type($data)));
+                throw new TransportException(\sprintf('Return value of the "body" option callback must be string, "%s" returned.', get_debug_type($data)));
             }
 
             $result .= $data;
@@ -326,21 +330,41 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
      */
     private static function dnsResolve(string $host, NativeClientState $multi, array &$info, ?\Closure $onProgress): string
     {
-        if (null === $ip = $multi->dnsCache[$host] ?? null) {
-            $info['debug'] .= "* Hostname was NOT found in DNS cache\n";
-            $now = microtime(true);
+        $flag = '' !== $host && '[' === $host[0] && ']' === $host[-1] && str_contains($host, ':') ? \FILTER_FLAG_IPV6 : \FILTER_FLAG_IPV4;
+        $ip = \FILTER_FLAG_IPV6 === $flag ? substr($host, 1, -1) : $host;
+        $now = microtime(true);
 
-            if (!$ip = gethostbynamel($host)) {
-                throw new TransportException(sprintf('Could not resolve host "%s".', $host));
+        if (filter_var($ip, \FILTER_VALIDATE_IP, $flag)) {
+            // The host is already an IP address
+        } elseif (null === $ip = $multi->dnsCache[$host] ?? null) {
+            $info['debug'] .= "* Hostname was NOT found in DNS cache\n";
+
+            if ($ip = gethostbynamel($host)) {
+                $ip = $ip[0];
+            } elseif (!\defined('STREAM_PF_INET6')) {
+                throw new TransportException(\sprintf('Could not resolve host "%s".', $host));
+            } elseif ($ip = dns_get_record($host, \DNS_AAAA)) {
+                $ip = $ip[0]['ipv6'];
+            } elseif (\extension_loaded('sockets')) {
+                if (!$addrInfo = socket_addrinfo_lookup($host, 0, ['ai_socktype' => \SOCK_STREAM, 'ai_family' => \AF_INET6])) {
+                    throw new TransportException(\sprintf('Could not resolve host "%s".', $host));
+                }
+
+                $ip = socket_addrinfo_explain($addrInfo[0])['ai_addr']['sin6_addr'];
+            } elseif ('localhost' === $host || 'localhost.' === $host) {
+                $ip = '::1';
+            } else {
+                throw new TransportException(\sprintf('Could not resolve host "%s".', $host));
             }
 
-            $info['namelookup_time'] = microtime(true) - ($info['start_time'] ?: $now);
-            $multi->dnsCache[$host] = $ip = $ip[0];
+            $multi->dnsCache[$host] = $ip;
             $info['debug'] .= "* Added {$host}:0:{$ip} to DNS cache\n";
         } else {
             $info['debug'] .= "* Hostname was found in DNS cache\n";
         }
 
+        $host = str_contains($ip, ':') ? "[$ip]" : $ip;
+        $info['namelookup_time'] = microtime(true) - ($info['start_time'] ?: $now);
         $info['primary_ip'] = $ip;
 
         if ($onProgress) {
@@ -348,17 +372,17 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $onProgress();
         }
 
-        return $ip;
+        return $host;
     }
 
     /**
      * Handles redirects - the native logic is too buggy to be used.
      */
-    private static function createRedirectResolver(array $options, string $host, string $port, ?array $proxy, array &$info, ?\Closure $onProgress): \Closure
+    private static function createRedirectResolver(array $options, string $authority, ?array $proxy, array &$info, ?\Closure $onProgress): \Closure
     {
         $redirectHeaders = [];
         if (0 < $maxRedirects = $options['max_redirects']) {
-            $redirectHeaders = ['host' => $host, 'port' => $port];
+            $redirectHeaders = ['authority' => $authority];
             $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static fn ($h) => 0 !== stripos($h, 'Host:'));
 
             if (isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie'])) {
@@ -375,13 +399,14 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
             try {
                 $url = self::parseUrl($location);
+                $locationHasHost = isset($url['authority']);
+                $url = self::resolveUrl($url, $info['url']);
             } catch (InvalidArgumentException) {
                 $info['redirect_url'] = null;
 
                 return null;
             }
 
-            $url = self::resolveUrl($url, $info['url']);
             $info['redirect_url'] = implode('', $url);
 
             if ($info['redirect_count'] >= $maxRedirects) {
@@ -414,9 +439,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
             [$host, $port] = self::parseHostPort($url, $info);
 
-            if (false !== (parse_url($location, \PHP_URL_HOST) ?? false)) {
-                // Authorization and Cookie headers MUST NOT follow except for the initial host name
-                $requestHeaders = $redirectHeaders['host'] === $host && $redirectHeaders['port'] === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+            if ($locationHasHost) {
+                // Authorization and Cookie headers MUST NOT follow except for the initial authority name
+                $requestHeaders = $redirectHeaders['authority'] === $url['authority'] ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 $requestHeaders[] = 'Host: '.$host.$port;
                 $dnsResolve = !self::configureHeadersAndProxy($context, $host, $requestHeaders, $proxy, 'https:' === $url['scheme']);
             } else {

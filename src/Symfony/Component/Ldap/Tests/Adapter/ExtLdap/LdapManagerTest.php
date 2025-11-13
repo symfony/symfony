@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Ldap\Tests\Adapter\ExtLdap;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\UpdateOperation;
@@ -20,11 +22,8 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\Exception\UpdateOperationException;
 use Symfony\Component\Ldap\Tests\LdapTestCase;
 
-/**
- * @requires extension ldap
- *
- * @group integration
- */
+#[RequiresPhpExtension('ldap')]
+#[Group('integration')]
 class LdapManagerTest extends LdapTestCase
 {
     private Adapter $adapter;
@@ -35,9 +34,7 @@ class LdapManagerTest extends LdapTestCase
         $this->adapter->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapAddAndRemove()
     {
         $this->executeSearchQuery(1);
@@ -58,9 +55,7 @@ class LdapManagerTest extends LdapTestCase
         $this->executeSearchQuery(1);
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapAddInvalidEntry()
     {
         $this->expectException(LdapException::class);
@@ -77,9 +72,7 @@ class LdapManagerTest extends LdapTestCase
         $em->add($entry);
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapAddDouble()
     {
         $this->expectException(LdapException::class);
@@ -101,9 +94,7 @@ class LdapManagerTest extends LdapTestCase
         }
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapUpdate()
     {
         $result = $this->executeSearchQuery(1);
@@ -127,9 +118,7 @@ class LdapManagerTest extends LdapTestCase
         $this->assertNull($entry->getAttribute('email'));
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapUnboundAdd()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
@@ -138,9 +127,7 @@ class LdapManagerTest extends LdapTestCase
         $em->add(new Entry(''));
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapUnboundRemove()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
@@ -149,9 +136,7 @@ class LdapManagerTest extends LdapTestCase
         $em->remove(new Entry(''));
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapUnboundUpdate()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
@@ -173,9 +158,7 @@ class LdapManagerTest extends LdapTestCase
         return $results;
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapRename()
     {
         $result = $this->executeSearchQuery(1);
@@ -194,9 +177,7 @@ class LdapManagerTest extends LdapTestCase
         $this->executeSearchQuery(1);
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapRenameWithoutRemovingOldRdn()
     {
         $result = $this->executeSearchQuery(1);
@@ -263,6 +244,23 @@ class LdapManagerTest extends LdapTestCase
         $this->expectException(LdapException::class);
 
         $entryManager->addAttributeValues($entry, 'mail', $entry->getAttribute('mail'));
+    }
+
+    public function testLdapApplyOperationsRemoveAll()
+    {
+        $entryManager = $this->adapter->getEntryManager();
+
+        $result = $this->executeSearchQuery(1);
+        $entry = $result[0];
+
+        $entryManager->applyOperations($entry->getDn(), [new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE_ALL, 'mail', null)]);
+
+        $result = $this->executeSearchQuery(1);
+        $entry = $result[0];
+
+        $this->assertNull($entry->getAttribute('mail'));
+
+        $entryManager->addAttributeValues($entry, 'mail', ['fabpot@symfony.com', 'fabien@potencier.com']);
     }
 
     public function testLdapApplyOperationsRemoveAllWithArrayError()
@@ -366,9 +364,7 @@ class LdapManagerTest extends LdapTestCase
         $entryManager->applyOperations($entry->getDn(), $duplicateIterator);
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapMove()
     {
         $result = $this->executeSearchQuery(1);

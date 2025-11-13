@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
@@ -19,9 +20,7 @@ use Symfony\Component\Messenger\Worker;
 
 class StopWorkerOnTimeLimitListenerTest extends TestCase
 {
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testWorkerStopsWhenTimeLimitIsReached()
     {
         $logger = $this->createMock(LoggerInterface::class);

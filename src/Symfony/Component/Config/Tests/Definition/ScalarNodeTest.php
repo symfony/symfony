@@ -11,17 +11,17 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\ScalarNode;
+use Symfony\Component\Config\Exception\LogicException;
 
 class ScalarNodeTest extends TestCase
 {
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testNormalize($value)
     {
         $node = new ScalarNode('test');
@@ -53,6 +53,7 @@ class ScalarNodeTest extends TestCase
         $this->assertSame('"foo" is deprecated', $deprecation['message']);
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
+        $this->assertSame('Since vendor/package 1.1: "foo" is deprecated', $childNode->getDeprecationMessage());
 
         $node = new ArrayNode('root');
         $node->addChild($childNode);
@@ -83,9 +84,17 @@ class ScalarNodeTest extends TestCase
         $this->assertSame(1, $deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
+    public function testNotDeprecatedException()
+    {
+        $childNode = new ScalarNode('foo');
+
+        $this->assertFalse($childNode->isDeprecated());
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The node "foo" is not deprecated.');
+        $childNode->getDeprecation('node', 'path');
+    }
+
+    #[DataProvider('getInvalidValues')]
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
         $node = new ScalarNode('test');
@@ -125,9 +134,7 @@ class ScalarNodeTest extends TestCase
         $node->normalize([]);
     }
 
-    /**
-     * @dataProvider getValidNonEmptyValues
-     */
+    #[DataProvider('getValidNonEmptyValues')]
     public function testValidNonEmptyValues($value)
     {
         $node = new ScalarNode('test');
@@ -149,11 +156,7 @@ class ScalarNodeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getEmptyValues
-     *
-     * @param mixed $value
-     */
+    #[DataProvider('getEmptyValues')]
     public function testNotAllowedEmptyValuesThrowException($value)
     {
         $node = new ScalarNode('test');

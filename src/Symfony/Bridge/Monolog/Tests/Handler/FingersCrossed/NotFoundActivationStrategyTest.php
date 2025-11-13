@@ -14,6 +14,9 @@ namespace Symfony\Bridge\Monolog\Tests\Handler\FingersCrossed;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Level;
 use Monolog\LogRecord;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
@@ -23,9 +26,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class NotFoundActivationStrategyTest extends TestCase
 {
-    /**
-     * @dataProvider isActivatedProvider
-     */
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    #[DataProvider('isActivatedProvider')]
     public function testIsActivated(string $url, array|LogRecord $record, bool $expected)
     {
         $requestStack = new RequestStack();

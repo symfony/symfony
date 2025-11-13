@@ -11,11 +11,13 @@
 
 use Symfony\Config\PrimitiveTypesConfig;
 
-return static function (PrimitiveTypesConfig $config) {
-    $config->booleanNode(true);
-    $config->enumNode('foo');
-    $config->floatNode(47.11);
-    $config->integerNode(1337);
-    $config->scalarNode('foobar');
-    $config->scalarNodeWithDefault(null);
-};
+return new PrimitiveTypesConfig([
+    'boolean_node' => true,
+    'enum_node' => 'foo',
+    'fqcn_enum_node' => 'bar',
+    'fqcn_unit_enum_node' => \Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar,
+    'float_node' => 47.11,
+    'integer_node' => 1337,
+    'scalar_node' => 'foobar',
+    'scalar_node_with_default' => null,
+]);

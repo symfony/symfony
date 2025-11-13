@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Disabling HTML5 parsing is deprecated; Symfony 8 will unconditionally use the native HTML5 parser
+
 7.0
 ---
 

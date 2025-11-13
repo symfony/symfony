@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Tests\Fixtures\Attributes\FooAttributes;
     class: 'Symfony\Component\Security\Core\User\User',
     foo: [
         'bar' => ['foo','bar'],
-        'foo'
+        'foo',
     ]
 )]
 class AttributesClassParamQuotedAfterParenthesisController

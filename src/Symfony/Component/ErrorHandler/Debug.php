@@ -20,7 +20,7 @@ class Debug
 {
     public static function enable(): ErrorHandler
     {
-        error_reporting(-1);
+        error_reporting(\E_ALL & ~\E_DEPRECATED & ~\E_USER_DEPRECATED);
 
         if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
             ini_set('display_errors', 0);

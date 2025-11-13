@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -30,18 +31,16 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testPropertyPhpDoc($class)
     {
         $json = <<<EOF
-{
-    "animals": [
-        {"name": "Bug"}
-    ]
-}
-EOF;
+            {
+                "animals": [
+                    {"name": "Bug"}
+                ]
+            }
+            EOF;
         $serializer = new Serializer([
             new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
             new ArrayDenormalizer(),
@@ -57,23 +56,23 @@ EOF;
     public function testPropertyPhpDocWithKeyTypes()
     {
         $json = <<<EOF
-{
-    "animalsInt": [
-        {"name": "Bug"}
-    ],
-    "animalsString": {
-        "animal1": {"name": "Bug"}
-    },
-    "animalsUnion": {
-        "animal2": {"name": "Bug"},
-        "2": {"name": "Dog"}
-    },
-    "animalsGenerics": {
-        "animal3": {"name": "Bug"},
-        "3": {"name": "Dog"}
-    }
-}
-EOF;
+            {
+                "animalsInt": [
+                    {"name": "Bug"}
+                ],
+                "animalsString": {
+                    "animal1": {"name": "Bug"}
+                },
+                "animalsUnion": {
+                    "animal2": {"name": "Bug"},
+                    "2": {"name": "Dog"}
+                },
+                "animalsGenerics": {
+                    "animal3": {"name": "Bug"},
+                    "3": {"name": "Dog"}
+                }
+            }
+            EOF;
         $serializer = new Serializer([
             new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
             new ArrayDenormalizer(),
@@ -156,7 +155,7 @@ class ZooWithKeyTypes
     public $animalsString = [];
     /** @var array<int|string, Animal> */
     public $animalsUnion = [];
-    /** @var \stdClass<Animal> */
+    /** @var \Traversable<Animal> */
     public $animalsGenerics = [];
 }
 

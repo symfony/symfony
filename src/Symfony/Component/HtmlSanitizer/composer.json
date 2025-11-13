@@ -19,7 +19,8 @@
         "php": ">=8.2",
         "ext-dom": "*",
         "league/uri": "^6.5|^7.0",
-        "masterminds/html5": "^2.7.2"
+        "masterminds/html5": "^2.7.2",
+        "symfony/deprecation-contracts": "^2.5|^3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HtmlSanitizer\\": "" },

@@ -13,37 +13,21 @@ namespace Symfony\Component\Serializer\Mapping;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since Symfony 7.4
  */
 class ClassMetadata implements ClassMetadataInterface
 {
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getName()} instead.
-     */
-    public string $name;
+    private string $name;
 
     /**
      * @var AttributeMetadataInterface[]
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getAttributesMetadata()} instead.
      */
-    public array $attributesMetadata = [];
+    private array $attributesMetadata = [];
 
     private ?\ReflectionClass $reflClass = null;
+    private ?ClassDiscriminatorMapping $classDiscriminatorMapping = null;
 
-    /**
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getClassDiscriminatorMapping()} instead.
-     */
-    public ?ClassDiscriminatorMapping $classDiscriminatorMapping = null;
-
-    /**
-     * Constructs a metadata for the given class.
-     */
     public function __construct(string $class, ?ClassDiscriminatorMapping $classDiscriminatorMapping = null)
     {
         $this->name = $class;
@@ -78,11 +62,7 @@ class ClassMetadata implements ClassMetadataInterface
 
     public function getReflectionClass(): \ReflectionClass
     {
-        if (!$this->reflClass) {
-            $this->reflClass = new \ReflectionClass($this->getName());
-        }
-
-        return $this->reflClass;
+        return $this->reflClass ??= new \ReflectionClass($this->getName());
     }
 
     public function getClassDiscriminatorMapping(): ?ClassDiscriminatorMapping
@@ -96,9 +76,9 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
-     * Returns the names of the properties that should be serialized.
+     * @internal since Symfony 7.4, will be replaced by `__serialize()` in 8.0
      *
-     * @return string[]
+     * @final since Symfony 7.4, will be replaced by `__serialize()` in 8.0
      */
     public function __sleep(): array
     {

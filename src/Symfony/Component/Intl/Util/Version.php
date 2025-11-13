@@ -70,7 +70,7 @@ class Version
         $pattern = '[^\.]+';
 
         for ($i = 2; $i <= $precision; ++$i) {
-            $pattern = sprintf('[^\.]+(\.%s)?', $pattern);
+            $pattern = \sprintf('[^\.]+(\.%s)?', $pattern);
         }
 
         if (!preg_match('/^'.$pattern.'/', $version, $matches)) {

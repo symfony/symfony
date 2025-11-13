@@ -183,9 +183,9 @@ final class ProgressBar
         $this->messages[$name] = $message;
     }
 
-    public function getMessage(string $name = 'message'): string
+    public function getMessage(string $name = 'message'): ?string
     {
-        return $this->messages[$name];
+        return $this->messages[$name] ?? null;
     }
 
     public function getStartTime(): int
@@ -229,7 +229,7 @@ final class ProgressBar
 
     public function getRemaining(): float
     {
-        if (!$this->step) {
+        if (0 === $this->step || $this->step === $this->startingStep) {
             return 0;
         }
 
@@ -513,12 +513,21 @@ final class ProgressBar
                 if ($this->output instanceof ConsoleSectionOutput) {
                     $messageLines = explode("\n", $this->previousMessage);
                     $lineCount = \count($messageLines);
+
+                    $lastLineWithoutDecoration = Helper::removeDecoration($this->output->getFormatter(), end($messageLines) ?? '');
+
+                    // When the last previous line is empty (without formatting) it is already cleared by the section output, so we don't need to clear it again
+                    if ('' === $lastLineWithoutDecoration) {
+                        --$lineCount;
+                    }
+
                     foreach ($messageLines as $messageLine) {
                         $messageLineLength = Helper::width(Helper::removeDecoration($this->output->getFormatter(), $messageLine));
                         if ($messageLineLength > $this->terminal->getWidth()) {
                             $lineCount += floor($messageLineLength / $this->terminal->getWidth());
                         }
                     }
+
                     $this->output->clear($lineCount);
                 } else {
                     $lineCount = substr_count($this->previousMessage, "\n");
@@ -610,7 +619,7 @@ final class ProgressBar
     {
         \assert(null !== $this->format);
 
-        $regex = "{%([a-z\-_]+)(?:\:([^%]+))?%}i";
+        $regex = '{%([a-z\-_]+)(?:\:([^%]+))?%}i';
         $callback = function ($matches) {
             if ($formatter = $this->getPlaceholderFormatter($matches[1])) {
                 $text = $formatter($this, $this->output);
@@ -621,7 +630,7 @@ final class ProgressBar
             }
 
             if (isset($matches[2])) {
-                $text = sprintf('%'.$matches[2], $text);
+                $text = \sprintf('%'.$matches[2], $text);
             }
 
             return $text;

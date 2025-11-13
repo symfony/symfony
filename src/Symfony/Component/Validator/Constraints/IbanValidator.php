@@ -69,10 +69,11 @@ class IbanValidator extends ConstraintValidator
         'DK' => 'DK\d{2}\d{4}\d{9}\d{1}', // Denmark
         'DO' => 'DO\d{2}[\dA-Z]{4}\d{20}', // Dominican Republic
         'DZ' => 'DZ\d{2}\d{22}', // Algeria
-        'EE' => 'EE\d{2}\d{2}\d{2}\d{11}\d{1}', // Estonia
+        'EE' => 'EE\d{2}\d{2}\d{14}', // Estonia
         'EG' => 'EG\d{2}\d{4}\d{4}\d{17}', // Egypt
         'ES' => 'ES\d{2}\d{4}\d{4}\d{1}\d{1}\d{10}', // Spain
         'FI' => 'FI\d{2}\d{3}\d{11}', // Finland
+        'FK' => 'FK\d{2}[A-Z]{2}\d{12}', // Falkland Islands
         'FO' => 'FO\d{2}\d{4}\d{9}\d{1}', // Faroe Islands
         'FR' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
         'GA' => 'GA\d{2}\d{23}', // Gabon
@@ -117,6 +118,7 @@ class IbanValidator extends ConstraintValidator
         'MG' => 'MG\d{2}\d{23}', // Madagascar
         'MK' => 'MK\d{2}\d{3}[\dA-Z]{10}\d{2}', // Macedonia
         'ML' => 'ML\d{2}[\dA-Z]{2}\d{22}', // Mali
+        'MN' => 'MN\d{2}\d{4}\d{12}', // Mongolia
         'MQ' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
         'MR' => 'MR\d{2}\d{5}\d{5}\d{11}\d{2}', // Mauritania
         'MT' => 'MT\d{2}[A-Z]{4}\d{5}[\dA-Z]{18}', // Malta
@@ -124,9 +126,10 @@ class IbanValidator extends ConstraintValidator
         'MZ' => 'MZ\d{2}\d{21}', // Mozambique
         'NC' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
         'NE' => 'NE\d{2}[A-Z]{2}\d{22}', // Niger
-        'NI' => 'NI\d{2}[A-Z]{4}\d{24}', // Nicaragua
+        'NI' => 'NI\d{2}[A-Z]{4}\d{20}', // Nicaragua
         'NL' => 'NL\d{2}[A-Z]{4}\d{10}', // Netherlands (The)
         'NO' => 'NO\d{2}\d{4}\d{6}\d{1}', // Norway
+        'OM' => 'OM\d{2}\d{3}[\dA-Z]{16}', // Oman
         'PF' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
         'PK' => 'PK\d{2}[A-Z]{4}[\dA-Z]{16}', // Pakistan
         'PL' => 'PL\d{2}\d{8}\d{16}', // Poland
@@ -147,7 +150,7 @@ class IbanValidator extends ConstraintValidator
         'SM' => 'SM\d{2}[A-Z]{1}\d{5}\d{5}[\dA-Z]{12}', // San Marino
         'SN' => 'SN\d{2}[A-Z]{2}\d{22}', // Senegal
         'SO' => 'SO\d{2}\d{4}\d{3}\d{12}', // Somalia
-        'ST' => 'ST\d{2}\d{4}\d{4}\d{11}\d{2}', // Sao Tome and Principe
+        'ST' => 'ST\d{2}\d{8}\d{11}\d{2}', // Sao Tome and Principe
         'SV' => 'SV\d{2}[A-Z]{4}\d{20}', // El Salvador
         'TD' => 'TD\d{2}\d{23}', // Chad
         'TF' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
@@ -160,6 +163,7 @@ class IbanValidator extends ConstraintValidator
         'VG' => 'VG\d{2}[A-Z]{4}\d{16}', // Virgin Islands
         'WF' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
         'XK' => 'XK\d{2}\d{4}\d{10}\d{2}', // Kosovo
+        'YE' => 'YE\d{2}[A-Z]{4}\d{4}[\dA-Z]{18}', // Yemen
         'YT' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
     ];
 
@@ -179,8 +183,8 @@ class IbanValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        // Remove spaces and convert to uppercase
-        $canonicalized = str_replace(' ', '', strtoupper($value));
+        // Remove spaces (regular, non-breaking, and narrow non-breaking) and convert to uppercase
+        $canonicalized = str_replace([' ', "\xc2\xa0", "\xe2\x80\xaf"], '', strtoupper($value));
 
         // The IBAN must contain only digits and characters...
         if (!ctype_alnum($canonicalized)) {
@@ -220,6 +224,18 @@ class IbanValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Iban::INVALID_FORMAT_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
+        // Check digits should always between 2 and 98
+        // A ECBS document (https://www.ecbs.org/Download/EBS204_V3.PDF) replicates part of the ISO/IEC 7064:2003 standard as a method for generating check digits in the range 02 to 98.
+        $checkDigits = (int) substr($canonicalized, 2, 2);
+        if ($checkDigits < 2 || $checkDigits > 98) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Iban::CHECKSUM_FAILED_ERROR)
                 ->addViolation();
 
             return;

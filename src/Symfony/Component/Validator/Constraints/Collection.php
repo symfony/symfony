@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * Validates a collection with constraints defined for specific keys.
@@ -36,18 +38,27 @@ class Collection extends Composite
     public string $missingFieldsMessage = 'This field is missing.';
 
     /**
-     * @param array<string,Constraint>|array<string,mixed>|null $fields             An associative array defining keys in the collection and their constraints
-     * @param string[]|null                                     $groups
-     * @param bool|null                                         $allowExtraFields   Whether to allow additional keys not declared in the configured fields (defaults to false)
-     * @param bool|null                                         $allowMissingFields Whether to allow the collection to lack some fields declared in the configured fields (defaults to false)
+     * @param array<string,Constraint|list<Constraint>>|null $fields             An associative array defining keys in the collection and their constraints
+     * @param string[]|null                                  $groups
+     * @param bool|null                                      $allowExtraFields   Whether to allow additional keys not declared in the configured fields (defaults to false)
+     * @param bool|null                                      $allowMissingFields Whether to allow the collection to lack some fields declared in the configured fields (defaults to false)
      */
+    #[HasNamedArguments]
     public function __construct(mixed $fields = null, ?array $groups = null, mixed $payload = null, ?bool $allowExtraFields = null, ?bool $allowMissingFields = null, ?string $extraFieldsMessage = null, ?string $missingFieldsMessage = null)
     {
-        if (self::isFieldsOption($fields)) {
-            $fields = ['fields' => $fields];
+        if (null === $fields) {
+            throw new MissingOptionsException(\sprintf('The options "fields" must be set for constraint "%s".', self::class), ['fields']);
         }
 
-        parent::__construct($fields, $groups, $payload);
+        if (self::isFieldsOption($fields)) {
+            $this->fields = $fields;
+        } else {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = $fields;
+        }
+
+        parent::__construct($options ?? null, $groups, $payload);
 
         $this->allowExtraFields = $allowExtraFields ?? $this->allowExtraFields;
         $this->allowMissingFields = $allowMissingFields ?? $this->allowMissingFields;
@@ -72,8 +83,15 @@ class Collection extends Composite
         }
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getRequiredOptions(): array
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return ['fields'];
     }
 

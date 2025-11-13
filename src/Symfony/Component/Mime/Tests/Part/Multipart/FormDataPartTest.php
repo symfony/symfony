@@ -243,4 +243,14 @@ class FormDataPartTest extends TestCase
             $headers[0]
         );
     }
+
+    public function testGetPartsThrowsOnUnexpectedFieldType()
+    {
+        $dataPart = new FormDataPart(['foo' => new \stdClass()]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value of the form field "foo" can only be a string, an array, or an instance of TextPart, "stdClass" given.');
+
+        $dataPart->getParts();
+    }
 }

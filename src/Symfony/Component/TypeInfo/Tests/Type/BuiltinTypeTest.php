@@ -12,8 +12,6 @@
 namespace Symfony\Component\TypeInfo\Tests\Type;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\TypeInfo\Exception\LogicException;
-use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -24,42 +22,65 @@ class BuiltinTypeTest extends TestCase
         $this->assertSame('int', (string) new BuiltinType(TypeIdentifier::INT));
     }
 
+    public function testIsIdentifiedBy()
+    {
+        $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isIdentifiedBy(TypeIdentifier::ARRAY));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::INT))->isIdentifiedBy(TypeIdentifier::INT));
+
+        $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isIdentifiedBy('array'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::INT))->isIdentifiedBy('int'));
+
+        $this->assertTrue((new BuiltinType(TypeIdentifier::INT))->isIdentifiedBy('string', 'int'));
+    }
+
     public function testIsNullable()
     {
-        $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isNullable());
         $this->assertTrue((new BuiltinType(TypeIdentifier::NULL))->isNullable());
         $this->assertTrue((new BuiltinType(TypeIdentifier::MIXED))->isNullable());
+        $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isNullable());
     }
 
-    public function testAsNonNullable()
+    public function testAccepts()
     {
-        $type = new BuiltinType(TypeIdentifier::INT);
+        $this->assertFalse((new BuiltinType(TypeIdentifier::ARRAY))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::ARRAY))->accepts([]));
 
-        $this->assertSame($type, $type->asNonNullable());
-        $this->assertEquals(
-            Type::union(
-                new BuiltinType(TypeIdentifier::OBJECT),
-                new BuiltinType(TypeIdentifier::RESOURCE),
-                new BuiltinType(TypeIdentifier::ARRAY),
-                new BuiltinType(TypeIdentifier::STRING),
-                new BuiltinType(TypeIdentifier::FLOAT),
-                new BuiltinType(TypeIdentifier::INT),
-                new BuiltinType(TypeIdentifier::BOOL),
-            ),
-            Type::nullable(new BuiltinType(TypeIdentifier::MIXED))->asNonNullable()
-        );
-    }
+        $this->assertFalse((new BuiltinType(TypeIdentifier::BOOL))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::BOOL))->accepts(true));
 
-    public function testCannotTurnNullAsNonNullable()
-    {
-        $this->expectException(LogicException::class);
+        $this->assertFalse((new BuiltinType(TypeIdentifier::CALLABLE))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::CALLABLE))->accepts('strtoupper'));
 
-        (new BuiltinType(TypeIdentifier::NULL))->asNonNullable();
-    }
+        $this->assertFalse((new BuiltinType(TypeIdentifier::FALSE))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::FALSE))->accepts(false));
 
-    public function testIsA()
-    {
-        $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isA(TypeIdentifier::ARRAY));
-        $this->assertTrue((new BuiltinType(TypeIdentifier::INT))->isA(TypeIdentifier::INT));
+        $this->assertFalse((new BuiltinType(TypeIdentifier::FLOAT))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::FLOAT))->accepts(1.23));
+
+        $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::INT))->accepts(123));
+
+        $this->assertFalse((new BuiltinType(TypeIdentifier::ITERABLE))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::ITERABLE))->accepts([]));
+
+        $this->assertTrue((new BuiltinType(TypeIdentifier::MIXED))->accepts('string'));
+
+        $this->assertFalse((new BuiltinType(TypeIdentifier::NULL))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::NULL))->accepts(null));
+
+        $this->assertFalse((new BuiltinType(TypeIdentifier::OBJECT))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::OBJECT))->accepts(new \stdClass()));
+
+        $this->assertFalse((new BuiltinType(TypeIdentifier::RESOURCE))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::RESOURCE))->accepts(fopen('php://temp', 'r')));
+
+        $this->assertFalse((new BuiltinType(TypeIdentifier::STRING))->accepts(123));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::STRING))->accepts('string'));
+
+        $this->assertFalse((new BuiltinType(TypeIdentifier::TRUE))->accepts('string'));
+        $this->assertTrue((new BuiltinType(TypeIdentifier::TRUE))->accepts(true));
+
+        $this->assertFalse((new BuiltinType(TypeIdentifier::NEVER))->accepts('string'));
+        $this->assertFalse((new BuiltinType(TypeIdentifier::VOID))->accepts('string'));
     }
 }

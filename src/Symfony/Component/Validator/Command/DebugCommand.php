@@ -38,13 +38,10 @@ use Symfony\Component\Validator\Mapping\TraversalStrategy;
 #[AsCommand(name: 'debug:validator', description: 'Display validation constraints for classes')]
 class DebugCommand extends Command
 {
-    private MetadataFactoryInterface $validator;
-
-    public function __construct(MetadataFactoryInterface $validator)
-    {
+    public function __construct(
+        private MetadataFactoryInterface $validator,
+    ) {
         parent::__construct();
-
-        $this->validator = $validator;
     }
 
     protected function configure(): void
@@ -53,10 +50,10 @@ class DebugCommand extends Command
             ->addArgument('class', InputArgument::REQUIRED, 'A fully qualified class name or a path')
             ->addOption('show-all', null, InputOption::VALUE_NONE, 'Show all classes even if they have no validation constraints')
             ->setHelp(<<<'EOF'
-The <info>%command.name% 'App\Entity\Dummy'</info> command dumps the validators for the dummy class.
+                The <info>%command.name% 'App\Entity\Dummy'</info> command dumps the validators for the dummy class.
 
-The <info>%command.name% src/</info> command dumps the validators for the `src` directory.
-EOF
+                The <info>%command.name% src/</info> command dumps the validators for the `src` directory.
+                EOF
             )
         ;
     }
@@ -77,7 +74,7 @@ EOF
             }
         } catch (DirectoryNotFoundException) {
             $io = new SymfonyStyle($input, $output);
-            $io->error(sprintf('Neither class nor path were found with "%s" argument.', $input->getArgument('class')));
+            $io->error(\sprintf('Neither class nor path were found with "%s" argument.', $input->getArgument('class')));
 
             return 1;
         }
@@ -88,7 +85,7 @@ EOF
     private function dumpValidatorsForClass(InputInterface $input, OutputInterface $output, string $class): void
     {
         $io = new SymfonyStyle($input, $output);
-        $title = sprintf('<info>%s</info>', $class);
+        $title = \sprintf('<info>%s</info>', $class);
         $rows = [];
         $dump = new Dumper($output);
 

@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
 
-/**
- * @requires extension intl
- */
+#[RequiresPhpExtension('intl')]
 class IcuDatFileLoaderTest extends LocalizedTestCase
 {
     public function testLoadInvalidResource()

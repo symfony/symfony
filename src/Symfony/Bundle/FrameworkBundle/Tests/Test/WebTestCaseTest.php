@@ -12,13 +12,16 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Test;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\History;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Cookie as HttpFoundationCookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -188,6 +191,42 @@ class WebTestCaseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('has cookie "foo" with path "/path" and has cookie "foo" with path "/path" with value "babar".');
         $this->getClientTester()->assertBrowserCookieValueSame('foo', 'babar', false, '/path');
+    }
+
+    #[RequiresMethod(History::class, 'isFirstPage')]
+    public function testAssertBrowserHistoryIsOnFirstPage()
+    {
+        $this->createHistoryTester('isFirstPage', true)->assertBrowserHistoryIsOnFirstPage();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser history is on the first page.');
+        $this->createHistoryTester('isFirstPage', false)->assertBrowserHistoryIsOnFirstPage();
+    }
+
+    #[RequiresMethod(History::class, 'isFirstPage')]
+    public function testAssertBrowserHistoryIsNotOnFirstPage()
+    {
+        $this->createHistoryTester('isFirstPage', false)->assertBrowserHistoryIsNotOnFirstPage();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser history is not on the first page.');
+        $this->createHistoryTester('isFirstPage', true)->assertBrowserHistoryIsNotOnFirstPage();
+    }
+
+    #[RequiresMethod(History::class, 'isLastPage')]
+    public function testAssertBrowserHistoryIsOnLastPage()
+    {
+        $this->createHistoryTester('isLastPage', true)->assertBrowserHistoryIsOnLastPage();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser history is on the last page.');
+        $this->createHistoryTester('isLastPage', false)->assertBrowserHistoryIsOnLastPage();
+    }
+
+    #[RequiresMethod(History::class, 'isLastPage')]
+    public function testAssertBrowserHistoryIsNotOnLastPage()
+    {
+        $this->createHistoryTester('isLastPage', false)->assertBrowserHistoryIsNotOnLastPage();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser history is not on the last page.');
+        $this->createHistoryTester('isLastPage', true)->assertBrowserHistoryIsNotOnLastPage();
     }
 
     public function testAssertSelectorExists()
@@ -386,9 +425,22 @@ class WebTestCaseTest extends TestCase
         return $this->getTester($client);
     }
 
+    private function createHistoryTester(string $method, bool $returnValue): WebTestCase
+    {
+        /** @var KernelBrowser&MockObject $client */
+        $client = $this->createMock(KernelBrowser::class);
+        /** @var History&MockObject $history */
+        $history = $this->createMock(History::class);
+
+        $history->method($method)->willReturn($returnValue);
+        $client->method('getHistory')->willReturn($history);
+
+        return $this->getTester($client);
+    }
+
     private function getTester(KernelBrowser $client): WebTestCase
     {
-        $tester = new class() extends WebTestCase {
+        $tester = new class(method_exists($this, 'name') ? $this->name() : $this->getName()) extends WebTestCase {
             use WebTestAssertionsTrait {
                 getClient as public;
             }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\TimeValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -50,14 +51,23 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Time());
     }
 
-    /**
-     * @dataProvider getValidTimes
-     */
+    #[DataProvider('getValidTimes')]
     public function testValidTimes($time)
     {
         $this->validator->validate($time, new Time());
 
         $this->assertNoViolation();
+    }
+
+    #[DataProvider('getValidTimes')]
+    public function testValidTimesWithNewLine(string $time)
+    {
+        $this->validator->validate($time."\n", new Time());
+
+        $this->buildViolation('This value is not a valid time.')
+            ->setParameter('{{ value }}', '"'.$time."\n".'"')
+            ->setCode(Time::INVALID_FORMAT_ERROR)
+            ->assertRaised();
     }
 
     public static function getValidTimes()
@@ -69,16 +79,23 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getValidTimesWithoutSeconds
-     */
+    #[DataProvider('getValidTimesWithoutSeconds')]
     public function testValidTimesWithoutSeconds(string $time)
     {
-        $this->validator->validate($time, new Time([
-            'withSeconds' => false,
-        ]));
+        $this->validator->validate($time, new Time(withSeconds: false));
 
         $this->assertNoViolation();
+    }
+
+    #[DataProvider('getValidTimesWithoutSeconds')]
+    public function testValidTimesWithoutSecondsWithNewLine(string $time)
+    {
+        $this->validator->validate($time."\n", new Time(withSeconds: false));
+
+        $this->buildViolation('This value is not a valid time.')
+            ->setParameter('{{ value }}', '"'.$time."\n".'"')
+            ->setCode(Time::INVALID_FORMAT_ERROR)
+            ->assertRaised();
     }
 
     public static function getValidTimesWithoutSeconds()
@@ -90,9 +107,7 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidTimesWithoutSeconds
-     */
+    #[DataProvider('getInvalidTimesWithoutSeconds')]
     public function testInvalidTimesWithoutSeconds(string $time)
     {
         $this->validator->validate($time, $constraint = new Time());
@@ -112,14 +127,10 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidTimes
-     */
+    #[DataProvider('getInvalidTimes')]
     public function testInvalidTimes($time, $code)
     {
-        $constraint = new Time([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Time(message: 'myMessage');
 
         $this->validator->validate($time, $constraint);
 

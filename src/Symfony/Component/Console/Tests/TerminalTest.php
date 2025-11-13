@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\AnsiColorMode;
 use Symfony\Component\Console\Terminal;
@@ -95,9 +96,7 @@ class TerminalTest extends TestCase
         $this->assertSame((int) $matches[1], $terminal->getWidth());
     }
 
-    /**
-     * @dataProvider provideTerminalColorEnv
-     */
+    #[DataProvider('provideTerminalColorEnv')]
     public function testGetColorMode(?string $testColorTerm, ?string $testTerm, AnsiColorMode $expected)
     {
         $oriColorTerm = getenv('COLORTERM');

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
@@ -50,23 +51,23 @@ class ConstraintViolationListNormalizerTest extends TestCase
             'detail' => 'd: a
 4: 1',
             'violations' => [
-                    [
-                        'propertyPath' => 'd',
-                        'title' => 'a',
-                        'template' => 'b',
-                        'type' => 'urn:uuid:f',
-                        'parameters' => [
-                            'value' => 'foo',
-                        ],
-                    ],
-                    [
-                        'propertyPath' => '4',
-                        'title' => '1',
-                        'template' => '2',
-                        'type' => 'urn:uuid:6',
-                        'parameters' => [],
+                [
+                    'propertyPath' => 'd',
+                    'title' => 'a',
+                    'template' => 'b',
+                    'type' => 'urn:uuid:f',
+                    'parameters' => [
+                        'value' => 'foo',
                     ],
                 ],
+                [
+                    'propertyPath' => '4',
+                    'title' => '1',
+                    'template' => '2',
+                    'type' => 'urn:uuid:6',
+                    'parameters' => [],
+                ],
+            ],
         ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($list));
@@ -113,9 +114,7 @@ error',
         $this->assertEquals($expected, $normalizer->normalize($list));
     }
 
-    /**
-     * @dataProvider payloadFieldsProvider
-     */
+    #[DataProvider('payloadFieldsProvider')]
     public function testNormalizePayloadFields($fields, ?array $expected = null)
     {
         $constraint = new NotNull();

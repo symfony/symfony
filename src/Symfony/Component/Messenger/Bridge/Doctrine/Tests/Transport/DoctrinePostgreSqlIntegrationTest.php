@@ -16,15 +16,14 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
-/**
- * @requires extension pdo_pgsql
- *
- * @group integration
- */
+#[RequiresPhpExtension('pdo_pgsql')]
+#[Group('integration')]
 class DoctrinePostgreSqlIntegrationTest extends TestCase
 {
     private Connection $driverConnection;
@@ -50,6 +49,9 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
 
     protected function tearDown(): void
     {
+        if (!isset($this->driverConnection)) {
+            return;
+        }
         $this->driverConnection->createSchemaManager()->dropTable('queue_table');
         $this->driverConnection->close();
     }
@@ -63,5 +65,18 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
 
         $this->assertNull($this->connection->get());
+    }
+
+    public function testSkipLocked()
+    {
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table', 'skip_locked' => true], $this->driverConnection);
+
+        $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+
+        $encoded = $connection->get();
+        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+
+        $this->assertNull($connection->get());
     }
 }

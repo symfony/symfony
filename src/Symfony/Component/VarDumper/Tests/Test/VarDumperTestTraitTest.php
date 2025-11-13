@@ -25,16 +25,16 @@ class VarDumperTestTraitTest extends TestCase
         $howMany = 700;
         $data = array_fill_keys(range(0, $howMany), ['a', 'b', 'c', 'd']);
 
-        $expected = sprintf("array:%d [\n", $howMany + 1);
+        $expected = \sprintf("array:%d [\n", $howMany + 1);
         for ($i = 0; $i <= $howMany; ++$i) {
             $expected .= <<<EODUMP
-  $i => array:4 [
-    0 => "a"
-    1 => "b"
-    2 => "c"
-    3 => "d"
-  ]\n
-EODUMP;
+                  $i => array:4 [
+                    0 => "a"
+                    1 => "b"
+                    2 => "c"
+                    3 => "d"
+                  ]\n
+                EODUMP;
         }
         $expected .= "]\n";
 
@@ -60,15 +60,16 @@ EODUMP;
         $this->assertSame($casters, $this->varDumperConfig['casters']);
 
         $this->assertDumpEquals(<<<DUMP
-[
-  1,
-  2,
-  DateTimeImmutable {
-    +date: "09/07/2019"
-  }
-]
-DUMP
-            , [1, 2, new \DateTimeImmutable('2019-07-09T0:00:00+00:00')]);
+            [
+              1,
+              2,
+              DateTimeImmutable {
+                +date: "09/07/2019"
+              }
+            ]
+            DUMP,
+            [1, 2, new \DateTimeImmutable('2019-07-09T0:00:00+00:00')]
+        );
 
         $this->tearDownVarDumper();
 

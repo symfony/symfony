@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Bandwidth\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthOptions;
 use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransport;
@@ -29,7 +30,7 @@ final class BandwidthTransportTest extends TransportTestCase
         return new BandwidthTransport('username', 'password', $from, 'account_id', 'application_id', 'priority', $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'no zero at start if phone number' => ['+0'];
         yield 'phone number too short' => ['+1'];
@@ -41,22 +42,18 @@ final class BandwidthTransportTest extends TransportTestCase
         yield [new SmsMessage('0611223344', 'Hello!', 'from', new BandwidthOptions(['from' => 'from']))];
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
     {
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number. The number must be in E.164 format.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number. The number must be in E.164 format.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
-    /**
-     * @dataProvider validFromProvider
-     */
+    #[DataProvider('validFromProvider')]
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');

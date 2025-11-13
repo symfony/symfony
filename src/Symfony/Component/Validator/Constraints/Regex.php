@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * Validates that a value matches a regular expression.
@@ -36,12 +38,12 @@ class Regex extends Constraint
     public $normalizer;
 
     /**
-     * @param string|array<string,mixed>|null $pattern     The regular expression to match
-     * @param string|null                     $htmlPattern The pattern to use in the HTML5 pattern attribute
-     * @param bool|null                       $match       Whether to validate the value matches the configured pattern or not (defaults to false)
-     * @param string[]|null                   $groups
-     * @param array<string,mixed>             $options
+     * @param string|null   $pattern     The regular expression to match
+     * @param string|null   $htmlPattern The pattern to use in the HTML5 pattern attribute
+     * @param bool|null     $match       Whether to validate the value matches the configured pattern or not (defaults to true)
+     * @param string[]|null $groups
      */
+    #[HasNamedArguments]
     public function __construct(
         string|array|null $pattern,
         ?string $message = null,
@@ -50,33 +52,55 @@ class Regex extends Constraint
         ?callable $normalizer = null,
         ?array $groups = null,
         mixed $payload = null,
-        array $options = [],
+        ?array $options = null,
     ) {
+        if (null === $pattern && !isset($options['pattern'])) {
+            throw new MissingOptionsException(\sprintf('The options "pattern" must be set for constraint "%s".', self::class), ['pattern']);
+        }
+
         if (\is_array($pattern)) {
-            $options = array_merge($pattern, $options);
-        } elseif (null !== $pattern) {
-            $options['value'] = $pattern;
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($pattern, $options ?? []);
+            $pattern = $options['pattern'] ?? null;
+        } elseif (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
         }
 
         parent::__construct($options, $groups, $payload);
 
+        $this->pattern = $pattern ?? $this->pattern;
         $this->message = $message ?? $this->message;
         $this->htmlPattern = $htmlPattern ?? $this->htmlPattern;
         $this->match = $match ?? $this->match;
         $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
-            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
+            throw new InvalidArgumentException(\sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getDefaultOption(): ?string
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return 'pattern';
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getRequiredOptions(): array
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return ['pattern'];
     }
 
@@ -91,9 +115,7 @@ class Regex extends Constraint
     {
         // If htmlPattern is specified, use it
         if (null !== $this->htmlPattern) {
-            return empty($this->htmlPattern)
-                ? null
-                : $this->htmlPattern;
+            return $this->htmlPattern ?: null;
         }
 
         // Quit if delimiters not at very beginning/end (e.g. when options are passed)
@@ -122,8 +144,6 @@ class Regex extends Constraint
         $pattern = '^' === $pattern[0] ? substr($pattern, 1) : '.*'.$pattern;
 
         // Trim trailing $, otherwise append .*
-        $pattern = '$' === $pattern[\strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
-
-        return $pattern;
+        return '$' === $pattern[\strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
     }
 }

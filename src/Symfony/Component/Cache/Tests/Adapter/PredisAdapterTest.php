@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Predis\Connection\StreamConnection;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class PredisAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
@@ -36,17 +35,24 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertInstanceOf(StreamConnection::class, $connection);
 
         $redisHost = explode(':', $redisHost);
+        $connectionParameters = $connection->getParameters()->toArray();
+
         $params = [
             'scheme' => 'tcp',
             'host' => $redisHost[0],
             'port' => (int) ($redisHost[1] ?? 6379),
-            'persistent' => 0,
+            'persistent' => false,
             'timeout' => 3,
             'read_write_timeout' => 0,
             'tcp_nodelay' => true,
             'database' => '1',
         ];
-        $this->assertSame($params, $connection->getParameters()->toArray());
+
+        if (isset($connectionParameters['conn_uid'])) {
+            $params['conn_uid'] = $connectionParameters['conn_uid']; // if present, the value cannot be predicted
+        }
+
+        $this->assertSame($params, $connectionParameters);
     }
 
     public function testCreateSslConnection()
@@ -60,18 +66,25 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertInstanceOf(StreamConnection::class, $connection);
 
         $redisHost = explode(':', $redisHost);
+        $connectionParameters = $connection->getParameters()->toArray();
+
         $params = [
             'scheme' => 'tls',
             'host' => $redisHost[0],
             'port' => (int) ($redisHost[1] ?? 6379),
             'ssl' => ['verify_peer' => '0'],
-            'persistent' => 0,
+            'persistent' => false,
             'timeout' => 3,
             'read_write_timeout' => 0,
             'tcp_nodelay' => true,
             'database' => '1',
         ];
-        $this->assertSame($params, $connection->getParameters()->toArray());
+
+        if (isset($connectionParameters['conn_uid'])) {
+            $params['conn_uid'] = $connectionParameters['conn_uid']; // if present, the value cannot be predicted
+        }
+
+        $this->assertSame($params, $connectionParameters);
     }
 
     public function testAclUserPasswordAuth()

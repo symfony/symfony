@@ -58,7 +58,7 @@ class Registry
     {
         $reflector = self::$reflectors[$class] ??= self::getClassReflector($class, true, false);
 
-        return self::$factories[$class] = [$reflector, 'newInstanceWithoutConstructor'](...);
+        return self::$factories[$class] = $reflector->newInstanceWithoutConstructor(...);
     }
 
     public static function getClassReflector($class, $instantiableWithoutConstructor = false, $cloneable = null)

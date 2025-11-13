@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\RegexValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -25,14 +28,14 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Regex(['pattern' => '/^[0-9]+$/']));
+        $this->validator->validate(null, new Regex(pattern: '/^[0-9]+$/'));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Regex(['pattern' => '/^[0-9]+$/']));
+        $this->validator->validate('', new Regex(pattern: '/^[0-9]+$/'));
 
         $this->assertNoViolation();
     }
@@ -40,23 +43,21 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Regex(['pattern' => '/^[0-9]+$/']));
+        $this->validator->validate(new \stdClass(), new Regex(pattern: '/^[0-9]+$/'));
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testValidValues($value)
     {
-        $constraint = new Regex(['pattern' => '/^[0-9]+$/']);
+        $constraint = new Regex(pattern: '/^[0-9]+$/');
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidValuesWithWhitespaces
-     */
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    #[DataProvider('getValidValuesWithWhitespaces')]
     public function testValidValuesWithWhitespaces($value)
     {
         $constraint = new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'trim']);
@@ -65,9 +66,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidValuesWithWhitespaces
-     */
+    #[DataProvider('getValidValuesWithWhitespaces')]
     public function testValidValuesWithWhitespacesNamed($value)
     {
         $constraint = new Regex(pattern: '/^[0-9]+$/', normalizer: 'trim');
@@ -83,7 +82,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
             ['0'],
             ['090909'],
             [90909],
-            [new class() {
+            [new class {
                 public function __toString(): string
                 {
                     return '090909';
@@ -104,9 +103,9 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    #[DataProvider('getInvalidValues')]
     public function testInvalidValues($value)
     {
         $constraint = new Regex([
@@ -123,9 +122,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
+    #[DataProvider('getInvalidValues')]
     public function testInvalidValuesNamed($value)
     {
         $constraint = new Regex(pattern: '/^[0-9]+$/', message: 'myMessage');
@@ -144,7 +141,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
         return [
             ['abcd'],
             ['090foo'],
-            [new class() {
+            [new class {
                 public function __toString(): string
                 {
                     return 'abcd';

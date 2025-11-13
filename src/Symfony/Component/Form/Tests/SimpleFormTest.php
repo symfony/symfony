@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
@@ -75,9 +76,7 @@ class SimpleFormTest extends TestCase
         $this->form = $this->createForm();
     }
 
-    /**
-     * @dataProvider provideFormNames
-     */
+    #[DataProvider('provideFormNames')]
     public function testGetPropertyPath($name, $propertyPath)
     {
         $config = new FormConfigBuilder($name, null, new EventDispatcher());
@@ -230,9 +229,7 @@ class SimpleFormTest extends TestCase
         $this->assertFalse($child->isRequired());
     }
 
-    /**
-     * @dataProvider getDisabledStates
-     */
+    #[DataProvider('getDisabledStates')]
     public function testAlwaysDisabledIfParentDisabled($parentDisabled, $disabled, $result)
     {
         $parent = $this->getBuilder()->setDisabled($parentDisabled)->getForm();
@@ -503,9 +500,9 @@ class SimpleFormTest extends TestCase
     {
         $form = $this->getBuilder()
             ->addModelTransformer(new FixedDataTransformer([
-            '' => '',
-            1 => 23,
-        ]))
+                '' => '',
+                1 => 23,
+            ]))
             ->getForm();
 
         $form->setData(1);

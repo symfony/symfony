@@ -41,7 +41,7 @@ class StringHandler implements HandlerInterface
     {
         $quote = $reader->getSubstring(1);
 
-        if (!\in_array($quote, ["'", '"'])) {
+        if (!\in_array($quote, ["'", '"'], true)) {
             return false;
         }
 
@@ -49,7 +49,7 @@ class StringHandler implements HandlerInterface
         $match = $reader->findPattern($this->patterns->getQuotedStringPattern($quote));
 
         if (!$match) {
-            throw new InternalErrorException(sprintf('Should have found at least an empty match at %d.', $reader->getPosition()));
+            throw new InternalErrorException(\sprintf('Should have found at least an empty match at %d.', $reader->getPosition()));
         }
 
         // check unclosed strings

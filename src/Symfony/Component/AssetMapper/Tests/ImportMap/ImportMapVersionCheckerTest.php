@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
@@ -24,9 +25,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class ImportMapVersionCheckerTest extends TestCase
 {
-    /**
-     * @dataProvider getCheckVersionsTests
-     */
+    #[DataProvider('getCheckVersionsTests')]
     public function testCheckVersions(array $importMapEntries, array $dependencies, array $expectedRequests, array $expectedProblems)
     {
         $configReader = $this->createMock(ImportMapConfigReader::class);
@@ -48,7 +47,7 @@ class ImportMapVersionCheckerTest extends TestCase
             }))
             ->willReturnCallback(function ($importName) use ($dependencies) {
                 if (!isset($dependencies[$importName])) {
-                    throw new \InvalidArgumentException(sprintf('Missing dependencies in test for "%s"', $importName));
+                    throw new \InvalidArgumentException(\sprintf('Missing dependencies in test for "%s"', $importName));
                 }
 
                 return $dependencies[$importName];
@@ -261,11 +260,29 @@ class ImportMapVersionCheckerTest extends TestCase
                 new PackageVersionProblem('foo', 'bar', 'some/repo', '1.5.0'),
             ],
         ];
+
+        yield 'single with range constraint but no problem' => [
+            [
+                self::createRemoteEntry('foo', version: '1.0'),
+                self::createRemoteEntry('bar', version: '2.0.3'),
+            ],
+            [
+                'foo' => ['bar'],
+                'bar' => [],
+            ],
+            [
+                [
+                    'url' => '/foo/1.0',
+                    'response' => [
+                        'dependencies' => ['bar' => '1.11 - 2'],
+                    ],
+                ],
+            ],
+            [],
+        ];
     }
 
-    /**
-     * @dataProvider getNpmSpecificVersionConstraints
-     */
+    #[DataProvider('getNpmSpecificVersionConstraints')]
     public function testNpmSpecificConstraints(string $npmConstraint, ?string $expectedComposerConstraint)
     {
         $this->assertSame($expectedComposerConstraint, ImportMapVersionChecker::convertNpmConstraint($npmConstraint));
@@ -297,22 +314,22 @@ class ImportMapVersionCheckerTest extends TestCase
         // Hyphen Ranges
         yield 'hyphen range simple' => [
             '1.0.0 - 2.0.0',
-            '>=1.0.0 <=2.0.0',
+            '1.0.0 - 2.0.0',
         ];
 
         yield 'hyphen range with v prefix' => [
             'v1.0.0 - 2.0.0',
-            '>=1.0.0 <=2.0.0',
+            '1.0.0 - 2.0.0',
         ];
 
         yield 'hyphen range without patch' => [
             '1.0 - 2.0',
-            '>=1.0 <=2.0',
+            '1.0 - 2.0',
         ];
 
         yield 'hyphen range with no spaces' => [
             '1.0-v2.0',
-            '>=1.0 <=2.0',
+            '1.0 - 2.0',
         ];
 
         // .x Wildcards
@@ -386,7 +403,7 @@ class ImportMapVersionCheckerTest extends TestCase
 
         yield 'multiple constraints with space and or operator' => [
             '1.2.7 || 1.2.9- v2.0.0',
-            '1.2.7 || >=1.2.9 <=2.0.0',
+            '1.2.7 || 1.2.9 - 2.0.0',
         ];
 
         yield 'tilde constraint with patch version no change' => [
@@ -407,7 +424,7 @@ class ImportMapVersionCheckerTest extends TestCase
 
     private static function createRemoteEntry(string $importName, string $version, ?string $packageModuleSpecifier = null): ImportMapEntry
     {
-        $packageModuleSpecifier = $packageModuleSpecifier ?? $importName;
+        $packageModuleSpecifier ??= $importName;
 
         return ImportMapEntry::createRemote($importName, ImportMapType::JS, '/path/to/'.$importName, $version, $packageModuleSpecifier, false);
     }

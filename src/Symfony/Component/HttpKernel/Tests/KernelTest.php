@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -29,7 +30,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
@@ -58,7 +58,7 @@ class KernelTest extends TestCase
     public function testEmptyEnv()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
+        $this->expectExceptionMessage(\sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
 
         new KernelForTest('', false);
     }
@@ -148,7 +148,7 @@ class KernelTest extends TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(['initializeBundles'], [], false, ['doLoadClassCache']);
+        $kernel = $this->getKernel(['initializeBundles', 'doLoadClassCache'], [], false, KernelForTestWithLoadClassCache::class);
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 
@@ -246,7 +246,7 @@ class KernelTest extends TestCase
         $env = 'test_env';
         $debug = true;
         $kernel = new KernelForTest($env, $debug);
-        $expected = "O:57:\"Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest\":2:{s:14:\"\0*\0environment\";s:8:\"test_env\";s:8:\"\0*\0debug\";b:1;}";
+        $expected = \sprintf('O:48:"%s":2:{s:11:"environment";s:8:"test_env";s:5:"debug";b:1;}', KernelForTest::class);
         $this->assertEquals($expected, serialize($kernel));
     }
 
@@ -299,7 +299,7 @@ class KernelTest extends TestCase
         $kernel
             ->expects($this->exactly(2))
             ->method('getBundle')
-            ->willReturn($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle'))
+            ->willReturn($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, 'Bundle1Bundle'))
         ;
 
         $this->assertEquals(
@@ -316,8 +316,8 @@ class KernelTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Trying to register two bundles with the same name "DuplicateName"');
-        $fooBundle = $this->getBundle(__DIR__.'/Fixtures/FooBundle', null, 'FooBundle', 'DuplicateName');
-        $barBundle = $this->getBundle(__DIR__.'/Fixtures/BarBundle', null, 'BarBundle', 'DuplicateName');
+        $fooBundle = $this->getBundle(__DIR__.'/Fixtures/FooBundle', 'FooBundle', 'DuplicateName');
+        $barBundle = $this->getBundle(__DIR__.'/Fixtures/BarBundle', 'BarBundle', 'DuplicateName');
 
         $kernel = $this->getKernel([], [$fooBundle, $barBundle]);
         $kernel->boot();
@@ -411,17 +411,23 @@ class KernelTest extends TestCase
 
     public function testKernelExtension()
     {
-        $kernel = new class() extends CustomProjectDirKernel implements ExtensionInterface {
+        $kernel = new class extends CustomProjectDirKernel implements ExtensionInterface {
             public function load(array $configs, ContainerBuilder $container): void
             {
                 $container->setParameter('test.extension-registered', true);
             }
 
+            /**
+             * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+             */
             public function getNamespace(): string
             {
                 return '';
             }
 
+            /**
+             * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+             */
             public function getXsdValidationBasePath(): string|false
             {
                 return false;
@@ -451,7 +457,7 @@ class KernelTest extends TestCase
         $kernel->boot();
 
         $this->assertTrue($kernel->warmedUp);
-        $this->assertSame($kernel->getBuildDir(), $kernel->warmedUpBuildDir);
+        $this->assertSame(realpath($kernel->getBuildDir()), $kernel->warmedUpBuildDir);
     }
 
     public function testServicesResetter()
@@ -486,9 +492,7 @@ class KernelTest extends TestCase
         $this->assertEquals(1, ResettableService::$counter);
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testKernelStartTimeIsResetWhileBootingAlreadyBootedKernel()
     {
         $kernel = $this->getKernel(['initializeBundles'], [], true);
@@ -522,14 +526,32 @@ class KernelTest extends TestCase
         $this->assertMatchesRegularExpression('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
     }
 
+    public function testTrustedParameters()
+    {
+        $kernel = new CustomProjectDirKernel(function (ContainerBuilder $container) {
+            $container->setParameter('kernel.trusted_hosts', '^a{2,3}.com$, ^b{2,}.com$');
+            $container->setParameter('kernel.trusted_proxies', 'a,b');
+            $container->setParameter('kernel.trusted_headers', 'x-forwarded-for');
+        });
+        $kernel->boot();
+
+        try {
+            $this->assertSame(['{^a{2,3}.com$}i', '{^b{2,}.com$}i'], Request::getTrustedHosts());
+            $this->assertSame(['a', 'b'], Request::getTrustedProxies());
+            $this->assertSame(Request::HEADER_X_FORWARDED_FOR, Request::getTrustedHeaderSet());
+        } finally {
+            Request::setTrustedHosts([]);
+            Request::setTrustedProxies([], 0);
+        }
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      */
-    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null): BundleInterface
+    protected function getBundle($dir = null, $className = null, $bundleName = null): BundleInterface
     {
         $bundle = $this
             ->getMockBuilder(BundleInterface::class)
-            ->onlyMethods(['getPath', 'getName'])
             ->disableOriginalConstructor()
         ;
 
@@ -537,7 +559,7 @@ class KernelTest extends TestCase
             $bundle->setMockClassName($className);
         }
 
-        $bundle = $bundle->getMockForAbstractClass();
+        $bundle = $bundle->getMock();
 
         $bundle
             ->expects($this->any())
@@ -560,19 +582,15 @@ class KernelTest extends TestCase
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
      */
-    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, array $methodsToAdd = []): Kernel
+    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false, string $kernelClass = KernelForTest::class): Kernel
     {
         $methods[] = 'registerBundles';
 
         $kernelMockBuilder = $this
-            ->getMockBuilder(KernelForTest::class)
+            ->getMockBuilder($kernelClass)
             ->onlyMethods($methods)
             ->setConstructorArgs(['test', $debug])
         ;
-
-        if (0 !== \count($methodsToAdd)) {
-            $kernelMockBuilder->addMethods($methodsToAdd);
-        }
 
         $kernel = $kernelMockBuilder->getMock();
         $kernel->expects($this->any())
@@ -663,5 +681,53 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $container->setParameter('test.processed', true);
+    }
+}
+
+class KernelForTest extends Kernel
+{
+    public function __construct(string $environment, bool $debug, private readonly bool $fakeContainer = true)
+    {
+        parent::__construct($environment, $debug);
+    }
+
+    public function getBundleMap(): array
+    {
+        return [];
+    }
+
+    public function registerBundles(): iterable
+    {
+        return [];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader): void
+    {
+    }
+
+    public function isBooted(): bool
+    {
+        return $this->booted;
+    }
+
+    public function getProjectDir(): string
+    {
+        return __DIR__;
+    }
+
+    protected function initializeContainer(): void
+    {
+        if ($this->fakeContainer) {
+            $this->container = new ContainerBuilder();
+        } else {
+            parent::initializeContainer();
+        }
+    }
+}
+
+class KernelForTestWithLoadClassCache extends KernelForTest
+{
+    public function doLoadClassCache(): void
+    {
     }
 }

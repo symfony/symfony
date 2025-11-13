@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mobyt\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytOptions;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -18,9 +19,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 
 final class MobytOptionsTest extends TestCase
 {
-    /**
-     * @dataProvider fromNotificationDataProvider
-     */
+    #[DataProvider('fromNotificationDataProvider')]
     public function testFromNotification(string $importance, string $expectedMessageType)
     {
         $notification = (new Notification('Foo'))->importance($importance);
@@ -50,9 +49,7 @@ final class MobytOptionsTest extends TestCase
         $this->assertSame(MobytOptions::MESSAGE_TYPE_QUALITY_HIGH, $options['message_type']);
     }
 
-    /**
-     * @dataProvider validMessageTypes
-     */
+    #[DataProvider('validMessageTypes')]
     public function testMessageType(string $type)
     {
         $mobytOptions = new MobytOptions();

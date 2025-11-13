@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
@@ -19,9 +20,7 @@ use Symfony\Component\Messenger\Worker;
 
 class StopWorkerOnMessageLimitListenerTest extends TestCase
 {
-    /**
-     * @dataProvider countProvider
-     */
+    #[DataProvider('countProvider')]
     public function testWorkerStopsWhenMaximumCountExceeded(int $max, bool $shouldStop)
     {
         $worker = $this->createMock(Worker::class);

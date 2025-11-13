@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\String\Tests\Inflector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\Inflector\EnglishInflector;
 
@@ -24,17 +25,20 @@ class EnglishInflectorTest extends TestCase
             ['accesses', 'access'],
             ['addresses', 'address'],
             ['agendas', 'agenda'],
+            ['albums', 'album'],
             ['alumnae', 'alumna'],
             ['alumni', 'alumnus'],
             ['analyses', ['analys', 'analyse', 'analysis']],
+            ['ankles', 'ankle'],
             ['antennae', 'antenna'],
             ['antennas', 'antenna'],
             ['appendices', ['appendex', 'appendix', 'appendice']],
             ['arches', ['arch', 'arche']],
+            ['articles', 'article'],
             ['atlases', ['atlas', 'atlase', 'atlasis']],
             ['axes', ['ax', 'axe', 'axis']],
             ['babies', 'baby'],
-            ['bacteria', ['bacterion', 'bacterium']],
+            ['bacteria', 'bacterium'],
             ['bases', ['bas', 'base', 'basis']],
             ['batches', ['batch', 'batche']],
             ['beaux', 'beau'],
@@ -45,6 +49,7 @@ class EnglishInflectorTest extends TestCase
             ['bureaux', 'bureau'],
             ['buses', ['bus', 'buse', 'busis']],
             ['bushes', ['bush', 'bushe']],
+            ['buttons', 'button'],
             ['calves', ['calf', 'calve', 'calff']],
             ['cars', 'car'],
             ['cassettes', ['cassett', 'cassette']],
@@ -56,10 +61,12 @@ class EnglishInflectorTest extends TestCase
             ['cliffs', 'cliff'],
             ['codes', 'code'],
             ['committee', 'committee'],
-            ['crises', ['cris', 'crise', 'crisis']],
-            ['criteria', ['criterion', 'criterium']],
-            ['cups', 'cup'],
+            ['corpora', 'corpus'],
             ['coupons', 'coupon'],
+            ['crises', ['cris', 'crise', 'crisis']],
+            ['criteria', 'criterion'],
+            ['cups', 'cup'],
+            ['curricula', 'curriculum'],
             ['data', 'data'],
             ['days', 'day'],
             ['discos', 'disco'],
@@ -85,6 +92,7 @@ class EnglishInflectorTest extends TestCase
             ['funguses', ['fungus', 'funguse', 'fungusis']],
             ['garages', ['garag', 'garage']],
             ['geese', 'goose'],
+            ['genera', 'genus'],
             ['halves', ['half', 'halve', 'halff']],
             ['hats', 'hat'],
             ['heroes', ['hero', 'heroe']],
@@ -96,6 +104,7 @@ class EnglishInflectorTest extends TestCase
             ['indices', ['index', 'indix', 'indice']],
             ['ions', 'ion'],
             ['irises', ['iris', 'irise', 'irisis']],
+            ['issues', 'issue'],
             ['kisses', 'kiss'],
             ['knives', 'knife'],
             ['lamps', 'lamp'],
@@ -105,6 +114,8 @@ class EnglishInflectorTest extends TestCase
             ['lives', 'life'],
             ['matrices', ['matrex', 'matrix', 'matrice']],
             ['matrixes', 'matrix'],
+            ['media', 'medium'],
+            ['memoranda', 'memorandum'],
             ['men', 'man'],
             ['mice', 'mouse'],
             ['moves', 'move'],
@@ -113,13 +124,15 @@ class EnglishInflectorTest extends TestCase
             ['nebulae', 'nebula'],
             ['neuroses', ['neuros', 'neurose', 'neurosis']],
             ['news', 'news'],
+            ['nodes', 'node'],
             ['oases', ['oas', 'oase', 'oasis']],
             ['objectives', 'objective'],
+            ['outages', 'outage'],
             ['oxen', 'ox'],
             ['parties', 'party'],
             ['people', 'person'],
             ['persons', 'person'],
-            ['phenomena', ['phenomenon', 'phenomenum']],
+            ['phenomena', 'phenomenon'],
             ['photos', 'photo'],
             ['pianos', 'piano'],
             ['plateaux', 'plateau'],
@@ -127,6 +140,8 @@ class EnglishInflectorTest extends TestCase
             ['poppies', 'poppy'],
             ['prices', ['prex', 'prix', 'price']],
             ['quizzes', 'quiz'],
+            ['quora', 'quorum'],
+            ['quorums', 'quorum'],
             ['radii', 'radius'],
             ['roofs', 'roof'],
             ['roses', ['ros', 'rose', 'rosis']],
@@ -145,7 +160,7 @@ class EnglishInflectorTest extends TestCase
             ['status', 'status'],
             ['statuses', 'status'],
             ['stories', 'story'],
-            ['strata', ['straton', 'stratum']],
+            ['strata', 'stratum'],
             ['suitcases', ['suitcas', 'suitcase', 'suitcasis']],
             ['syllabi', 'syllabus'],
             ['tags', 'tag'],
@@ -157,16 +172,15 @@ class EnglishInflectorTest extends TestCase
             ['waltzes', ['waltz', 'waltze']],
             ['wives', 'wife'],
             ['zombies', 'zombie'],
+            ['passersby', 'passerby'],
+            ['rattles', 'rattle'],
+            ['insignia', 'insigne'],
+            ['insignias', 'insigne'],
 
             // test casing: if the first letter was uppercase, it should remain so
             ['Men', 'Man'],
             ['GrandChildren', 'GrandChild'],
             ['SubTrees', 'SubTree'],
-
-            // Known issues
-            // ['insignia', 'insigne'],
-            // ['insignias', 'insigne'],
-            // ['rattles', 'rattle'],
         ];
     }
 
@@ -179,11 +193,14 @@ class EnglishInflectorTest extends TestCase
             ['address', 'addresses'],
             ['agenda', 'agendas'],
             ['aircraft', 'aircraft'],
+            ['album', 'albums'],
             ['alumnus', 'alumni'],
             ['analysis', 'analyses'],
+            ['ankle', 'ankles'],
             ['antenna', 'antennas'], // antennae
-            ['appendix', ['appendicies', 'appendixes']],
+            ['appendix', ['appendices', 'appendixes']],
             ['arch', 'arches'],
+            ['article', 'articles'],
             ['atlas', 'atlases'],
             ['axe', 'axes'],
             ['axis', 'axes'],
@@ -198,7 +215,9 @@ class EnglishInflectorTest extends TestCase
             ['bureau', ['bureaus', 'bureaux']],
             ['bus', 'buses'],
             ['bush', 'bushes'],
+            ['button', 'buttons'],
             ['calf', ['calfs', 'calves']],
+            ['campus', 'campuses'],
             ['car', 'cars'],
             ['cassette', 'cassettes'],
             ['cave', 'caves'],
@@ -208,10 +227,11 @@ class EnglishInflectorTest extends TestCase
             ['circus', 'circuses'],
             ['cliff', 'cliffs'],
             ['committee', 'committees'],
-            ['crisis', 'crises'],
-            ['criteria', 'criterion'],
-            ['cup', 'cups'],
             ['coupon', 'coupons'],
+            ['crisis', 'crises'],
+            ['criterion', 'criteria'],
+            ['cup', 'cups'],
+            ['curriculum', 'curricula'],
             ['data', 'data'],
             ['day', 'days'],
             ['disco', 'discos'],
@@ -223,7 +243,7 @@ class EnglishInflectorTest extends TestCase
             ['edge', 'edges'],
             ['elf', ['elfs', 'elves']],
             ['emphasis', 'emphases'],
-            ['fax', ['facies', 'faxes']],
+            ['fax', ['faxes', 'faxxes']],
             ['feedback', 'feedback'],
             ['focus', 'focuses'],
             ['foot', 'feet'],
@@ -235,13 +255,17 @@ class EnglishInflectorTest extends TestCase
             ['half', ['halfs', 'halves']],
             ['hat', 'hats'],
             ['hero', 'heroes'],
+            ['hippocampus', 'hippocampi'],
             ['hippopotamus', 'hippopotami'], // hippopotamuses
             ['hoax', 'hoaxes'],
             ['hoof', ['hoofs', 'hooves']],
             ['house', 'houses'],
+            ['icon', 'icons'],
             ['index', ['indicies', 'indexes']],
+            ['insigne', ['insignia', 'insignias']],
             ['ion', 'ions'],
             ['iris', 'irises'],
+            ['issue', 'issues'],
             ['kiss', 'kisses'],
             ['knife', 'knives'],
             ['lamp', 'lamps'],
@@ -250,17 +274,21 @@ class EnglishInflectorTest extends TestCase
             ['life', 'lives'],
             ['louse', 'lice'],
             ['man', 'men'],
-            ['matrix', ['matricies', 'matrixes']],
+            ['matrix', ['matrices', 'matrixes']],
+            ['medium', 'media'],
+            ['memorandum', 'memoranda'],
             ['mouse', 'mice'],
             ['move', 'moves'],
             ['movie', 'movies'],
             ['nebula', 'nebulae'],
             ['neurosis', 'neuroses'],
             ['news', 'news'],
+            ['node', 'nodes'],
             ['oasis', 'oases'],
             ['objective', 'objectives'],
             ['ox', 'oxen'],
             ['party', 'parties'],
+            ['passerby', 'passersby'],
             ['person', ['persons', 'people']],
             ['phenomenon', 'phenomena'],
             ['photo', 'photos'],
@@ -270,7 +298,9 @@ class EnglishInflectorTest extends TestCase
             ['poppy', 'poppies'],
             ['price', 'prices'],
             ['quiz', 'quizzes'],
+            ['quorum', ['quora', 'quorums']],
             ['radius', 'radii'],
+            ['rattle', 'rattles'],
             ['roof', ['roofs', 'rooves']],
             ['rose', 'roses'],
             ['sandwich', 'sandwiches'],
@@ -284,6 +314,7 @@ class EnglishInflectorTest extends TestCase
             ['shoe', 'shoes'],
             ['species', 'species'],
             ['status', ['status', 'statuses']],
+            ['stratum', 'strata'],
             ['spy', 'spies'],
             ['staff', 'staves'],
             ['story', 'stories'],
@@ -300,6 +331,8 @@ class EnglishInflectorTest extends TestCase
             ['icon', 'icons'],
             ['hippocampus', 'hippocampi'],
             ['campus', 'campuses'],
+            ['hardware', 'hardware'],
+            ['alias', 'aliases'],
 
             // test casing: if the first letter was uppercase, it should remain so
             ['Man', 'Men'],
@@ -308,17 +341,13 @@ class EnglishInflectorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider singularizeProvider
-     */
+    #[DataProvider('singularizeProvider')]
     public function testSingularize(string $plural, $singular)
     {
         $this->assertSame(\is_array($singular) ? $singular : [$singular], (new EnglishInflector())->singularize($plural));
     }
 
-    /**
-     * @dataProvider pluralizeProvider
-     */
+    #[DataProvider('pluralizeProvider')]
     public function testPluralize(string $singular, $plural)
     {
         $this->assertSame(\is_array($plural) ? $plural : [$plural], (new EnglishInflector())->pluralize($singular));

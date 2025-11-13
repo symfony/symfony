@@ -21,7 +21,11 @@ use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
  */
 class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
+    use CompareWithNullValueAtPropertyAtTestTrait;
     use IcuCompatibilityTrait;
+    use InvalidComparisonToValueTestTrait;
+    use ThrowsOnInvalidStringDatesTestTrait;
+    use ValidComparisonToValueTrait;
 
     protected function createValidator(): NotIdenticalToValidator
     {
@@ -30,7 +34,11 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 
     protected static function createConstraint(?array $options = null): Constraint
     {
-        return new NotIdenticalTo($options);
+        if (null !== $options) {
+            return new NotIdenticalTo(...$options);
+        }
+
+        return new NotIdenticalTo();
     }
 
     protected function getErrorCode(): ?string
@@ -85,13 +93,6 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             ['a', '"a"', 'a', '"a"', 'string'],
             [$date, self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), $date, self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
             [$object, '2', $object, '2', __NAMESPACE__.'\ComparisonTest_Class'],
-        ];
-    }
-
-    public static function provideComparisonsToNullValueAtPropertyPath(): array
-    {
-        return [
-            [5, '5', true],
         ];
     }
 }

@@ -66,9 +66,17 @@ class ParentDummy
     public $rootDummyItems;
 
     /**
-     * @var \Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem
+     * @var RootDummyItem
      */
     public $rootDummyItem;
+
+    /**
+     * @param RootDummyItem|null $rootDummyItem
+     */
+    public function __construct(?RootDummyItem $rootDummyItem = null)
+    {
+        $this->rootDummyItem = $rootDummyItem;
+    }
 
     /**
      * @return bool|null

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Formatter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -159,9 +160,7 @@ class OutputFormatterTest extends TestCase
         $this->assertEquals("\033[34;41msome text\033[39;49m", $formatter->format('<fg=blue;bg=red>some text</fg=blue;bg=red>'));
     }
 
-    /**
-     * @dataProvider provideInlineStyleOptionsCases
-     */
+    #[DataProvider('provideInlineStyleOptionsCases')]
     public function testInlineStyleOptions(string $tag, ?string $expected = null, ?string $input = null, bool $truecolor = false)
     {
         if ($truecolor && 'truecolor' !== getenv('COLORTERM')) {
@@ -199,7 +198,7 @@ class OutputFormatterTest extends TestCase
         ];
     }
 
-    public function provideInlineStyleTagsWithUnknownOptions()
+    public static function provideInlineStyleTagsWithUnknownOptions()
     {
         return [
             ['<options=abc;>', 'abc'],
@@ -241,9 +240,7 @@ class OutputFormatterTest extends TestCase
         $this->assertTrue($formatter->hasStyle('question'));
     }
 
-    /**
-     * @dataProvider provideDecoratedAndNonDecoratedOutput
-     */
+    #[DataProvider('provideDecoratedAndNonDecoratedOutput')]
     public function testNotDecoratedFormatterOnJediTermEmulator(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput, bool $shouldBeJediTerm = false)
     {
         $terminalEmulator = $shouldBeJediTerm ? 'JetBrains-JediTerm' : 'Unknown';
@@ -259,9 +256,7 @@ class OutputFormatterTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideDecoratedAndNonDecoratedOutput
-     */
+    #[DataProvider('provideDecoratedAndNonDecoratedOutput')]
     public function testNotDecoratedFormatterOnIDEALikeEnvironment(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput, bool $expectsIDEALikeTerminal = false)
     {
         // Backup previous env variable
@@ -307,50 +302,54 @@ class OutputFormatterTest extends TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(<<<EOF
-\033[32m
-some text\033[39m
-EOF
-            , $formatter->format(<<<'EOF'
-<info>
-some text</info>
-EOF
-            ));
+            \033[32m
+            some text\033[39m
+            EOF,
+            $formatter->format(<<<'EOF'
+                <info>
+                some text</info>
+                EOF
+            )
+        );
 
         $this->assertEquals(<<<EOF
-\033[32msome text
-\033[39m
-EOF
-            , $formatter->format(<<<'EOF'
-<info>some text
-</info>
-EOF
-            ));
+            \033[32msome text
+            \033[39m
+            EOF,
+            $formatter->format(<<<'EOF'
+                <info>some text
+                </info>
+                EOF
+            )
+        );
 
         $this->assertEquals(<<<EOF
-\033[32m
-some text
-\033[39m
-EOF
-            , $formatter->format(<<<'EOF'
-<info>
-some text
-</info>
-EOF
-            ));
+            \033[32m
+            some text
+            \033[39m
+            EOF,
+            $formatter->format(<<<'EOF'
+                <info>
+                some text
+                </info>
+                EOF
+            )
+        );
 
         $this->assertEquals(<<<EOF
-\033[32m
-some text
-more text
-\033[39m
-EOF
-            , $formatter->format(<<<'EOF'
-<info>
-some text
-more text
-</info>
-EOF
-            ));
+            \033[32m
+            some text
+            more text
+            \033[39m
+            EOF,
+            $formatter->format(<<<'EOF'
+                <info>
+                some text
+                more text
+                </info>
+                EOF
+            )
+        );
     }
 
     public function testFormatAndWrap()
@@ -365,6 +364,15 @@ EOF
         $this->assertSame("Lore\nm \e[37;41mip\e[39;49m\n\e[37;41msum\e[39;49m \ndolo\nr \e[32msi\e[39m\n\e[32mt\e[39m am\net", $formatter->formatAndWrap('Lorem <error>ipsum</error> dolor <info>sit</info> amet', 4));
         $this->assertSame("Lorem \e[37;41mip\e[39;49m\n\e[37;41msum\e[39;49m dolo\nr \e[32msit\e[39m am\net", $formatter->formatAndWrap('Lorem <error>ipsum</error> dolor <info>sit</info> amet', 8));
         $this->assertSame("Lorem \e[37;41mipsum\e[39;49m dolor \e[32m\e[39m\n\e[32msit\e[39m, \e[37;41mamet\e[39;49m et \e[32mlauda\e[39m\n\e[32mntium\e[39m architecto", $formatter->formatAndWrap('Lorem <error>ipsum</error> dolor <info>sit</info>, <error>amet</error> et <info>laudantium</info> architecto', 18));
+        $this->assertSame("\e[37;41mnon-empty-array\e[39;49m\e[37;41m<mixed, mixed>\e[39;49m given.\n🪪  argument.type", $formatter->formatAndWrap("<error>non-empty-array<mixed, mixed></error> given.\n🪪  argument.type", 38));
+        $this->assertSame("Usuário <strong>{{user_name}}</strong> não é válid\no.", $formatter->formatAndWrap('Usuário <strong>{{user_name}}</strong> não é válido.', 50));
+        $this->assertSame("foo\e[37;41mb\e[39;49m\n\e[37;41mar\e[39;49mbaz", $formatter->formatAndWrap("foo<error>b\nar</error>baz", 7));
+        $this->assertSame("foo\e[37;41mbar\e[39;49mbaz\nnewline", $formatter->formatAndWrap("foo<error>bar</error>baz\nnewline", 11));
+        $this->assertSame("foobarbaz\n\e[37;41mnewline\e[39;49m", $formatter->formatAndWrap("foobarbaz\n<error>newline</error>", 11));
+        $this->assertSame("foobar\e[37;41mbaz\e[39;49m\n\e[37;41mnewline\e[39;49m", $formatter->formatAndWrap("foobar<error>baz\nnewline</error>", 11));
+        $this->assertSame("foobar\e[37;41mbazne\e[39;49m\n\e[37;41mwline\e[39;49m", $formatter->formatAndWrap("foobar<error>bazne\nwline</error>", 11));
+        $this->assertSame("foobar\e[37;41mbazne\e[39;49m\n\e[37;41mw\e[39;49m\n\e[37;41mline\e[39;49m", $formatter->formatAndWrap("foobar<error>baznew\nline</error>", 11));
+        $this->assertSame("\e[37;41m👩‍🌾\e[39;49m", $formatter->formatAndWrap('<error>👩‍🌾</error>', 1));
 
         $formatter = new OutputFormatter();
 
@@ -376,6 +384,15 @@ EOF
         $this->assertSame("Â rèälly\nlöng tîtlè\nthät cöüld\nnèêd\nmúltîplê\nlínès", $formatter->formatAndWrap('Â rèälly löng tîtlè thät cöüld nèêd múltîplê línès', 10));
         $this->assertSame("Â rèälly\nlöng tîtlè\nthät cöüld\nnèêd\nmúltîplê\n línès", $formatter->formatAndWrap("Â rèälly löng tîtlè thät cöüld nèêd múltîplê\n línès", 10));
         $this->assertSame('', $formatter->formatAndWrap(null, 5));
+        $this->assertSame("non-empty-array<mixed, mixed> given.\n🪪  argument.type", $formatter->formatAndWrap("<error>non-empty-array<mixed, mixed></error> given.\n🪪  argument.type", 38));
+        $this->assertSame("Usuário <strong>{{user_name}}</strong> não é válid\no.", $formatter->formatAndWrap('Usuário <strong>{{user_name}}</strong> não é válido.', 50));
+        $this->assertSame("foob\narbaz", $formatter->formatAndWrap("foo<error>b\nar</error>baz", 7));
+        $this->assertSame("foobarbaz\nnewline", $formatter->formatAndWrap("foo<error>bar</error>baz\nnewline", 11));
+        $this->assertSame("foobarbaz\nnewline", $formatter->formatAndWrap("foobarbaz\n<error>newline</error>", 11));
+        $this->assertSame("foobarbaz\nnewline", $formatter->formatAndWrap("foobar<error>baz\nnewline</error>", 11));
+        $this->assertSame("foobarbazne\nwline", $formatter->formatAndWrap("foobar<error>bazne\nwline</error>", 11));
+        $this->assertSame("foobarbazne\nw\nline", $formatter->formatAndWrap("foobar<error>baznew\nline</error>", 11));
+        $this->assertSame('👩‍🌾', $formatter->formatAndWrap('👩‍🌾', 1));
     }
 }
 

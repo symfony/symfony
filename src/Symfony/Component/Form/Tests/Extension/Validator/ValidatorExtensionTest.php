@@ -42,8 +42,8 @@ class ValidatorExtensionTest extends TestCase
         $this->assertCount(1, $metadata->getConstraints());
         $this->assertInstanceOf(FormConstraint::class, $metadata->getConstraints()[0]);
 
-        $this->assertSame(CascadingStrategy::NONE, $metadata->cascadingStrategy);
-        $this->assertSame(TraversalStrategy::NONE, $metadata->traversalStrategy);
+        $this->assertSame(CascadingStrategy::NONE, $metadata->getCascadingStrategy());
+        $this->assertSame(TraversalStrategy::NONE, $metadata->getTraversalStrategy());
         $this->assertCount(0, $metadata->getPropertyMetadata('children'));
     }
 }

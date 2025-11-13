@@ -16,6 +16,9 @@ namespace Symfony\Component\Serializer\Annotation;
 class_exists(\Symfony\Component\Serializer\Attribute\Context::class);
 
 if (false) {
+    /**
+     * @deprecated since Symfony 7.4, use {@see \Symfony\Component\Serializer\Attribute\Context} instead
+     */
     #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
     class Context extends \Symfony\Component\Serializer\Attribute\Context
     {

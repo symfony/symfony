@@ -40,10 +40,10 @@ final class IsendproTransport extends AbstractTransport
     public function __toString(): string
     {
         if (null === $this->from) {
-            return sprintf('isendpro://%s?no_stop=%d&sandbox=%d', $this->getEndpoint(), (int) $this->noStop, (int) $this->sandbox);
+            return \sprintf('isendpro://%s?no_stop=%d&sandbox=%d', $this->getEndpoint(), (int) $this->noStop, (int) $this->sandbox);
         }
 
-        return sprintf('isendpro://%s?from=%s&no_stop=%d&sandbox=%d', $this->getEndpoint(), $this->from, (int) $this->noStop, (int) $this->sandbox);
+        return \sprintf('isendpro://%s?from=%s&no_stop=%d&sandbox=%d', $this->getEndpoint(), $this->from, (int) $this->noStop, (int) $this->sandbox);
     }
 
     public function supports(MessageInterface $message): bool
@@ -98,16 +98,16 @@ final class IsendproTransport extends AbstractTransport
                 return $sentMessage;
             }
 
-            $errorMessage = sprintf('Unable to send the SMS: error %d.', $statusCode);
+            $errorMessage = \sprintf('Unable to send the SMS: error %d.', $statusCode);
             $detailsMessage = $details['message'] ?? null;
 
             if ($detailsMessage) {
-                $errorMessage .= sprintf(' Details from iSendPro: %s: "%s".', $detailsCode, $detailsMessage);
+                $errorMessage .= \sprintf(' Details from iSendPro: %s: "%s".', $detailsCode, $detailsMessage);
             }
         } catch (TransportExceptionInterface $e) {
             throw new TransportException('Could not reach the remote iSendPro server.', $response, 0, $e);
         } catch (DecodingExceptionInterface $e) {
-            $errorMessage = sprintf('Unable to send the SMS: error %d. %s', $statusCode, $e->getMessage());
+            $errorMessage = \sprintf('Unable to send the SMS: error %d. %s', $statusCode, $e->getMessage());
         }
 
         throw new TransportException($errorMessage, $response);

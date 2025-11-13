@@ -50,7 +50,6 @@ class Kernel extends SymfonyKernel
             'router' => ['utf8' => true],
             'secret' => 'for your eyes only',
             'test' => true,
-            'annotations' => false,
             'http_method_override' => false,
             'handle_all_throwables' => true,
             'php_errors' => ['log' => true],

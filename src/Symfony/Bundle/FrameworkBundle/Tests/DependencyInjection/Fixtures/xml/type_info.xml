@@ -8,6 +8,8 @@
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:type-info enabled="true" />
+        <framework:type-info enabled="true">
+            <framework:alias name="CustomAlias">int</framework:alias>
+        </framework:type-info>
     </framework:config>
 </container>

@@ -72,7 +72,7 @@ class ClockMock
             return self::$now;
         }
 
-        return sprintf('%0.6f00 %d', self::$now - (int) self::$now, (int) self::$now);
+        return \sprintf('%0.6f00 %d', self::$now - (int) self::$now, (int) self::$now);
     }
 
     public static function date($format, $timestamp = null): string
@@ -101,12 +101,24 @@ class ClockMock
         $ns = (self::$now - (int) self::$now) * 1000000000;
 
         if ($asNumber) {
-            $number = sprintf('%d%d', (int) self::$now, $ns);
+            $number = \sprintf('%d%d', (int) self::$now, $ns);
 
             return \PHP_INT_SIZE === 8 ? (int) $number : (float) $number;
         }
 
         return [(int) self::$now, (int) $ns];
+    }
+
+    /**
+     * @return false|int
+     */
+    public static function strtotime(string $datetime, ?int $timestamp = null)
+    {
+        if (null === $timestamp) {
+            $timestamp = self::time();
+        }
+
+        return \strtotime($datetime, $timestamp);
     }
 
     public static function register($class): void
@@ -117,7 +129,7 @@ class ClockMock
         if (0 < strpos($class, '\\Tests\\')) {
             $ns = str_replace('\\Tests\\', '\\', $class);
             $mockedNs[] = substr($ns, 0, strrpos($ns, '\\'));
-        } elseif (0 === strpos($class, 'Tests\\')) {
+        } elseif (str_starts_with($class, 'Tests\\')) {
             $mockedNs[] = substr($class, 6, strrpos($class, '\\') - 6);
         }
         foreach ($mockedNs as $ns) {
@@ -160,6 +172,11 @@ function gmdate(\$format, \$timestamp = null)
 function hrtime(\$asNumber = false)
 {
     return \\$self::hrtime(\$asNumber);
+}
+
+function strtotime(\$datetime, \$timestamp = null)
+{
+    return \\$self::strtotime(\$datetime, \$timestamp);
 }
 EOPHP
             );

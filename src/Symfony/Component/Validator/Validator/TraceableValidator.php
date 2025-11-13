@@ -25,12 +25,12 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TraceableValidator implements ValidatorInterface, ResetInterface
 {
-    private ValidatorInterface $validator;
     private array $collectedData = [];
 
-    public function __construct(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
+    public function __construct(
+        private ValidatorInterface $validator,
+        protected readonly ?\Closure $disabled = null,
+    ) {
     }
 
     public function getCollectedData(): array
@@ -56,6 +56,10 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     public function validate(mixed $value, Constraint|array|null $constraints = null, string|GroupSequence|array|null $groups = null): ConstraintViolationListInterface
     {
         $violations = $this->validator->validate($value, $constraints, $groups);
+
+        if ($this->disabled?->__invoke()) {
+            return $violations;
+        }
 
         $trace = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 7);
 

@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\SmsSluzba\Tests;
 
 use Symfony\Component\Notifier\Bridge\SmsSluzba\SmsSluzbaTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class SmsSluzbaTransportFactoryTest extends TransportFactoryTestCase
+final class SmsSluzbaTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): SmsSluzbaTransportFactory
     {
         return new SmsSluzbaTransportFactory();

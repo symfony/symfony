@@ -20,6 +20,7 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class JsDelivrEsmResolver implements PackageResolverInterface
 {
@@ -28,7 +29,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     public const URL_PATTERN_DIST = self::URL_PATTERN_DIST_CSS.'/+esm';
     public const URL_PATTERN_ENTRYPOINT = 'https://data.jsdelivr.com/v1/packages/npm/%s@%s/entrypoints';
 
-    public const IMPORT_REGEX = '#(?:import\s*(?:\w+,)?(?:(?:\{[^}]*\}|\w+|\*\s*as\s+\w+)\s*\bfrom\s*)?|export\s*(?:\{[^}]*\}|\*)\s*from\s*)("/npm/((?:@[^/]+/)?[^@]+?)(?:@([^/]+))?((?:/[^/]+)*?)/\+esm")#';
+    public const IMPORT_REGEX = '#(?:import\s*(?:[\w$]+,)?(?:(?:\{[^}]*\}|[\w$]+|\*\s*as\s+[\w$]+)\s*\bfrom\s*)?|export\s*(?:\{[^}]*\}|\*)\s*from\s*|await\simport\()("/npm/((?:@[^/]+/)?[^@]+?)(?:@([^/]+))?((?:/[^/]+)*?)/\+esm")(?:\)*)#';
 
     private const ES_MODULE_SHIMS = 'es-module-shims';
 
@@ -58,7 +59,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
             [$packageName, $filePath] = ImportMapEntry::splitPackageNameAndFilePath($packageSpecifier);
 
-            $versionUrl = sprintf(self::URL_PATTERN_VERSION, $packageName);
+            $versionUrl = \sprintf(self::URL_PATTERN_VERSION, $packageName);
             if (null !== $options->versionConstraint) {
                 $versionUrl .= '?specifier='.urlencode($options->versionConstraint);
             }
@@ -77,15 +78,15 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
             $version = $response->toArray()['version'];
             if (null === $version) {
-                throw new RuntimeException(sprintf('Unable to find the latest version for package "%s" - try specifying the version manually.', $packageName));
+                throw new RuntimeException(\sprintf('Unable to find the latest version for package "%s" - try specifying the version manually.', $packageName));
             }
 
             $pattern = $this->resolveUrlPattern($packageName, $filePath);
-            $requiredPackages[$i][1] = $this->httpClient->request('GET', sprintf($pattern, $packageName, $version, $filePath));
+            $requiredPackages[$i][1] = $this->httpClient->request('GET', \sprintf($pattern, $packageName, $version, $filePath));
             $requiredPackages[$i][4] = $version;
 
             if (!$filePath) {
-                $entrypointResponses[$packageName] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_ENTRYPOINT, $packageName, $version)), $version];
+                $entrypointResponses[$packageName] = [$this->httpClient->request('GET', \sprintf(self::URL_PATTERN_ENTRYPOINT, $packageName, $version)), $version];
             }
         }
 
@@ -95,7 +96,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $response = $e->getResponse();
             $packages = implode('", "', array_column($findVersionErrors, 0));
 
-            throw new RuntimeException(sprintf('Error %d finding version from jsDelivr for the following packages: "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+            throw new RuntimeException(\sprintf('Error %d finding version from jsDelivr for the following packages: "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
         // process the contents of each package & add the resolved package
@@ -120,7 +121,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $response = $e->getResponse();
             $packages = implode('", "', array_column($getContentErrors, 0));
 
-            throw new RuntimeException(sprintf('Error %d requiring packages from jsDelivr for "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+            throw new RuntimeException(\sprintf('Error %d requiring packages from jsDelivr for "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
         // process any pending CSS entrypoints
@@ -148,7 +149,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $response = $e->getResponse();
             $packages = implode('", "', array_column($entrypointErrors, 0));
 
-            throw new RuntimeException(sprintf('Error %d checking for a CSS entrypoint for "%s". Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+            throw new RuntimeException(\sprintf('Error %d checking for a CSS entrypoint for "%s". Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
         if ($packagesToRequire) {
@@ -165,10 +166,11 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
      */
     public function downloadPackages(array $importMapEntries, ?callable $progressCallback = null): array
     {
+        /** @var array<string, array{0: ResponseInterface, 1: ImportMapEntry}> $responses */
         $responses = [];
         foreach ($importMapEntries as $package => $entry) {
             if (!$entry->isRemotePackage()) {
-                throw new \InvalidArgumentException(sprintf('The entry "%s" is not a remote package.', $entry->importName));
+                throw new \InvalidArgumentException(\sprintf('The entry "%s" is not a remote package.', $entry->importName));
             }
 
             $pattern = $this->resolveUrlPattern(
@@ -176,7 +178,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 $entry->getPackagePathString(),
                 $entry->type,
             );
-            $url = sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
+            $url = \sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
 
             $responses[$package] = [$this->httpClient->request('GET', $url), $entry];
         }
@@ -196,7 +198,6 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
             $dependencies = [];
             $extraFiles = [];
-            /* @var ImportMapEntry $entry */
             $contents[$package] = [
                 'content' => $this->makeImportsBare($response->getContent(), $dependencies, $extraFiles, $entry->type, $entry->getPackagePathString()),
                 'dependencies' => $dependencies,
@@ -206,7 +207,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             if (0 !== \count($extraFiles)) {
                 $extraFileResponses[$package] = [];
                 foreach ($extraFiles as $extraFile) {
-                    $extraFileResponses[$package][] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_DIST_CSS, $entry->getPackageName(), $entry->version, $extraFile)), $extraFile, $entry->getPackageName(), $entry->version];
+                    $extraFileResponses[$package][] = [$this->httpClient->request('GET', \sprintf(self::URL_PATTERN_DIST_CSS, $entry->getPackageName(), $entry->version, $extraFile)), $extraFile, $entry->getPackageName(), $entry->version];
                 }
             }
 
@@ -221,7 +222,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $response = $e->getResponse();
             $packages = implode('", "', array_column($errors, 0));
 
-            throw new RuntimeException(sprintf('Error %d downloading packages from jsDelivr for "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+            throw new RuntimeException(\sprintf('Error %d downloading packages from jsDelivr for "%s". Check your package names. Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
         $extraFileErrors = [];
@@ -246,7 +247,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 if (0 !== \count($extraFiles)) {
                     $extraFileResponses[$package] = [];
                     foreach ($extraFiles as $newExtraFile) {
-                        $extraFileResponses[$package][] = [$this->httpClient->request('GET', sprintf(self::URL_PATTERN_DIST_CSS, $packageName, $version, $newExtraFile)), $newExtraFile, $packageName, $version];
+                        $extraFileResponses[$package][] = [$this->httpClient->request('GET', \sprintf(self::URL_PATTERN_DIST_CSS, $packageName, $version, $newExtraFile)), $newExtraFile, $packageName, $version];
                     }
                 }
             }
@@ -262,7 +263,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $response = $e->getResponse();
             $packages = implode('", "', array_column($extraFileErrors, 0));
 
-            throw new RuntimeException(sprintf('Error %d downloading extra imported files from jsDelivr for "%s". Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+            throw new RuntimeException(\sprintf('Error %d downloading extra imported files from jsDelivr for "%s". Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
         return $contents;
@@ -305,7 +306,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 $dependencies[] = $packageName;
 
                 // replace the "/npm/package@version/+esm" with "package@version"
-                return str_replace($matches[1], sprintf('"%s"', $packageName), $matches[0]);
+                return str_replace($matches[1], \sprintf('"%s"', $packageName), $matches[0]);
             }, $content);
 
             // source maps are not also downloaded - so remove the sourceMappingURL
@@ -318,7 +319,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         }
 
         preg_match_all(CssAssetUrlCompiler::ASSET_URL_PATTERN, $content, $matches);
-        foreach ($matches[1] as $path) {
+        foreach ($matches[2] as $path) {
             if (str_starts_with($path, 'data:')) {
                 continue;
             }

@@ -13,31 +13,30 @@ namespace Symfony\Component\Messenger\Exception;
 
 use Symfony\Component\Messenger\Envelope;
 
-class HandlerFailedException extends RuntimeException implements WrappedExceptionsInterface
+class HandlerFailedException extends RuntimeException implements WrappedExceptionsInterface, EnvelopeAwareExceptionInterface
 {
     use WrappedExceptionsTrait;
-
-    private Envelope $envelope;
 
     /**
      * @param \Throwable[] $exceptions The name of the handler should be given as key
      */
-    public function __construct(Envelope $envelope, array $exceptions)
-    {
+    public function __construct(
+        private Envelope $envelope,
+        array $exceptions,
+    ) {
         $firstFailure = current($exceptions);
 
-        $message = sprintf('Handling "%s" failed: ', $envelope->getMessage()::class);
+        $message = \sprintf('Handling "%s" failed: ', $envelope->getMessage()::class);
 
         parent::__construct(
             $message.(1 === \count($exceptions)
                 ? $firstFailure->getMessage()
-                : sprintf('%d handlers failed. First failure is: %s', \count($exceptions), $firstFailure->getMessage())
+                : \sprintf('%d handlers failed. First failure is: %s', \count($exceptions), $firstFailure->getMessage())
             ),
             (int) $firstFailure->getCode(),
             $firstFailure
         );
 
-        $this->envelope = $envelope;
         $this->exceptions = $exceptions;
     }
 

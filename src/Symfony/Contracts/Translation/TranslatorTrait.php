@@ -41,6 +41,12 @@ trait TranslatorTrait
             return '';
         }
 
+        foreach ($parameters as $k => $v) {
+            if ($v instanceof TranslatableInterface) {
+                $parameters[$k] = $v->trans($this, $locale);
+            }
+        }
+
         if (!isset($parameters['%count%']) || !is_numeric($parameters['%count%'])) {
             return strtr($id, $parameters);
         }
@@ -56,22 +62,22 @@ trait TranslatorTrait
         }
 
         $intervalRegexp = <<<'EOF'
-/^(?P<interval>
-    ({\s*
-        (\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)
-    \s*})
+            /^(?P<interval>
+                ({\s*
+                    (\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)
+                \s*})
 
-        |
+                    |
 
-    (?P<left_delimiter>[\[\]])
-        \s*
-        (?P<left>-Inf|\-?\d+(\.\d+)?)
-        \s*,\s*
-        (?P<right>\+?Inf|\-?\d+(\.\d+)?)
-        \s*
-    (?P<right_delimiter>[\[\]])
-)\s*(?P<message>.*?)$/xs
-EOF;
+                (?P<left_delimiter>[\[\]])
+                    \s*
+                    (?P<left>-Inf|\-?\d+(\.\d+)?)
+                    \s*,\s*
+                    (?P<right>\+?Inf|\-?\d+(\.\d+)?)
+                    \s*
+                (?P<right_delimiter>[\[\]])
+            )\s*(?P<message>.*?)$/xs
+            EOF;
 
         $standardRules = [];
         foreach ($parts as $part) {
@@ -111,7 +117,7 @@ EOF;
                 return strtr($standardRules[0], $parameters);
             }
 
-            $message = sprintf('Unable to choose a translation for "%s" with locale "%s" for value "%d". Double check that this translation has the correct plural options (e.g. "There is one apple|There are %%count%% apples").', $id, $locale, $number);
+            $message = \sprintf('Unable to choose a translation for "%s" with locale "%s" for value "%d". Double check that this translation has the correct plural options (e.g. "There is one apple|There are %%count%% apples").', $id, $locale, $number);
 
             if (class_exists(InvalidArgumentException::class)) {
                 throw new InvalidArgumentException($message);

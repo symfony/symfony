@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 /**
  * @author Chris Smith <chris@cs278.org>
@@ -85,9 +87,32 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(\PHP_BINARY, $result);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    public function testFindWithoutSuffix()
+    {
+        $fixturesDir = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures';
+        $name = 'executable_without_suffix';
+
+        $finder = new ExecutableFinder();
+        $result = $finder->find($name, null, [$fixturesDir]);
+
+        $this->assertSamePath($fixturesDir.\DIRECTORY_SEPARATOR.$name, $result);
+    }
+
+    public function testFindWithAddedSuffixes()
+    {
+        $fixturesDir = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures';
+        $name = 'executable_with_added_suffix';
+        $suffix = '.foo';
+
+        $finder = new ExecutableFinder();
+        $finder->addSuffix($suffix);
+
+        $result = $finder->find($name, null, [$fixturesDir]);
+
+        $this->assertSamePath($fixturesDir.\DIRECTORY_SEPARATOR.$name.$suffix, $result);
+    }
+
+    #[RunInSeparateProcess]
     public function testFindWithOpenBaseDir()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -98,15 +123,14 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        putenv('PATH='.\dirname(\PHP_BINARY));
-        $this->iniSet('open_basedir', \dirname(\PHP_BINARY).\PATH_SEPARATOR.'/');
-
-        $finder = new ExecutableFinder();
-        $result = $finder->find($this->getPhpBinaryName());
+        $process = new Process([\PHP_BINARY, '-d', 'open_basedir='.\dirname(\PHP_BINARY).\PATH_SEPARATOR.'/', __DIR__.'/Fixtures/open_basedir.php']);
+        $process->run();
+        $result = $process->getOutput();
 
         $this->assertSamePath(\PHP_BINARY, $result);
     }
 
+    #[RunInSeparateProcess]
     public function testFindBatchExecutableOnWindows()
     {
         if (\ini_get('open_basedir')) {
@@ -116,22 +140,55 @@ class ExecutableFinderTest extends TestCase
             $this->markTestSkipped('Can be only tested on windows');
         }
 
-        $target = tempnam(sys_get_temp_dir(), 'example-windows-executable');
+        $tempDir = realpath(sys_get_temp_dir());
+        $target = str_replace('.tmp', '_tmp', tempnam($tempDir, 'example-windows-executable'));
 
-        touch($target);
-        touch($target.'.BAT');
+        try {
+            touch($target);
+            touch($target.'.BAT');
 
-        $this->assertFalse(is_executable($target));
+            $this->assertFalse(is_executable($target));
 
-        putenv('PATH='.sys_get_temp_dir());
+            putenv('PATH='.$tempDir);
 
-        $finder = new ExecutableFinder();
-        $result = $finder->find(basename($target), false);
-
-        unlink($target);
-        unlink($target.'.BAT');
+            $finder = new ExecutableFinder();
+            $result = $finder->find(basename($target), false);
+        } finally {
+            unlink($target);
+            unlink($target.'.BAT');
+        }
 
         $this->assertSamePath($target.'.BAT', $result);
+    }
+
+    #[RunInSeparateProcess]
+    public function testEmptyDirInPath()
+    {
+        putenv(\sprintf('PATH=%s%s', \dirname(\PHP_BINARY), \PATH_SEPARATOR));
+
+        try {
+            touch('executable');
+            chmod('executable', 0o700);
+
+            $finder = new ExecutableFinder();
+            $result = $finder->find('executable');
+
+            $this->assertSame(\sprintf('.%sexecutable', \DIRECTORY_SEPARATOR), $result);
+        } finally {
+            unlink('executable');
+        }
+    }
+
+    public function testFindBuiltInCommandOnWindows()
+    {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Can be only tested on windows');
+        }
+
+        $finder = new ExecutableFinder();
+        $this->assertSame('rmdir', strtolower($finder->find('RMDIR')));
+        $this->assertSame('cd', strtolower($finder->find('cd')));
+        $this->assertSame('move', strtolower($finder->find('MoVe')));
     }
 
     private function assertSamePath($expected, $tested)

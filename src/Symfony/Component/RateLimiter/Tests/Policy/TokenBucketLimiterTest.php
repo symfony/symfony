@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Tests\Policy;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
@@ -21,9 +22,7 @@ use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class TokenBucketLimiterTest extends TestCase
 {
     private InMemoryStorage $storage;
@@ -55,6 +54,18 @@ class TokenBucketLimiterTest extends TestCase
         $this->expectExceptionMessage('Cannot reserve more tokens (15) than the burst size of the rate limiter (10).');
 
         $limiter->reserve(15);
+    }
+
+    public function testReduceBucketSizeWhenAlreadyExistInStorageWithBiggerBucketSize()
+    {
+        $limiter = $this->createLimiter(100);
+
+        $limiter->consume();
+
+        $limiter2 = $this->createLimiter(1);
+        $limiter2->consume();
+
+        $this->assertFalse($limiter2->consume()->isAccepted());
     }
 
     public function testReserveMaxWaitingTime()

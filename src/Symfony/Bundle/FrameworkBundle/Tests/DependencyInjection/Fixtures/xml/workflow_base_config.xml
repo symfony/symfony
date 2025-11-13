@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <services>
+        <service id="test_workflow" alias="workflow.test_workflow" public="true" />
+    </services>
+    <framework:config http-method-override="false" handle-all-throwables="true">
+        <framework:annotations enabled="false" />
+        <framework:php-errors log="true" />
+        <framework:workflow name="test_workflow" type="workflow">
+            <framework:initial-marking>start</framework:initial-marking>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
+            <framework:place>start</framework:place>
+            <framework:place>middle</framework:place>
+            <framework:place>end</framework:place>
+            <framework:place>alternative</framework:place>
+            <framework:transition key="base_transition">
+                <framework:from>start</framework:from>
+                <framework:to>end</framework:to>
+            </framework:transition>
+        </framework:workflow>
+    </framework:config>
+</container>

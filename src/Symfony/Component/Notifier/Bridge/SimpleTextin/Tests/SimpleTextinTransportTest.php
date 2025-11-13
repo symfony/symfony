@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\SimpleTextin\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -28,7 +29,7 @@ final class SimpleTextinTransportTest extends TransportTestCase
         return new SimpleTextinTransport('test_api_key', $from, $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'no zero at start if phone number' => ['+0'];
         yield 'phone number too short' => ['+1'];
@@ -39,22 +40,18 @@ final class SimpleTextinTransportTest extends TransportTestCase
         yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
     {
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
-    /**
-     * @dataProvider validFromProvider
-     */
+    #[DataProvider('validFromProvider')]
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
@@ -87,7 +84,7 @@ final class SimpleTextinTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function validFromProvider(): iterable
+    public static function validFromProvider(): iterable
     {
         yield ['+11'];
         yield ['+112'];

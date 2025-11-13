@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotBlankValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -22,9 +23,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
         return new NotBlankValidator();
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testValidValues($value)
     {
         $this->validator->validate($value, new NotBlank());
@@ -45,9 +44,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsInvalid()
     {
-        $constraint = new NotBlank([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new NotBlank(message: 'myMessage');
 
         $this->validator->validate(null, $constraint);
 
@@ -59,9 +56,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function testBlankIsInvalid()
     {
-        $constraint = new NotBlank([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new NotBlank(message: 'myMessage');
 
         $this->validator->validate('', $constraint);
 
@@ -73,9 +68,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function testFalseIsInvalid()
     {
-        $constraint = new NotBlank([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new NotBlank(message: 'myMessage');
 
         $this->validator->validate(false, $constraint);
 
@@ -87,9 +80,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function testEmptyArrayIsInvalid()
     {
-        $constraint = new NotBlank([
-            'message' => 'myMessage',
-        ]);
+        $constraint = new NotBlank(message: 'myMessage');
 
         $this->validator->validate([], $constraint);
 
@@ -101,10 +92,10 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function testAllowNullTrue()
     {
-        $constraint = new NotBlank([
-            'message' => 'myMessage',
-            'allowNull' => true,
-        ]);
+        $constraint = new NotBlank(
+            message: 'myMessage',
+            allowNull: true,
+        );
 
         $this->validator->validate(null, $constraint);
         $this->assertNoViolation();
@@ -112,10 +103,10 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function testAllowNullFalse()
     {
-        $constraint = new NotBlank([
-            'message' => 'myMessage',
-            'allowNull' => false,
-        ]);
+        $constraint = new NotBlank(
+            message: 'myMessage',
+            allowNull: false,
+        );
 
         $this->validator->validate(null, $constraint);
 
@@ -125,15 +116,13 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getWhitespaces
-     */
+    #[DataProvider('getWhitespaces')]
     public function testNormalizedStringIsInvalid($value)
     {
-        $constraint = new NotBlank([
-            'message' => 'myMessage',
-            'normalizer' => 'trim',
-        ]);
+        $constraint = new NotBlank(
+            message: 'myMessage',
+            normalizer: 'trim',
+        );
 
         $this->validator->validate($value, $constraint);
 

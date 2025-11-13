@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Config\Definition;
 
+use Symfony\Component\Config\Definition\Builder\ExprBuilder;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
+use Symfony\Component\Config\Exception\LogicException;
 
 /**
  * The base node class.
@@ -215,7 +217,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Sets the list of types supported by normalization.
      *
-     * see ExprBuilder::TYPE_* constants.
+     * @param list<ExprBuilder::TYPE_*> $types
      */
     public function setNormalizedTypes(array $types): void
     {
@@ -225,7 +227,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Gets the list of types supported by normalization.
      *
-     * see ExprBuilder::TYPE_* constants.
+     * @return list<ExprBuilder::TYPE_*>
      */
     public function getNormalizedTypes(): array
     {
@@ -258,14 +260,37 @@ abstract class BaseNode implements NodeInterface
     /**
      * @param string $node The configuration node name
      * @param string $path The path of the node
+     *
+     * @return array{package: string, version: string, message: string}
      */
     public function getDeprecation(string $node, string $path): array
     {
+        if (!$this->deprecation) {
+            throw new LogicException(\sprintf('The node "%s" is not deprecated.', $this->getName()));
+        }
+
         return [
             'package' => $this->deprecation['package'],
             'version' => $this->deprecation['version'],
             'message' => strtr($this->deprecation['message'], ['%node%' => $node, '%path%' => $path]),
         ];
+    }
+
+    /**
+     * @internal
+     */
+    public function getDeprecationMessage(?NodeInterface $parent = null): string
+    {
+        if (!$this->deprecation) {
+            throw new LogicException(\sprintf('The node "%s" is not deprecated.', $this->getName()));
+        }
+
+        $message = strtr($this->deprecation['message'], ['%node%' => $this->getName(), '%path%' => ($parent ?? $this->parent ?? $this)->getPath()]);
+        if ($this->deprecation['package'] || $this->deprecation['version']) {
+            $message = \sprintf('Since %s %s: ', $this->deprecation['package'], $this->deprecation['version']).$message;
+        }
+
+        return $message;
     }
 
     public function getName(): string
@@ -285,7 +310,7 @@ abstract class BaseNode implements NodeInterface
     final public function merge(mixed $leftSide, mixed $rightSide): mixed
     {
         if (!$this->allowOverwrite) {
-            throw new ForbiddenOverwriteException(sprintf('Configuration path "%s" cannot be overwritten. You have to define all options for this path, and any of its sub-paths in one configuration section.', $this->getPath()));
+            throw new ForbiddenOverwriteException(\sprintf('Configuration path "%s" cannot be overwritten. You have to define all options for this path, and any of its sub-paths in one configuration section.', $this->getPath()));
         }
 
         if ($leftSide !== $leftPlaceholders = self::resolvePlaceholderValue($leftSide)) {
@@ -404,7 +429,7 @@ abstract class BaseNode implements NodeInterface
 
                 throw $e;
             } catch (\Exception $e) {
-                throw new InvalidConfigurationException(sprintf('Invalid configuration for path "%s": ', $this->getPath()).$e->getMessage(), $e->getCode(), $e);
+                throw new InvalidConfigurationException(\sprintf('Invalid configuration for path "%s": ', $this->getPath()).$e->getMessage(), $e->getCode(), $e);
             }
         }
 
@@ -477,7 +502,7 @@ abstract class BaseNode implements NodeInterface
     private function doValidateType(mixed $value): void
     {
         if (null !== $this->handlingPlaceholder && !$this->allowPlaceholders()) {
-            $e = new InvalidTypeException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', static::class, $this->getPath()));
+            $e = new InvalidTypeException(\sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', static::class, $this->getPath()));
             $e->setPath($this->getPath());
 
             throw $e;
@@ -493,7 +518,7 @@ abstract class BaseNode implements NodeInterface
         $validTypes = $this->getValidPlaceholderTypes();
 
         if ($validTypes && array_diff($knownTypes, $validTypes)) {
-            $e = new InvalidTypeException(sprintf(
+            $e = new InvalidTypeException(\sprintf(
                 'Invalid type for path "%s". Expected %s, but got %s.',
                 $this->getPath(),
                 1 === \count($validTypes) ? '"'.reset($validTypes).'"' : 'one of "'.implode('", "', $validTypes).'"',

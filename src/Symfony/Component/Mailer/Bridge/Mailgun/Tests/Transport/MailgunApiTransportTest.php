@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -26,9 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MailgunApiTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(MailgunApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
@@ -98,14 +97,8 @@ class MailgunApiTransportTest extends TestCase
         $this->assertEquals('amp-html-value', $payload['amp-html']);
     }
 
-    /**
-     * @legacy
-     */
     public function testPrefixHeaderWithH()
     {
-        $json = json_encode(['foo' => 'bar']);
-        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeInterface::RFC2822);
-
         $email = new Email();
         $email->getHeaders()->addTextHeader('h:bar', 'bar-value');
 

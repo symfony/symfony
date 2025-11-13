@@ -68,7 +68,7 @@ class CacheMetadataFactoryTest extends TestCase
 
     public function testAnonymousClass()
     {
-        $anonymousObject = new class() {
+        $anonymousObject = new class {
         };
 
         $metadata = new ClassMetadata($anonymousObject::class);

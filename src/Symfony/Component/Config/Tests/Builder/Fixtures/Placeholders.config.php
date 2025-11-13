@@ -13,8 +13,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Config\PlaceholdersConfig;
 
-return static function (PlaceholdersConfig $config) {
-    $config->enabled(env('FOO_ENABLED')->bool());
-    $config->favoriteFloat(param('eulers_number'));
-    $config->goodIntegers(env('MY_INTEGERS')->json());
-};
+return new PlaceholdersConfig([
+    'enabled' => env('FOO_ENABLED')->bool(),
+    'favorite_float' => param('eulers_number'),
+    'good_integers' => env('MY_INTEGERS')->json(),
+]);

@@ -11,35 +11,39 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\RequestMatcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\SchemeRequestMatcher;
 
 class SchemeRequestMatcherTest extends TestCase
 {
-    /**
-     * @dataProvider getData
-     */
+    #[DataProvider('getData')]
     public function test(string $requestScheme, array|string $matcherScheme, bool $isMatch)
     {
         $httpRequest = Request::create('');
         $httpsRequest = Request::create('', 'get', [], [], [], ['HTTPS' => 'on']);
 
+        $matcher = new SchemeRequestMatcher($matcherScheme);
         if ($isMatch) {
             if ('https' === $requestScheme) {
-                $matcher = new SchemeRequestMatcher($matcherScheme);
                 $this->assertFalse($matcher->matches($httpRequest));
                 $this->assertTrue($matcher->matches($httpsRequest));
             } else {
-                $matcher = new SchemeRequestMatcher($matcherScheme);
                 $this->assertFalse($matcher->matches($httpsRequest));
                 $this->assertTrue($matcher->matches($httpRequest));
             }
         } else {
-            $matcher = new SchemeRequestMatcher($matcherScheme);
             $this->assertFalse($matcher->matches($httpRequest));
             $this->assertFalse($matcher->matches($httpsRequest));
         }
+    }
+
+    public function testAlwaysMatchesOnParamsHeaders()
+    {
+        $matcher = new SchemeRequestMatcher([]);
+        $request = Request::create('sftp://example.com');
+        $this->assertTrue($matcher->matches($request));
     }
 
     public static function getData()

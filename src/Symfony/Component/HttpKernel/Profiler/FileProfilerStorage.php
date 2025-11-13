@@ -33,12 +33,12 @@ class FileProfilerStorage implements ProfilerStorageInterface
     public function __construct(string $dsn)
     {
         if (!str_starts_with($dsn, 'file:')) {
-            throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use FileStorage with an invalid dsn "%s". The expected format is "file:/path/to/the/storage/folder".', $dsn));
+            throw new \RuntimeException(\sprintf('Please check your configuration. You are trying to use FileStorage with an invalid dsn "%s". The expected format is "file:/path/to/the/storage/folder".', $dsn));
         }
         $this->folder = substr($dsn, 5);
 
-        if (!is_dir($this->folder) && false === @mkdir($this->folder, 0777, true) && !is_dir($this->folder)) {
-            throw new \RuntimeException(sprintf('Unable to create the storage directory (%s).', $this->folder));
+        if (!is_dir($this->folder) && false === @mkdir($this->folder, 0o777, true) && !is_dir($this->folder)) {
+            throw new \RuntimeException(\sprintf('Unable to create the storage directory (%s).', $this->folder));
         }
     }
 
@@ -55,7 +55,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
         $result = [];
         while (\count($result) < $limit && $line = $this->readLineFromFile($file)) {
-            $values = str_getcsv($line);
+            $values = str_getcsv($line, ',', '"', '\\');
 
             if (7 > \count($values)) {
                 // skip invalid lines
@@ -74,11 +74,11 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            if (!empty($start) && $csvTime < $start) {
+            if ($start && $csvTime < $start) {
                 continue;
             }
 
-            if (!empty($end) && $csvTime > $end) {
+            if ($end && $csvTime > $end) {
                 continue;
             }
 
@@ -136,8 +136,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
         if (!$profileIndexed) {
             // Create directory
             $dir = \dirname($file);
-            if (!is_dir($dir) && false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                throw new \RuntimeException(sprintf('Unable to create the storage directory (%s).', $dir));
+            if (!is_dir($dir) && false === @mkdir($dir, 0o777, true) && !is_dir($dir)) {
+                throw new \RuntimeException(\sprintf('Unable to create the storage directory (%s).', $dir));
             }
         }
 
@@ -186,7 +186,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getParentToken(),
                 $profile->getStatusCode(),
                 $profile->getVirtualType() ?? 'request',
-            ]);
+            ], ',', '"', '\\');
             fclose($file);
 
             if (1 === mt_rand(1, 10)) {
@@ -324,7 +324,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         while ($line = fgets($handle)) {
-            $values = str_getcsv($line);
+            $values = str_getcsv($line, ',', '"', '\\');
 
             if (7 > \count($values)) {
                 // skip invalid lines

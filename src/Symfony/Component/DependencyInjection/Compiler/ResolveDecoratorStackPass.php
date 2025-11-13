@@ -32,11 +32,11 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
             $definition = $container->getDefinition($id);
 
             if (!$definition instanceof ChildDefinition) {
-                throw new InvalidArgumentException(sprintf('Invalid service "%s": only definitions with a "parent" can have the "container.stack" tag.', $id));
+                throw new InvalidArgumentException(\sprintf('Invalid service "%s": only definitions with a "parent" can have the "container.stack" tag.', $id));
             }
 
             if (!$stack = $definition->getArguments()) {
-                throw new InvalidArgumentException(sprintf('Invalid service "%s": the stack of decorators is empty.', $id));
+                throw new InvalidArgumentException(\sprintf('Invalid service "%s": the stack of decorators is empty.', $id));
             }
 
             $stacks[$id] = $stack;
@@ -96,7 +96,7 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
             } elseif ($definition instanceof Reference || $definition instanceof Alias) {
                 $path[] = (string) $definition;
             } else {
-                throw new InvalidArgumentException(sprintf('Invalid service "%s": unexpected value of type "%s" found in the stack of decorators.', $id, get_debug_type($definition)));
+                throw new InvalidArgumentException(\sprintf('Invalid service "%s": unexpected value of type "%s" found in the stack of decorators.', $id, get_debug_type($definition)));
             }
 
             $p = $prefix.$k;

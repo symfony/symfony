@@ -11,27 +11,35 @@
 
 use Symfony\Config\AddToListConfig;
 
-return static function (AddToListConfig $config) {
-    $config->translator()->fallbacks(['sv', 'fr', 'es']);
-    $config->translator()->source('\\Acme\\Foo', 'yellow');
-    $config->translator()->source('\\Acme\\Bar', 'green');
-
-    $config->messenger([
+return new AddToListConfig([
+    'translator' => [
+        'fallbacks' => ['sv', 'fr', 'es'],
+        'sources' => [
+            '\\Acme\\Foo' => 'yellow',
+            '\\Acme\\Bar' => 'green',
+        ],
+    ],
+    'messenger' => [
         'routing' => [
             'Foo\\MyArrayMessage' => [
                 'senders' => ['workqueue'],
             ],
+            'Foo\\Message' => [
+                'senders' => ['workqueue'],
+            ],
+            'Foo\\DoubleMessage' => [
+                'senders' => ['sync', 'workqueue'],
+            ],
         ],
-    ]);
-    $config->messenger()
-        ->routing('Foo\\Message')->senders(['workqueue']);
-    $config->messenger()
-        ->routing('Foo\\DoubleMessage')->senders(['sync', 'workqueue']);
-
-    $config->messenger()->receiving()
-        ->color('blue')
-        ->priority(10);
-    $config->messenger()->receiving()
-        ->color('red')
-        ->priority(5);
-};
+        'receiving' => [
+            [
+                'color' => 'blue',
+                'priority' => 10,
+            ],
+            [
+                'color' => 'red',
+                'priority' => 5,
+            ],
+        ],
+    ],
+]);

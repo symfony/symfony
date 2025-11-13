@@ -20,24 +20,28 @@
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php83": "^1.27",
+        "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/translation-contracts": "^2.5|^3"
     },
     "require-dev": {
-        "symfony/console": "^6.4|^7.0",
-        "symfony/finder": "^6.4|^7.0",
-        "symfony/http-client": "^6.4|^7.0",
-        "symfony/http-foundation": "^6.4|^7.0",
-        "symfony/http-kernel": "^6.4|^7.0",
-        "symfony/intl": "^6.4|^7.0",
-        "symfony/yaml": "^6.4|^7.0",
-        "symfony/config": "^6.4|^7.0",
-        "symfony/dependency-injection": "^6.4|^7.0",
-        "symfony/expression-language": "^6.4|^7.0",
-        "symfony/cache": "^6.4|^7.0",
-        "symfony/mime": "^6.4|^7.0",
-        "symfony/property-access": "^6.4|^7.0",
-        "symfony/property-info": "^6.4|^7.0",
-        "symfony/translation": "^6.4.3|^7.0.3",
+        "symfony/console": "^6.4|^7.0|^8.0",
+        "symfony/finder": "^6.4|^7.0|^8.0",
+        "symfony/http-client": "^6.4|^7.0|^8.0",
+        "symfony/http-foundation": "^6.4|^7.0|^8.0",
+        "symfony/http-kernel": "^6.4|^7.0|^8.0",
+        "symfony/intl": "^6.4|^7.0|^8.0",
+        "symfony/yaml": "^6.4|^7.0|^8.0",
+        "symfony/config": "^6.4|^7.0|^8.0",
+        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+        "symfony/expression-language": "^6.4|^7.0|^8.0",
+        "symfony/cache": "^6.4|^7.0|^8.0",
+        "symfony/mime": "^6.4|^7.0|^8.0",
+        "symfony/process": "^6.4|^7.0|^8.0",
+        "symfony/property-access": "^6.4|^7.0|^8.0",
+        "symfony/property-info": "^6.4|^7.0|^8.0",
+        "symfony/string": "^6.4|^7.0|^8.0",
+        "symfony/translation": "^6.4.3|^7.0.3|^8.0",
+        "symfony/type-info": "^7.1.8",
         "egulias/email-validator": "^2.1.10|^3|^4"
     },
     "conflict": {
@@ -49,12 +53,14 @@
         "symfony/intl": "<6.4",
         "symfony/property-info": "<6.4",
         "symfony/translation": "<6.4.3|>=7.0,<7.0.3",
+        "symfony/var-exporter": "<6.4.25|>=7.0,<7.3.3",
         "symfony/yaml": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" },
         "exclude-from-classmap": [
-            "/Tests/"
+            "/Tests/",
+            "/Resources/bin/"
         ]
     },
     "minimum-stability": "dev"

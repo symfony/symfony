@@ -149,7 +149,7 @@ class MarkdownDescriptor extends Descriptor
             }
 
             $this->write("\n\n");
-            $this->write(implode("\n", array_map(fn ($commandName) => sprintf('* [`%s`](#%s)', $commandName, str_replace(':', '', $description->getCommand($commandName)->getName())), $namespace['commands'])));
+            $this->write(implode("\n", array_map(fn ($commandName) => \sprintf('* [`%s`](#%s)', $commandName, str_replace(':', '', $description->getCommand($commandName)->getName())), $namespace['commands'])));
         }
 
         foreach ($description->getCommands() as $command) {
@@ -162,7 +162,7 @@ class MarkdownDescriptor extends Descriptor
     {
         if ('UNKNOWN' !== $application->getName()) {
             if ('UNKNOWN' !== $application->getVersion()) {
-                return sprintf('%s %s', $application->getName(), $application->getVersion());
+                return \sprintf('%s %s', $application->getName(), $application->getVersion());
             }
 
             return $application->getName();

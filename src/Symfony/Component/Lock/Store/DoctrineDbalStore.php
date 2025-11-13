@@ -14,10 +14,18 @@ namespace Symfony\Component\Lock\Store;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Schema\Name\Identifier;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Tools\DsnParser;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
@@ -132,7 +140,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     public function putOffExpiration(Key $key, $ttl): void
     {
         if ($ttl < 1) {
-            throw new InvalidTtlException(sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
+            throw new InvalidTtlException(\sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
         }
 
         $key->reduceLifetime($ttl);
@@ -214,7 +222,12 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $table->addColumn($this->idCol, 'string', ['length' => 64]);
         $table->addColumn($this->tokenCol, 'string', ['length' => 44]);
         $table->addColumn($this->expirationCol, 'integer', ['unsigned' => true]);
-        $table->setPrimaryKey([$this->idCol]);
+
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($this->idCol))], true));
+        } else {
+            $table->setPrimaryKey([$this->idCol]);
+        }
     }
 
     /**
@@ -234,13 +247,20 @@ class DoctrineDbalStore implements PersistingStoreInterface
     {
         $platform = $this->conn->getDatabasePlatform();
 
+        if (interface_exists(Exception::class)) {
+            // DBAL 4+
+            $sqlitePlatformClass = 'Doctrine\DBAL\Platforms\SQLitePlatform';
+        } else {
+            $sqlitePlatformClass = 'Doctrine\DBAL\Platforms\SqlitePlatform';
+        }
+
         return match (true) {
-            $platform instanceof \Doctrine\DBAL\Platforms\AbstractMySQLPlatform => 'UNIX_TIMESTAMP()',
-            $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform => 'strftime(\'%s\',\'now\')',
-            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform => 'CAST(EXTRACT(epoch FROM NOW()) AS INT)',
-            $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform => '(SYSDATE - TO_DATE(\'19700101\',\'yyyymmdd\'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone), 1, 3))*3600',
-            $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform => 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())',
-            default => (string) time(),
+            $platform instanceof AbstractMySQLPlatform => 'UNIX_TIMESTAMP(NOW(6))',
+            $platform instanceof $sqlitePlatformClass => "(julianday('now') - 2440587.5) * 86400.0",
+            $platform instanceof PostgreSQLPlatform => 'CAST(EXTRACT(epoch FROM NOW()) AS DOUBLE PRECISION)',
+            $platform instanceof OraclePlatform => "(CAST(systimestamp AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400 + TO_NUMBER(TO_CHAR(systimestamp AT TIME ZONE 'UTC', 'SSSSS.FF'))",
+            $platform instanceof SQLServerPlatform => "CAST(DATEDIFF_BIG(ms, '1970-01-01', SYSUTCDATETIME()) AS FLOAT) / 1000.0",
+            default => (new \DateTimeImmutable())->format('U.u'),
         };
     }
 
@@ -251,10 +271,17 @@ class DoctrineDbalStore implements PersistingStoreInterface
     {
         $platform = $this->conn->getDatabasePlatform();
 
+        if (interface_exists(Exception::class)) {
+            // DBAL 4+
+            $sqlitePlatformClass = 'Doctrine\DBAL\Platforms\SQLitePlatform';
+        } else {
+            $sqlitePlatformClass = 'Doctrine\DBAL\Platforms\SqlitePlatform';
+        }
+
         return match (true) {
-            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform,
-            $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform,
-            $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform => true,
+            $platform instanceof PostgreSQLPlatform,
+            $platform instanceof $sqlitePlatformClass,
+            $platform instanceof SQLServerPlatform => true,
             default => false,
         };
     }

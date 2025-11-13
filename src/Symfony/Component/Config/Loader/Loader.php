@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Loader;
 
 use Symfony\Component\Config\Exception\LoaderLoadException;
+use Symfony\Component\Config\Exception\LogicException;
 
 /**
  * Loader is the abstract class used by all built-in loaders.
@@ -20,7 +21,7 @@ use Symfony\Component\Config\Exception\LoaderLoadException;
  */
 abstract class Loader implements LoaderInterface
 {
-    protected LoaderResolverInterface $resolver;
+    protected ?LoaderResolverInterface $resolver = null;
 
     public function __construct(
         protected ?string $env = null,
@@ -29,6 +30,10 @@ abstract class Loader implements LoaderInterface
 
     public function getResolver(): LoaderResolverInterface
     {
+        if (null === $this->resolver) {
+            throw new LogicException('Cannot get a resolver if none was set.');
+        }
+
         return $this->resolver;
     }
 

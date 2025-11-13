@@ -6,6 +6,6 @@ $wh = new MailerEngagementEvent(MailerEngagementEvent::SPAM, '62fb66bef54a112e92
 $wh->setRecipientEmail('test@example.com');
 $wh->setTags(["test-tag"]);
 $wh->setMetadata([]);
-$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u\Z', '2024-01-01T12:00:00.000000Z'));
+$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', '2024-01-01T12:00:00.000000Z'));
 
 return $wh;

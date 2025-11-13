@@ -44,7 +44,7 @@ class LocaleValidator extends ConstraintValidator
             $value = \Locale::canonicalize($value);
         }
 
-        if (!Locales::exists($value)) {
+        if (null === $value || !Locales::exists($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($inputValue))
                 ->setCode(Locale::NO_SUCH_LOCALE_ERROR)

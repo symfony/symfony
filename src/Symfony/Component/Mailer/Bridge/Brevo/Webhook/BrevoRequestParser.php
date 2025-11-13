@@ -35,9 +35,9 @@ final class BrevoRequestParser extends AbstractRequestParser
         return new ChainRequestMatcher([
             new MethodRequestMatcher('POST'),
             new IsJsonRequestMatcher(),
-            // https://developers.brevo.com/docs/how-to-use-webhooks#securing-your-webhooks
+            // https://help.brevo.com/hc/en-us/articles/15127404548498-Brevo-IP-ranges-List-of-publicly-exposed-services
             // localhost is added for testing
-            new IpsRequestMatcher(['185.107.232.1/24', '1.179.112.1/20', '127.0.0.1']),
+            new IpsRequestMatcher(['1.179.112.0/20', '172.246.240.0/20', '127.0.0.1']),
         ]);
     }
 

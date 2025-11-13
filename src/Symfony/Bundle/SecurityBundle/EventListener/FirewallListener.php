@@ -25,14 +25,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class FirewallListener extends Firewall
 {
-    private FirewallMapInterface $map;
-    private LogoutUrlGenerator $logoutUrlGenerator;
-
-    public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher, LogoutUrlGenerator $logoutUrlGenerator)
-    {
-        $this->map = $map;
-        $this->logoutUrlGenerator = $logoutUrlGenerator;
-
+    public function __construct(
+        private FirewallMapInterface $map,
+        EventDispatcherInterface $dispatcher,
+        private LogoutUrlGenerator $logoutUrlGenerator,
+    ) {
         parent::__construct($map, $dispatcher);
     }
 

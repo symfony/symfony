@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class PredisTagAwareClusterAdapterTest extends PredisClusterAdapterTest
 {
     use TagAwareTestTrait;

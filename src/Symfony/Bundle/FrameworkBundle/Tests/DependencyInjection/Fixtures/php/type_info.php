@@ -7,5 +7,8 @@ $container->loadFromExtension('framework', [
     'php_errors' => ['log' => true],
     'type_info' => [
         'enabled' => true,
+        'aliases' => [
+            'CustomAlias' => 'int',
+        ],
     ],
 ]);

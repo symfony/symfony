@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\MessageMedia\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaOptions;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransport;
@@ -49,10 +50,9 @@ final class MessageMediaTransportTest extends TransportTestCase
     }
 
     /**
-     * @dataProvider exceptionIsThrownWhenHttpSendFailedProvider
-     *
      * @throws TransportExceptionInterface
      */
+    #[DataProvider('exceptionIsThrownWhenHttpSendFailedProvider')]
     public function testExceptionIsThrownWhenHttpSendFailed(int $statusCode, string $content, string $expectedExceptionMessage)
     {
         $response = $this->createMock(ResponseInterface::class);

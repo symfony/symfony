@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\InMemory;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -31,9 +32,7 @@ class InMemoryTransportFactoryTest extends TestCase
         $this->factory = new InMemoryTransportFactory();
     }
 
-    /**
-     * @dataProvider provideDSN
-     */
+    #[DataProvider('provideDSN')]
     public function testSupports(string $dsn, bool $expected = true)
     {
         $this->assertSame($expected, $this->factory->supports($dsn, []), 'InMemoryTransportFactory::supports returned unexpected result.');

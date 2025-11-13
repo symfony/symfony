@@ -31,19 +31,19 @@ use Symfony\Component\Workflow\Marking;
  */
 final class MethodMarkingStore implements MarkingStoreInterface
 {
-    /** @var array<class-string, MarkingStoreMethod> */
+    /** @var array<class-string, \Closure(object): mixed> */
     private array $getters = [];
-    /** @var array<class-string, MarkingStoreMethod> */
+    /** @var array<class-string, \Closure(object, mixed, array)> */
     private array $setters = [];
 
     /**
-     * @param string $property Used to determine methods or property to call
-     *                         The `getMarking` method will use `$subject->getProperty()` or `$subject->property`
-     *                         The `setMarking` method will use `$subject->setProperty(string|array $places, array $context = [])` or `$subject->property = string|array $places`
+     * @param string $property Used to determine the accessor methods or the property to call
+     *                         `getMarking()` will use `$subject->getProperty()` or `$subject->$property`
+     *                         `setMarking()` will use `$subject->setProperty(string|array|\BackedEnum $places, array $context = [])` or `$subject->$property = string|array|\BackedEnum $places`
      */
     public function __construct(
-        private bool $singleState = false,
-        private string $property = 'marking',
+        private readonly bool $singleState = false,
+        private readonly string $property = 'marking',
     ) {
     }
 
@@ -51,9 +51,9 @@ final class MethodMarkingStore implements MarkingStoreInterface
     {
         $marking = null;
         try {
-            $marking = ($this->getGetter($subject))();
+            $marking = ($this->getters[$subject::class] ??= $this->getGetter($subject))($subject);
         } catch (\Error $e) {
-            $unInitializedPropertyMessage = sprintf('Typed property %s::$%s must not be accessed before initialization', get_debug_type($subject), $this->property);
+            $unInitializedPropertyMessage = \sprintf('Typed property %s::$%s must not be accessed before initialization', get_debug_type($subject), $this->property);
             if ($e->getMessage() !== $unInitializedPropertyMessage) {
                 throw $e;
             }
@@ -64,9 +64,13 @@ final class MethodMarkingStore implements MarkingStoreInterface
         }
 
         if ($this->singleState) {
+            if ($marking instanceof \BackedEnum) {
+                $marking = $marking->value;
+            }
+
             $marking = [(string) $marking => 1];
         } elseif (!\is_array($marking)) {
-            throw new LogicException(sprintf('The marking stored in "%s::$%s" is not an array and the Workflow\'s Marking store is instantiated with $singleState=false.', get_debug_type($subject), $this->property));
+            throw new LogicException(\sprintf('The marking stored in "%s::$%s" is not an array and the Workflow\'s Marking store is instantiated with $singleState=false.', get_debug_type($subject), $this->property));
         }
 
         return new Marking($marking);
@@ -80,7 +84,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
             $marking = key($marking);
         }
 
-        ($this->getSetter($subject))($marking, $context);
+        ($this->setters[$subject::class] ??= $this->getSetter($subject))($subject, $marking, $context);
     }
 
     private function getGetter(object $subject): callable
@@ -88,9 +92,9 @@ final class MethodMarkingStore implements MarkingStoreInterface
         $property = $this->property;
         $method = 'get'.ucfirst($property);
 
-        return match ($this->getters[$subject::class] ??= $this->getType($subject, $property, $method)) {
-            MarkingStoreMethod::METHOD => $subject->{$method}(...),
-            MarkingStoreMethod::PROPERTY => static fn () => $subject->{$property},
+        return match (self::getType($subject, $property, $method)) {
+            MarkingStoreMethod::METHOD => static fn ($subject) => $subject->{$method}(),
+            MarkingStoreMethod::PROPERTY => static fn ($subject) => $subject->{$property},
         };
     }
 
@@ -99,26 +103,34 @@ final class MethodMarkingStore implements MarkingStoreInterface
         $property = $this->property;
         $method = 'set'.ucfirst($property);
 
-        return match ($this->setters[$subject::class] ??= $this->getType($subject, $property, $method)) {
-            MarkingStoreMethod::METHOD => $subject->{$method}(...),
-            MarkingStoreMethod::PROPERTY => static fn ($marking) => $subject->{$property} = $marking,
+        return match (self::getType($subject, $property, $method, $type)) {
+            MarkingStoreMethod::METHOD => $type ? static fn ($subject, $marking, $context) => $subject->{$method}($type::from($marking), $context) : static fn ($subject, $marking, $context) => $subject->{$method}($marking, $context),
+            MarkingStoreMethod::PROPERTY => $type ? static fn ($subject, $marking) => $subject->{$property} = $type::from($marking) : static fn ($subject, $marking) => $subject->{$property} = $marking,
         };
     }
 
-    private static function getType(object $subject, string $property, string $method): MarkingStoreMethod
+    private static function getType(object $subject, string $property, string $method, ?string &$type = null): MarkingStoreMethod
     {
-        if (method_exists($subject, $method) && (new \ReflectionMethod($subject, $method))->isPublic()) {
-            return MarkingStoreMethod::METHOD;
-        }
-
         try {
-            if ((new \ReflectionProperty($subject, $property))->isPublic()) {
-                return MarkingStoreMethod::PROPERTY;
-            }
-        } catch (\ReflectionException) {
-        }
+            if (method_exists($subject, $method) && ($r = new \ReflectionMethod($subject, $method))->isPublic()) {
+                $type = 0 < $r->getNumberOfRequiredParameters() ? $r->getParameters()[0]->getType() : null;
 
-        throw new LogicException(sprintf('Cannot store marking: class "%s" should have either a public method named "%s()" or a public property named "$%s"; none found.', get_debug_type($subject), $method, $property));
+                return MarkingStoreMethod::METHOD;
+            }
+
+            try {
+                if (($r = new \ReflectionProperty($subject, $property))->isPublic()) {
+                    $type = $r->getType();
+
+                    return MarkingStoreMethod::PROPERTY;
+                }
+            } catch (\ReflectionException) {
+            }
+
+            throw new LogicException(\sprintf('Cannot store marking: class "%s" should have either a public method named "%s()" or a public property named "$%s"; none found.', get_debug_type($subject), $method, $property));
+        } finally {
+            $type = $type instanceof \ReflectionNamedType && is_subclass_of($type->getName(), \BackedEnum::class) ? $type->getName() : null;
+        }
     }
 }
 

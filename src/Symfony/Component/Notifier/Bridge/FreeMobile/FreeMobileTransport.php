@@ -43,7 +43,7 @@ final class FreeMobileTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('freemobile://%s?phone=%s', $this->getEndpoint(), $this->phone);
+        return \sprintf('freemobile://%s?phone=%s', $this->getEndpoint(), $this->phone);
     }
 
     public function supports(MessageInterface $message): bool
@@ -59,10 +59,10 @@ final class FreeMobileTransport extends AbstractTransport
 
         /** @var SmsMessage $message */
         if ('' !== $message->getFrom()) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
+            throw new InvalidArgumentException(\sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
-        $endpoint = sprintf('https://%s', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'query' => [
@@ -86,7 +86,7 @@ final class FreeMobileTransport extends AbstractTransport
                 500 => 'Server error, please try again later.',
             ];
 
-            throw new TransportException(sprintf('Unable to send the SMS: error %d: ', $statusCode).($errors[$statusCode] ?? ''), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: error %d: ', $statusCode).($errors[$statusCode] ?? ''), $response);
         }
 
         return new SentMessage($message, (string) $this);

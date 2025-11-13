@@ -11,10 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -26,6 +29,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
+require_once __DIR__.'/default/src/DefaultKernel.php';
 require_once __DIR__.'/flex-style/src/FlexStyleMicroKernel.php';
 
 class MicroKernelTraitTest extends TestCase
@@ -39,7 +43,37 @@ class MicroKernelTraitTest extends TestCase
             $this->kernel = null;
             $fs = new Filesystem();
             $fs->remove($kernel->getCacheDir());
+            $fs->remove($kernel->getProjectDir().'/config/reference.php');
         }
+    }
+
+    #[BackupGlobals(true)]
+    public function testGetShareDirDisabledByEnv()
+    {
+        $_SERVER['APP_SHARE_DIR'] = 'false';
+
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
+
+        $this->assertNull($kernel->getShareDir());
+
+        $parameters = $kernel->getKernelParameters();
+        $this->assertArrayNotHasKey('kernel.share_dir', $parameters);
+    }
+
+    #[BackupGlobals(true)]
+    public function testGetShareDirCustomPathFromEnv()
+    {
+        $_SERVER['APP_SHARE_DIR'] = sys_get_temp_dir();
+
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
+
+        $expected = rtrim(sys_get_temp_dir(), '/').'/test';
+        $this->assertSame($expected, $kernel->getShareDir());
+
+        $parameters = $kernel->getKernelParameters();
+        $this->assertArrayHasKey('kernel.share_dir', $parameters);
+        $this->assertNotNull($parameters['kernel.share_dir']);
+        $this->assertSame(realpath($expected), realpath($parameters['kernel.share_dir']));
     }
 
     public function test()
@@ -82,7 +116,7 @@ class MicroKernelTraitTest extends TestCase
 
     public function testFlexStyle()
     {
-        $kernel = new FlexStyleMicroKernel('test', false);
+        $kernel = $this->kernel = new FlexStyleMicroKernel('test', false);
         $kernel->boot();
 
         $request = Request::create('/');
@@ -140,33 +174,75 @@ class MicroKernelTraitTest extends TestCase
 
         $this->assertSame('Hello World!', $response->getContent());
     }
-}
 
-abstract class MinimalKernel extends Kernel
-{
-    use MicroKernelTrait;
-
-    private string $cacheDir;
-
-    public function __construct(string $cacheDir)
+    public function testSimpleKernel()
     {
-        parent::__construct('test', false);
+        $kernel = $this->kernel = new SimpleKernel('simple_kernel');
+        $kernel->boot();
 
-        $this->cacheDir = sys_get_temp_dir().'/'.$cacheDir;
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('Hello World!', $response->getContent());
     }
 
-    public function registerBundles(): iterable
+    public function testKernelCommand()
     {
-        yield new FrameworkBundle();
+        if (!property_exists(AsCommand::class, 'help')) {
+            $this->markTestSkipped('Invokable command no available.');
+        }
+
+        $kernel = $this->kernel = new KernelCommand('kernel_command');
+        $application = new Application($kernel);
+
+        $input = new ArrayInput(['command' => 'kernel:hello']);
+        $output = new BufferedOutput();
+
+        $this->assertTrue($application->has('kernel:hello'));
+        $this->assertSame(0, $application->doRun($input, $output));
+        $this->assertSame('Hello Kernel!', $output->fetch());
     }
 
-    public function getCacheDir(): string
+    public function testDefaultKernel()
     {
-        return $this->cacheDir;
+        $kernel = $this->kernel = new DefaultKernel('test', false);
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->has('foo_service'));
+
+        $request = Request::create('/');
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('OK', $response->getContent());
     }
 
-    public function getLogDir(): string
+    public function testGetKernelParameters()
     {
-        return $this->cacheDir;
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
+
+        $parameters = $kernel->getKernelParameters();
+
+        $this->assertSame($kernel->getConfigDir(), $parameters['.kernel.config_dir']);
+        $this->assertSame(['test'], $parameters['.container.known_envs']);
+        $this->assertSame(['Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true]], $parameters['.kernel.bundles_definition']);
+    }
+
+    public function testGetKernelParametersWithBundlesFile()
+    {
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
+
+        $configDir = $kernel->getConfigDir();
+        mkdir($configDir, 0o777, true);
+
+        $bundlesContent = "<?php\nreturn [\n    'Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true],\n    'TestBundle' => ['test' => true, 'dev' => true],\n];";
+        file_put_contents($configDir.'/bundles.php', $bundlesContent);
+
+        $parameters = $kernel->getKernelParameters();
+
+        $this->assertSame(['test', 'dev'], $parameters['.container.known_envs']);
+        $this->assertSame([
+            'Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true],
+            'TestBundle' => ['test' => true, 'dev' => true],
+        ], $parameters['.kernel.bundles_definition']);
     }
 }

@@ -33,7 +33,7 @@ class UriResolver
         $uri = trim($uri);
 
         // absolute URL?
-        if (null !== parse_url($uri, \PHP_URL_SCHEME)) {
+        if (null !== parse_url(\strlen($uri) !== strcspn($uri, '?#') ? $uri : $uri.'#', \PHP_URL_SCHEME)) {
             return $uri;
         }
 
@@ -71,7 +71,7 @@ class UriResolver
 
         // relative path
         $path = parse_url(substr($baseUri, \strlen($baseUriCleaned)), \PHP_URL_PATH) ?? '';
-        $path = self::canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
+        $path = self::canonicalizePath((str_contains($path, '/') ? substr($path, 0, strrpos($path, '/')) : '').'/'.$uri);
 
         return $baseUriCleaned.('' === $path || '/' !== $path[0] ? '/' : '').$path;
     }

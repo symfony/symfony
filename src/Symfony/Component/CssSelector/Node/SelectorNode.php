@@ -49,6 +49,6 @@ class SelectorNode extends AbstractNode
 
     public function __toString(): string
     {
-        return sprintf('%s[%s%s]', $this->getNodeName(), $this->tree, $this->pseudoElement ? '::'.$this->pseudoElement : '');
+        return \sprintf('%s[%s%s]', $this->getNodeName(), $this->tree, $this->pseudoElement ? '::'.$this->pseudoElement : '');
     }
 }

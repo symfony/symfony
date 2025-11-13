@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
@@ -151,6 +152,11 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
         $container->register('service3', IntTagClass::class)->addTag('my_custom_tag');
 
+        $container->register('service4', HelloInterface::class)->addTag('my_custom_tag');
+
+        $definition = $container->register('debug.service5', \stdClass::class)->addTag('my_custom_tag');
+        $definition->addTag('container.decorator', ['id' => 'service5']);
+
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
 
         $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
@@ -158,15 +164,15 @@ class PriorityTaggedServiceTraitTest extends TestCase
             'bar_tab_class_with_defaultmethod' => new TypedReference('service2', BarTagClass::class),
             'service1' => new TypedReference('service1', FooTagClass::class),
             '10' => new TypedReference('service3', IntTagClass::class),
+            'service4' => new TypedReference('service4', HelloInterface::class),
+            'service5' => new TypedReference('debug.service5', \stdClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $this->assertSame(array_keys($expected), array_keys($services));
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
     }
 
-    /**
-     * @dataProvider provideInvalidDefaultMethods
-     */
+    #[DataProvider('provideInvalidDefaultMethods')]
     public function testTheIndexedTagsByDefaultIndexMethodFailure(string $defaultIndexMethod, ?string $indexAttribute, string $expectedExceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -184,12 +190,12 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     public static function provideInvalidDefaultMethods(): iterable
     {
-        yield ['getMethodShouldBeStatic', null, sprintf('Method "%s::getMethodShouldBeStatic()" should be static.', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBeStatic', 'foo', sprintf('Either method "%s::getMethodShouldBeStatic()" should be static or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBePublicInsteadProtected', null, sprintf('Method "%s::getMethodShouldBePublicInsteadProtected()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBePublicInsteadProtected', 'foo', sprintf('Either method "%s::getMethodShouldBePublicInsteadProtected()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBePublicInsteadPrivate', null, sprintf('Method "%s::getMethodShouldBePublicInsteadPrivate()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
-        yield ['getMethodShouldBePublicInsteadPrivate', 'foo', sprintf('Either method "%s::getMethodShouldBePublicInsteadPrivate()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBeStatic', null, \sprintf('Method "%s::getMethodShouldBeStatic()" should be static.', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBeStatic', 'foo', \sprintf('Either method "%s::getMethodShouldBeStatic()" should be static or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadProtected', null, \sprintf('Method "%s::getMethodShouldBePublicInsteadProtected()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadProtected', 'foo', \sprintf('Either method "%s::getMethodShouldBePublicInsteadProtected()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadPrivate', null, \sprintf('Method "%s::getMethodShouldBePublicInsteadPrivate()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadPrivate', 'foo', \sprintf('Either method "%s::getMethodShouldBePublicInsteadPrivate()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
     }
 
     public function testTaggedItemAttributes()
@@ -211,6 +217,9 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $container->register('service5', HelloNamedService2::class)
             ->setAutoconfigured(true)
             ->addTag('my_custom_tag');
+        $container->register('service6', MultiTagHelloNamedService::class)
+            ->setAutoconfigured(true)
+            ->addTag('my_custom_tag');
 
         (new ResolveInstanceofConditionalsPass())->process($container);
 
@@ -219,12 +228,86 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar', exclude: ['service4', 'service5']);
         $expected = [
             'service3' => new TypedReference('service3', HelloNamedService2::class),
+            'multi_hello_2' => new TypedReference('service6', MultiTagHelloNamedService::class),
             'hello' => new TypedReference('service2', HelloNamedService::class),
+            'multi_hello_1' => new TypedReference('service6', MultiTagHelloNamedService::class),
             'service1' => new TypedReference('service1', FooTagClass::class),
+            'multi_hello_0' => new TypedReference('service6', MultiTagHelloNamedService::class),
+        ];
+
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
+        $this->assertSame(array_keys($expected), array_keys($services));
+        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+    }
+
+    public function testResolveIndexedTags()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('custom_param_service1', 'bar');
+        $container->setParameter('custom_param_service2', 'baz');
+        $container->setParameter('custom_param_service2_empty', '');
+        $container->setParameter('custom_param_service2_null', null);
+        $container->register('service1')->addTag('my_custom_tag', ['foo' => '%custom_param_service1%']);
+
+        $definition = $container->register('service2', BarTagClass::class);
+        $definition->addTag('my_custom_tag', ['foo' => '%custom_param_service2%', 'priority' => 100]);
+        $definition->addTag('my_custom_tag', ['foo' => '%custom_param_service2_empty%']);
+        $definition->addTag('my_custom_tag', ['foo' => '%custom_param_service2_null%']);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
+        $expected = [
+            'baz' => new TypedReference('service2', BarTagClass::class),
+            'bar' => new Reference('service1'),
+            '' => new TypedReference('service2', BarTagClass::class),
+            'bar_tab_class_with_defaultmethod' => new TypedReference('service2', BarTagClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $this->assertSame(array_keys($expected), array_keys($services));
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+    }
+
+    public function testAttributesAreMergedWithTags()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register('service_attr_first', MultiTagHelloNamedService::class);
+        $definition->setAutoconfigured(true);
+        $definition->addTag('my_custom_tag', ['foo' => 'z']);
+        $definition->addTag('my_custom_tag', []);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
+
+        $expected = [
+            'multi_hello_2' => new TypedReference('service_attr_first', MultiTagHelloNamedService::class),
+            'multi_hello_1' => new TypedReference('service_attr_first', MultiTagHelloNamedService::class),
+            'z' => new TypedReference('service_attr_first', MultiTagHelloNamedService::class),
+            'multi_hello_0' => new TypedReference('service_attr_first', MultiTagHelloNamedService::class),
+        ];
+        $this->assertSame(array_keys($expected), array_keys($services));
+        $this->assertEquals($expected, $services);
+    }
+
+    public function testAttributesAreFallbacks()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register('service_attr_first', MultiTagHelloNamedService::class);
+        $definition->setAutoconfigured(true);
+        $definition->addTag('my_custom_tag', ['foo' => 'z']);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
+
+        $this->assertEquals(['z' => new TypedReference('service_attr_first', MultiTagHelloNamedService::class)], $services);
     }
 }
 
@@ -246,4 +329,16 @@ class HelloNamedService extends \stdClass
 #[AsTaggedItem(priority: 2)]
 class HelloNamedService2
 {
+}
+
+#[AsTaggedItem(index: 'multi_hello_0', priority: 0)]
+#[AsTaggedItem(index: 'multi_hello_1', priority: 1)]
+#[AsTaggedItem(index: 'multi_hello_2', priority: 2)]
+class MultiTagHelloNamedService
+{
+}
+
+interface HelloInterface
+{
+    public static function getFooBar(): string;
 }

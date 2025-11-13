@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.3
+---
+
+ * Add "keepalive" support
+
 7.1
 ---
 

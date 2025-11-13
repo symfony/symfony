@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\KazInfoTeh\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\KazInfoTeh\KazInfoTehTransport;
@@ -68,9 +69,7 @@ final class KazInfoTehTransportTest extends TransportTestCase
         }
     }
 
-    /**
-     * @dataProvider responseProvider
-     */
+    #[DataProvider('responseProvider')]
     public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, string $content, string $errorMessage)
     {
         $client = $this->createClient($statusCode, $content);

@@ -20,7 +20,7 @@ class BarMethodCall
         $this->foo = $foo;
     }
 
-    public function setFoosOptional(Foo $foo, Foo $fooOptional = null)
+    public function setFoosOptional(Foo $foo, ?Foo $fooOptional = null)
     {
         $this->foo = $foo;
     }

@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Bump ext-redis to 6.1 and ext-relay to 0.12 minimum
+
+7.3
+---
+
+ * Add support for `\Relay\Cluster` in `RedisAdapter`
+ * Add support for `valkey:` / `valkeys:` schemes
+ * Add support for namespace-based invalidation
+ * Rename options "redis_cluster" and "redis_sentinel" to "cluster" and "sentinel" respectively
+
+7.2
+---
+
+ * `igbinary_serialize()` is no longer used instead of `serialize()` by default when the igbinary extension is installed,
+   due to behavior compatibilities between the two
+ * Add optional `Psr\Clock\ClockInterface` parameter to `ArrayAdapter`
+
 7.1
 ---
 
@@ -8,6 +28,7 @@ CHANGELOG
  * Deprecate `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter`
  * Add support for URL encoded characters in Couchbase DSN
  * Add support for using DSN with PDOAdapter
+ * The algorithm for the default cache namespace changed from SHA256 to XXH128
 
 7.0
 ---

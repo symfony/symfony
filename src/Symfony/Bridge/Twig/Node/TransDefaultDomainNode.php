@@ -22,9 +22,9 @@ use Twig\Node\Node;
 #[YieldReady]
 final class TransDefaultDomainNode extends Node
 {
-    public function __construct(AbstractExpression $expr, int $lineno = 0, ?string $tag = null)
+    public function __construct(AbstractExpression $expr, int $lineno = 0)
     {
-        parent::__construct(['expr' => $expr], [], $lineno, $tag);
+        parent::__construct(['expr' => $expr], [], $lineno);
     }
 
     public function compile(Compiler $compiler): void

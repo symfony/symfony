@@ -48,7 +48,7 @@ class IdReader
             $singleId = $this->associationIdReader->isSingleId();
             $this->intId = $this->associationIdReader->isIntId();
         } else {
-            $this->intId = $singleId && \in_array($idType, ['integer', 'smallint', 'bigint']);
+            $this->intId = $singleId && \in_array($idType, ['integer', 'smallint', 'bigint'], true);
             $this->associationIdReader = null;
         }
 
@@ -83,7 +83,7 @@ class IdReader
         }
 
         if (!$this->om->contains($object)) {
-            throw new RuntimeException(sprintf('Entity of type "%s" passed to the choice field must be managed. Maybe you forget to persist it in the entity manager?', get_debug_type($object)));
+            throw new RuntimeException(\sprintf('Entity of type "%s" passed to the choice field must be managed. Maybe you forget to persist it in the entity manager?', get_debug_type($object)));
         }
 
         $this->om->initializeObject($object);

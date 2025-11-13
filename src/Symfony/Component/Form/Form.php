@@ -22,11 +22,13 @@ use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Validator\Constraints\Form as AssertForm;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\Validator\Constraints\Traverse;
 
 /**
  * Form represents a form.
@@ -68,6 +70,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @implements \IteratorAggregate<string, FormInterface>
  */
+#[AssertForm]
+#[Traverse(false)]
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
     private ?FormInterface $parent = null;
@@ -301,7 +305,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
                 $actualType = get_debug_type($viewData);
 
-                throw new LogicException('The form\'s view data is expected to be a "'.$dataClass.'", but it is a "'.$actualType.'". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "'.$actualType.'" to an instance of "'.$dataClass.'".');
+                throw new LogicException(\sprintf('The form\'s view data is expected to be a "%s", but it is a "%s". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "%2$s" to an instance of "%1$s".', $dataClass, $actualType));
             }
         }
 
@@ -613,7 +617,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         return null === $this->transformationFailure;
     }
 
-    public function getTransformationFailure(): ?Exception\TransformationFailedException
+    public function getTransformationFailure(): ?TransformationFailedException
     {
         return $this->transformationFailure;
     }
@@ -738,7 +742,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $child = $this->config->getFormFactory()->createNamed($child, $type, null, $options);
             }
         } elseif ($child->getConfig()->getAutoInitialize()) {
-            throw new RuntimeException(sprintf('Automatic initialization is only supported on root forms. You should set the "auto_initialize" option to false on the field "%s".', $child->getName()));
+            throw new RuntimeException(\sprintf('Automatic initialization is only supported on root forms. You should set the "auto_initialize" option to false on the field "%s".', $child->getName()));
         }
 
         $this->children[$child->getName()] = $child;
@@ -800,7 +804,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             return $this->children[$name];
         }
 
-        throw new OutOfBoundsException(sprintf('Child "%s" does not exist.', $name));
+        throw new OutOfBoundsException(\sprintf('Child "%s" does not exist.', $name));
     }
 
     /**
@@ -933,7 +937,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $value = $transformer->transform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(sprintf('Unable to transform data for property path "%s": ', $this->getPropertyPath()).$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
+            throw new TransformationFailedException(\sprintf('Unable to transform data for property path "%s": ', $this->getPropertyPath()).$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
         }
 
         return $value;
@@ -953,7 +957,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $value = $transformers[$i]->reverseTransform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(sprintf('Unable to reverse value for property path "%s": ', $this->getPropertyPath()).$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
+            throw new TransformationFailedException(\sprintf('Unable to reverse value for property path "%s": ', $this->getPropertyPath()).$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
         }
 
         return $value;
@@ -980,7 +984,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $value = $transformer->transform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(sprintf('Unable to transform value for property path "%s": ', $this->getPropertyPath()).$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
+            throw new TransformationFailedException(\sprintf('Unable to transform value for property path "%s": ', $this->getPropertyPath()).$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
         }
 
         return $value;
@@ -1002,7 +1006,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $value = $transformers[$i]->reverseTransform($value);
             }
         } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(sprintf('Unable to reverse value for property path "%s": ', $this->getPropertyPath()).$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
+            throw new TransformationFailedException(\sprintf('Unable to reverse value for property path "%s": ', $this->getPropertyPath()).$exception->getMessage(), $exception->getCode(), $exception, $exception->getInvalidMessage(), $exception->getInvalidMessageParameters());
         }
 
         return $value;

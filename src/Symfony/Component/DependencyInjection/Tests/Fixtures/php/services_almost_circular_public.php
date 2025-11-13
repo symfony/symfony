@@ -259,7 +259,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $container->services['dispatcher2'] = $instance = new \stdClass();
 
-        $instance->subscriber2 = new \stdClass(($container->services['manager2'] ?? self::getManager2Service($container)));
+        $instance->subscriber2 = ($container->privates['subscriber2'] ?? self::getSubscriber2Service($container));
 
         return $instance;
     }
@@ -819,5 +819,21 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         }
 
         return $container->privates['manager4'] = new \stdClass($a);
+    }
+
+    /**
+     * Gets the private 'subscriber2' shared service.
+     *
+     * @return \stdClass
+     */
+    protected static function getSubscriber2Service($container)
+    {
+        $a = ($container->services['manager2'] ?? self::getManager2Service($container));
+
+        if (isset($container->privates['subscriber2'])) {
+            return $container->privates['subscriber2'];
+        }
+
+        return $container->privates['subscriber2'] = new \stdClass($a);
     }
 }

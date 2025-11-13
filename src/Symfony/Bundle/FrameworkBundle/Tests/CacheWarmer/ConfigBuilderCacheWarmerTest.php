@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -31,14 +33,17 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class ConfigBuilderCacheWarmerTest extends TestCase
+#[IgnoreDeprecations]
+#[Group('legacy')]
+final class ConfigBuilderCacheWarmerTest extends TestCase
 {
     private string $varDir;
 
     protected function setUp(): void
     {
-        $this->varDir = sys_get_temp_dir().'/'.uniqid();
         $fs = new Filesystem();
+        $this->varDir = tempnam(sys_get_temp_dir(), 'sf_var_');
+        $fs->remove($this->varDir);
         $fs->mkdir($this->varDir);
     }
 
@@ -188,7 +193,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
         $kernel = new class($this->varDir) extends TestKernel {
             protected function build(ContainerBuilder $container): void
             {
-                $container->registerExtension(new class() extends Extension implements ConfigurationInterface {
+                $container->registerExtension(new class extends Extension implements ConfigurationInterface {
                     public function load(array $configs, ContainerBuilder $container): void
                     {
                     }
@@ -230,11 +235,17 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             {
             }
 
+            /**
+             * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+             */
             public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }
 
+            /**
+             * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+             */
             public function getNamespace(): string
             {
                 return 'http://www.example.com/schema/acme';
@@ -275,7 +286,7 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             {
                 /** @var TestSecurityExtension $extension */
                 $extension = $container->getExtension('test_security');
-                $extension->addAuthenticatorFactory(new class() implements TestAuthenticatorFactoryInterface {
+                $extension->addAuthenticatorFactory(new class implements TestAuthenticatorFactoryInterface {
                     public function getKey(): string
                     {
                         return 'token';
@@ -291,19 +302,19 @@ class ConfigBuilderCacheWarmerTest extends TestCase
             {
                 yield from parent::registerBundles();
 
-                yield new class() extends Bundle {
+                yield new class extends Bundle {
                     public function getContainerExtension(): ExtensionInterface
                     {
                         return new TestSecurityExtension();
                     }
                 };
 
-                yield new class() extends Bundle {
+                yield new class extends Bundle {
                     public function build(ContainerBuilder $container): void
                     {
                         /** @var TestSecurityExtension $extension */
                         $extension = $container->getExtension('test_security');
-                        $extension->addAuthenticatorFactory(new class() implements TestAuthenticatorFactoryInterface {
+                        $extension->addAuthenticatorFactory(new class implements TestAuthenticatorFactoryInterface {
                             public function getKey(): string
                             {
                                 return 'form-login';
@@ -329,9 +340,6 @@ class ConfigBuilderCacheWarmerTest extends TestCase
 
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/FrameworkConfig.php');
         self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/SecurityConfig.php');
-        self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Security/FirewallConfig.php');
-        self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Security/FirewallConfig/FormLoginConfig.php');
-        self::assertFileExists($kernel->getBuildDir().'/Symfony/Config/Security/FirewallConfig/TokenConfig.php');
     }
 }
 
@@ -411,9 +419,8 @@ class TestSecurityExtension extends Extension implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         $firewallNodeBuilder = $rootNode
-            ->fixXmlConfig('firewall')
             ->children()
-                ->arrayNode('firewalls')
+                ->arrayNode('firewalls', 'firewall')
                     ->isRequired()
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')

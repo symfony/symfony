@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\SmsBiuras\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -43,9 +44,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    /**
-     * @dataProvider provideTestMode()
-     */
+    #[DataProvider('provideTestMode')]
     public function testTestMode(int $expected, bool $testMode)
     {
         $message = new SmsMessage('0037012345678', 'Hello World');
@@ -60,7 +59,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $message, $expected): ResponseInterface {
             $this->assertSame('GET', $method);
-            $this->assertSame(sprintf(
+            $this->assertSame(\sprintf(
                 'https://savitarna.smsbiuras.lt/api?uid=uid&apikey=api_key&message=%s&from=from&test=%s&to=%s',
                 rawurlencode($message->getSubject()),
                 $expected,

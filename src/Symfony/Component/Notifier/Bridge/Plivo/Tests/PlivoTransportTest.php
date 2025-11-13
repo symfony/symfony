@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Plivo\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Plivo\PlivoOptions;
 use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransport;
@@ -29,7 +30,7 @@ final class PlivoTransportTest extends TransportTestCase
         return new PlivoTransport('authId', 'authToken', $from, $client ?? new MockHttpClient());
     }
 
-    public function invalidFromProvider(): iterable
+    public static function invalidFromProvider(): iterable
     {
         yield 'too short' => ['a'];
         yield 'too long' => ['abcdefghijkl'];
@@ -43,22 +44,18 @@ final class PlivoTransportTest extends TransportTestCase
         yield [new SmsMessage('0611223344', 'Hello!', 'from', new PlivoOptions(['src' => 'foo']))];
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
     {
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
-    /**
-     * @dataProvider validFromProvider
-     */
+    #[DataProvider('validFromProvider')]
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');

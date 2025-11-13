@@ -28,7 +28,7 @@ class TraceableArgumentResolverTest extends TestCase
         $stopwatch = $this->createStub(Stopwatch::class);
         $stopwatch->method('start')->willReturn($stopwatchEvent);
 
-        $resolver = new class() implements ArgumentResolverInterface {
+        $resolver = new class implements ArgumentResolverInterface {
             public function getArguments(Request $request, callable $controller, ?\ReflectionFunctionAbstract $reflector = null): array
             {
                 throw new \Exception();

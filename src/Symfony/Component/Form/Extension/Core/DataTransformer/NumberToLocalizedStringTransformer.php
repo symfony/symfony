@@ -41,14 +41,14 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms a number type into localized number.
      *
-     * @param int|float|null $value Number value
+     * @param int|float|string|null $value Number value
      *
      * @throws TransformationFailedException if the given value is not numeric
      *                                       or if the value cannot be transformed
      */
     public function transform(mixed $value): string
     {
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return '';
         }
 
@@ -64,9 +64,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         // Convert non-breaking and narrow non-breaking spaces to normal ones
-        $value = str_replace(["\xc2\xa0", "\xe2\x80\xaf"], ' ', $value);
-
-        return $value;
+        return str_replace(["\xc2\xa0", "\xe2\x80\xaf"], ' ', $value);
     }
 
     /**
@@ -104,7 +102,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $value = str_replace(',', $decSep, $value);
         }
 
-        if (str_contains($value, $decSep)) {
+        // If the value is in exponential notation with a negative exponent, we end up with a float value too
+        if (str_contains($value, $decSep) || false !== stripos($value, 'e-')) {
             $type = \NumberFormatter::TYPE_DOUBLE;
         } else {
             $type = \PHP_INT_SIZE === 8
@@ -112,10 +111,14 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
                 : \NumberFormatter::TYPE_INT32;
         }
 
-        $result = $formatter->parse($value, $type, $position);
+        try {
+            $result = @$formatter->parse($value, $type, $position);
+        } catch (\IntlException $e) {
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+        }
 
         if (intl_is_failure($formatter->getErrorCode())) {
-            throw new TransformationFailedException($formatter->getErrorMessage());
+            throw new TransformationFailedException($formatter->getErrorMessage(), $formatter->getErrorCode());
         }
 
         if ($result >= \PHP_INT_MAX || $result <= -\PHP_INT_MAX) {
@@ -140,7 +143,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $remainder = trim($remainder, " \t\n\r\0\x0b\xc2\xa0");
 
             if ('' !== $remainder) {
-                throw new TransformationFailedException(sprintf('The number contains unrecognized characters: "%s".', $remainder));
+                throw new TransformationFailedException(\sprintf('The number contains unrecognized characters: "%s".', $remainder));
             }
         }
 
@@ -170,7 +173,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      */
     protected function castParsedValue(int|float $value): int|float
     {
-        if (\is_int($value) && $value === (int) $float = (float) $value) {
+        if (\is_int($value) && (($float = (float) $value) < \PHP_INT_MAX) && $value === (int) $float) {
             return $float;
         }
 
@@ -182,6 +185,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      */
     private function round(int|float $number): int|float
     {
+        if (\is_int($number)) {
+            return $number;
+        }
+
         if (null !== $this->scale) {
             // shift number to maintain the correct scale during rounding
             $roundingCoef = 10 ** $this->scale;

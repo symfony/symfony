@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -28,22 +30,21 @@ class RoundRobinTransport implements TransportInterface
      * @var \SplObjectStorage<TransportInterface, float>
      */
     private \SplObjectStorage $deadTransports;
-    private array $transports = [];
-    private int $retryPeriod;
     private int $cursor = -1;
 
     /**
      * @param TransportInterface[] $transports
      */
-    public function __construct(array $transports, int $retryPeriod = 60)
-    {
+    public function __construct(
+        private array $transports,
+        private int $retryPeriod = 60,
+        private LoggerInterface $logger = new NullLogger(),
+    ) {
         if (!$transports) {
-            throw new TransportException(sprintf('"%s" must have at least one transport configured.', static::class));
+            throw new TransportException(\sprintf('"%s" must have at least one transport configured.', static::class));
         }
 
-        $this->transports = $transports;
         $this->deadTransports = new \SplObjectStorage();
-        $this->retryPeriod = $retryPeriod;
     }
 
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
@@ -52,10 +53,11 @@ class RoundRobinTransport implements TransportInterface
 
         while ($transport = $this->getNextTransport()) {
             try {
-                return $transport->send($message, $envelope);
+                return $transport->send(clone $message, $envelope);
             } catch (TransportExceptionInterface $e) {
                 $exception ??= new TransportException('All transports failed.');
-                $exception->appendDebug(sprintf("Transport \"%s\": %s\n", $transport, $e->getDebug()));
+                $exception->appendDebug(\sprintf("Transport \"%s\": %s\n", $transport, $e->getDebug()));
+                $this->logger->error(\sprintf('Transport "%s" failed.', $transport), ['exception' => $e]);
                 $this->deadTransports[$transport] = microtime(true);
             }
         }
@@ -86,7 +88,7 @@ class RoundRobinTransport implements TransportInterface
             }
 
             if ((microtime(true) - $this->deadTransports[$transport]) > $this->retryPeriod) {
-                $this->deadTransports->detach($transport);
+                unset($this->deadTransports[$transport]);
 
                 break;
             }
@@ -103,7 +105,7 @@ class RoundRobinTransport implements TransportInterface
 
     protected function isTransportDead(TransportInterface $transport): bool
     {
-        return $this->deadTransports->contains($transport);
+        return $this->deadTransports->offsetExists($transport);
     }
 
     protected function getInitialCursor(): int

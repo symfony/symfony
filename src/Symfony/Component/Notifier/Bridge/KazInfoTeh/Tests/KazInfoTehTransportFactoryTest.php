@@ -12,13 +12,18 @@
 namespace Symfony\Component\Notifier\Bridge\KazInfoTeh\Tests;
 
 use Symfony\Component\Notifier\Bridge\KazInfoTeh\KazInfoTehTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
 /**
  * @author Egor Taranov <dev@taranovegor.com>
  */
-final class KazInfoTehTransportFactoryTest extends TransportFactoryTestCase
+final class KazInfoTehTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): KazInfoTehTransportFactory
     {
         return new KazInfoTehTransportFactory();

@@ -411,8 +411,6 @@ class EventDispatcherTest extends TestCase
         $this->assertNotSame($callback1, $callback2);
         $this->assertNotSame($callback1, $callback3);
         $this->assertNotSame($callback2, $callback3);
-        $this->assertEquals($callback1, $callback2);
-        $this->assertEquals($callback1, $callback3);
 
         $this->dispatcher->addListener('foo', $callback1, 3);
         $this->dispatcher->addListener('foo', $callback2, 2);

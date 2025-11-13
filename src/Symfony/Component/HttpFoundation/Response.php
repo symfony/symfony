@@ -121,6 +121,8 @@ class Response
      * (last updated 2021-10-01).
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
+     *
+     * @var array<int, string>
      */
     public static array $statusTexts = [
         100 => 'Continue',
@@ -217,7 +219,7 @@ class Response
     public function __toString(): string
     {
         return
-            sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
+            \sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
             $this->headers."\r\n".
             $this->getContent();
     }
@@ -259,7 +261,7 @@ class Response
             }
 
             // Fix Content-Type
-            $charset = $this->charset ?: 'UTF-8';
+            $charset = $this->charset ?: 'utf-8';
             if (!$headers->has('Content-Type')) {
                 $headers->set('Content-Type', 'text/html; charset='.$charset);
             } elseif (0 === stripos($headers->get('Content-Type') ?? '', 'text/') && false === stripos($headers->get('Content-Type') ?? '', 'charset')) {
@@ -315,6 +317,12 @@ class Response
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
+            if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+                $statusCode ??= $this->statusCode;
+                trigger_deprecation('symfony/http-foundation', '7.4', 'Trying to use "%s::sendHeaders()" after headers have already been sent is deprecated and will throw a PHP warning in 8.0. Use a "StreamedResponse" instead.', static::class);
+                // header(\sprintf('HTTP/%s %s %s', $this->version, $statusCode, $this->statusText), true, $statusCode);
+            }
+
             return $this;
         }
 
@@ -326,9 +334,6 @@ class Response
 
         // headers
         foreach ($this->headers->allPreserveCaseWithoutCookies() as $name => $values) {
-            $newValues = $values;
-            $replace = false;
-
             // As recommended by RFC 8297, PHP automatically copies headers from previous 103 responses, we need to deal with that if headers changed
             $previousValues = $this->sentHeaders[$name] ?? null;
             if ($previousValues === $values) {
@@ -368,7 +373,7 @@ class Response
         $statusCode ??= $this->statusCode;
 
         // status
-        header(sprintf('HTTP/%s %s %s', $this->version, $statusCode, $this->statusText), true, $statusCode);
+        header(\sprintf('HTTP/%s %s %s', $this->version, $statusCode, $this->statusText), true, $statusCode);
 
         return $this;
     }
@@ -473,7 +478,7 @@ class Response
     {
         $this->statusCode = $code;
         if ($this->isInvalid()) {
-            throw new \InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $code));
+            throw new \InvalidArgumentException(\sprintf('The HTTP status code "%s" is not valid.', $code));
         }
 
         if (null === $text) {
@@ -540,7 +545,7 @@ class Response
      */
     public function isCacheable(): bool
     {
-        if (!\in_array($this->statusCode, [200, 203, 300, 301, 302, 404, 410])) {
+        if (!\in_array($this->statusCode, [200, 203, 300, 301, 302, 404, 410], true)) {
             return false;
         }
 
@@ -780,7 +785,7 @@ class Response
     /**
      * Sets the number of seconds after which the response should no longer be considered fresh.
      *
-     * This methods sets the Cache-Control max-age directive.
+     * This method sets the Cache-Control max-age directive.
      *
      * @return $this
      *
@@ -828,7 +833,7 @@ class Response
     /**
      * Sets the number of seconds after which the response should no longer be considered fresh by shared caches.
      *
-     * This methods sets the Cache-Control s-maxage directive.
+     * This method sets the Cache-Control s-maxage directive.
      *
      * @return $this
      *
@@ -976,7 +981,7 @@ class Response
     public function setCache(array $options): static
     {
         if ($diff = array_diff(array_keys($options), array_keys(self::HTTP_RESPONSE_CACHE_CONTROL_DIRECTIVES))) {
-            throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', $diff)));
+            throw new \InvalidArgumentException(\sprintf('Response does not support the following options: "%s".', implode('", "', $diff)));
         }
 
         if (isset($options['etag'])) {
@@ -1249,7 +1254,7 @@ class Response
      */
     public function isRedirect(?string $location = null): bool
     {
-        return \in_array($this->statusCode, [201, 301, 302, 303, 307, 308]) && (null === $location ?: $location == $this->headers->get('Location'));
+        return \in_array($this->statusCode, [201, 301, 302, 303, 307, 308], true) && (null === $location ?: $location == $this->headers->get('Location'));
     }
 
     /**
@@ -1259,7 +1264,7 @@ class Response
      */
     public function isEmpty(): bool
     {
-        return \in_array($this->statusCode, [204, 304]);
+        return \in_array($this->statusCode, [204, 304], true);
     }
 
     /**

@@ -34,8 +34,8 @@ class MailerSendMissingSignatureRequestParserTest extends AbstractRequestParserT
         $currentDir = \dirname((new \ReflectionClass(static::class))->getFileName());
 
         yield $filename => [
-            file_get_contents($currentDir . '/Fixtures/sent.json'),
-            include($currentDir . '/Fixtures/sent.php'),
+            file_get_contents($currentDir.'/Fixtures/sent.json'),
+            include ($currentDir.'/Fixtures/sent.php'),
         ];
     }
 

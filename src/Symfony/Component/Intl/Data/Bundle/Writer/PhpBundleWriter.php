@@ -25,11 +25,11 @@ class PhpBundleWriter implements BundleWriterInterface
     public function write(string $path, string $locale, mixed $data): void
     {
         $template = <<<'TEMPLATE'
-<?php
+            <?php
 
-return %s;
+            return %s;
 
-TEMPLATE;
+            TEMPLATE;
 
         if ($data instanceof \Traversable) {
             $data = iterator_to_array($data);
@@ -41,6 +41,6 @@ TEMPLATE;
             }
         });
 
-        file_put_contents($path.'/'.$locale.'.php', sprintf($template, VarExporter::export($data)));
+        file_put_contents($path.'/'.$locale.'.php', \sprintf($template, VarExporter::export($data)));
     }
 }

@@ -29,6 +29,7 @@ class FrozenParameterBag extends ParameterBag
     public function __construct(
         array $parameters = [],
         protected array $deprecatedParameters = [],
+        protected array $nonEmptyParameters = [],
     ) {
         $this->parameters = $parameters;
         $this->resolved = true;
@@ -52,6 +53,11 @@ class FrozenParameterBag extends ParameterBag
     public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.'): never
     {
         throw new LogicException('Impossible to call deprecate() on a frozen ParameterBag.');
+    }
+
+    public function cannotBeEmpty(string $name, string $message = 'A non-empty parameter "%s" is required.'): never
+    {
+        throw new LogicException('Impossible to call cannotBeEmpty() on a frozen ParameterBag.');
     }
 
     public function remove(string $name): never

@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\PackageUpdateInfo;
 
 class PackageUpdateInfoTest extends TestCase
 {
-    /**
-     * @dataProvider provideValidConstructorArguments
-     */
+    #[DataProvider('provideValidConstructorArguments')]
     public function testConstructor($importName, $currentVersion, $latestVersion, $updateType)
     {
         $packageUpdateInfo = new PackageUpdateInfo(
@@ -34,7 +33,7 @@ class PackageUpdateInfoTest extends TestCase
         $this->assertSame($updateType, $packageUpdateInfo->updateType);
     }
 
-    public function provideValidConstructorArguments()
+    public static function provideValidConstructorArguments(): iterable
     {
         return [
             ['@hotwired/stimulus', '5.2.1', 'string', 'downgrade'],
@@ -44,9 +43,7 @@ class PackageUpdateInfoTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideHasUpdateArguments
-     */
+    #[DataProvider('provideHasUpdateArguments')]
     public function testHasUpdate($updateType, $expectUpdate)
     {
         $packageUpdateInfo = new PackageUpdateInfo(
@@ -57,7 +54,7 @@ class PackageUpdateInfoTest extends TestCase
         $this->assertSame($expectUpdate, $packageUpdateInfo->hasUpdate());
     }
 
-    public function provideHasUpdateArguments()
+    public static function provideHasUpdateArguments(): iterable
     {
         return [
             ['downgrade', false],

@@ -22,20 +22,20 @@ final class FormErrorNormalizer implements NormalizerInterface
     public const TYPE = 'type';
     public const CODE = 'status_code';
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $data = [
+        $error = [
             'title' => $context[self::TITLE] ?? 'Validation Failed',
             'type' => $context[self::TYPE] ?? 'https://symfony.com/errors/form',
             'code' => $context[self::CODE] ?? null,
-            'errors' => $this->convertFormErrorsToArray($object),
+            'errors' => $this->convertFormErrorsToArray($data),
         ];
 
-        if (0 !== \count($object->all())) {
-            $data['children'] = $this->convertFormChildrenToArray($object);
+        if (0 !== \count($data->all())) {
+            $error['children'] = $this->convertFormChildrenToArray($data);
         }
 
-        return $data;
+        return $error;
     }
 
     public function getSupportedTypes(?string $format): array

@@ -35,6 +35,9 @@ class Yaml
     public const DUMP_EMPTY_ARRAY_AS_SEQUENCE = 1024;
     public const DUMP_NULL_AS_TILDE = 2048;
     public const DUMP_NUMERIC_KEY_AS_STRING = 4096;
+    public const DUMP_NULL_AS_EMPTY = 8192;
+    public const DUMP_COMPACT_NESTED_MAPPING = 16384;
+    public const DUMP_FORCE_DOUBLE_QUOTES_ON_VALUES = 32768;
 
     /**
      * Parses a YAML file into a PHP value.
@@ -44,8 +47,8 @@ class Yaml
      *     $array = Yaml::parseFile('config.yml');
      *     print_r($array);
      *
-     * @param string $filename The path to the YAML file to be parsed
-     * @param int    $flags    A bit field of PARSE_* constants to customize the YAML parser behavior
+     * @param string                     $filename The path to the YAML file to be parsed
+     * @param int-mask-of<self::PARSE_*> $flags    A bit field of PARSE_* constants to customize the YAML parser behavior
      *
      * @throws ParseException If the file could not be read or the YAML is not valid
      */
@@ -65,8 +68,8 @@ class Yaml
      *   print_r($array);
      *  </code>
      *
-     * @param string $input A string containing YAML
-     * @param int    $flags A bit field of PARSE_* constants to customize the YAML parser behavior
+     * @param string                     $input A string containing YAML
+     * @param int-mask-of<self::PARSE_*> $flags A bit field of PARSE_* constants to customize the YAML parser behavior
      *
      * @throws ParseException If the YAML is not valid
      */
@@ -83,10 +86,10 @@ class Yaml
      * The dump method, when supplied with an array, will do its best
      * to convert the array into friendly YAML.
      *
-     * @param mixed $input  The PHP value
-     * @param int   $inline The level where you switch to inline YAML
-     * @param int   $indent The amount of spaces to use for indentation of nested nodes
-     * @param int   $flags  A bit field of DUMP_* constants to customize the dumped YAML string
+     * @param mixed                     $input  The PHP value
+     * @param int                       $inline The level where you switch to inline YAML
+     * @param int                       $indent The amount of spaces to use for indentation of nested nodes
+     * @param int-mask-of<self::DUMP_*> $flags  A bit field of DUMP_* constants to customize the dumped YAML string
      */
     public static function dump(mixed $input, int $inline = 2, int $indent = 4, int $flags = 0): string
     {

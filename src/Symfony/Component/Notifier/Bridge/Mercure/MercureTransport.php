@@ -15,9 +15,9 @@ use Symfony\Component\Mercure\Exception\InvalidArgumentException;
 use Symfony\Component\Mercure\Exception\RuntimeException as MercureRuntimeException;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Exception\UnsupportedOptionsException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -49,7 +49,7 @@ final class MercureTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mercure://%s%s', $this->hubId, '?'.http_build_query(['topic' => $this->topics], '', '&'));
+        return \sprintf('mercure://%s%s', $this->hubId, '?'.http_build_query(['topic' => $this->topics], '', '&'));
     }
 
     public function supports(MessageInterface $message): bool
@@ -67,7 +67,7 @@ final class MercureTransport extends AbstractTransport
         }
 
         if (($options = $message->getOptions()) && !$options instanceof MercureOptions) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, MercureOptions::class));
+            throw new UnsupportedOptionsException(__CLASS__, MercureOptions::class, $options);
         }
 
         $options ??= new MercureOptions($this->topics);
@@ -77,6 +77,8 @@ final class MercureTransport extends AbstractTransport
             '@context' => 'https://www.w3.org/ns/activitystreams',
             'type' => 'Announce',
             'summary' => $message->getSubject(),
+            'mediaType' => 'application/json',
+            'content' => $options->getContent(),
         ]), $options->isPrivate(), $options->getId(), $options->getType(), $options->getRetry());
 
         try {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Bridge\Loco\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -25,16 +26,15 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
 {
-    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null, ?string $restrictToStatus = null): ProviderInterface
     {
-        return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint, null);
+        return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint, null, $restrictToStatus);
     }
 
     /**
      * Ensure the Last-Modified is not sent when $translatorBag is null.
-     *
-     * @dataProvider getResponsesForReadWithLastModified
      */
+    #[DataProvider('getResponsesForReadWithLastModified')]
     public function testReadWithLastModified(array $locales, array $domains, array $responseContents, array $lastModifieds, TranslatorBag $expectedTranslatorBag)
     {
         $responses = [];

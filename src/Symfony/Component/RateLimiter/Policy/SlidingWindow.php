@@ -21,19 +21,17 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class SlidingWindow implements LimiterStateInterface
 {
-    private string $id;
     private int $hitCount = 0;
     private int $hitCountForLastWindow = 0;
-    private int $intervalInSeconds;
     private float $windowEndAt;
 
-    public function __construct(string $id, int $intervalInSeconds)
-    {
+    public function __construct(
+        private string $id,
+        private int $intervalInSeconds,
+    ) {
         if ($intervalInSeconds < 1) {
-            throw new InvalidIntervalException(sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
+            throw new InvalidIntervalException(\sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
         }
-        $this->id = $id;
-        $this->intervalInSeconds = $intervalInSeconds;
         $this->windowEndAt = microtime(true) + $intervalInSeconds;
     }
 

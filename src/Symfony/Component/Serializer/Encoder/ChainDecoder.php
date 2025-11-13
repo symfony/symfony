@@ -78,6 +78,6 @@ class ChainDecoder implements ContextAwareDecoderInterface
             }
         }
 
-        throw new RuntimeException(sprintf('No decoder found for format "%s".', $format));
+        throw new RuntimeException(\sprintf('No decoder found for format "%s".', $format));
     }
 }

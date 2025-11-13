@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset\Tests\VersionStrategy;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
@@ -24,13 +25,11 @@ class StaticVersionStrategyTest extends TestCase
         $this->assertSame($version, $staticVersionStrategy->getVersion($path));
     }
 
-    /**
-     * @dataProvider getConfigs
-     */
+    #[DataProvider('getConfigs')]
     public function testApplyVersion($path, $version, $format)
     {
         $staticVersionStrategy = new StaticVersionStrategy($version, $format);
-        $formatted = sprintf($format ?: '%s?%s', $path, $version);
+        $formatted = \sprintf($format ?: '%s?%s', $path, $version);
         $this->assertSame($formatted, $staticVersionStrategy->applyVersion($path));
     }
 

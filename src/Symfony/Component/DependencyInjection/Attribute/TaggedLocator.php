@@ -13,6 +13,8 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 
 /**
  * Autowires a locator of services based on a tag name.
+ *
+ * @deprecated since Symfony 7.1, use {@see AutowireLocator} instead.
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class TaggedLocator extends AutowireLocator
@@ -33,6 +35,8 @@ class TaggedLocator extends AutowireLocator
         public string|array $exclude = [],
         public bool $excludeSelf = true,
     ) {
+        trigger_deprecation('symfony/dependency-injection', '7.1', 'The "%s" attribute is deprecated, use "%s" instead.', self::class, AutowireLocator::class);
+
         parent::__construct($tag, $indexAttribute, $defaultIndexMethod, $defaultPriorityMethod, $exclude, $excludeSelf);
     }
 }

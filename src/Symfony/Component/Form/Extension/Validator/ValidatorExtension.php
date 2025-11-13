@@ -33,6 +33,7 @@ class ValidatorExtension extends AbstractExtension
         private ?FormRendererInterface $formRenderer = null,
         private ?TranslatorInterface $translator = null,
     ) {
+        /** @var ClassMetadata $metadata */
         $metadata = $validator->getMetadataFor(\Symfony\Component\Form\Form::class);
 
         // Register the form constraints in the validator programmatically.
@@ -40,7 +41,6 @@ class ValidatorExtension extends AbstractExtension
         // the DIC, where the XML file is loaded automatically. Thus the following
         // code must be kept synchronized with validation.xml
 
-        /* @var $metadata ClassMetadata */
         $metadata->addConstraint(new Form());
         $metadata->addConstraint(new Traverse(false));
     }

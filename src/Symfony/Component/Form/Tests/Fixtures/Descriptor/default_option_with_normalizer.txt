@@ -25,4 +25,6 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (choice_translation_domain
                      }       %s
                    ]         %s
  ---------------- -----------%s
+  Nested Options   -         %s
+ ---------------- -----------%s
 

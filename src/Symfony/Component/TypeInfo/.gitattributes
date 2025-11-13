@@ -1,4 +1,4 @@
 /Tests export-ignore
+/Tests/Fixtures/DummyWithUsesWindowsLineEndings.php text eol=crlf
 /phpunit.xml.dist export-ignore
-/.gitattributes export-ignore
-/.gitignore export-ignore
+/.git* export-ignore

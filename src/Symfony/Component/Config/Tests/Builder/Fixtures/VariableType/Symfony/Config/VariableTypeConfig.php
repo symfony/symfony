@@ -12,15 +12,18 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
 {
     private $anyValue;
     private $_usedProperties = [];
+    private $_hasDeprecatedCalls = false;
 
     /**
      * @default null
      * @param ParamConfigurator|mixed $value
      *
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function anyValue(mixed $value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['anyValue'] = true;
         $this->anyValue = $value;
 
@@ -32,16 +35,16 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         return 'variable_type';
     }
 
-    public function __construct(array $value = [])
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('any_value', $value)) {
+        if (array_key_exists('any_value', $config)) {
             $this->_usedProperties['anyValue'] = true;
-            $this->anyValue = $value['any_value'];
-            unset($value['any_value']);
+            $this->anyValue = $config['any_value'];
+            unset($config['any_value']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 
@@ -50,6 +53,9 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
         $output = [];
         if (isset($this->_usedProperties['anyValue'])) {
             $output['any_value'] = $this->anyValue;
+        }
+        if ($this->_hasDeprecatedCalls) {
+            trigger_deprecation('symfony/config', '7.4', 'Calling any fluent method on "%s" is deprecated; pass the configuration to the constructor instead.', $this::class);
         }
 
         return $output;

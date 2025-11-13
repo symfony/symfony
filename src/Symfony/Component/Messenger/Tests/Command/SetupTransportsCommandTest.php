@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -30,10 +31,10 @@ class SetupTransportsCommandTest extends TestCase
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
         $serviceLocator->expects($this->exactly(2))
             ->method('get')
-            ->will($this->onConsecutiveCalls(
+            ->willReturn(
                 $this->createMock(SetupableTransportInterface::class),
                 $this->createMock(TransportInterface::class)
-            ));
+            );
         $serviceLocator
             ->method('has')
             ->willReturn(true);
@@ -53,12 +54,10 @@ class SetupTransportsCommandTest extends TestCase
         /** @var MockObject&ServiceLocator $serviceLocator */
         $serviceLocator = $this->createMock(ServiceLocator::class);
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
-        $serviceLocator->expects($this->exactly(1))
+        $serviceLocator->expects($this->once())
             ->method('get')
-            ->will($this->onConsecutiveCalls(
-                $this->createMock(SetupableTransportInterface::class)
-            ));
-        $serviceLocator->expects($this->exactly(1))
+            ->willReturn($this->createMock(SetupableTransportInterface::class));
+        $serviceLocator->expects($this->once())
             ->method('has')
             ->willReturn(true);
 
@@ -103,9 +102,7 @@ class SetupTransportsCommandTest extends TestCase
         $serviceLocator = $this->createMock(ServiceLocator::class);
         $serviceLocator->expects($this->exactly(1))
             ->method('get')
-            ->will($this->onConsecutiveCalls(
-                $amqpTransport
-            ));
+            ->willReturn($amqpTransport);
         $serviceLocator
             ->method('has')
             ->willReturn(true);
@@ -118,9 +115,7 @@ class SetupTransportsCommandTest extends TestCase
         $tester->execute(['transport' => 'amqp']);
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $serviceLocator = $this->createMock(ServiceLocator::class);

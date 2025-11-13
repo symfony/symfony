@@ -27,9 +27,9 @@ class TranslatorBagTest extends TestCase
         $this->assertEquals(['en' => $messages], $this->getAllMessagesFromTranslatorBag($bag));
 
         $messages = ['domain1+intl-icu' => ['foo' => 'bar']] + $messages + [
-                'domain2+intl-icu' => ['bar' => 'foo'],
-                'domain3+intl-icu' => ['biz' => 'biz'],
-            ];
+            'domain2+intl-icu' => ['bar' => 'foo'],
+            'domain3+intl-icu' => ['biz' => 'biz'],
+        ];
         $catalogue = new MessageCatalogue('en', $messages);
 
         $bag = new TranslatorBag();

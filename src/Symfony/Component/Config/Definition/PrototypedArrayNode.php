@@ -29,10 +29,12 @@ class PrototypedArrayNode extends ArrayNode
     protected int $minNumberOfElements = 0;
     protected array $defaultValue = [];
     protected ?array $defaultChildren = null;
+
     /**
      * @var NodeInterface[] An array of the prototypes of the simplified value children
      */
     private array $valuePrototypes = [];
+    private bool $defaultToNull = false;
 
     /**
      * Sets the minimum number of elements that a prototype based node must
@@ -87,6 +89,13 @@ class PrototypedArrayNode extends ArrayNode
     public function setDefaultValue(array $value): void
     {
         $this->defaultValue = $value;
+        $this->defaultToNull = false;
+    }
+
+    public function setNullAsDefault(): void
+    {
+        $this->defaultValue = [];
+        $this->defaultToNull = true;
     }
 
     public function hasDefaultValue(): bool
@@ -106,14 +115,19 @@ class PrototypedArrayNode extends ArrayNode
         } else {
             $this->defaultChildren = \is_int($children) && $children > 0 ? range(1, $children) : (array) $children;
         }
+        $this->defaultToNull = false;
     }
 
     /**
-     * The default value could be either explicited or derived from the prototype
+     * The default value could be either explicit or derived from the prototype
      * default value.
      */
     public function getDefaultValue(): mixed
     {
+        if ($this->defaultToNull) {
+            return null;
+        }
+
         if (null !== $this->defaultChildren) {
             $default = $this->prototype->hasDefaultValue() ? $this->prototype->getDefaultValue() : [];
             $defaults = [];
@@ -156,7 +170,7 @@ class PrototypedArrayNode extends ArrayNode
     protected function finalizeValue(mixed $value): mixed
     {
         if (false === $value) {
-            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), json_encode($value)));
+            throw new UnsetKeyException(\sprintf('Unsetting key for path "%s", value: false.', $this->getPath()));
         }
 
         foreach ($value as $k => $v) {
@@ -169,7 +183,7 @@ class PrototypedArrayNode extends ArrayNode
         }
 
         if (\count($value) < $this->minNumberOfElements) {
-            $ex = new InvalidConfigurationException(sprintf('The path "%s" should have at least %d element(s) defined.', $this->getPath(), $this->minNumberOfElements));
+            $ex = new InvalidConfigurationException(\sprintf('The path "%s" should have at least %d element(s) defined.', $this->getPath(), $this->minNumberOfElements));
             $ex->setPath($this->getPath());
 
             throw $ex;
@@ -194,7 +208,7 @@ class PrototypedArrayNode extends ArrayNode
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && \is_array($v)) {
                 if (!isset($v[$this->keyAttribute]) && \is_int($k) && $isList) {
-                    $ex = new InvalidConfigurationException(sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath()));
+                    $ex = new InvalidConfigurationException(\sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath()));
                     $ex->setPath($this->getPath());
 
                     throw $ex;
@@ -217,17 +231,15 @@ class PrototypedArrayNode extends ArrayNode
                             $valuePrototype = current($this->valuePrototypes) ?: clone $children['value'];
                             $valuePrototype->parent = $this;
                             $originalClosures = $this->prototype->normalizationClosures;
-                            if (\is_array($originalClosures)) {
-                                $valuePrototypeClosures = $valuePrototype->normalizationClosures;
-                                $valuePrototype->normalizationClosures = \is_array($valuePrototypeClosures) ? array_merge($originalClosures, $valuePrototypeClosures) : $originalClosures;
-                            }
+                            $valuePrototypeClosures = $valuePrototype->normalizationClosures;
+                            $valuePrototype->normalizationClosures = array_merge($originalClosures, $valuePrototypeClosures);
                             $this->valuePrototypes[$k] = $valuePrototype;
                         }
                     }
                 }
 
                 if (\array_key_exists($k, $normalized)) {
-                    $ex = new DuplicateKeyException(sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath()));
+                    $ex = new DuplicateKeyException(\sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath()));
                     $ex->setPath($this->getPath());
 
                     throw $ex;
@@ -268,7 +280,7 @@ class PrototypedArrayNode extends ArrayNode
             // no conflict
             if (!\array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {
-                    $ex = new InvalidConfigurationException(sprintf('You are not allowed to define new elements for path "%s". Please define all elements for this path in one config file.', $this->getPath()));
+                    $ex = new InvalidConfigurationException(\sprintf('You are not allowed to define new elements for path "%s". Please define all elements for this path in one config file.', $this->getPath()));
                     $ex->setPath($this->getPath());
 
                     throw $ex;

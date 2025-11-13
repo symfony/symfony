@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\LogicException;
@@ -134,35 +135,45 @@ class MessageTest extends TestCase
         $message->generateMessageId();
     }
 
+    public function testGenerateMessageIdThrowsWhenNeitherFromNorSenderIsPresent()
+    {
+        $message = new Message();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('An email must have a "From" or a "Sender" header.');
+
+        $message->generateMessageId();
+    }
+
     public function testToString()
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
         $expected = <<<EOF
-From: fabien@symfony.com
-MIME-Version: 1.0
-Date: %s
-Message-ID: <%s@symfony.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+            From: fabien@symfony.com
+            MIME-Version: 1.0
+            Date: %s
+            Message-ID: <%s@symfony.com>
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: quoted-printable
 
 
-EOF;
+            EOF;
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
 
         $message = new Message(null, new TextPart('content'));
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
         $expected = <<<EOF
-From: fabien@symfony.com
-MIME-Version: 1.0
-Date: %s
-Message-ID: <%s@symfony.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+            From: fabien@symfony.com
+            MIME-Version: 1.0
+            Date: %s
+            Message-ID: <%s@symfony.com>
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: quoted-printable
 
-content
-EOF;
+            content
+            EOF;
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
     }
@@ -182,81 +193,81 @@ EOF;
         $expected = clone $e;
 
         $expectedJson = <<<EOF
-{
-    "headers": {
-        "to": [
             {
-                "addresses": [
-                    {
-                        "address": "you@example.com",
-                        "name": ""
-                    }
-                ],
-                "name": "To",
-                "lineLength": 76,
-                "lang": null,
-                "charset": "utf-8"
-            }
-        ]
-    },
-    "body": {
-        "boundary": null,
-        "parts": [
-            {
-                "boundary": null,
-                "parts": [
-                    {
-                        "body": "Text content",
-                        "charset": "utf-8",
-                        "subtype": "plain",
-                        "disposition": null,
-                        "name": null,
-                        "encoding": "quoted-printable",%A
-                        "headers": [],
-                        "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\TextPart"
+                "headers": {
+                    "to": [
+                        {
+                            "addresses": [
+                                {
+                                    "address": "you@example.com",
+                                    "name": ""
+                                }
+                            ],
+                            "name": "To",
+                            "lineLength": 76,
+                            "lang": null,
+                            "charset": "utf-8"
+                        }
+                    ]
+                },
+                "body": {
+                    "boundary": null,
+                    "parts": [
+                        {
+                            "boundary": null,
+                            "parts": [
+                                {
+                                    "body": "Text content",
+                                    "charset": "utf-8",
+                                    "subtype": "plain",
+                                    "disposition": null,
+                                    "name": null,
+                                    "encoding": "quoted-printable",%A
+                                    "headers": [],
+                                    "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\TextPart"
+                                },
+                                {
+                                    "body": "HTML content",
+                                    "charset": "utf-8",
+                                    "subtype": "html",
+                                    "disposition": null,
+                                    "name": null,
+                                    "encoding": "quoted-printable",%A
+                                    "headers": [],
+                                    "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\TextPart"
+                                }
+                            ],
+                            "headers": [],
+                            "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\AlternativePart"
+                        },
+                        {
+                            "filename": "text.txt",
+                            "mediaType": "application",%A
+                            "body": "text data",
+                            "charset": null,
+                            "subtype": "octet-stream",
+                            "disposition": "attachment",
+                            "name": "text.txt",
+                            "encoding": "base64",%A
+                            "headers": [],
+                            "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart"
+                        }
+                    ],
+                    "headers": {
+                        "foo": [
+                            {
+                                "value": "bar",
+                                "name": "foo",
+                                "lineLength": 76,
+                                "lang": null,
+                                "charset": "utf-8"
+                            }
+                        ]
                     },
-                    {
-                        "body": "HTML content",
-                        "charset": "utf-8",
-                        "subtype": "html",
-                        "disposition": null,
-                        "name": null,
-                        "encoding": "quoted-printable",%A
-                        "headers": [],
-                        "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\TextPart"
-                    }
-                ],
-                "headers": [],
-                "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\AlternativePart"
-            },
-            {
-                "filename": "text.txt",
-                "mediaType": "application",%A
-                "body": "text data",
-                "charset": null,
-                "subtype": "octet-stream",
-                "disposition": "attachment",
-                "name": "text.txt",
-                "encoding": "base64",%A
-                "headers": [],
-                "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart"
-            }
-        ],
-        "headers": {
-            "foo": [
-                {
-                    "value": "bar",
-                    "name": "foo",
-                    "lineLength": 76,
-                    "lang": null,
-                    "charset": "utf-8"
+                    "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\MixedPart"
                 }
-            ]
-        },
-        "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\MixedPart"
-    }
-}
-EOF;
+            }
+            EOF;
 
         $extractor = new PhpDocExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
@@ -275,5 +286,70 @@ EOF;
 
         $serialized = $serializer->serialize($e, 'json');
         $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+    }
+
+    #[DataProvider('ensureValidityProvider')]
+    public function testEnsureValidity(array $headers, ?string $exceptionClass, ?string $exceptionMessage)
+    {
+        if ($exceptionClass) {
+            $this->expectException($exceptionClass);
+            $this->expectExceptionMessage($exceptionMessage);
+        } else {
+            $this->expectNotToPerformAssertions();
+        }
+
+        $m = new Message();
+        foreach ($headers as $headerName => $headerValue) {
+            $m->getHeaders()->addMailboxListHeader($headerName, $headerValue);
+        }
+        $m->ensureValidity();
+    }
+
+    public static function ensureValidityProvider(): array
+    {
+        return [
+            'Valid address fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                    'From' => ['test@symfony.com'],
+                ],
+                null,
+                null,
+            ],
+
+            'No destination address fields' => [
+                [
+                    'From' => ['test@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "To", "Cc", or "Bcc" header.',
+            ],
+
+            'Empty destination address fields' => [
+                [
+                    'To' => [],
+                    'From' => ['test@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "To", "Cc", or "Bcc" header.',
+            ],
+
+            'No originator fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                ],
+                LogicException::class,
+                'An email must have a "From" or a "Sender" header.',
+            ],
+
+            'Empty originator fields' => [
+                [
+                    'To' => ['dummy@symfony.com'],
+                    'From' => [],
+                ],
+                LogicException::class,
+                'An email must have a "From" or a "Sender" header.',
+            ],
+        ];
     }
 }

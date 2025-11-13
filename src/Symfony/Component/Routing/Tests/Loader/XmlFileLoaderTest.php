@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -23,6 +26,8 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Tests\Fixtures\CustomXmlFileLoader;
 use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
 
+#[IgnoreDeprecations]
+#[Group('legacy')]
 class XmlFileLoaderTest extends TestCase
 {
     public function testSupports()
@@ -79,7 +84,7 @@ class XmlFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         foreach ($routes as $route) {
             $this->assertSame('/{foo}/blog/{slug}', $route->getPath());
@@ -176,7 +181,7 @@ class XmlFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         $this->assertEquals('/route', $routeCollection->get('localized.fr')->getPath());
         $this->assertEquals('/path', $routeCollection->get('localized.en')->getPath());
@@ -189,7 +194,7 @@ class XmlFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         $this->assertEquals('/le-prefix/le-suffix', $routeCollection->get('imported.fr')->getPath());
         $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
@@ -205,7 +210,7 @@ class XmlFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         $this->assertEquals('/le-prefix/suffix', $routeCollection->get('imported.fr')->getPath());
         $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
@@ -214,9 +219,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('en', $routeCollection->get('imported.en')->getRequirement('_locale'));
     }
 
-    /**
-     * @dataProvider getPathsToInvalidFiles
-     */
+    #[DataProvider('getPathsToInvalidFiles')]
     public function testLoadThrowsExceptionWithInvalidFile($filePath)
     {
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
@@ -226,9 +229,7 @@ class XmlFileLoaderTest extends TestCase
         $loader->load($filePath);
     }
 
-    /**
-     * @dataProvider getPathsToInvalidFiles
-     */
+    #[DataProvider('getPathsToInvalidFiles')]
     public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation(string $filePath)
     {
         $loader = new CustomXmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
@@ -472,9 +473,7 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('override_defaults.xml');
     }
 
-    /**
-     * @dataProvider provideFilesImportingRoutesWithControllers
-     */
+    #[DataProvider('provideFilesImportingRoutesWithControllers')]
     public function testImportRouteWithController(string $file)
     {
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
@@ -587,6 +586,16 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('xml'), $routes);
     }
 
+    public function testAddingRouteWithHosts()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('route-with-hosts.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/route-with-hosts-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
     public function testWhenEnv()
     {
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
@@ -607,17 +616,15 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('xml'), $routes);
     }
 
-    /**
-     * @dataProvider providePsr4ConfigFiles
-     */
+    #[DataProvider('providePsr4ConfigFiles')]
     public function testImportAttributesWithPsr4Prefix(string $configFile)
     {
         $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
         new LoaderResolver([
             $loader = new XmlFileLoader($locator),
             new Psr4DirectoryLoader($locator),
-            new class() extends AttributeClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }
@@ -641,8 +648,8 @@ class XmlFileLoaderTest extends TestCase
     {
         new LoaderResolver([
             $loader = new XmlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
-            new class() extends AttributeClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }

@@ -173,10 +173,10 @@ class FormFactoryTest extends TestCase
 
 class ConfigurableFormTypeGuesser implements FormTypeGuesserInterface
 {
-    private ?\Symfony\Component\Form\Guess\TypeGuess $typeGuess = null;
-    private ?\Symfony\Component\Form\Guess\ValueGuess $requiredGuess = null;
-    private ?\Symfony\Component\Form\Guess\ValueGuess $maxLengthGuess = null;
-    private ?\Symfony\Component\Form\Guess\ValueGuess $patternGuess = null;
+    private ?TypeGuess $typeGuess = null;
+    private ?ValueGuess $requiredGuess = null;
+    private ?ValueGuess $maxLengthGuess = null;
+    private ?ValueGuess $patternGuess = null;
 
     public function guessType($class, $property): ?TypeGuess
     {

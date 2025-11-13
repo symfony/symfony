@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
@@ -22,51 +24,46 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class ImportMapConfigReaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private Filesystem $filesystem;
 
     protected function setUp(): void
     {
         $this->filesystem = new Filesystem();
-        if (!file_exists(__DIR__.'/../Fixtures/importmaps_for_writing')) {
-            $this->filesystem->mkdir(__DIR__.'/../Fixtures/importmaps_for_writing');
-        }
-        if (!file_exists(__DIR__.'/../Fixtures/importmaps_for_writing/assets')) {
-            $this->filesystem->mkdir(__DIR__.'/../Fixtures/importmaps_for_writing/assets');
+        if (!file_exists(__DIR__.'/../Fixtures/importmap_config_reader/assets')) {
+            $this->filesystem->mkdir(__DIR__.'/../Fixtures/importmap_config_reader/assets');
         }
     }
 
     protected function tearDown(): void
     {
-        $this->filesystem->remove(__DIR__.'/../Fixtures/importmaps_for_writing');
+        $this->filesystem->remove(__DIR__.'/../Fixtures/importmap_config_reader');
     }
 
     public function testGetEntriesAndWriteEntries()
     {
         $importMap = <<<EOF
-<?php
-return [
-    'remote_package' => [
-        'version' => '3.2.1',
-    ],
-    'local_package' => [
-        'path' => 'app.js',
-    ],
-    'type_css' => [
-        'path' => 'styles/app.css',
-        'type' => 'css',
-    ],
-    'entry_point' => [
-        'path' => 'entry.js',
-        'entrypoint' => true,
-    ],
-    'package/with_file.js' => [
-        'version' => '1.0.0',
-    ],
-];
-EOF;
-        file_put_contents(__DIR__.'/../Fixtures/importmaps_for_writing/importmap.php', $importMap);
+            <?php
+            return [
+                'remote_package' => [
+                    'version' => '3.2.1',
+                ],
+                'local_package' => [
+                    'path' => 'app.js',
+                ],
+                'type_css' => [
+                    'path' => 'styles/app.css',
+                    'type' => 'css',
+                ],
+                'entry_point' => [
+                    'path' => 'entry.js',
+                    'entrypoint' => true,
+                ],
+                'package/with_file.js' => [
+                    'version' => '1.0.0',
+                ],
+            ];
+            EOF;
+        file_put_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php', $importMap);
 
         $remotePackageStorage = $this->createMock(RemotePackageStorage::class);
         $remotePackageStorage->expects($this->any())
@@ -75,7 +72,7 @@ EOF;
                 return '/path/to/vendor/'.$packageModuleSpecifier.'.'.$type->value;
             });
         $reader = new ImportMapConfigReader(
-            __DIR__.'/../Fixtures/importmaps_for_writing/importmap.php',
+            __DIR__.'/../Fixtures/importmap_config_reader/importmap.php',
             $remotePackageStorage,
         );
         $entries = $reader->getEntries();
@@ -103,18 +100,16 @@ EOF;
         $this->assertSame('package/with_file.js', $packageWithFileEntry->packageModuleSpecifier);
 
         // now save the original raw data from importmap.php and delete the file
-        $originalImportMapData = (static fn () => include __DIR__.'/../Fixtures/importmaps_for_writing/importmap.php')();
-        unlink(__DIR__.'/../Fixtures/importmaps_for_writing/importmap.php');
+        $originalImportMapData = (static fn () => eval('?>'.file_get_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php')))();
+        unlink(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php');
         // dump the entries back to the file
         $reader->writeEntries($entries);
-        $newImportMapData = (static fn () => include __DIR__.'/../Fixtures/importmaps_for_writing/importmap.php')();
+        $newImportMapData = (static fn () => eval('?>'.file_get_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php')))();
 
         $this->assertSame($originalImportMapData, $newImportMapData);
     }
 
-    /**
-     * @dataProvider getPathToFilesystemPathTests
-     */
+    #[DataProvider('getPathToFilesystemPathTests')]
     public function testConvertPathToFilesystemPath(string $path, string $expectedPath)
     {
         $configReader = new ImportMapConfigReader(realpath(__DIR__.'/../Fixtures/importmap.php'), $this->createMock(RemotePackageStorage::class));
@@ -136,9 +131,7 @@ EOF;
         ];
     }
 
-    /**
-     * @dataProvider getFilesystemPathToPathTests
-     */
+    #[DataProvider('getFilesystemPathToPathTests')]
     public function testConvertFilesystemPathToPath(string $path, ?string $expectedPath)
     {
         $configReader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
@@ -166,12 +159,11 @@ EOF;
         $this->assertSame('file2.js', $entry->path);
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testDeprecatedMethodTriggerDeprecation()
     {
-        $this->expectDeprecation('Since symfony/asset-mapper 7.1: The method "Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader::splitPackageNameAndFilePath()" is deprecated and will be removed in 8.0. Use ImportMapEntry::splitPackageNameAndFilePath() instead.');
+        $this->expectUserDeprecationMessage('Since symfony/asset-mapper 7.1: The method "Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader::splitPackageNameAndFilePath()" is deprecated and will be removed in 8.0. Use ImportMapEntry::splitPackageNameAndFilePath() instead.');
         ImportMapConfigReader::splitPackageNameAndFilePath('foo');
     }
 }

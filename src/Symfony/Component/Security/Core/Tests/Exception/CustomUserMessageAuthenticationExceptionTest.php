@@ -53,6 +53,7 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
         $exception->setSafeMessage('message', ['token' => $token]);
 
         $processed = unserialize(serialize($exception));
+        $this->assertSame($token->getRoleNames(), $processed->getToken()->getRoleNames());
         $this->assertEquals($token, $processed->getToken());
         $this->assertEquals($token, $processed->getMessageData()['token']);
         $this->assertSame($processed->getToken(), $processed->getMessageData()['token']);
@@ -67,6 +68,7 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
         $exception->setToken($token);
 
         $processed = unserialize(serialize($exception));
+        $this->assertSame($token->getRoleNames(), $processed->getToken()->getRoleNames());
         $this->assertEquals($token, $processed->childMember);
         $this->assertEquals($token, $processed->getToken());
         $this->assertSame($processed->getToken(), $processed->childMember);

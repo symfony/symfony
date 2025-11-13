@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Header\Headers;
  */
 class DataPart extends TextPart
 {
-    /** @internal */
+    /** @internal, to be removed in 8.0 */
     protected array $_parent;
 
     private ?string $filename = null;
@@ -66,7 +66,7 @@ class DataPart extends TextPart
     public function setContentId(string $cid): static
     {
         if (!str_contains($cid, '@')) {
-            throw new InvalidArgumentException(sprintf('Invalid cid "%s".', $cid));
+            throw new InvalidArgumentException(\sprintf('The "%s" CID is invalid as it doesn\'t contain an "@".', $cid));
         }
 
         $this->cid = $cid;
@@ -129,8 +129,86 @@ class DataPart extends TextPart
         return bin2hex(random_bytes(16)).'@symfony';
     }
 
+    public function __serialize(): array
+    {
+        if (self::class === (new \ReflectionMethod($this, '__sleep'))->class || self::class !== (new \ReflectionMethod($this, '__serialize'))->class) {
+            $parent = parent::__serialize();
+            $headers = $parent['_headers'];
+            unset($parent['_headers']);
+
+            return [
+                '_headers' => $headers,
+                '_parent' => $parent,
+                'filename' => $this->filename,
+                'mediaType' => $this->mediaType,
+            ];
+        }
+
+        trigger_deprecation('symfony/mime', '7.4', 'Implementing "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
+
+        $data = [];
+        foreach ($this->__sleep() as $key) {
+            try {
+                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
+                    $data[$key] = $r->getValue($this);
+                }
+            } catch (\ReflectionException) {
+                $data[$key] = $this->$key;
+            }
+        }
+
+        return $data;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        if ($wakeup = self::class !== (new \ReflectionMethod($this, '__wakeup'))->class && self::class === (new \ReflectionMethod($this, '__unserialize'))->class) {
+            trigger_deprecation('symfony/mime', '7.4', 'Implementing "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
+        }
+
+        if (['_headers', '_parent', 'filename', 'mediaType'] === array_keys($data)) {
+            parent::__unserialize(['_headers' => $data['_headers'], ...$data['_parent']]);
+            $this->filename = $data['filename'];
+            $this->mediaType = $data['mediaType'];
+
+            if ($wakeup) {
+                $this->__wakeup();
+            }
+
+            return;
+        }
+
+        if (["\0*\0_headers", "\0*\0_parent", "\0".self::class."\0filename", "\0".self::class."\0mediaType"] === array_keys($data)) {
+            parent::__unserialize(['_headers' => $data["\0*\0_headers"], ...$data["\0*\0_parent"]]);
+            $this->filename = $data["\0".self::class."\0filename"];
+            $this->mediaType = $data["\0".self::class."\0mediaType"];
+
+            if ($wakeup) {
+                $this->__wakeup();
+            }
+
+            return;
+        }
+
+        trigger_deprecation('symfony/mime', '7.4', 'Passing extra keys to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
+
+        \Closure::bind(function ($data) use ($wakeup) {
+            foreach ($data as $key => $value) {
+                $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
+            }
+
+            if ($wakeup) {
+                $this->__wakeup();
+            }
+        }, $this, static::class)($data);
+    }
+
+    /**
+     * @deprecated since Symfony 7.4, will be replaced by `__serialize()` in 8.0
+     */
     public function __sleep(): array
     {
+        trigger_deprecation('symfony/mime', '7.4', 'Calling "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
         // converts the body to a string
         parent::__sleep();
 
@@ -144,6 +222,9 @@ class DataPart extends TextPart
         return ['_headers', '_parent', 'filename', 'mediaType'];
     }
 
+    /**
+     * @deprecated since Symfony 7.4, will be replaced by `__unserialize()` in 8.0
+     */
     public function __wakeup(): void
     {
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');

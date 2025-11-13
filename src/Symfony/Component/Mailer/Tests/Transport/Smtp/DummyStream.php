@@ -77,7 +77,7 @@ class DummyStream extends AbstractStream
         } elseif (str_starts_with($bytes, 'QUIT')) {
             $this->nextResponse = '221 Goodbye';
         } else {
-            $this->nextResponse = '250 OK';
+            $this->nextResponse = '250 OK queued as 000501c4054c';
         }
     }
 

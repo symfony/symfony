@@ -41,7 +41,7 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(\extension_loaded('xdebug'), $c->hasXDebug());
         $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL), $c->hasZendOpcache());
         $this->assertSame(\extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL), $c->hasApcu());
-        $this->assertSame(sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION), $c->getSymfonyMinorVersion());
+        $this->assertSame(\sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION), $c->getSymfonyMinorVersion());
         $this->assertContains($c->getSymfonyState(), ['eol', 'eom', 'dev', 'stable']);
 
         $eom = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->format('F Y');
@@ -69,7 +69,7 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(\extension_loaded('xdebug'), $c->hasXDebug());
         $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOL), $c->hasZendOpcache());
         $this->assertSame(\extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL), $c->hasApcu());
-        $this->assertSame(sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION), $c->getSymfonyMinorVersion());
+        $this->assertSame(\sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION), $c->getSymfonyMinorVersion());
         $this->assertContains($c->getSymfonyState(), ['eol', 'eom', 'dev', 'stable']);
 
         $eom = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->format('F Y');

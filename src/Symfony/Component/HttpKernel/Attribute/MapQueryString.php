@@ -37,6 +37,7 @@ class MapQueryString extends ValueResolver
         public readonly string|GroupSequence|array|null $validationGroups = null,
         string $resolver = RequestPayloadValueResolver::class,
         public readonly int $validationFailedStatusCode = Response::HTTP_NOT_FOUND,
+        public readonly ?string $key = null,
     ) {
         parent::__construct($resolver);
     }

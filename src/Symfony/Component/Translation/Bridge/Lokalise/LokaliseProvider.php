@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Bridge\Lokalise;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\ProviderException;
+use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Provider\ProviderInterface;
@@ -31,6 +32,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class LokaliseProvider implements ProviderInterface
 {
     private const LOKALISE_GET_KEYS_LIMIT = 5000;
+    private const PROJECT_TOO_BIG_STATUS_CODE = 413;
+    private const FAILED_PROCESS_STATUS = ['cancelled', 'failed'];
+    private const SUCESS_PROCESS_STATUS = 'finished';
 
     public function __construct(
         private HttpClientInterface $client,
@@ -43,7 +47,7 @@ final class LokaliseProvider implements ProviderInterface
 
     public function __toString(): string
     {
-        return sprintf('lokalise://%s', $this->endpoint);
+        return \sprintf('lokalise://%s', $this->endpoint);
     }
 
     /**
@@ -113,12 +117,16 @@ final class LokaliseProvider implements ProviderInterface
             $keysIds += $this->getKeysIds($keysToDelete, $domain);
         }
 
+        if (!$keysIds) {
+            return;
+        }
+
         $response = $this->client->request('DELETE', 'keys', [
             'json' => ['keys' => array_values($keysIds)],
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderException(sprintf('Unable to delete keys from Lokalise: "%s".', $response->getContent(false)), $response);
+            throw new ProviderException(\sprintf('Unable to delete keys from Lokalise: "%s".', $response->getContent(false)), $response);
         }
     }
 
@@ -147,7 +155,14 @@ final class LokaliseProvider implements ProviderInterface
         }
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderException(sprintf('Unable to export translations from Lokalise: "%s".', $response->getContent(false)), $response);
+            if (self::PROJECT_TOO_BIG_STATUS_CODE !== ($responseContent['error']['code'] ?? null)) {
+                throw new ProviderException(\sprintf('Unable to export translations from Lokalise: "%s".', $response->getContent(false)), $response);
+            }
+            if (!\extension_loaded('zip')) {
+                throw new ProviderException(\sprintf('Unable to export translations from Lokalise: "%s". Make sure that the "zip" extension is enabled.', $response->getContent(false)), $response);
+            }
+
+            return $this->exportFilesAsync($locales, $domains);
         }
 
         // Lokalise returns languages with "-" separator, we need to reformat them to "_" separator.
@@ -156,6 +171,115 @@ final class LokaliseProvider implements ProviderInterface
         }, array_keys($responseContent['files']));
 
         return array_combine($reformattedLanguages, $responseContent['files']);
+    }
+
+    /**
+     * @see https://developers.lokalise.com/reference/download-files-async
+     */
+    private function exportFilesAsync(array $locales, array $domains): array
+    {
+        $response = $this->client->request('POST', 'files/async-download', [
+            'json' => [
+                'format' => 'symfony_xliff',
+                'original_filenames' => true,
+                'filter_langs' => array_values($locales),
+                'filter_filenames' => array_map($this->getLokaliseFilenameFromDomain(...), $domains),
+                'export_empty_as' => 'skip',
+                'replace_breaks' => false,
+            ],
+        ]);
+
+        if (200 !== $response->getStatusCode()) {
+            throw new ProviderException(\sprintf('Unable to export translations from Lokalise: "%s".', $response->getContent(false)), $response);
+        }
+
+        $processId = $response->toArray()['process_id'];
+        while (true) {
+            $response = $this->client->request('GET', \sprintf('processes/%s', $processId));
+            $process = $response->toArray()['process'];
+            if (\in_array($process['status'], self::FAILED_PROCESS_STATUS, true)) {
+                throw new ProviderException(\sprintf('Unable to export translations from Lokalise: "%s".', $response->getContent(false)), $response);
+            }
+            if (self::SUCESS_PROCESS_STATUS === $process['status']) {
+                $downloadUrl = $process['details']['download_url'];
+                break;
+            }
+            usleep(500000);
+        }
+
+        $response = $this->client->request('GET', $downloadUrl, ['buffer' => false]);
+        if (200 !== $response->getStatusCode()) {
+            throw new ProviderException(\sprintf('Unable to download translations file from Lokalise: "%s".', $response->getContent(false)), $response);
+        }
+        $zipFile = tempnam(sys_get_temp_dir(), 'lokalise');
+        $extractPath = $zipFile.'.dir';
+        try {
+            if (!$h = @fopen($zipFile, 'w')) {
+                throw new RuntimeException(error_get_last()['message'] ?? 'Failed to create temporary file.');
+            }
+            foreach ($this->client->stream($response) as $chunk) {
+                fwrite($h, $chunk->getContent());
+            }
+            fclose($h);
+
+            $zip = new \ZipArchive();
+            if (!$zip->open($zipFile)) {
+                throw new RuntimeException('Failed to open zipped translations from Lokalise.');
+            }
+
+            try {
+                if (!$zip->extractTo($extractPath)) {
+                    throw new RuntimeException('Failed to unzip translations from Lokalize.');
+                }
+            } finally {
+                $zip->close();
+            }
+
+            return $this->getZipContents($extractPath);
+        } finally {
+            if (is_resource($h)) {
+                fclose($h);
+            }
+            @unlink($zipFile);
+            $this->removeDir($extractPath);
+        }
+    }
+
+    private function getZipContents(string $dir): array
+    {
+        $contents = [];
+        foreach (scandir($dir) as $lang) {
+            if (\in_array($lang, ['.', '..'], true)) {
+                continue;
+            }
+            $path = $dir.'/'.$lang;
+            // Lokalise returns languages with "-" separator, we need to reformat them to "_" separator.
+            $lang = str_replace('-', '_', $lang);
+            foreach (scandir($path) as $name) {
+                if (!\in_array($name, ['.', '..'], true)) {
+                    $contents[$lang][$name]['content'] = file_get_contents($path.'/'.$name);
+                }
+            }
+        }
+
+        return $contents;
+    }
+
+    private function removeDir(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $it = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
+        $files = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($files as $file) {
+            if ($file->isDir()) {
+                rmdir($file->getPathname());
+            } else {
+                unlink($file->getPathname());
+            }
+        }
+        rmdir($dir);
     }
 
     private function createKeys(array $keys, string $domain): array
@@ -190,7 +314,7 @@ final class LokaliseProvider implements ProviderInterface
 
         foreach ($responses as $response) {
             if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(sprintf('Unable to create keys to Lokalise: "%s".', $response->getContent(false)));
+                $this->logger->error(\sprintf('Unable to create keys to Lokalise: "%s".', $response->getContent(false)));
 
                 if (500 <= $statusCode) {
                     throw new ProviderException('Unable to create keys to Lokalise.', $response);
@@ -245,12 +369,16 @@ final class LokaliseProvider implements ProviderInterface
             }
         }
 
+        if (!$keysToUpdate) {
+            return;
+        }
+
         $response = $this->client->request('PUT', 'keys', [
             'json' => ['keys' => $keysToUpdate],
         ]);
 
         if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to create/update translations to Lokalise: "%s".', $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to create/update translations to Lokalise: "%s".', $response->getContent(false)));
 
             if (500 <= $statusCode) {
                 throw new ProviderException('Unable to create/update translations to Lokalise.', $response);
@@ -270,7 +398,7 @@ final class LokaliseProvider implements ProviderInterface
         ]);
 
         if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to get keys ids from Lokalise: "%s".', $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to get keys ids from Lokalise: "%s".', $response->getContent(false)));
 
             if (500 <= $statusCode) {
                 throw new ProviderException('Unable to get keys ids from Lokalise.', $response);
@@ -324,7 +452,7 @@ final class LokaliseProvider implements ProviderInterface
         $response = $this->client->request('GET', 'languages');
 
         if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to get languages from Lokalise: "%s".', $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to get languages from Lokalise: "%s".', $response->getContent(false)));
 
             if (500 <= $statusCode) {
                 throw new ProviderException('Unable to get languages from Lokalise.', $response);
@@ -351,7 +479,7 @@ final class LokaliseProvider implements ProviderInterface
         ]);
 
         if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(sprintf('Unable to create languages on Lokalise: "%s".', $response->getContent(false)));
+            $this->logger->error(\sprintf('Unable to create languages on Lokalise: "%s".', $response->getContent(false)));
 
             if (500 <= $statusCode) {
                 throw new ProviderException('Unable to create languages on Lokalise.', $response);
@@ -361,6 +489,6 @@ final class LokaliseProvider implements ProviderInterface
 
     private function getLokaliseFilenameFromDomain(string $domain): string
     {
-        return sprintf('%s.xliff', $domain);
+        return \sprintf('%s.xliff', $domain);
     }
 }

@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyThirdChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AccessorishGetters;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadMethodContextDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummyParent;
@@ -33,7 +34,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummyParent;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummyAdditionalGetter;
-use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\IgnoreDummyAdditionalGetterWithoutIgnoreAttributes;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathDummy;
@@ -84,7 +85,7 @@ class AttributeLoaderTest extends TestCase
             'first' => AbstractDummyFirstChild::class,
             'second' => AbstractDummySecondChild::class,
             'third' => AbstractDummyThirdChild::class,
-        ]));
+        ], 'third'));
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
         $expected->getReflectionClass();
@@ -152,6 +153,7 @@ class AttributeLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
         $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
+        $this->assertTrue($attributesMetadata['beIgnored']->isIgnored());
     }
 
     public function testLoadContextsPropertiesPromoted()
@@ -162,7 +164,7 @@ class AttributeLoaderTest extends TestCase
     public function testThrowsOnContextOnInvalidMethod()
     {
         $this->expectException(MappingException::class);
-        $this->expectExceptionMessage(sprintf('Context on "%s::badMethod()" cannot be added', BadMethodContextDummy::class));
+        $this->expectExceptionMessage(\sprintf('Context on "%s::badMethod()" cannot be added', BadMethodContextDummy::class));
 
         $loader = $this->getLoaderForContextMapping();
 
@@ -173,16 +175,15 @@ class AttributeLoaderTest extends TestCase
 
     public function testCanHandleUnrelatedIgnoredMethods()
     {
-        $this->expectException(MappingException::class);
-        $this->expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', Entity45016::class));
-
         $metadata = new ClassMetadata(Entity45016::class);
         $loader = $this->getLoaderForContextMapping();
 
         $loader->loadClassMetadata($metadata);
+
+        $this->assertSame(['id'], array_keys($metadata->getAttributesMetadata()));
     }
 
-    public function testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsUsed()
+    public function testIgnoreGetterWithRequiredParameterIfIgnoreAttributeIsUsed()
     {
         $classMetadata = new ClassMetadata(IgnoreDummyAdditionalGetter::class);
         $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
@@ -192,9 +193,9 @@ class AttributeLoaderTest extends TestCase
         self::assertArrayHasKey('extraValue2', $attributes);
     }
 
-    public function testIgnoreGetterWithRequiredParameterIfIgnoreAnnotationIsNotUsed()
+    public function testIgnoreGetterWithRequiredParameterIfIgnoreAttributeIsNotUsed()
     {
-        $classMetadata = new ClassMetadata(IgnoreDummyAdditionalGetterWithoutIgnoreAnnotations::class);
+        $classMetadata = new ClassMetadata(IgnoreDummyAdditionalGetterWithoutIgnoreAttributes::class);
         $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
 
         $attributes = $classMetadata->getAttributesMetadata();
@@ -230,8 +231,106 @@ class AttributeLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
     }
 
+    public function testIgnoresAccessorishGetters()
+    {
+        $classMetadata = new ClassMetadata(AccessorishGetters::class);
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        self::assertCount(4, $classMetadata->getAttributesMetadata());
+
+        self::assertArrayHasKey('field1', $attributesMetadata);
+        self::assertArrayHasKey('field2', $attributesMetadata);
+        self::assertArrayHasKey('field3', $attributesMetadata);
+        self::assertArrayHasKey('field4', $attributesMetadata);
+        self::assertArrayNotHasKey('h', $attributesMetadata);
+    }
+
+    public function testGetMappedClasses()
+    {
+        $mappedClasses = [
+            'App\Entity\User' => ['App\Entity\User'],
+            'App\Entity\Product' => ['App\Entity\Product'],
+        ];
+        $loader = new AttributeLoader(false, $mappedClasses);
+
+        $this->assertSame(['App\Entity\User', 'App\Entity\Product'], $loader->getMappedClasses());
+    }
+
+    public function testLoadClassMetadataReturnsFalseForUnmappedClass()
+    {
+        $loader = new AttributeLoader(false, ['App\Entity\User' => ['App\Entity\User']]);
+        $classMetadata = new ClassMetadata('App\Entity\Product');
+
+        $this->assertFalse($loader->loadClassMetadata($classMetadata));
+    }
+
+    public function testLoadClassMetadataForMappedClassWithAttributes()
+    {
+        $loader = new AttributeLoader(false, [GroupDummy::class => [GroupDummy::class]]);
+        $classMetadata = new ClassMetadata(GroupDummy::class);
+
+        $this->assertTrue($loader->loadClassMetadata($classMetadata));
+        $this->assertNotEmpty($classMetadata->getAttributesMetadata());
+    }
+
+    public function testLoadClassMetadataFromExplicitAttributeMappings()
+    {
+        $targetClass = _AttrMap_Target::class;
+        $sourceClass = _AttrMap_Source::class;
+
+        $loader = new AttributeLoader(false, [$targetClass => [$sourceClass]]);
+        $classMetadata = new ClassMetadata($targetClass);
+
+        $this->assertTrue($loader->loadClassMetadata($classMetadata));
+        $this->assertContains('default', $classMetadata->getAttributesMetadata()['name']->getGroups());
+    }
+
+    public function testLoadClassMetadataWithClassLevelAttributes()
+    {
+        $targetClass = _AttrMap_Target::class;
+        $sourceClass = _AttrMap_ClassLevelSource::class;
+
+        $loader = new AttributeLoader(false, [$targetClass => [$sourceClass]]);
+        $classMetadata = new ClassMetadata($targetClass);
+
+        $this->assertTrue($loader->loadClassMetadata($classMetadata));
+
+        // Check that property attributes are added to the target
+        $this->assertContains('default', $classMetadata->getAttributesMetadata()['name']->getGroups());
+    }
+
     protected function getLoaderForContextMapping(): AttributeLoader
     {
         return $this->loader;
     }
+}
+
+class _AttrMap_Target
+{
+    public string $name;
+
+    public function getName()
+    {
+        return $this->name;
+    }
+}
+
+use Symfony\Component\Serializer\Attribute\ExtendsSerializationFor;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+#[ExtendsSerializationFor(_AttrMap_Target::class)]
+class _AttrMap_Source
+{
+    #[Groups(['default'])]
+    public string $name;
+}
+
+#[ExtendsSerializationFor(_AttrMap_Target::class)]
+#[Groups(['class'])]
+class _AttrMap_ClassLevelSource
+{
+    #[Groups(['default'])]
+    public string $name = '';
 }

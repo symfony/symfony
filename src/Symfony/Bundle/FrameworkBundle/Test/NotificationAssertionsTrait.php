@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Event\NotificationEvents;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Test\Constraint as NotifierConstraint;
 
-/*
+/**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
  */
 trait NotificationAssertionsTrait

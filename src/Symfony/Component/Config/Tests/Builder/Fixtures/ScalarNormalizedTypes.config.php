@@ -11,21 +11,21 @@
 
 use Symfony\Config\ScalarNormalizedTypesConfig;
 
-return static function (ScalarNormalizedTypesConfig $config) {
-    $config
-        ->simpleArray('foo')
-        ->keyedArray('key', 'value')
-        ->object(true)
-        ->listObject('bar')
-        ->listObject('baz')
-        ->listObject()->name('qux');
-
-    $config
-        ->keyedListObject('Foo\\Bar', true)
-        ->keyedListObject('Foo\\Baz')->settings(['one', 'two']);
-
-    $config->nested([
+return new ScalarNormalizedTypesConfig([
+    'simple_array' => 'foo',
+    'keyed_array' => ['key' => 'value'],
+    'object' => true,
+    'list_object' => [
+        'bar',
+        'baz',
+        ['name' => 'qux'],
+    ],
+    'keyed_list_object' => [
+        'Foo\\Bar' => true,
+        'Foo\\Baz' => ['settings' => ['one', 'two']],
+    ],
+    'nested' => [
         'nested_object' => true,
         'nested_list_object' => ['one', 'two'],
-    ]);
-};
+    ],
+]);

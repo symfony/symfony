@@ -35,22 +35,22 @@ class MessengerConfig
         return $this->receiving[] = new \Symfony\Config\AddToList\Messenger\ReceivingConfig($value);
     }
 
-    public function __construct(array $value = [])
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('routing', $value)) {
+        if (array_key_exists('routing', $config)) {
             $this->_usedProperties['routing'] = true;
-            $this->routing = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\RoutingConfig($v), $value['routing']);
-            unset($value['routing']);
+            $this->routing = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\RoutingConfig($v), $config['routing']);
+            unset($config['routing']);
         }
 
-        if (array_key_exists('receiving', $value)) {
+        if (array_key_exists('receiving', $config)) {
             $this->_usedProperties['receiving'] = true;
-            $this->receiving = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\ReceivingConfig($v), $value['receiving']);
-            unset($value['receiving']);
+            $this->receiving = array_map(fn ($v) => new \Symfony\Config\AddToList\Messenger\ReceivingConfig($v), $config['receiving']);
+            unset($config['receiving']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

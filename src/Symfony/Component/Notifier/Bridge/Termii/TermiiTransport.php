@@ -42,7 +42,7 @@ final class TermiiTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('termii://%s?from=%s&channel=%s', $this->getEndpoint(), $this->from, $this->channel);
+        return \sprintf('termii://%s?from=%s&channel=%s', $this->getEndpoint(), $this->from, $this->channel);
     }
 
     public function supports(MessageInterface $message): bool
@@ -65,10 +65,10 @@ final class TermiiTransport extends AbstractTransport
         $options['type'] ??= 'plain';
 
         if (!preg_match('/^[a-zA-Z0-9\s]{3,11}$/', $options['from']) && !preg_match('/^\+?[1-9]\d{1,14}$/', $options['from'])) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $options['from']));
+            throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $options['from']));
         }
 
-        $endpoint = sprintf('https://%s/api/sms/send', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api/sms/send', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);
@@ -85,7 +85,7 @@ final class TermiiTransport extends AbstractTransport
             } catch (JsonException) {
                 $error['message'] = $response->getContent(false);
             }
-            throw new TransportException(sprintf('Unable to send the SMS - status code: "%s": "%s".', $statusCode, $error['message'] ?? 'unknown error'), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS - status code: "%s": "%s".', $statusCode, $error['message'] ?? 'unknown error'), $response);
         }
 
         $success = $response->toArray(false);

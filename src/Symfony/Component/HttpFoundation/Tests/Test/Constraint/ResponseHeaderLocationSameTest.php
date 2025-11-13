@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,9 +20,7 @@ use Symfony\Component\HttpFoundation\Test\Constraint\ResponseHeaderLocationSame;
 
 class ResponseHeaderLocationSameTest extends TestCase
 {
-    /**
-     * @dataProvider provideSuccessCases
-     */
+    #[DataProvider('provideSuccessCases')]
     public function testConstraintSuccess(string $requestUrl, ?string $location, string $expectedLocation)
     {
         $request = Request::create($requestUrl);
@@ -36,7 +35,7 @@ class ResponseHeaderLocationSameTest extends TestCase
         self::assertTrue($constraint->evaluate($response, '', true));
     }
 
-    public function provideSuccessCases(): iterable
+    public static function provideSuccessCases(): iterable
     {
         yield ['http://example.com', 'http://example.com', 'http://example.com'];
         yield ['http://example.com', 'http://example.com', '//example.com'];
@@ -91,9 +90,7 @@ class ResponseHeaderLocationSameTest extends TestCase
         yield ['http://example.com/', 'http://another-example.com', 'http://another-example.com'];
     }
 
-    /**
-     * @dataProvider provideFailureCases
-     */
+    #[DataProvider('provideFailureCases')]
     public function testConstraintFailure(string $requestUrl, ?string $location, string $expectedLocation)
     {
         $request = Request::create($requestUrl);
@@ -112,7 +109,7 @@ class ResponseHeaderLocationSameTest extends TestCase
         $constraint->evaluate($response);
     }
 
-    public function provideFailureCases(): iterable
+    public static function provideFailureCases(): iterable
     {
         yield ['http://example.com', null, 'http://example.com'];
         yield ['http://example.com', null, '//example.com'];

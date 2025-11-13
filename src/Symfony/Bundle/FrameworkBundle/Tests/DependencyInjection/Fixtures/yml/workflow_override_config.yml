@@ -1,0 +1,13 @@
+framework:
+    http_method_override: false
+    handle_all_throwables: true
+    annotations:
+        enabled: false
+    php_errors:
+        log: true
+    workflows:
+        test_workflow:
+            transitions:
+                base_transition:
+                    from: [middle]
+                    to: [alternative]

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
 use Symfony\Component\Config\FileLocator;
@@ -25,13 +26,15 @@ class FileLoaderTest extends TestCase
         $locatorMock = $this->createMock(FileLocatorInterface::class);
 
         $locatorMockForAdditionalLoader = $this->createMock(FileLocatorInterface::class);
-        $locatorMockForAdditionalLoader->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
-            ['path/to/file1'],                    // Default
-            ['path/to/file1', 'path/to/file2'],   // First is imported
-            ['path/to/file1', 'path/to/file2'],   // Second is imported
-            ['path/to/file1'],                    // Exception
-            ['path/to/file1', 'path/to/file2']    // Exception
-        ));
+        $locatorMockForAdditionalLoader->expects($this->any())
+            ->method('locate')
+            ->willReturn(
+                ['path/to/file1'],
+                ['path/to/file1', 'path/to/file2'],
+                ['path/to/file1', 'path/to/file2'],
+                ['path/to/file1'],
+                ['path/to/file1', 'path/to/file2']
+            );
 
         $fileLoader = new TestFileLoader($locatorMock);
         $fileLoader->setSupports(false);
@@ -128,9 +131,7 @@ class FileLoaderTest extends TestCase
         $this->assertNotContains('ExcludeFile.txt', $loadedFiles);
     }
 
-    /**
-     * @dataProvider excludeTrailingSlashConsistencyProvider
-     */
+    #[DataProvider('excludeTrailingSlashConsistencyProvider')]
     public function testExcludeTrailingSlashConsistency(string $exclude)
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__.'/../Fixtures'));

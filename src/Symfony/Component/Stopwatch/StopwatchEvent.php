@@ -38,8 +38,6 @@ class StopwatchEvent
      * @param string|null $category      The event category or null to use the default
      * @param bool        $morePrecision If true, time is stored as float to keep the original microsecond precision
      * @param string|null $name          The event name or null to define the name as default
-     *
-     * @throws \InvalidArgumentException When the raw time is not valid
      */
     public function __construct(
         float $origin,
@@ -103,7 +101,7 @@ class StopwatchEvent
      */
     public function isStarted(): bool
     {
-        return !empty($this->started);
+        return (bool) $this->started;
     }
 
     /**
@@ -134,6 +132,18 @@ class StopwatchEvent
     public function getPeriods(): array
     {
         return $this->periods;
+    }
+
+    /**
+     * Gets the last event period.
+     */
+    public function getLastPeriod(): ?StopwatchPeriod
+    {
+        if ([] === $this->periods) {
+            return null;
+        }
+
+        return $this->periods[array_key_last($this->periods)];
     }
 
     /**
@@ -207,8 +217,6 @@ class StopwatchEvent
 
     /**
      * Formats a time.
-     *
-     * @throws \InvalidArgumentException When the raw time is not valid
      */
     private function formatTime(float $time): float
     {
@@ -225,6 +233,6 @@ class StopwatchEvent
 
     public function __toString(): string
     {
-        return sprintf('%s/%s: %.2F MiB - %d ms', $this->getCategory(), $this->getName(), $this->getMemory() / 1024 / 1024, $this->getDuration());
+        return \sprintf('%s/%s: %.2F MiB - %d ms', $this->getCategory(), $this->getName(), $this->getMemory() / 1024 / 1024, $this->getDuration());
     }
 }

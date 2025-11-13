@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCompiler;
 
 class RouteCompilerTest extends TestCase
 {
-    /**
-     * @dataProvider provideCompileData
-     */
+    #[DataProvider('provideCompileData')]
     public function testCompile($name, $arguments, $prefix, $regex, $variables, $tokens)
     {
         $r = new \ReflectionClass(Route::class);
@@ -183,9 +182,7 @@ class RouteCompilerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideCompileImplicitUtf8Data
-     */
+    #[DataProvider('provideCompileImplicitUtf8Data')]
     public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens)
     {
         $this->expectException(\LogicException::class);
@@ -205,39 +202,47 @@ class RouteCompilerTest extends TestCase
             [
                 'Static UTF-8 route',
                 ['/foé'],
-                '/foé', '{^/foé$}sDu', [], [
+                '/foé',
+                '{^/foé$}sDu',
+                [],
+                [
                     ['text', '/foé'],
                 ],
-                'patterns',
             ],
 
             [
                 'Route with an implicit UTF-8 requirement',
                 ['/{bar}', ['bar' => null], ['bar' => 'é']],
-                '', '{^/(?P<bar>é)?$}sDu', ['bar'], [
+                '',
+                '{^/(?P<bar>é)?$}sDu',
+                ['bar'],
+                [
                     ['variable', '/', 'é', 'bar', true],
                 ],
-                'requirements',
             ],
 
             [
                 'Route with a UTF-8 class requirement',
                 ['/{bar}', ['bar' => null], ['bar' => '\pM']],
-                '', '{^/(?P<bar>\pM)?$}sDu', ['bar'], [
+                '',
+                '{^/(?P<bar>\pM)?$}sDu',
+                ['bar'],
+                [
                     ['variable', '/', '\pM', 'bar', true],
                 ],
-                'requirements',
             ],
 
             [
                 'Route with a UTF-8 separator',
                 ['/foo/{bar}§{_format}', [], [], ['compiler_class' => Utf8RouteCompiler::class]],
-                '/foo', '{^/foo/(?P<bar>[^/§]++)§(?P<_format>[^/]++)$}sDu', ['bar', '_format'], [
+                '/foo',
+                '{^/foo/(?P<bar>[^/§]++)§(?P<_format>[^/]++)$}sDu',
+                ['bar', '_format'],
+                [
                     ['variable', '§', '[^/]++', '_format', true],
                     ['variable', '/', '[^/§]++', 'bar', true],
                     ['text', '/foo'],
                 ],
-                'patterns',
             ],
         ];
     }
@@ -277,9 +282,7 @@ class RouteCompilerTest extends TestCase
         $route->compile();
     }
 
-    /**
-     * @dataProvider getVariableNamesStartingWithADigit
-     */
+    #[DataProvider('getVariableNamesStartingWithADigit')]
     public function testRouteWithVariableNameStartingWithADigit(string $name)
     {
         $this->expectException(\DomainException::class);
@@ -290,15 +293,13 @@ class RouteCompilerTest extends TestCase
     public static function getVariableNamesStartingWithADigit()
     {
         return [
-           ['09'],
-           ['123'],
-           ['1e2'],
+            ['09'],
+            ['123'],
+            ['1e2'],
         ];
     }
 
-    /**
-     * @dataProvider provideCompileWithHostData
-     */
+    #[DataProvider('provideCompileWithHostData')]
     public function testCompileWithHost(string $name, array $arguments, string $prefix, string $regex, array $variables, array $pathVariables, array $tokens, string $hostRegex, array $hostVariables, array $hostTokens)
     {
         $r = new \ReflectionClass(Route::class);
@@ -369,16 +370,14 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteWithTooLongVariableName()
     {
-        $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
+        $route = new Route(\sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
 
         $this->expectException(\DomainException::class);
 
         $route->compile();
     }
 
-    /**
-     * @dataProvider provideRemoveCapturingGroup
-     */
+    #[DataProvider('provideRemoveCapturingGroup')]
     public function testRemoveCapturingGroup(string $regex, string $requirement)
     {
         $route = new Route('/{foo}', [], ['foo' => $requirement]);

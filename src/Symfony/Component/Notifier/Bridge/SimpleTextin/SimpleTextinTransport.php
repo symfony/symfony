@@ -40,7 +40,7 @@ final class SimpleTextinTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('simpletextin://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        return \sprintf('simpletextin://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -56,7 +56,7 @@ final class SimpleTextinTransport extends AbstractTransport
         if (!$message instanceof SmsMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
-        $endpoint = sprintf('https://%s/v2/api/messages', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/v2/api/messages', $this->getEndpoint());
 
         $options = [];
         $options['text'] = $message->getSubject();
@@ -65,7 +65,7 @@ final class SimpleTextinTransport extends AbstractTransport
         $options['accountPhone'] = $message->getFrom() ?: $this->from;
 
         if (null !== $options['accountPhone'] && !preg_match('/^\+?[1-9]\d{1,14}$/', $options['accountPhone'])) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number.', $options['accountPhone']));
+            throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number.', $options['accountPhone']));
         }
 
         $response = $this->client->request('POST', $endpoint, [
@@ -81,7 +81,7 @@ final class SimpleTextinTransport extends AbstractTransport
 
         if (201 !== $statusCode) {
             $error = $response->getContent(false);
-            throw new TransportException(sprintf('Unable to send the SMS - "%s".', $error ?: 'unknown failure'), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS - "%s".', $error ?: 'unknown failure'), $response);
         }
 
         $success = $response->toArray(false);

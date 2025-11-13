@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\DefinitionBuilder;
@@ -23,9 +24,7 @@ class MermaidDumperTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    /**
-     * @dataProvider provideWorkflowDefinitionWithoutMarking
-     */
+    #[DataProvider('provideWorkflowDefinitionWithoutMarking')]
     public function testDumpWithoutMarking(Definition $definition, string $expected)
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
@@ -35,9 +34,7 @@ class MermaidDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    /**
-     * @dataProvider provideWorkflowWithReservedWords
-     */
+    #[DataProvider('provideWorkflowWithReservedWords')]
     public function testDumpWithReservedWordsAsPlacenames(Definition $definition, string $expected)
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
@@ -47,9 +44,7 @@ class MermaidDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    /**
-     * @dataProvider provideStateMachine
-     */
+    #[DataProvider('provideStateMachine')]
     public function testDumpAsStateMachine(Definition $definition, string $expected)
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_STATEMACHINE);
@@ -59,9 +54,7 @@ class MermaidDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    /**
-     * @dataProvider provideWorkflowWithMarking
-     */
+    #[DataProvider('provideWorkflowWithMarking')]
     public function testDumpWorkflowWithMarking(Definition $definition, Marking $marking, string $expected)
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
@@ -104,7 +97,7 @@ class MermaidDumperTest extends TestCase
             ."transition4-->place6\n"
             ."transition5[\"t6\"]\n"
             ."place5-->transition5\n"
-            ."transition5-->place6",
+            .'transition5-->place6',
         ];
         yield [
             self::createWorkflowWithSameNameTransition(),
@@ -124,7 +117,7 @@ class MermaidDumperTest extends TestCase
             ."transition2-->place0\n"
             ."transition3[\"to_a\"]\n"
             ."place2-->transition3\n"
-            ."transition3-->place0",
+            .'transition3-->place0',
         ];
         yield [
             self::createSimpleWorkflowDefinition(),
@@ -140,7 +133,7 @@ class MermaidDumperTest extends TestCase
             ."linkStyle 1 stroke:Grey\n"
             ."transition1[\"t2\"]\n"
             ."place1-->transition1\n"
-            ."transition1-->place2",
+            .'transition1-->place2',
         ];
     }
 
@@ -148,10 +141,10 @@ class MermaidDumperTest extends TestCase
     {
         $builder = new DefinitionBuilder();
 
-        $builder->addPlaces(['start', 'subgraph', 'end', 'finis']);
+        $builder->addPlaces(['start', 'subgraph', 'end', 'finish']);
         $builder->addTransitions([
             new Transition('t0', ['start', 'subgraph'], ['end']),
-            new Transition('t1', ['end'], ['finis']),
+            new Transition('t1', ['end'], ['finish']),
         ]);
 
         $definition = $builder->build();
@@ -162,14 +155,14 @@ class MermaidDumperTest extends TestCase
             ."place0([\"start\"])\n"
             ."place1((\"subgraph\"))\n"
             ."place2((\"end\"))\n"
-            ."place3((\"finis\"))\n"
+            ."place3((\"finish\"))\n"
             ."transition0[\"t0\"]\n"
             ."place0-->transition0\n"
             ."transition0-->place2\n"
             ."place1-->transition0\n"
             ."transition1[\"t1\"]\n"
             ."place2-->transition1\n"
-            ."transition1-->place3",
+            .'transition1-->place3',
         ];
     }
 
@@ -186,7 +179,7 @@ class MermaidDumperTest extends TestCase
             ."place3-->|\"My custom transition label 3\"|place1\n"
             ."linkStyle 1 stroke:Grey\n"
             ."place1-->|\"t2\"|place2\n"
-            ."place1-->|\"t3\"|place3",
+            .'place1-->|"t3"|place3',
         ];
     }
 
@@ -212,7 +205,7 @@ class MermaidDumperTest extends TestCase
             ."linkStyle 1 stroke:Grey\n"
             ."transition1[\"t2\"]\n"
             ."place1-->transition1\n"
-            ."transition1-->place2",
+            .'transition1-->place2',
         ];
     }
 }

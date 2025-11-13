@@ -10,6 +10,7 @@
     findUnusedBaselineEntry="false"
     findUnusedCode="false"
     findUnusedIssueHandlerSuppression="false"
+    ensureOverrideAttribute="false"
 >
     <projectFiles>
         <directory name="src" />
@@ -32,6 +33,8 @@
                 <referencedClass name="UnitEnum"/>
                 <!-- These classes have been added in PHP 8.2 -->
                 <referencedClass name="Random\*"/>
+                <!-- These classes have been added in PHP 8.4 -->
+                <referencedClass name="BcMath\Number"/>
             </errorLevel>
         </UndefinedClass>
         <UndefinedDocblockClass>

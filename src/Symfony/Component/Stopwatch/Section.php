@@ -113,7 +113,7 @@ class Section
     public function stopEvent(string $name): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
-            throw new \LogicException(sprintf('Event "%s" is not started.', $name));
+            throw new \LogicException(\sprintf('Event "%s" is not started.', $name));
         }
 
         return $this->events[$name]->stop();
@@ -137,7 +137,7 @@ class Section
     public function getEvent(string $name): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
-            throw new \LogicException(sprintf('Event "%s" is not known.', $name));
+            throw new \LogicException(\sprintf('Event "%s" is not known.', $name));
         }
 
         return $this->events[$name];

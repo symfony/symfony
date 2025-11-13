@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Tests\Validator\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -25,9 +28,7 @@ class UserPasswordTest extends TestCase
         self::assertSame('security.validator.user_password', $constraint->validatedBy());
     }
 
-    /**
-     * @dataProvider provideServiceValidatedConstraints
-     */
+    #[DataProvider('provideServiceValidatedConstraints')]
     public function testValidatedByService(UserPassword $constraint)
     {
         self::assertSame('my_service', $constraint->validatedBy());
@@ -35,14 +36,19 @@ class UserPasswordTest extends TestCase
 
     public static function provideServiceValidatedConstraints(): iterable
     {
-        yield 'Doctrine style' => [new UserPassword(['service' => 'my_service'])];
-
         yield 'named arguments' => [new UserPassword(service: 'my_service')];
 
         $metadata = new ClassMetadata(UserPasswordDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
-        yield 'attribute' => [$metadata->properties['b']->constraints[0]];
+        yield 'attribute' => [$metadata->getPropertyMetadata('b')[0]->getConstraints()[0]];
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testValidatedByServiceDoctrineStyle()
+    {
+        self::assertSame('my_service', (new UserPassword(['service' => 'my_service']))->validatedBy());
     }
 
     public function testAttributes()
@@ -50,12 +56,12 @@ class UserPasswordTest extends TestCase
         $metadata = new ClassMetadata(UserPasswordDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'UserPasswordDummy'], $bConstraint->groups);
         self::assertNull($bConstraint->payload);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

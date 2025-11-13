@@ -114,7 +114,7 @@ class UnstructuredHeaderTest extends TestCase
         $nonPrintableBytes = array_merge(range(0x00, 0x08), range(0x10, 0x19), [0x7F]);
         foreach ($nonPrintableBytes as $byte) {
             $char = pack('C', $byte);
-            $encodedChar = sprintf('=%02X', $byte);
+            $encodedChar = \sprintf('=%02X', $byte);
             $header = new UnstructuredHeader('X-A', $char);
             $header->setCharset('iso-8859-1');
             $this->assertEquals('X-A: =?'.$header->getCharset().'?Q?'.$encodedChar.'?=', $header->toString(), 'Non-printable ascii should be encoded');
@@ -125,7 +125,7 @@ class UnstructuredHeaderTest extends TestCase
     {
         foreach (range(0x80, 0xFF) as $byte) {
             $char = pack('C', $byte);
-            $encodedChar = sprintf('=%02X', $byte);
+            $encodedChar = \sprintf('=%02X', $byte);
             $header = new UnstructuredHeader('X-A', $char);
             $header->setCharset('iso-8859-1');
             $this->assertEquals('X-A: =?'.$header->getCharset().'?Q?'.$encodedChar.'?=', $header->toString(), '8-bit octets should be encoded');

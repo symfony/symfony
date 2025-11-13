@@ -70,7 +70,7 @@ final class FakeChatEmailTransportTest extends TransportTestCase
         $this->assertInstanceOf(Email::class, $sentEmail);
         $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
         $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame(sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
+        $this->assertSame(\sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertFalse($sentEmail->getHeaders()->has('X-Transport'));
     }
@@ -116,7 +116,7 @@ final class FakeChatEmailTransportTest extends TransportTestCase
         $this->assertInstanceOf(Email::class, $sentEmail);
         $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
         $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame(sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
+        $this->assertSame(\sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
         $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());

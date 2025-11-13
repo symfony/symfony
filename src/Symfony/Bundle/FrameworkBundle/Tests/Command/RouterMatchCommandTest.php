@@ -46,8 +46,8 @@ class RouterMatchCommandTest extends TestCase
     private function createCommandTester(): CommandTester
     {
         $application = new Application($this->getKernel());
-        $application->add(new RouterMatchCommand($this->getRouter()));
-        $application->add(new RouterDebugCommand($this->getRouter()));
+        $application->addCommand(new RouterMatchCommand($this->getRouter()));
+        $application->addCommand(new RouterDebugCommand($this->getRouter()));
 
         return new CommandTester($application->find('router:match'));
     }

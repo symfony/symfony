@@ -34,19 +34,15 @@ class SerializerExtractor implements PropertyListExtractorInterface
             return null;
         }
 
-        if (!$this->classMetadataFactory->getMetadataFor($class)) {
+        if (!$this->classMetadataFactory->hasMetadataFor($class)) {
             return null;
         }
-
-        $groups = $context['serializer_groups'] ?? [];
-        $groupsHasBeenDefined = [] !== $groups;
-        $groups = array_merge($groups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
 
         $properties = [];
         $serializerClassMetadata = $this->classMetadataFactory->getMetadataFor($class);
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            if (!$serializerAttributeMetadata->isIgnored() && (!$groupsHasBeenDefined || array_intersect(array_merge($serializerAttributeMetadata->getGroups(), ['*']), $groups))) {
+            if (!$serializerAttributeMetadata->isIgnored() && (null === $context['serializer_groups'] || \in_array('*', $context['serializer_groups'], true) || array_intersect($serializerAttributeMetadata->getGroups(), $context['serializer_groups']))) {
                 $properties[] = $serializerAttributeMetadata->getName();
             }
         }

@@ -23,12 +23,30 @@ trait TagTrait
     final public function tag(string $name, array $attributes = []): static
     {
         if ('' === $name) {
-            throw new InvalidArgumentException(sprintf('The tag name for service "%s" must be a non-empty string.', $this->id));
+            throw new InvalidArgumentException(\sprintf('The tag name for service "%s" must be a non-empty string.', $this->id));
         }
 
         $this->validateAttributes($name, $attributes);
 
         $this->definition->addTag($name, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * Adds a resource tag for this definition.
+     *
+     * @return $this
+     */
+    final public function resourceTag(string $name, array $attributes = []): static
+    {
+        if ('' === $name) {
+            throw new InvalidArgumentException(\sprintf('The resource tag name for service "%s" must be a non-empty string.', $this->id));
+        }
+
+        $this->validateAttributes($name, $attributes);
+
+        $this->definition->addResourceTag($name, $attributes);
 
         return $this;
     }
@@ -40,7 +58,7 @@ trait TagTrait
                 $this->validateAttributes($tag, $value, [...$path, $name]);
             } elseif (!\is_scalar($value ?? '')) {
                 $name = implode('.', [...$path, $name]);
-                throw new InvalidArgumentException(sprintf('A tag attribute must be of a scalar-type or an array of scalar-types for service "%s", tag "%s", attribute "%s".', $this->id, $tag, $name));
+                throw new InvalidArgumentException(\sprintf('A tag attribute must be of a scalar-type or an array of scalar-types for service "%s", tag "%s", attribute "%s".', $this->id, $tag, $name));
             }
         }
     }

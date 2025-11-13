@@ -25,17 +25,12 @@ use Twig\Template;
  */
 final class SourceContextProvider implements ContextProviderInterface
 {
-    private int $limit;
-    private ?string $charset;
-    private ?string $projectDir;
-    private ?FileLinkFormatter $fileLinkFormatter;
-
-    public function __construct(?string $charset = null, ?string $projectDir = null, ?FileLinkFormatter $fileLinkFormatter = null, int $limit = 9)
-    {
-        $this->charset = $charset;
-        $this->projectDir = $projectDir;
-        $this->fileLinkFormatter = $fileLinkFormatter;
-        $this->limit = $limit;
+    public function __construct(
+        private ?string $charset = null,
+        private ?string $projectDir = null,
+        private ?FileLinkFormatter $fileLinkFormatter = null,
+        private int $limit = 9,
+    ) {
     }
 
     public function getContext(): ?array

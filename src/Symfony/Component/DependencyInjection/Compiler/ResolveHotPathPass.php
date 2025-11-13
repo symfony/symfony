@@ -48,7 +48,7 @@ class ResolveHotPathPass extends AbstractRecursivePass
                 return $value->clearTag('container.hot_path');
             }
 
-            $this->resolvedIds[$this->currentId] = true;
+            $this->resolvedIds[$this->currentId ?? ''] = true;
 
             if (!$value->hasTag('container.hot_path')) {
                 return $value;

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Tests\Security;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -44,9 +45,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->ldap = $this->createMock(LdapInterface::class);
     }
 
-    /**
-     * @dataProvider provideShouldNotCheckPassport
-     */
+    #[DataProvider('provideShouldNotCheckPassport')]
     public function testShouldNotCheckPassport($authenticator, $passport)
     {
         $this->ldap->expects($this->never())->method('bind');
@@ -88,9 +87,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('not_existing_ldap_service')));
     }
 
-    /**
-     * @dataProvider provideWrongPassportData
-     */
+    #[DataProvider('provideWrongPassportData')]
     public function testWrongPassport($passport)
     {
         $this->expectException(\LogicException::class);

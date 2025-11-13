@@ -26,14 +26,12 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  */
 class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private iterable $providers;
-
     /**
      * @param iterable<array-key, UserProviderInterface> $providers
      */
-    public function __construct(iterable $providers)
-    {
-        $this->providers = $providers;
+    public function __construct(
+        private iterable $providers,
+    ) {
     }
 
     /**
@@ -48,17 +46,25 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         return $this->providers;
     }
 
-    public function loadUserByIdentifier(string $identifier): UserInterface
+    /**
+     * @param array $attributes
+     */
+    public function loadUserByIdentifier(string $identifier/* , array $attributes = [] */): UserInterface
     {
+        $attributes = \func_num_args() > 1 ? func_get_arg(1) : [];
         foreach ($this->providers as $provider) {
             try {
+                if ($provider instanceof AttributesBasedUserProviderInterface || $provider instanceof self) {
+                    return $provider->loadUserByIdentifier($identifier, $attributes);
+                }
+
                 return $provider->loadUserByIdentifier($identifier);
             } catch (UserNotFoundException) {
                 // try next one
             }
         }
 
-        $ex = new UserNotFoundException(sprintf('There is no user with identifier "%s".', $identifier));
+        $ex = new UserNotFoundException(\sprintf('There is no user with identifier "%s".', $identifier));
         $ex->setUserIdentifier($identifier);
         throw $ex;
     }
@@ -84,12 +90,12 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
 
         if ($supportedUserFound) {
             $username = $user->getUserIdentifier();
-            $e = new UserNotFoundException(sprintf('There is no user with name "%s".', $username));
+            $e = new UserNotFoundException(\sprintf('There is no user with name "%s".', $username));
             $e->setUserIdentifier($username);
             throw $e;
-        } else {
-            throw new UnsupportedUserException(sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', get_debug_type($user)));
         }
+
+        throw new UnsupportedUserException(\sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', get_debug_type($user)));
     }
 
     public function supportsClass(string $class): bool

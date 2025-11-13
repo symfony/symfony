@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveFactoryClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -55,9 +56,7 @@ class ResolveFactoryClassPassTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideFulfilledFactories
-     */
+    #[DataProvider('provideFulfilledFactories')]
     public function testIgnoresFulfilledFactories($factory)
     {
         $container = new ContainerBuilder();

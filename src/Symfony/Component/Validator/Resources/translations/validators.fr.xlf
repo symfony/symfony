@@ -438,6 +438,122 @@
                 <source>This value is not a valid MAC address.</source>
                 <target>Cette valeur n'est pas une adresse MAC valide.</target>
             </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Cette URL doit contenir un domaine de premier niveau.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
+                <target>Cette valeur est trop courte. Elle doit contenir au moins un mot.|Cette valeur est trop courte. Elle doit contenir au moins {{ min }} mots.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
+                <target>Cette valeur est trop longue. Elle doit contenir au maximum un mot.|Cette valeur est trop longue. Elle doit contenir au maximum {{ max }} mots.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value does not represent a valid week in the ISO 8601 format.</source>
+                <target>Cette valeur ne représente pas une semaine valide au format ISO 8601.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value is not a valid week.</source>
+                <target>Cette valeur n'est pas une semaine valide.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value should not be before week "{{ min }}".</source>
+                <target>Cette valeur ne doit pas être antérieure à la semaine "{{ min }}".</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>This value should not be after week "{{ max }}".</source>
+                <target>Cette valeur ne doit pas être postérieure à la semaine "{{ max }}".</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target>Cette valeur n'est pas un modèle Twig valide.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>This file is not a valid video.</source>
+                <target>Ce fichier n’est pas une vidéo valide.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>The size of the video could not be detected.</source>
+                <target>La taille de la vidéo n’a pas pu être détectée.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>La largeur de la vidéo est trop grande ({{ width }}px). La largeur maximale autorisée est de {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>La largeur de la vidéo est trop petite ({{ width }}px). La largeur minimale attendue est de {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>La hauteur de la vidéo est trop grande ({{ height }}px). La hauteur maximale autorisée est de {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>La hauteur de la vidéo est trop petite ({{ height }}px). La hauteur minimale attendue est de {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>La vidéo a trop peu de pixels ({{ pixels }}). La quantité minimale attendue est de {{ min_pixels }} pixels.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>La vidéo contient trop de pixels ({{ pixels }}). La quantité maximale attendue est de {{ max_pixels }} pixels.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>Le ratio de la vidéo est trop élevé ({{ ratio }}). Le ratio maximal autorisé est de {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>Le ratio de la vidéo est trop petit ({{ ratio }}). Le ratio minimum attendu est de {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="132">
+                <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
+                <target>La vidéo est carrée ({{ width }}x{{ height }}px). Les vidéos carrées ne sont pas autorisées.</target>
+            </trans-unit>
+            <trans-unit id="133">
+                <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
+                <target>La vidéo est au format paysage ({{ width }}x{{ height }} px). Les vidéos au format paysage ne sont pas autorisées.</target>
+            </trans-unit>
+            <trans-unit id="134">
+                <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
+                <target>La vidéo est orientée en portrait ({{ width }}x{{ height }} px). Les vidéos en orientation portrait ne sont pas autorisées.</target>
+            </trans-unit>
+            <trans-unit id="135">
+                <source>The video file is corrupted.</source>
+                <target>Le fichier vidéo est corrompu.</target>
+            </trans-unit>
+            <trans-unit id="136">
+                <source>The video contains multiple streams. Only one stream is allowed.</source>
+                <target>La vidéo contient plusieurs flux. Un seul flux est autorisé.</target>
+            </trans-unit>
+            <trans-unit id="137">
+                <source>Unsupported video codec "{{ codec }}".</source>
+                <target>Le codec vidéo «{{ codec }}» est non pris en charge.</target>
+            </trans-unit>
+            <trans-unit id="138">
+                <source>Unsupported video container "{{ container }}".</source>
+                <target>Le conteneur vidéo «{{ container }}» est non pris en charge.</target>
+            </trans-unit>
+            <trans-unit id="139">
+                <source>The image file is corrupted.</source>
+                <target>Le fichier image est corrompu.</target>
+            </trans-unit>
+            <trans-unit id="140">
+                <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>L’image comporte trop peu de pixels ({{ pixels }}). La quantité minimale attendue est de {{ min_pixels }} pixels.</target>
+            </trans-unit>
+            <trans-unit id="141">
+                <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>L’image contient trop de pixels ({{ pixels }}). La quantité maximale attendue est de {{ max_pixels }} pixels.</target>
+            </trans-unit>
+            <trans-unit id="142">
+                <source>This filename does not match the expected charset.</source>
+                <target>Le nom de fichier ne correspond pas au jeu de caractères attendu.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

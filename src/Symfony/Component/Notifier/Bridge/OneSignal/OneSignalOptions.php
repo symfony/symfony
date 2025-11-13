@@ -19,11 +19,9 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class OneSignalOptions implements MessageOptionsInterface
 {
-    private array $options;
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
+    public function __construct(
+        private array $options = [],
+    ) {
     }
 
     /**

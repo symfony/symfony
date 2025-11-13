@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DatePointToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
-use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -45,7 +46,7 @@ class TimeType extends AbstractType
         }
 
         if (null !== $options['reference_date'] && $options['reference_date']->getTimezone()->getName() !== $options['model_timezone']) {
-            throw new InvalidConfigurationException(sprintf('The configured "model_timezone" (%s) must match the timezone of the "reference_date" (%s).', $options['model_timezone'], $options['reference_date']->getTimezone()->getName()));
+            throw new InvalidConfigurationException(\sprintf('The configured "model_timezone" (%s) must match the timezone of the "reference_date" (%s).', $options['model_timezone'], $options['reference_date']->getTimezone()->getName()));
         }
 
         if ($options['with_minutes']) {
@@ -60,15 +61,14 @@ class TimeType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $e) use ($options) {
-                /** @var PreSubmitEvent $event */
                 $data = $e->getData();
                 if ($data && preg_match('/^(?P<hours>\d{2}):(?P<minutes>\d{2})(?::(?P<seconds>\d{2})(?:\.\d+)?)?$/', $data, $matches)) {
                     if ($options['with_seconds']) {
                         // handle seconds ignored by user's browser when with_seconds enabled
                         // https://codereview.chromium.org/450533009/
-                        $e->setData(sprintf('%s:%s:%s', $matches['hours'], $matches['minutes'], $matches['seconds'] ?? '00'));
+                        $e->setData(\sprintf('%s:%s:%s', $matches['hours'], $matches['minutes'], $matches['seconds'] ?? '00'));
                     } else {
-                        $e->setData(sprintf('%s:%s', $matches['hours'], $matches['minutes']));
+                        $e->setData(\sprintf('%s:%s', $matches['hours'], $matches['minutes']));
                     }
                 }
             });
@@ -192,7 +192,12 @@ class TimeType extends AbstractType
             $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget'], $options['reference_date']));
         }
 
-        if ('datetime_immutable' === $options['input']) {
+        if ('date_point' === $options['input']) {
+            if (!class_exists(DatePoint::class)) {
+                throw new LogicException(\sprintf('The "symfony/clock" component is required to use "%s" with option "input=date_point". Try running "composer require symfony/clock".', self::class));
+            }
+            $builder->addModelTransformer(new DatePointToDateTimeTransformer());
+        } elseif ('datetime_immutable' === $options['input']) {
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
@@ -208,7 +213,7 @@ class TimeType extends AbstractType
             ));
         }
 
-        if (\in_array($options['input'], ['datetime', 'datetime_immutable'], true) && null !== $options['model_timezone']) {
+        if (\in_array($options['input'], ['datetime', 'datetime_immutable', 'date_point'], true) && null !== $options['model_timezone']) {
             $builder->addEventListener(FormEvents::POST_SET_DATA, static function (FormEvent $event) use ($options): void {
                 $date = $event->getData();
 
@@ -217,7 +222,7 @@ class TimeType extends AbstractType
                 }
 
                 if ($date->getTimezone()->getName() !== $options['model_timezone']) {
-                    throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', get_debug_type($date), $date->getTimezone()->getName(), $options['model_timezone']));
+                    throw new LogicException(\sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', get_debug_type($date), $date->getTimezone()->getName(), $options['model_timezone']));
                 }
             });
         }
@@ -276,10 +281,8 @@ class TimeType extends AbstractType
 
         $choiceTranslationDomainNormalizer = static function (Options $options, $choiceTranslationDomain) {
             if (\is_array($choiceTranslationDomain)) {
-                $default = false;
-
                 return array_replace(
-                    ['hour' => $default, 'minute' => $default, 'second' => $default],
+                    ['hour' => false, 'minute' => false, 'second' => false],
                     $choiceTranslationDomain
                 );
             }
@@ -358,6 +361,7 @@ class TimeType extends AbstractType
         $resolver->setAllowedValues('input', [
             'datetime',
             'datetime_immutable',
+            'date_point',
             'string',
             'timestamp',
             'array',

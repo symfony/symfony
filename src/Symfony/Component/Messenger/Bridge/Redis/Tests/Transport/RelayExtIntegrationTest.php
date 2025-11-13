@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Relay\Relay;
 
-/**
- * @requires extension relay
- *
- * @group time-sensitive
- * @group integration
- */
+#[RequiresPhpExtension('relay')]
+#[Group('time-sensitive')]
+#[Group('integration')]
 class RelayExtIntegrationTest extends RedisExtIntegrationTest
 {
     protected function createRedisClient(): \Redis|Relay

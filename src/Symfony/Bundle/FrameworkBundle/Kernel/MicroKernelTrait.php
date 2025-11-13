@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Kernel;
 
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
@@ -48,12 +49,12 @@ trait MicroKernelTrait
      */
     private function configureContainer(ContainerConfigurator $container, LoaderInterface $loader, ContainerBuilder $builder): void
     {
-        $configDir = $this->getConfigDir();
+        $configDir = preg_replace('{/config$}', '/{config}', $this->getConfigDir());
 
         $container->import($configDir.'/{packages}/*.{php,yaml}');
         $container->import($configDir.'/{packages}/'.$this->environment.'/*.{php,yaml}');
 
-        if (is_file($configDir.'/services.yaml')) {
+        if (is_file($this->getConfigDir().'/services.yaml')) {
             $container->import($configDir.'/services.yaml');
             $container->import($configDir.'/{services}_'.$this->environment.'.yaml');
         } else {
@@ -73,19 +74,17 @@ trait MicroKernelTrait
      */
     private function configureRoutes(RoutingConfigurator $routes): void
     {
-        $configDir = $this->getConfigDir();
+        $configDir = preg_replace('{/config$}', '/{config}', $this->getConfigDir());
 
         $routes->import($configDir.'/{routes}/'.$this->environment.'/*.{php,yaml}');
         $routes->import($configDir.'/{routes}/*.{php,yaml}');
 
-        if (is_file($configDir.'/routes.yaml')) {
+        $routes->import('routing.controllers');
+
+        if (is_file($this->getConfigDir().'/routes.yaml')) {
             $routes->import($configDir.'/routes.yaml');
         } else {
             $routes->import($configDir.'/{routes}.php');
-        }
-
-        if (false !== ($fileName = (new \ReflectionObject($this))->getFileName())) {
-            $routes->import($fileName, 'attribute');
         }
     }
 
@@ -123,6 +122,20 @@ trait MicroKernelTrait
         return parent::getBuildDir();
     }
 
+    public function getShareDir(): ?string
+    {
+        if (isset($_SERVER['APP_SHARE_DIR'])) {
+            if (false === $dir = filter_var($_SERVER['APP_SHARE_DIR'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? $_SERVER['APP_SHARE_DIR']) {
+                return null;
+            }
+            if (\is_string($dir)) {
+                return $dir.'/'.$this->environment;
+            }
+        }
+
+        return parent::getShareDir();
+    }
+
     public function getLogDir(): string
     {
         return $_SERVER['APP_LOG_DIR'] ?? parent::getLogDir();
@@ -130,7 +143,13 @@ trait MicroKernelTrait
 
     public function registerBundles(): iterable
     {
-        $contents = require $this->getBundlesPath();
+        if (!is_file($bundlesPath = $this->getBundlesPath())) {
+            yield new FrameworkBundle();
+
+            return;
+        }
+
+        $contents = require $bundlesPath;
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
                 yield new $class();
@@ -175,7 +194,7 @@ trait MicroKernelTrait
             }
 
             $file = (new \ReflectionObject($this))->getFileName();
-            /* @var ContainerPhpFileLoader $kernelLoader */
+            /** @var ContainerPhpFileLoader $kernelLoader */
             $kernelLoader = $loader->getResolver()->resolve($file);
             $kernelLoader->setCurrentDir(\dirname($file));
             $instanceof = &\Closure::bind(fn &() => $this->instanceof, $kernelLoader, $kernelLoader)();
@@ -201,7 +220,7 @@ trait MicroKernelTrait
     public function loadRoutes(LoaderInterface $loader): RouteCollection
     {
         $file = (new \ReflectionObject($this))->getFileName();
-        /* @var RoutingPhpFileLoader $kernelLoader */
+        /** @var RoutingPhpFileLoader $kernelLoader */
         $kernelLoader = $loader->getResolver()->resolve($file, 'php');
         $kernelLoader->setCurrentDir(\dirname($file));
         $collection = new RouteCollection();
@@ -216,9 +235,34 @@ trait MicroKernelTrait
                 $route->setDefault('_controller', ['kernel', $controller[1]]);
             } elseif ($controller instanceof \Closure && $this === ($r = new \ReflectionFunction($controller))->getClosureThis() && !$r->isAnonymous()) {
                 $route->setDefault('_controller', ['kernel', $r->name]);
+            } elseif ($this::class === $controller && method_exists($this, '__invoke')) {
+                $route->setDefault('_controller', 'kernel');
             }
         }
 
         return $collection;
+    }
+
+    /**
+     * Returns the kernel parameters.
+     *
+     * @return array<string, array|bool|string|int|float|\UnitEnum|null>
+     */
+    protected function getKernelParameters(): array
+    {
+        $parameters = parent::getKernelParameters();
+        $bundlesPath = $this->getBundlesPath();
+        $bundlesDefinition = !is_file($bundlesPath) ? [FrameworkBundle::class => ['all' => true]] : require $bundlesPath;
+        $knownEnvs = [$this->environment => true];
+
+        foreach ($bundlesDefinition as $envs) {
+            $knownEnvs += $envs;
+        }
+        unset($knownEnvs['all']);
+        $parameters['.container.known_envs'] = array_keys($knownEnvs);
+        $parameters['.kernel.config_dir'] = $this->getConfigDir();
+        $parameters['.kernel.bundles_definition'] = $bundlesDefinition;
+
+        return $parameters;
     }
 }

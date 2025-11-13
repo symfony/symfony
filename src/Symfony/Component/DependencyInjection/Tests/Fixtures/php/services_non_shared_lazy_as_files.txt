@@ -23,7 +23,7 @@ class getNonSharedFooService extends Symfony_DI_PhpDumper_Service_Non_Shared_Laz
         $container->factories['non_shared_foo'] ??= fn () => self::do($container);
 
         if (true === $lazyLoad) {
-            return $container->createProxy('FooLazyClassGhost%s', static fn () => \FooLazyClassGhost%s::createLazyGhost(static fn ($proxy) => self::do($container, $proxy)));
+            return new \ReflectionClass('Bar\FooLazyClass')->newLazyGhost(static function ($proxy) use ($container) { self::do($container, $proxy); });
         }
 
         static $include = true;
@@ -36,26 +36,6 @@ class getNonSharedFooService extends Symfony_DI_PhpDumper_Service_Non_Shared_Laz
 
         return $lazyLoad;
     }
-}
-
-    [Container%s/FooLazyClassGhost%s.php] => <?php
-
-namespace Container%s;
-
-class FooLazyClassGhost%s extends \Bar\FooLazyClass implements \Symfony\Component\VarExporter\LazyObjectInterface
-{
-    use \Symfony\Component\VarExporter\LazyGhostTrait;
-
-    private const LAZY_OBJECT_PROPERTY_SCOPES = [];
-}
-
-// Help opcache.preload discover always-needed symbols
-class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
-
-if (!\class_exists('FooLazyClassGhost%s', false)) {
-    \class_alias(__NAMESPACE__.'\\FooLazyClassGhost%s', 'FooLazyClassGhost%s', false);
 }
 
     [Container%s/Symfony_DI_PhpDumper_Service_Non_Shared_Lazy_As_File.php] => <?php
@@ -136,7 +116,6 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
 
 require '%svendor/autoload.php';
 (require __DIR__.'/Symfony_DI_PhpDumper_Service_Non_Shared_Lazy_As_File.php')->set(\Container%s\Symfony_DI_PhpDumper_Service_Non_Shared_Lazy_As_File::class, null);
-require __DIR__.'/Container%s/FooLazyClassGhost%s.php';
 require __DIR__.'/Container%s/getNonSharedFooService.php';
 
 $classes = [];

@@ -13,11 +13,12 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class NumberTypeTest extends BaseTypeTestCase
 {
-    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
+    public const TESTED_TYPE = NumberType::class;
 
     private string $defaultLocale;
 
@@ -26,7 +27,7 @@ class NumberTypeTest extends BaseTypeTestCase
         parent::setUp();
 
         // we test against "de_DE", so we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this);
 
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('de_DE');
@@ -34,9 +35,9 @@ class NumberTypeTest extends BaseTypeTestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
-        \Locale::setDefault($this->defaultLocale);
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
     public function testDefaultFormatting()

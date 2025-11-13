@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsbox;
 
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Charset;
 use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Day;
@@ -28,9 +30,13 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class SmsboxOptions implements MessageOptionsInterface
 {
+    private ClockInterface $clock;
+
     public function __construct(
         private array $options = [],
+        ?ClockInterface $clock = null,
     ) {
+        $this->clock = $clock ?? Clock::get();
     }
 
     public function getRecipientId(): null
@@ -64,7 +70,7 @@ final class SmsboxOptions implements MessageOptionsInterface
     public function date(string $date): static
     {
         if (isset($this->options['dateTime'])) {
-            throw new InvalidArgumentException(sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
+            throw new InvalidArgumentException(\sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
         }
 
         if (!\DateTimeImmutable::createFromFormat('d/m/Y', $date)) {
@@ -82,7 +88,7 @@ final class SmsboxOptions implements MessageOptionsInterface
     public function hour(string $hour): static
     {
         if (isset($this->options['dateTime'])) {
-            throw new InvalidArgumentException(sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
+            throw new InvalidArgumentException(\sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
         }
 
         if (!\DateTimeImmutable::createFromFormat('H:i', $hour)) {
@@ -100,10 +106,10 @@ final class SmsboxOptions implements MessageOptionsInterface
     public function dateTime(\DateTimeImmutable $dateTime): static
     {
         if (isset($this->options['date']) || isset($this->options['heure'])) {
-            throw new InvalidArgumentException(sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
+            throw new InvalidArgumentException(\sprintf('Either %1$s::dateTime() or %1$s::date() and %1$s::hour() must be called, but not both.', self::class));
         }
 
-        if ($dateTime < new \DateTimeImmutable('now')) {
+        if ($dateTime < $this->clock->now()) {
             throw new InvalidArgumentException('The given DateTime must be greater to the current date.');
         }
 
@@ -120,7 +126,7 @@ final class SmsboxOptions implements MessageOptionsInterface
     public function destIso(string $isoCode): static
     {
         if (class_exists(Countries::class) && !Countries::exists($isoCode)) {
-            throw new InvalidArgumentException(sprintf('The country code "%s" is not valid.', $isoCode));
+            throw new InvalidArgumentException(\sprintf('The country code "%s" is not valid.', $isoCode));
         }
 
         $this->options['dest_iso'] = $isoCode;
@@ -196,7 +202,7 @@ final class SmsboxOptions implements MessageOptionsInterface
     public function maxParts(int $maxParts): static
     {
         if ($maxParts < 1 || $maxParts > 8) {
-            throw new InvalidArgumentException(sprintf('The "max_parts" option must be an integer between 1 and 8, got "%d".', $maxParts));
+            throw new InvalidArgumentException(\sprintf('The "max_parts" option must be an integer between 1 and 8, got "%d".', $maxParts));
         }
 
         $this->options['max_parts'] = $maxParts;
@@ -210,7 +216,7 @@ final class SmsboxOptions implements MessageOptionsInterface
     public function validity(int $validity): static
     {
         if ($validity < 5 || $validity > 1440) {
-            throw new InvalidArgumentException(sprintf('The "validity" option must be an integer between 5 and 1440, got "%d".', $validity));
+            throw new InvalidArgumentException(\sprintf('The "validity" option must be an integer between 5 and 1440, got "%d".', $validity));
         }
 
         $this->options['validity'] = $validity;

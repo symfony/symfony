@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\TypeInfo\Type;
 
-use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -39,30 +38,40 @@ final class BuiltinType extends Type
         return $this->typeIdentifier;
     }
 
-    /**
-     * @return self|UnionType<BuiltinType<TypeIdentifier::OBJECT>|BuiltinType<TypeIdentifier::RESOURCE>|BuiltinType<TypeIdentifier::ARRAY>|BuiltinType<TypeIdentifier::STRING>|BuiltinType<TypeIdentifier::FLOAT>|BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::BOOL>>
-     */
-    public function asNonNullable(): self|UnionType
+    public function isIdentifiedBy(TypeIdentifier|string ...$identifiers): bool
     {
-        if (TypeIdentifier::NULL === $this->typeIdentifier) {
-            throw new LogicException('"null" cannot be turned as non nullable.');
+        foreach ($identifiers as $identifier) {
+            if ($identifier === $this->typeIdentifier || $identifier === $this->typeIdentifier->value) {
+                return true;
+            }
         }
 
-        // "mixed" is an alias of "object|resource|array|string|float|int|bool|null"
-        // therefore, its non-nullable version is "object|resource|array|string|float|int|bool"
-        if (TypeIdentifier::MIXED === $this->typeIdentifier) {
-            return new UnionType(
-                new self(TypeIdentifier::OBJECT),
-                new self(TypeIdentifier::RESOURCE),
-                new self(TypeIdentifier::ARRAY),
-                new self(TypeIdentifier::STRING),
-                new self(TypeIdentifier::FLOAT),
-                new self(TypeIdentifier::INT),
-                new self(TypeIdentifier::BOOL),
-            );
-        }
+        return false;
+    }
 
-        return $this;
+    public function isNullable(): bool
+    {
+        return \in_array($this->typeIdentifier, [TypeIdentifier::NULL, TypeIdentifier::MIXED], true);
+    }
+
+    public function accepts(mixed $value): bool
+    {
+        return match ($this->typeIdentifier) {
+            TypeIdentifier::ARRAY => \is_array($value),
+            TypeIdentifier::BOOL => \is_bool($value),
+            TypeIdentifier::CALLABLE => \is_callable($value),
+            TypeIdentifier::FALSE => false === $value,
+            TypeIdentifier::FLOAT => \is_float($value),
+            TypeIdentifier::INT => \is_int($value),
+            TypeIdentifier::ITERABLE => is_iterable($value),
+            TypeIdentifier::MIXED => true,
+            TypeIdentifier::NULL => null === $value,
+            TypeIdentifier::OBJECT => \is_object($value),
+            TypeIdentifier::RESOURCE => \is_resource($value),
+            TypeIdentifier::STRING => \is_string($value),
+            TypeIdentifier::TRUE => true === $value,
+            default => false,
+        };
     }
 
     public function __toString(): string

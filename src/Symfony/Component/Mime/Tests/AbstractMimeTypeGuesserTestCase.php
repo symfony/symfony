@@ -20,7 +20,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
     {
         $path = __DIR__.'/Fixtures/mimetypes/to_delete';
         if (file_exists($path)) {
-            @chmod($path, 0666);
+            @chmod($path, 0o666);
             @unlink($path);
         }
     }
@@ -114,9 +114,9 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
 
         $path = __DIR__.'/Fixtures/mimetypes/to_delete';
         touch($path);
-        @chmod($path, 0333);
+        @chmod($path, 0o333);
 
-        if (str_ends_with(sprintf('%o', fileperms($path)), '0333')) {
+        if (str_ends_with(\sprintf('%o', fileperms($path)), '0333')) {
             $this->expectException(\InvalidArgumentException::class);
             $this->getGuesser()->guessMimeType($path);
         } else {

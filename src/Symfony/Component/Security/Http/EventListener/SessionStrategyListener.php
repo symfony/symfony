@@ -27,11 +27,9 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  */
 class SessionStrategyListener implements EventSubscriberInterface
 {
-    private SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy;
-
-    public function __construct(SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy)
-    {
-        $this->sessionAuthenticationStrategy = $sessionAuthenticationStrategy;
+    public function __construct(
+        private SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy,
+    ) {
     }
 
     public function onSuccessfulLogin(LoginSuccessEvent $event): void
@@ -47,7 +45,7 @@ class SessionStrategyListener implements EventSubscriberInterface
             $user = $token->getUserIdentifier();
             $previousUser = $previousToken->getUserIdentifier();
 
-            if ('' !== ($user ?? '') && $user === $previousUser && \get_class($token) === \get_class($previousToken)) {
+            if ('' !== $user && $user === $previousUser && $token::class === $previousToken::class) {
                 return;
             }
         }

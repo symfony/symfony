@@ -60,7 +60,7 @@ class DumpDataCollectorTest extends TestCase
         $this->assertSame(0, $collector->getDumpsCount());
 
         $serialized = serialize($collector);
-        $this->assertSame("O:60:\"Symfony\Component\HttpKernel\DataCollector\DumpDataCollector\":1:{s:7:\"\0*\0data\";a:2:{i:0;b:0;i:1;s:5:\"UTF-8\";}}", $serialized);
+        $this->assertSame("O:60:\"Symfony\Component\HttpKernel\DataCollector\DumpDataCollector\":1:{s:4:\"data\";a:2:{i:0;b:0;i:1;s:5:\"UTF-8\";}}", $serialized);
 
         $this->assertInstanceOf(DumpDataCollector::class, unserialize($serialized));
     }
@@ -79,7 +79,7 @@ class DumpDataCollectorTest extends TestCase
         // Collect doesn't re-trigger dump
         ob_start();
         $collector->collect(new Request(), new Response());
-        $this->assertEmpty(ob_get_clean());
+        $this->assertSame('', ob_get_clean());
         $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:6:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
     }
 
@@ -111,10 +111,10 @@ class DumpDataCollectorTest extends TestCase
         $line = __LINE__ - 1;
         $file = __FILE__;
         $xOutput = <<<EOTXT
-<pre class=sf-dump id=sf-dump data-indent-pad="  "><a href="test://{$file}:{$line}" title="{$file}"><span class=sf-dump-meta>DumpDataCollectorTest.php</span></a> on line <span class=sf-dump-meta>{$line}</span>:
-<span class=sf-dump-num>123</span>
-</pre>
-EOTXT;
+            <pre class=sf-dump id=sf-dump data-indent-pad="  "><a href="test://{$file}:{$line}" title="{$file}"><span class=sf-dump-meta>DumpDataCollectorTest.php</span></a> on line <span class=sf-dump-meta>{$line}</span>:
+            <span class=sf-dump-num>123</span>
+            </pre>
+            EOTXT;
 
         ob_start();
         $response = new Response();
@@ -157,7 +157,7 @@ EOTXT;
 
         ob_start();
         $collector->__destruct();
-        $this->assertEmpty(ob_get_clean());
+        $this->assertSame('', ob_get_clean());
     }
 
     public function testNullContentTypeWithNoDebugEnv()
@@ -175,6 +175,6 @@ EOTXT;
 
         ob_start();
         $collector->__destruct();
-        $this->assertEmpty(ob_get_clean());
+        $this->assertSame('', ob_get_clean());
     }
 }

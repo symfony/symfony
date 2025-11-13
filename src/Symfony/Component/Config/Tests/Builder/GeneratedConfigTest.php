@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Config\Tests\Builder;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Builder\ClassBuilder;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
@@ -28,20 +31,15 @@ use Symfony\Config\AddToListConfig;
  * Test to use the generated config and test its output.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * @covers \Symfony\Component\Config\Builder\ClassBuilder
- * @covers \Symfony\Component\Config\Builder\ConfigBuilderGenerator
- * @covers \Symfony\Component\Config\Builder\Method
- * @covers \Symfony\Component\Config\Builder\Property
  */
+#[IgnoreDeprecations]
+#[Group('legacy')]
 class GeneratedConfigTest extends TestCase
 {
     private array $tempDir = [];
 
     protected function setup(): void
     {
-        parent::setup();
-
         $this->tempDir = [];
     }
 
@@ -49,8 +47,6 @@ class GeneratedConfigTest extends TestCase
     {
         (new Filesystem())->remove($this->tempDir);
         $this->tempDir = [];
-
-        parent::tearDown();
     }
 
     public static function fixtureNames()
@@ -62,6 +58,7 @@ class GeneratedConfigTest extends TestCase
             'AddToList' => 'add_to_list',
             'NodeInitialValues' => 'node_initial_values',
             'ArrayExtraKeys' => 'array_extra_keys',
+            'ArrayValues' => 'array_values',
         ];
 
         foreach ($array as $name => $alias) {
@@ -77,23 +74,47 @@ class GeneratedConfigTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider fixtureNames
-     */
+    #[DataProvider('fixtureNames')]
     public function testConfig(string $name, string $alias)
     {
         $basePath = __DIR__.'/Fixtures/';
-        $callback = include $basePath.$name.'.config.php';
         $expectedOutput = include $basePath.$name.'.output.php';
         $expectedCode = $basePath.$name;
 
-        // to regenerate snapshot files, uncomment these lines
-        // (new Filesystem())->remove($expectedCode);
-        // $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
-        // $this->markTestIncomplete('Re-comment the line above and relaunch the tests');
+        if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
+            (new Filesystem())->remove($expectedCode);
+            $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
+            $this->markTestIncomplete('TEST_GENERATE_FIXTURES is set');
+        }
 
-        $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
+        $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);
+
+        $config = include $basePath.$name.'.config.php';
+
+        $this->assertDirectorySame($expectedCode, $outputDir);
+
+        $this->assertInstanceOf(ConfigBuilderInterface::class, $config);
+        $this->assertSame($alias, $config->getExtensionAlias());
+        $output = $config->toArray();
+        if (class_exists(AbstractConfigurator::class)) {
+            $output = AbstractConfigurator::processValue($output);
+        }
+        $this->assertSame($expectedOutput, $output);
+    }
+
+    #[DataProvider('fixtureNames')]
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testLegacyConfig(string $name, string $alias)
+    {
+        $basePath = __DIR__.'/Fixtures/';
+        $callback = include $basePath.$name.'.legacy.php';
+        $expectedOutput = include $basePath.$name.'.output.php';
+        $expectedCode = $basePath.$name;
+
         $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);
+
+        $this->expectUserDeprecationMessageMatches('{^Since symfony/config 7.4: Calling any fluent method on "Symfony\\\\Config\\\\.*Config" is deprecated; pass the configuration to the constructor instead\.}');
         $callback($configBuilder);
 
         $this->assertDirectorySame($expectedCode, $outputDir);
@@ -162,24 +183,23 @@ class GeneratedConfigTest extends TestCase
     /**
      * Generate the ConfigBuilder or return an already generated instance.
      */
-    private function generateConfigBuilder(string $configurationClass, ?string $outputDir = null)
+    private function generateConfigBuilder(string $configurationClass, ?string &$outputDir = null)
     {
-        $outputDir ??= sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
-        if (!str_contains($outputDir, __DIR__)) {
+        if (null === $outputDir) {
+            $outputDir = tempnam(sys_get_temp_dir(), 'sf_config_builder_');
+            unlink($outputDir);
+            mkdir($outputDir);
             $this->tempDir[] = $outputDir;
         }
 
         $configuration = new $configurationClass();
         $rootNode = $configuration->getConfigTreeBuilder()->buildTree();
-        $rootClass = new ClassBuilder('Symfony\\Config', $rootNode->getName());
-        if (class_exists($fqcn = $rootClass->getFqcn())) {
-            // Avoid generating the class again
-            return new $fqcn();
-        }
+        $rootClass = new ClassBuilder('Symfony\\Config', $rootNode->getName(), $rootNode);
+        $fqcn = $rootClass->getFqcn();
 
         $loader = (new ConfigBuilderGenerator($outputDir))->build(new $configurationClass());
 
-        return $loader();
+        return class_exists($fqcn) ? new $fqcn() : $loader();
     }
 
     private function assertDirectorySame($expected, $current)
@@ -198,6 +218,8 @@ class GeneratedConfigTest extends TestCase
             }
             $currentFiles[substr($file->getPathname(), \strlen($current))] = $file->getPathname();
         }
+        ksort($expectedFiles);
+        ksort($currentFiles);
 
         $this->assertSame(array_keys($expectedFiles), array_keys($currentFiles));
         foreach ($expectedFiles as $fileName => $filePath) {

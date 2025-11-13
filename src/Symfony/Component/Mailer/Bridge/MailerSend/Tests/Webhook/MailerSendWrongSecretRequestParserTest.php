@@ -34,8 +34,8 @@ class MailerSendWrongSecretRequestParserTest extends AbstractRequestParserTestCa
         $currentDir = \dirname((new \ReflectionClass(static::class))->getFileName());
 
         yield $filename => [
-            file_get_contents($currentDir . '/Fixtures/sent.json'),
-            include($currentDir . '/Fixtures/sent.php'),
+            file_get_contents($currentDir.'/Fixtures/sent.json'),
+            include ($currentDir.'/Fixtures/sent.php'),
         ];
     }
 
@@ -51,9 +51,9 @@ class MailerSendWrongSecretRequestParserTest extends AbstractRequestParserTestCa
             method: 'POST',
             server: [
                 'Content-Type' => 'application/json',
-                'HTTP_Signature' => 'e60f87b019f0aaae29042b14762991765ebb0cd6f6d42884af9fccca4cbd16e7'
+                'HTTP_Signature' => 'e60f87b019f0aaae29042b14762991765ebb0cd6f6d42884af9fccca4cbd16e7',
             ],
-            content: str_replace("\n", "", $payload)
+            content: str_replace("\n", '', $payload)
         );
     }
 }

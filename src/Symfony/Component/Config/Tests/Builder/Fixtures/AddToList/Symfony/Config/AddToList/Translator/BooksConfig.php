@@ -17,7 +17,7 @@ class BooksConfig
     /**
      * @example "page 1"
      * @default {"number":1,"content":""}
-    */
+     */
     public function page(array $value = []): \Symfony\Config\AddToList\Translator\Books\PageConfig
     {
         $this->_usedProperties['page'] = true;
@@ -25,16 +25,16 @@ class BooksConfig
         return $this->page[] = new \Symfony\Config\AddToList\Translator\Books\PageConfig($value);
     }
 
-    public function __construct(array $value = [])
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('page', $value)) {
+        if (array_key_exists('page', $config)) {
             $this->_usedProperties['page'] = true;
-            $this->page = array_map(fn ($v) => new \Symfony\Config\AddToList\Translator\Books\PageConfig($v), $value['page']);
-            unset($value['page']);
+            $this->page = array_map(fn ($v) => new \Symfony\Config\AddToList\Translator\Books\PageConfig($v), $config['page']);
+            unset($config['page']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

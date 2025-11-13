@@ -12,47 +12,45 @@
 namespace Symfony\Component\TypeInfo\Tests\Type;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class GenericTypeTest extends TestCase
 {
+    public function testCannotCreateInvalidBuiltinType()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new GenericType(Type::int(), Type::string());
+    }
+
     public function testToString()
     {
         $type = new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::bool());
         $this->assertEquals('array<bool>', (string) $type);
 
         $type = new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool());
-        $this->assertEquals('array<string,bool>', (string) $type);
+        $this->assertEquals('array<string, bool>', (string) $type);
 
         $type = new GenericType(Type::object(self::class), Type::union(Type::bool(), Type::string()), Type::int(), Type::float());
-        $this->assertEquals(sprintf('%s<bool|string,int,float>', self::class), (string) $type);
+        $this->assertEquals(\sprintf('%s<bool|string, int, float>', self::class), (string) $type);
     }
 
-    public function testIsNullable()
+    public function testWrappedTypeIsSatisfiedBy()
     {
-        $this->assertFalse((new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::int()))->isNullable());
-        $this->assertTrue((new GenericType(Type::null(), Type::int()))->isNullable());
-        $this->assertTrue((new GenericType(Type::mixed(), Type::int()))->isNullable());
+        $type = new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::bool());
+        $this->assertTrue($type->wrappedTypeIsSatisfiedBy(static fn (Type $t): bool => 'array' === (string) $t));
+
+        $type = new GenericType(Type::builtin(TypeIdentifier::ITERABLE), Type::bool());
+        $this->assertFalse($type->wrappedTypeIsSatisfiedBy(static fn (Type $t): bool => 'array' === (string) $t));
     }
 
-    public function testAsNonNullable()
+    public function testAccepts()
     {
-        $type = new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::int());
+        $type = new GenericType(Type::object(self::class), Type::string());
 
-        $this->assertSame($type, $type->asNonNullable());
-    }
-
-    public function testIsA()
-    {
-        $type = new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool());
-        $this->assertTrue($type->isA(TypeIdentifier::ARRAY));
-        $this->assertFalse($type->isA(TypeIdentifier::STRING));
-
-        $type = new GenericType(Type::object(self::class), Type::union(Type::bool(), Type::string()), Type::int(), Type::float());
-        $this->assertTrue($type->isA(TypeIdentifier::OBJECT));
-        $this->assertFalse($type->isA(TypeIdentifier::INT));
-        $this->assertFalse($type->isA(TypeIdentifier::STRING));
+        $this->assertFalse($type->accepts('string'));
+        $this->assertTrue($type->accepts($this));
     }
 }

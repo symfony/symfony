@@ -19,6 +19,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -33,11 +34,9 @@ use Twig\TwigTest;
  */
 final class FormExtension extends AbstractExtension
 {
-    private ?TranslatorInterface $translator;
-
-    public function __construct(?TranslatorInterface $translator = null)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private ?TranslatorInterface $translator = null,
+    ) {
     }
 
     public function getTokenParsers(): array
@@ -63,6 +62,7 @@ final class FormExtension extends AbstractExtension
             new TwigFunction('csrf_token', [FormRenderer::class, 'renderCsrfToken']),
             new TwigFunction('form_parent', 'Symfony\Bridge\Twig\Extension\twig_get_form_parent'),
             new TwigFunction('field_name', $this->getFieldName(...)),
+            new TwigFunction('field_id', $this->getFieldId(...)),
             new TwigFunction('field_value', $this->getFieldValue(...)),
             new TwigFunction('field_label', $this->getFieldLabel(...)),
             new TwigFunction('field_help', $this->getFieldHelp(...)),
@@ -92,6 +92,11 @@ final class FormExtension extends AbstractExtension
         $view->setRendered();
 
         return $view->vars['full_name'];
+    }
+
+    public function getFieldId(FormView $view): string
+    {
+        return $view->vars['id'];
     }
 
     public function getFieldValue(FormView $view): string|array
@@ -149,23 +154,26 @@ final class FormExtension extends AbstractExtension
     private function createFieldChoicesList(iterable $choices, string|false|null $translationDomain): iterable
     {
         foreach ($choices as $choice) {
-            $translatableLabel = $this->createFieldTranslation($choice->label, [], $translationDomain);
-
             if ($choice instanceof ChoiceGroupView) {
+                $translatableLabel = $this->createFieldTranslation($choice->label, [], $translationDomain);
                 yield $translatableLabel => $this->createFieldChoicesList($choice, $translationDomain);
 
                 continue;
             }
 
-            /* @var ChoiceView $choice */
+            /** @var ChoiceView $choice */
+            $translatableLabel = $this->createFieldTranslation($choice->label, $choice->labelTranslationParameters, $translationDomain);
             yield $translatableLabel => $choice->value;
         }
     }
 
-    private function createFieldTranslation(?string $value, array $parameters, string|false|null $domain): ?string
+    private function createFieldTranslation(TranslatableInterface|string|null $value, array $parameters, string|false|null $domain): ?string
     {
         if (!$this->translator || !$value || false === $domain) {
-            return $value;
+            return null !== $value ? (string) $value : null;
+        }
+        if ($value instanceof TranslatableInterface) {
+            return $value->trans($this->translator);
         }
 
         return $this->translator->trans($value, $parameters, $domain);

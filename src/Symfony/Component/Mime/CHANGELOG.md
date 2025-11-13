@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Deprecate implementing `__sleep/wakeup()` on `AbstractPart` implementations; use `__(un)serialize()` instead
+
 7.0
 ---
 

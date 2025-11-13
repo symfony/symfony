@@ -248,7 +248,7 @@ class Email extends Message
             $priority = 1;
         }
 
-        return $this->setHeaderBody('Text', 'X-Priority', sprintf('%d (%s)', $priority, self::PRIORITY_MAP[$priority]));
+        return $this->setHeaderBody('Text', 'X-Priority', \sprintf('%d (%s)', $priority, self::PRIORITY_MAP[$priority]));
     }
 
     /**
@@ -272,7 +272,7 @@ class Email extends Message
     public function text($body, string $charset = 'utf-8', ?string $encoding = null): static
     {
         if (null !== $body && !\is_string($body) && !\is_resource($body)) {
-            throw new \TypeError(sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
+            throw new \TypeError(\sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
         }
 
         $this->cachedBody = null;
@@ -319,7 +319,7 @@ class Email extends Message
     public function html($body, string $charset = 'utf-8', ?string $encoding = null): static
     {
         if (null !== $body && !\is_string($body) && !\is_resource($body)) {
-            throw new \TypeError(sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
+            throw new \TypeError(\sprintf('The body must be a string, a resource or null (got "%s").', get_debug_type($body)));
         }
 
         $this->cachedBody = null;
@@ -435,7 +435,7 @@ class Email extends Message
 
     private function ensureBodyValid(): void
     {
-        if (null === $this->text && null === $this->html && !$this->attachments) {
+        if (null === $this->text && null === $this->html && !$this->attachments && null === parent::getBody()) {
             throw new LogicException('A message must have a text or an HTML part or attachments.');
         }
     }
@@ -526,7 +526,7 @@ class Email extends Message
                 }
 
                 if ($name !== $part->getContentId()) {
-                    $html = str_replace('cid:'.$name, 'cid:'.$part->getContentId(), $html, $count);
+                    $html = str_replace('cid:'.$name, 'cid:'.$part->getContentId(), $html);
                 }
                 $relatedParts[$name] = $part;
                 $part->setName($part->getContentId())->asInline();

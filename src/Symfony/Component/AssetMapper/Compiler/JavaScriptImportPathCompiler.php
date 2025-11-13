@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Compiler;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\Compiler\Parser\JavascriptSequenceParser;
 use Symfony\Component\AssetMapper\Exception\CircularAssetsException;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
@@ -50,7 +51,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             )
             \s*[\'"`](\.\/[^\'"`\n]++|(\.\.\/)*+[^\'"`\n]++)[\'"`]\s*[;\)]
         ?
-    /mx';
+    /mxu';
 
     public function __construct(
         private readonly ImportMapConfigReader $importMapConfigReader,
@@ -61,15 +62,13 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
-        return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper, $content) {
+        $jsParser = new JavascriptSequenceParser($content);
+
+        return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper, $jsParser) {
             $fullImportString = $matches[0][0];
 
-            // Ignore matches that did not capture import statements
-            if (!isset($matches[1][0])) {
-                return $fullImportString;
-            }
-
-            if ($this->isCommentedOut($matches[0][1], $content)) {
+            $jsParser->parseUntil($matches[0][1]);
+            if (!$jsParser->isExecutable()) {
                 return $fullImportString;
             }
 
@@ -89,6 +88,11 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             }
 
             if (!$dependentAsset) {
+                return $fullImportString;
+            }
+
+            // Ignore self-referencing import
+            if ($dependentAsset->logicalPath === $asset->logicalPath) {
                 return $fullImportString;
             }
 
@@ -115,7 +119,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             $relativeImportPath = $this->makeRelativeForJavaScript($relativeImportPath);
 
             return str_replace($importedModule, $relativeImportPath, $fullImportString);
-        }, $content, -1, $count, \PREG_OFFSET_CAPTURE) ?? throw new RuntimeException(sprintf('Failed to compile JavaScript import paths in "%s". Error: "%s".', $asset->sourcePath, preg_last_error_msg()));
+        }, $content, -1, $count, \PREG_OFFSET_CAPTURE) ?? throw new RuntimeException(\sprintf('Failed to compile JavaScript import paths in "%s". Error: "%s".', $asset->sourcePath, preg_last_error_msg()));
     }
 
     public function supports(MappedAsset $asset): bool
@@ -139,33 +143,6 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             AssetCompilerInterface::MISSING_IMPORT_WARN => $this->logger?->warning($message),
             AssetCompilerInterface::MISSING_IMPORT_STRICT => throw new RuntimeException($message, 0, $e),
         };
-    }
-
-    /**
-     * Simple check for the most common types of comments.
-     *
-     * This is not a full parser, but should be good enough for most cases.
-     */
-    private function isCommentedOut(mixed $offsetStart, string $fullContent): bool
-    {
-        $lineStart = strrpos($fullContent, "\n", $offsetStart - \strlen($fullContent));
-        $lineContentBeforeImport = substr($fullContent, $lineStart, $offsetStart - $lineStart);
-        $firstTwoChars = substr(ltrim($lineContentBeforeImport), 0, 2);
-        if ('//' === $firstTwoChars) {
-            return true;
-        }
-
-        if ('/*' === $firstTwoChars) {
-            $commentEnd = strpos($fullContent, '*/', $lineStart);
-            // if we can't find the end comment, be cautious: assume this is not a comment
-            if (false === $commentEnd) {
-                return false;
-            }
-
-            return $offsetStart < $commentEnd;
-        }
-
-        return false;
     }
 
     private function findAssetForBareImport(string $importedModule, AssetMapperInterface $assetMapper): ?MappedAsset
@@ -194,7 +171,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         } catch (RuntimeException $e) {
             // avoid warning about vendor imports - these are often comments
             if (!$asset->isVendor) {
-                $this->handleMissingImport(sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
+                $this->handleMissingImport(\sprintf('Error processing import in "%s": ', $asset->sourcePath).$e->getMessage(), $e);
             }
 
             return null;
@@ -215,14 +192,14 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
             return null;
         }
 
-        $message = sprintf('Unable to find asset "%s" imported from "%s".', $importedModule, $asset->sourcePath);
+        $message = \sprintf('Unable to find asset "%s" imported from "%s".', $importedModule, $asset->sourcePath);
 
         if (is_file($resolvedSourcePath)) {
-            $message .= sprintf('The file "%s" exists, but it is not in a mapped asset path. Add it to the "paths" config.', $resolvedSourcePath);
+            $message .= \sprintf('The file "%s" exists, but it is not in a mapped asset path. Add it to the "paths" config.', $resolvedSourcePath);
         } else {
             try {
-                if (null !== $assetMapper->getAssetFromSourcePath(sprintf('%s.js', $resolvedSourcePath))) {
-                    $message .= sprintf(' Try adding ".js" to the end of the import - i.e. "%s.js".', $importedModule);
+                if (null !== $assetMapper->getAssetFromSourcePath(\sprintf('%s.js', $resolvedSourcePath))) {
+                    $message .= \sprintf(' Try adding ".js" to the end of the import - i.e. "%s.js".', $importedModule);
                 }
             } catch (CircularAssetsException) {
                 // avoid circular error if there is self-referencing import comments

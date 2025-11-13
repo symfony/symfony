@@ -8,6 +8,7 @@ putenv($k.'='.$_SERVER[$k] = $_ENV[$k] = 'max[total]=0');
 putenv('ANSICON');
 putenv('ConEmuANSI');
 putenv('TERM');
+putenv('SYMFONY_DEPRECATIONS_SERIALIZE');
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {

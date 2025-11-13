@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Node;
 use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Expression\AssignNameExpression;
+use Twig\Node\Expression\Variable\LocalVariable;
 use Twig\Node\Node;
 
 /**
@@ -24,9 +25,9 @@ use Twig\Node\Node;
 #[YieldReady]
 final class StopwatchNode extends Node
 {
-    public function __construct(Node $name, Node $body, AssignNameExpression $var, int $lineno = 0, ?string $tag = null)
+    public function __construct(Node $name, Node $body, AssignNameExpression|LocalVariable $var, int $lineno = 0)
     {
-        parent::__construct(['body' => $body, 'name' => $name, 'var' => $var], [], $lineno, $tag);
+        parent::__construct(['body' => $body, 'name' => $name, 'var' => $var], [], $lineno);
     }
 
     public function compile(Compiler $compiler): void

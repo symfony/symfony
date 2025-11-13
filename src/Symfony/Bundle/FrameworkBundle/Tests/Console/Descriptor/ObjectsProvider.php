@@ -34,7 +34,64 @@ class ObjectsProvider
             $collection1->add($name, $route);
         }
 
-        return ['route_collection_1' => $collection1];
+        $routesWithGenericHost = new RouteCollection();
+        $routesWithGenericHost->add('some_route', new RouteStub(
+            '/some-route',
+            ['_controller' => 'Controller'],
+            [],
+            [],
+            null,
+            ['https'],
+        ));
+
+        $routesWithGenericScheme = new RouteCollection();
+        $routesWithGenericScheme->add('some_route_with_host', new RouteStub(
+            '/some-route',
+            ['_controller' => 'strpos'],
+            [],
+            [],
+            'symfony.com',
+            [],
+        ));
+
+        return [
+            'empty_route_collection' => new RouteCollection(),
+            'route_collection_1' => $collection1,
+            'route_with_generic_host' => $routesWithGenericHost,
+            'route_with_generic_scheme' => $routesWithGenericScheme,
+        ];
+    }
+
+    public static function getRouteCollectionsByHttpMethod(): array
+    {
+        $collection = new RouteCollection();
+        foreach (self::getRoutes() as $name => $route) {
+            $collection->add($name, $route);
+        }
+
+        // Clone the original collection and add a route without any specific method restrictions
+        $collectionWithRouteWithoutMethodRestriction = clone $collection;
+        $collectionWithRouteWithoutMethodRestriction->add(
+            'route_3',
+            new RouteStub(
+                '/other/route',
+                [],
+                [],
+                ['opt1' => 'val1', 'opt2' => 'val2'],
+                'localhost',
+                ['http', 'https'],
+                [],
+            )
+        );
+
+        return [
+            'GET' => [
+                'route_collection_2' => $collectionWithRouteWithoutMethodRestriction,
+            ],
+            'PUT' => [
+                'route_collection_3' => $collection,
+            ],
+        ];
     }
 
     public static function getRoutes()

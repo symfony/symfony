@@ -11,13 +11,8 @@
 
 namespace Symfony\Component\TypeInfo;
 
-use Symfony\Component\TypeInfo\Exception\LogicException;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
-use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\GenericType;
-use Symfony\Component\TypeInfo\Type\IntersectionType;
-use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -27,63 +22,87 @@ abstract class Type implements \Stringable
 {
     use TypeFactoryTrait;
 
-    public function getBaseType(): BuiltinType|ObjectType
+    /**
+     * Tells if the type is satisfied by the $specification callable.
+     *
+     * @param callable(self): bool $specification
+     */
+    public function isSatisfiedBy(callable $specification): bool
     {
-        if ($this instanceof UnionType || $this instanceof IntersectionType) {
-            throw new LogicException(sprintf('Cannot get base type on "%s" compound type.', (string) $this));
+        if ($this instanceof WrappingTypeInterface && $this->wrappedTypeIsSatisfiedBy($specification)) {
+            return true;
         }
 
-        $baseType = $this;
-
-        if ($baseType instanceof CollectionType) {
-            $baseType = $baseType->getType();
+        if ($this instanceof CompositeTypeInterface && $this->composedTypesAreSatisfiedBy($specification)) {
+            return true;
         }
 
-        if ($baseType instanceof GenericType) {
-            $baseType = $baseType->getType();
-        }
-
-        return $baseType;
+        return $specification($this);
     }
 
     /**
-     * @param callable(Type): bool $callable
+     * Tells if the type (or one of its wrapped/composed parts) is identified by one of the $identifiers.
      */
-    public function is(callable $callable): bool
+    public function isIdentifiedBy(TypeIdentifier|string ...$identifiers): bool
     {
-        return match(true) {
-            $this instanceof UnionType => $this->atLeastOneTypeIs($callable),
-            $this instanceof IntersectionType => $this->everyTypeIs($callable),
-            default => $callable($this),
-        };
-    }
+        $specification = static fn (Type $type): bool => $type->isIdentifiedBy(...$identifiers);
 
-    public function isA(TypeIdentifier $typeIdentifier): bool
-    {
-        return $this->testIdentifier(fn (TypeIdentifier $i): bool => $typeIdentifier === $i);
+        if ($this instanceof WrappingTypeInterface && $this->wrappedTypeIsSatisfiedBy($specification)) {
+            return true;
+        }
+
+        if ($this instanceof CompositeTypeInterface && $this->composedTypesAreSatisfiedBy($specification)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function isNullable(): bool
     {
-        return $this->testIdentifier(fn (TypeIdentifier $i): bool => TypeIdentifier::NULL === $i || TypeIdentifier::MIXED === $i);
+        return false;
     }
 
-    abstract public function asNonNullable(): self;
-
     /**
-     * @param callable(TypeIdentifier): bool $test
+     * Tells if the type (or one of its wrapped/composed parts) accepts the given $value.
      */
-    private function testIdentifier(callable $test): bool
+    public function accepts(mixed $value): bool
     {
-        $callable = function (self $t) use ($test, &$callable): bool {
-            // unwrap compound type to forward type identifier check
-            if ($t instanceof UnionType || $t instanceof IntersectionType) {
-                return $t->is($callable);
+        $specification = static function (Type $type) use (&$specification, $value): bool {
+            if ($type instanceof WrappingTypeInterface) {
+                return $type->wrappedTypeIsSatisfiedBy($specification);
             }
 
-            return $test($t->getBaseType()->getTypeIdentifier());
+            if ($type instanceof CompositeTypeInterface) {
+                return $type->composedTypesAreSatisfiedBy($specification);
+            }
+
+            return $type->accepts($value);
         };
 
-        return $this->is($callable);
+        return $this->isSatisfiedBy($specification);
+    }
+
+    /**
+     * Traverses the whole type tree.
+     *
+     * @return iterable<self>
+     */
+    public function traverse(bool $traverseComposite = true, bool $traverseWrapped = true): iterable
+    {
+        yield $this;
+
+        if ($this instanceof CompositeTypeInterface && $traverseComposite) {
+            foreach ($this->getTypes() as $type) {
+                yield $type;
+            }
+
+            // prevent yielding twice when having a type that is both composite and wrapped
+            return;
+        }
+
+        if ($this instanceof WrappingTypeInterface && $traverseWrapped) {
+            yield $this->getWrappedType();
+        }
     }
 }

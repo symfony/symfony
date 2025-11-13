@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Tests\Crypto;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Symfony\Component\Mime\Email;
@@ -19,9 +20,7 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\TextPart;
 
-/**
- * @requires extension openssl
- */
+#[RequiresPhpExtension('openssl')]
 class SMimeSignerTest extends SMimeTestCase
 {
     public function testSignedMessage()
@@ -158,12 +157,12 @@ class SMimeSignerTest extends SMimeTestCase
         file_put_contents($messageFile, $messageString);
 
         $this->assertMessageHeaders($message, $originalMessage);
-        $this->assertTrue(openssl_pkcs7_verify($messageFile, 0, $this->generateTmpFilename(), [$this->samplesDir.'ca.crt']), sprintf('Verification of the message %s failed. Internal error "%s".', $messageFile, openssl_error_string()));
+        $this->assertTrue(openssl_pkcs7_verify($messageFile, 0, $this->generateTmpFilename(), [$this->samplesDir.'ca.crt']), \sprintf('Verification of the message %s failed. Internal error "%s".', $messageFile, openssl_error_string()));
 
         if (!str_contains($messageString, 'enveloped-data')) {
             // Tamper to ensure it actually verified
             file_put_contents($messageFile, str_replace('Content-Transfer-Encoding: ', 'Content-Transfer-Encoding:  ', $messageString));
-            $this->assertFalse(openssl_pkcs7_verify($messageFile, 0, $this->generateTmpFilename(), [$this->samplesDir.'ca.crt']), sprintf('Verification of the message failed. Internal error "%s".', openssl_error_string()));
+            $this->assertFalse(openssl_pkcs7_verify($messageFile, 0, $this->generateTmpFilename(), [$this->samplesDir.'ca.crt']), \sprintf('Verification of the message failed. Internal error "%s".', openssl_error_string()));
         }
     }
 }

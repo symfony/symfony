@@ -43,12 +43,15 @@ class SerializerExtractorTest extends TestCase
     public function testGetPropertiesWithIgnoredProperties()
     {
         $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['a']]));
-        $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['Default']]));
-        $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['IgnorePropertyDummy']]));
     }
 
     public function testGetPropertiesWithAnyGroup()
     {
         $this->assertSame(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class, ['serializer_groups' => null]));
+    }
+
+    public function testGetPropertiesWithNonExistentClassReturnsNull()
+    {
+        $this->assertNull($this->extractor->getProperties('NonExistent'));
     }
 }

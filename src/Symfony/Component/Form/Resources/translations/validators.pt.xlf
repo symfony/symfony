@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
-                <target>A escolha seleccionada é inválida.</target>
+                <target>A escolha selecionada é inválida.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>The collection is invalid.</source>

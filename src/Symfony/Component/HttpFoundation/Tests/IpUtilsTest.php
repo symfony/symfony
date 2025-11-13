@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\IpUtils;
 
@@ -31,9 +33,7 @@ class IpUtilsTest extends TestCase
         $this->assertTrue(IpUtils::checkIp6($ip, $subnet));
     }
 
-    /**
-     * @dataProvider getIpv4Data
-     */
+    #[DataProvider('getIpv4Data')]
     public function testIpv4($matches, $remoteAddr, $cidr)
     {
         $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
@@ -58,9 +58,7 @@ class IpUtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getIpv6Data
-     */
+    #[DataProvider('getIpv6Data')]
     public function testIpv6($matches, $remoteAddr, $cidr)
     {
         if (!\defined('AF_INET6')) {
@@ -94,9 +92,7 @@ class IpUtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @requires extension sockets
-     */
+    #[RequiresPhpExtension('sockets')]
     public function testAnIpv6WithOptionDisabledIpv6()
     {
         $this->expectException(\RuntimeException::class);
@@ -107,9 +103,7 @@ class IpUtilsTest extends TestCase
         IpUtils::checkIp('2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65');
     }
 
-    /**
-     * @dataProvider invalidIpAddressData
-     */
+    #[DataProvider('invalidIpAddressData')]
     public function testInvalidIpAddressesDoNotMatch($requestIp, $proxyIp)
     {
         $this->assertFalse(IpUtils::checkIp4($requestIp, $proxyIp));
@@ -124,9 +118,7 @@ class IpUtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider anonymizedIpData
-     */
+    #[DataProvider('anonymizedIpData')]
     public function testAnonymize($ip, $expected)
     {
         $this->assertSame($expected, IpUtils::anonymize($ip));
@@ -147,12 +139,73 @@ class IpUtilsTest extends TestCase
             ['[2a01:198::3]', '[2a01:198::]'],
             ['::ffff:123.234.235.236', '::ffff:123.234.235.0'], // IPv4-mapped IPv6 addresses
             ['::123.234.235.236', '::123.234.235.0'], // deprecated IPv4-compatible IPv6 address
+            ['fe80::1fc4:15d8:78db:2319%enp4s0', 'fe80::'], // IPv6 link-local with RFC4007 scoping
         ];
     }
 
-    /**
-     * @dataProvider getIp4SubnetMaskZeroData
-     */
+    #[DataProvider('anonymizedIpDataWithBytes')]
+    public function testAnonymizeWithBytes($ip, $expected, $bytesForV4, $bytesForV6)
+    {
+        $this->assertSame($expected, IpUtils::anonymize($ip, $bytesForV4, $bytesForV6));
+    }
+
+    public static function anonymizedIpDataWithBytes(): array
+    {
+        return [
+            ['192.168.1.1', '192.168.0.0', 2, 8],
+            ['192.168.1.1', '192.0.0.0', 3, 8],
+            ['192.168.1.1', '0.0.0.0', 4, 8],
+            ['1.2.3.4', '1.2.3.0', 1, 8],
+            ['1.2.3.4', '1.2.3.4', 0, 8],
+            ['2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0:396e:4789:8e99:890f', 1, 0],
+            ['2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0:396e:4789::', 1, 4],
+            ['2a01:198:603:10:396e:4789:8e99:890f', '2a01:198:603:10:396e:4700::', 1, 5],
+            ['2a01:198:603:10:396e:4789:8e99:890f', '2a00::', 1, 15],
+            ['2a01:198:603:10:396e:4789:8e99:890f', '::', 1, 16],
+            ['::1', '::', 1, 1],
+            ['0:0:0:0:0:0:0:1', '::', 1, 1],
+            ['1:0:0:0:0:0:0:1', '1::', 1, 1],
+            ['0:0:603:50:396e:4789:8e99:0001', '0:0:603::', 1, 10],
+            ['[0:0:603:50:396e:4789:8e99:0001]', '[::603:50:396e:4789:8e00:0]', 1, 3],
+            ['[2a01:198::3]', '[2a01:198::]', 1, 2],
+            ['::ffff:123.234.235.236', '::ffff:123.234.235.0', 1, 8], // IPv4-mapped IPv6 addresses
+            ['::123.234.235.236', '::123.234.0.0', 2, 8], // deprecated IPv4-compatible IPv6 address
+        ];
+    }
+
+    public function testAnonymizeV4WithNegativeBytes()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot anonymize less than 0 bytes.');
+
+        IpUtils::anonymize('anything', -1, 8);
+    }
+
+    public function testAnonymizeV6WithNegativeBytes()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot anonymize less than 0 bytes.');
+
+        IpUtils::anonymize('anything', 1, -1);
+    }
+
+    public function testAnonymizeV4WithTooManyBytes()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot anonymize more than 4 bytes for IPv4 and 16 bytes for IPv6.');
+
+        IpUtils::anonymize('anything', 5, 8);
+    }
+
+    public function testAnonymizeV6WithTooManyBytes()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot anonymize more than 4 bytes for IPv4 and 16 bytes for IPv6.');
+
+        IpUtils::anonymize('anything', 1, 17);
+    }
+
+    #[DataProvider('getIp4SubnetMaskZeroData')]
     public function testIp4SubnetMaskZero($matches, $remoteAddr, $cidr)
     {
         $this->assertSame($matches, IpUtils::checkIp4($remoteAddr, $cidr));
@@ -167,9 +220,7 @@ class IpUtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getIsPrivateIpData
-     */
+    #[DataProvider('getIsPrivateIpData')]
     public function testIsPrivateIp(string $ip, bool $matches)
     {
         $this->assertSame($matches, IpUtils::isPrivateIp($ip));

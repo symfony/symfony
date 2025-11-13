@@ -101,7 +101,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         $managerRegistry
             ->method('getManager')
             ->with('unknown_manager')
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->willThrowException(new \InvalidArgumentException());
 
         $middleware = new DoctrinePingConnectionMiddleware($managerRegistry, 'unknown_manager');
 

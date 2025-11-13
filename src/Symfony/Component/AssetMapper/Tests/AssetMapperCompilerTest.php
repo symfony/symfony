@@ -21,7 +21,7 @@ class AssetMapperCompilerTest extends TestCase
 {
     public function testCompile()
     {
-        $compiler1 = new class() implements AssetCompilerInterface {
+        $compiler1 = new class implements AssetCompilerInterface {
             public function supports(MappedAsset $asset): bool
             {
                 return 'css' === $asset->publicExtension;
@@ -33,7 +33,7 @@ class AssetMapperCompilerTest extends TestCase
             }
         };
 
-        $compiler2 = new class() implements AssetCompilerInterface {
+        $compiler2 = new class implements AssetCompilerInterface {
             public function supports(MappedAsset $asset): bool
             {
                 return 'js' === $asset->publicExtension;
@@ -45,7 +45,7 @@ class AssetMapperCompilerTest extends TestCase
             }
         };
 
-        $compiler3 = new class() implements AssetCompilerInterface {
+        $compiler3 = new class implements AssetCompilerInterface {
             public function supports(MappedAsset $asset): bool
             {
                 return 'js' === $asset->publicExtension;

@@ -72,11 +72,17 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
         self::$registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
             $attribute = (array) $attribute->newInstance();
 
-            foreach ($attribute['tags'] ?? [] as $i => $tag) {
-                if (\is_array($tag) && [0] === array_keys($tag)) {
-                    $attribute['tags'][$i] = [$class->name => $tag[0]];
+            foreach (['tags', 'resourceTags'] as $type) {
+                foreach ($attribute[$type] ?? [] as $i => $tag) {
+                    if (\is_array($tag) && [0] === array_keys($tag)) {
+                        $attribute[$type][$i] = [$class->name => $tag[0]];
+                    }
                 }
             }
+            if (isset($attribute['resourceTags'])) {
+                $attribute['resource_tags'] = $attribute['resourceTags'];
+            }
+            unset($attribute['resourceTags']);
 
             $parseDefinitions->invoke(
                 $yamlLoader,

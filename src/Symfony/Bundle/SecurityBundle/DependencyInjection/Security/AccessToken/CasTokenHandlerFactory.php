@@ -42,7 +42,6 @@ class CasTokenHandlerFactory implements TokenHandlerFactoryInterface
     {
         $node
             ->arrayNode($this->getKey())
-                ->fixXmlConfig($this->getKey())
                 ->children()
                     ->scalarNode('validation_url')
                         ->info('CAS server validation URL')

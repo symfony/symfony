@@ -14,11 +14,13 @@ namespace Symfony\Component\VarDumper\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
- * Casts pqsql resources to array representation.
+ * Casts pgsql resources to array representation.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @final
+ *
+ * @internal since Symfony 7.3
  */
 class PgSqlCaster
 {
@@ -131,11 +133,11 @@ class PgSqlCaster
         for ($i = 0; $i < $fields; ++$i) {
             $field = [
                 'name' => pg_field_name($result, $i),
-                'table' => sprintf('%s (OID: %s)', pg_field_table($result, $i), pg_field_table($result, $i, true)),
-                'type' => sprintf('%s (OID: %s)', pg_field_type($result, $i), pg_field_type_oid($result, $i)),
-                'nullable' => (bool) pg_field_is_null($result, $i),
+                'table' => \sprintf('%s (OID: %s)', pg_field_table($result, $i), pg_field_table($result, $i, true)),
+                'type' => \sprintf('%s (OID: %s)', pg_field_type($result, $i), pg_field_type_oid($result, $i)),
+                'nullable' => (bool) (\PHP_VERSION_ID >= 80300 ? pg_field_is_null($result, null, $i) : pg_field_is_null($result, $i)),
                 'storage' => pg_field_size($result, $i).' bytes',
-                'display' => pg_field_prtlen($result, $i).' chars',
+                'display' => (\PHP_VERSION_ID >= 80300 ? pg_field_prtlen($result, null, $i) : pg_field_prtlen($result, $i)).' chars',
             ];
             if (' (OID: )' === $field['table']) {
                 $field['table'] = null;

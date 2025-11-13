@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Sendgrid\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Header\SuppressionGroupHeader;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -32,20 +33,21 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class SendgridApiTransport extends AbstractApiTransport
 {
-    private const HOST = 'api.sendgrid.com';
+    private const HOST = 'api.%region_dot%sendgrid.com';
 
     public function __construct(
         #[\SensitiveParameter] private string $key,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
         ?LoggerInterface $logger = null,
+        private ?string $region = null,
     ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
-        return sprintf('sendgrid+api://%s', $this->getEndpoint());
+        return \sprintf('sendgrid+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -65,9 +67,9 @@ class SendgridApiTransport extends AbstractApiTransport
             try {
                 $result = $response->toArray(false);
 
-                throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($result['errors'], 'message')).sprintf(' (code %d).', $statusCode), $response);
+                throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($result['errors'], 'message')).\sprintf(' (code %d).', $statusCode), $response);
             } catch (DecodingExceptionInterface $e) {
-                throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response, 0, $e);
+                throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response, 0, $e);
             }
         }
 
@@ -117,21 +119,27 @@ class SendgridApiTransport extends AbstractApiTransport
         $customArguments = [];
         $categories = [];
 
-        // these headers can't be overwritten according to Sendgrid docs
-        // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
-        $headersToBypass = ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'];
         foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            // these headers can't be overwritten according to Sendgrid docs
+            // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
+            if (\in_array($name, ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'], true)) {
                 continue;
             }
 
             if ($header instanceof TagHeader) {
                 if (10 === \count($categories)) {
-                    throw new TransportException(sprintf('Too many "%s" instances present in the email headers. Sendgrid does not accept more than 10 categories on an email.', TagHeader::class));
+                    throw new TransportException(\sprintf('Too many "%s" instances present in the email headers. Sendgrid does not accept more than 10 categories on an email.', TagHeader::class));
                 }
                 $categories[] = mb_substr($header->getValue(), 0, 255);
             } elseif ($header instanceof MetadataHeader) {
                 $customArguments[$header->getKey()] = $header->getValue();
+            } elseif ($header instanceof SuppressionGroupHeader) {
+                $payload['asm'] = [
+                    'group_id' => $header->getGroupId(),
+                ];
+                if ($groupsToDisplay = $header->getGroupsToDisplay()) {
+                    $payload['asm']['groups_to_display'] = $groupsToDisplay;
+                }
             } else {
                 $payload['headers'][$header->getName()] = $header->getBodyAsString();
             }
@@ -179,7 +187,7 @@ class SendgridApiTransport extends AbstractApiTransport
             ];
 
             if ('inline' === $disposition) {
-                $att['content_id'] = $filename;
+                $att['content_id'] = $attachment->hasContentId() ? $attachment->getContentId() : $filename;
             }
 
             $attachments[] = $att;
@@ -190,6 +198,11 @@ class SendgridApiTransport extends AbstractApiTransport
 
     private function getEndpoint(): ?string
     {
-        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
+        $host = $this->host ?: str_replace('%region_dot%', '', self::HOST);
+        if (null !== $this->region && 'global' !== $this->region && null === $this->host) {
+            $host = str_replace('%region_dot%', $this->region.'.', self::HOST);
+        }
+
+        return $host.($this->port ? ':'.$this->port : '');
     }
 }

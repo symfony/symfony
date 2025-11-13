@@ -70,11 +70,11 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             }
 
             if (!is_file($autoloadTemplate)) {
-                throw new \InvalidArgumentException(sprintf('File "%s" defined under "extra.runtime.autoload_template" in your composer.json file not found.', $this->composer->getPackage()->getExtra()['runtime']['autoload_template']));
+                throw new \InvalidArgumentException(\sprintf('File "%s" defined under "extra.runtime.autoload_template" in your composer.json file not found.', $this->composer->getPackage()->getExtra()['runtime']['autoload_template']));
             }
         }
 
-        $projectDir = $fs->makePathRelative($projectDir, $vendorDir);
+        $projectDir = $fs->makePathRelative(realpath($projectDir.'/'.($extra['project_dir'] ?? '')), $vendorDir);
         $nestingLevel = 0;
 
         while (str_starts_with($projectDir, '../')) {
@@ -82,6 +82,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             $projectDir = substr($projectDir, 3);
         }
 
+        // the hack about __DIR__ is required because composer pre-processes plugins
         if (!$nestingLevel) {
             $projectDir = '__'.'DIR__.'.var_export('/'.$projectDir, true);
         } else {
@@ -90,7 +91,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
 
         $runtimeClass = $extra['class'] ?? SymfonyRuntime::class;
 
-        unset($extra['class'], $extra['autoload_template']);
+        unset($extra['class'], $extra['autoload_template'], $extra['project_dir']);
 
         $code = strtr(file_get_contents($autoloadTemplate), [
             '%project_dir%' => $projectDir,

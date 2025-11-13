@@ -11,29 +11,32 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Locales;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
-/**
- * @group intl-data
- */
+#[Group('intl-data')]
 class LocalesTest extends ResourceBundleTestCase
 {
     public function testGetLocales()
     {
-        $this->assertSame($this->getLocales(), Locales::getLocales());
+        $this->assertSame(static::getLocales(), Locales::getLocales());
     }
 
     public function testGetAliases()
     {
-        $this->assertSame($this->getLocaleAliases(), Locales::getAliases());
+        $this->assertSame(static::getLocaleAliases(), Locales::getAliases());
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetNames($displayLocale)
     {
+        if ('en' !== $displayLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         $locales = array_keys(Locales::getNames($displayLocale));
 
         sort($locales);
@@ -41,32 +44,38 @@ class LocalesTest extends ResourceBundleTestCase
         // We can't assert on exact list of locale, as there's too many variations.
         // The best we can do is to make sure getNames() returns a subset of what getLocales() returns.
         $this->assertNotEmpty($locales);
-        $this->assertEmpty(array_diff($locales, $this->getLocales()));
+        $this->assertSame([], array_diff($locales, static::getLocales()));
     }
 
     public function testGetNamesDefaultLocale()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('de_AT');
 
         $this->assertSame(Locales::getNames('de_AT'), Locales::getNames());
     }
 
-    /**
-     * @dataProvider provideLocaleAliases
-     */
+    #[DataProvider('provideLocaleAliases')]
     public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
+        if ('en' !== $ofLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
         $this->assertEquals(Locales::getNames($ofLocale), Locales::getNames($alias));
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetName($displayLocale)
     {
+        if ('en' !== $displayLocale) {
+            IntlTestHelper::requireFullIntl($this);
+        }
+
         $names = Locales::getNames($displayLocale);
 
         foreach ($names as $locale => $name) {
@@ -76,6 +85,8 @@ class LocalesTest extends ResourceBundleTestCase
 
     public function testGetNameDefaultLocale()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('de_AT');
 
         $names = Locales::getNames('de_AT');

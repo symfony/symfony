@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,9 +32,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class ExceptionListenerTest extends TestCase
 {
-    /**
-     * @dataProvider getAuthenticationExceptionProvider
-     */
+    #[DataProvider('getAuthenticationExceptionProvider')]
     public function testAuthenticationExceptionWithoutEntryPoint(\Exception $exception, \Exception $eventException)
     {
         $event = $this->createEvent($exception);
@@ -45,10 +44,8 @@ class ExceptionListenerTest extends TestCase
         $this->assertEquals($eventException, $event->getThrowable());
     }
 
-    /**
-     * @dataProvider getAuthenticationExceptionProvider
-     */
-    public function testAuthenticationExceptionWithEntryPoint(\Exception $exception)
+    #[DataProvider('getAuthenticationExceptionProvider')]
+    public function testAuthenticationExceptionWithEntryPoint(\Exception $exception, \Exception $eventException)
     {
         $event = $this->createEvent($exception);
 
@@ -75,9 +72,7 @@ class ExceptionListenerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getAccessDeniedExceptionProvider
-     */
+    #[DataProvider('getAccessDeniedExceptionProvider')]
     public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, ?\Exception $eventException = null)
     {
         $event = $this->createEvent($exception);
@@ -89,9 +84,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
-    /**
-     * @dataProvider getAccessDeniedExceptionProvider
-     */
+    #[DataProvider('getAccessDeniedExceptionProvider')]
     public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithErrorPage(\Exception $exception, ?\Exception $eventException = null)
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
@@ -112,9 +105,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
-    /**
-     * @dataProvider getAccessDeniedExceptionProvider
-     */
+    #[DataProvider('getAccessDeniedExceptionProvider')]
     public function testAccessDeniedExceptionFullFledgedAndWithAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, ?\Exception $eventException = null)
     {
         $event = $this->createEvent($exception);
@@ -129,9 +120,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
-    /**
-     * @dataProvider getAccessDeniedExceptionProvider
-     */
+    #[DataProvider('getAccessDeniedExceptionProvider')]
     public function testAccessDeniedExceptionNotFullFledged(\Exception $exception, ?\Exception $eventException = null)
     {
         $event = $this->createEvent($exception);
@@ -166,7 +155,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertNotEmpty($dispatcher->getListeners());
 
         $listener->unregister($dispatcher);
-        $this->assertEmpty($dispatcher->getListeners());
+        $this->assertSame([], $dispatcher->getListeners());
     }
 
     public static function getAccessDeniedExceptionProvider()

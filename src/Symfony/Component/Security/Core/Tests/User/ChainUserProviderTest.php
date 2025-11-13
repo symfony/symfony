@@ -14,12 +14,14 @@ namespace Symfony\Component\Security\Core\Tests\User;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\AttributesBasedUserProviderInterface;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class ChainUserProviderTest extends TestCase
 {
@@ -43,6 +45,36 @@ class ChainUserProviderTest extends TestCase
 
         $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertSame($account, $provider->loadUserByIdentifier('foo'));
+    }
+
+    public function testLoadUserByIdentifierWithAttributes()
+    {
+        $provider0 = $this->createMock(ChainUserProvider::class);
+        $provider0
+            ->expects($this->once())
+            ->method('loadUserByIdentifier')
+            ->with($this->equalTo('foo'), $this->equalTo(['attr' => 5]))
+            ->willThrowException(new UserNotFoundException('not found'))
+        ;
+
+        $provider1 = $this->createMock(UserProviderInterface::class);
+        $provider1
+            ->expects($this->once())
+            ->method('loadUserByIdentifier')
+            ->with($this->equalTo('foo'))
+            ->willThrowException(new UserNotFoundException('not found'))
+        ;
+
+        $provider2 = $this->createMock(AttributesBasedUserProviderInterface::class);
+        $provider2
+            ->expects($this->once())
+            ->method('loadUserByIdentifier')
+            ->with($this->equalTo('foo'), $this->equalTo(['attr' => 5]))
+            ->willReturn($account = $this->createMock(UserInterface::class))
+        ;
+
+        $provider = new ChainUserProvider([$provider0, $provider1, $provider2]);
+        $this->assertSame($account, $provider->loadUserByIdentifier('foo', ['attr' => 5]));
     }
 
     public function testLoadUserByIdentifierThrowsUserNotFoundException()
@@ -256,14 +288,14 @@ class ChainUserProviderTest extends TestCase
     {
         $user = new InMemoryUser('user', 'pwd');
 
-        $provider1 = $this->getMockForAbstractClass(MigratingProvider::class);
+        $provider1 = $this->createMock(MigratingProvider::class);
         $provider1
             ->expects($this->once())
             ->method('upgradePassword')
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
-        $provider2 = $this->getMockForAbstractClass(MigratingProvider::class);
+        $provider2 = $this->createMock(MigratingProvider::class);
         $provider2
             ->expects($this->once())
             ->method('upgradePassword')

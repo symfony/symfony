@@ -56,12 +56,12 @@ class Symfony_DI_PhpDumper_Service_Wither_Lazy extends Container
     protected static function getWitherService($container, $lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $container->services['wither'] = $container->createProxy('WitherProxy1991f2a', static fn () => \WitherProxy1991f2a::createLazyProxy(static fn () => self::getWitherService($container, false)));
+            return $container->services['wither'] = new \ReflectionClass('Symfony\Component\DependencyInjection\Tests\Compiler\Wither')->newLazyProxy(static fn () => self::getWitherService($container, false));
         }
 
         $instance = new \Symfony\Component\DependencyInjection\Tests\Compiler\Wither();
 
-        $a = new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo();
+        $a = ($container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo());
 
         $instance = $instance->withFoo1($a);
         $instance = $instance->withFoo2($a);
@@ -70,17 +70,3 @@ class Symfony_DI_PhpDumper_Service_Wither_Lazy extends Container
         return $instance;
     }
 }
-
-class WitherProxy1991f2a extends \Symfony\Component\DependencyInjection\Tests\Compiler\Wither implements \Symfony\Component\VarExporter\LazyObjectInterface
-{
-    use \Symfony\Component\VarExporter\LazyProxyTrait;
-
-    private const LAZY_OBJECT_PROPERTY_SCOPES = [
-        'foo' => [parent::class, 'foo', null],
-    ];
-}
-
-// Help opcache.preload discover always-needed symbols
-class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);

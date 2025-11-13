@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Charset;
 use Symfony\Component\Validator\Constraints\CharsetValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -24,9 +25,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
         return new CharsetValidator();
     }
 
-    /**
-     * @dataProvider provideValidValues
-     */
+    #[DataProvider('provideValidValues')]
     public function testEncodingIsValid(string|\Stringable $value, array|string $encodings)
     {
         $this->validator->validate($value, new Charset(encodings: $encodings));
@@ -34,23 +33,19 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider provideInvalidValues
-     */
-    public function testInvalidValues(string $value, array $encodings)
+    #[DataProvider('provideInvalidValues')]
+    public function testInvalidValues(string $value, array|string $encodings)
     {
         $this->validator->validate($value, new Charset(encodings: $encodings));
 
         $this->buildViolation('The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.')
             ->setParameter('{{ detected }}', 'UTF-8')
-            ->setParameter('{{ encodings }}', implode(', ', $encodings))
+            ->setParameter('{{ encodings }}', implode(', ', (array) $encodings))
             ->setCode(Charset::BAD_ENCODING_ERROR)
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider provideInvalidTypes
-     */
+    #[DataProvider('provideInvalidTypes')]
     public function testNonStringValues(mixed $value)
     {
         $this->expectException(UnexpectedValueException::class);
@@ -73,6 +68,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
 
     public static function provideInvalidValues()
     {
+        yield ['my non-Äscîi string', 'ASCII'];
         yield ['my non-Äscîi string', ['ASCII']];
         yield ['😊', ['7bit']];
     }

@@ -54,8 +54,12 @@ final class MockClock implements ClockInterface
 
     public function sleep(float|int $seconds): void
     {
+        if (0 >= $seconds) {
+            return;
+        }
+
         $now = (float) $this->now->format('Uu') + $seconds * 1e6;
-        $now = substr_replace(sprintf('@%07.0F', $now), '.', -6, 0);
+        $now = substr_replace(\sprintf('@%07.0F', $now), '.', -6, 0);
         $timezone = $this->now->getTimezone();
 
         $this->now = DatePoint::createFromInterface(new \DateTimeImmutable($now, $timezone))->setTimezone($timezone);
@@ -67,7 +71,7 @@ final class MockClock implements ClockInterface
     public function modify(string $modifier): void
     {
         if (\PHP_VERSION_ID < 80300) {
-            $this->now = @$this->now->modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? sprintf('Invalid modifier: "%s". Could not modify MockClock.', $modifier));
+            $this->now = @$this->now->modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? \sprintf('Invalid modifier: "%s". Could not modify MockClock.', $modifier));
 
             return;
         }

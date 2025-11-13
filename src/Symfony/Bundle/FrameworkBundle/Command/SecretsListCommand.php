@@ -43,14 +43,14 @@ final class SecretsListCommand extends Command
         $this
             ->addOption('reveal', 'r', InputOption::VALUE_NONE, 'Display decrypted values alongside names')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command list all stored secrets.
+                The <info>%command.name%</info> command list all stored secrets.
 
-    <info>%command.full_name%</info>
+                    <info>%command.full_name%</info>
 
-When the option <info>--reveal</info> is provided, the decrypted secrets are also displayed.
+                When the option <info>--reveal</info> is provided, the decrypted secrets are also displayed.
 
-    <info>%command.full_name% --reveal</info>
-EOF
+                    <info>%command.full_name% --reveal</info>
+                EOF
             )
         ;
     }
@@ -62,7 +62,7 @@ EOF
         $io->comment('Use <info>"%env(<name>)%"</info> to reference a secret in a config file.');
 
         if (!$reveal = $input->getOption('reveal')) {
-            $io->comment(sprintf('To reveal the secrets run <info>php %s %s --reveal</info>', $_SERVER['PHP_SELF'], $this->getName()));
+            $io->comment(\sprintf('To reveal the secrets run <info>php %s %s --reveal</info>', $_SERVER['PHP_SELF'], $this->getName()));
         }
 
         $secrets = $this->vault->list($reveal);

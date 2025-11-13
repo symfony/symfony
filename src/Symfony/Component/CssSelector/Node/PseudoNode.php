@@ -49,6 +49,6 @@ class PseudoNode extends AbstractNode
 
     public function __toString(): string
     {
-        return sprintf('%s[%s:%s]', $this->getNodeName(), $this->selector, $this->identifier);
+        return \sprintf('%s[%s:%s]', $this->getNodeName(), $this->selector, $this->identifier);
     }
 }

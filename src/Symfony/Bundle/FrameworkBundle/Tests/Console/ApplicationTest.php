@@ -119,7 +119,7 @@ class ApplicationTest extends TestCase
 
         $application = new Application($kernel);
         $newCommand = new Command('example');
-        $application->add($newCommand);
+        $application->addCommand($newCommand);
 
         $this->assertSame($newCommand, $application->get('example'));
     }
@@ -135,7 +135,11 @@ class ApplicationTest extends TestCase
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
-                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })]
+                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output): int {
+                    $output->write('fine');
+
+                    return 0;
+                })]
             )]);
         $kernel
             ->method('getContainer')
@@ -163,7 +167,11 @@ class ApplicationTest extends TestCase
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
-                [(new Command(null))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })]
+                [(new Command(null))->setCode(function (InputInterface $input, OutputInterface $output): int {
+                    $output->write('fine');
+
+                    return 0;
+                })]
             )]);
         $kernel
             ->method('getContainer')
@@ -193,7 +201,11 @@ class ApplicationTest extends TestCase
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
-                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })]
+                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output): int {
+                    $output->write('fine');
+
+                    return 0;
+                })]
             )]);
         $kernel
             ->method('getContainer')

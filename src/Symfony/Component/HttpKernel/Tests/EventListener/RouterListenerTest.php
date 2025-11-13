@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -37,9 +38,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends TestCase
 {
-    /**
-     * @dataProvider getPortData
-     */
+    #[DataProvider('getPortData')]
     public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
         $urlMatcher = $this->createMock(UrlMatcherInterface::class);
@@ -122,9 +121,7 @@ class RouterListenerTest extends TestCase
         $this->assertEquals('GET', $context->getMethod());
     }
 
-    /**
-     * @dataProvider getLoggingParameterData
-     */
+    #[DataProvider('getLoggingParameterData')]
     public function testLoggingParameter($parameter, $log, $parameters)
     {
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
@@ -203,7 +200,8 @@ class RouterListenerTest extends TestCase
     {
         $this->expectException(BadRequestHttpException::class);
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $request = Request::create('http://bad host %22/');
+        $request = Request::create('/');
+        $request->headers->set('host', 'bad host %22');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
@@ -263,5 +261,107 @@ class RouterListenerTest extends TestCase
 
         $listener = new RouterListener($urlMatcher, new RequestStack());
         $listener->onKernelRequest($event);
+    }
+
+    #[DataProvider('provideRouteMapping')]
+    public function testRouteMapping(array $expected, array $parameters)
+    {
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $request = Request::create('http://localhost/');
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
+        $requestMatcher->expects($this->any())
+                       ->method('matchRequest')
+                       ->with($this->isInstanceOf(Request::class))
+                       ->willReturn($parameters);
+
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
+        $listener->onKernelRequest($event);
+
+        $expected['_route_mapping'] = $parameters['_route_mapping'];
+        unset($parameters['_route_mapping']);
+        $expected['_route_params'] = $parameters;
+
+        $this->assertEquals($expected, $request->attributes->all());
+    }
+
+    public static function provideRouteMapping(): iterable
+    {
+        yield [
+            [
+                'conference' => 'vienna-2024',
+            ],
+            [
+                'slug' => 'vienna-2024',
+                '_route_mapping' => [
+                    'slug' => 'conference',
+                ],
+            ],
+        ];
+
+        yield [
+            [
+                'article' => [
+                    'id' => 'abc123',
+                    'date' => '2024-04-24',
+                    'slug' => 'symfony-rocks',
+                ],
+            ],
+            [
+                'id' => 'abc123',
+                'date' => '2024-04-24',
+                'slug' => 'symfony-rocks',
+                '_route_mapping' => [
+                    'id' => 'article',
+                    'date' => 'article',
+                    'slug' => 'article',
+                ],
+            ],
+        ];
+
+        yield [
+            [
+                'conference' => ['slug' => 'vienna-2024'],
+            ],
+            [
+                'slug' => 'vienna-2024',
+                '_route_mapping' => [
+                    'slug' => [
+                        'conference',
+                        'slug',
+                    ],
+                ],
+            ],
+        ];
+
+        yield [
+            [
+                'article' => [
+                    'id' => 'abc123',
+                    'date' => '2024-04-24',
+                    'slug' => 'symfony-rocks',
+                ],
+            ],
+            [
+                'id' => 'abc123',
+                'date' => '2024-04-24',
+                'slug' => 'symfony-rocks',
+                '_route_mapping' => [
+                    'id' => [
+                        'article',
+                        'id',
+                    ],
+                    'date' => [
+                        'article',
+                        'date',
+                    ],
+                    'slug' => [
+                        'article',
+                        'slug',
+                    ],
+                ],
+            ],
+        ];
     }
 }

@@ -36,27 +36,19 @@ use Twig\Loader\FilesystemLoader;
 #[AsCommand(name: 'debug:twig', description: 'Show a list of twig functions, filters, globals and tests')]
 class DebugCommand extends Command
 {
-    private Environment $twig;
-    private ?string $projectDir;
-    private array $bundlesMetadata;
-    private ?string $twigDefaultPath;
-
     /**
      * @var FilesystemLoader[]
      */
     private array $filesystemLoaders;
 
-    private ?FileLinkFormatter $fileLinkFormatter;
-
-    public function __construct(Environment $twig, ?string $projectDir = null, array $bundlesMetadata = [], ?string $twigDefaultPath = null, ?FileLinkFormatter $fileLinkFormatter = null)
-    {
+    public function __construct(
+        private Environment $twig,
+        private ?string $projectDir = null,
+        private array $bundlesMetadata = [],
+        private ?string $twigDefaultPath = null,
+        private ?FileLinkFormatter $fileLinkFormatter = null,
+    ) {
         parent::__construct();
-
-        $this->twig = $twig;
-        $this->projectDir = $projectDir;
-        $this->bundlesMetadata = $bundlesMetadata;
-        $this->twigDefaultPath = $twigDefaultPath;
-        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     protected function configure(): void
@@ -65,28 +57,28 @@ class DebugCommand extends Command
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The template name'),
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'Show details for all entries matching this filter'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'text'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command outputs a list of twig functions,
-filters, globals and tests.
+                The <info>%command.name%</info> command outputs a list of twig functions,
+                filters, globals and tests.
 
-  <info>php %command.full_name%</info>
+                  <info>php %command.full_name%</info>
 
-The command lists all functions, filters, etc.
+                The command lists all functions, filters, etc.
 
-  <info>php %command.full_name% @Twig/Exception/error.html.twig</info>
+                  <info>php %command.full_name% @Twig/Exception/error.html.twig</info>
 
-The command lists all paths that match the given template name.
+                The command lists all paths that match the given template name.
 
-  <info>php %command.full_name% --filter=date</info>
+                  <info>php %command.full_name% --filter=date</info>
 
-The command lists everything that contains the word date.
+                The command lists everything that contains the word date.
 
-  <info>php %command.full_name% --format=json</info>
+                  <info>php %command.full_name% --format=json</info>
 
-The command lists everything in a machine readable json format.
-EOF
+                The command lists everything in a machine readable json format.
+                EOF
             )
         ;
     }
@@ -98,13 +90,19 @@ EOF
         $filter = $input->getOption('filter');
 
         if (null !== $name && [] === $this->getFilesystemLoaders()) {
-            throw new InvalidArgumentException(sprintf('Argument "name" not supported, it requires the Twig loader "%s".', FilesystemLoader::class));
+            throw new InvalidArgumentException(\sprintf('Argument "name" not supported, it requires the Twig loader "%s".', FilesystemLoader::class));
         }
 
-        match ($input->getOption('format')) {
-            'text' => $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter),
+        $format = $input->getOption('format');
+        if ('text' === $format) {
+            trigger_deprecation('symfony/twig-bridge', '7.2', 'The "text" format is deprecated, use "txt" instead.');
+
+            $format = 'txt';
+        }
+        match ($format) {
+            'txt' => $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter),
             'json' => $name ? $this->displayPathsJson($io, $name) : $this->displayGeneralJson($io, $filter),
-            default => throw new InvalidArgumentException(sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
+            default => throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
 
         return 0;
@@ -129,7 +127,7 @@ EOF
         $io->section('Matched File');
         if ($file->valid()) {
             if ($fileLink = $this->getFileLink($file->key())) {
-                $io->block($file->current(), 'OK', sprintf('fg=black;bg=green;href=%s', $fileLink), ' ', true);
+                $io->block($file->current(), 'OK', \sprintf('fg=black;bg=green;href=%s', $fileLink), ' ', true);
             } else {
                 $io->success($file->current());
             }
@@ -139,9 +137,9 @@ EOF
                 $io->section('Overridden Files');
                 do {
                     if ($fileLink = $this->getFileLink($file->key())) {
-                        $io->text(sprintf('* <href=%s>%s</>', $fileLink, $file->current()));
+                        $io->text(\sprintf('* <href=%s>%s</>', $fileLink, $file->current()));
                     } else {
-                        $io->text(sprintf('* %s', $file->current()));
+                        $io->text(\sprintf('* %s', $file->current()));
                     }
                     $file->next();
                 } while ($file->valid());
@@ -166,7 +164,7 @@ EOF
                 }
             }
 
-            $this->error($io, sprintf('Template name "%s" not found', $name), $alternatives);
+            $this->error($io, \sprintf('Template name "%s" not found', $name), $alternatives);
         }
 
         $io->section('Configured Paths');
@@ -179,7 +177,7 @@ EOF
             if (FilesystemLoader::MAIN_NAMESPACE === $namespace) {
                 $message = 'No template paths configured for your application';
             } else {
-                $message = sprintf('No template paths configured for "@%s" namespace', $namespace);
+                $message = \sprintf('No template paths configured for "@%s" namespace', $namespace);
                 foreach ($this->getFilesystemLoaders() as $loader) {
                     $namespaces = $loader->getNamespaces();
                     foreach ($this->findAlternatives($namespace, $namespaces) as $namespace) {
@@ -207,7 +205,7 @@ EOF
                 $data['overridden_files'] = $files;
             }
         } else {
-            $data['matched_file'] = sprintf('Template name "%s" not found', $name);
+            $data['matched_file'] = \sprintf('Template name "%s" not found', $name);
         }
         $data['loader_paths'] = $paths;
 
@@ -346,15 +344,13 @@ EOF
             }
 
             // format args
-            $args = array_map(function (\ReflectionParameter $param) {
+            return array_map(function (\ReflectionParameter $param) {
                 if ($param->isDefaultValueAvailable()) {
                     return $param->getName().' = '.json_encode($param->getDefaultValue());
                 }
 
                 return $param->getName();
             }, $args);
-
-            return $args;
         }
 
         return null;
@@ -372,7 +368,7 @@ EOF
                 return '(unknown?)';
             }
         } catch (\UnexpectedValueException $e) {
-            return sprintf(' <error>%s</error>', $decorated ? OutputFormatter::escape($e->getMessage()) : $e->getMessage());
+            return \sprintf(' <error>%s</error>', $decorated ? OutputFormatter::escape($e->getMessage()) : $e->getMessage());
         }
 
         if ('globals' === $type) {
@@ -382,7 +378,7 @@ EOF
 
             $description = substr(@json_encode($meta), 0, 50);
 
-            return sprintf(' = %s', $decorated ? OutputFormatter::escape($description) : $description);
+            return \sprintf(' = %s', $decorated ? OutputFormatter::escape($description) : $description);
         }
 
         if ('functions' === $type) {
@@ -416,7 +412,6 @@ EOF
         }
 
         if ($notFoundBundles = array_diff_key($bundleNames, $this->bundlesMetadata)) {
-            $alternatives = [];
             foreach ($notFoundBundles as $notFoundBundle => $path) {
                 $alternatives[$path] = $this->findAlternatives($notFoundBundle, array_keys($this->bundlesMetadata));
             }
@@ -429,14 +424,14 @@ EOF
     {
         $messages = [];
         foreach ($wrongBundles as $path => $alternatives) {
-            $message = sprintf('Path "%s" not matching any bundle found', $path);
+            $message = \sprintf('Path "%s" not matching any bundle found', $path);
             if ($alternatives) {
                 if (1 === \count($alternatives)) {
-                    $message .= sprintf(", did you mean \"%s\"?\n", $alternatives[0]);
+                    $message .= \sprintf(", did you mean \"%s\"?\n", $alternatives[0]);
                 } else {
                     $message .= ", did you mean one of these:\n";
                     foreach ($alternatives as $bundle) {
-                        $message .= sprintf("  - %s\n", $bundle);
+                        $message .= \sprintf("  - %s\n", $bundle);
                     }
                 }
             }
@@ -489,7 +484,7 @@ EOF
     {
         if (isset($name[0]) && '@' === $name[0]) {
             if (false === ($pos = strpos($name, '/')) || $pos === \strlen($name) - 1) {
-                throw new InvalidArgumentException(sprintf('Malformed namespaced template name "%s" (expecting "@namespace/template_name").', $name));
+                throw new InvalidArgumentException(\sprintf('Malformed namespaced template name "%s" (expecting "@namespace/template_name").', $name));
             }
 
             $namespace = substr($name, 1, $pos - 1);
@@ -558,7 +553,7 @@ EOF
 
     private function isAbsolutePath(string $file): bool
     {
-        return strspn($file, '/\\', 0, 1) || (\strlen($file) > 3 && ctype_alpha($file[0]) && ':' === $file[1] && strspn($file, '/\\', 2, 1)) || null !== parse_url($file, \PHP_URL_SCHEME);
+        return strspn($file, '/\\', 0, 1) || (\strlen($file) > 3 && ctype_alpha($file[0]) && ':' === $file[1] && strspn($file, '/\\', 2, 1)) || parse_url($file, \PHP_URL_SCHEME);
     }
 
     /**
@@ -590,8 +585,9 @@ EOF
         return (string) $this->fileLinkFormatter?->format($absolutePath, 1);
     }
 
+    /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
-        return ['text', 'json'];
+        return ['txt', 'json'];
     }
 }

@@ -51,7 +51,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
         foreach ($headers as $name => $values) {
             $name = ucwords($name, '-');
             foreach ($values as $value) {
-                $content .= sprintf("%-{$max}s %s\r\n", $name.':', $value);
+                $content .= \sprintf("%-{$max}s %s\r\n", $name.':', $value);
             }
         }
 
@@ -118,7 +118,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
             return null;
         }
 
-        return (string) $headers[0];
+        return $headers[0];
     }
 
     /**
@@ -194,7 +194,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
         }
 
         if (false === $date = \DateTimeImmutable::createFromFormat(\DATE_RFC2822, $value)) {
-            throw new \RuntimeException(sprintf('The "%s" HTTP header is not parseable (%s).', $key, $value));
+            throw new \RuntimeException(\sprintf('The "%s" HTTP header is not parseable (%s).', $key, $value));
         }
 
         return $date;

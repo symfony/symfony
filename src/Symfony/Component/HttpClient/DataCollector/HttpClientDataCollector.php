@@ -45,8 +45,8 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
     public function lateCollect(): void
     {
-        $this->data['request_count'] = $this->data['request_count'] ?? 0;
-        $this->data['error_count'] = $this->data['error_count'] ?? 0;
+        $this->data['request_count'] ??= 0;
+        $this->data['error_count'] ??= 0;
         $this->data += ['clients' => []];
 
         foreach ($this->clients as $name => $client) {
@@ -213,7 +213,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             }
         }
 
-        $dataArg = empty($dataArg) ? null : implode(' ', $dataArg);
+        $dataArg = $dataArg ? implode(' ', $dataArg) : null;
 
         foreach (explode("\n", $trace['info']['debug']) as $line) {
             $line = substr($line, 0, -1);
@@ -233,8 +233,8 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             }
 
             if (preg_match('/^> ([A-Z]+)/', $line, $match)) {
-                $command[] = sprintf('--request %s', $match[1]);
-                $command[] = sprintf('--url %s', escapeshellarg($url));
+                $command[] = \sprintf('--request %s', $match[1]);
+                $command[] = \sprintf('--url %s', escapeshellarg($url));
                 continue;
             }
 
@@ -252,8 +252,8 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
     {
         static $useProcess;
 
-        if ($useProcess ??= class_exists(Process::class)) {
-            return (new Process([$payload]))->getCommandLine();
+        if ($useProcess ??= \function_exists('proc_open') && class_exists(Process::class)) {
+            return substr((new Process(['', $payload]))->getCommandLine(), 3);
         }
 
         if ('\\' === \DIRECTORY_SEPARATOR) {

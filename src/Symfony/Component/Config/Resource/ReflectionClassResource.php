@@ -23,14 +23,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
 {
     private array $files = [];
     private string $className;
-    private \ReflectionClass $classReflector;
     private array $excludedVendors = [];
     private string $hash;
 
-    public function __construct(\ReflectionClass $classReflector, array $excludedVendors = [])
-    {
+    public function __construct(
+        private \ReflectionClass $classReflector,
+        array $excludedVendors = [],
+    ) {
         $this->className = $classReflector->name;
-        $this->classReflector = $classReflector;
         $this->excludedVendors = $excludedVendors;
     }
 
@@ -59,17 +59,19 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         return 'reflection.'.$this->className;
     }
 
-    /**
-     * @internal
-     */
-    public function __sleep(): array
+    public function __serialize(): array
     {
         if (!isset($this->hash)) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
         }
 
-        return ['files', 'className', 'hash'];
+        return [
+            'files' => $this->files,
+            'className' => $this->className,
+            'excludedVendors' => $this->excludedVendors,
+            'hash' => $this->hash,
+        ];
     }
 
     private function loadFiles(\ReflectionClass $class): void
@@ -81,7 +83,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             $file = $class->getFileName();
             if (false !== $file && is_file($file)) {
                 foreach ($this->excludedVendors as $vendor) {
-                    if (str_starts_with($file, $vendor) && false !== strpbrk(substr($file, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
+                    if (\in_array($file[\strlen($vendor)] ?? '', ['/', \DIRECTORY_SEPARATOR], true) && str_starts_with($file, $vendor)) {
                         $file = false;
                         break;
                     }
@@ -122,7 +124,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         yield print_r($attributes, true);
         $attributes = [];
 
-        yield $class->getDocComment();
+        yield $class->getDocComment() ?: '';
         yield (int) $class->isFinal();
         yield (int) $class->isAbstract();
 
@@ -132,6 +134,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             yield print_r(class_parents($class->name), true);
             yield print_r(class_implements($class->name), true);
             yield print_r($class->getConstants(), true);
+        }
+
+        foreach ($class->getReflectionConstants() as $constant) {
+            foreach ($constant->getAttributes() as $a) {
+                $attributes[] = [$a->getName(), (string) $a];
+            }
+            yield $constant->name.print_r($attributes, true);
+            $attributes = [];
         }
 
         if (!$class->isInterface()) {
@@ -144,7 +154,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                 yield print_r($attributes, true);
                 $attributes = [];
 
-                yield $p->getDocComment();
+                yield $p->getDocComment() ?: '';
                 yield $p->isDefault() ? '<default>' : '';
                 yield $p->isPublic() ? 'public' : 'protected';
                 yield $p->isStatic() ? 'static' : '';
@@ -154,6 +164,13 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         }
 
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
+            foreach ($this->excludedVendors as $vendor) {
+                $file = $m->getFileName();
+                if (\in_array($file[\strlen($vendor)] ?? '', ['/', \DIRECTORY_SEPARATOR], true) && str_starts_with($file, $vendor)) {
+                    continue 2;
+                }
+            }
+
             foreach ($m->getAttributes() as $a) {
                 $attributes[] = [$a->getName(), (string) $a];
             }

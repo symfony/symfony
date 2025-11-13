@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -171,6 +172,24 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('name');
     }
 
+    public function testLoadUserByIdentifierShouldPassAttributesToTheUserLoader()
+    {
+        $repository = $this->createMock(UserLoaderRepository::class);
+        $repository->expects($this->once())
+            ->method('loadUserByIdentifier')
+            ->with('name', ['foo' => 'bar'])
+            ->willReturn(
+                $this->createMock(UserInterface::class)
+            );
+
+        $provider = new EntityUserProvider(
+            $this->getManager($this->getObjectManager($repository)),
+            'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
+        );
+
+        $provider->loadUserByIdentifier('name', ['foo' => 'bar']);
+    }
+
     public function testLoadUserByIdentifierShouldDeclineInvalidInterface()
     {
         $repository = $this->createMock(ObjectRepository::class);
@@ -219,8 +238,13 @@ class EntityUserProviderTest extends TestCase
         $provider = new EntityUserProvider($this->getManager($em), User::class);
         $refreshedUser = $provider->refreshUser($user);
 
-        $this->assertInstanceOf(Proxy::class, $refreshedUser);
-        $this->assertTrue($refreshedUser->__isInitialized());
+        if (\PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects')) {
+            $this->assertFalse((new \ReflectionClass(User::class))->isUninitializedLazyObject($refreshedUser));
+            $this->assertSame('user1', $refreshedUser->name);
+        } else {
+            $this->assertInstanceOf(Proxy::class, $refreshedUser);
+            $this->assertTrue($refreshedUser->__isInitialized());
+        }
     }
 
     private function getManager($em, $name = null)
@@ -236,14 +260,11 @@ class EntityUserProviderTest extends TestCase
 
     private function getObjectManager($repository)
     {
-        $em = $this->getMockBuilder(ObjectManager::class)
-            ->onlyMethods(['getClassMetadata', 'getRepository'])
-            ->getMockForAbstractClass();
-        $em->expects($this->any())
-            ->method('getRepository')
+        $objectManager = $this->createMock(ObjectManager::class);
+        $objectManager->method('getRepository')
             ->willReturn($repository);
 
-        return $em;
+        return $objectManager;
     }
 
     private function createSchema($em)

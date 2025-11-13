@@ -17,6 +17,7 @@ use Symfony\Bridge\Twig\DataCollector\TwigDataCollector;
 use Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer;
 use Symfony\Bridge\Twig\EventListener\TemplateAttributeListener;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
+use Symfony\Bridge\Twig\Extension\EmojiExtension;
 use Symfony\Bridge\Twig\Extension\ExpressionExtension;
 use Symfony\Bridge\Twig\Extension\HtmlSanitizerExtension;
 use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
@@ -35,8 +36,11 @@ use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator;
 use Symfony\Bundle\TwigBundle\TemplateIterator;
+use Twig\Cache\ChainCache;
 use Twig\Cache\FilesystemCache;
+use Twig\Cache\ReadOnlyFilesystemCache;
 use Twig\Environment;
+use Twig\ExpressionParser\Infix\BinaryOperatorExpressionParser;
 use Twig\Extension\CoreExtension;
 use Twig\Extension\DebugExtension;
 use Twig\Extension\EscaperExtension;
@@ -62,6 +66,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.preload', ['class' => EscaperExtension::class])
             ->tag('container.preload', ['class' => OptimizerExtension::class])
             ->tag('container.preload', ['class' => StagingExtension::class])
+            ->tag('container.preload', ['class' => BinaryOperatorExpressionParser::class])
             ->tag('container.preload', ['class' => ExtensionSet::class])
             ->tag('container.preload', ['class' => Template::class])
             ->tag('container.preload', ['class' => TemplateWrapper::class])
@@ -78,8 +83,24 @@ return static function (ContainerConfigurator $container) {
         ->set('twig.template_iterator', TemplateIterator::class)
             ->args([service('kernel'), abstract_arg('Twig paths'), param('twig.default_path'), abstract_arg('File name pattern')])
 
+        ->set('twig.template_cache.runtime_cache', FilesystemCache::class)
+            ->args([param('kernel.cache_dir').'/twig'])
+
+        ->set('twig.template_cache.readonly_cache', ReadOnlyFilesystemCache::class)
+            ->args([param('kernel.build_dir').'/twig'])
+
+        ->set('twig.template_cache.warmup_cache', FilesystemCache::class)
+            ->args([param('kernel.build_dir').'/twig'])
+
+        ->set('twig.template_cache.chain', ChainCache::class)
+            ->args([[service('twig.template_cache.readonly_cache'), service('twig.template_cache.runtime_cache')]])
+
         ->set('twig.template_cache_warmer', TemplateCacheWarmer::class)
-            ->args([service(ContainerInterface::class), service('twig.template_iterator')])
+            ->args([
+                service(ContainerInterface::class),
+                service('twig.template_iterator'),
+                service('twig.template_cache.warmup_cache'),
+            ])
             ->tag('kernel.cache_warmer')
             ->tag('container.service_subscriber', ['id' => 'twig'])
 
@@ -114,6 +135,8 @@ return static function (ContainerConfigurator $container) {
             ->args([service('debug.stopwatch')->ignoreOnInvalid(), param('kernel.debug')])
 
         ->set('twig.extension.expression', ExpressionExtension::class)
+
+        ->set('twig.extension.emoji', EmojiExtension::class)
 
         ->set('twig.extension.htmlsanitizer', HtmlSanitizerExtension::class)
             ->args([tagged_locator('html_sanitizer', 'sanitizer')])

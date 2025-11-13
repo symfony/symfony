@@ -11,6 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension;
@@ -22,14 +25,14 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 /**
  * @author  Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
+#[IgnoreDeprecations]
+#[Group('legacy')]
 class DoctrineExtensionTest extends TestCase
 {
     private MockObject&AbstractDoctrineExtension $extension;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->extension = $this
             ->getMockBuilder(AbstractDoctrineExtension::class)
             ->onlyMethods([
@@ -147,9 +150,7 @@ class DoctrineExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getAutomappingData
-     */
+    #[DataProvider('getAutomappingData')]
     public function testFixManagersAutoMappings(array $originalEm1, array $originalEm2, array $expectedEm1, array $expectedEm2)
     {
         $emConfigs = [
@@ -189,9 +190,7 @@ class DoctrineExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerBasicDrivers
-     */
+    #[DataProvider('providerBasicDrivers')]
     public function testLoadBasicCacheDriver(string $class, array $config, array $expectedCalls = [])
     {
         $container = $this->createContainer();
@@ -272,9 +271,7 @@ class DoctrineExtensionTest extends TestCase
         yield ['NewXmlBundle', 'xml', '/config/doctrine'];
     }
 
-    /**
-     * @dataProvider providerBundles
-     */
+    #[DataProvider('providerBundles')]
     public function testBundleAutoMapping(string $bundle, string $expectedType, string $dirSuffix)
     {
         $bundleDir = __DIR__.'/../Fixtures/Bundles/'.$bundle;

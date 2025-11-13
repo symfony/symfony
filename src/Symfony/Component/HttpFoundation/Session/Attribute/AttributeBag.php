@@ -21,14 +21,13 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     protected array $attributes = [];
 
     private string $name = 'attributes';
-    private string $storageKey;
 
     /**
      * @param string $storageKey The key used to store attributes in the session
      */
-    public function __construct(string $storageKey = '_sf2_attributes')
-    {
-        $this->storageKey = $storageKey;
+    public function __construct(
+        private string $storageKey = '_sf2_attributes',
+    ) {
     }
 
     public function getName(): string

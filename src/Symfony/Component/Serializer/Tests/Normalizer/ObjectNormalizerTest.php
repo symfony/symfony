@@ -12,20 +12,23 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
+use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
@@ -39,17 +42,20 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
+use Symfony\Component\Serializer\Tests\Fixtures\StdClassNormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\AttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ContextMetadataTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\FilterBoolTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\GroupsTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\IgnoredAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
@@ -60,6 +66,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipUninitializedValu
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObjectWithGetters;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -72,6 +79,7 @@ class ObjectNormalizerTest extends TestCase
     use CircularReferenceTestTrait;
     use ConstructorArgumentsTestTrait;
     use ContextMetadataTestTrait;
+    use FilterBoolTestTrait;
     use GroupsTestTrait;
     use IgnoredAttributesTestTrait;
     use MaxDepthTestTrait;
@@ -81,7 +89,7 @@ class ObjectNormalizerTest extends TestCase
     use TypeEnforcementTestTrait;
 
     private ObjectNormalizer $normalizer;
-    private SerializerInterface&NormalizerInterface&MockObject $serializer;
+    private SerializerInterface&NormalizerInterface $serializer;
 
     protected function setUp(): void
     {
@@ -90,8 +98,8 @@ class ObjectNormalizerTest extends TestCase
 
     private function createNormalizer(array $defaultContext = [], ?ClassMetadataFactoryInterface $classMetadataFactory = null): void
     {
-        $this->serializer = $this->createMock(ObjectSerializerNormalizer::class);
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, null, null, null, null, null, $defaultContext);
+        $this->serializer = new Serializer([new StdClassNormalizer(), $this->normalizer]);
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -106,13 +114,6 @@ class ObjectNormalizerTest extends TestCase
         $obj->setObject($object);
         $obj->setGo(true);
 
-        $this->serializer
-            ->expects($this->once())
-            ->method('normalize')
-            ->with($object, 'any')
-            ->willReturn('string_object')
-        ;
-
         $this->assertEquals(
             [
                 'foo' => 'foo',
@@ -121,6 +122,32 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => 'string_object',
+                'go' => true,
+            ],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
+    public function testNormalizeWithoutSerializer()
+    {
+        $obj = new ObjectDummy();
+        $obj->setFoo('foo');
+        $obj->bar = 'bar';
+        $obj->setBaz(true);
+        $obj->setCamelCase('camelcase');
+        $obj->setObject(null);
+        $obj->setGo(true);
+
+        $this->normalizer = new ObjectNormalizer();
+
+        $this->assertEquals(
+            [
+                'foo' => 'foo',
+                'bar' => 'bar',
+                'baz' => true,
+                'fooBar' => 'foobar',
+                'camelCase' => 'camelcase',
+                'object' => null,
                 'go' => true,
             ],
             $this->normalizer->normalize($obj, 'any')
@@ -195,8 +222,7 @@ class ObjectNormalizerTest extends TestCase
             'xml'
         );
 
-        $this->assertIsArray($obj->bar);
-        $this->assertEmpty($obj->bar);
+        $this->assertSame([], $obj->bar);
     }
 
     public function testDenormalizeWithObject()
@@ -266,6 +292,22 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
+    public function testConstructorWithObjectDenormalizeUsingPropertyInfoExtractor()
+    {
+        $serializer = $this->createMock(ObjectSerializerNormalizer::class);
+        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, [], new PropertyInfoExtractor());
+        $normalizer->setSerializer($serializer);
+
+        $data = new \stdClass();
+        $data->foo = 'foo';
+        $data->bar = 'bar';
+        $data->baz = true;
+        $data->fooBar = 'foobar';
+        $obj = $normalizer->denormalize($data, ObjectConstructorDummy::class, 'any');
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertEquals('bar', $obj->bar);
+    }
+
     public function testConstructorWithObjectTypeHintDenormalize()
     {
         $data = [
@@ -325,6 +367,27 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize($data, DummyWithConstructorInexistingObject::class);
     }
 
+    public function testConstructorWithNotMatchingUnionTypes()
+    {
+        $data = [
+            'value' => 'string',
+            'value2' => 'string',
+        ];
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor([], [new ReflectionExtractor()]));
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        if (class_exists(Type::class) && method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "float", "int" ("string" given).');
+        } else {
+            $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "int", "float" ("string" given).');
+        }
+
+        $normalizer->denormalize($data, DummyWithUnion::class, 'xml', [
+            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        ]);
+    }
+
     // attributes
 
     protected function getNormalizerForAttributes(): ObjectNormalizer
@@ -343,6 +406,11 @@ class ObjectNormalizerTest extends TestCase
         new Serializer([$normalizer]);
 
         return $normalizer;
+    }
+
+    protected function getNormalizerForFilterBool(): ObjectNormalizer
+    {
+        return new ObjectNormalizer();
     }
 
     public function testAttributesContextDenormalizeConstructor()
@@ -482,8 +550,6 @@ class ObjectNormalizerTest extends TestCase
                 'bar' => null,
                 'foo_bar' => '@dunglas',
                 'symfony' => '@coopTilleuls',
-                'default' => null,
-                'class_name' => null,
             ],
             $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => ['name_converter']])
         );
@@ -724,7 +790,9 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 
-        $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], (new class() {
+        $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], (new class {
+            public const TEST = 'me';
+
             /** @var self::*|null */
             public $foo;
         })::class)->foo);
@@ -759,15 +827,15 @@ class ObjectNormalizerTest extends TestCase
 
     public function testAdvancedNameConverter()
     {
-        $nameConverter = new class() implements AdvancedNameConverterInterface {
+        $nameConverter = new class implements AdvancedNameConverterInterface {
             public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
-                return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
+                return \sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
 
             public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
-                return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
+                return \sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
         };
 
@@ -858,6 +926,275 @@ class ObjectNormalizerTest extends TestCase
 
             throw $e;
         }
+    }
+
+    public function testNormalizeWithoutSerializerSet()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot normalize attribute "foo" because the injected serializer is not a normalizer.');
+
+        $normalizer->normalize(new ObjectConstructorDummy([], [], []));
+    }
+
+    public function testNormalizeWithIgnoreAttributeAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $this->assertSame(['foo' => 'foo'], $normalizer->normalize(new ObjectDummyWithIgnoreAttributeAndPrivateProperty()));
+    }
+
+    public function testDenormalizeWithIgnoreAttributeAndPrivateProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $obj = $normalizer->denormalize([
+            'foo' => 'set',
+            'ignore' => 'set',
+            'private' => 'set',
+        ], ObjectDummyWithIgnoreAttributeAndPrivateProperty::class);
+
+        $expected = new ObjectDummyWithIgnoreAttributeAndPrivateProperty();
+        $expected->foo = 'set';
+
+        $this->assertEquals($expected, $obj);
+    }
+
+    public function testNormalizeWithPropertyPath()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $dummyInner = new ObjectInner();
+        $dummyInner->foo = 'foo';
+        $dummy = new ObjectOuter();
+        $dummy->setInner($dummyInner);
+
+        $this->assertSame(['inner_foo' => 'foo'], $normalizer->normalize($dummy, 'json', ['groups' => 'read']));
+    }
+
+    public function testDenormalizeWithPropertyPath()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $dummy = new ObjectOuter();
+        $dummy->setInner(new ObjectInner());
+
+        $obj = $normalizer->denormalize(['inner_foo' => 'foo'], ObjectOuter::class, 'json', [
+            'object_to_populate' => $dummy,
+            'groups' => 'read',
+        ]);
+
+        $expectedInner = new ObjectInner();
+        $expectedInner->foo = 'foo';
+        $expected = new ObjectOuter();
+        $expected->setInner($expectedInner);
+
+        $this->assertEquals($expected, $obj);
+    }
+
+    public function testObjectNormalizerWithAttributeLoaderAndObjectHasStaticProperty()
+    {
+        $class = new class {
+            public static string $foo;
+        };
+
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+        $this->assertSame([], $normalizer->normalize($class));
+    }
+
+    // accessors
+
+    protected function getNormalizerForAccessors($accessorPrefixes = null): ObjectNormalizer
+    {
+        $accessorPrefixes ??= ReflectionExtractor::$defaultAccessorPrefixes;
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $propertyAccessorBuilder = (new PropertyAccessorBuilder())
+            ->setReadInfoExtractor(
+                new ReflectionExtractor([], $accessorPrefixes, null, false)
+            );
+
+        return new ObjectNormalizer(
+            $classMetadataFactory,
+            propertyAccessor: $propertyAccessorBuilder->getPropertyAccessor(),
+        );
+    }
+
+    public function testNormalizeWithMethodNamesSimilarToAccessors()
+    {
+        $normalizer = $this->getNormalizerForAccessors();
+
+        $object = new ObjectWithAccessorishMethods();
+        $normalized = $normalizer->normalize($object);
+
+        $this->assertFalse($object->isAccessorishCalled());
+        $this->assertSame([
+            'accessorishCalled' => false,
+            'tell' => true,
+            'class' => true,
+            'responsibility' => true,
+            123 => 321,
+        ], $normalized);
+    }
+
+    public function testNormalizeObjectWithPublicPropertyAccessorPrecedence()
+    {
+        $normalizer = $this->getNormalizerForAccessors();
+
+        $object = new ObjectWithPropertyAndAllAccessorMethods(
+            'foo',
+        );
+        $normalized = $normalizer->normalize($object);
+
+        // The getter method should take precedence over all other accessor methods
+        $this->assertSame([
+            'foo' => 'foo',
+        ], $normalized);
+    }
+
+    public function testNormalizeObjectWithPropertyAndAccessorMethodsWithSameName()
+    {
+        $normalizer = $this->getNormalizerForAccessors();
+
+        $object = new ObjectWithPropertyAndAccessorSameName(
+            'foo',
+            'getFoo',
+            'canFoo',
+            'hasFoo',
+            'isFoo'
+        );
+        $normalized = $normalizer->normalize($object);
+
+        // Accessor methods with exactly the same name as the property should take precedence
+        $this->assertSame([
+            'getFoo' => 'getFoo',
+            'canFoo' => 'canFoo',
+            'hasFoo' => 'hasFoo',
+            'isFoo' => 'isFoo',
+            // The getFoo accessor method is used for foo, thus it's also 'getFoo' instead of 'foo'
+            'foo' => 'getFoo',
+        ], $normalized);
+
+        $denormalized = $this->normalizer->denormalize($normalized, ObjectWithPropertyAndAccessorSameName::class);
+
+        $this->assertSame('getFoo', $denormalized->getFoo());
+
+        // On the initial object the value was 'foo', but the normalizer prefers the accessor method 'getFoo'
+        // Thus on the denormalized object the value is 'getFoo'
+        $this->assertSame('foo', $object->foo);
+        $this->assertSame('getFoo', $denormalized->foo);
+
+        $this->assertSame('hasFoo', $denormalized->hasFoo());
+        $this->assertSame('canFoo', $denormalized->canFoo());
+        $this->assertSame('isFoo', $denormalized->isFoo());
+    }
+
+    public function testNormalizeChildExtendsObjectWithPropertyAndAccessorSameName()
+    {
+        // This test follows the same logic used in testNormalizeObjectWithPropertyAndAccessorMethodsWithSameName()
+        $normalizer = $this->getNormalizerForAccessors();
+
+        $object = new ChildExtendsObjectWithPropertyAndAccessorSameName(
+            'foo',
+            'getFoo',
+            'canFoo',
+            'hasFoo',
+            'isFoo'
+        );
+        $normalized = $normalizer->normalize($object);
+
+        $this->assertSame([
+            'getFoo' => 'getFoo',
+            'canFoo' => 'canFoo',
+            'hasFoo' => 'hasFoo',
+            'isFoo' => 'isFoo',
+            // The getFoo accessor method is used for foo, thus it's also 'getFoo' instead of 'foo'
+            'foo' => 'getFoo',
+        ], $normalized);
+
+        $denormalized = $this->normalizer->denormalize($normalized, ChildExtendsObjectWithPropertyAndAccessorSameName::class);
+
+        $this->assertSame('getFoo', $denormalized->getFoo());
+
+        // On the initial object the value was 'foo', but the normalizer prefers the accessor method 'getFoo'
+        // Thus on the denormalized object the value is 'getFoo'
+        $this->assertSame('foo', $object->foo);
+        $this->assertSame('getFoo', $denormalized->foo);
+
+        $this->assertSame('hasFoo', $denormalized->hasFoo());
+        $this->assertSame('canFoo', $denormalized->canFoo());
+        $this->assertSame('isFoo', $denormalized->isFoo());
+    }
+
+    public function testNormalizeChildWithPropertySameAsParentMethod()
+    {
+        $normalizer = $this->getNormalizerForAccessors();
+
+        $object = new ChildWithPropertySameAsParentMethod('foo');
+        $normalized = $normalizer->normalize($object);
+
+        $this->assertSame([
+            'foo' => 'foo',
+        ],
+            $normalized);
+    }
+
+    /**
+     * Priority of accessor methods is defined by the PropertyReadInfoExtractorInterface passed to the PropertyAccessor
+     * component. By default ReflectionExtractor::$defaultAccessorPrefixes are used.
+     */
+    public function testPrecedenceOfAccessorMethods()
+    {
+        // by default 'is' comes before 'has'
+        $defaultAccessorPrefixNormalizer = $this->getNormalizerForAccessors();
+        $swappedAccessorPrefixNormalizer = $this->getNormalizerForAccessors(['has', 'is']);
+
+        // Nearly equal class, only accessor order is different
+        $isserHasserObject = new ObjectWithPropertyIsserAndHasser('foo');
+        $hasserIsserObject = new ObjectWithPropertyHasserAndIsser('foo');
+
+        // default precedence (is, has)
+        $normalizedDefaultIsserHasser = $defaultAccessorPrefixNormalizer->normalize($isserHasserObject);
+        $normalizedDefaultHasserIsser = $defaultAccessorPrefixNormalizer->normalize($hasserIsserObject);
+
+        $this->assertSame([
+            'foo' => 'isFoo',
+        ], $normalizedDefaultIsserHasser);
+        $this->assertSame([
+            'foo' => 'isFoo',
+        ], $normalizedDefaultHasserIsser);
+
+        // swapped precedence (has, is)
+        $normalizedSwappedIsserHasser = $swappedAccessorPrefixNormalizer->normalize($isserHasserObject);
+        $normalizedSwappedHasserIsser = $swappedAccessorPrefixNormalizer->normalize($hasserIsserObject);
+
+        $this->assertSame([
+            'foo' => 'hasFoo',
+        ], $normalizedSwappedIsserHasser);
+        $this->assertSame([
+            'foo' => 'hasFoo',
+        ], $normalizedSwappedHasserIsser);
+    }
+
+    public function testDiscriminatorWithAllowExtraAttributesFalse()
+    {
+        // Discriminator type property should be allowed with allow_extra_attributes=false
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, null, $discriminator);
+
+        $obj = $normalizer->denormalize(
+            ['type' => 'type_a'],
+            DiscriminatorDummyInterface::class,
+            null,
+            [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]
+        );
+
+        $this->assertInstanceOf(DiscriminatorDummyTypeA::class, $obj);
     }
 }
 
@@ -1033,6 +1370,11 @@ class LazyObjectInner extends ObjectInner
             return $this->foo = 123;
         }
     }
+
+    public function __isset($name): bool
+    {
+        return 'foo' === $name;
+    }
 }
 
 class DummyWithConstructorObject
@@ -1124,5 +1466,202 @@ class DummyWithNullableConstructorObject
     public function getInner()
     {
         return $this->inner;
+    }
+}
+
+class ObjectDummyWithIgnoreAttributeAndPrivateProperty
+{
+    public $foo = 'foo';
+
+    #[Ignore]
+    public $ignored = 'ignored';
+
+    private $private = 'private';
+}
+
+class ObjectWithAccessorishMethods
+{
+    private $accessorishCalled = false;
+
+    public function isAccessorishCalled()
+    {
+        return $this->accessorishCalled;
+    }
+
+    public function cancel()
+    {
+        $this->accessorishCalled = true;
+    }
+
+    public function hash()
+    {
+        $this->accessorishCalled = true;
+    }
+
+    public function canTell()
+    {
+        return true;
+    }
+
+    public function getClass()
+    {
+        return true;
+    }
+
+    public function hasResponsibility()
+    {
+        return true;
+    }
+
+    public function get_foo()
+    {
+        return 'bar';
+    }
+
+    public function get123()
+    {
+        return 321;
+    }
+
+    public function gettings()
+    {
+        $this->accessorishCalled = true;
+    }
+
+    public function settings()
+    {
+        $this->accessorishCalled = true;
+    }
+
+    public function isolate()
+    {
+        $this->accessorishCalled = true;
+    }
+}
+
+#[\Symfony\Component\Serializer\Attribute\DiscriminatorMap(
+    typeProperty: 'type',
+    mapping: [
+        'type_a' => DiscriminatorDummyTypeA::class,
+        'type_b' => DiscriminatorDummyTypeB::class,
+    ]
+)]
+interface DiscriminatorDummyInterface
+{
+}
+
+class DiscriminatorDummyTypeA implements DiscriminatorDummyInterface
+{
+}
+
+class DiscriminatorDummyTypeB implements DiscriminatorDummyInterface
+{
+}
+
+class ObjectWithPropertyAndAllAccessorMethods
+{
+    public function __construct(
+        private $foo,
+    ) {
+    }
+
+    public function canFoo()
+    {
+        return 'canFoo';
+    }
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
+    public function hasFoo()
+    {
+        return 'hasFoo';
+    }
+
+    public function isFoo()
+    {
+        return 'isFoo';
+    }
+}
+
+class ObjectWithPropertyAndAccessorSameName
+{
+    public function __construct(
+        public $foo,
+        private $getFoo,
+        private $canFoo = null,
+        private $hasFoo = null,
+        private $isFoo = null,
+    ) {
+    }
+
+    public function getFoo()
+    {
+        return $this->getFoo;
+    }
+
+    public function canFoo()
+    {
+        return $this->canFoo;
+    }
+
+    public function hasFoo()
+    {
+        return $this->hasFoo;
+    }
+
+    public function isFoo()
+    {
+        return $this->isFoo;
+    }
+}
+
+class ChildExtendsObjectWithPropertyAndAccessorSameName extends ObjectWithPropertyAndAccessorSameName
+{
+}
+
+class ChildWithPropertySameAsParentMethod extends ObjectWithPropertyAndAllAccessorMethods
+{
+    private $canFoo;
+    private $getFoo;
+    private $hasFoo;
+    private $isFoo;
+}
+
+class ObjectWithPropertyHasserAndIsser
+{
+    public function __construct(
+        private $foo,
+    ) {
+    }
+
+    public function hasFoo()
+    {
+        return 'hasFoo';
+    }
+
+    public function isFoo()
+    {
+        return 'isFoo';
+    }
+}
+
+class ObjectWithPropertyIsserAndHasser
+{
+    public function __construct(
+        private $foo,
+    ) {
+    }
+
+    public function isFoo()
+    {
+        return 'isFoo';
+    }
+
+    public function hasFoo()
+    {
+        return 'hasFoo';
     }
 }

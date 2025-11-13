@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\TypeInfo\Tests\Fixtures;
 
 final class ReflectionExtractableDummy extends AbstractDummy
@@ -27,6 +36,8 @@ final class ReflectionExtractableDummy extends AbstractDummy
 
     public DummyBackedEnum $backedEnum;
     public ?DummyBackedEnum $nullableBackedEnum;
+
+    public DummyBackedEnumInterface $backedEnumInterface;
 
     public int|string $union;
     public \Traversable&\Stringable $intersection;
@@ -73,7 +84,7 @@ final class ReflectionExtractableDummy extends AbstractDummy
         $this->nothing = $nothing;
     }
 
-    public function setOptional(int $optional = null): void
+    public function setOptional(?int $optional = null): void
     {
     }
 }

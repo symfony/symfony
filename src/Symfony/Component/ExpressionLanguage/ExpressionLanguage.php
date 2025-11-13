@@ -32,9 +32,9 @@ class ExpressionLanguage
     protected array $functions = [];
 
     /**
-     * @param ExpressionFunctionProviderInterface[] $providers
+     * @param iterable<ExpressionFunctionProviderInterface> $providers
      */
-    public function __construct(?CacheItemPoolInterface $cache = null, array $providers = [])
+    public function __construct(?CacheItemPoolInterface $cache = null, iterable $providers = [])
     {
         $this->cache = $cache ?? new ArrayAdapter();
         $this->registerFunctions();
@@ -101,7 +101,7 @@ class ExpressionLanguage
     public function lint(Expression|string $expression, ?array $names, int $flags = 0): void
     {
         if (null === $names) {
-            trigger_deprecation('symfony/expression-language', '7.1', 'Passing "null" as the second argument of "%s()" is deprecated, pass "self::IGNORE_UNKNOWN_VARIABLES" instead as a third argument.', __METHOD__);
+            trigger_deprecation('symfony/expression-language', '7.1', 'Passing "null" as the second argument of "%s()" is deprecated, pass "%s\Parser::IGNORE_UNKNOWN_VARIABLES" instead as a third argument.', __METHOD__, __NAMESPACE__);
 
             $flags |= Parser::IGNORE_UNKNOWN_VARIABLES;
             $names = [];
@@ -156,12 +156,12 @@ class ExpressionLanguage
         }
 
         $this->addFunction(new ExpressionFunction('enum',
-            static fn ($str): string => sprintf("(\constant(\$v = (%s))) instanceof \UnitEnum ? \constant(\$v) : throw new \TypeError(\sprintf('The string \"%%s\" is not the name of a valid enum case.', \$v))", $str),
+            static fn ($str): string => \sprintf("(\constant(\$v = (%s))) instanceof \UnitEnum ? \constant(\$v) : throw new \TypeError(\sprintf('The string \"%%s\" is not the name of a valid enum case.', \$v))", $str),
             static function ($arguments, $str): \UnitEnum {
                 $value = \constant($str);
 
                 if (!$value instanceof \UnitEnum) {
-                    throw new \TypeError(sprintf('The string "%s" is not the name of a valid enum case.', $str));
+                    throw new \TypeError(\sprintf('The string "%s" is not the name of a valid enum case.', $str));
                 }
 
                 return $value;

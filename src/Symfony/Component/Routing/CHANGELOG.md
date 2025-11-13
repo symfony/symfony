@@ -1,6 +1,37 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `AttributeServicesLoader` and `RoutingControllerPass` to auto-register routes from attributes on services
+ * Allow query-specific parameters in `UrlGenerator` using `_query`
+ * Add support of multiple env names in the  `Symfony\Component\Routing\Attribute\Route` attribute
+ * Add argument `$parameters` to `RequestContext`'s constructor
+ * Handle declaring routes using PHP arrays that follow the same shape as corresponding yaml files
+ * Add `RoutesReference` to help writing PHP configs using yaml-like array-shapes
+ * Deprecate class aliases in the `Annotation` namespace, use attributes instead
+ * Deprecate getters and setters in attribute classes in favor of public properties
+ * Deprecate accessing the internal scope of the loader in PHP config files, use only its public API instead
+ * Deprecate XML configuration format, use YAML, PHP or attributes instead
+
+7.3
+---
+
+ * Allow aliases and deprecations in `#[Route]` attribute
+ * Add the `Requirement::MONGODB_ID` constant to validate MongoDB ObjectIDs in hexadecimal format
+
+7.2
+---
+
+ * Add the `Requirement::UID_RFC9562` constant to validate UUIDs in the RFC 9562 format
+ * Deprecate the `AttributeClassLoader::$routeAnnotationClass` property
+
+7.1
+---
+
+ * Add `{foo:bar}` syntax to define a mapping between a route parameter and its corresponding request attribute
+
 7.0
 ---
 

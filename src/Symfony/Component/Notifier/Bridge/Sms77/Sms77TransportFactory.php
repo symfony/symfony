@@ -17,11 +17,15 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 /**
  * @author André Matthies <matthiez@gmail.com>
+ *
+ * @deprecated since Symfony 7.3, use the Seven.io bridge instead.
  */
 final class Sms77TransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): Sms77Transport
     {
+        trigger_deprecation('symfony/sms77-notifier', '7.3', 'The "symfony/sms77-notifier" package is deprecated, use "symfony/sevenio-notifier" instead.');
+
         $scheme = $dsn->getScheme();
 
         if ('sms77' !== $scheme) {

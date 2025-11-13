@@ -17,14 +17,13 @@ Installation
 Sponsor
 -------
 
-Symfony 7.1 is [backed][27] by
-- [Rector][29]
+Symfony 7.3 is [backed][27] by
+- [Les-Tilleuls.coop][29]
 
-**Rector** helps successful and growing companies to get the most of the code
-they already have. Including upgrading to the latest Symfony LTS. They deliver
-automated refactoring, reduce maintenance costs, speed up feature delivery, and
-transform legacy code into a strategic asset. They can handle the dirty work,
-so you can focus on the features.
+**Les-Tilleuls.coop** is a team of 70+ Symfony experts who can help you design, develop and
+fix your projects. They provide a wide range of professional services including development,
+consulting, coaching, training and audits. They also are highly skilled in JS, Go and DevOps.
+They are a worker cooperative!
 
 Help Symfony by [sponsoring][28] its development!
 
@@ -90,4 +89,4 @@ and supported by [Symfony contributors][19].
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
 [28]: https://symfony.com/sponsor
-[29]: https://getrector.com
+[29]: https://les-tilleuls.coop

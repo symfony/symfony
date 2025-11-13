@@ -78,7 +78,7 @@ class TestContainer extends Container
                 throw $e;
             }
             if (isset($container->privates[$renamedId])) {
-                throw new InvalidArgumentException(sprintf('The "%s" service is already initialized, you cannot replace it.', $id));
+                throw new InvalidArgumentException(\sprintf('The "%s" service is already initialized, you cannot replace it.', $id));
             }
             $container->privates[$renamedId] = $service;
         }

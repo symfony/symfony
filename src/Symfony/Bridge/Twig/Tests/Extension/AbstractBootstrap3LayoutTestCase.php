@@ -2869,8 +2869,6 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 
     public function testWeekSingleText()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
             'widget' => 'single_text',
@@ -2889,8 +2887,6 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 
     public function testWeekSingleTextNoHtml5()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
             'widget' => 'single_text',
@@ -2910,8 +2906,6 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 
     public function testWeekChoices()
     {
-        $this->requiresFeatureSet(404);
-
         $data = ['year' => (int) date('Y'), 'week' => 1];
 
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', $data, [
@@ -2938,8 +2932,6 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
 
     public function testWeekText()
     {
-        $this->requiresFeatureSet(404);
-
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '2000-W01', [
             'input' => 'string',
             'widget' => 'text',

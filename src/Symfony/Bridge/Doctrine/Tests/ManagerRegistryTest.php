@@ -11,7 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Tests;
 
+use Doctrine\Persistence\ObjectManager;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DummyManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -20,20 +24,17 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
 
 class ManagerRegistryTest extends TestCase
 {
-    public static function setUpBeforeClass(): void
+    public function testResetService()
     {
         $container = new ContainerBuilder();
 
-        $container->register('foo', \stdClass::class)->setPublic(true);
-        $container->getDefinition('foo')->setLazy(true)->addTag('proxy', ['interface' => \stdClass::class]);
+        $container->register('foo', DummyManager::class)->setPublic(true);
+        $container->getDefinition('foo')->setLazy(true)->addTag('proxy', ['interface' => ObjectManager::class]);
         $container->compile();
 
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(['class' => 'LazyServiceDoctrineBridgeContainer']));
-    }
 
-    public function testResetService()
-    {
         $container = new \LazyServiceDoctrineBridgeContainer();
 
         $registry = new TestManagerRegistry('name', [], ['defaultManager' => 'foo'], 'defaultConnection', 'defaultManager', 'proxyInterfaceName');
@@ -46,12 +47,66 @@ class ManagerRegistryTest extends TestCase
         $registry->resetManager();
 
         $this->assertSame($foo, $container->get('foo'));
-        $this->assertInstanceOf(\stdClass::class, $foo);
-        $this->assertFalse(property_exists($foo, 'bar'));
+        $this->assertInstanceOf(ObjectManager::class, $foo);
+        $this->assertFalse(isset($foo->bar));
+    }
+
+    #[DataProvider('provideResetServiceWithNativeLazyObjectsCases')]
+    #[RequiresPhp('>=8.4')]
+    public function testResetServiceWithNativeLazyObjects(string $class)
+    {
+        $container = new $class();
+
+        $registry = new TestManagerRegistry(
+            'irrelevant',
+            [],
+            ['defaultManager' => 'foo'],
+            'irrelevant',
+            'defaultManager',
+            'irrelevant',
+        );
+        $registry->setTestContainer($container);
+
+        $foo = $container->get('foo');
+        self::assertSame(DummyManager::class, $foo::class);
+
+        $foo->bar = 123;
+        self::assertTrue(isset($foo->bar));
+
+        $registry->resetManager();
+
+        self::assertSame($foo, $container->get('foo'));
+        self::assertSame(DummyManager::class, $foo::class);
+        self::assertFalse(isset($foo->bar));
+    }
+
+    public static function provideResetServiceWithNativeLazyObjectsCases(): iterable
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', DummyManager::class)->setPublic(true);
+        $container->getDefinition('foo')->setLazy(true);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        eval('?>'.$dumper->dump(['class' => 'NativeLazyServiceDoctrineBridgeContainer']));
+
+        yield ['NativeLazyServiceDoctrineBridgeContainer'];
+
+        $dumps = $dumper->dump(['class' => 'NativeLazyServiceDoctrineBridgeContainerAsFiles', 'as_files' => true]);
+
+        $lastDump = array_pop($dumps);
+        foreach (array_reverse($dumps) as $dump) {
+            eval('?>'.$dump);
+        }
+        eval('?>'.$lastDump);
+
+        yield ['NativeLazyServiceDoctrineBridgeContainerAsFiles'];
     }
 
     /**
-     * When performing an entity manager lazy service reset, the reset operations may re-use the container
+     * When performing an entity manager lazy service reset, the reset operations may reuse the container
      * to create a "fresh" service: when doing so, it can happen that the "fresh" service is itself a proxy.
      *
      * Because of that, the proxy will be populated with a wrapped value that is itself a proxy: repeating
@@ -79,7 +134,7 @@ class ManagerRegistryTest extends TestCase
 
         $service = $container->get('foo');
 
-        self::assertInstanceOf(\stdClass::class, $service);
+        self::assertInstanceOf(ObjectManager::class, $service);
         self::assertInstanceOf(LazyObjectInterface::class, $service);
         self::assertFalse($service->isLazyObjectInitialized());
 
@@ -92,7 +147,7 @@ class ManagerRegistryTest extends TestCase
         $service->initializeLazyObject();
 
         $wrappedValue = $service->initializeLazyObject();
-        self::assertInstanceOf(\stdClass::class, $wrappedValue);
+        self::assertInstanceOf(DummyManager::class, $wrappedValue);
         self::assertNotInstanceOf(LazyObjectInterface::class, $wrappedValue);
     }
 
@@ -104,10 +159,10 @@ class ManagerRegistryTest extends TestCase
 
         $container = new ContainerBuilder();
 
-        $container->register('foo', \stdClass::class)
+        $container->register('foo', DummyManager::class)
             ->setPublic(true)
             ->setLazy(true)
-            ->addTag('proxy', ['interface' => \stdClass::class]);
+            ->addTag('proxy', ['interface' => ObjectManager::class]);
         $container->compile();
 
         $fileSystem = new Filesystem();

@@ -12,19 +12,24 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
 {
     private $booleanNode;
     private $enumNode;
+    private $fqcnEnumNode;
+    private $fqcnUnitEnumNode;
     private $floatNode;
     private $integerNode;
     private $scalarNode;
     private $scalarNodeWithDefault;
     private $_usedProperties = [];
+    private $_hasDeprecatedCalls = false;
 
     /**
      * @default null
      * @param ParamConfigurator|bool $value
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function booleanNode($value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['booleanNode'] = true;
         $this->booleanNode = $value;
 
@@ -35,9 +40,11 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @default null
      * @param ParamConfigurator|'foo'|'bar'|'baz'|\Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar $value
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function enumNode($value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['enumNode'] = true;
         $this->enumNode = $value;
 
@@ -46,11 +53,43 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
 
     /**
      * @default null
+     * @param ParamConfigurator|\Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum::Foo|\Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum::Bar $value
+     * @return $this
+     * @deprecated since Symfony 7.4
+     */
+    public function fqcnEnumNode($value): static
+    {
+        $this->_hasDeprecatedCalls = true;
+        $this->_usedProperties['fqcnEnumNode'] = true;
+        $this->fqcnEnumNode = $value;
+
+        return $this;
+    }
+
+    /**
+     * @default null
+     * @param ParamConfigurator|\Symfony\Component\Config\Tests\Fixtures\TestEnum::Foo|\Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar|\Symfony\Component\Config\Tests\Fixtures\TestEnum::Ccc $value
+     * @return $this
+     * @deprecated since Symfony 7.4
+     */
+    public function fqcnUnitEnumNode($value): static
+    {
+        $this->_hasDeprecatedCalls = true;
+        $this->_usedProperties['fqcnUnitEnumNode'] = true;
+        $this->fqcnUnitEnumNode = $value;
+
+        return $this;
+    }
+
+    /**
+     * @default null
      * @param ParamConfigurator|float $value
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function floatNode($value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['floatNode'] = true;
         $this->floatNode = $value;
 
@@ -61,9 +100,11 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @default null
      * @param ParamConfigurator|int $value
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function integerNode($value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['integerNode'] = true;
         $this->integerNode = $value;
 
@@ -74,9 +115,11 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @default null
      * @param ParamConfigurator|mixed $value
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function scalarNode($value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['scalarNode'] = true;
         $this->scalarNode = $value;
 
@@ -87,9 +130,11 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @default true
      * @param ParamConfigurator|mixed $value
      * @return $this
+     * @deprecated since Symfony 7.4
      */
     public function scalarNodeWithDefault($value): static
     {
+        $this->_hasDeprecatedCalls = true;
         $this->_usedProperties['scalarNodeWithDefault'] = true;
         $this->scalarNodeWithDefault = $value;
 
@@ -101,46 +146,58 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
         return 'primitive_types';
     }
 
-    public function __construct(array $value = [])
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('boolean_node', $value)) {
+        if (array_key_exists('boolean_node', $config)) {
             $this->_usedProperties['booleanNode'] = true;
-            $this->booleanNode = $value['boolean_node'];
-            unset($value['boolean_node']);
+            $this->booleanNode = $config['boolean_node'];
+            unset($config['boolean_node']);
         }
 
-        if (array_key_exists('enum_node', $value)) {
+        if (array_key_exists('enum_node', $config)) {
             $this->_usedProperties['enumNode'] = true;
-            $this->enumNode = $value['enum_node'];
-            unset($value['enum_node']);
+            $this->enumNode = $config['enum_node'];
+            unset($config['enum_node']);
         }
 
-        if (array_key_exists('float_node', $value)) {
+        if (array_key_exists('fqcn_enum_node', $config)) {
+            $this->_usedProperties['fqcnEnumNode'] = true;
+            $this->fqcnEnumNode = $config['fqcn_enum_node'];
+            unset($config['fqcn_enum_node']);
+        }
+
+        if (array_key_exists('fqcn_unit_enum_node', $config)) {
+            $this->_usedProperties['fqcnUnitEnumNode'] = true;
+            $this->fqcnUnitEnumNode = $config['fqcn_unit_enum_node'];
+            unset($config['fqcn_unit_enum_node']);
+        }
+
+        if (array_key_exists('float_node', $config)) {
             $this->_usedProperties['floatNode'] = true;
-            $this->floatNode = $value['float_node'];
-            unset($value['float_node']);
+            $this->floatNode = $config['float_node'];
+            unset($config['float_node']);
         }
 
-        if (array_key_exists('integer_node', $value)) {
+        if (array_key_exists('integer_node', $config)) {
             $this->_usedProperties['integerNode'] = true;
-            $this->integerNode = $value['integer_node'];
-            unset($value['integer_node']);
+            $this->integerNode = $config['integer_node'];
+            unset($config['integer_node']);
         }
 
-        if (array_key_exists('scalar_node', $value)) {
+        if (array_key_exists('scalar_node', $config)) {
             $this->_usedProperties['scalarNode'] = true;
-            $this->scalarNode = $value['scalar_node'];
-            unset($value['scalar_node']);
+            $this->scalarNode = $config['scalar_node'];
+            unset($config['scalar_node']);
         }
 
-        if (array_key_exists('scalar_node_with_default', $value)) {
+        if (array_key_exists('scalar_node_with_default', $config)) {
             $this->_usedProperties['scalarNodeWithDefault'] = true;
-            $this->scalarNodeWithDefault = $value['scalar_node_with_default'];
-            unset($value['scalar_node_with_default']);
+            $this->scalarNodeWithDefault = $config['scalar_node_with_default'];
+            unset($config['scalar_node_with_default']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 
@@ -153,6 +210,12 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
         if (isset($this->_usedProperties['enumNode'])) {
             $output['enum_node'] = $this->enumNode;
         }
+        if (isset($this->_usedProperties['fqcnEnumNode'])) {
+            $output['fqcn_enum_node'] = $this->fqcnEnumNode;
+        }
+        if (isset($this->_usedProperties['fqcnUnitEnumNode'])) {
+            $output['fqcn_unit_enum_node'] = $this->fqcnUnitEnumNode;
+        }
         if (isset($this->_usedProperties['floatNode'])) {
             $output['float_node'] = $this->floatNode;
         }
@@ -164,6 +227,9 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
         }
         if (isset($this->_usedProperties['scalarNodeWithDefault'])) {
             $output['scalar_node_with_default'] = $this->scalarNodeWithDefault;
+        }
+        if ($this->_hasDeprecatedCalls) {
+            trigger_deprecation('symfony/config', '7.4', 'Calling any fluent method on "%s" is deprecated; pass the configuration to the constructor instead.', $this::class);
         }
 
         return $output;

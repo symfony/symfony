@@ -40,7 +40,7 @@ final class AllMySmsTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('allmysms://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        return \sprintf('allmysms://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -48,6 +48,9 @@ final class AllMySmsTransport extends AbstractTransport
         return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof AllMySmsOptions);
     }
 
+    /**
+     * @see https://doc.allmysms.com/api/en/#api-SMS-sendsimple
+     */
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
@@ -59,7 +62,7 @@ final class AllMySmsTransport extends AbstractTransport
         $options['to'] = $message->getPhone();
         $options['text'] = $message->getSubject();
 
-        $endpoint = sprintf('https://%s/sms/send/', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/sms/send/', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->login, $this->apiKey],
             'json' => array_filter($options),
@@ -74,16 +77,22 @@ final class AllMySmsTransport extends AbstractTransport
         if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $error['description'], $error['code']), $response);
         }
 
         $success = $response->toArray(false);
 
         if (false === isset($success['smsId'])) {
-            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $success['description'], $success['code']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $success['description'], $success['code']), $response);
         }
 
-        $sentMessage = new SentMessage($message, (string) $this);
+        $additionalInfo = [
+            'nbSms' => $success['nbSms'] ?? null,
+            'balance' => $success['balance'] ?? null,
+            'cost' => $success['cost'] ?? null,
+        ];
+
+        $sentMessage = new SentMessage($message, (string) $this, $additionalInfo);
         $sentMessage->setMessageId($success['smsId']);
 
         return $sentMessage;

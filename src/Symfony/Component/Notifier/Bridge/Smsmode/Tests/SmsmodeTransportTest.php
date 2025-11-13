@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsmode\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Smsmode\SmsmodeOptions;
 use Symfony\Component\Notifier\Bridge\Smsmode\SmsmodeTransport;
@@ -40,22 +41,18 @@ final class SmsmodeTransportTest extends TransportTestCase
         yield [new SmsMessage('0611223344', 'Hello!', 'from', new SmsmodeOptions(['ref_client' => 'test_ref_client']))];
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
     {
         $transport = $this->createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" value "%s" is not a valid sender ID.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" value "%s" is not a valid sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
-    /**
-     * @dataProvider validFromProvider
-     */
+    #[DataProvider('validFromProvider')]
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');

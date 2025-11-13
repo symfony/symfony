@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Resources;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Util\XliffUtils;
 
 class TranslationFilesTest extends TestCase
 {
-    /**
-     * @dataProvider provideTranslationFiles
-     */
+    #[DataProvider('provideTranslationFiles')]
     public function testTranslationFileIsValid($filePath)
     {
         $document = new \DOMDocument();
@@ -26,12 +25,10 @@ class TranslationFilesTest extends TestCase
 
         $errors = XliffUtils::validateSchema($document);
 
-        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+        $this->assertCount(0, $errors, \sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
-    /**
-     * @dataProvider provideTranslationFiles
-     */
+    #[DataProvider('provideTranslationFiles')]
     public function testTranslationFileIsValidWithoutEntityLoader($filePath)
     {
         $document = new \DOMDocument();
@@ -39,7 +36,7 @@ class TranslationFilesTest extends TestCase
 
         $errors = XliffUtils::validateSchema($document);
 
-        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+        $this->assertCount(0, $errors, \sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
     public static function provideTranslationFiles()

@@ -7,7 +7,7 @@
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:serializer enable-attributes="false">
+        <framework:serializer enable-attributes="true">
             <framework:mapping>
                 <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/serializer_mapping/files</framework:path>
                 <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/serializer_mapping/serialization.yml</framework:path>

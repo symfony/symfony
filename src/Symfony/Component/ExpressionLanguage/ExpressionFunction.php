@@ -75,15 +75,15 @@ class ExpressionFunction
     {
         $phpFunctionName = ltrim($phpFunctionName, '\\');
         if (!\function_exists($phpFunctionName)) {
-            throw new \InvalidArgumentException(sprintf('PHP function "%s" does not exist.', $phpFunctionName));
+            throw new \InvalidArgumentException(\sprintf('PHP function "%s" does not exist.', $phpFunctionName));
         }
 
         $parts = explode('\\', $phpFunctionName);
         if (!$expressionFunctionName && \count($parts) > 1) {
-            throw new \InvalidArgumentException(sprintf('An expression function name must be defined when PHP function "%s" is namespaced.', $phpFunctionName));
+            throw new \InvalidArgumentException(\sprintf('An expression function name must be defined when PHP function "%s" is namespaced.', $phpFunctionName));
         }
 
-        $compiler = fn (...$args) => sprintf('\%s(%s)', $phpFunctionName, implode(', ', $args));
+        $compiler = fn (...$args) => \sprintf('\%s(%s)', $phpFunctionName, implode(', ', $args));
 
         $evaluator = fn ($p, ...$args) => $phpFunctionName(...$args);
 

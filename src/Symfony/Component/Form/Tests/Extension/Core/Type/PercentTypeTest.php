@@ -25,7 +25,7 @@ class PercentTypeTest extends TypeTestCase
     {
         // we test against different locales, so we need the full
         // implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
 
@@ -34,9 +34,9 @@ class PercentTypeTest extends TypeTestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
-        \Locale::setDefault($this->defaultLocale);
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
     public function testSubmitWithRoundingMode()

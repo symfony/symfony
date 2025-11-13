@@ -10,5 +10,6 @@ return [
         'pt_CV' => 'Portugiesisch (Kapverden)',
         'pt_TL' => 'Portugiesisch (Osttimor)',
         'sn_ZW' => 'Shona (Zimbabwe)',
+        'tn_BW' => 'Tswana (Botswana)',
     ],
 ];

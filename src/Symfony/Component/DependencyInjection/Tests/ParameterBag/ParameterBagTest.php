@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\DependencyInjection\Exception\EmptyParameterValueException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
@@ -21,8 +24,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class ParameterBagTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testConstructor()
     {
         $bag = new ParameterBag($parameters = [
@@ -82,35 +83,29 @@ class ParameterBagTest extends TestCase
         }
     }
 
-    /**
-     * @testWith [1001]
-     *           [10.0]
-     */
+    #[TestWith([1001])]
+    #[TestWith([10.0])]
     public function testSetNumericName(int|float $name)
     {
         $bag = new ParameterBag();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The parameter name "%s" cannot be numeric.', $name));
+        $this->expectExceptionMessage(\sprintf('The parameter name "%s" cannot be numeric.', $name));
 
         $bag->set($name, 'foo');
     }
 
-    /**
-     * @testWith [1001]
-     *           [10.0]
-     */
+    #[TestWith([1001])]
+    #[TestWith([10.0])]
     public function testConstructorNumericName(int|float $name)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The parameter name "%s" cannot be numeric.', $name));
+        $this->expectExceptionMessage(\sprintf('The parameter name "%s" cannot be numeric.', $name));
 
         new ParameterBag([$name => 'foo']);
     }
 
-    /**
-     * @dataProvider provideGetThrowParameterNotFoundExceptionData
-     */
+    #[DataProvider('provideGetThrowParameterNotFoundExceptionData')]
     public function testGetThrowParameterNotFoundException($parameterKey, $exceptionMessage)
     {
         $bag = new ParameterBag([
@@ -139,49 +134,46 @@ class ParameterBagTest extends TestCase
     }
 
     /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
+     * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
+    #[IgnoreDeprecations]
     public function testDeprecate()
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 
         $bag->deprecate('foo', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo" is deprecated.');
 
         $bag->get('foo');
     }
 
     /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
+     * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
+    #[IgnoreDeprecations]
     public function testDeprecateWithMessage()
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 
         $bag->deprecate('foo', 'symfony/test', '6.3', 'The parameter "%s" is deprecated, use "new_foo" instead.');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "foo" is deprecated, use "new_foo" instead.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "foo" is deprecated, use "new_foo" instead.');
 
         $bag->get('foo');
     }
 
     /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
+     * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
+    #[IgnoreDeprecations]
     public function testDeprecationIsTriggeredWhenResolved()
     {
         $bag = new ParameterBag(['foo' => '%bar%', 'bar' => 'baz']);
 
         $bag->deprecate('bar', 'symfony/test', '6.3');
 
-        $this->expectDeprecation('Since symfony/test 6.3: The parameter "bar" is deprecated.');
+        $this->expectUserDeprecationMessage('Since symfony/test 6.3: The parameter "bar" is deprecated.');
 
         $bag->resolve();
     }
@@ -194,6 +186,54 @@ class ParameterBagTest extends TestCase
         $this->expectExceptionMessage('You have requested a non-existent parameter "foo".');
 
         $bag->deprecate('foo', 'symfony/test', '6.3');
+    }
+
+    public function testGetMissingRequiredParameter()
+    {
+        $bag = new ParameterBag();
+
+        $bag->cannotBeEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage('You have requested a non-existent parameter "bar". Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
+    }
+
+    public function testGetNonEmptyParameterThrowsWhenNullValue()
+    {
+        $bag = new ParameterBag();
+        $bag->set('bar', null);
+        $bag->cannotBeEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
+    }
+
+    public function testGetNonEmptyParameterThrowsWhenEmptyStringValue()
+    {
+        $bag = new ParameterBag();
+        $bag->set('bar', '');
+        $bag->cannotBeEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
+    }
+
+    public function testGetNonEmptyParameterThrowsWhenEmptyArrayValue()
+    {
+        $bag = new ParameterBag();
+        $bag->set('bar', []);
+        $bag->cannotBeEmpty('bar', 'Did you forget to configure the "foo.bar" option?');
+
+        $this->expectException(EmptyParameterValueException::class);
+        $this->expectExceptionMessage('Did you forget to configure the "foo.bar" option?');
+
+        $bag->get('bar');
     }
 
     public function testHas()
@@ -331,9 +371,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['bar' => ['ding' => 'I\'m a bar %%foo %%bar', 'zero' => null]], $bag->get('foo'), '->escapeValue() escapes % by doubling it');
     }
 
-    /**
-     * @dataProvider stringsWithSpacesProvider
-     */
+    #[DataProvider('stringsWithSpacesProvider')]
     public function testResolveStringWithSpacesReturnsString($expected, $test, $description)
     {
         $bag = new ParameterBag(['foo' => 'bar']);
@@ -341,7 +379,7 @@ class ParameterBagTest extends TestCase
         try {
             $this->assertEquals($expected, $bag->resolveString($test), $description);
         } catch (ParameterNotFoundException $e) {
-            $this->fail(sprintf('%s - "%s"', $description, $expected));
+            $this->fail(\sprintf('%s - "%s"', $description, $expected));
         }
     }
 

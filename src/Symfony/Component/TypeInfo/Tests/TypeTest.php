@@ -12,34 +12,20 @@
 namespace Symfony\Component\TypeInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class TypeTest extends TestCase
 {
-    public function testIs()
+    public function testIsIdentifiedBy()
     {
-        $isInt = fn (Type $t) => TypeIdentifier::INT === $t->getBaseType()->getTypeIdentifier();
-
-        $this->assertTrue(Type::int()->is($isInt));
-        $this->assertTrue(Type::union(Type::string(), Type::int())->is($isInt));
-        $this->assertTrue(Type::generic(Type::int(), Type::string())->is($isInt));
-
-        $this->assertFalse(Type::string()->is($isInt));
-        $this->assertFalse(Type::union(Type::string(), Type::float())->is($isInt));
-        $this->assertFalse(Type::generic(Type::string(), Type::int())->is($isInt));
-    }
-
-    public function testIsA()
-    {
-        $this->assertTrue(Type::int()->isA(TypeIdentifier::INT));
-        $this->assertTrue(Type::union(Type::string(), Type::int())->isA(TypeIdentifier::INT));
-        $this->assertTrue(Type::generic(Type::int(), Type::string())->isA(TypeIdentifier::INT));
-
-        $this->assertFalse(Type::string()->isA(TypeIdentifier::INT));
-        $this->assertFalse(Type::union(Type::string(), Type::float())->isA(TypeIdentifier::INT));
-        $this->assertFalse(Type::generic(Type::string(), Type::int())->isA(TypeIdentifier::INT));
+        $this->assertTrue(Type::intersection(Type::object(\Iterator::class), Type::object(\Stringable::class))->isIdentifiedBy(TypeIdentifier::OBJECT));
+        $this->assertTrue(Type::union(Type::int(), Type::string())->isIdentifiedBy(TypeIdentifier::INT));
+        $this->assertTrue(Type::collection(Type::object(\Iterator::class))->isIdentifiedBy(TypeIdentifier::OBJECT));
+        $this->assertTrue(Type::generic(Type::object(\Iterator::class), Type::string())->isIdentifiedBy(TypeIdentifier::OBJECT));
+        $this->assertTrue(Type::nullable(Type::union(Type::collection(Type::object(\Iterator::class)), Type::string()))->isIdentifiedBy(TypeIdentifier::OBJECT));
     }
 
     public function testIsNullable()
@@ -47,28 +33,55 @@ class TypeTest extends TestCase
         $this->assertTrue(Type::null()->isNullable());
         $this->assertTrue(Type::mixed()->isNullable());
         $this->assertTrue(Type::nullable(Type::int())->isNullable());
-        $this->assertTrue(Type::union(Type::int(), Type::null())->isNullable());
-        $this->assertTrue(Type::union(Type::int(), Type::mixed())->isNullable());
-        $this->assertTrue(Type::generic(Type::null(), Type::string())->isNullable());
 
         $this->assertFalse(Type::int()->isNullable());
-        $this->assertFalse(Type::union(Type::int(), Type::string())->isNullable());
-        $this->assertFalse(Type::generic(Type::int(), Type::nullable(Type::string()))->isNullable());
-        $this->assertFalse(Type::generic(Type::int(), Type::mixed())->isNullable());
     }
 
-    public function testGetBaseType()
+    public function testIsSatisfiedBy()
     {
-        $this->assertEquals(Type::string(), Type::string()->getBaseType());
-        $this->assertEquals(Type::object(self::class), Type::object(self::class)->getBaseType());
-        $this->assertEquals(Type::object(), Type::generic(Type::object(), Type::int())->getBaseType());
-        $this->assertEquals(Type::builtin(TypeIdentifier::ARRAY), Type::list()->getBaseType());
-        $this->assertEquals(Type::int(), Type::collection(Type::generic(Type::int(), Type::string()))->getBaseType());
+        $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(fn (Type $t): bool => 'int' === (string) $t));
+        $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(fn (Type $t): bool => $t instanceof UnionType));
+        $this->assertTrue(Type::list(Type::int())->isSatisfiedBy(fn (Type $t): bool => $t instanceof CollectionType && 'int' === (string) $t->getCollectionValueType()));
+        $this->assertFalse(Type::list(Type::int())->isSatisfiedBy(fn (Type $t): bool => 'int' === (string) $t));
     }
 
-    public function testCannotGetBaseTypeOnCompoundType()
+    public function testTraverse()
     {
-        $this->expectException(LogicException::class);
-        Type::union(Type::int(), Type::string())->getBaseType();
+        $this->assertEquals([Type::int()], iterator_to_array(Type::int()->traverse()));
+
+        $this->assertEquals(
+            [Type::union(Type::int(), Type::string()), Type::int(), Type::string()],
+            iterator_to_array(Type::union(Type::int(), Type::string())->traverse()),
+        );
+        $this->assertEquals(
+            [Type::union(Type::int(), Type::string())],
+            iterator_to_array(Type::union(Type::int(), Type::string())->traverse(traverseComposite: false)),
+        );
+
+        $this->assertEquals(
+            [Type::generic(Type::object(\Traversable::class), Type::string()), Type::object(\Traversable::class)],
+            iterator_to_array(Type::generic(Type::object(\Traversable::class), Type::string())->traverse()),
+        );
+        $this->assertEquals(
+            [Type::generic(Type::object(\Traversable::class), Type::string())],
+            iterator_to_array(Type::generic(Type::object(\Traversable::class), Type::string())->traverse(traverseWrapped: false)),
+        );
+
+        $this->assertEquals(
+            [Type::nullable(Type::int()), Type::int(), Type::null()],
+            iterator_to_array(Type::nullable(Type::int())->traverse()),
+        );
+        $this->assertEquals(
+            [Type::nullable(Type::int()), Type::int()],
+            iterator_to_array(Type::nullable(Type::int())->traverse(traverseComposite: false)),
+        );
+        $this->assertEquals(
+            [Type::nullable(Type::int()), Type::int(), Type::null()],
+            iterator_to_array(Type::nullable(Type::int())->traverse(traverseWrapped: false)),
+        );
+        $this->assertEquals(
+            [Type::nullable(Type::int())],
+            iterator_to_array(Type::nullable(Type::int())->traverse(traverseComposite: false, traverseWrapped: false)),
+        );
     }
 }

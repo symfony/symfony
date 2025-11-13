@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Cidr;
 use Symfony\Component\Validator\Constraints\Ip;
@@ -31,7 +32,7 @@ class CidrTest extends TestCase
 
     public function testForV4()
     {
-        $cidrConstraint = new Cidr(['version' => Ip::V4]);
+        $cidrConstraint = new Cidr(version: Ip::V4);
 
         self::assertEquals(Ip::V4, $cidrConstraint->version);
         self::assertEquals(0, $cidrConstraint->netmaskMin);
@@ -40,7 +41,7 @@ class CidrTest extends TestCase
 
     public function testForV6()
     {
-        $cidrConstraint = new Cidr(['version' => Ip::V6]);
+        $cidrConstraint = new Cidr(version: Ip::V6);
 
         self::assertEquals(Ip::V6, $cidrConstraint->version);
         self::assertEquals(0, $cidrConstraint->netmaskMin);
@@ -60,42 +61,38 @@ class CidrTest extends TestCase
         ];
 
         self::expectException(ConstraintDefinitionException::class);
-        self::expectExceptionMessage(sprintf('The option "version" must be one of "%s".', implode('", "', $availableVersions)));
+        self::expectExceptionMessage(\sprintf('The option "version" must be one of "%s".', implode('", "', $availableVersions)));
 
-        new Cidr(['version' => '8']);
+        new Cidr(version: '8');
     }
 
-    /**
-     * @dataProvider getValidMinMaxValues
-     */
+    #[DataProvider('getValidMinMaxValues')]
     public function testWithValidMinMaxValues(string $ipVersion, int $netmaskMin, int $netmaskMax)
     {
-        $cidrConstraint = new Cidr([
-            'version' => $ipVersion,
-            'netmaskMin' => $netmaskMin,
-            'netmaskMax' => $netmaskMax,
-        ]);
+        $cidrConstraint = new Cidr(
+            version: $ipVersion,
+            netmaskMin: $netmaskMin,
+            netmaskMax: $netmaskMax,
+        );
 
         self::assertEquals($ipVersion, $cidrConstraint->version);
         self::assertEquals($netmaskMin, $cidrConstraint->netmaskMin);
         self::assertEquals($netmaskMax, $cidrConstraint->netmaskMax);
     }
 
-    /**
-     * @dataProvider getInvalidMinMaxValues
-     */
+    #[DataProvider('getInvalidMinMaxValues')]
     public function testWithInvalidMinMaxValues(string $ipVersion, int $netmaskMin, int $netmaskMax)
     {
         $expectedMax = Ip::V4 == $ipVersion ? 32 : 128;
 
         self::expectException(ConstraintDefinitionException::class);
-        self::expectExceptionMessage(sprintf('The netmask range must be between 0 and %d.', $expectedMax));
+        self::expectExceptionMessage(\sprintf('The netmask range must be between 0 and %d.', $expectedMax));
 
-        new Cidr([
-            'version' => $ipVersion,
-            'netmaskMin' => $netmaskMin,
-            'netmaskMax' => $netmaskMax,
-        ]);
+        new Cidr(
+            version: $ipVersion,
+            netmaskMin: $netmaskMin,
+            netmaskMax: $netmaskMax,
+        );
     }
 
     public static function getInvalidMinMaxValues(): array
@@ -134,19 +131,19 @@ class CidrTest extends TestCase
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame(Ip::ALL, $aConstraint->version);
         self::assertSame(0, $aConstraint->netmaskMin);
         self::assertSame(128, $aConstraint->netmaskMax);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame(Ip::V6, $bConstraint->version);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(10, $bConstraint->netmaskMin);
         self::assertSame(126, $bConstraint->netmaskMax);
         self::assertSame(['Default', 'CidrDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

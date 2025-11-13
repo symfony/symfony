@@ -7,15 +7,15 @@ Configuration example:
 
 ```env
 # SMTP
-MAILER_DSN=sendgrid+smtp://KEY@default
+MAILER_DSN=sendgrid+smtp://KEY@default?region=REGION
 
 # API
-MAILER_DSN=sendgrid+api://KEY@default
+MAILER_DSN=sendgrid+api://KEY@default?region=REGION
 ```
 
 where:
  - `KEY` is your Sendgrid API Key
-
+ - `REGION` is Sendgrid selected region (default to global)
 
 Webhook
 -------
@@ -28,7 +28,7 @@ framework:
         routing:
             sendgrid:
                 service: mailer.webhook.request_parser.sendgrid
-                secret: '!SENDGRID_VALIDATION_SECRET!' # Leave blank if you dont want to use the signature validation
+                secret: '!SENDGRID_VALIDATION_SECRET!' # Leave blank if you don't want to use the signature validation
 ```
 
 And a consume:
@@ -43,6 +43,22 @@ class SendGridConsumer implements ConsumerInterface
     }
 }
 ```
+
+Suppression Groups
+------------------
+
+Create an e-mail and add the `SuppressionGroupHeader`:
+
+```php
+use Symfony\Component\Mailer\Bridge\Sendgrid\Header\SuppressionGroupHeader;
+// [...]
+$email = new Email();
+$email->getHeaders()->add(new SuppressionGroupHeader(GROUP_ID, GROUPS_TO_DISPLAY));
+```
+
+where:
+ - `GROUP_ID` is your Sendgrid suppression group ID
+ - `GROUPS_TO_DISPLAY_ID` is an array of the Sendgrid suppression group IDs presented to the user
 
 Resources
 ---------

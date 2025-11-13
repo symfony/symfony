@@ -77,7 +77,7 @@ class FormErrorNormalizerTest extends TestCase
 
     public function testNormalizeWithChildren()
     {
-        $exptected = [
+        $expected = [
             'code' => null,
             'title' => 'Validation Failed',
             'type' => 'https://symfony.com/errors/form',
@@ -151,6 +151,6 @@ class FormErrorNormalizerTest extends TestCase
             ])
             );
 
-        $this->assertEquals($exptected, $this->normalizer->normalize($form));
+        $this->assertEquals($expected, $this->normalizer->normalize($form));
     }
 }

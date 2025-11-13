@@ -34,9 +34,9 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
         $processors = [];
         foreach ($container->findTaggedServiceIds('container.env_var_processor') as $id => $tags) {
             if (!$r = $container->getReflectionClass($class = $container->getDefinition($id)->getClass())) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
             } elseif (!$r->isSubclassOf(EnvVarProcessorInterface::class)) {
-                throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, EnvVarProcessorInterface::class));
+                throw new InvalidArgumentException(\sprintf('Service "%s" must implement interface "%s".', $id, EnvVarProcessorInterface::class));
             }
             foreach ($class::getProvidedTypes() as $prefix => $type) {
                 $processors[$prefix] = new Reference($id);
@@ -66,7 +66,7 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
 
         foreach ($types as $type) {
             if (!\in_array($type, self::ALLOWED_TYPES, true)) {
-                throw new InvalidArgumentException(sprintf('Invalid type "%s" returned by "%s::getProvidedTypes()", expected one of "%s".', $type, $class, implode('", "', self::ALLOWED_TYPES)));
+                throw new InvalidArgumentException(\sprintf('Invalid type "%s" returned by "%s::getProvidedTypes()", expected one of "%s".', $type, $class, implode('", "', self::ALLOWED_TYPES)));
             }
         }
 

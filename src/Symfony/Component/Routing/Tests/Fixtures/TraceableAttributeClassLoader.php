@@ -20,7 +20,7 @@ final class TraceableAttributeClassLoader extends AttributeClassLoader
     /** @var list<string> */
     public array $foundClasses = [];
 
-    public function load(mixed $class, string $type = null): RouteCollection
+    public function load(mixed $class, ?string $type = null): RouteCollection
     {
         if (!is_string($class)) {
             throw new \InvalidArgumentException(sprintf('Expected string, got "%s"', get_debug_type($class)));
@@ -31,7 +31,7 @@ final class TraceableAttributeClassLoader extends AttributeClassLoader
         return parent::load($class, $type);
     }
 
-    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+    protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
     {
     }
 }

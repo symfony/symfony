@@ -58,7 +58,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
      */
     protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values): array
     {
-        return (array) $phpArrayAdapter->warmUp($values);
+        return $phpArrayAdapter->warmUp($values);
     }
 
     /**

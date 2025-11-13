@@ -477,7 +477,7 @@ class EmailTest extends TestCase
     public function testAttachments()
     {
         // inline part
-        $contents = file_get_contents($name = __DIR__.'/Fixtures/mimetypes/test', 'r');
+        $contents = file_get_contents($name = __DIR__.'/Fixtures/mimetypes/test');
         $att = new DataPart($file = fopen($name, 'r'), 'test');
         $inline = (new DataPart($contents, 'test'))->asInline();
         $e = new Email();
@@ -529,46 +529,46 @@ class EmailTest extends TestCase
         $expected = clone $e;
 
         $expectedJson = <<<EOF
-{
-    "text": "Text content",
-    "textCharset": "utf-8",
-    "textEncoding": null,
-    "html": "HTML <b>content</b>",
-    "htmlCharset": "utf-8",
-    "htmlEncoding": null,
-    "attachments": [
-        {
-            "filename": "test.txt",
-            "mediaType": "application",
-            "body": "Some Text file",
-            "charset": null,
-            "subtype": "octet-stream",
-            "disposition": "attachment",
-            "name": "test.txt",
-            "encoding": "base64",
-            "headers": [],
-            "class": "Symfony\\\Component\\\Mime\\\Part\\\DataPart"
-        }
-    ],
-    "headers": {
-        "to": [
             {
-                "addresses": [
+                "text": "Text content",
+                "textCharset": "utf-8",
+                "textEncoding": null,
+                "html": "HTML <b>content</b>",
+                "htmlCharset": "utf-8",
+                "htmlEncoding": null,
+                "attachments": [
                     {
-                        "address": "you@example.com",
-                        "name": ""
+                        "filename": "test.txt",
+                        "mediaType": "application",
+                        "body": "Some Text file",
+                        "charset": null,
+                        "subtype": "octet-stream",
+                        "disposition": "attachment",
+                        "name": "test.txt",
+                        "encoding": "base64",
+                        "headers": [],
+                        "class": "Symfony\\\Component\\\Mime\\\Part\\\DataPart"
                     }
                 ],
-                "name": "To",
-                "lineLength": 76,
-                "lang": null,
-                "charset": "utf-8"
+                "headers": {
+                    "to": [
+                        {
+                            "addresses": [
+                                {
+                                    "address": "you@example.com",
+                                    "name": ""
+                                }
+                            ],
+                            "name": "To",
+                            "lineLength": 76,
+                            "lang": null,
+                            "charset": "utf-8"
+                        }
+                    ]
+                },
+                "body": null
             }
-        ]
-    },
-    "body": null
-}
-EOF;
+            EOF;
 
         $extractor = new PhpDocExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
@@ -620,7 +620,7 @@ EOF;
         $email->html(null);
         $this->assertNull($email->getHtmlBody());
 
-        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', 'r');
+        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test');
         $email->html($contents);
         $this->assertSame($contents, $email->getHtmlBody());
     }
@@ -643,7 +643,7 @@ EOF;
         $email->text(null);
         $this->assertNull($email->getTextBody());
 
-        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', 'r');
+        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test');
         $email->text($contents);
         $this->assertSame($contents, $email->getTextBody());
     }
@@ -740,5 +740,61 @@ EOF;
         $email->htmlEncoding('base64');
         $email->html('foo');
         $this->assertSame('base64', $email->getHtmlEncoding());
+    }
+
+    public function testInvalidBodyWithEmptyEmail()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('A message must have a text or an HTML part or attachments.');
+
+        (new Email())->ensureValidity();
+    }
+
+    public function testBodyWithTextIsValid()
+    {
+        $email = new Email();
+        $email->to('test@example.com')
+            ->from('test@example.com')
+            ->text('foo');
+
+        $email->ensureValidity();
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testBodyWithHtmlIsValid()
+    {
+        $email = new Email();
+        $email->to('test@example.com')
+            ->from('test@example.com')
+            ->html('foo');
+
+        $email->ensureValidity();
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testEmptyBodyWithAttachmentsIsValid()
+    {
+        $email = new Email();
+        $email->to('test@example.com')
+            ->from('test@example.com')
+            ->addPart(new DataPart('foo'));
+
+        $email->ensureValidity();
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testSetBodyIsValid()
+    {
+        $email = new Email();
+        $email->to('test@example.com')
+            ->from('test@example.com')
+            ->setBody(new TextPart('foo'));
+
+        $email->ensureValidity();
+
+        $this->expectNotToPerformAssertions();
     }
 }

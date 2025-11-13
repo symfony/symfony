@@ -11,16 +11,19 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PdoStore;
+use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
- *
- * @requires extension pdo_sqlite
  */
+#[RequiresPhpExtension('pdo_sqlite')]
 class PdoStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
@@ -69,12 +72,10 @@ class PdoStoreTest extends AbstractStoreTestCase
         return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0);
     }
 
-    /**
-     * @dataProvider provideDsnWithSQLite
-     */
+    #[DataProvider('provideDsnWithSQLite')]
     public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         try {
             $store = new PdoStore($dsn);
@@ -95,18 +96,15 @@ class PdoStoreTest extends AbstractStoreTestCase
         yield 'SQLite in memory' => ['sqlite::memory:'];
     }
 
-    /**
-     * @requires extension pdo_pgsql
-     *
-     * @group integration
-     */
+    #[RequiresPhpExtension('pdo_pgsql')]
+    #[Group('integration')]
     public function testDsnWithPostgreSQL()
     {
         if (!$host = getenv('POSTGRES_HOST')) {
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         $dsn = 'pgsql:host='.$host.';user=postgres;password=password';
 

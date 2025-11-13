@@ -19,22 +19,21 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
  *
  * The event is *only* dispatched if the message will actually
  * be sent to at least one transport. If the message is sent
- * to multiple transports, the message is dispatched only once.
- * This message is only dispatched the first time a message
+ * to multiple transports, the event is dispatched only once.
+ * This event is only dispatched the first time a message
  * is sent to a transport, not also if it is retried.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 final class SendMessageToTransportsEvent
 {
-    private Envelope $envelope;
-
-    private array $senders;
-
-    public function __construct(Envelope $envelope, array $senders)
-    {
-        $this->envelope = $envelope;
-        $this->senders = $senders;
+    /**
+     * @param array<string, SenderInterface> $senders
+     */
+    public function __construct(
+        private Envelope $envelope,
+        private array $senders,
+    ) {
     }
 
     public function getEnvelope(): Envelope

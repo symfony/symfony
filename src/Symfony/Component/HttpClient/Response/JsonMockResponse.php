@@ -34,12 +34,12 @@ class JsonMockResponse extends MockResponse
     public static function fromFile(string $path, array $info = []): static
     {
         if (!is_file($path)) {
-            throw new InvalidArgumentException(sprintf('File not found: "%s".', $path));
+            throw new InvalidArgumentException(\sprintf('File not found: "%s".', $path));
         }
 
         $json = file_get_contents($path);
         if (!json_validate($json)) {
-            throw new \InvalidArgumentException(sprintf('File "%s" does not contain valid JSON.', $path));
+            throw new \InvalidArgumentException(\sprintf('File "%s" does not contain valid JSON.', $path));
         }
 
         return new static(json_decode($json, true, flags: \JSON_THROW_ON_ERROR), $info);

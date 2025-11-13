@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -32,11 +33,11 @@ class NotCompromisedPassword extends Constraint
     public bool $skipOnError = false;
 
     /**
-     * @param array<string,mixed>|null $options
-     * @param int|null                 $threshold   The number of times the password should have been leaked to consider it is compromised (defaults to 1)
-     * @param bool|null                $skipOnError Whether to ignore HTTP errors while requesting the API and thus consider the password valid (defaults to false)
-     * @param string[]|null            $groups
+     * @param positive-int|null $threshold   The number of times the password should have been leaked to consider it is compromised (defaults to 1)
+     * @param bool|null         $skipOnError Whether to ignore HTTP errors while requesting the API and thus consider the password valid (defaults to false)
+     * @param string[]|null     $groups
      */
+    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
@@ -45,6 +46,10 @@ class NotCompromisedPassword extends Constraint
         ?array $groups = null,
         mixed $payload = null,
     ) {
+        if (\is_array($options)) {
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;

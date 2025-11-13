@@ -80,7 +80,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         }
 
         if (null !== $attributesMetadata[$propertyName]->getSerializedName() && null !== $attributesMetadata[$propertyName]->getSerializedPath()) {
-            throw new LogicException(sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $propertyName, $class));
+            throw new LogicException(\sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $propertyName, $class));
         }
 
         return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
@@ -124,20 +124,17 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             }
 
             if (null !== $metadata->getSerializedName() && null !== $metadata->getSerializedPath()) {
-                throw new LogicException(sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $name, $class));
+                throw new LogicException(\sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $name, $class));
             }
 
             $metadataGroups = $metadata->getGroups();
-
             $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
-            $contextGroupsHasBeenDefined = [] !== $contextGroups;
-            $contextGroups = array_merge($contextGroups, ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class]);
 
-            if ($contextGroupsHasBeenDefined && !$metadataGroups) {
+            if ($contextGroups && !$metadataGroups) {
                 continue;
             }
 
-            if ($metadataGroups && !array_intersect(array_merge($metadataGroups, ['*']), $contextGroups)) {
+            if ($metadataGroups && !array_intersect($metadataGroups, $contextGroups) && !\in_array('*', $contextGroups, true)) {
                 continue;
             }
 

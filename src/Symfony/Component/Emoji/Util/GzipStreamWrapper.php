@@ -26,7 +26,7 @@ class GzipStreamWrapper
     public static function require(string $path): array
     {
         if (!\extension_loaded('zlib')) {
-            throw new \LogicException(sprintf('The "zlib" extension is required to load the "%s/%s" map, please enable it in your php.ini file.', basename(\dirname($path)), basename($path)));
+            throw new \LogicException(\sprintf('The "zlib" extension is required to load the "%s/%s" map, please enable it in your php.ini file.', basename(\dirname($path)), basename($path)));
         }
 
         if (!\function_exists('opcache_is_script_cached') || !@opcache_is_script_cached($path)) {

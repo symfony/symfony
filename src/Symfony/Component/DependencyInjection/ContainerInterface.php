@@ -33,11 +33,13 @@ interface ContainerInterface extends PsrContainerInterface
     public function set(string $id, ?object $service): void;
 
     /**
+     * @template C of object
      * @template B of self::*_REFERENCE
      *
-     * @param B $invalidBehavior
+     * @param string|class-string<C> $id
+     * @param B                      $invalidBehavior
      *
-     * @psalm-return (B is self::EXCEPTION_ON_INVALID_REFERENCE|self::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE ? object : object|null)
+     * @return ($id is class-string<C> ? (B is 0|1 ? C|object : C|object|null) : (B is 0|1 ? object : object|null))
      *
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined

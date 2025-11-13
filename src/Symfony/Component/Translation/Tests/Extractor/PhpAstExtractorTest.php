@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests\Extractor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Extractor\PhpAstExtractor;
 use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
@@ -22,9 +23,7 @@ final class PhpAstExtractorTest extends TestCase
 {
     public const OTHER_DOMAIN = 'not_messages';
 
-    /**
-     * @dataProvider resourcesProvider
-     */
+    #[DataProvider('resourcesProvider')]
     public function testExtraction(iterable|string $resource)
     {
         $extractor = new PhpAstExtractor([
@@ -42,11 +41,11 @@ final class PhpAstExtractorTest extends TestCase
         $extractor->extract($resource, $catalogue);
 
         $expectedHeredoc = <<<EOF
-heredoc key with whitespace and escaped \$\n sequences
-EOF;
+            heredoc key with whitespace and escaped \$\n sequences
+            EOF;
         $expectedNowdoc = <<<'EOF'
-nowdoc key with whitespace and nonescaped \$\n sequences
-EOF;
+            nowdoc key with whitespace and nonescaped \$\n sequences
+            EOF;
         $expectedCatalogue = [
             'messages' => [
                 'translatable single-quoted key' => 'prefixtranslatable single-quoted key',
@@ -146,12 +145,12 @@ EOF;
             ],
             'validators' => [
                 'message-in-constraint-attribute' => 'prefixmessage-in-constraint-attribute',
-//                'custom Isbn message from attribute' => 'prefixcustom Isbn message from attribute',
+                // 'custom Isbn message from attribute' => 'prefixcustom Isbn message from attribute',
                 'custom Isbn message from attribute with options as array' => 'prefixcustom Isbn message from attribute with options as array',
                 'custom Length exact message from attribute from named argument' => 'prefixcustom Length exact message from attribute from named argument',
                 'custom Length exact message from attribute from named argument 1/2' => 'prefixcustom Length exact message from attribute from named argument 1/2',
                 'custom Length min message from attribute from named argument 2/2' => 'prefixcustom Length min message from attribute from named argument 2/2',
-//                'custom Isbn message' => 'prefixcustom Isbn message',
+                // 'custom Isbn message' => 'prefixcustom Isbn message',
                 'custom Isbn message with options as array' => 'prefixcustom Isbn message with options as array',
                 'custom Isbn message from named argument' => 'prefixcustom Isbn message from named argument',
                 'custom Length exact message from named argument' => 'prefixcustom Length exact message from named argument',

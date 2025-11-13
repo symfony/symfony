@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * Validates a credit card number for a given credit card company.
@@ -47,30 +49,54 @@ class CardScheme extends Constraint
     public array|string|null $schemes = null;
 
     /**
-     * @param string|string[]|array<string,mixed>|null $schemes Name(s) of the number scheme(s) used to validate the credit card number
+     * @param non-empty-string|non-empty-string[]|null $schemes Name(s) of the number scheme(s) used to validate the credit card number
      * @param string[]|null                            $groups
-     * @param array<string,mixed>                      $options
      */
-    public function __construct(array|string|null $schemes, ?string $message = null, ?array $groups = null, mixed $payload = null, array $options = [])
+    #[HasNamedArguments]
+    public function __construct(array|string|null $schemes, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
     {
+        if (null === $schemes && !isset($options['schemes'])) {
+            throw new MissingOptionsException(\sprintf('The options "schemes" must be set for constraint "%s".', self::class), ['schemes']);
+        }
+
         if (\is_array($schemes) && \is_string(key($schemes))) {
-            $options = array_merge($schemes, $options);
+            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+
+            $options = array_merge($schemes, $options ?? []);
+            $schemes = null;
         } else {
-            $options['value'] = $schemes;
+            if (\is_array($options)) {
+                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            }
         }
 
         parent::__construct($options, $groups, $payload);
 
+        $this->schemes = $schemes ?? $this->schemes;
         $this->message = $message ?? $this->message;
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getDefaultOption(): ?string
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return 'schemes';
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function getRequiredOptions(): array
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return ['schemes'];
     }
 }

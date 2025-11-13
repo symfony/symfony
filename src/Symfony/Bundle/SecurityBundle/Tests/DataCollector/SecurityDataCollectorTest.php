@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DataCollector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
@@ -28,9 +30,11 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\VarDumper\Caster\ClassStub;
@@ -40,7 +44,7 @@ class SecurityDataCollectorTest extends TestCase
 {
     public function testCollectWhenSecurityIsDisabled()
     {
-        $collector = new SecurityDataCollector(null, null, null, null, null, null, true);
+        $collector = new SecurityDataCollector(null, null, null, null, null, null);
         $collector->collect(new Request(), new Response());
 
         $this->assertSame('security', $collector->getName());
@@ -53,14 +57,14 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertFalse($collector->supportsRoleHierarchy());
         $this->assertCount(0, $collector->getRoles());
         $this->assertCount(0, $collector->getInheritedRoles());
-        $this->assertEmpty($collector->getUser());
+        $this->assertSame('', $collector->getUser());
         $this->assertNull($collector->getFirewall());
     }
 
     public function testCollectWhenAuthenticationTokenIsNull()
     {
         $tokenStorage = new TokenStorage();
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
         $collector->collect(new Request(), new Response());
 
         $this->assertTrue($collector->isEnabled());
@@ -72,17 +76,17 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertTrue($collector->supportsRoleHierarchy());
         $this->assertCount(0, $collector->getRoles());
         $this->assertCount(0, $collector->getInheritedRoles());
-        $this->assertEmpty($collector->getUser());
+        $this->assertSame('', $collector->getUser());
         $this->assertNull($collector->getFirewall());
     }
 
-    /** @dataProvider provideRoles */
+    #[DataProvider('provideRoles')]
     public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
     {
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('hhamon', 'P4$$w0rD', $roles), 'provider', $roles));
 
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
@@ -105,7 +109,7 @@ class SecurityDataCollectorTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER']), 'provider', ['ROLE_USER'], $adminToken));
 
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
@@ -135,7 +139,7 @@ class SecurityDataCollectorTest extends TestCase
             ->with($request)
             ->willReturn($firewallConfig);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
         $collector->collect($request, new Response());
         $collector->lateCollect();
         $collected = $collector->getFirewall();
@@ -159,7 +163,7 @@ class SecurityDataCollectorTest extends TestCase
         $response = new Response();
 
         // Don't inject any firewall map
-        $collector = new SecurityDataCollector(null, null, null, null, null, null, true);
+        $collector = new SecurityDataCollector(null, null, null, null, null, null);
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
 
@@ -169,7 +173,7 @@ class SecurityDataCollectorTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
 
@@ -179,21 +183,29 @@ class SecurityDataCollectorTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testGetListeners()
     {
         $request = new Request();
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $event->setResponse($response = new Response());
-        $listener = function ($e) use ($event, &$listenerCalled) {
-            $listenerCalled += $e === $event;
+        $listener = new class extends AbstractListener {
+            public int $callCount = 0;
+
+            public function supports(Request $request): ?bool
+            {
+                return true;
+            }
+
+            public function authenticate(RequestEvent $event): void
+            {
+                ++$this->callCount;
+            }
         };
         $firewallMap = $this
             ->getMockBuilder(FirewallMap::class)
@@ -213,12 +225,12 @@ class SecurityDataCollectorTest extends TestCase
         $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
         $firewall->onKernelRequest($event);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, $firewall, true);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, $firewall);
         $collector->collect($request, $response);
 
-        $this->assertNotEmpty($collected = $collector->getListeners()[0]);
+        $this->assertCount(1, $collector->getListeners());
         $collector->lateCollect();
-        $this->assertSame(1, $listenerCalled);
+        $this->assertSame(1, $listener->callCount);
     }
 
     public function testCollectCollectsDecisionLogWhenStrategyIsAffirmative()
@@ -226,7 +238,7 @@ class SecurityDataCollectorTest extends TestCase
         $voter1 = new DummyVoter();
         $voter2 = new DummyVoter();
 
-        $decoratedVoter1 = new TraceableVoter($voter1, new class() implements EventDispatcherInterface {
+        $decoratedVoter1 = new TraceableVoter($voter1, new class implements EventDispatcherInterface {
             public function dispatch(object $event, ?string $eventName = null): object
             {
                 return new \stdClass();
@@ -260,7 +272,7 @@ class SecurityDataCollectorTest extends TestCase
                 ],
             ]]);
 
-        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
 
         $dataCollector->collect(new Request(), new Response());
 
@@ -271,8 +283,8 @@ class SecurityDataCollectorTest extends TestCase
             'object' => new \stdClass(),
             'result' => true,
             'voter_details' => [
-                ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
-                ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN, 'reasons' => []],
+                ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN, 'reasons' => []],
             ],
         ]];
 
@@ -301,7 +313,7 @@ class SecurityDataCollectorTest extends TestCase
         $voter1 = new DummyVoter();
         $voter2 = new DummyVoter();
 
-        $decoratedVoter1 = new TraceableVoter($voter1, new class() implements EventDispatcherInterface {
+        $decoratedVoter1 = new TraceableVoter($voter1, new class implements EventDispatcherInterface {
             public function dispatch(object $event, ?string $eventName = null): object
             {
                 return new \stdClass();
@@ -348,7 +360,7 @@ class SecurityDataCollectorTest extends TestCase
                 ],
             ]);
 
-        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
 
         $dataCollector->collect(new Request(), new Response());
 
@@ -360,10 +372,10 @@ class SecurityDataCollectorTest extends TestCase
                 'object' => new \stdClass(),
                 'result' => false,
                 'voter_details' => [
-                    ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED],
-                    ['class' => $voter1::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
-                    ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                    ['class' => $voter2::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED, 'reasons' => []],
+                    ['class' => $voter1::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED, 'reasons' => []],
+                    ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
+                    ['class' => $voter2::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
                 ],
             ],
             [
@@ -371,8 +383,8 @@ class SecurityDataCollectorTest extends TestCase
                 'object' => new \stdClass(),
                 'result' => true,
                 'voter_details' => [
-                    ['class' => $voter1::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                    ['class' => $voter2::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ['class' => $voter1::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
+                    ['class' => $voter2::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
                 ],
             ],
         ];
@@ -395,6 +407,36 @@ class SecurityDataCollectorTest extends TestCase
         );
 
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
+    }
+
+    public function testGetVotersIfAccessDecisionManagerHasNoVoters()
+    {
+        $strategy = MainConfiguration::STRATEGY_AFFIRMATIVE;
+
+        $accessDecisionManager = $this->createMock(TraceableAccessDecisionManager::class);
+
+        $accessDecisionManager
+            ->method('getStrategy')
+            ->willReturn($strategy);
+
+        $accessDecisionManager
+            ->method('getVoters')
+            ->willReturn([]);
+
+        $accessDecisionManager
+            ->method('getDecisionLog')
+            ->willReturn([[
+                'attributes' => ['view'],
+                'object' => new \stdClass(),
+                'result' => true,
+                'voterDetails' => [],
+            ]]);
+
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
+
+        $dataCollector->collect(new Request(), new Response());
+
+        $this->assertSame([], $dataCollector->getVoters());
     }
 
     public static function provideRoles(): array
@@ -431,7 +473,7 @@ class SecurityDataCollectorTest extends TestCase
 
 final class DummyVoter implements VoterInterface
 {
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {
     }
 }

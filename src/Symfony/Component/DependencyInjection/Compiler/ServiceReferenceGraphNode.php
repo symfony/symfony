@@ -23,15 +23,13 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class ServiceReferenceGraphNode
 {
-    private string $id;
     private array $inEdges = [];
     private array $outEdges = [];
-    private mixed $value;
 
-    public function __construct(string $id, mixed $value)
-    {
-        $this->id = $id;
-        $this->value = $value;
+    public function __construct(
+        private string $id,
+        private mixed $value,
+    ) {
     }
 
     public function addInEdge(ServiceReferenceGraphEdge $edge): void

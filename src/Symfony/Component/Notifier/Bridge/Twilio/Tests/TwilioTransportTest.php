@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Twilio\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -44,28 +45,24 @@ final class TwilioTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
     {
         $transport = self::createTransport(null, $from);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfSmsMessageFromIsInvalid(string $from)
     {
         $transport = $this->createTransport();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+        $this->expectExceptionMessage(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!', $from));
     }
@@ -81,9 +78,7 @@ final class TwilioTransportTest extends TransportTestCase
         yield 'phone number to short' => ['+1'];
     }
 
-    /**
-     * @dataProvider validFromProvider
-     */
+    #[DataProvider('validFromProvider')]
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
@@ -146,5 +141,21 @@ final class TwilioTransportTest extends TransportTestCase
         yield ['+1123456789123'];
         yield ['+11234567891234'];
         yield ['+112345678912345'];
+
+        // whatsapp
+        yield ['whatsapp:+11'];
+        yield ['whatsapp:+112'];
+        yield ['whatsapp:+1123'];
+        yield ['whatsapp:+11234'];
+        yield ['whatsapp:+112345'];
+        yield ['whatsapp:+1123456'];
+        yield ['whatsapp:+11234567'];
+        yield ['whatsapp:+112345678'];
+        yield ['whatsapp:+1123456789'];
+        yield ['whatsapp:+11234567891'];
+        yield ['whatsapp:+112345678912'];
+        yield ['whatsapp:+1123456789123'];
+        yield ['whatsapp:+11234567891234'];
+        yield ['whatsapp:+112345678912345'];
     }
 }

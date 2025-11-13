@@ -21,21 +21,19 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
- *
- * @internal
  */
-final readonly class ReflectionParameterTypeResolver implements TypeResolverInterface
+final class ReflectionParameterTypeResolver implements TypeResolverInterface
 {
     public function __construct(
-        private ReflectionTypeResolver $reflectionTypeResolver,
-        private TypeContextFactory $typeContextFactory,
+        private readonly ReflectionTypeResolver $reflectionTypeResolver,
+        private readonly TypeContextFactory $typeContextFactory,
     ) {
     }
 
-    public function resolve(mixed $subject, TypeContext $typeContext = null): Type
+    public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if (!$subject instanceof \ReflectionParameter) {
-            throw new UnsupportedException(sprintf('Expected subject to be a "ReflectionParameter", "%s" given.', get_debug_type($subject)), $subject);
+            throw new UnsupportedException(\sprintf('Expected subject to be a "ReflectionParameter", "%s" given.', get_debug_type($subject)), $subject);
         }
 
         $typeContext ??= $this->typeContextFactory->createFromReflection($subject);
@@ -44,10 +42,10 @@ final readonly class ReflectionParameterTypeResolver implements TypeResolverInte
             return $this->reflectionTypeResolver->resolve($subject->getType(), $typeContext);
         } catch (UnsupportedException $e) {
             $path = null !== $typeContext
-                ? sprintf('%s::%s($%s)', $typeContext->calledClassName, $subject->getDeclaringFunction()->getName(), $subject->getName())
-                : sprintf('%s($%s)', $subject->getDeclaringFunction()->getName(), $subject->getName());
+                ? \sprintf('%s::%s($%s)', $typeContext->calledClassName, $subject->getDeclaringFunction()->getName(), $subject->getName())
+                : \sprintf('%s($%s)', $subject->getDeclaringFunction()->getName(), $subject->getName());
 
-            throw new UnsupportedException(sprintf('Cannot resolve type for "%s".', $path), $subject, previous: $e);
+            throw new UnsupportedException(\sprintf('Cannot resolve type for "%s".', $path), $subject, previous: $e);
         }
     }
 }

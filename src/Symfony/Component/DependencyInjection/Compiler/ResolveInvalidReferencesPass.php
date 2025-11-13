@@ -62,7 +62,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
         } elseif ($value instanceof ArgumentInterface) {
             $value->setValues($this->processValue($value->getValues(), $rootLevel, 1 + $level));
         } elseif ($value instanceof Definition) {
-            if ($value->isSynthetic() || $value->isAbstract()) {
+            if ($value->isSynthetic() || $value->isAbstract() || $value->hasTag('container.excluded')) {
                 return $value;
             }
             $value->setArguments($this->processValue($value->getArguments(), 0));
@@ -112,7 +112,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                 $e = new ServiceNotFoundException($id, $this->currentId);
 
                 // since the error message varies by $id and $this->currentId, so should the id of the dummy errored definition
-                $this->container->register($id = sprintf('.errored.%s.%s', $this->currentId, $id), $value->getType())
+                $this->container->register($id = \sprintf('.errored.%s.%s', $this->currentId, $id), $value->getType())
                     ->addError($e->getMessage());
 
                 return new TypedReference($id, $value->getType(), $value->getInvalidBehavior());

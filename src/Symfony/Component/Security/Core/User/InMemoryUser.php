@@ -22,20 +22,18 @@ namespace Symfony\Component\Security\Core\User;
 final class InMemoryUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface, \Stringable
 {
     private string $username;
-    private ?string $password;
-    private bool $enabled;
-    private array $roles;
 
-    public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true)
-    {
+    public function __construct(
+        ?string $username,
+        private ?string $password,
+        private array $roles = [],
+        private bool $enabled = true,
+    ) {
         if ('' === $username || null === $username) {
             throw new \InvalidArgumentException('The username cannot be empty.');
         }
 
         $this->username = $username;
-        $this->password = $password;
-        $this->enabled = $enabled;
-        $this->roles = $roles;
     }
 
     public function __toString(): string
@@ -76,8 +74,15 @@ final class InMemoryUser implements UserInterface, PasswordAuthenticatedUserInte
         return $this->enabled;
     }
 
+    /**
+     * @deprecated since Symfony 7.3
+     */
+    #[\Deprecated(since: 'symfony/security-core 7.3')]
     public function eraseCredentials(): void
     {
+        if (\PHP_VERSION_ID < 80400) {
+            @trigger_error(\sprintf('Method %s::eraseCredentials() is deprecated since symfony/security-core 7.3', self::class), \E_USER_DEPRECATED);
+        }
     }
 
     public function isEqualTo(UserInterface $user): bool
@@ -90,8 +95,8 @@ final class InMemoryUser implements UserInterface, PasswordAuthenticatedUserInte
             return false;
         }
 
-        $currentRoles = array_map('strval', (array) $this->getRoles());
-        $newRoles = array_map('strval', (array) $user->getRoles());
+        $currentRoles = array_map('strval', $this->getRoles());
+        $newRoles = array_map('strval', $user->getRoles());
         $rolesChanged = \count($currentRoles) !== \count($newRoles) || \count($currentRoles) !== \count(array_intersect($currentRoles, $newRoles));
         if ($rolesChanged) {
             return false;

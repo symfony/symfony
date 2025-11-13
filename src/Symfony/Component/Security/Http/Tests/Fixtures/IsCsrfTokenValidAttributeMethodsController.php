@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Fixtures;
 
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 
 class IsCsrfTokenValidAttributeMethodsController
@@ -24,6 +25,16 @@ class IsCsrfTokenValidAttributeMethodsController
     {
     }
 
+    #[IsCsrfTokenValid(new Expression('"foo_" ~ args.id'))]
+    public function withCustomExpressionId(string $id)
+    {
+    }
+
+    #[IsCsrfTokenValid(new Expression('"foo_" ~ args.slug'))]
+    public function withInvalidExpressionId(string $id)
+    {
+    }
+
     #[IsCsrfTokenValid('foo', tokenKey: 'my_token_key')]
     public function withCustomTokenKey()
     {
@@ -31,6 +42,36 @@ class IsCsrfTokenValidAttributeMethodsController
 
     #[IsCsrfTokenValid('foo', tokenKey: 'invalid_token_key')]
     public function withInvalidTokenKey()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', methods: 'DELETE')]
+    public function withDeleteMethod()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', methods: ['GET', 'POST'])]
+    public function withGetOrPostMethod()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', tokenKey: 'invalid_token_key', methods: ['POST'])]
+    public function withPostMethodAndInvalidTokenKey()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', tokenSource: IsCsrfTokenValid::SOURCE_QUERY)]
+    public function withCustomTokenSourceQuery()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', tokenSource: IsCsrfTokenValid::SOURCE_QUERY | IsCsrfTokenValid::SOURCE_PAYLOAD)]
+    public function withCustomTokenSourceQueryPayload()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', tokenKey: 'my_token_key', tokenSource: IsCsrfTokenValid::SOURCE_HEADER)]
+    public function withCustomTokenSourceHeaderAndCustomSourceToken()
     {
     }
 }

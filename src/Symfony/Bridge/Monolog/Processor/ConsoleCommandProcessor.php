@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Processor;
 
 use Monolog\LogRecord;
+use Monolog\ResettableInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,16 +23,14 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Piotr Stankowski <git@trakos.pl>
  */
-final class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface
+final class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface, ResettableInterface
 {
     private array $commandData;
-    private bool $includeArguments;
-    private bool $includeOptions;
 
-    public function __construct(bool $includeArguments = true, bool $includeOptions = false)
-    {
-        $this->includeArguments = $includeArguments;
-        $this->includeOptions = $includeOptions;
+    public function __construct(
+        private bool $includeArguments = true,
+        private bool $includeOptions = false,
+    ) {
     }
 
     public function __invoke(LogRecord $record): LogRecord

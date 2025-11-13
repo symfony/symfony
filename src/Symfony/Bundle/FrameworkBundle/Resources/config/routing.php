@@ -26,6 +26,7 @@ use Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Loader\AttributeDirectoryLoader;
 use Symfony\Component\Routing\Loader\AttributeFileLoader;
+use Symfony\Component\Routing\Loader\AttributeServicesLoader;
 use Symfony\Component\Routing\Loader\ContainerLoader;
 use Symfony\Component\Routing\Loader\DirectoryLoader;
 use Symfony\Component\Routing\Loader\GlobFileLoader;
@@ -98,6 +99,12 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('routing.loader', ['priority' => -10])
 
+        ->set('routing.loader.attribute.services', AttributeServicesLoader::class)
+            ->args([
+                abstract_arg('classes tagged with "routing.controller"'),
+            ])
+            ->tag('routing.loader', ['priority' => -10])
+
         ->set('routing.loader.attribute.directory', AttributeDirectoryLoader::class)
             ->args([
                 service('file_locator'),
@@ -164,10 +171,10 @@ return static function (ContainerConfigurator $container) {
                 param('request_listener.http_port'),
                 param('request_listener.https_port'),
             ])
-            ->call('setParameter', [
-                '_functions',
-                service('router.expression_language_provider')->ignoreOnInvalid(),
-            ])
+            ->call('setParameters', [[
+                '_functions' => service('router.expression_language_provider')->ignoreOnInvalid(),
+                '_locale' => '%kernel.default_locale%',
+            ]])
         ->alias(RequestContext::class, 'router.request_context')
 
         ->set('router.expression_language_provider', ExpressionLanguageProvider::class)

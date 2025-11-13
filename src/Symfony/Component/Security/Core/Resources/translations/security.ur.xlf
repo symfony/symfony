@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>منٹ باد %minutes% لاگ ان کی بہت زیادہ ناکام کوششیں ہو چکی ہیں، براۓ کرم دوبارھ کوشيش کريں </target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">بہت زیادہ ناکام لاگ ان کوششیں، براہ کرم %minutes% منٹ میں دوبارہ کوشش کریں۔</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

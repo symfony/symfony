@@ -18,13 +18,10 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private AbstractSessionHandler $handler;
-    private MarshallerInterface $marshaller;
-
-    public function __construct(AbstractSessionHandler $handler, MarshallerInterface $marshaller)
-    {
-        $this->handler = $handler;
-        $this->marshaller = $marshaller;
+    public function __construct(
+        private AbstractSessionHandler $handler,
+        private MarshallerInterface $marshaller,
+    ) {
     }
 
     public function open(string $savePath, string $name): bool

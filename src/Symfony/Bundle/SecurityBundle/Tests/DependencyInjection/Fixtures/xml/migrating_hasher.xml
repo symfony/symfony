@@ -13,9 +13,9 @@
     </imports>
 
     <sec:config>
-        <sec:password_hasher class="JMS\FooBundle\Entity\User7" algorithm="argon2i" memory-cost="256" time-cost="1">
+        <sec:password-hasher class="JMS\FooBundle\Entity\User7" algorithm="argon2i" memory-cost="256" time-cost="1">
             <sec:migrate-from>bcrypt</sec:migrate-from>
-        </sec:password_hasher>
+        </sec:password-hasher>
     </sec:config>
 
 </container>

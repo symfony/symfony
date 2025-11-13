@@ -21,13 +21,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class AbstractTransportFactory implements TransportFactoryInterface
 {
-    protected ?EventDispatcherInterface $dispatcher;
-    protected ?HttpClientInterface $client;
-
-    public function __construct(?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null)
-    {
-        $this->dispatcher = $dispatcher;
-        $this->client = $client;
+    public function __construct(
+        protected ?EventDispatcherInterface $dispatcher = null,
+        protected ?HttpClientInterface $client = null,
+    ) {
     }
 
     public function supports(Dsn $dsn): bool

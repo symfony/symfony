@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>มีความพยายามเข้าสู่ระบบล้มเหลวมากเกินไป โปรดลองอีกครั้งใน %minutes% นาที</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">มีความพยายามในการเข้าสู่ระบบล้มเหลวมากเกินไป โปรดลองอีกครั้งใน %minutes% นาที.|มีความพยายามในการเข้าสู่ระบบล้มเหลวมากเกินไป โปรดลองอีกครั้งใน %minutes% นาที.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

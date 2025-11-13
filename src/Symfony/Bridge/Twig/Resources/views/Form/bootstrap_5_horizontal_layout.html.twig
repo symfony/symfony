@@ -1,4 +1,4 @@
-{% use "bootstrap_5_layout.html.twig" %}
+{% use 'bootstrap_5_layout.html.twig' %}
 
 {# Labels #}
 
@@ -23,14 +23,10 @@
 
 {# Rows #}
 
-{% block form_row -%}
+{% block form_row_render -%}
     {%- if expanded is defined and expanded -%}
         {{ block('fieldset_form_row') }}
     {%- else -%}
-        {%- set widget_attr = {} -%}
-        {%- if help is not empty -%}
-            {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-        {%- endif -%}
         {%- set row_class = row_class|default(row_attr.class|default('mb-3')) -%}
         {%- set is_form_floating = is_form_floating|default('form-floating' in row_class) -%}
         {%- set is_input_group = is_input_group|default('input-group' in row_class) -%}
@@ -68,12 +64,12 @@
             {%- endif -%}
         {##}</div>
     {%- endif -%}
-{%- endblock form_row %}
+{%- endblock form_row_render %}
 
 {% block fieldset_form_row -%}
     {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- if help -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
     {%- endif -%}
     <fieldset{% with {attr: row_attr|merge({class: row_attr.class|default('mb-3')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="row{% if (not compound or force_error|default(false)) and not valid %} is-invalid{% endif %}">

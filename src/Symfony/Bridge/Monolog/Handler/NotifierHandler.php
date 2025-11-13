@@ -25,12 +25,11 @@ use Symfony\Component\Notifier\NotifierInterface;
  */
 final class NotifierHandler extends AbstractHandler
 {
-    private NotifierInterface $notifier;
-
-    public function __construct(NotifierInterface $notifier, string|int|Level $level = Level::Error, bool $bubble = true)
-    {
-        $this->notifier = $notifier;
-
+    public function __construct(
+        private NotifierInterface $notifier,
+        string|int|Level $level = Level::Error,
+        bool $bubble = true,
+    ) {
         parent::__construct(Logger::toMonologLevel($level)->isLowerThan(Level::Error) ? Level::Error : $level, $bubble);
     }
 

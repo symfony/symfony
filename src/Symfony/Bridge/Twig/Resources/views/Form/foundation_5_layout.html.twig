@@ -1,4 +1,4 @@
-{% extends "form_div_layout.html.twig" %}
+{% extends 'form_div_layout.html.twig' %}
 
 {# Based on Foundation 5 Doc #}
 {# Widgets #}
@@ -68,8 +68,8 @@
             <div class="large-5 columns">{{ form_errors(form.time) }}</div>
         </div>
         <div {{ block('widget_container_attributes') }}>
-            <div class="large-7 columns">{{ form_widget(form.date, { datetime: true } ) }}</div>
-            <div class="large-5 columns">{{ form_widget(form.time, { datetime: true } ) }}</div>
+            <div class="large-7 columns">{{ form_widget(form.date, {datetime: true}) }}</div>
+            <div class="large-5 columns">{{ form_widget(form.time, {datetime: true}) }}</div>
         </div>
     {% endif %}
 {%- endblock datetime_widget %}
@@ -156,7 +156,7 @@
     {%- endif -%}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple" data-customforms="disabled"{% endif %}>
         {% if placeholder is not none -%}
-            <option value=""{% if placeholder_attr|default({}) %}{% with { attr: placeholder_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if required and value is empty %} selected="selected"{% endif %}>{{ translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain) }}</option>
+            <option value=""{% if placeholder_attr|default({}) %}{% with {attr: placeholder_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}{% if required and value is empty %} selected="selected"{% endif %}>{{ translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain) }}</option>
         {%- endif %}
         {%- if preferred_choices|length > 0 -%}
             {% set options = preferred_choices %}
@@ -202,10 +202,10 @@
         {% set attr = attr|merge({class: (attr.class|default('') ~ ' error')|trim}) %}
     {% endif %}
     {% if 'checkbox-inline' in parent_label_class %}
-        {{ form_label(form, null, { widget: parent() }) }}
+        {{ form_label(form, null, {widget: parent()}) }}
     {% else %}
         <div class="checkbox">
-            {{ form_label(form, null, { widget: parent() }) }}
+            {{ form_label(form, null, {widget: parent()}) }}
         </div>
     {% endif %}
 {%- endblock checkbox_widget %}
@@ -213,13 +213,13 @@
 {% block radio_widget -%}
     {% set parent_label_class = parent_label_class|default('') %}
     {% if 'radio-inline' in parent_label_class %}
-        {{ form_label(form, null, { widget: parent() }) }}
+        {{ form_label(form, null, {widget: parent()}) }}
     {% else %}
         {% if errors|length > 0 -%}
             {% set attr = attr|merge({class: (attr.class|default('') ~ ' error')|trim}) %}
         {% endif %}
         <div class="radio">
-            {{ form_label(form, null, { widget: parent() }) }}
+            {{ form_label(form, null, {widget: parent()}) }}
         </div>
     {% endif %}
 {%- endblock radio_widget %}
@@ -261,7 +261,7 @@
         {% set embed_label_classes = parent_label_class|split(' ')|filter(class => class in ['checkbox-inline', 'radio-inline']) %}
         {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ embed_label_classes|join(' '))|trim}) -%}
     {% endif %}
-    {% if label is empty %}
+    {% if not label %}
         {%- if label_format is not empty -%}
             {% set label = label_format|replace({
                 '%name%': name,
@@ -271,7 +271,7 @@
             {% set label = name|humanize %}
         {%- endif -%}
     {% endif %}
-    <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+    <label{% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}>
         {{ widget|raw }}
         {%- if label is not same as(false) -%}
             {{- block('form_label_content') -}}
@@ -281,11 +281,7 @@
 
 {# Rows #}
 
-{% block form_row -%}
-    {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-    {%- endif -%}
+{% block form_row_render -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="large-12 columns{% if (not compound or force_error|default(false)) and not valid %} error{% endif %}">
             {{- form_label(form) -}}
@@ -294,7 +290,7 @@
             {{- form_errors(form) -}}
         </div>
     </div>
-{%- endblock form_row %}
+{%- endblock form_row_render %}
 
 {% block choice_row -%}
     {% set force_error = true %}
@@ -342,8 +338,7 @@
     {% if errors|length > 0 -%}
         {% if form is not rootform %}<small class="error">{% else %}<div data-alert class="alert-box alert">{% endif %}
         {%- for error in errors -%}
-            {{ error.message }}
-            {% if not loop.last %}, {% endif %}
+            <span id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</span>{% if not loop.last %}, {% endif %}
         {%- endfor -%}
         {% if form is not rootform %}</small>{% else %}</div>{% endif %}
     {%- endif %}

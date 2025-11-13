@@ -52,14 +52,26 @@ abstract class AbstractPipes implements PipesInterface
 
     /**
      * Returns true if a system call has been interrupted.
+     *
+     * stream_select() returns false when the `select` system call is interrupted by an incoming signal.
      */
     protected function hasSystemCallBeenInterrupted(): bool
     {
         $lastError = $this->lastError;
         $this->lastError = null;
 
-        // stream_select returns false when the `select` system call is interrupted by an incoming signal
-        return null !== $lastError && false !== stripos($lastError, 'interrupted system call');
+        if (null === $lastError) {
+            return false;
+        }
+
+        if (false !== stripos($lastError, 'interrupted system call')) {
+            return true;
+        }
+
+        // on applications with a different locale than english, the message above is not found because
+        // it's translated. So we also check for the SOCKET_EINTR constant which is defined under
+        // Windows and UNIX-like platforms (if available on the platform).
+        return \defined('SOCKET_EINTR') && str_starts_with($lastError, 'stream_select(): Unable to select ['.\SOCKET_EINTR.']');
     }
 
     /**
@@ -72,10 +84,10 @@ abstract class AbstractPipes implements PipesInterface
         }
 
         foreach ($this->pipes as $pipe) {
-            stream_set_blocking($pipe, 0);
+            stream_set_blocking($pipe, false);
         }
         if (\is_resource($this->input)) {
-            stream_set_blocking($this->input, 0);
+            stream_set_blocking($this->input, false);
         }
 
         $this->blocked = false;
@@ -97,11 +109,11 @@ abstract class AbstractPipes implements PipesInterface
             if (!$input->valid()) {
                 $input = null;
             } elseif (\is_resource($input = $input->current())) {
-                stream_set_blocking($input, 0);
+                stream_set_blocking($input, false);
             } elseif (!isset($this->inputBuffer[0])) {
                 if (!\is_string($input)) {
                     if (!\is_scalar($input)) {
-                        throw new InvalidArgumentException(sprintf('"%s" yielded a value of type "%s", but only scalars and stream resources are supported.', get_debug_type($this->input), get_debug_type($input)));
+                        throw new InvalidArgumentException(\sprintf('"%s" yielded a value of type "%s", but only scalars and stream resources are supported.', get_debug_type($this->input), get_debug_type($input)));
                     }
                     $input = (string) $input;
                 }

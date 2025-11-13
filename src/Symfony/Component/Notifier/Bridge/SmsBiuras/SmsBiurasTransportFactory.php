@@ -31,7 +31,7 @@ final class SmsBiurasTransportFactory extends AbstractTransportFactory
         $uid = $this->getUser($dsn);
         $apiKey = $this->getPassword($dsn);
         $from = $dsn->getRequiredOption('from');
-        $testMode = filter_var($dsn->getOption('test_mode', false), \FILTER_VALIDATE_BOOL);
+        $testMode = $dsn->getBooleanOption('test_mode');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

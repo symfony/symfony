@@ -38,8 +38,8 @@ final class CachePoolListCommand extends Command
     {
         $this
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command lists all available cache pools.
-EOF
+                The <info>%command.name%</info> command lists all available cache pools.
+                EOF
             )
         ;
     }

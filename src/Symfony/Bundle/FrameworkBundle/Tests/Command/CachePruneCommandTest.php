@@ -77,7 +77,7 @@ class CachePruneCommandTest extends TestCase
     private function getCommandTester(KernelInterface $kernel, RewindableGenerator $generator): CommandTester
     {
         $application = new Application($kernel);
-        $application->add(new CachePoolPruneCommand($generator));
+        $application->addCommand(new CachePoolPruneCommand($generator));
 
         return new CommandTester($application->find('cache:pool:prune'));
     }

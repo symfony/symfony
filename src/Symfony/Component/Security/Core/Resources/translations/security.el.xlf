@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Πολλαπλές αποτυχημένες απόπειρες σύνδεσης, παρακαλούμε ξαναδοκιμάστε σε %minutes% λεπτό.</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Πολλές αποτυχημένες προσπάθειες σύνδεσης, δοκιμάστε ξανά σε %minutes% λεπτά.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

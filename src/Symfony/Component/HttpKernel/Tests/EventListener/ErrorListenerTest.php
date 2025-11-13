@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -33,9 +35,8 @@ use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
- *
- * @group time-sensitive
  */
+#[Group('time-sensitive')]
 class ErrorListenerTest extends TestCase
 {
     public function testConstruct()
@@ -50,32 +51,32 @@ class ErrorListenerTest extends TestCase
         $this->assertSame('foo', $_controller->getValue($l));
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testHandleWithoutLogger($event, $event2)
     {
-        $this->iniSet('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
-
-        $l = new ErrorListener('foo');
-        $l->logKernelException($event);
-        $l->onKernelException($event);
-
-        $this->assertEquals(new Response('foo'), $event->getResponse());
+        $initialErrorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
         try {
-            $l->logKernelException($event2);
-            $l->onKernelException($event2);
-            $this->fail('RuntimeException expected');
-        } catch (\RuntimeException $e) {
-            $this->assertSame('bar', $e->getMessage());
-            $this->assertSame('foo', $e->getPrevious()->getMessage());
+            $l = new ErrorListener('foo');
+            $l->logKernelException($event);
+            $l->onKernelException($event);
+
+            $this->assertEquals(new Response('foo'), $event->getResponse());
+
+            try {
+                $l->logKernelException($event2);
+                $l->onKernelException($event2);
+                $this->fail('RuntimeException expected');
+            } catch (\RuntimeException $e) {
+                $this->assertSame('bar', $e->getMessage());
+                $this->assertSame('foo', $e->getPrevious()->getMessage());
+            }
+        } finally {
+            ini_set('error_log', $initialErrorLog);
         }
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testHandleWithLogger($event, $event2)
     {
         $logger = new TestLogger();
@@ -96,7 +97,7 @@ class ErrorListenerTest extends TestCase
         }
 
         $this->assertEquals(3, $logger->countErrors());
-        $logs = $logger->getLogs('critical');
+        $logs = $logger->getLogsForLevel('critical');
         $this->assertCount(3, $logs);
         $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[0]);
         $this->assertStringStartsWith('Uncaught PHP Exception Exception: "foo" at ErrorListenerTest.php line', $logs[1]);
@@ -120,8 +121,8 @@ class ErrorListenerTest extends TestCase
         $this->assertEquals(new Response('foo', 401), $event->getResponse());
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('critical'));
-        $this->assertCount(1, $logger->getLogs('warning'));
+        $this->assertCount(0, $logger->getLogsForLevel('critical'));
+        $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
     public function testHandleWithLogLevelAttribute()
@@ -135,8 +136,65 @@ class ErrorListenerTest extends TestCase
         $l->onKernelException($event);
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('critical'));
-        $this->assertCount(1, $logger->getLogs('warning'));
+        $this->assertCount(0, $logger->getLogsForLevel('critical'));
+        $this->assertCount(1, $logger->getLogsForLevel('warning'));
+    }
+
+    public function testHandleWithLogChannel()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
+
+        $defaultLogger = new TestLogger();
+        $channelLoger = new TestLogger();
+
+        $l = new ErrorListener('not used', $defaultLogger, false, [
+            \RuntimeException::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+                'log_channel' => 'channel',
+            ],
+            \Exception::class => [
+                'log_level' => 'error',
+                'status_code' => 402,
+            ],
+        ], ['channel' => $channelLoger]);
+
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertCount(0, $defaultLogger->getLogsForLevel('error'));
+        $this->assertCount(0, $defaultLogger->getLogsForLevel('warning'));
+        $this->assertCount(0, $channelLoger->getLogsForLevel('error'));
+        $this->assertCount(1, $channelLoger->getLogsForLevel('warning'));
+    }
+
+    public function testHandleWithLoggerChannelNotUsed()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
+        $defaultLogger = new TestLogger();
+        $channelLoger = new TestLogger();
+        $l = new ErrorListener('not used', $defaultLogger, false, [
+            \RuntimeException::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+            ],
+            \ErrorException::class => [
+                'log_level' => 'error',
+                'status_code' => 402,
+                'log_channel' => 'channel',
+            ],
+        ], ['channel' => $channelLoger]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertSame(0, $defaultLogger->countErrors());
+        $this->assertCount(0, $defaultLogger->getLogsForLevel('critical'));
+        $this->assertCount(1, $defaultLogger->getLogsForLevel('warning'));
+        $this->assertCount(0, $channelLoger->getLogsForLevel('warning'));
+        $this->assertCount(0, $channelLoger->getLogsForLevel('error'));
+        $this->assertCount(0, $channelLoger->getLogsForLevel('critical'));
     }
 
     public function testHandleClassImplementingInterfaceWithLogLevelAttribute()
@@ -150,8 +208,8 @@ class ErrorListenerTest extends TestCase
         $l->onKernelException($event);
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('critical'));
-        $this->assertCount(1, $logger->getLogs('warning'));
+        $this->assertCount(0, $logger->getLogsForLevel('critical'));
+        $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
     public function testHandleWithLogLevelAttributeAndCustomConfiguration()
@@ -169,13 +227,11 @@ class ErrorListenerTest extends TestCase
         $l->onKernelException($event);
 
         $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('warning'));
-        $this->assertCount(1, $logger->getLogs('info'));
+        $this->assertCount(0, $logger->getLogsForLevel('warning'));
+        $this->assertCount(1, $logger->getLogsForLevel('info'));
     }
 
-    /**
-     * @dataProvider exceptionWithAttributeProvider
-     */
+    #[DataProvider('exceptionWithAttributeProvider')]
     public function testHandleHttpAttribute(\Throwable $exception, int $expectedStatusCode, array $expectedHeaders)
     {
         $request = new Request();
@@ -272,9 +328,7 @@ class ErrorListenerTest extends TestCase
         $listener->onKernelException($event);
     }
 
-    /**
-     * @dataProvider controllerProvider
-     */
+    #[DataProvider('controllerProvider')]
     public function testOnControllerArguments(callable $controller)
     {
         $listener = new ErrorListener($controller, $this->createMock(LoggerInterface::class), true);
@@ -322,6 +376,11 @@ class TestLogger extends Logger implements DebugLoggerInterface
     public function countErrors(?Request $request = null): int
     {
         return \count($this->logs['critical']);
+    }
+
+    public function getLogs(?Request $request = null): array
+    {
+        return [];
     }
 }
 

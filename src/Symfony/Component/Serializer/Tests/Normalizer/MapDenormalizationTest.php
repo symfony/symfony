@@ -187,7 +187,7 @@ class MapDenormalizationTest extends TestCase
 
     private function getSerializer()
     {
-        $loaderMock = new class() implements ClassMetadataFactoryInterface {
+        $loaderMock = new class implements ClassMetadataFactoryInterface {
             public function getMetadataFor($value): ClassMetadataInterface
             {
                 if (AbstractDummyValue::class === $value) {

@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 
 /**
@@ -48,16 +47,16 @@ class DebugAutowiringCommand extends ContainerDebugCommand
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Show also services that are not aliased'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command displays the classes and interfaces that
-you can use as type-hints for autowiring:
+                The <info>%command.name%</info> command displays the classes and interfaces that
+                you can use as type-hints for autowiring:
 
-  <info>php %command.full_name%</info>
+                  <info>php %command.full_name%</info>
 
-You can also pass a search term to filter the list:
+                You can also pass a search term to filter the list:
 
-  <info>php %command.full_name% log</info>
+                  <info>php %command.full_name% log</info>
 
-EOF
+                EOF
             )
         ;
     }
@@ -77,7 +76,7 @@ EOF
             $serviceIds = array_filter($serviceIds, fn ($serviceId) => false !== stripos(str_replace('\\', '', $serviceId), $searchNormalized) && !str_starts_with($serviceId, '.'));
 
             if (!$serviceIds) {
-                $errorIo->error(sprintf('No autowirable classes or interfaces found matching "%s"', $search));
+                $errorIo->error(\sprintf('No autowirable classes or interfaces found matching "%s"', $search));
 
                 return 1;
             }
@@ -96,7 +95,7 @@ EOF
         $io->title('Autowirable Types');
         $io->text('The following classes & interfaces can be used as type-hints when autowiring:');
         if ($search) {
-            $io->text(sprintf('(only showing classes/interfaces matching <comment>%s</comment>)', $search));
+            $io->text(\sprintf('(only showing classes/interfaces matching <comment>%s</comment>)', $search));
         }
         $hasAlias = [];
         $all = $input->getOption('all');
@@ -119,10 +118,10 @@ EOF
                 }
             }
 
-            $serviceLine = sprintf('<fg=yellow>%s</>', $serviceId);
+            $serviceLine = \sprintf('<fg=yellow>%s</>', $serviceId);
             if ('' !== $fileLink = $this->getFileLink($previousId)) {
                 $serviceLine = substr($serviceId, \strlen($previousId));
-                $serviceLine = sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $previousId).('' !== $serviceLine ? sprintf('<fg=yellow>%s</>', $serviceLine) : '');
+                $serviceLine = \sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $previousId).('' !== $serviceLine ? \sprintf('<fg=yellow>%s</>', $serviceLine) : '');
             }
 
             if ($container->hasAlias($serviceId)) {
@@ -137,7 +136,7 @@ EOF
                     }
                     $target = substr($id, \strlen($previousId) + 3);
 
-                    if ($previousId.' $'.(new Target($target))->getParsedName() === $serviceId) {
+                    if ($container->findDefinition($id) === $container->findDefinition($serviceId)) {
                         $serviceLine .= ' - <fg=magenta>target:</><fg=cyan>'.$target.'</>';
                         break;
                     }
@@ -167,7 +166,7 @@ EOF
         $io->newLine();
 
         if (0 < $serviceIdsNb) {
-            $io->text(sprintf('%s more concrete service%s would be displayed when adding the "--all" option.', $serviceIdsNb, $serviceIdsNb > 1 ? 's' : ''));
+            $io->text(\sprintf('%s more concrete service%s would be displayed when adding the "--all" option.', $serviceIdsNb, $serviceIdsNb > 1 ? 's' : ''));
         }
         if ($all) {
             $io->text('Pro-tip: use interfaces in your type-hints instead of classes to benefit from the dependency inversion principle.');
@@ -185,7 +184,7 @@ EOF
             return '';
         }
 
-        return (string) $this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine());
+        return $r->getFileName() ? ($this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine()) ?: '') : '';
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

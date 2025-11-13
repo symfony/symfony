@@ -74,7 +74,7 @@ abstract class Constraint
             return static::ERROR_NAMES[$errorCode];
         }
 
-        throw new InvalidArgumentException(sprintf('The error code "%s" does not exist for constraint of type "%s".', $errorCode, static::class));
+        throw new InvalidArgumentException(\sprintf('The error code "%s" does not exist for constraint of type "%s".', $errorCode, static::class));
     }
 
     /**
@@ -110,6 +110,17 @@ abstract class Constraint
     {
         unset($this->groups); // enable lazy initialization
 
+        if (null === $options && (\func_num_args() > 0 || self::class === (new \ReflectionMethod($this, 'getRequiredOptions'))->getDeclaringClass()->getName())) {
+            if (null !== $groups) {
+                $this->groups = $groups;
+            }
+            $this->payload = $payload;
+
+            return;
+        }
+
+        trigger_deprecation('symfony/validator', '7.4', 'Support for evaluating options in the base Constraint class is deprecated. Initialize properties in the constructor of %s instead.', static::class);
+
         $options = $this->normalizeOptions($options);
         if (null !== $groups) {
             $options['groups'] = $groups;
@@ -121,17 +132,22 @@ abstract class Constraint
         }
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     *
+     * @return array<string, mixed>
+     */
     protected function normalizeOptions(mixed $options): array
     {
         $normalizedOptions = [];
-        $defaultOption = $this->getDefaultOption();
+        $defaultOption = $this->getDefaultOption(false);
         $invalidOptions = [];
-        $missingOptions = array_flip((array) $this->getRequiredOptions());
+        $missingOptions = array_flip($this->getRequiredOptions(false));
         $knownOptions = get_class_vars(static::class);
 
         if (\is_array($options) && isset($options['value']) && !property_exists($this, 'value')) {
             if (null === $defaultOption) {
-                throw new ConstraintDefinitionException(sprintf('No default option is configured for constraint "%s".', static::class));
+                throw new ConstraintDefinitionException(\sprintf('No default option is configured for constraint "%s".', static::class));
             }
 
             $options[$defaultOption] = $options['value'];
@@ -152,7 +168,7 @@ abstract class Constraint
             }
         } elseif (null !== $options && !(\is_array($options) && 0 === \count($options))) {
             if (null === $defaultOption) {
-                throw new ConstraintDefinitionException(sprintf('No default option is configured for constraint "%s".', static::class));
+                throw new ConstraintDefinitionException(\sprintf('No default option is configured for constraint "%s".', static::class));
             }
 
             if (\array_key_exists($defaultOption, $knownOptions)) {
@@ -164,11 +180,11 @@ abstract class Constraint
         }
 
         if (\count($invalidOptions) > 0) {
-            throw new InvalidOptionsException(sprintf('The options "%s" do not exist in constraint "%s".', implode('", "', $invalidOptions), static::class), $invalidOptions);
+            throw new InvalidOptionsException(\sprintf('The options "%s" do not exist in constraint "%s".', implode('", "', $invalidOptions), static::class), $invalidOptions);
         }
 
         if (\count($missingOptions) > 0) {
-            throw new MissingOptionsException(sprintf('The options "%s" must be set for constraint "%s".', implode('", "', array_keys($missingOptions)), static::class), array_keys($missingOptions));
+            throw new MissingOptionsException(\sprintf('The options "%s" must be set for constraint "%s".', implode('", "', array_keys($missingOptions)), static::class), array_keys($missingOptions));
         }
 
         return $normalizedOptions;
@@ -191,7 +207,7 @@ abstract class Constraint
             return;
         }
 
-        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint "%s".', $option, static::class), [$option]);
+        throw new InvalidOptionsException(\sprintf('The option "%s" does not exist in constraint "%s".', $option, static::class), [$option]);
     }
 
     /**
@@ -211,7 +227,7 @@ abstract class Constraint
             return $this->groups;
         }
 
-        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint "%s".', $option, static::class), [$option]);
+        throw new InvalidOptionsException(\sprintf('The option "%s" does not exist in constraint "%s".', $option, static::class), [$option]);
     }
 
     public function __isset(string $option): bool
@@ -225,7 +241,7 @@ abstract class Constraint
     public function addImplicitGroupName(string $group): void
     {
         if (null === $this->groups && \array_key_exists('groups', (array) $this)) {
-            throw new \LogicException(sprintf('"%s::$groups" is set to null. Did you forget to call "%s::__construct()"?', static::class, self::class));
+            throw new \LogicException(\sprintf('"%s::$groups" is set to null. Did you forget to call "%s::__construct()"?', static::class, self::class));
         }
 
         if (\in_array(self::DEFAULT_GROUP, $this->groups) && !\in_array($group, $this->groups, true)) {
@@ -238,10 +254,15 @@ abstract class Constraint
      *
      * Override this method to define a default option.
      *
+     * @deprecated since Symfony 7.4
      * @see __construct()
      */
     public function getDefaultOption(): ?string
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return null;
     }
 
@@ -252,10 +273,15 @@ abstract class Constraint
      *
      * @return string[]
      *
+     * @deprecated since Symfony 7.4
      * @see __construct()
      */
     public function getRequiredOptions(): array
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
+        }
+
         return [];
     }
 
@@ -275,10 +301,7 @@ abstract class Constraint
      * Returns whether the constraint can be put onto classes, properties or
      * both.
      *
-     * This method should return one or more of the constants
-     * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
-     *
-     * @return string|string[] One or more constant values
+     * @return self::CLASS_CONSTRAINT|self::PROPERTY_CONSTRAINT|array<self::CLASS_CONSTRAINT|self::PROPERTY_CONSTRAINT>
      */
     public function getTargets(): string|array
     {
@@ -287,14 +310,23 @@ abstract class Constraint
 
     /**
      * Optimizes the serialized value to minimize storage space.
-     *
-     * @internal
      */
-    public function __sleep(): array
+    public function __serialize(): array
     {
         // Initialize "groups" option if it is not set
         $this->groups;
 
-        return array_keys(get_object_vars($this));
+        $data = [];
+        $class = $this::class;
+        foreach ((array) $this as $k => $v) {
+            $data[match (true) {
+                '' === $k || "\0" !== $k[0] => $k,
+                str_starts_with($k, "\0*\0") => substr($k, 3),
+                str_starts_with($k, "\0{$class}\0") => substr($k, 2 + \strlen($class)),
+                default => $k,
+            }] = $v;
+        }
+
+        return $data;
     }
 }

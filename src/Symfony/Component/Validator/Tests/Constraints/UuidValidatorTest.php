@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Uuid;
 use Symfony\Component\Validator\Constraints\UuidValidator;
@@ -44,7 +45,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsUuidConstraintCompatibleType()
     {
-        $constraint = $this->getMockForAbstractClass(Constraint::class);
+        $constraint = $this->createStub(Constraint::class);
 
         $this->expectException(UnexpectedTypeException::class);
 
@@ -57,9 +58,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Uuid());
     }
 
-    /**
-     * @dataProvider getValidStrictUuids
-     */
+    #[DataProvider('getValidStrictUuids')]
     public function testValidStrictUuids($uuid, $versions = null)
     {
         $constraint = new Uuid();
@@ -88,12 +87,10 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getValidStrictUuidsWithWhitespaces
-     */
+    #[DataProvider('getValidStrictUuidsWithWhitespaces')]
     public function testValidStrictUuidsWithWhitespaces($uuid, $versions = null)
     {
-        $constraint = new Uuid(['normalizer' => 'trim']);
+        $constraint = new Uuid(normalizer: 'trim');
 
         if (null !== $versions) {
             $constraint->versions = $versions;
@@ -126,14 +123,10 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getInvalidStrictUuids
-     */
+    #[DataProvider('getInvalidStrictUuids')]
     public function testInvalidStrictUuids($uuid, $code, $versions = null)
     {
-        $constraint = new Uuid([
-            'message' => 'testMessage',
-        ]);
+        $constraint = new Uuid(message: 'testMessage');
 
         if (null !== $versions) {
             $constraint->versions = $versions;
@@ -190,14 +183,10 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getValidNonStrictUuids
-     */
+    #[DataProvider('getValidNonStrictUuids')]
     public function testValidNonStrictUuids($uuid)
     {
-        $constraint = new Uuid([
-            'strict' => false,
-        ]);
+        $constraint = new Uuid(strict: false);
 
         $this->validator->validate($uuid, $constraint);
 
@@ -221,15 +210,13 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidNonStrictUuids
-     */
+    #[DataProvider('getInvalidNonStrictUuids')]
     public function testInvalidNonStrictUuids($uuid, $code)
     {
-        $constraint = new Uuid([
-            'strict' => false,
-            'message' => 'myMessage',
-        ]);
+        $constraint = new Uuid(
+            strict: false,
+            message: 'myMessage',
+        );
 
         $this->validator->validate($uuid, $constraint);
 
@@ -265,14 +252,10 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getUuidForTimeBasedAssertions
-     */
+    #[DataProvider('getUuidForTimeBasedAssertions')]
     public function testTimeBasedUuid(string $uid, bool $expectedTimeBased)
     {
-        $constraint = new Uuid([
-            'versions' => Uuid::TIME_BASED_VERSIONS,
-        ]);
+        $constraint = new Uuid(versions: Uuid::TIME_BASED_VERSIONS);
 
         $this->validator->validate($uid, $constraint);
 

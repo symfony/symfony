@@ -12,10 +12,13 @@
 namespace Symfony\Component\Notifier\Bridge\Mailjet\Tests;
 
 use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
-final class MailjetTransportFactoryTest extends TransportFactoryTestCase
+final class MailjetTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function createFactory(): MailjetTransportFactory
     {
         return new MailjetTransportFactory();

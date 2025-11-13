@@ -37,15 +37,13 @@ final class Node implements NodeInterface
         'wbr' => true,
     ];
 
-    private NodeInterface $parent;
-    private string $tagName;
     private array $attributes = [];
     private array $children = [];
 
-    public function __construct(NodeInterface $parent, string $tagName)
-    {
-        $this->parent = $parent;
-        $this->tagName = $tagName;
+    public function __construct(
+        private NodeInterface $parent,
+        private string $tagName,
+    ) {
     }
 
     public function getParent(): ?NodeInterface
@@ -58,10 +56,10 @@ final class Node implements NodeInterface
         return $this->attributes[$name] ?? null;
     }
 
-    public function setAttribute(string $name, ?string $value): void
+    public function setAttribute(string $name, ?string $value, bool $override = false): void
     {
         // Always use only the first declaration (ease sanitization)
-        if (!\array_key_exists($name, $this->attributes)) {
+        if ($override || !\array_key_exists($name, $this->attributes)) {
             $this->attributes[$name] = $value;
         }
     }

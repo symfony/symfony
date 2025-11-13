@@ -24,7 +24,7 @@ class TestBundle extends Bundle
     {
         parent::build($container);
 
-        /** @var $extension DependencyInjection\TestExtension */
+        /** @var DependencyInjection\TestExtension $extension */
         $extension = $container->getExtension('test');
 
         if (!$container->getParameterBag() instanceof FrozenParameterBag) {

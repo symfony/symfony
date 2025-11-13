@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 class AbstractDummyFirstChild extends AbstractDummy
 {
     public $bar;
+    public $baz;
 
     /** @var DummyFirstChildQuux|null */
     public $quux;

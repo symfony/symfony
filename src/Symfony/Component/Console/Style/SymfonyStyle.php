@@ -21,6 +21,9 @@ use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
+use Symfony\Component\Console\Helper\TreeHelper;
+use Symfony\Component\Console\Helper\TreeNode;
+use Symfony\Component\Console\Helper\TreeStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
@@ -73,8 +76,8 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependBlock();
         $this->writeln([
-            sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
-            sprintf('<comment>%s</>', str_repeat('=', Helper::width(Helper::removeDecoration($this->getFormatter(), $message)))),
+            \sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
+            \sprintf('<comment>%s</>', str_repeat('=', Helper::width(Helper::removeDecoration($this->getFormatter(), $message)))),
         ]);
         $this->newLine();
     }
@@ -83,8 +86,8 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependBlock();
         $this->writeln([
-            sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
-            sprintf('<comment>%s</>', str_repeat('-', Helper::width(Helper::removeDecoration($this->getFormatter(), $message)))),
+            \sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
+            \sprintf('<comment>%s</>', str_repeat('-', Helper::width(Helper::removeDecoration($this->getFormatter(), $message)))),
         ]);
         $this->newLine();
     }
@@ -92,7 +95,7 @@ class SymfonyStyle extends OutputStyle
     public function listing(array $elements): void
     {
         $this->autoPrependText();
-        $elements = array_map(fn ($element) => sprintf(' * %s', $element), $elements);
+        $elements = array_map(fn ($element) => \sprintf(' * %s', $element), $elements);
 
         $this->writeln($elements);
         $this->newLine();
@@ -104,7 +107,7 @@ class SymfonyStyle extends OutputStyle
 
         $messages = \is_array($message) ? array_values($message) : [$message];
         foreach ($messages as $message) {
-            $this->writeln(sprintf(' %s', $message));
+            $this->writeln(\sprintf(' %s', $message));
         }
     }
 
@@ -369,6 +372,24 @@ class SymfonyStyle extends OutputStyle
             ?? throw new RuntimeException('The ProgressBar is not started.');
     }
 
+    /**
+     * @param iterable<string, iterable|string|TreeNode> $nodes
+     */
+    public function tree(iterable $nodes, string $root = ''): void
+    {
+        $this->createTree($nodes, $root)->render();
+    }
+
+    /**
+     * @param iterable<string, iterable|string|TreeNode> $nodes
+     */
+    public function createTree(iterable $nodes, string $root = ''): TreeHelper
+    {
+        $output = $this->output instanceof ConsoleOutputInterface ? $this->output->section() : $this->output;
+
+        return TreeHelper::createTree($output, $root, $nodes, TreeStyle::default());
+    }
+
     private function autoPrependBlock(): void
     {
         $chars = substr(str_replace(\PHP_EOL, "\n", $this->bufferedOutput->fetch()), -2);
@@ -404,7 +425,7 @@ class SymfonyStyle extends OutputStyle
         $lines = [];
 
         if (null !== $type) {
-            $type = sprintf('[%s] ', $type);
+            $type = \sprintf('[%s] ', $type);
             $indentLength = Helper::width($type);
             $lineIndentation = str_repeat(' ', $indentLength);
         }
@@ -446,7 +467,7 @@ class SymfonyStyle extends OutputStyle
             $line .= str_repeat(' ', max($this->lineLength - Helper::width(Helper::removeDecoration($this->getFormatter(), $line)), 0));
 
             if ($style) {
-                $line = sprintf('<%s>%s</>', $style, $line);
+                $line = \sprintf('<%s>%s</>', $style, $line);
             }
         }
 

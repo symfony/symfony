@@ -1,0 +1,16 @@
+{
+    "events": [
+        {
+            "event": "delivery",
+            "category": "Password reset",
+            "custom_variables": {
+                "variable_a": "value",
+                "variable_b": "value2"
+            },
+            "message_id": "00000000-0000-0000-0000-000000000000",
+            "email": "receiver@example.com",
+            "timestamp": 1726358034,
+            "event_id": "bede7236-2284-43d6-a953-1fdcafd0fdbc"
+        }
+    ]
+}

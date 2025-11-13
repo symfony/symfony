@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FormField;
@@ -67,10 +68,9 @@ class FormTest extends TestCase
     }
 
     /**
-     * @dataProvider constructorThrowsExceptionIfNoRelatedFormProvider
-     *
      * __construct() should throw a \LogicException if the form attribute is invalid.
      */
+    #[DataProvider('constructorThrowsExceptionIfNoRelatedFormProvider')]
     public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement $node)
     {
         $this->expectException(\LogicException::class);
@@ -197,9 +197,7 @@ class FormTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideInitializeValues
-     */
+    #[DataProvider('provideInitializeValues')]
     public function testConstructor($message, $form, $values)
     {
         $form = $this->createForm('<form>'.$form.'</form>');
@@ -252,7 +250,7 @@ class FormTest extends TestCase
                 'appends the submitted button value but not other submit buttons',
                 '<input type="submit" name="bar" value="bar" />
                  <input type="submit" name="foobar" value="foobar" />',
-                 ['foobar' => ['InputFormField', 'foobar']],
+                ['foobar' => ['InputFormField', 'foobar']],
             ],
             [
                 'turns an image input into x and y fields',
@@ -263,38 +261,38 @@ class FormTest extends TestCase
                 'returns textareas',
                 '<textarea name="foo">foo</textarea>
                  <input type="submit" />',
-                 ['foo' => ['TextareaFormField', 'foo']],
+                ['foo' => ['TextareaFormField', 'foo']],
             ],
             [
                 'returns inputs',
                 '<input type="text" name="foo" value="foo" />
                  <input type="submit" />',
-                 ['foo' => ['InputFormField', 'foo']],
+                ['foo' => ['InputFormField', 'foo']],
             ],
             [
                 'returns checkboxes',
                 '<input type="checkbox" name="foo" value="foo" checked="checked" />
                  <input type="submit" />',
-                 ['foo' => ['ChoiceFormField', 'foo']],
+                ['foo' => ['ChoiceFormField', 'foo']],
             ],
             [
                 'returns not-checked checkboxes',
                 '<input type="checkbox" name="foo" value="foo" />
                  <input type="submit" />',
-                 ['foo' => ['ChoiceFormField', false]],
+                ['foo' => ['ChoiceFormField', false]],
             ],
             [
                 'returns radio buttons',
                 '<input type="radio" name="foo" value="foo" />
                  <input type="radio" name="foo" value="bar" checked="bar" />
                  <input type="submit" />',
-                 ['foo' => ['ChoiceFormField', 'bar']],
+                ['foo' => ['ChoiceFormField', 'bar']],
             ],
             [
                 'returns file inputs',
                 '<input type="file" name="foo" />
                  <input type="submit" />',
-                 ['foo' => ['FileFormField', ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]],
+                ['foo' => ['FileFormField', ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]],
             ],
         ];
     }
@@ -515,9 +513,7 @@ class FormTest extends TestCase
         $this->assertEquals(['size' => ['error' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]], $form->getPhpFiles(), '->getPhpFiles() int conversion does not collide with file names');
     }
 
-    /**
-     * @dataProvider provideGetUriValues
-     */
+    #[DataProvider('provideGetUriValues')]
     public function testGetUri($message, $form, $values, $uri, $method = null)
     {
         $form = $this->createForm($form, $method);
@@ -830,7 +826,7 @@ class FormTest extends TestCase
             3 => 3,
             'bar' => [
                 'baz' => 'fbb',
-             ],
+            ],
         ]);
     }
 

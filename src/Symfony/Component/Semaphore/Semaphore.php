@@ -39,12 +39,12 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
     ) {
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -79,7 +79,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         } catch (\Exception $e) {
             $this->logger?->notice('Failed to acquire the "{resource}" semaphore.', ['resource' => $this->key, 'exception' => $e]);
 
-            throw new RuntimeException(sprintf('Failed to acquire the "%s" semaphore.', $this->key), 0, $e);
+            throw new RuntimeException(\sprintf('Failed to acquire the "%s" semaphore.', $this->key), 0, $e);
         }
     }
 
@@ -105,7 +105,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         } catch (\Exception $e) {
             $this->logger?->notice('Failed to define an expiration for the "{resource}" semaphore.', ['resource' => $this->key, 'exception' => $e]);
 
-            throw new RuntimeException(sprintf('Failed to define an expiration for the "%s" semaphore.', $this->key), 0, $e);
+            throw new RuntimeException(\sprintf('Failed to define an expiration for the "%s" semaphore.', $this->key), 0, $e);
         }
     }
 
@@ -124,7 +124,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         } catch (\Exception $e) {
             $this->logger?->notice('Failed to release the "{resource}" semaphore.', ['resource' => $this->key]);
 
-            throw new RuntimeException(sprintf('Failed to release the "%s" semaphore.', $this->key), 0, $e);
+            throw new RuntimeException(\sprintf('Failed to release the "%s" semaphore.', $this->key), 0, $e);
         }
     }
 

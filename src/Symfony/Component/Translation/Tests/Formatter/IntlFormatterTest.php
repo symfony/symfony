@@ -11,18 +11,17 @@
 
 namespace Symfony\Component\Translation\Tests\Formatter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Formatter\IntlFormatter;
 use Symfony\Component\Translation\Formatter\IntlFormatterInterface;
 
-/**
- * @requires extension intl
- */
-class IntlFormatterTest extends \PHPUnit\Framework\TestCase
+#[RequiresPhpExtension('intl')]
+class IntlFormatterTest extends TestCase
 {
-    /**
-     * @dataProvider provideDataForFormat
-     */
+    #[DataProvider('provideDataForFormat')]
     public function testFormat($expected, $message, $arguments)
     {
         $this->assertEquals($expected, trim((new IntlFormatter())->formatIntl($message, 'en', $arguments)));
@@ -41,23 +40,23 @@ class IntlFormatterTest extends \PHPUnit\Framework\TestCase
         }
 
         $chooseMessage = <<<'_MSG_'
-{gender_of_host, select,
-  female {{num_guests, plural, offset:1
-      =0 {{host} does not give a party.}
-      =1 {{host} invites {guest} to her party.}
-      =2 {{host} invites {guest} and one other person to her party.}
-     other {{host} invites {guest} as one of the # people invited to her party.}}}
-  male   {{num_guests, plural, offset:1
-      =0 {{host} does not give a party.}
-      =1 {{host} invites {guest} to his party.}
-      =2 {{host} invites {guest} and one other person to his party.}
-     other {{host} invites {guest} as one of the # people invited to his party.}}}
-  other {{num_guests, plural, offset:1
-      =0 {{host} does not give a party.}
-      =1 {{host} invites {guest} to their party.}
-      =2 {{host} invites {guest} and one other person to their party.}
-     other {{host} invites {guest} as one of the # people invited to their party.}}}}
-_MSG_;
+            {gender_of_host, select,
+              female {{num_guests, plural, offset:1
+                  =0 {{host} does not give a party.}
+                  =1 {{host} invites {guest} to her party.}
+                  =2 {{host} invites {guest} and one other person to her party.}
+                 other {{host} invites {guest} as one of the # people invited to her party.}}}
+              male   {{num_guests, plural, offset:1
+                  =0 {{host} does not give a party.}
+                  =1 {{host} invites {guest} to his party.}
+                  =2 {{host} invites {guest} and one other person to his party.}
+                 other {{host} invites {guest} as one of the # people invited to his party.}}}
+              other {{num_guests, plural, offset:1
+                  =0 {{host} does not give a party.}
+                  =1 {{host} invites {guest} to their party.}
+                  =2 {{host} invites {guest} and one other person to their party.}
+                 other {{host} invites {guest} as one of the # people invited to their party.}}}}
+            _MSG_;
 
         $message = (new IntlFormatter())->formatIntl($chooseMessage, 'en', [
             'gender_of_host' => 'male',
@@ -90,14 +89,12 @@ _MSG_;
         ];
     }
 
-    /**
-     * @dataProvider percentAndBracketsAreTrimmedProvider
-     */
-    public function testPercentsAndBracketsAreTrimmed(string $expected, string $message, array $paramters)
+    #[DataProvider('percentAndBracketsAreTrimmedProvider')]
+    public function testPercentsAndBracketsAreTrimmed(string $expected, string $message, array $parameters)
     {
         $formatter = new IntlFormatter();
         $this->assertInstanceof(IntlFormatterInterface::class, $formatter);
-        $this->assertSame($expected, $formatter->formatIntl($message, 'en', $paramters));
+        $this->assertSame($expected, $formatter->formatIntl($message, 'en', $parameters));
     }
 
     public static function percentAndBracketsAreTrimmedProvider(): array

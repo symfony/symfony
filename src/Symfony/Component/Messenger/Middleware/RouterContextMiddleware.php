@@ -23,17 +23,16 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  */
 class RouterContextMiddleware implements MiddlewareInterface
 {
-    private RequestContextAwareInterface $router;
-
-    public function __construct(RequestContextAwareInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        private RequestContextAwareInterface $router,
+    ) {
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
+        $context = $this->router->getContext();
+
         if (!$envelope->last(ConsumedByWorkerStamp::class) || !$contextStamp = $envelope->last(RouterContextStamp::class)) {
-            $context = $this->router->getContext();
             $envelope = $envelope->with(new RouterContextStamp(
                 $context->getBaseUrl(),
                 $context->getMethod(),
@@ -48,7 +47,6 @@ class RouterContextMiddleware implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $context = $this->router->getContext();
         $currentBaseUrl = $context->getBaseUrl();
         $currentMethod = $context->getMethod();
         $currentHost = $context->getHost();
@@ -58,7 +56,6 @@ class RouterContextMiddleware implements MiddlewareInterface
         $currentPathInfo = $context->getPathInfo();
         $currentQueryString = $context->getQueryString();
 
-        /* @var RouterContextStamp $contextStamp */
         $context
             ->setBaseUrl($contextStamp->getBaseUrl())
             ->setMethod($contextStamp->getMethod())

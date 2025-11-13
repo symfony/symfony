@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -34,9 +35,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->userProvider = new InMemoryUserProvider();
     }
 
-    /**
-     * @dataProvider provideSupportData
-     */
+    #[DataProvider('provideSupportData')]
     public function testSupport($request)
     {
         $this->setUpAuthenticator();
@@ -53,9 +52,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [$request];
     }
 
-    /**
-     * @dataProvider provideSupportsWithCheckPathData
-     */
+    #[DataProvider('provideSupportsWithCheckPathData')]
     public function testSupportsWithCheckPath($request, $result)
     {
         $this->setUpAuthenticator(['check_path' => '/api/login']);
@@ -90,9 +87,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
     }
 
-    /**
-     * @dataProvider provideInvalidAuthenticateData
-     */
+    #[DataProvider('provideInvalidAuthenticateData')]
     public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType = BadRequestHttpException::class)
     {
         $this->setUpAuthenticator();
@@ -127,7 +122,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [$request, 'The key "password" must be a non-empty string.'];
 
         $username = str_repeat('x', UserBadge::MAX_USERNAME_LENGTH + 1);
-        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": "foo"}', $username));
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], \sprintf('{"username": "%s", "password": "foo"}', $username));
         yield [$request, 'Username too long.', BadCredentialsException::class];
     }
 
@@ -156,7 +151,7 @@ class JsonLoginAuthenticatorTest extends TestCase
     {
         $this->setUpAuthenticator();
 
-        $response = $this->authenticator->onAuthenticationFailure(new Request(), new class() extends AuthenticationException {
+        $response = $this->authenticator->onAuthenticationFailure(new Request(), new class extends AuthenticationException {
             public function getMessageData(): array
             {
                 return ['%failed_attempts%' => 3];

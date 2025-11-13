@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -25,9 +26,7 @@ use Symfony\Component\AssetMapper\MappedAsset;
 
 class JavaScriptImportPathCompilerTest extends TestCase
 {
-    /**
-     * @dataProvider provideCompileTests
-     */
+    #[DataProvider('provideCompileTests')]
     public function testCompileFindsCorrectImports(string $input, array $expectedJavaScriptImports)
     {
         $asset = new MappedAsset('app.js', '/project/assets/app.js', publicPathWithoutDigest: '/assets/app.js');
@@ -49,7 +48,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                 return match ($path) {
                     './vendor/module_in_importmap_remote.js' => '/project/assets/vendor/module_in_importmap_remote.js',
                     '/project/assets/vendor/@popperjs/core.js' => '/project/assets/vendor/@popperjs/core.js',
-                    default => throw new \RuntimeException(sprintf('Unexpected path "%s"', $path)),
+                    default => throw new \RuntimeException(\sprintf('Unexpected path "%s"', $path)),
                 };
             });
 
@@ -95,18 +94,18 @@ class JavaScriptImportPathCompilerTest extends TestCase
     {
         yield 'standard_symfony_app_js' => [
             'input' => <<<EOF
-            import './bootstrap.js';
+                import './bootstrap.js';
 
-            /*
-             * Welcome to your app's main JavaScript file!
-             *
-             * This file will be included onto the page via the importmap() Twig function,
-             * which should already be in your base.html.twig.
-             */
-            import './styles/app.css';
+                /*
+                 * Welcome to your app's main JavaScript file!
+                 *
+                 * This file will be included onto the page via the importmap() Twig function,
+                 * which should already be in your base.html.twig.
+                 */
+                import './styles/app.css';
 
-            console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
-            EOF,
+                console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+                EOF,
             'expectedJavaScriptImports' => [
                 '/assets/bootstrap.js' => ['lazy' => false, 'asset' => 'bootstrap.js', 'add' => true],
                 '/assets/styles/app.css' => ['lazy' => false, 'asset' => 'styles/app.css', 'add' => true],
@@ -122,8 +121,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 import("./other.js");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
@@ -169,6 +167,21 @@ class JavaScriptImportPathCompilerTest extends TestCase
 
         yield 'static_default_and_named_import' => [
             'input' => 'import myFunction, { helperFunction } from "./other.js";',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'static_named_import_with_unicode_character' => [
+            'input' => 'import { ɵmyFunction } from "./other.js";',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'static_multiple_named_imports' => [
+            'input' => <<<EOF
+                import {
+                    myFunction,
+                    helperFunction
+                } from "./other.js";
+                EOF,
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
@@ -224,8 +237,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 // import("./other.js");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => [],
         ];
 
@@ -233,8 +245,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                  // import("./other.js");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => [],
         ];
 
@@ -242,8 +253,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 // this is not going to be parsed import("./other.js");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => [],
         ];
 
@@ -251,8 +261,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 console.log('// I am not really a comment'); import("./other.js");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
@@ -260,8 +269,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 /* comment */ import("./other.js");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
@@ -269,18 +277,8 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                     /* comment import("./other.js"); */
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => [],
-        ];
-
-        yield 'multi_line_comment_with_no_end_parsed_for_safety' => [
-            'input' => <<<EOF
-                const fun;
-                    /* comment import("./other.js");
-                EOF
-            ,
-            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
         yield 'multi_line_comment_with_no_end_found_eventually_ignored' => [
@@ -289,8 +287,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     /* comment import("./other.js");
                     and more
                     */
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => [],
         ];
 
@@ -298,8 +295,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                     console.log('/* not a comment'); import("./other.js");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
@@ -307,8 +303,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 console.log("import('./foo.js')");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => [],
         ];
 
@@ -316,8 +311,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 console.log(" foo \" import('./foo.js')");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => [],
         ];
 
@@ -325,8 +319,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 console.log('import("./foo.js")');
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => [],
         ];
 
@@ -334,8 +327,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 console.log("import('./other.js')"); import("./foo.js");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => ['/assets/foo.js' => ['lazy' => true, 'asset' => 'foo.js', 'add' => true]],
         ];
 
@@ -343,8 +335,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 import("./other.js"); console.log("import('./foo.js')");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true]],
         ];
 
@@ -352,8 +343,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'input' => <<<EOF
                 const fun;
                 import("./other.js"); console.log("import('./foo.js')"); import("./subdir/foo.js");
-                EOF
-            ,
+                EOF,
             'expectedJavaScriptImports' => [
                 '/assets/other.js' => ['lazy' => true, 'asset' => 'other.js', 'add' => true],
                 '/assets/subdir/foo.js' => ['lazy' => true, 'asset' => 'subdir/foo.js', 'add' => true],
@@ -398,7 +388,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     '/project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
                     '/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
                     '/project/root_asset.js' => new MappedAsset('root_asset.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/root_asset.js'),
-                    default => throw new \RuntimeException(sprintf('Unexpected source path "%s"', $path)),
+                    default => throw new \RuntimeException(\sprintf('Unexpected source path "%s"', $path)),
                 };
             });
 
@@ -431,7 +421,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
                     'C://project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
                     'C://project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
                     'C://project/root_asset.js' => new MappedAsset('root_asset.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/root_asset.js'),
-                    default => throw new \RuntimeException(sprintf('Unexpected source path "%s"', $path)),
+                    default => throw new \RuntimeException(\sprintf('Unexpected source path "%s"', $path)),
                 };
             });
 
@@ -449,9 +439,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame('root_asset.js', $inputAsset->getJavaScriptImports()[2]->assetLogicalPath);
     }
 
-    /**
-     * @dataProvider providePathsCanUpdateTests
-     */
+    #[DataProvider('providePathsCanUpdateTests')]
     public function testImportPathsCanUpdateForDifferentPublicPath(string $input, string $inputAssetPublicPath, string $importedPublicPath, string $expectedOutput)
     {
         $asset = new MappedAsset('app.js', '/path/to/assets/app.js', publicPathWithoutDigest: $inputAssetPublicPath);
@@ -558,9 +546,35 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame($popperAsset->logicalPath, $bootstrapAsset->getJavaScriptImports()[0]->assetLogicalPath);
     }
 
-    /**
-     * @dataProvider provideMissingImportModeTests
-     */
+    public function testCompileIgnoresSelfReferencingBareImportAssets()
+    {
+        $bootstrapAsset = new MappedAsset('foo.js', 'foo.js', 'foo.js');
+
+        $importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
+        $importMapConfigReader->expects($this->once())
+            ->method('findRootImportMapEntry')
+            ->with('foobar')
+            ->willReturn(ImportMapEntry::createRemote('foobar', ImportMapType::JS, 'foo.js', '1.2.3', 'foobar', false));
+        $importMapConfigReader->expects($this->any())
+            ->method('convertPathToFilesystemPath')
+            ->with('foo.js')
+            ->willReturn('foo.js');
+
+        $assetMapper = $this->createMock(AssetMapperInterface::class);
+        $assetMapper->expects($this->once())
+            ->method('getAssetFromSourcePath')
+            ->with('foo.js')
+            ->willReturn($bootstrapAsset);
+
+        $compiler = new JavaScriptImportPathCompiler($importMapConfigReader);
+        $input = 'import { foo } from "foobar";';
+        $compiler->compile($input, $bootstrapAsset, $assetMapper);
+        $this->assertCount(0, $bootstrapAsset->getDependencies());
+        $this->assertCount(0, $bootstrapAsset->getFileDependencies());
+        $this->assertCount(0, $bootstrapAsset->getJavaScriptImports());
+    }
+
+    #[DataProvider('provideMissingImportModeTests')]
     public function testMissingImportMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage)
     {
         if (null !== $expectedExceptionMessage) {

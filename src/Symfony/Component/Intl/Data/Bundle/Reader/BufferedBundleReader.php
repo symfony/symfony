@@ -20,13 +20,13 @@ use Symfony\Component\Intl\Data\Util\RingBuffer;
  */
 class BufferedBundleReader implements BundleReaderInterface
 {
-    private BundleReaderInterface $reader;
     /** @var RingBuffer<string, mixed> */
     private RingBuffer $buffer;
 
-    public function __construct(BundleReaderInterface $reader, int $bufferSize)
-    {
-        $this->reader = $reader;
+    public function __construct(
+        private BundleReaderInterface $reader,
+        int $bufferSize,
+    ) {
         $this->buffer = new RingBuffer($bufferSize);
     }
 

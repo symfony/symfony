@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add microsecond precision to UUIDv7
+ * Default to `UuidV7` when using `UuidFactory`
+ * Add `MockUuidFactory` to allow deterministic and mockable UUID generation for testing purposes
+
+7.3
+---
+
+ * Add component-specific exception hierarchy
+
+7.2
+---
+
+ * Make `AbstractUid` implement `Ds\Hashable` if available
+ * Add support for binary, base-32 and base-58 representations in `Uuid::isValid()`
+ * Add the `Uuid::FORMAT_RFC_9562` constant to validate UUIDs in the RFC 9562 format
+
 7.1
 ---
 

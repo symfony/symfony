@@ -40,15 +40,15 @@ abstract class AbstractConfigurator
             return $this->{'set'.$method}(...$args);
         }
 
-        throw new \BadMethodCallException(sprintf('Call to undefined method "%s::%s()".', static::class, $method));
+        throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s()".', static::class, $method));
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -92,7 +92,7 @@ abstract class AbstractConfigurator
         }
 
         if ($value instanceof self) {
-            throw new InvalidArgumentException(sprintf('"%s()" can be used only at the root of service configuration files.', $value::FACTORY));
+            throw new InvalidArgumentException(\sprintf('"%s()" can be used only at the root of service configuration files.', $value::FACTORY));
         }
 
         switch (true) {
@@ -100,6 +100,9 @@ abstract class AbstractConfigurator
             case \is_scalar($value):
             case $value instanceof \UnitEnum:
                 return $value;
+
+            case $value instanceof \Closure:
+                return self::processClosure($value);
 
             case $value instanceof ArgumentInterface:
             case $value instanceof Definition:
@@ -112,6 +115,31 @@ abstract class AbstractConfigurator
                 }
         }
 
-        throw new InvalidArgumentException(sprintf('Cannot use values of type "%s" in service configuration files.', get_debug_type($value)));
+        throw new InvalidArgumentException(\sprintf('Cannot use values of type "%s" in service configuration files.', get_debug_type($value)));
+    }
+
+    /**
+     * Converts a named closure to dumpable callable.
+     *
+     * @throws InvalidArgumentException if the closure is anonymous or references a non-static method
+     */
+    private static function processClosure(\Closure $closure): callable
+    {
+        $function = new \ReflectionFunction($closure);
+        if ($function->isAnonymous()) {
+            throw new InvalidArgumentException('Anonymous closure not supported. The closure must be created from a static method or a global function.');
+        }
+
+        // Convert global_function(...) closure into 'global_function'
+        if (!$class = $function->getClosureCalledClass()) {
+            return $function->name;
+        }
+
+        // Convert Class::method(...) closure into ['Class', 'method']
+        if ($function->isStatic()) {
+            return [$class->name, $function->name];
+        }
+
+        throw new InvalidArgumentException(\sprintf('The method "%s::%s(...)" is not static.', $class->name, $function->name));
     }
 }

@@ -41,7 +41,7 @@ class CheckAliasValidityPass implements CompilerPassInterface
 
                 $targetReflection = $container->getReflectionClass($target->getClass());
                 if (null !== $targetReflection && !$targetReflection->implementsInterface($id)) {
-                    throw new RuntimeException(sprintf('Invalid alias definition: alias "%s" is referencing class "%s" but this class does not implement "%s". Because this alias is an interface, "%s" must implement "%s".', $id, $target->getClass(), $id, $target->getClass(), $id));
+                    throw new RuntimeException(\sprintf('Invalid alias definition: alias "%s" is referencing class "%s" but this class does not implement "%s". Because this alias is an interface, "%s" must implement "%s".', $id, $target->getClass(), $id, $target->getClass(), $id));
                 }
             } catch (\ReflectionException) {
                 continue;

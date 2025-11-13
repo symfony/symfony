@@ -23,7 +23,7 @@ class ThrottlingHttpClientTest extends TestCase
     public function testThrottling()
     {
         $failPauseHandler = static function (float $duration) {
-            self::fail(sprintf('The pause handler should\'t have been called, but it was called with %f.', $duration));
+            self::fail(\sprintf('The pause handler should\'t have been called, but it was called with %f.', $duration));
         };
 
         $pauseHandler = static fn (float $expectedDuration) => function (float $duration) use ($expectedDuration) {

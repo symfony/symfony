@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Bridge\Slack\SlackSentMessage;
@@ -165,6 +166,54 @@ final class SlackTransportTest extends TransportTestCase
         $sentMessage = $transport->send($chatMessage);
 
         $this->assertSame('1503435956.000247', $sentMessage->getMessageId());
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testSendWithBooleanOptionValue(bool $value)
+    {
+        $channel = 'testChannel';
+        $message = 'testMessage';
+
+        $response = $this->createMock(ResponseInterface::class);
+
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn(json_encode(['ok' => true, 'ts' => '1503435956.000247', 'channel' => 'C123456']));
+
+        $options = new SlackOptions();
+        $options->asUser($value);
+        $options->linkNames($value);
+        $options->mrkdwn($value);
+        $options->unfurlLinks($value);
+        $options->unfurlMedia($value);
+        $notification = new Notification($message);
+        $chatMessage = ChatMessage::fromNotification($notification);
+        $chatMessage->options($options);
+
+        $expectedBody = json_encode([
+            'as_user' => $value,
+            'channel' => $channel,
+            'link_names' => $value,
+            'mrkdwn' => $value,
+            'text' => $message,
+            'unfurl_links' => $value,
+            'unfurl_media' => $value,
+        ]);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+
+            return $response;
+        });
+
+        $transport = self::createTransport($client, $channel);
+
+        $transport->send($chatMessage);
     }
 
     public function testSendWith200ResponseButNotOk()

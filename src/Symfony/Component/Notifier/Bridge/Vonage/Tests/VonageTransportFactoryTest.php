@@ -12,10 +12,15 @@
 namespace Symfony\Component\Notifier\Bridge\Vonage\Tests;
 
 use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
-use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Test\MissingRequiredOptionTestTrait;
 
-final class VonageTransportFactoryTest extends TransportFactoryTestCase
+final class VonageTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+    use MissingRequiredOptionTestTrait;
+
     public function createFactory(): VonageTransportFactory
     {
         return new VonageTransportFactory();
@@ -44,5 +49,11 @@ final class VonageTransportFactoryTest extends TransportFactoryTestCase
     {
         yield ['somethingElse://apiKey:apiSecret@default?from=0611223344'];
         yield ['somethingElse://apiKey:apiSecret@default']; // missing "from" option
+    }
+
+    public static function incompleteDsnProvider(): iterable
+    {
+        yield ['vonage://:apiSecret@default?from=0611223344'];
+        yield ['vonage://apiKey:@default?from=0611223344'];
     }
 }

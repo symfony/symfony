@@ -27,7 +27,7 @@ class CustomExpressionLanguageFunctionTest extends TestCase
             ->setPublic(true)
             ->setArguments([new Expression('custom_func("foobar")')]);
 
-        $container->addExpressionLanguageProvider(new class() implements ExpressionFunctionProviderInterface {
+        $container->addExpressionLanguageProvider(new class implements ExpressionFunctionProviderInterface {
             public function getFunctions(): array
             {
                 return [

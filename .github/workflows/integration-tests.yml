@@ -19,7 +19,7 @@ jobs:
 
   tests:
     name: Integration
-    runs-on: Ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -28,13 +28,13 @@ jobs:
 
     services:
       postgres:
-        image: postgres:10.6-alpine
+        image: postgres:16-alpine
         ports:
           - 5432:5432
         env:
           POSTGRES_PASSWORD: 'password'
       ldap:
-        image: bitnami/openldap
+        image: bitnamilegacy/openldap
         ports:
           - 3389:3389
         env:
@@ -44,6 +44,13 @@ jobs:
           LDAP_PORT_NUMBER: 3389
           LDAP_USERS: a
           LDAP_PASSWORDS: a
+      ftp:
+        image: onekilo79/ftpd_test
+        ports:
+          - 21:21
+          - 30000-30009:30000-30009
+        volumes:
+          - ./:/hostmount
       redis:
         image: redis:6.2.8
         ports:
@@ -67,13 +74,33 @@ jobs:
         env:
           STANDALONE: 1
       redis-sentinel:
-        image: bitnami/redis-sentinel:6.2.8
+        image: bitnamilegacy/redis-sentinel:6.2.8
         ports:
           - 26379:26379
         env:
           REDIS_MASTER_HOST: redis
           REDIS_MASTER_SET: redis_sentinel
           REDIS_SENTINEL_QUORUM: 1
+      redis-primary:
+        image: bitnamilegacy/redis:latest
+        ports:
+          - 16381:6379
+        env:
+          ALLOW_EMPTY_PASSWORD: "yes"
+          REDIS_REPLICATION_MODE: "master"
+        options: >-
+          --name=redis-primary
+      redis-replica:
+        image: bitnamilegacy/redis:latest
+        ports:
+          - 16382:6379
+        env:
+          ALLOW_EMPTY_PASSWORD: "yes"
+          REDIS_REPLICATION_MODE: "slave"
+          REDIS_MASTER_HOST: redis-primary
+          REDIS_MASTER_PORT_NUMBER: "6379"
+        options: >-
+          --name=redis-replica
       memcached:
         image: memcached:1.6.5
         ports:
@@ -94,42 +121,58 @@ jobs:
           - 8093:8093
           - 8094:8094
           - 11210:11210
-      sqs:
+      aws:
         image: localstack/localstack:3.0.2
         ports:
           - 4566:4566
       zookeeper:
-        image: wurstmeister/zookeeper:3.4.6
+        image: zookeeper
       kafka:
-        image: wurstmeister/kafka:2.12-2.0.1
+        image: bitnamilegacy/kafka:3.7
         ports:
           - 9092:9092
         env:
-          KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
-          KAFKA_CREATE_TOPICS: 'test-topic:1:1:compact'
-          KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-          KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-          KAFKA_ADVERTISED_PORT: 9092
+          KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: false
+          ALLOW_PLAINTEXT_LISTENER: 'yes'
+          KAFKA_CFG_ADVERTISED_LISTENERS: 'PLAINTEXT://127.0.0.1:9092'
+          KAFKA_CFG_LISTENERS: 'PLAINTEXT://:9092'
+          KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+        options: --name=kafka
       frankenphp:
         image: dunglas/frankenphp:1.1.0
         ports:
           - 80:80
+          - 8681:81
+          - 8682:82
+          - 8683:83
+          - 8684:84
         volumes:
           - ${{ github.workspace }}:/symfony
         env:
-          SERVER_NAME: 'http://localhost'
+          SERVER_NAME: 'http://localhost http://localhost:81 http://localhost:82 http://localhost:83 http://localhost:84'
           CADDY_SERVER_EXTRA_DIRECTIVES: |
+            route /http-client* {
+              root * /symfony/src/Symfony/Component/HttpClient/Tests/Fixtures/response-functional/
+              php_server
+            }
+
             root * /symfony/src/Symfony/Component/HttpFoundation/Tests/Fixtures/response-functional/
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Init Kafka topics
+        run: |
+          docker exec kafka /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic test-topic --bootstrap-server kafka:9092
 
       - name: Install system dependencies
         run: |
           echo "::group::apt-get update"
           sudo wget -O - https://packages.couchbase.com/clients/c/repos/deb/couchbase.key | sudo apt-key add -
-          echo "deb https://packages.couchbase.com/clients/c/repos/deb/ubuntu2004 focal focal/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
+          echo "deb https://packages.couchbase.com/clients/c/repos/deb/ubuntu2404 noble noble/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
           sudo apt-get update
           echo "::endgroup::"
 
@@ -155,6 +198,11 @@ jobs:
           curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
           curl -s -u Administrator:111111@ -X POST http://localhost:8091/pools/default -d 'memoryQuota=256'
 
+      - name: Create FTP fixtures
+        run: |
+          mkdir -p ./ftpusers/test/pub
+          touch ./ftpusers/test/pub/example ./ftpusers/test/readme.txt
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -170,7 +218,7 @@ jobs:
           php -i
 
       - name: Load fixtures
-        uses: docker://bitnami/openldap
+        uses: docker://bitnamilegacy/openldap
         with:
           entrypoint: /bin/bash
           args: -c "(/opt/bitnami/openldap/bin/ldapwhoami -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && /opt/bitnami/openldap/bin/ldapadd -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && /opt/bitnami/openldap/bin/ldapdelete -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"
@@ -190,37 +238,34 @@ jobs:
           ./phpunit install
           echo "::endgroup::"
 
+      - name: Check for changes in translation files
+        id: changed-translation-files
+        run: |
+          echo 'changed='$((git diff --quiet HEAD~1 HEAD -- 'src/**/Resources/translations/*.xlf' || (echo 'true' && exit 1)) && echo 'false') >> $GITHUB_OUTPUT
+
+      - name: Check Translation Status
+        if: steps.changed-translation-files.outputs.changed == 'true'
+        run: |
+          php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v
+          php .github/sync-translations.php
+          git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)
+
       - name: Run tests
-        run: ./phpunit --group integration -v
+        run: ./phpunit --group integration
         env:
+          INTEGRATION_FTP_URL: 'ftp://test:test@localhost'
+          LOCK_DYNAMODB_DSN: "dynamodb://localhost:4566/lock_keys?sslmode=disable"
           REDIS_HOST: 'localhost:16379'
           REDIS_AUTHENTICATED_HOST: 'localhost:16380'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
           REDIS_SENTINEL_HOSTS: 'unreachable-host:26379 localhost:26379 localhost:26379'
           REDIS_SENTINEL_SERVICE: redis_sentinel
+          REDIS_REPLICATION_HOSTS: 'localhost:16382 localhost:16381'
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
+          MESSENGER_REDIS_SENTINEL_MASTER: redis_sentinel
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
           MESSENGER_SQS_DSN: "sqs://localhost:4566/messages?sslmode=disable&poll_timeout=0.01"
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:4566/messages.fifo?sslmode=disable&poll_timeout=0.01"
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
           PGBOUNCER_HOST: localhost:6432
-
-      #- name: Run HTTP push tests
-      #  if: matrix.php == '8.2'
-      #  run: |
-      #    [ -d .phpunit ] && mv .phpunit .phpunit.bak
-      #    wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin
-      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.1-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
-      #    sudo rm -rf .phpunit
-      #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
-
-      - uses: marceloprado/has-changed-path@v1.0.1
-        id: changed-translation-files
-        with:
-          paths: src/**/Resources/translations/*.xlf
-
-      - name: Check Translation Status
-        if: steps.changed-translation-files.outputs.changed == 'true'
-        run: |
-          php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v

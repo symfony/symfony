@@ -17,9 +17,11 @@ use MongoDB\Collection;
 use MongoDB\Database;
 use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\Command;
-use MongoDB\Driver\Exception\WriteException;
+use MongoDB\Driver\Exception\BulkWriteException;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Query;
+use MongoDB\Driver\ReadPreference;
+use MongoDB\Driver\WriteConcern;
 use MongoDB\Exception\DriverRuntimeException;
 use MongoDB\Exception\InvalidArgumentException as MongoInvalidArgumentException;
 use MongoDB\Exception\UnsupportedException;
@@ -58,12 +60,11 @@ class MongoDbStore implements PersistingStoreInterface
     private string $namespace;
     private string $uri;
     private array $options;
-    private float $initialTtl;
 
     /**
-     * @param Collection|Client|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
-     * @param array                            $options    See below
-     * @param float                            $initialTtl The expiration delay of locks in seconds
+     * @param Collection|Database|Client|Manager|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
+     * @param array                                     $options    See below
+     * @param float                                     $initialTtl The expiration delay of locks in seconds
      *
      * @throws InvalidArgumentException If required options are not provided
      * @throws InvalidTtlException      When the initial ttl is not valid
@@ -89,12 +90,16 @@ class MongoDbStore implements PersistingStoreInterface
      * to 0.0 and optionally leverage
      * self::createTtlIndex(int $expireAfterSeconds = 0).
      *
-     * writeConcern and readConcern are not specified by MongoDbStore meaning the connection's settings will take effect.
-     * readPreference is primary for all queries.
+     * readConcern is not specified by MongoDbStore meaning the connection's settings will take effect.
+     * writeConcern is majority for all update queries.
+     * readPreference is primary for all read queries.
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
-    public function __construct(Collection|Database|Client|Manager|string $mongo, array $options = [], float $initialTtl = 300.0)
-    {
+    public function __construct(
+        Collection|Database|Client|Manager|string $mongo,
+        array $options = [],
+        private float $initialTtl = 300.0,
+    ) {
         $this->options = array_merge([
             'gcProbability' => 0.001,
             'database' => null,
@@ -102,8 +107,6 @@ class MongoDbStore implements PersistingStoreInterface
             'uriOptions' => [],
             'driverOptions' => [],
         ], $options);
-
-        $this->initialTtl = $initialTtl;
 
         if ($mongo instanceof Collection) {
             $this->options['database'] ??= $mongo->getDatabaseName();
@@ -121,37 +124,37 @@ class MongoDbStore implements PersistingStoreInterface
         }
 
         if (null === $this->options['database']) {
-            throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
+            throw new InvalidArgumentException(\sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
         }
         if (null === $this->options['collection']) {
-            throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
+            throw new InvalidArgumentException(\sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
         }
         $this->namespace = $this->options['database'].'.'.$this->options['collection'];
 
         if ($this->options['gcProbability'] < 0.0 || $this->options['gcProbability'] > 1.0) {
-            throw new InvalidArgumentException(sprintf('"%s()" gcProbability must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbability']));
+            throw new InvalidArgumentException(\sprintf('"%s()" gcProbability must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbability']));
         }
 
         if ($this->initialTtl <= 0) {
-            throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
+            throw new InvalidTtlException(\sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
         }
     }
 
     /**
      * Extract default database and collection from given connection URI and remove collection querystring.
      *
-     * Non-standard parameters are removed from the URI to improve libmongoc's re-use of connections.
+     * Non-standard parameters are removed from the URI to improve libmongoc's reuse of connections.
      *
-     * @see https://www.php.net/manual/en/mongodb.connection-handling.php
+     * @see https://php.net/mongodb.connection-handling
      */
     private function skimUri(string $uri): string
     {
         if (!str_starts_with($uri, 'mongodb://') && !str_starts_with($uri, 'mongodb+srv://')) {
-            throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
+            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
         }
 
         if (false === $params = parse_url($uri)) {
-            throw new InvalidArgumentException(sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
+            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
         }
         $pathDb = ltrim($params['path'] ?? '', '/') ?: null;
         if (null !== $pathDb) {
@@ -225,7 +228,7 @@ class MongoDbStore implements PersistingStoreInterface
 
         try {
             $this->upsert($key, $this->initialTtl);
-        } catch (WriteException $e) {
+        } catch (BulkWriteException $e) {
             if ($this->isDuplicateKeyException($e)) {
                 throw new LockConflictedException('Lock was acquired by someone else.', 0, $e);
             }
@@ -249,7 +252,7 @@ class MongoDbStore implements PersistingStoreInterface
 
         try {
             $this->upsert($key, $ttl);
-        } catch (WriteException $e) {
+        } catch (BulkWriteException $e) {
             if ($this->isDuplicateKeyException($e)) {
                 throw new LockConflictedException('Failed to put off the expiration of the lock.', 0, $e);
             }
@@ -270,7 +273,11 @@ class MongoDbStore implements PersistingStoreInterface
             ['limit' => 1]
         );
 
-        $this->getManager()->executeBulkWrite($this->namespace, $write);
+        $this->getManager()->executeBulkWrite(
+            $this->namespace,
+            $write,
+            ['writeConcern' => new WriteConcern(WriteConcern::MAJORITY)]
+        );
     }
 
     public function exists(Key $key): bool
@@ -287,7 +294,9 @@ class MongoDbStore implements PersistingStoreInterface
                 'limit' => 1,
                 'projection' => ['_id' => 1],
             ]
-        ));
+        ), [
+            'readPreference' => new ReadPreference(ReadPreference::PRIMARY),
+        ]);
 
         return [] !== $cursor->toArray();
     }
@@ -329,10 +338,14 @@ class MongoDbStore implements PersistingStoreInterface
             ]
         );
 
-        $this->getManager()->executeBulkWrite($this->namespace, $write);
+        $this->getManager()->executeBulkWrite(
+            $this->namespace,
+            $write,
+            ['writeConcern' => new WriteConcern(WriteConcern::MAJORITY)]
+        );
     }
 
-    private function isDuplicateKeyException(WriteException $e): bool
+    private function isDuplicateKeyException(BulkWriteException $e): bool
     {
         $code = $e->getCode();
 
@@ -355,7 +368,7 @@ class MongoDbStore implements PersistingStoreInterface
      */
     private function createMongoDateTime(float $seconds): UTCDateTime
     {
-        return new UTCDateTime($seconds * 1000);
+        return new UTCDateTime((int) ($seconds * 1000));
     }
 
     /**

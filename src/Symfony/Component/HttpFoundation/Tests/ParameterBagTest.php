@@ -206,7 +206,7 @@ class ParameterBagTest extends TestCase
 
     public function testGetString()
     {
-        $bag = new ParameterBag(['integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class() implements \Stringable {
+        $bag = new ParameterBag(['integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class implements \Stringable {
             public function __toString(): string
             {
                 return 'strval';
@@ -219,7 +219,7 @@ class ParameterBagTest extends TestCase
         $this->assertSame('foo', $bag->getString('unknown', 'foo'), '->getString() returns the default if a parameter is not defined');
         $this->assertSame('1', $bag->getString('bool_true'), '->getString() returns "1" if a parameter is true');
         $this->assertSame('', $bag->getString('bool_false', 'foo'), '->getString() returns an empty empty string if a parameter is false');
-        $this->assertSame('strval', $bag->getString('stringable'), '->getString() gets a value of a stringable paramater as string');
+        $this->assertSame('strval', $bag->getString('stringable'), '->getString() gets a value of a stringable parameter as string');
     }
 
     public function testGetStringExceptionWithArray()
@@ -251,9 +251,9 @@ class ParameterBagTest extends TestCase
             'dec' => '256',
             'hex' => '0x100',
             'array' => ['bang'],
-            ]);
+        ]);
 
-        $this->assertEmpty($bag->filter('nokey'), '->filter() should return empty by default if no key is found');
+        $this->assertSame('', $bag->filter('nokey'), '->filter() should return empty by default if no key is found');
 
         $this->assertEquals('0123', $bag->filter('digits', '', \FILTER_SANITIZE_NUMBER_INT), '->filter() gets a value of parameter as integer filtering out invalid characters');
 

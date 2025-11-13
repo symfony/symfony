@@ -44,7 +44,7 @@ final class PushyTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('pushy://%s', $this->getEndpoint());
+        return \sprintf('pushy://%s', $this->getEndpoint());
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -59,10 +59,10 @@ final class PushyTransport extends AbstractTransport
         $options['to'] ??= $message->getRecipientId();
 
         if (!$options['to']) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
+            throw new InvalidArgumentException(\sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
 
-        $endpoint = sprintf('https://%s?api_key=%s', $this->getEndpoint(), $this->apiKey);
+        $endpoint = \sprintf('https://%s?api_key=%s', $this->getEndpoint(), $this->apiKey);
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Accept' => 'application/json',
@@ -78,13 +78,13 @@ final class PushyTransport extends AbstractTransport
         }
 
         if (200 !== $statusCode) {
-            throw new TransportException(sprintf('Unable to send the Pushy push notification: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to send the Pushy push notification: "%s".', $response->getContent(false)), $response);
         }
 
         $result = $response->toArray(false);
 
         if (!isset($result['id'])) {
-            throw new TransportException(sprintf('Unable to find the message ID within the Pushy response: "%s".', $response->getContent(false)), $response);
+            throw new TransportException(\sprintf('Unable to find the message ID within the Pushy response: "%s".', $response->getContent(false)), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

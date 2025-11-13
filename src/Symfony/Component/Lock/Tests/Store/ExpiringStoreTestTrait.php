@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -39,7 +40,7 @@ trait ExpiringStoreTestTrait
      */
     public function testExpiration()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $clockDelay = $this->getClockDelay();
 
         /** @var PersistingStoreInterface $store */
@@ -59,7 +60,7 @@ trait ExpiringStoreTestTrait
     public function testAbortAfterExpiration()
     {
         $this->expectException(LockExpiredException::class);
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
@@ -78,7 +79,7 @@ trait ExpiringStoreTestTrait
         // Amount of microseconds we should wait without slowing things down too much
         $clockDelay = $this->getClockDelay();
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
@@ -93,7 +94,7 @@ trait ExpiringStoreTestTrait
 
     public function testSetExpiration()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
 
         /** @var PersistingStoreInterface $store */
         $store = $this->getStore();
@@ -106,10 +107,8 @@ trait ExpiringStoreTestTrait
 
     public function testExpiredLockCleaned()
     {
-        $resource = uniqid(__METHOD__, true);
-
-        $key1 = new Key($resource);
-        $key2 = new Key($resource);
+        $key1 = new Key(static::class.__METHOD__);
+        $key2 = new Key(static::class.__METHOD__);
 
         /** @var PersistingStoreInterface $store */
         $store = $this->getStore();

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Dotenv\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\FormatException;
@@ -18,9 +19,7 @@ use Symfony\Component\Dotenv\Exception\PathException;
 
 class DotenvTest extends TestCase
 {
-    /**
-     * @dataProvider getEnvDataWithFormatErrors
-     */
+    #[DataProvider('getEnvDataWithFormatErrors')]
     public function testParseWithFormatError($data, $error)
     {
         $dotenv = new Dotenv();
@@ -63,9 +62,7 @@ class DotenvTest extends TestCase
         return $tests;
     }
 
-    /**
-     * @dataProvider getEnvData
-     */
+    #[DataProvider('getEnvData')]
     public function testParse($data, $expected)
     {
         $dotenv = new Dotenv();
@@ -175,6 +172,14 @@ class DotenvTest extends TestCase
             ["FOO=BAR\nBAR=\${NOTDEFINED:=TEST}", ['FOO' => 'BAR', 'NOTDEFINED' => 'TEST', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\${FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\$FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST}']],
+            ["FOO=BAR\nBAR=\${FOO:-}", ['FOO' => 'BAR', 'BAR' => 'BAR']],
+            ["FOO=BAR\nBAR=\${NOTDEFINED:-}", ['FOO' => 'BAR', 'BAR' => '']],
+            ["FOO=\nBAR=\${FOO:-}", ['FOO' => '', 'BAR' => '']],
+            ["FOO=\nBAR=\$FOO:-}", ['FOO' => '', 'BAR' => '}']],
+            ["FOO=BAR\nBAR=\${FOO:=}", ['FOO' => 'BAR', 'BAR' => 'BAR']],
+            ["FOO=BAR\nBAR=\${NOTDEFINED:=}", ['FOO' => 'BAR', 'NOTDEFINED' => '', 'BAR' => '']],
+            ["FOO=\nBAR=\${FOO:=}", ['FOO' => '', 'BAR' => '']],
+            ["FOO=\nBAR=\$FOO:=}", ['FOO' => '', 'BAR' => '}']],
             ["FOO=foo\nFOOBAR=\${FOO}\${BAR}", ['FOO' => 'foo', 'FOOBAR' => 'foo']],
 
             // underscores
@@ -430,16 +435,16 @@ class DotenvTest extends TestCase
         $this->assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
     }
 
-    public function testEnvVarIsOverriden()
+    public function testEnvVarIsOverridden()
     {
-        putenv('TEST_ENV_VAR_OVERRIDEN=original_value');
+        putenv('TEST_ENV_VAR_OVERRIDDEN=original_value');
 
         $dotenv = (new Dotenv())->usePutenv();
-        $dotenv->populate(['TEST_ENV_VAR_OVERRIDEN' => 'new_value'], true);
+        $dotenv->populate(['TEST_ENV_VAR_OVERRIDDEN' => 'new_value'], true);
 
-        $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));
-        $this->assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDEN']);
-        $this->assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDEN']);
+        $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDDEN'));
+        $this->assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDDEN']);
+        $this->assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDDEN']);
     }
 
     public function testMemorizingLoadedVarsNamesInSpecialVar()
@@ -603,5 +608,15 @@ class DotenvTest extends TestCase
 
         $resetContext();
         rmdir($tmpdir);
+    }
+
+    public function testExceptionWithBom()
+    {
+        $dotenv = new Dotenv();
+
+        $this->expectException(FormatException::class);
+        $this->expectExceptionMessage('Loading files starting with a byte-order-mark (BOM) is not supported.');
+
+        $dotenv->load(__DIR__.'/fixtures/file_with_bom');
     }
 }

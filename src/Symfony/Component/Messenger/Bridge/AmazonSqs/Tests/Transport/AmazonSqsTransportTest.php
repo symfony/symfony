@@ -16,11 +16,13 @@ use AsyncAws\Core\Exception\Http\ServerException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceivedStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceiver;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransport;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -115,6 +117,22 @@ class AmazonSqsTransportTest extends TestCase
         $this->assertSame($envelope, $this->transport->send($envelope));
     }
 
+    public function testItSendsAMessageViaTheSenderWithRedeliveryStamp()
+    {
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(1)]);
+        $this->sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
+        $this->assertSame($envelope, $this->transport->send($envelope));
+    }
+
+    public function testItDoesNotSendRedeliveredMessageWhenNotHandlingRetries()
+    {
+        $transport = new AmazonSqsTransport($this->connection, null, $this->receiver, $this->sender, false);
+
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(1)]);
+        $this->sender->expects($this->never())->method('send')->with($envelope)->willReturn($envelope);
+        $this->assertSame($envelope, $transport->send($envelope));
+    }
+
     public function testItCanSetUpTheConnection()
     {
         $this->connection->expects($this->once())->method('setup');
@@ -149,6 +167,31 @@ class AmazonSqsTransportTest extends TestCase
         $this->expectException(TransportException::class);
 
         $this->transport->reset();
+    }
+
+    public function testKeepalive()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class),
+        );
+
+        $connection->expects($this->once())->method('keepalive')->with('123', 10);
+        $transport->keepalive(new Envelope(new DummyMessage('foo'), [new AmazonSqsReceivedStamp('123')]), 10);
+    }
+
+    public function testKeepaliveWhenASqsExceptionOccurs()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class),
+        );
+
+        $exception = $this->createHttpException();
+        $connection->expects($this->once())->method('keepalive')->with('123')->willThrowException($exception);
+
+        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        $transport->keepalive(new Envelope(new DummyMessage('foo'), [new AmazonSqsReceivedStamp('123')]));
     }
 
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null)

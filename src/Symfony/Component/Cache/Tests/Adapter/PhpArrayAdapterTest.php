@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -18,9 +19,7 @@ use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class PhpArrayAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [
@@ -42,6 +41,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         'testSaveDeferredWhenChangingValues' => 'PhpArrayAdapter is read-only.',
         'testSaveDeferredOverwrite' => 'PhpArrayAdapter is read-only.',
         'testIsHitDeferred' => 'PhpArrayAdapter is read-only.',
+        'testErrorsDontInvalidate' => 'PhpArrayAdapter is read-only.',
 
         'testExpiresAt' => 'PhpArrayAdapter does not support expiration.',
         'testExpiresAtWithNull' => 'PhpArrayAdapter does not support expiration.',
@@ -57,6 +57,8 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
         'testDefaultLifeTime' => 'PhpArrayAdapter does not allow configuring a default lifetime.',
         'testPrune' => 'PhpArrayAdapter just proxies',
+
+        'testNamespaces' => 'PhpArrayAdapter does not support namespaces.',
     ];
 
     protected static string $file;

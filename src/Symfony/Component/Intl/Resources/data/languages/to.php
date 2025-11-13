@@ -196,7 +196,6 @@ return [
         'gmh' => 'lea fakasiamane-hake-lotoloto',
         'gn' => 'lea fakakualani',
         'goh' => 'lea fakasiamane-hake-motuʻa',
-        'gom' => 'lea fakakonikanī-koani',
         'gon' => 'lea fakakonitī',
         'gor' => 'lea fakakolonitalo',
         'got' => 'lea fakakotika',

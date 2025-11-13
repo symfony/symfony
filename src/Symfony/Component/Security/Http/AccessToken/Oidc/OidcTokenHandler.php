@@ -16,9 +16,14 @@ use Jose\Component\Checker\ClaimCheckerManager;
 use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
+use Jose\Component\Core\JWKSet;
+use Jose\Component\Encryption\JWEDecrypter;
+use Jose\Component\Encryption\JWETokenSupport;
+use Jose\Component\Encryption\Serializer\CompactSerializer as JweCompactSerializer;
+use Jose\Component\Encryption\Serializer\JWESerializerManager;
 use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
-use Jose\Component\Signature\Serializer\CompactSerializer;
+use Jose\Component\Signature\Serializer\CompactSerializer as JwsCompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
@@ -29,6 +34,8 @@ use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureE
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\MissingClaimException;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * The token handler decodes and validates the token, and retrieves the user identifier from it.
@@ -36,16 +43,56 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 final class OidcTokenHandler implements AccessTokenHandlerInterface
 {
     use OidcTrait;
+    private ?JWKSet $decryptionKeyset = null;
+    private ?AlgorithmManager $decryptionAlgorithms = null;
+    private bool $enforceEncryption = false;
+
+    private ?CacheInterface $discoveryCache = null;
+    private ?string $oidcConfigurationCacheKey = null;
+
+    /**
+     * @var HttpClientInterface[]
+     */
+    private array $discoveryClients = [];
 
     public function __construct(
-        private Algorithm $signatureAlgorithm,
-        private JWK $jwk,
+        private Algorithm|AlgorithmManager $signatureAlgorithm,
+        private JWK|JWKSet|null $signatureKeyset,
         private string $audience,
         private array $issuers,
         private string $claim = 'sub',
         private ?LoggerInterface $logger = null,
         private ClockInterface $clock = new Clock(),
     ) {
+        if ($signatureAlgorithm instanceof Algorithm) {
+            trigger_deprecation('symfony/security-http', '7.1', 'First argument must be instance of %s, %s given.', AlgorithmManager::class, Algorithm::class);
+            $this->signatureAlgorithm = new AlgorithmManager([$signatureAlgorithm]);
+        }
+        if ($signatureKeyset instanceof JWK) {
+            trigger_deprecation('symfony/security-http', '7.1', 'Second argument must be instance of %s, %s given.', JWKSet::class, JWK::class);
+            $this->signatureKeyset = new JWKSet([$signatureKeyset]);
+        }
+    }
+
+    public function enableJweSupport(JWKSet $decryptionKeyset, AlgorithmManager $decryptionAlgorithms, bool $enforceEncryption): void
+    {
+        $this->decryptionKeyset = $decryptionKeyset;
+        $this->decryptionAlgorithms = $decryptionAlgorithms;
+        $this->enforceEncryption = $enforceEncryption;
+    }
+
+    /**
+     * @param HttpClientInterface|HttpClientInterface[] $client
+     */
+    public function enableDiscovery(CacheInterface $cache, array|HttpClientInterface $client, string $oidcConfigurationCacheKey, ?string $oidcJWKSetCacheKey = null): void
+    {
+        if (null !== $oidcJWKSetCacheKey) {
+            trigger_deprecation('symfony/security-http', '7.4', 'Passing $oidcJWKSetCacheKey parameter to "%s()" is deprecated.', __METHOD__);
+        }
+
+        $this->discoveryCache = $cache;
+        $this->discoveryClients = \is_array($client) ? $client : [$client];
+        $this->oidcConfigurationCacheKey = $oidcConfigurationCacheKey;
     }
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
@@ -54,45 +101,68 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             throw new \LogicException('You cannot use the "oidc" token handler since "web-token/jwt-signature" and "web-token/jwt-checker" are not installed. Try running "composer require web-token/jwt-signature web-token/jwt-checker".');
         }
 
+        if (!$this->discoveryClients && !$this->signatureKeyset) {
+            throw new \LogicException('You cannot use the "oidc" token handler without JWKSet nor "discovery". Please configure JWKSet in the constructor, or call "enableDiscovery" method.');
+        }
+
+        $jwkset = $this->signatureKeyset;
+        if ($this->discoveryClients) {
+            $clients = $this->discoveryClients;
+            $logger = $this->logger;
+            $keys = $this->discoveryCache->get($this->oidcConfigurationCacheKey, static function () use ($clients, $logger): array {
+                try {
+                    $configResponses = [];
+                    foreach ($clients as $client) {
+                        $configResponses[] = $client->request('GET', '.well-known/openid-configuration', [
+                            'user_data' => $client,
+                        ]);
+                    }
+
+                    $jwkSetResponses = [];
+                    foreach ($client->stream($configResponses) as $response => $chunk) {
+                        if ($chunk->isLast()) {
+                            $jwkSetResponses[] = $response->getInfo('user_data')->request('GET', $response->toArray()['jwks_uri']);
+                        }
+                    }
+
+                    $keys = [];
+                    foreach ($jwkSetResponses as $response) {
+                        foreach ($response->toArray()['keys'] as $key) {
+                            if ('sig' === $key['use']) {
+                                $keys[] = $key;
+                            }
+                        }
+                    }
+
+                    return $keys;
+                } catch (\Exception $e) {
+                    $logger?->error('An error occurred while requesting OIDC certs.', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    throw new BadCredentialsException('Invalid credentials.', $e->getCode(), $e);
+                }
+            });
+
+            $jwkset = JWKSet::createFromKeyData(['keys' => $keys]);
+        }
+
         try {
-            // Decode the token
-            $jwsVerifier = new JWSVerifier(new AlgorithmManager([$this->signatureAlgorithm]));
-            $serializerManager = new JWSSerializerManager([new CompactSerializer()]);
-            $jws = $serializerManager->unserialize($accessToken);
-            $claims = json_decode($jws->getPayload(), true);
-
-            // Verify the signature
-            if (!$jwsVerifier->verifyWithKey($jws, $this->jwk, 0)) {
-                throw new InvalidSignatureException();
-            }
-
-            // Verify the headers
-            $headerCheckerManager = new Checker\HeaderCheckerManager([
-                new Checker\AlgorithmChecker([$this->signatureAlgorithm->name()]),
-            ], [
-                new JWSTokenSupport(),
-            ]);
-            // if this check fails, an InvalidHeaderException is thrown
-            $headerCheckerManager->check($jws, 0);
-
-            // Verify the claims
-            $checkers = [
-                new Checker\IssuedAtChecker(0, false, $this->clock),
-                new Checker\NotBeforeChecker(0, false, $this->clock),
-                new Checker\ExpirationTimeChecker(0, false, $this->clock),
-                new Checker\AudienceChecker($this->audience),
-                new Checker\IssuerChecker($this->issuers),
-            ];
-            $claimCheckerManager = new ClaimCheckerManager($checkers);
-            // if this check fails, an InvalidClaimException is thrown
-            $claimCheckerManager->check($claims);
+            $accessToken = $this->decryptIfNeeded($accessToken);
+            $claims = $this->loadAndVerifyJws($accessToken, $jwkset);
+            $this->verifyClaims($claims);
 
             if (empty($claims[$this->claim])) {
-                throw new MissingClaimException(sprintf('"%s" claim not found.', $this->claim));
+                throw new MissingClaimException(\sprintf('"%s" claim not found.', $this->claim));
             }
 
             // UserLoader argument can be overridden by a UserProvider on AccessTokenAuthenticator::authenticate
-            return new UserBadge($claims[$this->claim], new FallbackUserLoader(fn () => $this->createUser($claims)), $claims);
+            return new UserBadge($claims[$this->claim], new FallbackUserLoader(function () use ($claims) {
+                $claims['user_identifier'] = $claims[$this->claim];
+
+                return $this->createUser($claims);
+            }), $claims);
         } catch (\Exception $e) {
             $this->logger?->error('An error occurred while decoding and validating the token.', [
                 'error' => $e->getMessage(),
@@ -100,6 +170,94 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             ]);
 
             throw new BadCredentialsException('Invalid credentials.', $e->getCode(), $e);
+        }
+    }
+
+    private function loadAndVerifyJws(string $accessToken, JWKSet $jwkset): array
+    {
+        // Decode the token
+        $jwsVerifier = new JWSVerifier($this->signatureAlgorithm);
+        $serializerManager = new JWSSerializerManager([new JwsCompactSerializer()]);
+        $jws = $serializerManager->unserialize($accessToken);
+
+        // Verify the signature
+        if (!$jwsVerifier->verifyWithKeySet($jws, $jwkset, 0)) {
+            throw new InvalidSignatureException();
+        }
+
+        $headerCheckerManager = new Checker\HeaderCheckerManager([
+            new Checker\AlgorithmChecker($this->signatureAlgorithm->list()),
+        ], [
+            new JWSTokenSupport(),
+        ]);
+        // if this check fails, an InvalidHeaderException is thrown
+        $headerCheckerManager->check($jws, 0);
+
+        return json_decode($jws->getPayload(), true);
+    }
+
+    private function verifyClaims(array $claims): array
+    {
+        // Verify the claims
+        $checkers = [
+            new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+            new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+            new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+            new Checker\AudienceChecker($this->audience),
+            new Checker\IssuerChecker($this->issuers),
+        ];
+        $claimCheckerManager = new ClaimCheckerManager($checkers);
+
+        // if this check fails, an InvalidClaimException is thrown
+        return $claimCheckerManager->check($claims);
+    }
+
+    private function decryptIfNeeded(string $accessToken): string
+    {
+        if (null === $this->decryptionKeyset || null === $this->decryptionAlgorithms) {
+            $this->logger?->debug('The encrypted tokens (JWE) are not supported. Skipping.');
+
+            return $accessToken;
+        }
+
+        $jweHeaderChecker = new Checker\HeaderCheckerManager(
+            [
+                new Checker\AlgorithmChecker($this->decryptionAlgorithms->list()),
+                new Checker\CallableChecker('enc', fn ($value) => \in_array($value, $this->decryptionAlgorithms->list())),
+                new Checker\CallableChecker('cty', fn ($value) => 'JWT' === $value),
+                new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+                new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+                new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+            ],
+            [new JWETokenSupport()]
+        );
+        $jweDecrypter = new JWEDecrypter($this->decryptionAlgorithms, null);
+        $serializerManager = new JWESerializerManager([new JweCompactSerializer()]);
+        try {
+            $jwe = $serializerManager->unserialize($accessToken);
+            $jweHeaderChecker->check($jwe, 0);
+            $result = $jweDecrypter->decryptUsingKeySet($jwe, $this->decryptionKeyset, 0);
+            if (false === $result) {
+                throw new \RuntimeException('The JWE could not be decrypted.');
+            }
+
+            $payload = $jwe->getPayload();
+            if (null === $payload) {
+                throw new \RuntimeException('The JWE payload is empty.');
+            }
+
+            return $payload;
+        } catch (\InvalidArgumentException|\RuntimeException $e) {
+            if ($this->enforceEncryption) {
+                $this->logger?->error('An error occurred while decrypting the token.', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                throw new BadCredentialsException('Encrypted token is required.', 0, $e);
+            }
+            $this->logger?->debug('The token decryption failed. Skipping as not mandatory.');
+
+            return $accessToken;
         }
     }
 }

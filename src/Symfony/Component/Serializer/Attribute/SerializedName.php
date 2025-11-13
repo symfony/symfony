@@ -22,13 +22,15 @@ class SerializedName
     /**
      * @param string $serializedName The name of the property as it will be serialized
      */
-    public function __construct(private readonly string $serializedName)
-    {
+    public function __construct(
+        public readonly string $serializedName,
+    ) {
         if ('' === $serializedName) {
-            throw new InvalidArgumentException(sprintf('Parameter given to "%s" must be a non-empty string.', self::class));
+            throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a non-empty string.', self::class));
         }
     }
 
+    #[\Deprecated('Use the "serializedName" property instead', 'symfony/serializer:7.4')]
     public function getSerializedName(): string
     {
         return $this->serializedName;

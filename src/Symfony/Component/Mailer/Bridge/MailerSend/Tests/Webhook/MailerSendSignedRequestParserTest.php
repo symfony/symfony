@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\MailerSend\RemoteEvent\MailerSendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\MailerSend\Webhook\MailerSendRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
-use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 class MailerSendSignedRequestParserTest extends AbstractRequestParserTestCase
@@ -31,8 +30,8 @@ class MailerSendSignedRequestParserTest extends AbstractRequestParserTestCase
         $currentDir = \dirname((new \ReflectionClass(static::class))->getFileName());
 
         yield $filename => [
-            file_get_contents($currentDir . '/Fixtures/sent.json'),
-            include($currentDir . '/Fixtures/sent.php'),
+            file_get_contents($currentDir.'/Fixtures/sent.json'),
+            include ($currentDir.'/Fixtures/sent.php'),
         ];
     }
 
@@ -48,9 +47,9 @@ class MailerSendSignedRequestParserTest extends AbstractRequestParserTestCase
             method: 'POST',
             server: [
                 'Content-Type' => 'application/json',
-                'HTTP_Signature' => 'e60f87b019f0aaae29042b14762991765ebb0cd6f6d42884af9fccca4cbd16e7'
+                'HTTP_Signature' => 'e60f87b019f0aaae29042b14762991765ebb0cd6f6d42884af9fccca4cbd16e7',
             ],
-            content: str_replace("\n", "", $payload)
+            content: str_replace("\n", '', $payload)
         );
     }
 }

@@ -11,15 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as Psr11ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTest;
 
-class ControllerResolverTest extends ContainerControllerResolverTest
+class ControllerResolverTest extends TestCase
 {
     public function testAbstractControllerGetsContainerWhenNotSet()
     {
@@ -110,11 +110,6 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         }
 
         return new ControllerResolver($container, $logger);
-    }
-
-    protected function createMockParser()
-    {
-        return $this->createMock(ControllerNameParser::class);
     }
 }
 

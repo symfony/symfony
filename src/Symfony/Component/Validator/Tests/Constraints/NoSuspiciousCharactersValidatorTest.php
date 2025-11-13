@@ -11,15 +11,16 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Validator\Constraints\NoSuspiciousCharacters;
 use Symfony\Component\Validator\Constraints\NoSuspiciousCharactersValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
- * @requires extension intl
- *
  * @extends ConstraintValidatorTestCase<NoSuspiciousCharactersValidator>
  */
+#[RequiresPhpExtension('intl')]
 class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): NoSuspiciousCharactersValidator
@@ -27,12 +28,10 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
         return new NoSuspiciousCharactersValidator();
     }
 
-    /**
-     * @dataProvider provideNonSuspiciousStrings
-     */
+    #[DataProvider('provideNonSuspiciousStrings')]
     public function testNonSuspiciousStrings(string $string, array $options = [])
     {
-        $this->validator->validate($string, new NoSuspiciousCharacters($options));
+        $this->validator->validate($string, new NoSuspiciousCharacters(...$options));
 
         $this->assertNoViolation();
     }
@@ -53,21 +52,22 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider provideSuspiciousStrings
-     */
+    #[DataProvider('provideSuspiciousStrings')]
     public function testSuspiciousStrings(string $string, array $options, array $errors)
     {
-        $this->validator->validate($string, new NoSuspiciousCharacters($options));
+        $this->validator->validate($string, new NoSuspiciousCharacters(...$options));
 
-        $violations = $this->buildViolation(reset($errors))
-            ->setCode(key($errors))
-            ->setParameter('{{ value }}', '"'.$string.'"')
-        ;
+        $violations = null;
 
-        while ($message = next($errors)) {
-            $violations = $violations->buildNextViolation($message)
-                ->setCode(key($errors))
+        foreach ($errors as $code => $message) {
+            if (null === $violations) {
+                $violations = $this->buildViolation($message);
+            } else {
+                $violations = $violations->buildNextViolation($message);
+            }
+
+            $violations = $violations
+                ->setCode($code)
                 ->setParameter('{{ value }}', '"'.$string.'"')
             ;
         }

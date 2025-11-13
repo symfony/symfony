@@ -12,8 +12,10 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 
@@ -26,6 +28,8 @@ class LockableTraitTest extends TestCase
         self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/FooLockCommand.php';
         require_once self::$fixturesPath.'/FooLock2Command.php';
+        require_once self::$fixturesPath.'/FooLock3Command.php';
+        require_once self::$fixturesPath.'/FooLock4InvokableCommand.php';
     }
 
     public function testLockIsReleased()
@@ -63,5 +67,40 @@ class LockableTraitTest extends TestCase
 
         $tester = new CommandTester($command);
         $this->assertSame(1, $tester->execute([]));
+    }
+
+    public function testCustomLockFactoryIsUsed()
+    {
+        $lockFactory = $this->createMock(LockFactory::class);
+        $command = new \FooLock3Command($lockFactory);
+
+        $tester = new CommandTester($command);
+
+        $lock = $this->createMock(SharedLockInterface::class);
+        $lock->method('acquire')->willReturn(false);
+
+        $lockFactory->expects(static::once())->method('createLock')->willReturn($lock);
+        $this->assertSame(1, $tester->execute([]));
+    }
+
+    public function testLockInvokableCommandReturnsFalseIfAlreadyLockedByAnotherCommand()
+    {
+        $command = new Command('foo:lock4');
+        $command->setCode(new \FooLock4InvokableCommand());
+
+        if (SemaphoreStore::isSupported()) {
+            $store = new SemaphoreStore();
+        } else {
+            $store = new FlockStore();
+        }
+
+        $lock = (new LockFactory($store))->createLock($command->getName());
+        $lock->acquire();
+
+        $tester = new CommandTester($command);
+        $this->assertSame(Command::FAILURE, $tester->execute([]));
+
+        $lock->release();
+        $this->assertSame(Command::SUCCESS, $tester->execute([]));
     }
 }

@@ -56,31 +56,31 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     public function setSerializer(SerializerInterface $serializer): void
     {
         if (!$serializer instanceof NormalizerInterface || !$serializer instanceof DenormalizerInterface) {
-            throw new LogicException(sprintf('The passed serializer should implement both NormalizerInterface and DenormalizerInterface, "%s" given.', get_debug_type($serializer)));
+            throw new LogicException(\sprintf('The passed serializer should implement both NormalizerInterface and DenormalizerInterface, "%s" given.', get_debug_type($serializer)));
         }
         $this->serializer = $serializer;
         $this->normalizer->setSerializer($serializer);
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        if ($object instanceof Headers) {
+        if ($data instanceof Headers) {
             $ret = [];
-            foreach ($this->headersProperty->getValue($object) as $name => $header) {
+            foreach ($this->headersProperty->getValue($data) as $name => $header) {
                 $ret[$name] = $this->serializer->normalize($header, $format, $context);
             }
 
             return $ret;
         }
 
-        $ret = $this->normalizer->normalize($object, $format, $context);
+        $ret = $this->normalizer->normalize($data, $format, $context);
 
-        if ($object instanceof AbstractPart) {
-            $ret['class'] = $object::class;
+        if ($data instanceof AbstractPart) {
+            $ret['class'] = $data::class;
             unset($ret['seekable'], $ret['cid'], $ret['handle']);
         }
 
-        if ($object instanceof RawMessage && \array_key_exists('message', $ret) && null === $ret['message']) {
+        if ($data instanceof RawMessage && \array_key_exists('message', $ret) && null === $ret['message']) {
             unset($ret['message']);
         }
 

@@ -17,12 +17,15 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 trait RuntimeLoaderProvider
 {
+    /**
+     * @return void
+     */
     protected function registerTwigRuntimeLoader(Environment $environment, FormRenderer $renderer)
     {
         $loader = $this->createMock(RuntimeLoaderInterface::class);
-        $loader->expects($this->any())->method('load')->will($this->returnValueMap([
+        $loader->expects($this->any())->method('load')->willReturnMap([
             ['Symfony\Component\Form\FormRenderer', $renderer],
-        ]));
+        ]);
         $environment->addRuntimeLoader($loader);
     }
 }

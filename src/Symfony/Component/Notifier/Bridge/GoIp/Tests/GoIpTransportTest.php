@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\GoIp\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\GoIp\GoIpOptions;
@@ -68,21 +69,20 @@ final class GoIpTransportTest extends TransportTestCase
     }
 
     /**
-     * @dataProvider goipErrorsProvider
-     *
      * @throws TransportExceptionInterface
      */
+    #[DataProvider('goipErrorsProvider')]
     public function testSendMessageWithUnsuccessfulReplyFromGoipThrows(string $goipError)
     {
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage(sprintf('Could not send the message through GoIP. Response: "%s".', $goipError));
+        $this->expectExceptionMessage(\sprintf('Could not send the message through GoIP. Response: "%s".', $goipError));
 
         $mockClient = new MockHttpClient(new MockResponse($goipError));
 
         self::createTransport($mockClient)->send(new SmsMessage('1', 'Test'));
     }
 
-    public function goipErrorsProvider(): iterable
+    public static function goipErrorsProvider(): iterable
     {
         yield ['ERROR,L10 GSM logout'];
     }
@@ -95,7 +95,7 @@ final class GoIpTransportTest extends TransportTestCase
         $misFormedReply = 'Sending,L5 Send SMS to:0123';
 
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage(sprintf('Could not extract the message id from the GoIP response: "%s".', $misFormedReply));
+        $this->expectExceptionMessage(\sprintf('Could not extract the message id from the GoIP response: "%s".', $misFormedReply));
 
         $mockClient = new MockHttpClient(new MockResponse($misFormedReply));
 

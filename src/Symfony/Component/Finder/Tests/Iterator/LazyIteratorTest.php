@@ -29,7 +29,7 @@ class LazyIteratorTest extends TestCase
     {
         $iterator = new LazyIterator(fn () => new Iterator(['foo', 'bar']));
 
-        $this->assertCount(2, $iterator);
+        $this->assertCount(2, iterator_to_array($iterator));
     }
 
     public function testInnerDestructedAtTheEnd()

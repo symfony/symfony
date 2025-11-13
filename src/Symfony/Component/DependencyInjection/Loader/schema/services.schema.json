@@ -1,0 +1,356 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Symfony Parameters and Services Configuration",
+  "description": "Defines application parameters and services, including imports and environment-specific conditionals.",
+  "$comment": "Root allows extension namespaces (framework:, doctrine:, etc.) via additionalProperties: true.",
+  "type": "object",
+  "properties": {
+    "imports": {
+      "type": "array",
+      "description": "Import other configuration resources.",
+      "$comment": "YAML examples:\n- { resource: 'services.yaml' }\n- { resource: packages/dev/services.yaml, ignore_errors: true }\n- 'other_file.yaml'",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "properties": {
+              "resource": { "type": "string" },
+              "type": { "type": ["string", "null"] },
+              "ignore_errors": { "type": "boolean" }
+            },
+            "required": ["resource"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Defines application-wide parameters.",
+      "$comment": "Values support scalars, arrays and objects.",
+      "patternProperties": {
+        "^.+$": { "$ref": "#/$defs/parameterValue" }
+      },
+      "additionalProperties": false
+    },
+    "services": {
+      "type": "object",
+      "description": "Defines your application services.",
+      "$comment": "Service ids accept multiple shapes: object (full definition), '@alias' string (alias), null (empty definition), prototype (resource/namespace), stack, and short array syntax for arguments.",
+      "properties": {
+        "_defaults": {
+          "$ref": "#/$defs/serviceDefaults"
+        },
+        "_instanceof": {
+          "type": "object",
+          "patternProperties": {
+            "^.+$": { "$ref": "#/$defs/serviceInstanceof" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "patternProperties": {
+        "^(?:[A-Za-z_\\x7f-\\xff][A-Za-z0-9_\\x7f-\\xff]*\\\\)+[A-Za-z_\\x7f-\\xff][A-Za-z0-9_\\x7f-\\xff]*$": {
+          "oneOf": [
+            { "$ref": "#/$defs/serviceConcrete" },
+            { "$ref": "#/$defs/serviceAliasObject" },
+            { "$ref": "#/$defs/servicePrototype" },
+            { "$ref": "#/$defs/serviceStack" },
+            { "$ref": "#/$defs/serviceShortSyntax" },
+            { "type": "null" },
+            { "type": "string", "pattern": "^@.+" }
+          ],
+          "$comment": "FQCN service ids: short array syntax is allowed here."
+        },
+        "^(?!_).+$": {
+          "oneOf": [
+            { "$ref": "#/$defs/serviceConcrete" },
+            { "$ref": "#/$defs/serviceAliasObject" },
+            { "$ref": "#/$defs/servicePrototype" },
+            { "$ref": "#/$defs/serviceStack" },
+            { "type": "null" },
+            { "type": "string", "pattern": "^@.+" }
+          ],
+          "$comment": "Non-FQCN ids: short array syntax is not allowed."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "patternProperties": {
+    "^when@.+$": {
+      "$ref": "#",
+      "description": "A container for parameters and services that are only loaded in a specific environment."
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "parameterValue": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "array" },
+        { "type": "object" },
+        { "type": "null" }
+      ]
+    },
+    "scalarValue": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "null" }
+      ]
+    },
+    "fqcn": {
+      "type": "string",
+      "pattern": "^(?:\\\\)?(?:[A-Za-z_\\\\x7f-\\\\xff][A-Za-z0-9_\\\\x7f-\\\\xff]*\\\\)+[A-Za-z_\\\\x7f-\\\\xff][A-Za-z0-9_\\\\x7f-\\\\xff]*$",
+      "$comment": "Fully-qualified class name, optional leading backslash; requires at least one namespace separator."
+    },
+    "arguments": {
+      "$comment": "Arguments can be an array (positional) or a map (named).",
+      "oneOf": [
+        { "type": "array", "items": { "$ref": "#/$defs/parameterValue" } },
+        { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } }
+      ]
+    },
+    "tags": {
+      "$comment": "YAML examples:\n- ['kernel.event_subscriber', { name: 'kernel.event_listener', event: 'kernel.request' }, { my_tag: { attr: 1 } }].",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "properties": { "name": { "type": "string" } },
+            "required": ["name"],
+            "additionalProperties": true
+          },
+          {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 1,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": { "$ref": "#/$defs/parameterValue" }
+            }
+          }
+        ]
+      }
+    },
+    "calls": {
+      "$comment": "YAML examples:\n- ['setFoo', ['@bar'], true]\n- { method: 'setFoo', arguments: ['@bar'], returns_clone: true }\n- { setFoo: ['@bar'] }\n- { setFoo: !returns_clone ['@bar'] } (special YAML tag)",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": [
+              { "type": "string" },
+              {
+                "oneOf": [
+                  { "type": "array", "items": { "$ref": "#/$defs/parameterValue" } },
+                  { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } }
+                ]
+              },
+              { "type": "boolean" }
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "method": { "type": "string" },
+              "arguments": { "$ref": "#/$defs/arguments" },
+              "returns_clone": { "type": "boolean" }
+            },
+            "required": ["method"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 1,
+            "additionalProperties": { "$ref": "#/$defs/arguments" }
+          }
+        ]
+      }
+    },
+    "deprecation": {
+      "$comment": "YamlFileLoader requires an object with 'package' and 'version'.",
+      "type": "object",
+      "properties": {
+        "package": { "type": "string" },
+        "version": { "type": "string" },
+        "message": { "type": "string" }
+      },
+      "required": ["package", "version"],
+      "additionalProperties": false
+    },
+    "callable": {
+      "$comment": "Either 'Class::method' or ['Class', 'method'].",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": [ { "type": "string" }, { "type": "string" } ]
+        }
+      ]
+    },
+    "serviceShortSyntax": {
+      "$comment": "Short syntax: service defined as arguments array. YAML example: App\\SomeService: ['@dependency', 'literal', 123]",
+      "type": "array",
+      "items": { "$ref": "#/$defs/parameterValue" }
+    },
+    "factoryCallable": {
+      "$comment": "Either '@service', 'Class::method', or [classOrService, method]. For ['null', method] the class is resolved from the service class when using 'constructor'.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": [ { "type": ["string", "null"] }, { "type": "string" } ]
+        }
+      ]
+    },
+    "serviceAliasObject": {
+      "$comment": "Allowed keys for aliases are only 'alias', 'public', 'deprecated'.",
+      "type": "object",
+      "properties": {
+        "alias": { "type": "string" },
+        "public": { "type": "boolean" },
+        "deprecated": { "$ref": "#/$defs/deprecation" }
+      },
+      "required": ["alias"],
+      "additionalProperties": false
+    },
+    "serviceConcrete": {
+      "$comment": "'constructor' cannot be used together with 'factory'. If 'from_callable' is used, many other keys are not allowed (see YamlFileLoader).",
+      "type": "object",
+      "properties": {
+        "class": { "type": "string" },
+        "file": { "type": "string" },
+        "parent": { "type": "string" },
+        "shared": { "type": "boolean" },
+        "synthetic": { "type": "boolean" },
+        "lazy": { "oneOf": [ { "type": "boolean" }, { "$ref": "#/$defs/fqcn" } ] },
+        "public": { "type": "boolean" },
+        "abstract": { "type": "boolean" },
+        "deprecated": { "$ref": "#/$defs/deprecation" },
+        "factory": { "$ref": "#/$defs/factoryCallable" },
+        "configurator": { "$ref": "#/$defs/callable" },
+        "arguments": { "$ref": "#/$defs/arguments" },
+        "properties": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "calls": { "$ref": "#/$defs/calls" },
+        "tags": { "$ref": "#/$defs/tags" },
+        "resource_tags": { "$ref": "#/$defs/tags" },
+        "decorates": { "type": "string" },
+        "decoration_inner_name": { "type": "string" },
+        "decoration_priority": { "type": "integer" },
+        "decoration_on_invalid": { "oneOf": [ { "enum": ["exception", "ignore"] }, { "type": "null" } ], "$comment": "Use null (without quotes) for NULL_ON_INVALID_REFERENCE." },
+        "autowire": { "type": "boolean" },
+        "autoconfigure": { "type": "boolean" },
+        "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "constructor": { "type": "string" },
+        "from_callable": { "$ref": "#/$defs/parameterValue", "$comment": "Will be wrapped by factory ['Closure','fromCallable'] and sets lazy=true unless class is 'Closure'." }
+      },
+      "additionalProperties": false
+    },
+    "servicePrototype": {
+      "$comment": "Prototype definitions register classes by scanning directories. 'namespace' requires 'resource'.",
+      "type": "object",
+      "properties": {
+        "resource": { "type": "string" },
+        "namespace": { "type": "string" },
+        "exclude": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        },
+        "parent": { "type": "string" },
+        "shared": { "type": "boolean" },
+        "lazy": { "oneOf": [ { "type": "boolean" }, { "$ref": "#/$defs/fqcn" } ] },
+        "public": { "type": "boolean" },
+        "abstract": { "type": "boolean" },
+        "deprecated": { "$ref": "#/$defs/deprecation" },
+        "factory": { "$ref": "#/$defs/factoryCallable" },
+        "arguments": { "$ref": "#/$defs/arguments" },
+        "properties": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "configurator": { "$ref": "#/$defs/callable" },
+        "calls": { "$ref": "#/$defs/calls" },
+        "tags": { "$ref": "#/$defs/tags" },
+        "resource_tags": { "$ref": "#/$defs/tags" },
+        "autowire": { "type": "boolean" },
+        "autoconfigure": { "type": "boolean" },
+        "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "constructor": { "type": "string" }
+      },
+      "required": ["resource"],
+      "allOf": [
+        { "anyOf": [ { "not": { "required": ["namespace"] } }, { "required": ["resource"] } ] }
+      ],
+      "additionalProperties": false
+    },
+    "serviceStack": {
+      "$comment": "A stack builds a service pipeline from multiple frames.",
+      "type": "object",
+      "properties": {
+        "stack": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/serviceConcrete" },
+              { "$ref": "#/$defs/serviceAliasObject" },
+              { "$ref": "#/$defs/servicePrototype" }
+            ]
+          }
+        },
+        "public": { "type": "boolean" },
+        "deprecated": { "$ref": "#/$defs/deprecation" }
+      },
+      "required": ["stack"],
+      "additionalProperties": false
+    },
+    "serviceDefaults": {
+      "$comment": "Defaults applied to services declared in the current file.",
+      "type": "object",
+      "properties": {
+        "public": { "type": "boolean" },
+        "tags": { "$ref": "#/$defs/tags" },
+        "resource_tags": { "$ref": "#/$defs/tags" },
+        "autowire": { "type": "boolean" },
+        "autoconfigure": { "type": "boolean" },
+        "bind": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/parameterValue" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "serviceInstanceof": {
+      "$comment": "Applied to services declared in the current file whose class matches the key (interface or parent class).",
+      "type": "object",
+      "properties": {
+        "shared": { "type": "boolean" },
+        "lazy": { "oneOf": [ { "type": "boolean" }, { "$ref": "#/$defs/fqcn" } ] },
+        "public": { "type": "boolean" },
+        "properties": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "configurator": { "$ref": "#/$defs/callable" },
+        "calls": { "$ref": "#/$defs/calls" },
+        "tags": { "$ref": "#/$defs/tags" },
+        "resource_tags": { "$ref": "#/$defs/tags" },
+        "autowire": { "type": "boolean" },
+        "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "constructor": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

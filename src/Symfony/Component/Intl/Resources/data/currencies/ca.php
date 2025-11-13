@@ -220,7 +220,7 @@ return [
         ],
         'BYN' => [
             'BYN',
-            'ruble bielorús',
+            'ruble belarús',
         ],
         'BYR' => [
             'BYR',

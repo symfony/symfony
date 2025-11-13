@@ -20,14 +20,13 @@ use Symfony\Component\Lock\Exception\UnserializableKeyException;
  */
 final class Key
 {
-    private string $resource;
     private ?float $expiringTime = null;
     private array $state = [];
     private bool $serializable = true;
 
-    public function __construct(string $resource)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        private string $resource,
+    ) {
     }
 
     public function __toString(): string
@@ -90,12 +89,23 @@ final class Key
         return null !== $this->expiringTime && $this->expiringTime <= microtime(true);
     }
 
-    public function __sleep(): array
+    public function __unserialize(array $data): void
+    {
+        $this->resource = $data['resource'];
+        $this->expiringTime = $data['expiringTime'];
+        $this->state = $data['state'];
+    }
+
+    public function __serialize(): array
     {
         if (!$this->serializable) {
             throw new UnserializableKeyException('The key cannot be serialized.');
         }
 
-        return ['resource', 'expiringTime', 'state'];
+        return [
+            'resource' => $this->resource,
+            'expiringTime' => $this->expiringTime,
+            'state' => $this->state,
+        ];
     }
 }

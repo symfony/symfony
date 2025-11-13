@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\String\Tests;
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\String\LazyString;
 
 class LazyStringTest extends TestCase
@@ -29,17 +29,13 @@ class LazyStringTest extends TestCase
         $this->assertSame(1, $count);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testReturnTypeError()
     {
-        ErrorHandler::register();
-
         $s = LazyString::fromCallable(fn () => []);
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Return value of '.__NAMESPACE__.'\{closure}() passed to '.LazyString::class.'::fromCallable() must be of the type string, array returned.');
+        $this->expectExceptionMessageMatches('{^Return value of .*\{closure.*\}\(\) passed to '.preg_quote(LazyString::class).'::fromCallable\(\) must be of the type string, array returned\.$}');
 
         (string) $s;
     }

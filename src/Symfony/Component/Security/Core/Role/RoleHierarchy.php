@@ -12,8 +12,6 @@
 namespace Symfony\Component\Security\Core\Role;
 
 /**
- * RoleHierarchy defines a role hierarchy.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RoleHierarchy implements RoleHierarchyInterface
@@ -21,21 +19,18 @@ class RoleHierarchy implements RoleHierarchyInterface
     /** @var array<string, list<string>> */
     protected array $map;
 
-    private array $hierarchy;
-
     /**
      * @param array<string, list<string>> $hierarchy
      */
-    public function __construct(array $hierarchy)
-    {
-        $this->hierarchy = $hierarchy;
-
+    public function __construct(
+        private array $hierarchy,
+    ) {
         $this->buildRoleMap();
     }
 
     public function getReachableRoleNames(array $roles): array
     {
-        $reachableRoles = $roles;
+        $reachableRoles = array_combine($roles, $roles);
 
         foreach ($roles as $role) {
             if (!isset($this->map[$role])) {
@@ -43,11 +38,11 @@ class RoleHierarchy implements RoleHierarchyInterface
             }
 
             foreach ($this->map[$role] as $r) {
-                $reachableRoles[] = $r;
+                $reachableRoles[$r] = $r;
             }
         }
 
-        return array_values(array_unique($reachableRoles));
+        return array_keys($reachableRoles);
     }
 
     protected function buildRoleMap(): void
@@ -57,8 +52,11 @@ class RoleHierarchy implements RoleHierarchyInterface
             $this->map[$main] = $roles;
             $visited = [];
             $additionalRoles = $roles;
-            while ($role = array_shift($additionalRoles)) {
+            while (null !== $role = key($additionalRoles)) {
+                $role = $additionalRoles[$role];
+
                 if (!isset($this->hierarchy[$role])) {
+                    next($additionalRoles);
                     continue;
                 }
 
@@ -71,6 +69,8 @@ class RoleHierarchy implements RoleHierarchyInterface
                 foreach (array_diff($this->hierarchy[$role], $visited) as $additionalRole) {
                     $additionalRoles[] = $additionalRole;
                 }
+
+                next($additionalRoles);
             }
 
             $this->map[$main] = array_unique($this->map[$main]);

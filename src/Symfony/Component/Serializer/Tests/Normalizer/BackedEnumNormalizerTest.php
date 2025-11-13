@@ -126,4 +126,30 @@ class BackedEnumNormalizerTest extends TestCase
 
         $this->assertSame(StringBackedEnumDummy::GET, $this->normalizer->denormalize('GET', StringBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
     }
+
+    public function testDenormalizeNullWithAllowInvalidAndCollectErrorsThrows()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The data is neither an integer nor a string');
+
+        $context = [
+            BackedEnumNormalizer::ALLOW_INVALID_VALUES => true,
+            'not_normalizable_value_exceptions' => [], // Indicate that we want to collect errors
+        ];
+
+        $this->normalizer->denormalize(null, StringBackedEnumDummy::class, null, $context);
+    }
+
+    public function testDenormalizeInvalidValueWithAllowInvalidAndCollectErrorsThrows()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The data must belong to a backed enumeration of type');
+
+        $context = [
+            BackedEnumNormalizer::ALLOW_INVALID_VALUES => true,
+            'not_normalizable_value_exceptions' => [],
+        ];
+
+        $this->normalizer->denormalize('invalid-value', StringBackedEnumDummy::class, null, $context);
+    }
 }

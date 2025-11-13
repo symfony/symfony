@@ -78,7 +78,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         ++$this->requestsCount;
 
         if (!$response instanceof ResponseInterface) {
-            throw new TransportException(sprintf('The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "%s" given.', get_debug_type($response)));
+            throw new TransportException(\sprintf('The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "%s" given.', get_debug_type($response)));
         }
 
         return MockResponse::fromRequest($method, $url, $options, $response);

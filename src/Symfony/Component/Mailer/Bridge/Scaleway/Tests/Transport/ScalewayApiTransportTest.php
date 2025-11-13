@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Scaleway\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -23,9 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ScalewayApiTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(ScalewayApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
@@ -69,6 +68,8 @@ class ScalewayApiTransportTest extends TestCase
             $this->assertSame('attachment.txt', $body['attachments'][0]['name']);
             $this->assertSame('text/plain', $body['attachments'][0]['type']);
             $this->assertSame(base64_encode('some attachment'), $body['attachments'][0]['content']);
+            $this->assertSame('Reply-To', $body['additional_headers'][0]['key']);
+            $this->assertStringContainsString('foo@bar.fr', $body['additional_headers'][0]['value']);
 
             return new JsonMockResponse(['emails' => [['message_id' => 'foobar']]], [
                 'http_code' => 200,
@@ -81,6 +82,7 @@ class ScalewayApiTransportTest extends TestCase
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->replyTo(new Address('foo@bar.fr', 'Foo'))
             ->text('Hello There!')
             ->addPart(new DataPart('some attachment', 'attachment.txt', 'text/plain'));
 

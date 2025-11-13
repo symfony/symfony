@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Csrf\Tests\TokenGenerator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 
@@ -22,7 +23,7 @@ class UriSafeTokenGeneratorTest extends TestCase
     private const ENTROPY = 1000;
 
     /**
-     * A non alpha-numeric byte string.
+     * A non alphanumeric byte string.
      */
     private static string $bytes;
 
@@ -43,14 +44,10 @@ class UriSafeTokenGeneratorTest extends TestCase
         $token = $this->generator->generateToken();
 
         $this->assertTrue(ctype_print($token), 'is printable');
-        $this->assertStringNotMatchesFormat('%S+%S', $token, 'is URI safe');
-        $this->assertStringNotMatchesFormat('%S/%S', $token, 'is URI safe');
-        $this->assertStringNotMatchesFormat('%S=%S', $token, 'is URI safe');
+        $this->assertDoesNotMatchRegularExpression('#.+([+/=]).+#', $token, 'is URI safe');
     }
 
-    /**
-     * @dataProvider validDataProvider
-     */
+    #[DataProvider('validDataProvider')]
     public function testValidLength(int $entropy, int $length)
     {
         $generator = new UriSafeTokenGenerator($entropy);

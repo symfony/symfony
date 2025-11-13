@@ -116,8 +116,8 @@ class UrlPackage extends Package
         foreach ($urls as $url) {
             if (str_starts_with($url, 'https://') || str_starts_with($url, '//') || '' === $url) {
                 $sslUrls[] = $url;
-            } elseif (null === parse_url($url, \PHP_URL_SCHEME)) {
-                throw new InvalidArgumentException(sprintf('"%s" is not a valid URL.', $url));
+            } elseif (!parse_url($url, \PHP_URL_SCHEME)) {
+                throw new InvalidArgumentException(\sprintf('"%s" is not a valid URL.', $url));
             }
         }
 

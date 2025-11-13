@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
@@ -110,11 +111,10 @@ class ImportMapUpdateCheckerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideImportMapEntry
-     *
      * @param ImportMapEntry[]    $entries
      * @param PackageUpdateInfo[] $expectedUpdateInfo
      */
+    #[DataProvider('provideImportMapEntry')]
     public function testGetAvailableUpdatesForSinglePackage(array $entries, array $expectedUpdateInfo, ?\Exception $expectedException)
     {
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries($entries));
@@ -127,7 +127,7 @@ class ImportMapUpdateCheckerTest extends TestCase
         }
     }
 
-    private function provideImportMapEntry()
+    public static function provideImportMapEntry(): iterable
     {
         yield [
             [self::createRemoteEntry(
@@ -207,7 +207,7 @@ class ImportMapUpdateCheckerTest extends TestCase
 
     private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
-        $packageSpecifier = $packageSpecifier ?? $importName;
+        $packageSpecifier ??= $importName;
 
         return ImportMapEntry::createRemote($importName, $type, path: '/vendor/any-path.js', version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
     }

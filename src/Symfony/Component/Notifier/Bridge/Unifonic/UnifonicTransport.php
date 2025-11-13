@@ -39,7 +39,7 @@ final class UnifonicTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('unifonic://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        return \sprintf('unifonic://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -53,7 +53,7 @@ final class UnifonicTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/rest/SMS/messages', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/rest/SMS/messages', $this->getEndpoint());
 
         $body = [
             'AppSid' => $this->appSid,
@@ -74,7 +74,7 @@ final class UnifonicTransport extends AbstractTransport
         try {
             $statusCode = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {
-            throw new TransportException(sprintf('Could not reach "%s" endpoint.', $endpoint), $response, previous: $e);
+            throw new TransportException(\sprintf('Could not reach "%s" endpoint.', $endpoint), $response, previous: $e);
         }
 
         if (200 !== $statusCode) {
@@ -84,7 +84,7 @@ final class UnifonicTransport extends AbstractTransport
         $content = $response->toArray(false);
 
         if ('true' != $content['success']) {
-            throw new TransportException(sprintf('Unable to send the SMS. Reason: "%s". Error code: "%s".', $content['message'], $content['errorCode']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS. Reason: "%s". Error code: "%s".', $content['message'], $content['errorCode']), $response);
         }
 
         return new SentMessage($message, (string) $this);

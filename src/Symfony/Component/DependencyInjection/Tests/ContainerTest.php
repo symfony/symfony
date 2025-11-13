@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,12 +35,10 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    /**
-     * @dataProvider dataForTestCamelize
-     */
+    #[DataProvider('dataForTestCamelize')]
     public function testCamelize($id, $expected)
     {
-        $this->assertEquals($expected, Container::camelize($id), sprintf('Container::camelize("%s")', $id));
+        $this->assertEquals($expected, Container::camelize($id), \sprintf('Container::camelize("%s")', $id));
     }
 
     public static function dataForTestCamelize()
@@ -58,12 +57,10 @@ class ContainerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataForTestUnderscore
-     */
+    #[DataProvider('dataForTestUnderscore')]
     public function testUnderscore($id, $expected)
     {
-        $this->assertEquals($expected, Container::underscore($id), sprintf('Container::underscore("%s")', $id));
+        $this->assertEquals($expected, Container::underscore($id), \sprintf('Container::underscore("%s")', $id));
     }
 
     public static function dataForTestUnderscore()
@@ -320,7 +317,7 @@ class ContainerTest extends TestCase
     public function testReset()
     {
         $c = new Container();
-        $c->set('bar', $bar = new class() implements ResetInterface {
+        $c->set('bar', $bar = new class implements ResetInterface {
             public int $resetCounter = 0;
 
             public function reset(): void

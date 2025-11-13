@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
@@ -24,9 +25,7 @@ use Symfony\Component\Mime\RawMessage;
 
 class TransportTest extends TestCase
 {
-    /**
-     * @dataProvider fromStringProvider
-     */
+    #[DataProvider('fromStringProvider')]
     public function testFromString(string $dsn, TransportInterface $transport)
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
@@ -58,11 +57,14 @@ class TransportTest extends TestCase
             'roundrobin(dummy://a failover(dummy://b dummy://a) dummy://b)',
             new RoundRobinTransport([$transportA, new FailoverTransport([$transportB, $transportA]), $transportB]),
         ];
+
+        yield 'round robin transport with retry period' => [
+            'roundrobin(dummy://a dummy://b)?retry_period=15',
+            new RoundRobinTransport([$transportA, $transportB], 15),
+        ];
     }
 
-    /**
-     * @dataProvider fromDsnProvider
-     */
+    #[DataProvider('fromDsnProvider')]
     public function testFromDsn(string $dsn, TransportInterface $transport)
     {
         $this->assertEquals($transport, Transport::fromDsn($dsn));
@@ -76,9 +78,7 @@ class TransportTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fromWrongStringProvider
-     */
+    #[DataProvider('fromWrongStringProvider')]
     public function testFromWrongString(string $dsn, string $error)
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
@@ -100,7 +100,7 @@ class TransportTest extends TestCase
     }
 }
 
-class DummyTransport implements Transport\TransportInterface
+class DummyTransport implements TransportInterface
 {
     private string $host;
 

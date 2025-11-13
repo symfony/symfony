@@ -1,13 +1,36 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `input=date_point` to `DateTimeType`, `DateType` and `TimeType`
+ * Add support for guessing form type of enum properties
+ * Add `active_at`, `not_active_at` and `legal_tender`, `include_undated` options to `CurrencyType`
+ * Add `FormFlow` for multistep forms management
+
+7.3
+---
+
+ * Add support for displaying nested options in DebugCommand
+ * Add support for strings as data for the `MoneyType`
+
+7.2
+---
+
+ * Deprecate the `VersionAwareTest` trait, use feature detection instead
+ * Add support for the `calendar` option in `DateType`
+ * Add `LazyChoiceLoader` and `choice_lazy` option in `ChoiceType` for loading and rendering choices on demand
+ * Use `form.post_set_data` instead of `form.pre_set_data` in `ResizeFormListener`
+ * Change the priority of `DataCollectorListener` from 255 to -255
+
 7.1
 ---
 
  * Add option `separator` to `ChoiceType` to use a custom separator after preferred choices (use the new `separator_html` option to display the separator text as HTML)
- * Deprecate not configuring the `default_protocol` option of the `UrlType`, it will default to `null` in 8.0
+ * Deprecate not configuring the `default_protocol` option of the `UrlType`, it will default to `null` in 8.0 (the current default is `'http'`)
  * Add a `keep_as_list` option to `CollectionType`
- * Add a new `model_type` option to `MoneyType`, to be able to cast the transformed value to `integer`
+ * Add an `input` option to `MoneyType`, to be able to cast the transformed value to `integer`
 
 7.0
 ---

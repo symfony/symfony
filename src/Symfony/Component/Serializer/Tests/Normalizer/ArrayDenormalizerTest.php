@@ -108,6 +108,22 @@ class ArrayDenormalizerTest extends TestCase
             )
         );
     }
+
+    public function testDenormalizeWithoutDenormalizer()
+    {
+        $arrayDenormalizer = new ArrayDenormalizer();
+
+        $this->expectException(\BadMethodCallException::class);
+        $arrayDenormalizer->denormalize([], 'string[]');
+    }
+
+    public function testSupportsDenormalizationWithoutDenormalizer()
+    {
+        $arrayDenormalizer = new ArrayDenormalizer();
+
+        $this->expectException(\BadMethodCallException::class);
+        $arrayDenormalizer->supportsDenormalization([], 'string[]');
+    }
 }
 
 class ArrayDummy

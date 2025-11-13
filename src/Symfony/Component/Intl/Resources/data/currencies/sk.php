@@ -904,7 +904,7 @@ return [
         ],
         'SLL' => [
             'SLL',
-            'sierraleonský leone (1964—2022)',
+            'sierraleonský leone (1964 – 2022)',
         ],
         'SOS' => [
             'SOS',

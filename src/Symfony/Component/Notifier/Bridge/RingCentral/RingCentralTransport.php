@@ -40,7 +40,7 @@ final class RingCentralTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('ringcentral://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
+        return \sprintf('ringcentral://%s%s', $this->getEndpoint(), null !== $this->from ? '?from='.$this->from : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -60,10 +60,10 @@ final class RingCentralTransport extends AbstractTransport
         $options['to'][]['phoneNumber'] = $message->getPhone();
 
         if (!preg_match('/^\+[1-9]\d{1,14}$/', $options['from']['phoneNumber'] ?? '')) {
-            throw new InvalidArgumentException(sprintf('The "From" number "%s" is not a valid phone number. Phone number must be in E.164 format.', $options['from']['phoneNumber'] ?? ''));
+            throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number. Phone number must be in E.164 format.', $options['from']['phoneNumber'] ?? ''));
         }
 
-        $endpoint = sprintf('https://%s/restapi/v1.0/account/~/extension/~/sms', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/restapi/v1.0/account/~/extension/~/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->apiToken,
             'json' => array_filter($options),
@@ -77,7 +77,7 @@ final class RingCentralTransport extends AbstractTransport
 
         if (200 !== $statusCode) {
             $error = $response->toArray(false);
-            throw new TransportException(sprintf('Unable to send the SMS - "%s".', $error['message'] ?? $error['error_description'] ?? $error['description'] ?? 'unknown failure'), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS - "%s".', $error['message'] ?? $error['error_description'] ?? $error['description'] ?? 'unknown failure'), $response);
         }
 
         $success = $response->toArray(false);

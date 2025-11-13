@@ -1,0 +1,27 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    http_method_override: false
+    type_info: ~
+    json_streamer: ~
+
+services:
+    _defaults:
+        autoconfigure: true
+
+    json_streamer.stream_writer.alias:
+        alias: json_streamer.stream_writer
+        public: true
+
+    json_streamer.stream_reader.alias:
+        alias: json_streamer.stream_reader
+        public: true
+
+    json_streamer.cache_warmer.streamer.alias:
+        alias: .json_streamer.cache_warmer.streamer
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\Dto\Dummy: ~
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\StringToRangeValueTransformer: ~
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\RangeToStringValueTransformer: ~

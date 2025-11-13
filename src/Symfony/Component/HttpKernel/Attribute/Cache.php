@@ -102,6 +102,18 @@ final class Cache
          * It can be expressed in seconds or with a relative time format (1 day, 2 weeks, ...).
          */
         public int|string|null $staleIfError = null,
+
+        /**
+         * Add the "no-store" Cache-Control directive when set to true.
+         *
+         * This directive indicates that no part of the response can be cached
+         * in any cache (not in a shared cache, nor in a private cache).
+         *
+         * Supersedes the "$public" and "$smaxage" values.
+         *
+         * @see https://datatracker.ietf.org/doc/html/rfc7234#section-5.2.2.3
+         */
+        public ?bool $noStore = null,
     ) {
     }
 }

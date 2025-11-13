@@ -58,7 +58,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         // create remember me handler (which manage the remember-me cookies)
         $rememberMeHandlerId = 'security.authenticator.remember_me_handler.'.$firewallName;
         if (isset($config['service']) && isset($config['token_provider'])) {
-            throw new InvalidConfigurationException(sprintf('You cannot use both "service" and "token_provider" in "security.firewalls.%s.remember_me".', $firewallName));
+            throw new InvalidConfigurationException(\sprintf('You cannot use both "service" and "token_provider" in "security.firewalls.%s.remember_me".', $firewallName));
         }
 
         if (isset($config['service'])) {
@@ -107,7 +107,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.remember_me'))
             ->replaceArgument(0, new Reference($rememberMeHandlerId))
-            ->replaceArgument(3, $config['name'] ?? $this->options['name'])
+            ->replaceArgument(2, $config['name'] ?? $this->options['name'])
         ;
 
         return $authenticatorId;
@@ -125,25 +125,19 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
 
     public function addConfiguration(NodeDefinition $node): void
     {
-        $builder = $node
-            ->fixXmlConfig('user_provider')
-            ->children()
-        ;
-
+        $builder = $node->children();
         $builder
             ->scalarNode('secret')
                 ->cannotBeEmpty()
                 ->defaultValue('%kernel.secret%')
             ->end()
             ->scalarNode('service')->end()
-            ->arrayNode('user_providers')
-                ->beforeNormalization()
-                    ->ifString()->then(fn ($v) => [$v])
-                ->end()
+            ->arrayNode('user_providers', 'user_provider')
+                ->acceptAndWrap(['string'])
                 ->prototype('scalar')->end()
             ->end()
             ->booleanNode('catch_exceptions')->defaultTrue()->end()
-            ->arrayNode('signature_properties')
+            ->arrayNode('signature_properties', 'signature_property')
                 ->prototype('scalar')->end()
                 ->requiresAtLeastOneElement()
                 ->info('An array of properties on your User that are used to sign the remember-me cookie. If any of these change, all existing cookies will become invalid.')
@@ -151,11 +145,9 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
                 ->defaultValue(['password'])
             ->end()
             ->arrayNode('token_provider')
-                ->beforeNormalization()
-                    ->ifString()->then(fn ($v) => ['service' => $v])
-                ->end()
+                ->acceptAndWrap(['string'], 'service')
                 ->children()
-                    ->scalarNode('service')->info('The service ID of a custom rememberme token provider.')->end()
+                    ->scalarNode('service')->info('The service ID of a custom remember-me token provider.')->end()
                     ->arrayNode('doctrine')
                         ->canBeEnabled()
                         ->children()
@@ -203,7 +195,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         }
 
         if (!$tokenProviderId) {
-            throw new InvalidConfigurationException(sprintf('No token provider was set for firewall "%s". Either configure a service ID or set "remember_me.token_provider.doctrine" to true.', $firewallName));
+            throw new InvalidConfigurationException(\sprintf('No token provider was set for firewall "%s". Either configure a service ID or set "remember_me.token_provider.doctrine" to true.', $firewallName));
         }
 
         return $tokenProviderId;

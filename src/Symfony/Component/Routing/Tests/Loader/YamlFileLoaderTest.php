@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -46,9 +47,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource(realpath(__DIR__.'/../Fixtures/empty.yml'))], $collection->getResources());
     }
 
-    /**
-     * @dataProvider getPathsToInvalidFiles
-     */
+    #[DataProvider('getPathsToInvalidFiles')]
     public function testLoadThrowsExceptionWithInvalidFile(string $filePath)
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
@@ -109,7 +108,7 @@ class YamlFileLoaderTest extends TestCase
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         foreach ($routes as $route) {
             $this->assertSame('/{foo}/blog/{slug}', $route->getPath());
@@ -161,9 +160,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('override_defaults.yml');
     }
 
-    /**
-     * @dataProvider provideFilesImportingRoutesWithControllers
-     */
+    #[DataProvider('provideFilesImportingRoutesWithControllers')]
     public function testImportRouteWithController($file)
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
@@ -450,6 +447,16 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
 
+    public function testAddingRouteWithHosts()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
+        $routes = $loader->load('route-with-hosts.yml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/route-with-hosts-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
     public function testWhenEnv()
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
@@ -474,8 +481,8 @@ class YamlFileLoaderTest extends TestCase
     {
         new LoaderResolver([
             $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/localized')),
-            new class() extends AttributeClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }
@@ -489,17 +496,38 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame(1, $routes->getPriority('also_important'));
     }
 
-    /**
-     * @dataProvider providePsr4ConfigFiles
-     */
+    public function testPriorityWithHost()
+    {
+        new LoaderResolver([
+            $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/locale_and_host')),
+            new class extends AttributeClassLoader {
+                protected function configureRoute(
+                    Route $route,
+                    \ReflectionClass $class,
+                    \ReflectionMethod $method,
+                    object $annot,
+                ): void {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $routes = $loader->load('priorized-host.yml');
+
+        $this->assertSame(2, $routes->getPriority('important.cs'));
+        $this->assertSame(2, $routes->getPriority('important.en'));
+        $this->assertSame(1, $routes->getPriority('also_important'));
+    }
+
+    #[DataProvider('providePsr4ConfigFiles')]
     public function testImportAttributesWithPsr4Prefix(string $configFile)
     {
         $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
         new LoaderResolver([
             $loader = new YamlFileLoader($locator),
             new Psr4DirectoryLoader($locator),
-            new class() extends AttributeClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }
@@ -523,8 +551,8 @@ class YamlFileLoaderTest extends TestCase
     {
         new LoaderResolver([
             $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
-            new class() extends AttributeClassLoader {
-                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
+            new class extends AttributeClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void
                 {
                     $route->setDefault('_controller', $class->getName().'::'.$method->getName());
                 }

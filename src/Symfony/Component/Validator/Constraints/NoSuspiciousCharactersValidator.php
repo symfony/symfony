@@ -99,7 +99,17 @@ class NoSuspiciousCharactersValidator extends ConstraintValidator
         }
 
         foreach (self::CHECK_ERROR as $check => $error) {
-            if (!($errorCode & $check)) {
+            if (\PHP_VERSION_ID < 80204) {
+                if (!($checks & $check)) {
+                    continue;
+                }
+
+                $checker->setChecks($check);
+
+                if (!$checker->isSuspicious($value)) {
+                    continue;
+                }
+            } elseif (!($errorCode & $check)) {
                 continue;
             }
 

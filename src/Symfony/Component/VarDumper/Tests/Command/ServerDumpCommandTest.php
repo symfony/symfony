@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\VarDumper\Command\ServerDumpCommand;
@@ -18,9 +19,7 @@ use Symfony\Component\VarDumper\Server\DumpServer;
 
 class ServerDumpCommandTest extends TestCase
 {
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $tester = new CommandCompletionTester($this->createCommand());

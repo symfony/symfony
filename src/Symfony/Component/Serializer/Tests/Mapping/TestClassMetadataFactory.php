@@ -63,14 +63,6 @@ class TestClassMetadataFactory
             $symfony->addGroup('name_converter');
         }
 
-        $default = new AttributeMetadata('default');
-        $default->addGroup('Default');
-        $expected->addAttributeMetadata($default);
-
-        $className = new AttributeMetadata('className');
-        $className->addGroup('GroupDummy');
-        $expected->addAttributeMetadata($className);
-
         // load reflection class so that the comparison passes
         $expected->getReflectionClass();
 

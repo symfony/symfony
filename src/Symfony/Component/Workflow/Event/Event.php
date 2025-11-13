@@ -23,17 +23,12 @@ use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
  */
 class Event extends BaseEvent
 {
-    private object $subject;
-    private Marking $marking;
-    private ?Transition $transition;
-    private ?WorkflowInterface $workflow;
-
-    public function __construct(object $subject, Marking $marking, ?Transition $transition = null, ?WorkflowInterface $workflow = null)
-    {
-        $this->subject = $subject;
-        $this->marking = $marking;
-        $this->transition = $transition;
-        $this->workflow = $workflow;
+    public function __construct(
+        private object $subject,
+        private Marking $marking,
+        private ?Transition $transition = null,
+        private ?WorkflowInterface $workflow = null,
+    ) {
     }
 
     public function getMarking(): Marking
@@ -51,8 +46,13 @@ class Event extends BaseEvent
         return $this->transition;
     }
 
+    /**
+     * @deprecated since Symfony 7.3, inject the workflow in the constructor where you need it
+     */
     public function getWorkflow(): WorkflowInterface
     {
+        trigger_deprecation('symfony/workflow', '7.3', 'The "%s()" method is deprecated, inject the workflow in the constructor where you need it.', __METHOD__);
+
         return $this->workflow;
     }
 

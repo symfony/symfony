@@ -21,15 +21,15 @@ use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\ORMSetup;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 use Symfony\Bridge\Doctrine\Middleware\Debug\Middleware;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-/**
- * @requires extension pdo_sqlite
- */
+#[RequiresPhpExtension('pdo_sqlite')]
 class MiddlewareTest extends TestCase
 {
     private DebugDataHolder $debugDataHolder;
@@ -38,10 +38,8 @@ class MiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (!interface_exists(MiddlewareInterface::class)) {
-            $this->markTestSkipped(sprintf('%s needed to run this test', MiddlewareInterface::class));
+            $this->markTestSkipped(\sprintf('%s needed to run this test', MiddlewareInterface::class));
         }
 
         ClockMock::withClockMock(false);
@@ -63,16 +61,16 @@ class MiddlewareTest extends TestCase
         ], $config);
 
         $this->conn->executeQuery(<<<EOT
-CREATE TABLE products (
-	id INTEGER PRIMARY KEY,
-	name TEXT NOT NULL,
-	price REAL NOT NULL,
-	stock INTEGER NOT NULL,
-	picture BLOB NULL,
-	tags TEXT NULL,
-	created_at TEXT NULL
-);
-EOT);
+            CREATE TABLE products (
+            	id INTEGER PRIMARY KEY,
+            	name TEXT NOT NULL,
+            	price REAL NOT NULL,
+            	stock INTEGER NOT NULL,
+            	picture BLOB NULL,
+            	tags TEXT NULL,
+            	created_at TEXT NULL
+            );
+            EOT);
     }
 
     private function getResourceFromString(string $str)
@@ -95,9 +93,7 @@ EOT);
         ];
     }
 
-    /**
-     * @dataProvider provideExecuteMethod
-     */
+    #[DataProvider('provideExecuteMethod')]
     public function testWithoutBinding(callable $executeMethod)
     {
         $this->init();
@@ -112,17 +108,15 @@ EOT);
         $this->assertGreaterThan(0, $debug[1]['executionMS']);
     }
 
-    /**
-     * @dataProvider provideExecuteMethod
-     */
+    #[DataProvider('provideExecuteMethod')]
     public function testWithValueBound(callable $executeMethod)
     {
         $this->init();
 
         $sql = <<<EOT
-INSERT INTO products(name, price, stock, picture, tags, created_at)
-VALUES (?, ?, ?, ?, ?, ?)
-EOT;
+            INSERT INTO products(name, price, stock, picture, tags, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            EOT;
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(1, 'product1');
@@ -142,17 +136,15 @@ EOT;
         $this->assertGreaterThan(0, $debug[1]['executionMS']);
     }
 
-    /**
-     * @dataProvider provideExecuteMethod
-     */
+    #[DataProvider('provideExecuteMethod')]
     public function testWithParamBound(callable $executeMethod)
     {
         $this->init();
 
         $sql = <<<EOT
-INSERT INTO products(name, price, stock, picture, tags)
-VALUES (?, ?, ?, ?, ?)
-EOT;
+            INSERT INTO products(name, price, stock, picture, tags)
+            VALUES (?, ?, ?, ?, ?)
+            EOT;
 
         $expectedRes = $res = $this->getResourceFromString('mydata');
 
@@ -181,9 +173,7 @@ EOT;
         ];
     }
 
-    /**
-     * @dataProvider provideEndTransactionMethod
-     */
+    #[DataProvider('provideEndTransactionMethod')]
     public function testTransaction(callable $endTransactionMethod, string $expectedEndTransactionDebug)
     {
         $this->init();
@@ -239,9 +229,7 @@ EOT;
         ];
     }
 
-    /**
-     * @dataProvider provideExecuteAndEndTransactionMethods
-     */
+    #[DataProvider('provideExecuteAndEndTransactionMethods')]
     public function testGlobalDoctrineDuration(callable $sqlMethod, callable $endTransactionMethod)
     {
         $this->init();
@@ -265,9 +253,7 @@ EOT;
         $this->assertCount(4, $this->stopwatch->getEvent('doctrine')->getPeriods());
     }
 
-    /**
-     * @dataProvider provideExecuteAndEndTransactionMethods
-     */
+    #[DataProvider('provideExecuteAndEndTransactionMethods')]
     public function testWithoutStopwatch(callable $sqlMethod, callable $endTransactionMethod)
     {
         $this->init(false);

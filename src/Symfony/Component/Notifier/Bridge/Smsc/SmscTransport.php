@@ -36,14 +36,13 @@ final class SmscTransport extends AbstractTransport
         private string $from,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-)
-    {
+    ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return sprintf('smsc://%s?from=%s', $this->getEndpoint(), $this->from);
+        return \sprintf('smsc://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -68,7 +67,7 @@ final class SmscTransport extends AbstractTransport
             'time' => '0-24',
         ];
 
-        $endpoint = sprintf('https://%s/sys/send.php', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/sys/send.php', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, ['body' => $body]);
 
         try {
@@ -82,7 +81,7 @@ final class SmscTransport extends AbstractTransport
         }
 
         if (\array_key_exists('error', $result)) {
-            throw new TransportException(sprintf('Unable to send the SMS: code = %d, message = "%s".', $result['error_code'], $result['error']), $response);
+            throw new TransportException(\sprintf('Unable to send the SMS: code = %d, message = "%s".', $result['error_code'], $result['error']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

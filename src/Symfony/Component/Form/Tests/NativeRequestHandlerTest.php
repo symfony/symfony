@@ -41,8 +41,6 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $_GET = [];
         $_POST = [];
         $_FILES = [];
@@ -172,8 +170,8 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $form = $this->createForm('param1', 'POST');
 
         $this->setRequestData('GET', [
-                'param1' => 'DATA',
-            ]);
+            'param1' => 'DATA',
+        ]);
 
         $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] = 'PUT';
 

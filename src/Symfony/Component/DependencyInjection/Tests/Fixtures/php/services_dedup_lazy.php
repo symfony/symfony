@@ -52,7 +52,7 @@ class ProjectServiceContainer extends Container
     protected static function getBarService($container, $lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $container->services['bar'] = $container->createProxy('stdClassGhostAa01f12', static fn () => \stdClassGhostAa01f12::createLazyGhost(static fn ($proxy) => self::getBarService($container, $proxy)));
+            return $container->services['bar'] = new \ReflectionClass('stdClass')->newLazyGhost(static function ($proxy) use ($container) { self::getBarService($container, $proxy); });
         }
 
         return $lazyLoad;
@@ -94,28 +94,16 @@ class ProjectServiceContainer extends Container
     protected static function getFooService($container, $lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $container->services['foo'] = $container->createProxy('stdClassGhostAa01f12', static fn () => \stdClassGhostAa01f12::createLazyGhost(static fn ($proxy) => self::getFooService($container, $proxy)));
+            return $container->services['foo'] = new \ReflectionClass('stdClass')->newLazyGhost(static function ($proxy) use ($container) { self::getFooService($container, $proxy); });
         }
 
         return $lazyLoad;
     }
 }
 
-class stdClassGhostAa01f12 extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
-{
-    use \Symfony\Component\VarExporter\LazyGhostTrait;
-
-    private const LAZY_OBJECT_PROPERTY_SCOPES = [];
-}
-
-// Help opcache.preload discover always-needed symbols
-class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
-
 class stdClassProxyAa01f12 extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
-    use \Symfony\Component\VarExporter\LazyProxyTrait;
+    use \Symfony\Component\VarExporter\Internal\LazyDecoratorTrait;
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 }
@@ -123,4 +111,3 @@ class stdClassProxyAa01f12 extends \stdClass implements \Symfony\Component\VarEx
 // Help opcache.preload discover always-needed symbols
 class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
-class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);

@@ -12,8 +12,8 @@
 namespace Symfony\Bridge\Monolog\Tests;
 
 use Monolog\Level;
-use Monolog\LogRecord;
 use Monolog\Logger;
+use Monolog\LogRecord;
 
 class RecordFactory
 {

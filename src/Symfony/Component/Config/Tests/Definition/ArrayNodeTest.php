@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -75,9 +76,7 @@ class ArrayNodeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider ignoreAndRemoveMatrixProvider
-     */
+    #[DataProvider('ignoreAndRemoveMatrixProvider')]
     public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, array|\Exception $expected, string $message = '')
     {
         if ($expected instanceof \Exception) {
@@ -90,9 +89,7 @@ class ArrayNodeTest extends TestCase
         $this->assertSame($expected, $result, $message);
     }
 
-    /**
-     * @dataProvider getPreNormalizationTests
-     */
+    #[DataProvider('getPreNormalizationTests')]
     public function testPreNormalize(array $denormalized, array $normalized)
     {
         $node = new ArrayNode('foo');
@@ -124,9 +121,7 @@ class ArrayNodeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getZeroNamedNodeExamplesData
-     */
+    #[DataProvider('getZeroNamedNodeExamplesData')]
     public function testNodeNameCanBeZero(array $denormalized, array $normalized)
     {
         $zeroNode = new ArrayNode(0);
@@ -171,9 +166,7 @@ class ArrayNodeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getPreNormalizedNormalizedOrderedData
-     */
+    #[DataProvider('getPreNormalizedNormalizedOrderedData')]
     public function testChildrenOrderIsMaintainedOnNormalizeValue(array $prenormalized, array $normalized)
     {
         $scalar1 = new ScalarNode('1');
@@ -246,6 +239,7 @@ class ArrayNodeTest extends TestCase
         $this->assertSame('"foo" is deprecated', $deprecation['message']);
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
+        $this->assertSame('Since vendor/package 1.1: "foo" is deprecated', $childNode->getDeprecationMessage());
 
         $node = new ArrayNode('root');
         $node->addChild($childNode);
@@ -276,10 +270,8 @@ class ArrayNodeTest extends TestCase
         $this->assertTrue($deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
 
-    /**
-     * @dataProvider getDataWithIncludedExtraKeys
-     */
-    public function testMergeWithoutIgnoringExtraKeys(array $prenormalizeds)
+    #[DataProvider('getDataWithIncludedExtraKeys')]
+    public function testMergeWithoutIgnoringExtraKeys(array $prenormalizeds, array $merged)
     {
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));
@@ -294,10 +286,8 @@ class ArrayNodeTest extends TestCase
         $r->invoke($node, ...$prenormalizeds);
     }
 
-    /**
-     * @dataProvider getDataWithIncludedExtraKeys
-     */
-    public function testMergeWithIgnoringAndRemovingExtraKeys(array $prenormalizeds)
+    #[DataProvider('getDataWithIncludedExtraKeys')]
+    public function testMergeWithIgnoringAndRemovingExtraKeys(array $prenormalizeds, array $merged)
     {
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));
@@ -312,9 +302,7 @@ class ArrayNodeTest extends TestCase
         $r->invoke($node, ...$prenormalizeds);
     }
 
-    /**
-     * @dataProvider getDataWithIncludedExtraKeys
-     */
+    #[DataProvider('getDataWithIncludedExtraKeys')]
     public function testMergeWithIgnoringExtraKeys(array $prenormalizeds, array $merged)
     {
         $node = new ArrayNode('root');

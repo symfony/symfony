@@ -18,9 +18,13 @@ class SentMessage
 {
     private ?string $messageId = null;
 
+    /**
+     * @param array $info attaches any Transport-related information to the sent message
+     */
     public function __construct(
         private MessageInterface $original,
         private string $transport,
+        private array $info = [],
     ) {
     }
 
@@ -42,5 +46,19 @@ class SentMessage
     public function getMessageId(): ?string
     {
         return $this->messageId;
+    }
+
+    /**
+     * Returns extra info attached to the message.
+     *
+     * @param string|null $key if null, the whole info array will be returned, else returns the info value or null
+     */
+    public function getInfo(?string $key = null): mixed
+    {
+        if (null !== $key) {
+            return $this->info[$key] ?? null;
+        }
+
+        return $this->info;
     }
 }

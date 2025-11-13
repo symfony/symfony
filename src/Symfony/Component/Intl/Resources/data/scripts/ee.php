@@ -26,7 +26,7 @@ return [
         'Knda' => 'kannadagbeŋɔŋlɔ',
         'Kore' => 'Koreagbeŋɔŋlɔ',
         'Laoo' => 'laogbeŋɔŋlɔ',
-        'Latn' => 'Latingbeŋɔŋlɔ',
+        'Latn' => 'latingbeŋɔŋlɔ',
         'Mlym' => 'malayagbeŋɔŋlɔ',
         'Mong' => 'mongoliagbeŋɔŋlɔ',
         'Mymr' => 'myanmargbeŋɔŋlɔ',

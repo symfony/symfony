@@ -43,13 +43,13 @@ final class DateIntervalNormalizer implements NormalizerInterface, DenormalizerI
     /**
      * @throws InvalidArgumentException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): string
+    public function normalize(mixed $data, ?string $format = null, array $context = []): string
     {
-        if (!$object instanceof \DateInterval) {
+        if (!$data instanceof \DateInterval) {
             throw new InvalidArgumentException('The object must be an instance of "\DateInterval".');
         }
 
-        return $object->format($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY]);
+        return $data->format($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY]);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -85,7 +85,7 @@ final class DateIntervalNormalizer implements NormalizerInterface, DenormalizerI
         }
         $valuePattern = '/^'.$signPattern.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?:(?P<$1>\d+)$2)?', preg_replace('/(T.*)$/', '($1)?', $dateIntervalFormat)).'$/';
         if (!preg_match($valuePattern, $data)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Value "%s" contains intervals not accepted by format "%s".', $data, $dateIntervalFormat), $data, ['string'], $context['deserialization_path'] ?? null, false);
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Value "%s" contains intervals not accepted by format "%s".', $data, $dateIntervalFormat), $data, ['string'], $context['deserialization_path'] ?? null, false);
         }
 
         try {

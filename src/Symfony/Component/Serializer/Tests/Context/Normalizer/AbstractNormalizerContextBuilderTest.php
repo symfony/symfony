@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Context\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Context\Normalizer\AbstractNormalizerContextBuilder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -25,14 +26,13 @@ class AbstractNormalizerContextBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->contextBuilder = new class() extends AbstractNormalizerContextBuilder {};
+        $this->contextBuilder = new class extends AbstractNormalizerContextBuilder {};
     }
 
     /**
-     * @dataProvider withersDataProvider
-     *
      * @param array<string, mixed> $values
      */
+    #[DataProvider('withersDataProvider')]
     public function testWithers(array $values)
     {
         $context = $this->contextBuilder
@@ -41,7 +41,7 @@ class AbstractNormalizerContextBuilderTest extends TestCase
             ->withGroups($values[AbstractNormalizer::GROUPS])
             ->withAttributes($values[AbstractNormalizer::ATTRIBUTES])
             ->withAllowExtraAttributes($values[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES])
-            ->withDefaultContructorArguments($values[AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS])
+            ->withDefaultConstructorArguments($values[AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS])
             ->withCallbacks($values[AbstractNormalizer::CALLBACKS])
             ->withCircularReferenceHandler($values[AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER])
             ->withIgnoredAttributes($values[AbstractNormalizer::IGNORED_ATTRIBUTES])

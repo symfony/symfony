@@ -60,7 +60,7 @@ class QtFileLoaderTest extends TestCase
         $resource = __DIR__.'/../Fixtures/empty.xlf';
 
         $this->expectException(InvalidResourceException::class);
-        $this->expectExceptionMessage(sprintf('Unable to load "%s".', $resource));
+        $this->expectExceptionMessage(\sprintf('Unable to load "%s".', $resource));
 
         (new QtFileLoader())->load($resource, 'en', 'domain1');
     }

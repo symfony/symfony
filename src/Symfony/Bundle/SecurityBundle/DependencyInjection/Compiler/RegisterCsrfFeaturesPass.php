@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
@@ -35,6 +36,10 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
 
     private function registerCsrfProtectionListener(ContainerBuilder $container): void
     {
+        if (!$container->hasDefinition('cache.system')) {
+            $container->removeDefinition('cache.security_is_csrf_token_valid_attribute_expression_language');
+        }
+
         if (!$container->has('security.authenticator.manager') || !$container->has('security.csrf.token_manager')) {
             return;
         }
@@ -45,6 +50,7 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
 
         $container->register('controller.is_csrf_token_valid_attribute_listener', IsCsrfTokenValidAttributeListener::class)
             ->addArgument(new Reference('security.csrf.token_manager'))
+            ->addArgument(new Reference('security.is_csrf_token_valid_attribute_expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE))
             ->addTag('kernel.event_subscriber');
     }
 

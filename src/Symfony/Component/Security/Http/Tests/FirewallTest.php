@@ -11,18 +11,25 @@
 
 namespace Symfony\Component\Security\Http\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Http\Firewall;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
+use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 
 class FirewallTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public function testOnKernelRequestRegistersExceptionListener()
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -52,21 +59,25 @@ class FirewallTest extends TestCase
 
     public function testOnKernelRequestStopsWhenThereIsAResponse()
     {
-        $called = [];
+        $listener = new class extends AbstractListener {
+            public int $callCount = 0;
 
-        $first = function () use (&$called) {
-            $called[] = 1;
-        };
+            public function supports(Request $request): ?bool
+            {
+                return true;
+            }
 
-        $second = function () use (&$called) {
-            $called[] = 2;
+            public function authenticate(RequestEvent $event): void
+            {
+                ++$this->callCount;
+            }
         };
 
         $map = $this->createMock(FirewallMapInterface::class);
         $map
             ->expects($this->once())
             ->method('getListeners')
-            ->willReturn([[$first, $second], null, null])
+            ->willReturn([[$listener, $listener], null, null])
         ;
 
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST);
@@ -75,7 +86,7 @@ class FirewallTest extends TestCase
         $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));
         $firewall->onKernelRequest($event);
 
-        $this->assertSame([1], $called);
+        $this->assertSame(1, $listener->callCount);
     }
 
     public function testOnKernelRequestWithSubRequest()
@@ -96,5 +107,91 @@ class FirewallTest extends TestCase
         $firewall->onKernelRequest($event);
 
         $this->assertFalse($event->hasResponse());
+    }
+
+    public function testFirewallListenersAreCalled()
+    {
+        $calledListeners = [];
+
+        $firewallListener = new class($calledListeners) implements FirewallListenerInterface {
+            public function __construct(private array &$calledListeners)
+            {
+            }
+
+            public function supports(Request $request): ?bool
+            {
+                return true;
+            }
+
+            public function authenticate(RequestEvent $event): void
+            {
+                $this->calledListeners[] = 'firewallListener';
+            }
+
+            public static function getPriority(): int
+            {
+                return 0;
+            }
+        };
+        $callableFirewallListener = new class($calledListeners) extends AbstractListener {
+            public function __construct(private array &$calledListeners)
+            {
+            }
+
+            public function supports(Request $request): ?bool
+            {
+                return true;
+            }
+
+            public function authenticate(RequestEvent $event): void
+            {
+                $this->calledListeners[] = 'callableFirewallListener';
+            }
+        };
+
+        $request = $this->createMock(Request::class);
+
+        $map = $this->createMock(FirewallMapInterface::class);
+        $map
+            ->expects($this->once())
+            ->method('getListeners')
+            ->with($this->equalTo($request))
+            ->willReturn([[$firewallListener, $callableFirewallListener], null, null])
+        ;
+
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));
+        $firewall->onKernelRequest($event);
+
+        $this->assertSame(['firewallListener', 'callableFirewallListener'], $calledListeners);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testCallableListenersAreCalled()
+    {
+        $calledListeners = [];
+
+        $callableListener = static function () use (&$calledListeners) { $calledListeners[] = 'callableListener'; };
+
+        $request = $this->createMock(Request::class);
+
+        $map = $this->createMock(FirewallMapInterface::class);
+        $map
+            ->expects($this->once())
+            ->method('getListeners')
+            ->with($this->equalTo($request))
+            ->willReturn([[$callableListener], null, null])
+        ;
+
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));
+
+        $this->expectUserDeprecationMessage('Since symfony/security-http 7.4: Using a callable as firewall listener is deprecated, extend "Symfony\Component\Security\Http\Firewall\AbstractListener" or implement "Symfony\Component\Security\Http\Firewall\FirewallListenerInterface" instead.');
+        $firewall->onKernelRequest($event);
+
+        $this->assertSame(['callableListener'], $calledListeners);
     }
 }

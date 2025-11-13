@@ -24,6 +24,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsag
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\ReplaceDecoratedRememberMeHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\CasTokenHandlerFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OAuth2TokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcUserInfoTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\ServiceTokenHandlerFactory;
@@ -80,13 +81,14 @@ class SecurityBundle extends Bundle
             new OidcUserInfoTokenHandlerFactory(),
             new OidcTokenHandlerFactory(),
             new CasTokenHandlerFactory(),
+            new OAuth2TokenHandlerFactory(),
         ]));
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $container->addCompilerPass(new AddSecurityVotersPass());
-        $container->addCompilerPass(new AddSessionDomainConstraintPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new AddSessionDomainConstraintPass());
         $container->addCompilerPass(new CleanRememberMeVerifierPass());
         $container->addCompilerPass(new RegisterCsrfFeaturesPass());
         $container->addCompilerPass(new RegisterTokenUsageTrackingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
@@ -104,6 +106,6 @@ class SecurityBundle extends Bundle
         )));
 
         // must be registered before DecoratorServicePass
-        $container->addCompilerPass(new MakeFirewallsEventDispatcherTraceablePass(), PassConfig::TYPE_OPTIMIZE, 10);
+        $container->addCompilerPass(new MakeFirewallsEventDispatcherTraceablePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
     }
 }

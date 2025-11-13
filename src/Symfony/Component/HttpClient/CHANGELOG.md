@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add RFC 9111–based caching support to `CachingHttpClient`
+ * Add option `auto_upgrade_http_version` to control how the request HTTP version is handled in `HttplugClient` and `Psr18Client`
+ * Add QUERY to the list of retriable HTTP methods
+ * Deprecate using amphp/http-client < 5
+ * Deprecate passing an instance of `StoreInterface` as `$cache` argument to `CachingHttpClient` constructor
+
+7.3
+---
+
+ * Add IPv6 support to `NativeHttpClient`
+ * Allow using HTTP/3 with the `CurlHttpClient`
+
+7.2
+---
+
+ * Add support for amphp/http-client v5 on PHP 8.4+
+
 7.1
 ---
 
@@ -8,6 +28,7 @@ CHANGELOG
  * Allow mocking `start_time` info in `MockResponse`
  * Add `MockResponse::fromFile()` and `JsonMockResponse::fromFile()` methods to help using fixtures files
  * Add `ThrottlingHttpClient` to enable limiting the number of requests within a certain period
+ * Deprecate the `setLogger()` methods of the `NoPrivateNetworkHttpClient`, `TraceableHttpClient` and `ScopingHttpClient` classes, configure the logger of the wrapped clients directly instead
 
 7.0
 ---

@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @internal
+ * @final
  */
 class TraceableSerializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, EncoderInterface, DecoderInterface
 {
@@ -32,12 +32,13 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
     public function __construct(
         private SerializerInterface&NormalizerInterface&DenormalizerInterface&EncoderInterface&DecoderInterface $serializer,
         private SerializerDataCollector $dataCollector,
+        private readonly string $serializerName = 'default',
     ) {
     }
 
     public function serialize(mixed $data, string $format, array $context = []): string
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->serialize($data, $format, $context);
@@ -45,14 +46,14 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, SerializerInterface::class);
 
-        $this->dataCollector->collectSerialize($traceId, $data, $format, $context, $time, $caller);
+        $this->dataCollector->collectSerialize($traceId, $data, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
     public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->deserialize($data, $type, $format, $context);
@@ -60,29 +61,29 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, SerializerInterface::class);
 
-        $this->dataCollector->collectDeserialize($traceId, $data, $type, $format, $context, $time, $caller);
+        $this->dataCollector->collectDeserialize($traceId, $data, $type, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
-        $result = $this->serializer->normalize($object, $format, $context);
+        $result = $this->serializer->normalize($data, $format, $context);
         $time = microtime(true) - $startTime;
 
         $caller = $this->getCaller(__FUNCTION__, NormalizerInterface::class);
 
-        $this->dataCollector->collectNormalize($traceId, $object, $format, $context, $time, $caller);
+        $this->dataCollector->collectNormalize($traceId, $data, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->denormalize($data, $type, $format, $context);
@@ -90,14 +91,14 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, DenormalizerInterface::class);
 
-        $this->dataCollector->collectDenormalize($traceId, $data, $type, $format, $context, $time, $caller);
+        $this->dataCollector->collectDenormalize($traceId, $data, $type, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
     public function encode(mixed $data, string $format, array $context = []): string
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->encode($data, $format, $context);
@@ -105,14 +106,14 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, EncoderInterface::class);
 
-        $this->dataCollector->collectEncode($traceId, $data, $format, $context, $time, $caller);
+        $this->dataCollector->collectEncode($traceId, $data, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
 
     public function decode(string $data, string $format, array $context = []): mixed
     {
-        $context[self::DEBUG_TRACE_ID] = $traceId = uniqid();
+        $context[self::DEBUG_TRACE_ID] = $traceId = bin2hex(random_bytes(4));
 
         $startTime = microtime(true);
         $result = $this->serializer->decode($data, $format, $context);
@@ -120,7 +121,7 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
 
         $caller = $this->getCaller(__FUNCTION__, DecoderInterface::class);
 
-        $this->dataCollector->collectDecode($traceId, $data, $format, $context, $time, $caller);
+        $this->dataCollector->collectDecode($traceId, $data, $format, $context, $time, $caller, $this->serializerName);
 
         return $result;
     }
@@ -170,8 +171,8 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
                 && $method === $trace[$i]['function']
                 && is_a($trace[$i]['class'], $interface, true)
             ) {
-                $file = $trace[$i]['file'];
-                $line = $trace[$i]['line'];
+                $file = $trace[$i]['file'] ?? $trace[$i + 1]['file'];
+                $line = $trace[$i]['line'] ?? $trace[$i + 1]['line'];
 
                 break;
             }

@@ -144,8 +144,7 @@ class XmlReferenceDumper
                 }
 
                 if ($child instanceof BaseNode && $child->isDeprecated()) {
-                    $deprecation = $child->getDeprecation($child->getName(), $node->getPath());
-                    $comments[] = sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
+                    $comments[] = \sprintf('Deprecated (%s)', $child->getDeprecationMessage($node));
                 }
 
                 if ($child instanceof EnumNode) {
@@ -199,7 +198,7 @@ class XmlReferenceDumper
         $rootOpenTag = '<'.$rootName;
         if (1 >= ($attributesCount = \count($rootAttributes))) {
             if (1 === $attributesCount) {
-                $rootOpenTag .= sprintf(' %s="%s"', current(array_keys($rootAttributes)), $this->writeValue(current($rootAttributes)));
+                $rootOpenTag .= \sprintf(' %s="%s"', current(array_keys($rootAttributes)), $this->writeValue(current($rootAttributes)));
             }
 
             $rootOpenTag .= $rootIsEmptyTag ? ' />' : '>';
@@ -215,7 +214,7 @@ class XmlReferenceDumper
             $i = 1;
 
             foreach ($rootAttributes as $attrName => $attrValue) {
-                $attr = sprintf('%s="%s"', $attrName, $this->writeValue($attrValue));
+                $attr = \sprintf('%s="%s"', $attrName, $this->writeValue($attrValue));
 
                 $this->writeLine($attr, $depth + 4);
 
@@ -252,7 +251,7 @@ class XmlReferenceDumper
         $indent = \strlen($text) + $indent;
         $format = '%'.$indent.'s';
 
-        $this->reference .= sprintf($format, $text).\PHP_EOL;
+        $this->reference .= \sprintf($format, $text).\PHP_EOL;
     }
 
     /**
@@ -280,7 +279,7 @@ class XmlReferenceDumper
             return 'null';
         }
 
-        if (empty($value)) {
+        if (!$value) {
             return '';
         }
 

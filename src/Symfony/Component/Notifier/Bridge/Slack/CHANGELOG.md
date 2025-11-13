@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `confirm` option to `button` method in `SlackActionsBlock` block
+
+7.2
+---
+
+ * Add `SlackButtonBlockElement` to add button as accessory to a section block
+ * Add `emoji` and `verbatim` options to `text` and `field` methods in `SlackSectionBlock`
+
 6.3
 ---
 

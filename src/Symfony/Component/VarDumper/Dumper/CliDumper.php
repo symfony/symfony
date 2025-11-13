@@ -33,12 +33,13 @@ class CliDumper extends AbstractDumper
         'default' => '0;38;5;208',
         'num' => '1;38;5;38',
         'const' => '1;38;5;208',
+        'virtual' => '3',
         'str' => '1;38;5;113',
         'note' => '38;5;38',
         'ref' => '38;5;247',
-        'public' => '',
-        'protected' => '',
-        'private' => '',
+        'public' => '39',
+        'protected' => '39',
+        'private' => '39',
         'meta' => '38;5;170',
         'key' => '38;5;113',
         'index' => '38;5;38',
@@ -347,7 +348,10 @@ class CliDumper extends AbstractDumper
             if ($cursor->hashKeyIsBinary) {
                 $key = $this->utf8Encode($key);
             }
-            $attr = ['binary' => $cursor->hashKeyIsBinary];
+            $attr = [
+                'binary' => $cursor->hashKeyIsBinary,
+                'virtual' => $cursor->attr['virtual'] ?? false,
+            ];
             $bin = $cursor->hashKeyIsBinary ? 'b' : '';
             $style = 'key';
             switch ($cursor->hashType) {
@@ -371,7 +375,7 @@ class CliDumper extends AbstractDumper
                     // no break
                 case Cursor::HASH_OBJECT:
                     if (!isset($key[0]) || "\0" !== $key[0]) {
-                        $this->line .= '+'.$bin.$this->style('public', $key).': ';
+                        $this->line .= '+'.$bin.$this->style('public', $key, $attr).': ';
                     } elseif (0 < strpos($key, "\0", 1)) {
                         $key = explode("\0", substr($key, 1), 2);
 
@@ -459,7 +463,7 @@ class CliDumper extends AbstractDumper
             $s = $startCchr;
             $c = $c[$i = 0];
             do {
-                $s .= $map[$c[$i]] ?? sprintf('\x%02X', \ord($c[$i]));
+                $s .= $map[$c[$i]] ?? \sprintf('\x%02X', \ord($c[$i]));
             } while (isset($c[++$i]));
 
             return $s.$endCchr;
@@ -505,6 +509,9 @@ class CliDumper extends AbstractDumper
 
         if ('label' === $style && '' !== $value) {
             $value .= ' ';
+        }
+        if ($this->colors && ($attr['virtual'] ?? false)) {
+            $value = "\033[{$this->styles['virtual']}m".$value;
         }
 
         return $value;
@@ -552,7 +559,7 @@ class CliDumper extends AbstractDumper
     protected function dumpLine(int $depth, bool $endOfValue = false): void
     {
         if ($this->colors ??= $this->supportsColors()) {
-            $this->line = sprintf("\033[%sm%s\033[m", $this->styles['default'], $this->line);
+            $this->line = \sprintf("\033[%sm%s\033[m", $this->styles['default'], $this->line);
         }
         parent::dumpLine($depth);
     }
@@ -587,8 +594,13 @@ class CliDumper extends AbstractDumper
         }
 
         // Follow https://no-color.org/
-        if (isset($_SERVER['NO_COLOR']) || false !== getenv('NO_COLOR')) {
+        if ('' !== (($_SERVER['NO_COLOR'] ?? getenv('NO_COLOR'))[0] ?? '')) {
             return false;
+        }
+
+        // Follow https://force-color.org/
+        if ('' !== (($_SERVER['FORCE_COLOR'] ?? getenv('FORCE_COLOR'))[0] ?? '')) {
+            return true;
         }
 
         // Detect msysgit/mingw and assume this is a tty because detection
@@ -632,7 +644,7 @@ class CliDumper extends AbstractDumper
             || 'Hyper' === getenv('TERM_PROGRAM');
 
         if (!$result) {
-            $version = sprintf(
+            $version = \sprintf(
                 '%s.%s.%s',
                 PHP_WINDOWS_VERSION_MAJOR,
                 PHP_WINDOWS_VERSION_MINOR,

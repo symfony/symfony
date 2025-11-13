@@ -20,14 +20,13 @@ class FlashBag implements FlashBagInterface
 {
     private string $name = 'flashes';
     private array $flashes = [];
-    private string $storageKey;
 
     /**
      * @param string $storageKey The key used to store flashes in the session
      */
-    public function __construct(string $storageKey = '_symfony_flashes')
-    {
-        $this->storageKey = $storageKey;
+    public function __construct(
+        private string $storageKey = '_symfony_flashes',
+    ) {
     }
 
     public function getName(): string

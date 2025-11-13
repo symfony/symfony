@@ -15,12 +15,15 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureApiTransport;
 use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class AzureTransportFactoryTest extends TransportFactoryTestCase
+class AzureTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use IncompleteDsnTestTrait;
+
     public function getFactory(): TransportFactoryInterface
     {
         return new AzureTransportFactory(null, new MockHttpClient(), new NullLogger());

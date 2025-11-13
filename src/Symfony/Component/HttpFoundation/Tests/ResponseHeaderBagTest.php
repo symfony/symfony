@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class ResponseHeaderBagTest extends TestCase
 {
     public function testAllPreserveCase()

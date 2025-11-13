@@ -15,13 +15,12 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 
-/**
- * @requires extension pdo_sqlite
- */
+#[RequiresPhpExtension('pdo_sqlite')]
 class DoctrineIntegrationTest extends TestCase
 {
     private \Doctrine\DBAL\Connection $driverConnection;
@@ -191,6 +190,7 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testTheTransportIsSetupOnGet()
     {
+        $this->driverConnection->executeStatement('CREATE TABLE unrelated (unknown_type_column)');
         $this->assertFalse($this->driverConnection->createSchemaManager()->tablesExist(['messenger_messages']));
         $this->assertNull($this->connection->get());
 

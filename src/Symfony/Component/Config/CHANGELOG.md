@@ -1,6 +1,37 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add TagAwareAdapterInterface to NullAdapter
+ * Add argument `$singular` to `NodeBuilder::arrayNode()` to decouple plurals/singulars from XML
+ * Add support for `defaultNull()` on `ArrayNodeDefinition`
+ * Add `ArrayNodeDefinition::acceptAndWrap()` to list alternative types that should be accepted and wrapped in an array
+ * Add array-shapes to generated config builders
+ * Deprecate accessing the internal scope of the loader in PHP config files, use only its public API instead
+ * Deprecate setting a default value to a node that is required, and vice versa
+ * Deprecate fluent config builders, return PHP arrays from your config instead
+
+7.3
+---
+
+ * Add `ExprBuilder::ifFalse()`
+ * Add support for info on `ArrayNodeDefinition::canBeEnabled()` and `ArrayNodeDefinition::canBeDisabled()`
+ * Allow using an enum FQCN with `EnumNode`
+ * Add `NodeDefinition::docUrl()`
+
+7.2
+---
+
+ * Add `#[WhenNot]` attribute to prevent service from being registered in a specific environment
+ * Generate a meta file in JSON format for resource tracking
+ * Add `SkippingResourceChecker`
+ * Add support for `defaultNull()` on `BooleanNodeDefinition`
+ * Add `StringNode` and `StringNodeDefinition`
+ * Add `ArrayNodeDefinition::stringPrototype()` method
+ * Add `NodeBuilder::stringNode()` method
+
 7.1
 ---
 

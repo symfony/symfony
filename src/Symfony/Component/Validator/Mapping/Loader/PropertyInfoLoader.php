@@ -15,6 +15,16 @@ use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type as PropertyInfoType;
+use Symfony\Component\TypeInfo\Type as TypeInfoType;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\NullableType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -31,17 +41,12 @@ final class PropertyInfoLoader implements LoaderInterface
 {
     use AutoMappingTrait;
 
-    private PropertyListExtractorInterface $listExtractor;
-    private PropertyTypeExtractorInterface $typeExtractor;
-    private PropertyAccessExtractorInterface $accessExtractor;
-    private ?string $classValidatorRegexp;
-
-    public function __construct(PropertyListExtractorInterface $listExtractor, PropertyTypeExtractorInterface $typeExtractor, PropertyAccessExtractorInterface $accessExtractor, ?string $classValidatorRegexp = null)
-    {
-        $this->listExtractor = $listExtractor;
-        $this->typeExtractor = $typeExtractor;
-        $this->accessExtractor = $accessExtractor;
-        $this->classValidatorRegexp = $classValidatorRegexp;
+    public function __construct(
+        private PropertyListExtractorInterface $listExtractor,
+        private PropertyTypeExtractorInterface $typeExtractor,
+        private PropertyAccessExtractorInterface $accessExtractor,
+        private ?string $classValidatorRegexp = null,
+    ) {
     }
 
     public function loadClassMetadata(ClassMetadata $metadata): bool
@@ -62,7 +67,7 @@ final class PropertyInfoLoader implements LoaderInterface
                 continue;
             }
 
-            $types = $this->typeExtractor->getTypes($className, $property);
+            $types = $this->getPropertyTypes($className, $property);
             if (null === $types) {
                 continue;
             }
@@ -100,30 +105,71 @@ final class PropertyInfoLoader implements LoaderInterface
             }
 
             $loaded = true;
-            $builtinTypes = [];
-            $nullable = false;
-            $scalar = true;
-            foreach ($types as $type) {
-                $builtinTypes[] = $type->getBuiltinType();
 
-                if ($scalar && !\in_array($type->getBuiltinType(), [PropertyInfoType::BUILTIN_TYPE_INT, PropertyInfoType::BUILTIN_TYPE_FLOAT, PropertyInfoType::BUILTIN_TYPE_STRING, PropertyInfoType::BUILTIN_TYPE_BOOL], true)) {
-                    $scalar = false;
-                }
+            // BC layer for PropertyTypeExtractorInterface::getTypes().
+            // Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
+            if (\is_array($types)) {
+                $builtinTypes = [];
+                $nullable = false;
+                $scalar = true;
 
-                if (!$nullable && $type->isNullable()) {
-                    $nullable = true;
-                }
-            }
-            if (!$hasTypeConstraint) {
-                if (1 === \count($builtinTypes)) {
-                    if ($types[0]->isCollection() && \count($collectionValueType = $types[0]->getCollectionValueTypes()) > 0) {
-                        [$collectionValueType] = $collectionValueType;
-                        $this->handleAllConstraint($property, $allConstraint, $collectionValueType, $metadata);
+                foreach ($types as $type) {
+                    $builtinTypes[] = $type->getBuiltinType();
+
+                    if ($scalar && !\in_array($type->getBuiltinType(), ['int', 'float', 'string', 'bool'], true)) {
+                        $scalar = false;
                     }
 
-                    $metadata->addPropertyConstraint($property, $this->getTypeConstraint($builtinTypes[0], $types[0]));
-                } elseif ($scalar) {
-                    $metadata->addPropertyConstraint($property, new Type(['type' => 'scalar']));
+                    if (!$nullable && $type->isNullable()) {
+                        $nullable = true;
+                    }
+                }
+
+                if (!$hasTypeConstraint) {
+                    if (1 === \count($builtinTypes)) {
+                        if ($types[0]->isCollection() && \count($collectionValueType = $types[0]->getCollectionValueTypes()) > 0) {
+                            [$collectionValueType] = $collectionValueType;
+                            $this->handleAllConstraintLegacy($property, $allConstraint, $collectionValueType, $metadata);
+                        }
+
+                        $metadata->addPropertyConstraint($property, $this->getTypeConstraintLegacy($builtinTypes[0], $types[0]));
+                    } elseif ($scalar) {
+                        $metadata->addPropertyConstraint($property, new Type(type: 'scalar'));
+                    }
+                }
+            } else {
+                if ($hasTypeConstraint) {
+                    continue;
+                }
+
+                $type = $types;
+
+                // BC layer for type-info < 7.2
+                if (!class_exists(NullableType::class)) {
+                    $nullable = false;
+
+                    if ($type instanceof UnionType && $type->isNullable()) {
+                        $nullable = true;
+                        $type = $type->asNonNullable();
+                    }
+                } else {
+                    $nullable = $type->isNullable();
+
+                    if ($type instanceof NullableType) {
+                        $type = $type->getWrappedType();
+                    }
+                }
+
+                if ($type instanceof NullableType) {
+                    $type = $type->getWrappedType();
+                }
+
+                if ($type instanceof CollectionType) {
+                    $this->handleAllConstraint($property, $allConstraint, $type->getCollectionValueType(), $metadata);
+                }
+
+                if (null !== $typeConstraint = $this->getTypeConstraint($type)) {
+                    $metadata->addPropertyConstraint($property, $typeConstraint);
                 }
             }
 
@@ -135,16 +181,120 @@ final class PropertyInfoLoader implements LoaderInterface
         return $loaded;
     }
 
-    private function getTypeConstraint(string $builtinType, PropertyInfoType $type): Type
+    /**
+     * BC layer for PropertyTypeExtractorInterface::getTypes().
+     * Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
+     *
+     * @return TypeInfoType|list<PropertyInfoType>|null
+     */
+    private function getPropertyTypes(string $className, string $property): TypeInfoType|array|null
     {
-        if (PropertyInfoType::BUILTIN_TYPE_OBJECT === $builtinType && null !== $className = $type->getClassName()) {
-            return new Type(['type' => $className]);
+        if (class_exists(TypeInfoType::class) && method_exists($this->typeExtractor, 'getType')) {
+            return $this->typeExtractor->getType($className, $property);
         }
 
-        return new Type(['type' => $builtinType]);
+        return $this->typeExtractor->getTypes($className, $property);
     }
 
-    private function handleAllConstraint(string $property, ?All $allConstraint, PropertyInfoType $propertyInfoType, ClassMetadata $metadata): void
+    /**
+     * BC layer for PropertyTypeExtractorInterface::getTypes().
+     * Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
+     */
+    private function getTypeConstraintLegacy(string $builtinType, PropertyInfoType $type): Type
+    {
+        if (PropertyInfoType::BUILTIN_TYPE_OBJECT === $builtinType && null !== $className = $type->getClassName()) {
+            return new Type(type: $className);
+        }
+
+        return new Type(type: $builtinType);
+    }
+
+    private function getTypeConstraint(TypeInfoType $type): ?Type
+    {
+        // BC layer for type-info < 7.2
+        if (!interface_exists(CompositeTypeInterface::class)) {
+            if ($type instanceof UnionType || $type instanceof IntersectionType) {
+                return ($type->isA(TypeIdentifier::INT) || $type->isA(TypeIdentifier::FLOAT) || $type->isA(TypeIdentifier::STRING) || $type->isA(TypeIdentifier::BOOL)) ? new Type(['type' => 'scalar']) : null;
+            }
+
+            $baseType = $type->getBaseType();
+
+            if ($baseType instanceof ObjectType) {
+                return new Type(type: $baseType->getClassName());
+            }
+
+            if (TypeIdentifier::MIXED !== $baseType->getTypeIdentifier()) {
+                return new Type(type: $baseType->getTypeIdentifier()->value);
+            }
+
+            return null;
+        }
+
+        if ($type instanceof CompositeTypeInterface) {
+            return $type->isIdentifiedBy(
+                TypeIdentifier::INT,
+                TypeIdentifier::FLOAT,
+                TypeIdentifier::STRING,
+                TypeIdentifier::BOOL,
+                TypeIdentifier::TRUE,
+                TypeIdentifier::FALSE,
+            ) ? new Type(type: 'scalar') : null;
+        }
+
+        while ($type instanceof WrappingTypeInterface) {
+            $type = $type->getWrappedType();
+        }
+
+        if ($type instanceof ObjectType) {
+            return new Type(type: $type->getClassName());
+        }
+
+        if ($type instanceof BuiltinType && TypeIdentifier::MIXED !== $type->getTypeIdentifier()) {
+            return new Type(type: $type->getTypeIdentifier()->value);
+        }
+
+        return null;
+    }
+
+    private function handleAllConstraint(string $property, ?All $allConstraint, TypeInfoType $type, ClassMetadata $metadata): void
+    {
+        $containsTypeConstraint = false;
+        $containsNotNullConstraint = false;
+        if (null !== $allConstraint) {
+            foreach ($allConstraint->constraints as $constraint) {
+                if ($constraint instanceof Type) {
+                    $containsTypeConstraint = true;
+                } elseif ($constraint instanceof NotNull) {
+                    $containsNotNullConstraint = true;
+                }
+            }
+        }
+
+        $constraints = [];
+        if (!$containsNotNullConstraint && !$type->isNullable()) {
+            $constraints[] = new NotNull();
+        }
+
+        if (!$containsTypeConstraint && null !== $typeConstraint = $this->getTypeConstraint($type)) {
+            $constraints[] = $typeConstraint;
+        }
+
+        if (!$constraints) {
+            return;
+        }
+
+        if (null === $allConstraint) {
+            $metadata->addPropertyConstraint($property, new All(constraints: $constraints));
+        } else {
+            $allConstraint->constraints = array_merge($allConstraint->constraints, $constraints);
+        }
+    }
+
+    /**
+     * BC layer for PropertyTypeExtractorInterface::getTypes().
+     * Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
+     */
+    private function handleAllConstraintLegacy(string $property, ?All $allConstraint, PropertyInfoType $propertyInfoType, ClassMetadata $metadata): void
     {
         $containsTypeConstraint = false;
         $containsNotNullConstraint = false;
@@ -164,11 +314,11 @@ final class PropertyInfoLoader implements LoaderInterface
         }
 
         if (!$containsTypeConstraint) {
-            $constraints[] = $this->getTypeConstraint($propertyInfoType->getBuiltinType(), $propertyInfoType);
+            $constraints[] = $this->getTypeConstraintLegacy($propertyInfoType->getBuiltinType(), $propertyInfoType);
         }
 
         if (null === $allConstraint) {
-            $metadata->addPropertyConstraint($property, new All(['constraints' => $constraints]));
+            $metadata->addPropertyConstraint($property, new All(constraints: $constraints));
         } else {
             $allConstraint->constraints = array_merge($allConstraint->constraints, $constraints);
         }

@@ -56,9 +56,12 @@ class RegionDataGenerator extends AbstractDataGenerator
         'QO' => true, // Outlying Oceania
         'XA' => true, // Pseudo-Accents
         'XB' => true, // Pseudo-Bidi
-        'XK' => true, // Kosovo
         // Misc
         'ZZ' => true, // Unknown Region
+    ];
+
+    private const USER_ASSIGNED = [
+        'XK' => true, // Kosovo
     ];
 
     // @see https://en.wikipedia.org/wiki/ISO_3166-1_numeric#Withdrawn_codes
@@ -97,7 +100,7 @@ class RegionDataGenerator extends AbstractDataGenerator
 
     public static function isValidCountryCode(int|string|null $region): bool
     {
-        if (isset(self::DENYLIST[$region])) {
+        if (isset(self::DENYLIST[$region]) || isset(self::USER_ASSIGNED[$region])) {
             return false;
         }
 
@@ -107,6 +110,11 @@ class RegionDataGenerator extends AbstractDataGenerator
         }
 
         return true;
+    }
+
+    public static function isUserAssignedCountryCode(int|string|null $region): bool
+    {
+        return isset(self::USER_ASSIGNED[$region]);
     }
 
     protected function scanLocales(LocaleScanner $scanner, string $sourceDir): array
@@ -131,9 +139,7 @@ class RegionDataGenerator extends AbstractDataGenerator
 
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Countries']) && null !== $localeBundle['Countries']) {
-            $data = [
-                'Names' => $this->generateRegionNames($localeBundle),
-            ];
+            $data = $this->generateRegionNames($localeBundle);
 
             $this->regionCodes = array_merge($this->regionCodes, array_keys($data['Names']));
 
@@ -153,23 +159,39 @@ class RegionDataGenerator extends AbstractDataGenerator
         $metadataBundle = $reader->read($tempDir, 'metadata');
 
         $this->regionCodes = array_unique($this->regionCodes);
-
         sort($this->regionCodes);
 
         $alpha2ToAlpha3 = $this->generateAlpha2ToAlpha3Mapping(array_flip($this->regionCodes), $metadataBundle);
+        $userAssignedAlpha2ToAlpha3 = $this->generateAlpha2ToAlpha3Mapping(self::USER_ASSIGNED, $metadataBundle);
+
         $alpha3ToAlpha2 = array_flip($alpha2ToAlpha3);
         asort($alpha3ToAlpha2);
+        $userAssignedAlpha3toAlpha2 = array_flip($userAssignedAlpha2ToAlpha3);
+        asort($userAssignedAlpha3toAlpha2);
 
-        $alpha2ToNumeric = $this->generateAlpha2ToNumericMapping($metadataBundle);
+        $alpha2ToNumeric = $this->generateAlpha2ToNumericMapping(array_flip($this->regionCodes), $metadataBundle);
+        $userAssignedAlpha2ToNumeric = $this->generateAlpha2ToNumericMapping(self::USER_ASSIGNED, $metadataBundle);
+
         $numericToAlpha2 = [];
         foreach ($alpha2ToNumeric as $alpha2 => $numeric) {
             // Add underscore prefix to force keys with leading zeros to remain as string keys.
             $numericToAlpha2['_'.$numeric] = $alpha2;
         }
+        $userAssignedNumericToAlpha2 = [];
+        foreach ($userAssignedAlpha2ToNumeric as $alpha2 => $numeric) {
+            // Add underscore prefix to force keys with leading zeros to remain as string keys.
+            $userAssignedNumericToAlpha2['_'.$numeric] = $alpha2;
+        }
 
         asort($numericToAlpha2);
+        asort($userAssignedNumericToAlpha2);
 
         return [
+            'UserAssignedRegions' => array_keys(self::USER_ASSIGNED),
+            'UserAssignedAlpha2ToAlpha3' => $userAssignedAlpha2ToAlpha3,
+            'UserAssignedAlpha3ToAlpha2' => $userAssignedAlpha3toAlpha2,
+            'UserAssignedAlpha2ToNumeric' => $userAssignedAlpha2ToNumeric,
+            'UserAssignedNumericToAlpha2' => $userAssignedNumericToAlpha2,
             'Regions' => $this->regionCodes,
             'Alpha2ToAlpha3' => $alpha2ToAlpha3,
             'Alpha3ToAlpha2' => $alpha3ToAlpha2,
@@ -181,14 +203,19 @@ class RegionDataGenerator extends AbstractDataGenerator
     protected function generateRegionNames(ArrayAccessibleResourceBundle $localeBundle): array
     {
         $unfilteredRegionNames = iterator_to_array($localeBundle['Countries']);
-        $regionNames = [];
+        $regionNames = ['UserAssignedNames' => [], 'Names' => []];
 
         foreach ($unfilteredRegionNames as $region => $regionName) {
-            if (!self::isValidCountryCode($region)) {
+            if (!self::isValidCountryCode($region) && !self::isUserAssignedCountryCode($region)) {
                 continue;
             }
 
-            $regionNames[$region] = $regionName;
+            if (self::isUserAssignedCountryCode($region)) {
+                $regionNames['UserAssignedNames'][$region] = $regionName;
+                continue;
+            }
+
+            $regionNames['Names'][$region] = $regionName;
         }
 
         return $regionNames;
@@ -204,7 +231,9 @@ class RegionDataGenerator extends AbstractDataGenerator
             $country = $data['replacement'];
 
             if (2 === \strlen($country) && 3 === \strlen($alias) && 'overlong' === $data['reason']) {
-                if (isset(self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$country])) {
+                if (isset($countries[$country]) && self::isUserAssignedCountryCode($country)) {
+                    $alpha2ToAlpha3[$country] = $alias;
+                } elseif (isset($countries[$country]) && !self::isUserAssignedCountryCode($country) && isset(self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$country])) {
                     // Validate to prevent typos
                     if (!isset($aliases[self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$country]])) {
                         throw new RuntimeException('The statically set three-letter mapping '.self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$country].' for the country code '.$country.' seems to be invalid. Typo?');
@@ -231,7 +260,7 @@ class RegionDataGenerator extends AbstractDataGenerator
         return $alpha2ToAlpha3;
     }
 
-    private function generateAlpha2ToNumericMapping(ArrayAccessibleResourceBundle $metadataBundle): array
+    private function generateAlpha2ToNumericMapping(array $countries, ArrayAccessibleResourceBundle $metadataBundle): array
     {
         $aliases = iterator_to_array($metadataBundle['alias']['territory']);
 
@@ -247,6 +276,10 @@ class RegionDataGenerator extends AbstractDataGenerator
             }
 
             if (isset(self::DENYLIST[$data['replacement']])) {
+                continue;
+            }
+
+            if (!isset($countries[$data['replacement']])) {
                 continue;
             }
 

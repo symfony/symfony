@@ -74,6 +74,10 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Մուտքի չափազանց շատ անհաջող փորձեր: Խնդրում ենք կրկին փորձել %minutes րոպե:</target>
             </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target state="needs-review-translation">Չափազանց շատ անհաջող մուտքի փորձեր, խնդրում ենք փորձել կրկին %minutes% րոպեից.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

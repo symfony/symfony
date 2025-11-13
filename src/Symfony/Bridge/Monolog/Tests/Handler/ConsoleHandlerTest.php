@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Level;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
@@ -46,9 +47,7 @@ class ConsoleHandlerTest extends TestCase
         $this->assertFalse($handler->isHandling(RecordFactory::create()), '->isHandling returns false when no output is set');
     }
 
-    /**
-     * @dataProvider provideVerbosityMappingTests
-     */
+    #[DataProvider('provideVerbosityMappingTests')]
     public function testVerbosityMapping($verbosity, $level, $isHandling, array $map = [])
     {
         $output = $this->createMock(OutputInterface::class);
@@ -64,15 +63,11 @@ class ConsoleHandlerTest extends TestCase
 
         // check that the handler actually outputs the record if it handles it
         $levelName = Logger::getLevelName($level);
-        $levelName = sprintf('%-9s', $levelName);
+        $levelName = \sprintf('%-9s', $levelName);
 
         $realOutput = $this->getMockBuilder(Output::class)->onlyMethods(['doWrite'])->getMock();
         $realOutput->setVerbosity($verbosity);
-        if ($realOutput->isDebug()) {
-            $log = "16:21:54 $levelName [app] My info message\n";
-        } else {
-            $log = "16:21:54 $levelName [app] My info message\n";
-        }
+        $log = "16:21:54 $levelName [app] My info message\n";
         $realOutput
             ->expects($isHandling ? $this->once() : $this->never())
             ->method('doWrite')
@@ -105,16 +100,63 @@ class ConsoleHandlerTest extends TestCase
         ];
     }
 
+    #[DataProvider('provideHandleOrBubbleSilentTests')]
+    public function testHandleOrBubbleSilent(int $verbosity, Level $level, bool $isHandling, bool $isWriting, array $map = [])
+    {
+        $output = $this->createMock(OutputInterface::class);
+        $output
+            ->expects($this->atLeastOnce())
+            ->method('getVerbosity')
+            ->willReturn($verbosity)
+        ;
+        $handler = new ConsoleHandler($output, false, $map);
+        $this->assertSame($isHandling, $handler->isHandling(RecordFactory::create($level)), '->isHandling returns correct value depending on console verbosity and log level');
+
+        // check that the handler actually outputs the record if it handles it at verbosity above SILENT
+        $levelName = Logger::getLevelName($level);
+        $levelName = \sprintf('%-9s', $levelName);
+
+        $realOutput = $this->getMockBuilder(Output::class)->onlyMethods(['doWrite'])->getMock();
+        $realOutput->setVerbosity($verbosity);
+        $log = "16:21:54 $levelName [app] My info message\n";
+        $realOutput
+            ->expects($isWriting ? $this->once() : $this->never())
+            ->method('doWrite')
+            ->with($log, false);
+        $handler = new ConsoleHandler($realOutput, false, $map);
+
+        $infoRecord = RecordFactory::create($level, 'My info message', 'app', datetime: new \DateTimeImmutable('2013-05-29 16:21:54'));
+        $this->assertSame($isHandling, $handler->handle($infoRecord), 'The handler bubbled correctly when it did not output the message.');
+    }
+
+    public static function provideHandleOrBubbleSilentTests(): array
+    {
+        // The VERBOSITY_SILENT const is not defined for Console below 7.2, but in that case, the code behaves as before
+        if (!\defined('\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_SILENT')) {
+            return [
+                [OutputInterface::VERBOSITY_NORMAL, Level::Warning, true, true],
+                [OutputInterface::VERBOSITY_NORMAL, Level::Info, false, false],
+            ];
+        }
+
+        return [
+            [OutputInterface::VERBOSITY_SILENT, Level::Warning, false, false],
+            [OutputInterface::VERBOSITY_NORMAL, Level::Warning, true, true],
+            [OutputInterface::VERBOSITY_NORMAL, Level::Info, false, false],
+            [OutputInterface::VERBOSITY_SILENT, Level::Warning, true, false, [OutputInterface::VERBOSITY_SILENT => Level::Warning]],
+            [OutputInterface::VERBOSITY_SILENT, Level::Warning, false, false, [OutputInterface::VERBOSITY_SILENT => Level::Error]],
+            [OutputInterface::VERBOSITY_SILENT, Level::Emergency, false, false],
+            [OutputInterface::VERBOSITY_SILENT, Level::Emergency, true, false, [OutputInterface::VERBOSITY_SILENT => Level::Emergency]],
+        ];
+    }
+
     public function testVerbosityChanged()
     {
         $output = $this->createMock(OutputInterface::class);
         $output
             ->expects($this->exactly(2))
             ->method('getVerbosity')
-            ->willReturnOnConsecutiveCalls(
-                OutputInterface::VERBOSITY_QUIET,
-                OutputInterface::VERBOSITY_DEBUG
-            )
+            ->willReturn(OutputInterface::VERBOSITY_QUIET, OutputInterface::VERBOSITY_DEBUG)
         ;
         $handler = new ConsoleHandler($output);
         $this->assertFalse($handler->isHandling(RecordFactory::create(Level::Notice)),
@@ -192,5 +234,31 @@ class ConsoleHandlerTest extends TestCase
         $dispatcher->dispatch($event, ConsoleEvents::TERMINATE);
         $this->assertStringContainsString('Before terminate message.', $out = $output->fetch());
         $this->assertStringContainsString('After terminate message.', $out);
+    }
+
+    public function testInteractiveOnly()
+    {
+        $output = $this->createMock(OutputInterface::class);
+
+        $message = RecordFactory::create(Level::Info, 'My info message');
+        $interactiveInput = $this->createMock(InputInterface::class);
+        $interactiveInput
+            ->method('isInteractive')
+            ->willReturn(true);
+        $handler = new ConsoleHandler(interactiveOnly: true);
+        $handler->setInput($interactiveInput);
+        $handler->setOutput($output);
+        self::assertTrue($handler->isHandling($message), '->isHandling returns true when input is interactive');
+        self::assertFalse($handler->getBubble(), '->getBubble returns false when input is interactive and interactiveOnly is true');
+
+        $nonInteractiveInput = $this->createMock(InputInterface::class);
+        $nonInteractiveInput
+            ->method('isInteractive')
+            ->willReturn(false);
+        $handler = new ConsoleHandler(interactiveOnly: true);
+        $handler->setInput($nonInteractiveInput);
+        $handler->setOutput($output);
+        self::assertFalse($handler->isHandling($message), '->isHandling returns false when input is not interactive');
+        self::assertTrue($handler->getBubble(), '->getBubble returns true when input is not interactive and interactiveOnly is true');
     }
 }

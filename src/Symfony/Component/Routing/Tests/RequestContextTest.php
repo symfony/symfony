@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
@@ -27,7 +28,10 @@ class RequestContextTest extends TestCase
             8080,
             444,
             '/baz',
-            'bar=foobar'
+            'bar=foobar',
+            [
+                'foo' => 'bar',
+            ]
         );
 
         $this->assertEquals('foo', $requestContext->getBaseUrl());
@@ -38,6 +42,20 @@ class RequestContextTest extends TestCase
         $this->assertSame(444, $requestContext->getHttpsPort());
         $this->assertEquals('/baz', $requestContext->getPathInfo());
         $this->assertEquals('bar=foobar', $requestContext->getQueryString());
+        $this->assertSame(['foo' => 'bar'], $requestContext->getParameters());
+    }
+
+    public function testConstructParametersBcLayer()
+    {
+        $requestContext = new class() extends RequestContext {
+            public function __construct()
+            {
+                $this->setParameters(['foo' => 'bar']);
+                parent::__construct();
+            }
+        };
+
+        $this->assertSame(['foo' => 'bar'], $requestContext->getParameters());
     }
 
     public function testFromUriWithBaseUrl()
@@ -83,6 +101,26 @@ class RequestContextTest extends TestCase
         $this->assertSame('localhost', $requestContext->getHost());
         $this->assertSame('', $requestContext->getBaseUrl());
         $this->assertSame('/', $requestContext->getPathInfo());
+    }
+
+    #[TestWith(['http://foo.com\\bar'])]
+    #[TestWith(['\\\\foo.com/bar'])]
+    #[TestWith(["a\rb"])]
+    #[TestWith(["a\nb"])]
+    #[TestWith(["a\tb"])]
+    #[TestWith(["\u0000foo"])]
+    #[TestWith(["foo\u0000"])]
+    #[TestWith([' foo'])]
+    #[TestWith(['foo '])]
+    #[TestWith([':'])]
+    public function testFromBadUri(string $uri)
+    {
+        $context = RequestContext::fromUri($uri);
+
+        $this->assertSame('http', $context->getScheme());
+        $this->assertSame('localhost', $context->getHost());
+        $this->assertSame('', $context->getBaseUrl());
+        $this->assertSame('/', $context->getPathInfo());
     }
 
     public function testFromRequest()

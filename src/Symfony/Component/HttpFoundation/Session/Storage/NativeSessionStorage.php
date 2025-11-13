@@ -62,16 +62,16 @@ class NativeSessionStorage implements SessionStorageInterface
      * gc_probability, "1"
      * lazy_write, "1"
      * name, "PHPSESSID"
-     * referer_check, ""
+     * referer_check, "" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      * serialize_handler, "php"
      * use_strict_mode, "1"
      * use_cookies, "1"
-     * use_only_cookies, "1"
-     * use_trans_sid, "0"
-     * sid_length, "32"
-     * sid_bits_per_character, "5"
-     * trans_sid_hosts, $_SERVER['HTTP_HOST']
-     * trans_sid_tags, "a=href,area=href,frame=src,form="
+     * use_only_cookies, "1" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
+     * use_trans_sid, "0" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
+     * sid_length, "32" (@deprecated since Symfony 7.2, to be removed in 8.0)
+     * sid_bits_per_character, "5" (@deprecated since Symfony 7.2, to be removed in 8.0)
+     * trans_sid_hosts, $_SERVER['HTTP_HOST'] (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
+     * trans_sid_tags, "a=href,area=href,frame=src,form=" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      */
     public function __construct(array $options = [], AbstractProxy|\SessionHandlerInterface|null $handler = null, ?MetadataBag $metaBag = null)
     {
@@ -113,7 +113,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         if (filter_var(\ini_get('session.use_cookies'), \FILTER_VALIDATE_BOOL) && headers_sent($file, $line)) {
-            throw new \RuntimeException(sprintf('Failed to start the session because headers have already been sent by "%s" at line %d.', $file, $line));
+            throw new \RuntimeException(\sprintf('Failed to start the session because headers have already been sent by "%s" at line %d.', $file, $line));
         }
 
         $sessionId = $_COOKIE[session_name()] ?? null;
@@ -123,21 +123,23 @@ class NativeSessionStorage implements SessionStorageInterface
          * ---------- Part 1
          *
          * The part `[a-zA-Z0-9,-]` is related to the PHP ini directive `session.sid_bits_per_character` defined as 6.
-         * See https://www.php.net/manual/en/session.configuration.php#ini.session.sid-bits-per-character.
+         * See https://php.net/session.configuration#ini.session.sid-bits-per-character
          * Allowed values are integers such as:
          * - 4 for range `a-f0-9`
-         * - 5 for range `a-v0-9`
-         * - 6 for range `a-zA-Z0-9,-`
+         * - 5 for range `a-v0-9` (@deprecated since Symfony 7.2, it will default to 4 and the option will be ignored in Symfony 8.0)
+         * - 6 for range `a-zA-Z0-9,-` (@deprecated since Symfony 7.2, it will default to 4 and the option will be ignored in Symfony 8.0)
          *
          * ---------- Part 2
          *
          * The part `{22,250}` is related to the PHP ini directive `session.sid_length`.
-         * See https://www.php.net/manual/en/session.configuration.php#ini.session.sid-length.
+         * See https://php.net/session.configuration#ini.session.sid-length
          * Allowed values are integers between 22 and 256, but we use 250 for the max.
          *
          * Where does the 250 come from?
          * - The length of Windows and Linux filenames is limited to 255 bytes. Then the max must not exceed 255.
          * - The session filename prefix is `sess_`, a 5 bytes string. Then the max must not exceed 255 - 5 = 250.
+         *
+         * This is @deprecated since Symfony 7.2, the sid length will default to 32 and the option will be ignored in Symfony 8.0.
          *
          * ---------- Conclusion
          *
@@ -224,7 +226,7 @@ class NativeSessionStorage implements SessionStorageInterface
         $previousHandler = set_error_handler(function ($type, $msg, $file, $line) use (&$previousHandler) {
             if (\E_WARNING === $type && str_starts_with($msg, 'session_write_close():')) {
                 $handler = $this->saveHandler instanceof SessionHandlerProxy ? $this->saveHandler->getHandler() : $this->saveHandler;
-                $msg = sprintf('session_write_close(): Failed to write session data with "%s" handler', $handler::class);
+                $msg = \sprintf('session_write_close(): Failed to write session data with "%s" handler', $handler::class);
             }
 
             return $previousHandler ? $previousHandler($type, $msg, $file, $line) : false;
@@ -271,7 +273,7 @@ class NativeSessionStorage implements SessionStorageInterface
     public function getBag(string $name): SessionBagInterface
     {
         if (!isset($this->bags[$name])) {
-            throw new \InvalidArgumentException(sprintf('The SessionBagInterface "%s" is not registered.', $name));
+            throw new \InvalidArgumentException(\sprintf('The SessionBagInterface "%s" is not registered.', $name));
         }
 
         if (!$this->started && $this->saveHandler->isActive()) {
@@ -328,6 +330,10 @@ class NativeSessionStorage implements SessionStorageInterface
         ]);
 
         foreach ($options as $key => $value) {
+            if (\in_array($key, ['referer_check', 'use_only_cookies', 'use_trans_sid', 'trans_sid_hosts', 'trans_sid_tags', 'sid_length', 'sid_bits_per_character'], true)) {
+                trigger_deprecation('symfony/http-foundation', '7.2', 'NativeSessionStorage\'s "%s" option is deprecated and will be ignored in Symfony 8.0.', $key);
+            }
+
             if (isset($validOptions[$key])) {
                 if ('cookie_secure' === $key && 'auto' === $value) {
                     continue;

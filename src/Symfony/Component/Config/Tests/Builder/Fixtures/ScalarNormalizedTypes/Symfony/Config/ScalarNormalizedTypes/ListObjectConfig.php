@@ -40,22 +40,22 @@ class ListObjectConfig
         return $this;
     }
 
-    public function __construct(array $value = [])
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('name', $value)) {
+        if (array_key_exists('name', $config)) {
             $this->_usedProperties['name'] = true;
-            $this->name = $value['name'];
-            unset($value['name']);
+            $this->name = $config['name'];
+            unset($config['name']);
         }
 
-        if (array_key_exists('data', $value)) {
+        if (array_key_exists('data', $config)) {
             $this->_usedProperties['data'] = true;
-            $this->data = $value['data'];
-            unset($value['data']);
+            $this->data = $config['data'];
+            unset($config['data']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

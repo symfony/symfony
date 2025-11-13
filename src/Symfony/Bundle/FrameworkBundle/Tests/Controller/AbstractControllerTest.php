@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -40,7 +42,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -98,7 +103,7 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
+        $this->expectExceptionMessage('::getParameter()" method is missing a parameter bag');
 
         $controller->getParameter('foo');
     }
@@ -233,7 +238,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        /* @var BinaryFileResponse $response */
+        /** @var BinaryFileResponse $response */
         $response = $controller->file(new File(__FILE__));
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
         $this->assertSame(200, $response->getStatusCode());
@@ -248,7 +253,7 @@ class AbstractControllerTest extends TestCase
     {
         $controller = $this->createController();
 
-        /* @var BinaryFileResponse $response */
+        /** @var BinaryFileResponse $response */
         $response = $controller->file(new File(__FILE__), null, ResponseHeaderBag::DISPOSITION_INLINE);
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
@@ -264,7 +269,7 @@ class AbstractControllerTest extends TestCase
     {
         $controller = $this->createController();
 
-        /* @var BinaryFileResponse $response */
+        /** @var BinaryFileResponse $response */
         $fileName = 'test.php';
         $response = $controller->file(new File(__FILE__), $fileName);
 
@@ -281,7 +286,7 @@ class AbstractControllerTest extends TestCase
     {
         $controller = $this->createController();
 
-        /* @var BinaryFileResponse $response */
+        /** @var BinaryFileResponse $response */
         $fileName = 'test.php';
         $response = $controller->file(new File(__FILE__), $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
 
@@ -298,7 +303,7 @@ class AbstractControllerTest extends TestCase
     {
         $controller = $this->createController();
 
-        /* @var BinaryFileResponse $response */
+        /** @var BinaryFileResponse $response */
         $response = $controller->file(__FILE__);
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
@@ -314,7 +319,7 @@ class AbstractControllerTest extends TestCase
     {
         $controller = $this->createController();
 
-        /* @var BinaryFileResponse $response */
+        /** @var BinaryFileResponse $response */
         $response = $controller->file(__FILE__, 'test.php');
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
@@ -352,7 +357,19 @@ class AbstractControllerTest extends TestCase
     public function testdenyAccessUnlessGranted()
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
+        $authorizationChecker
+            ->expects($this->once())
+            ->method('isGranted')
+            ->willReturnCallback(function ($attribute, $subject, ?AccessDecision $accessDecision = null) {
+                if (class_exists(AccessDecision::class)) {
+                    $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+                    $accessDecision->votes[] = $vote = new Vote();
+                    $vote->result = VoterInterface::ACCESS_DENIED;
+                    $vote->reasons[] = 'Why should I.';
+                }
+
+                return false;
+            });
 
         $container = new Container();
         $container->set('security.authorization_checker', $authorizationChecker);
@@ -361,13 +378,20 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Access Denied.'.(class_exists(AccessDecision::class) ? ' Why should I.' : ''));
 
-        $controller->denyAccessUnlessGranted('foo');
+        try {
+            $controller->denyAccessUnlessGranted('foo');
+        } catch (AccessDeniedException $e) {
+            if (class_exists(AccessDecision::class)) {
+                $this->assertFalse($e->getAccessDecision()->isGranted);
+            }
+
+            throw $e;
+        }
     }
 
-    /**
-     * @dataProvider provideDenyAccessUnlessGrantedSetsAttributesAsArray
-     */
+    #[DataProvider('provideDenyAccessUnlessGrantedSetsAttributesAsArray')]
     public function testdenyAccessUnlessGrantedSetsAttributesAsArray($attribute, $exceptionAttributes)
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -431,7 +455,7 @@ class AbstractControllerTest extends TestCase
     {
         $formView = new FormView();
 
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('createView')->willReturn($formView);
 
         $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
@@ -452,7 +476,7 @@ class AbstractControllerTest extends TestCase
     {
         $formView = new FormView();
 
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('createView')->willReturn($formView);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
         $form->expects($this->once())->method('isValid')->willReturn(false);
@@ -502,9 +526,7 @@ class AbstractControllerTest extends TestCase
         $this->assertSame(302, $response->getStatusCode());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testAddFlash()
     {
         $flashBag = new FlashBag();

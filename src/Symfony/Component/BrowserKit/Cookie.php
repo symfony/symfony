@@ -71,12 +71,12 @@ class Cookie
             $this->value = $value ?? '';
             $this->rawValue = rawurlencode($this->value);
         }
-        $this->path = empty($path) ? '/' : $path;
+        $this->path = $path ?: '/';
 
         if (null !== $expires) {
             $timestampAsDateTime = \DateTimeImmutable::createFromFormat('U', $expires);
             if (false === $timestampAsDateTime) {
-                throw new UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.', $expires));
+                throw new UnexpectedValueException(\sprintf('The cookie expiration time "%s" is not valid.', $expires));
             }
 
             $this->expires = $timestampAsDateTime->format('U');
@@ -88,7 +88,7 @@ class Cookie
      */
     public function __toString(): string
     {
-        $cookie = sprintf('%s=%s', $this->name, $this->rawValue);
+        $cookie = \sprintf('%s=%s', $this->name, $this->rawValue);
 
         if (null !== $this->expires) {
             $dateTime = \DateTimeImmutable::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
@@ -128,7 +128,7 @@ class Cookie
         $parts = explode(';', $cookie);
 
         if (!str_contains($parts[0], '=')) {
-            throw new InvalidArgumentException(sprintf('The cookie string "%s" is not valid.', $parts[0]));
+            throw new InvalidArgumentException(\sprintf('The cookie string "%s" is not valid.', $parts[0]));
         }
 
         [$name, $value] = explode('=', array_shift($parts), 2);
@@ -146,8 +146,8 @@ class Cookie
         ];
 
         if (null !== $url) {
-            if ((false === $urlParts = parse_url($url)) || !isset($urlParts['host'])) {
-                throw new InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
+            if (false === ($urlParts = parse_url($url)) || !isset($urlParts['host'])) {
+                throw new InvalidArgumentException(\sprintf('The URL "%s" is not valid.', $url));
             }
 
             $values['domain'] = $urlParts['host'];
@@ -159,7 +159,7 @@ class Cookie
 
             if ('secure' === strtolower($part)) {
                 // Ignore the secure flag if the original URI is not given or is not HTTPS
-                if (!$url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
+                if (null === $url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
                     continue;
                 }
 

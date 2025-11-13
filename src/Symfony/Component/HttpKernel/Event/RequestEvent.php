@@ -46,6 +46,8 @@ class RequestEvent extends KernelEvent
 
     /**
      * Returns whether a response was set.
+     *
+     * @psalm-assert-if-true !null $this->getResponse()
      */
     public function hasResponse(): bool
     {

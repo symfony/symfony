@@ -17,7 +17,7 @@ class NestedConfig
     private $_usedProperties = [];
 
     /**
-     * @template TValue
+     * @template TValue of mixed
      * @param TValue $value
      * @default {"enabled":null}
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig|$this
@@ -43,7 +43,7 @@ class NestedConfig
     }
 
     /**
-     * @template TValue
+     * @template TValue of mixed
      * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig|$this
      * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig : static)
@@ -60,22 +60,22 @@ class NestedConfig
         return $this->nestedListObject[] = new \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig($value);
     }
 
-    public function __construct(array $value = [])
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('nested_object', $value)) {
+        if (array_key_exists('nested_object', $config)) {
             $this->_usedProperties['nestedObject'] = true;
-            $this->nestedObject = \is_array($value['nested_object']) ? new \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig($value['nested_object']) : $value['nested_object'];
-            unset($value['nested_object']);
+            $this->nestedObject = \is_array($config['nested_object']) ? new \Symfony\Config\ScalarNormalizedTypes\Nested\NestedObjectConfig($config['nested_object']) : $config['nested_object'];
+            unset($config['nested_object']);
         }
 
-        if (array_key_exists('nested_list_object', $value)) {
+        if (array_key_exists('nested_list_object', $config)) {
             $this->_usedProperties['nestedListObject'] = true;
-            $this->nestedListObject = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig($v) : $v, $value['nested_list_object']);
-            unset($value['nested_list_object']);
+            $this->nestedListObject = array_map(fn ($v) => \is_array($v) ? new \Symfony\Config\ScalarNormalizedTypes\Nested\NestedListObjectConfig($v) : $v, $config['nested_list_object']);
+            unset($config['nested_list_object']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 

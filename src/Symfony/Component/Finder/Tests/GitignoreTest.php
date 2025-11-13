@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Gitignore;
 
@@ -19,10 +20,8 @@ use Symfony\Component\Finder\Gitignore;
  */
 class GitignoreTest extends TestCase
 {
-    /**
-     * @dataProvider provider
-     * @dataProvider providerExtended
-     */
+    #[DataProvider('provider')]
+    #[DataProvider('providerExtended')]
     public function testToRegex(array $gitignoreLines, array $matchingCases, array $nonMatchingCases)
     {
         $patterns = implode("\n", $gitignoreLines);
@@ -35,7 +34,7 @@ class GitignoreTest extends TestCase
             $this->assertMatchesRegularExpression(
                 $regex,
                 $matchingCase,
-                sprintf(
+                \sprintf(
                     "Failed asserting path:\n%s\nmatches gitignore patterns:\n%s",
                     preg_replace('~^~m', '    ', $matchingCase),
                     preg_replace('~^~m', '    ', $patterns)
@@ -47,7 +46,7 @@ class GitignoreTest extends TestCase
             $this->assertDoesNotMatchRegularExpression(
                 $regex,
                 $nonMatchingCase,
-                sprintf("Failed asserting path:\n%s\nNOT matching gitignore patterns:\n%s",
+                \sprintf("Failed asserting path:\n%s\nNOT matching gitignore patterns:\n%s",
                     preg_replace('~^~m', '    ', $nonMatchingCase),
                     preg_replace('~^~m', '    ', $patterns)
                 )
@@ -444,9 +443,7 @@ class GitignoreTest extends TestCase
         return $cases;
     }
 
-    /**
-     * @dataProvider provideNegatedPatternsCases
-     */
+    #[DataProvider('provideNegatedPatternsCases')]
     public function testToRegexMatchingNegatedPatterns(array $gitignoreLines, array $matchingCases, array $nonMatchingCases)
     {
         $patterns = implode("\n", $gitignoreLines);
@@ -459,7 +456,7 @@ class GitignoreTest extends TestCase
             $this->assertMatchesRegularExpression(
                 $regex,
                 $matchingCase,
-                sprintf(
+                \sprintf(
                     "Failed asserting path:\n%s\nmatches gitignore negated patterns:\n%s",
                     preg_replace('~^~m', '    ', $matchingCase),
                     preg_replace('~^~m', '    ', $patterns)
@@ -471,7 +468,7 @@ class GitignoreTest extends TestCase
             $this->assertDoesNotMatchRegularExpression(
                 $regex,
                 $nonMatchingCase,
-                sprintf("Failed asserting path:\n%s\nNOT matching gitignore negated patterns:\n%s",
+                \sprintf("Failed asserting path:\n%s\nNOT matching gitignore negated patterns:\n%s",
                     preg_replace('~^~m', '    ', $nonMatchingCase),
                     preg_replace('~^~m', '    ', $patterns)
                 )

@@ -23,18 +23,18 @@ class TraceableVoterTest extends TestCase
 {
     public function testGetDecoratedVoterClass()
     {
-        $voter = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createStub(VoterInterface::class);
 
-        $sut = new TraceableVoter($voter, $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass());
+        $sut = new TraceableVoter($voter, $this->createStub(EventDispatcherInterface::class));
         $this->assertSame($voter, $sut->getDecoratedVoter());
     }
 
     public function testVote()
     {
-        $voter = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(VoterInterface::class);
 
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
-        $token = $this->getMockBuilder(TokenInterface::class)->getMockForAbstractClass();
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $token = $this->createStub(TokenInterface::class);
 
         $voter
             ->expects($this->once())
@@ -55,8 +55,8 @@ class TraceableVoterTest extends TestCase
 
     public function testSupportsAttributeOnCacheable()
     {
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
+        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
 
         $voter
             ->expects($this->once())
@@ -71,8 +71,8 @@ class TraceableVoterTest extends TestCase
 
     public function testSupportsTypeOnCacheable()
     {
-        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+        $voter = $this->createMock(CacheableVoterInterface::class);
+        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
 
         $voter
             ->expects($this->once())
@@ -87,8 +87,8 @@ class TraceableVoterTest extends TestCase
 
     public function testSupportsAttributeOnNonCacheable()
     {
-        $voter = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+        $voter = $this->createStub(VoterInterface::class);
+        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
 
         $sut = new TraceableVoter($voter, $eventDispatcher);
 
@@ -97,8 +97,8 @@ class TraceableVoterTest extends TestCase
 
     public function testSupportsTypeOnNonCacheable()
     {
-        $voter = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+        $voter = $this->createStub(VoterInterface::class);
+        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
 
         $sut = new TraceableVoter($voter, $eventDispatcher);
 

@@ -16,6 +16,7 @@ use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Not able to guess anything.
@@ -41,6 +42,14 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     }
 
     public function getTypes($class, $property, array $context = []): ?array
+    {
+        $this->assertIsString($class);
+        $this->assertIsString($property);
+
+        return null;
+    }
+
+    public function getType($class, $property, array $context = []): ?Type
     {
         $this->assertIsString($class);
         $this->assertIsString($property);

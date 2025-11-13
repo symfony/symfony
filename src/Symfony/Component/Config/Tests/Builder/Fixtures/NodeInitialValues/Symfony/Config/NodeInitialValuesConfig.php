@@ -15,9 +15,14 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
     private $someCleverName;
     private $messenger;
     private $_usedProperties = [];
+    private $_hasDeprecatedCalls = false;
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function someCleverName(array $value = []): \Symfony\Config\NodeInitialValues\SomeCleverNameConfig
     {
+        $this->_hasDeprecatedCalls = true;
         if (null === $this->someCleverName) {
             $this->_usedProperties['someCleverName'] = true;
             $this->someCleverName = new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($value);
@@ -28,8 +33,12 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
         return $this->someCleverName;
     }
 
+    /**
+     * @deprecated since Symfony 7.4
+     */
     public function messenger(array $value = []): \Symfony\Config\NodeInitialValues\MessengerConfig
     {
+        $this->_hasDeprecatedCalls = true;
         if (null === $this->messenger) {
             $this->_usedProperties['messenger'] = true;
             $this->messenger = new \Symfony\Config\NodeInitialValues\MessengerConfig($value);
@@ -45,22 +54,22 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
         return 'node_initial_values';
     }
 
-    public function __construct(array $value = [])
+    public function __construct(array $config = [])
     {
-        if (array_key_exists('some_clever_name', $value)) {
+        if (array_key_exists('some_clever_name', $config)) {
             $this->_usedProperties['someCleverName'] = true;
-            $this->someCleverName = new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($value['some_clever_name']);
-            unset($value['some_clever_name']);
+            $this->someCleverName = new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($config['some_clever_name']);
+            unset($config['some_clever_name']);
         }
 
-        if (array_key_exists('messenger', $value)) {
+        if (array_key_exists('messenger', $config)) {
             $this->_usedProperties['messenger'] = true;
-            $this->messenger = new \Symfony\Config\NodeInitialValues\MessengerConfig($value['messenger']);
-            unset($value['messenger']);
+            $this->messenger = new \Symfony\Config\NodeInitialValues\MessengerConfig($config['messenger']);
+            unset($config['messenger']);
         }
 
-        if ([] !== $value) {
-            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
+        if ($config) {
+            throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($config)));
         }
     }
 
@@ -72,6 +81,9 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
         }
         if (isset($this->_usedProperties['messenger'])) {
             $output['messenger'] = $this->messenger->toArray();
+        }
+        if ($this->_hasDeprecatedCalls) {
+            trigger_deprecation('symfony/config', '7.4', 'Calling any fluent method on "%s" is deprecated; pass the configuration to the constructor instead.', $this::class);
         }
 
         return $output;

@@ -17,9 +17,12 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  * OutputInterface is the interface implemented by all Output classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @method bool isSilent()
  */
 interface OutputInterface
 {
+    public const VERBOSITY_SILENT = 8;
     public const VERBOSITY_QUIET = 16;
     public const VERBOSITY_NORMAL = 32;
     public const VERBOSITY_VERBOSE = 64;

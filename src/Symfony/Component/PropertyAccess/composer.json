@@ -17,10 +17,11 @@
     ],
     "require": {
         "php": ">=8.2",
-        "symfony/property-info": "^6.4|^7.0"
+        "symfony/property-info": "^6.4|^7.0|^8.0"
     },
     "require-dev": {
-        "symfony/cache": "^6.4|^7.0"
+        "symfony/cache": "^6.4|^7.0|^8.0",
+        "symfony/var-exporter": "^6.4.1|^7.0.1|^8.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\PropertyAccess\\": "" },

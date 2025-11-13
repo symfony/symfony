@@ -18,9 +18,16 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @template T of Type
+ *
+ * @implements WrappingTypeInterface<T>
  */
-final class TemplateType extends Type
+final class TemplateType extends Type implements WrappingTypeInterface
 {
+    /**
+     * @param T $bound
+     */
     public function __construct(
         private readonly string $name,
         private readonly Type $bound,
@@ -32,14 +39,22 @@ final class TemplateType extends Type
         return $this->name;
     }
 
+    /**
+     * @return T
+     */
     public function getBound(): Type
     {
         return $this->bound;
     }
 
-    public function asNonNullable(): self
+    public function getWrappedType(): Type
     {
-        return $this;
+        return $this->bound;
+    }
+
+    public function wrappedTypeIsSatisfiedBy(callable $specification): bool
+    {
+        return $this->getWrappedType()->isSatisfiedBy($specification);
     }
 
     public function __toString(): string

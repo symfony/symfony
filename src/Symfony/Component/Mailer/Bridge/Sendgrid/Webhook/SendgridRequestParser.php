@@ -41,14 +41,17 @@ final class SendgridRequestParser extends AbstractRequestParser
         ]);
     }
 
-    protected function doParse(Request $request, string $secret): ?AbstractMailerEvent
+    /**
+     * @return AbstractMailerEvent[]
+     */
+    protected function doParse(Request $request, string $secret): array
     {
         $content = $request->toArray();
         if (
             !isset($content[0]['email'])
             || !isset($content[0]['timestamp'])
             || !isset($content[0]['event'])
-            || !isset($content[0]['sg_message_id'])
+            || !isset($content[0]['sg_event_id'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
@@ -69,7 +72,7 @@ final class SendgridRequestParser extends AbstractRequestParser
         }
 
         try {
-            return $this->converter->convert($content[0]);
+            return array_map($this->converter->convert(...), $content);
         } catch (ParseException $e) {
             throw new RejectWebhookException(406, $e->getMessage(), $e);
         }

@@ -46,22 +46,29 @@ class WebProfilerExtension extends Extension
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('profiler.php');
 
-        if ($config['toolbar'] || $config['intercept_redirects']) {
+        if ($config['toolbar']['enabled'] || $config['intercept_redirects']) {
             $loader->load('toolbar.php');
             $container->getDefinition('web_profiler.debug_toolbar')->replaceArgument(4, $config['excluded_ajax_paths']);
+            $container->getDefinition('web_profiler.debug_toolbar')->replaceArgument(7, $config['toolbar']['ajax_replace']);
             $container->setParameter('web_profiler.debug_toolbar.intercept_redirects', $config['intercept_redirects']);
-            $container->setParameter('web_profiler.debug_toolbar.mode', $config['toolbar'] ? WebDebugToolbarListener::ENABLED : WebDebugToolbarListener::DISABLED);
+            $container->setParameter('web_profiler.debug_toolbar.mode', $config['toolbar']['enabled'] ? WebDebugToolbarListener::ENABLED : WebDebugToolbarListener::DISABLED);
         }
 
         $container->getDefinition('debug.file_link_formatter')
             ->replaceArgument(3, new ServiceClosureArgument(new Reference('debug.file_link_formatter.url_format')));
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     */
     public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/webprofiler';

@@ -18,7 +18,6 @@ use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
-use Symfony\Component\Config\Definition\VariableNode;
 use Symfony\Component\Yaml\Inline;
 
 /**
@@ -41,7 +40,7 @@ class YamlReferenceDumper
 
         foreach (explode('.', $path) as $step) {
             if (!$node instanceof ArrayNode) {
-                throw new \UnexpectedValueException(sprintf('Unable to find node at path "%s.%s".', $rootNode->getName(), $path));
+                throw new \UnexpectedValueException(\sprintf('Unable to find node at path "%s.%s".', $rootNode->getName(), $path));
             }
 
             /** @var NodeInterface[] $children */
@@ -55,7 +54,7 @@ class YamlReferenceDumper
                 }
             }
 
-            throw new \UnexpectedValueException(sprintf('Unable to find node at path "%s.%s".', $rootNode->getName(), $path));
+            throw new \UnexpectedValueException(\sprintf('Unable to find node at path "%s.%s".', $rootNode->getName(), $path));
         }
 
         return $this->dumpNode($node);
@@ -90,19 +89,12 @@ class YamlReferenceDumper
                 $children = $this->getPrototypeChildren($node);
             }
 
-            if (!$children) {
-                if ($node->hasDefaultValue() && \count($defaultArray = $node->getDefaultValue())) {
-                    $default = '';
-                } elseif (!\is_array($example)) {
-                    $default = '[]';
-                }
+            if (!$children && !($node->hasDefaultValue() && $defaultArray = $node->getDefaultValue())) {
+                $default = $node->hasDefaultValue() && null === $defaultArray ? '~' : '[]';
             }
         } elseif ($node instanceof EnumNode) {
             $comments[] = 'One of '.$node->getPermissibleValues('; ');
             $default = $node->hasDefaultValue() ? Inline::dump($node->getDefaultValue()) : '~';
-        } elseif (VariableNode::class === $node::class && \is_array($example)) {
-            // If there is an array example, we are sure we dont need to print a default value
-            $default = '';
         } else {
             $default = '~';
 
@@ -128,8 +120,7 @@ class YamlReferenceDumper
 
         // deprecated?
         if ($node instanceof BaseNode && $node->isDeprecated()) {
-            $deprecation = $node->getDeprecation($node->getName(), $parentNode ? $parentNode->getPath() : $node->getPath());
-            $comments[] = sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
+            $comments[] = \sprintf('Deprecated (%s)', $node->getDeprecationMessage($parentNode));
         }
 
         // example
@@ -141,12 +132,12 @@ class YamlReferenceDumper
         $comments = \count($comments) ? '# '.implode(', ', $comments) : '';
 
         $key = $prototypedArray ? '-' : $node->getName().':';
-        $text = rtrim(sprintf('%-21s%s %s', $key, $default, $comments), ' ');
+        $text = rtrim(\sprintf('%-21s%s %s', $key, $default, $comments), ' ');
 
         if ($node instanceof BaseNode && $info = $node->getInfo()) {
             $this->writeLine('');
             // indenting multi-line info
-            $info = str_replace("\n", sprintf("\n%".($depth * 4).'s# ', ' '), $info);
+            $info = str_replace("\n", \sprintf("\n%".($depth * 4).'s# ', ' '), $info);
             $this->writeLine('# '.$info, $depth * 4);
         }
 
@@ -170,7 +161,7 @@ class YamlReferenceDumper
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
-            $this->writeArray(array_map(Inline::dump(...), $example), $depth + 1);
+            $this->writeArray(array_map(Inline::dump(...), $example), $depth + 1, true);
         }
 
         if ($children) {
@@ -188,10 +179,10 @@ class YamlReferenceDumper
         $indent = \strlen($text) + $indent;
         $format = '%'.$indent.'s';
 
-        $this->reference .= sprintf($format, $text)."\n";
+        $this->reference .= \sprintf($format, $text)."\n";
     }
 
-    private function writeArray(array $array, int $depth): void
+    private function writeArray(array $array, int $depth, bool $asComment = false): void
     {
         $isIndexed = array_is_list($array);
 
@@ -202,14 +193,16 @@ class YamlReferenceDumper
                 $val = $value;
             }
 
+            $prefix = $asComment ? '# ' : '';
+
             if ($isIndexed) {
-                $this->writeLine('- '.$val, $depth * 4);
+                $this->writeLine($prefix.'- '.$val, $depth * 4);
             } else {
-                $this->writeLine(sprintf('%-20s %s', $key.':', $val), $depth * 4);
+                $this->writeLine(\sprintf('%s%-20s %s', $prefix, $key.':', $val), $depth * 4);
             }
 
             if (\is_array($value)) {
-                $this->writeArray($value, $depth + 1);
+                $this->writeArray($value, $depth + 1, $asComment);
             }
         }
     }
@@ -246,6 +239,6 @@ class YamlReferenceDumper
         }
         $keyNode->setInfo($info);
 
-        return [$key => $keyNode];
+        return [$key ?? '' => $keyNode];
     }
 }

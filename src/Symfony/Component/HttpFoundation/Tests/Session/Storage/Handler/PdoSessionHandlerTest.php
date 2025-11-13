@@ -12,14 +12,15 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use Doctrine\DBAL\Schema\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
-/**
- * @requires extension pdo_sqlite
- *
- * @group time-sensitive
- */
+#[RequiresPhpExtension('pdo_sqlite')]
+#[Group('time-sensitive')]
 class PdoSessionHandlerTest extends TestCase
 {
     private ?string $dbFile = null;
@@ -30,7 +31,6 @@ class PdoSessionHandlerTest extends TestCase
         if ($this->dbFile) {
             @unlink($this->dbFile);
         }
-        parent::tearDown();
     }
 
     protected function getPersistentSqliteDsn()
@@ -224,6 +224,7 @@ class PdoSessionHandlerTest extends TestCase
     {
         // wrong method sequence that should no happen, but still works
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage->open('', 'sid');
         $storage->write('id', 'data');
         $storage->write('other_id', 'other_data');
         $storage->destroy('inexistent');
@@ -259,9 +260,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('', $data, 'Destroyed session returns empty string');
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testSessionGC()
     {
         $previousLifeTime = ini_set('session.gc_maxlifetime', 1000);
@@ -309,9 +308,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
 
-    /**
-     * @dataProvider provideUrlDsnPairs
-     */
+    #[DataProvider('provideUrlDsnPairs')]
     public function testUrlDsn($url, $expectedDsn, $expectedUser = null, $expectedPassword = null)
     {
         $storage = new PdoSessionHandler($url);
@@ -352,7 +349,7 @@ class PdoSessionHandlerTest extends TestCase
         $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
         $pdoSessionHandler->configureSchema($schema, fn () => true);
         $table = $schema->getTable('sessions');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 
     public static function provideUrlDsnPairs()

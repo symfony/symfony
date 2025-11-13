@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-11-13T16:43:05Z
+
+> 2\. Allows all other import keys (`prefix`, `type`, `namespace`, etc.) to be nested inside the `resource` object, matching the merging behavior of `YamlFileLoader`.
+
+Where do you see such merging behavior ?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-11-13T16:56:32Z
+
+Technically, `resource` could actually be almost anything (except `null`) as long as you have a loader supporting it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-13T17:00:06Z
+
+> Technically, resource could actually be almost anything (except null) as long as you have a loader supporting it.
+
+that's right, although I'd describe what is the most common. The schema is not enforced so ppl that use exotic `resource` could either report an issue explaining their case - or ignore the failure (and if nobody gets back, then that's fine as that'd mean the schema is providing best guidance).
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-13T17:11:19Z
+
+Hi @stof and @nicolas-grekas, thank you for the feedback and clarification 🙏🏼.
+
+@stof, you were right, my initial assumption about a full merge behavior was incorrect.
+
+I've also included the deprecated key for routes (to match the XSD)

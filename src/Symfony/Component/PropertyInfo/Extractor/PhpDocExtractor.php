@@ -183,18 +183,17 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     {
         trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getTypeFromConstructor()" instead.', __METHOD__, self::class);
 
-        $docBlock = $this->getDocBlockFromConstructor($class, $property);
+        // Give priority to @var declarations, fallback on @param on constructor if not found
+        $docBlock = $this->getDocBlockFromPromotedProperty($class, $property);
 
         if (!$docBlock) {
-            // If no @param found in constructor docblock, try the promoted property's @var docblock
-            if (!$docBlock = $this->getDocBlockFromPromotedProperty($class, $property)) {
+            if (!$docBlock = $this->getDocBlockFromConstructor($class, $property)) {
                 return null;
             }
 
-            // For promoted properties, use @var tag instead of @param
-            $tags = $docBlock->getTagsByName('var');
-        } else {
             $tags = $docBlock->getTagsByName('param');
+        } else {
+            $tags = $docBlock->getTagsByName('var');
         }
 
         $types = [];
@@ -273,16 +272,15 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
     public function getTypeFromConstructor(string $class, string $property): ?Type
     {
-        if (!$docBlock = $this->getDocBlockFromConstructor($class, $property)) {
-            // If no @param found in constructor docblock, try the promoted property's @var docblock
-            if (!$docBlock = $this->getDocBlockFromPromotedProperty($class, $property)) {
+        // Give priority to @var declarations, fallback on @param if not found
+        if (!$docBlock = $this->getDocBlockFromPromotedProperty($class, $property)) {
+            if (!$docBlock = $this->getDocBlockFromConstructor($class, $property)) {
                 return null;
             }
 
-            // For promoted properties, use @var tag instead of @param
-            $tags = $docBlock->getTagsByName('var');
-        } else {
             $tags = $docBlock->getTagsByName('param');
+        } else {
+            $tags = $docBlock->getTagsByName('var');
         }
 
         $types = [];

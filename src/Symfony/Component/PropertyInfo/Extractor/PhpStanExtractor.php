@@ -181,9 +181,9 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     {
         trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getTypeFromConstructor()" instead.', __METHOD__, self::class);
 
-        if (null === $tagDocNode = $this->getDocBlockFromConstructor($class, $property)) {
-            // If no @param found in constructor docblock, try the promoted property's @var docblock
-            if (null === $tagDocNode = $this->getDocBlockFromPromotedProperty($class, $property)) {
+        // Give priority to @var declarations, fallback on @param if not found
+        if (null === $tagDocNode = $this->getDocBlockFromPromotedProperty($class, $property)) {
+            if (null === $tagDocNode = $this->getDocBlockFromConstructor($class, $property)) {
                 return null;
             }
         }
@@ -249,9 +249,10 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     public function getTypeFromConstructor(string $class, string $property): ?Type
     {
         $declaringClass = $class;
-        if (!$tagDocNode = $this->getDocBlockFromConstructor($declaringClass, $property)) {
-            // If no @param found in constructor docblock, try the promoted property's @var docblock
-            if (!$tagDocNode = $this->getDocBlockFromPromotedProperty($class, $property)) {
+
+        // Give priority to @var declarations, fallback on @param if not found
+        if (!$tagDocNode = $this->getDocBlockFromPromotedProperty($declaringClass, $property)) {
+            if (!$tagDocNode = $this->getDocBlockFromConstructor($declaringClass, $property)) {
                 return null;
             }
         }
@@ -414,7 +415,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
         return $tags[0]->value;
     }
 
-    private function getDocBlockFromPromotedProperty(string $class, string $property): ?VarTagValueNode
+    private function getDocBlockFromPromotedProperty(string &$class, string $property): ?VarTagValueNode
     {
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
@@ -436,6 +437,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
         }
 
         $phpDocNode = $this->getPhpDocNode($rawDocNode);
+        $class = $reflectionProperty->class;
 
         $tags = array_values(array_filter($phpDocNode->getTagsByName('@var'), fn ($tagNode) => $tagNode->value instanceof VarTagValueNode));
 

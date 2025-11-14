@@ -903,6 +903,7 @@ class PhpDocExtractorTest extends TestCase
     {
         // Test that promoted properties with @var docblock are recognized
         yield ['dates', Type::list(Type::object(\DateTimeImmutable::class))];
+        yield ['datesWithIncoherentDocBlock', Type::list(Type::object(\DateTimeImmutable::class))];
     }
 
     /**

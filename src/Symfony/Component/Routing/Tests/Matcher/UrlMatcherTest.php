@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -1015,6 +1017,99 @@ class UrlMatcherTest extends TestCase
         $result = $matcher->match('/test');
         $this->assertSame('test', $result['_route']);
         $this->assertSame('foo-', $result['foo']);
+    }
+
+    /**
+     * @dataProvider provideRequirementRegexCases
+     */
+    public function testRequirementRegexCompiler(string $fooReq, string $barReq, string $path, ?array $expectedResult, ?string $expectedException = null)
+    {
+        if ($expectedException) {
+            $this->expectException($expectedException);
+        }
+
+        $collection = new RouteCollection();
+        $collection->add('test', new Route('/{foo}/{bar}', [], [
+            'foo' => $fooReq,
+            'bar' => $barReq,
+        ]));
+
+        $matcher = new CompiledUrlMatcher((new CompiledUrlMatcherDumper($collection))->getCompiledRoutes(), new RequestContext());
+        $result = $matcher->match($path);
+
+        if ($expectedResult) {
+            $this->assertEquals($expectedResult, $result);
+        }
+    }
+
+    public static function provideRequirementRegexCases(): \Generator
+    {
+        $successResult = ['_route' => 'test', 'foo' => '1', 'bar' => '2'];
+        $successPath = '/1/2';
+
+        yield 'bug case: duplicate (?P<name>)' => [
+            '(?P<digit>\d+)',
+            '(?P<digit>\d+)',
+            $successPath,
+            $successResult,
+        ];
+
+        yield 'bug case: duplicate (?<name>)' => [
+            '(?<digit>\d+)',
+            '(?<digit>\d+)',
+            $successPath,
+            $successResult,
+        ];
+
+        yield "bug case: duplicate (?'name')" => [
+            "(?'digit'\d+)",
+            "(?'digit'\d+)",
+            $successPath,
+            $successResult,
+        ];
+
+        yield 'non-regression: non-capturing groups (?:)' => [
+            '(?:\d+)',
+            '(?:\d+)',
+            $successPath,
+            $successResult,
+        ];
+
+        yield 'non-regression: lookahead groups (?=)' => [
+            '(?=\d)\d',
+            '\d(?!\w)',
+            $successPath,
+            $successResult,
+        ];
+
+        yield 'non-regression: escaped parentheses' => [
+            '\(\d\)',
+            '\(\d\)',
+            '/(1)/(2)',
+            ['_route' => 'test', 'foo' => '(1)', 'bar' => '(2)'],
+        ];
+
+        yield 'non-regression: parentheses in character class' => [
+            '[(\d)]+',
+            '[(\d)]+',
+            '/(1/(2',
+            ['_route' => 'test', 'foo' => '(1', 'bar' => '(2'],
+        ];
+
+        yield 'non-regression: simple regex' => [
+            '\d+',
+            '\d+',
+            $successPath,
+            $successResult,
+        ];
+
+        yield 'matching failure (proves reqs still work)' => [
+            '\d+',
+            '\d+',
+            '/1/abc',
+            null,
+            'Symfony\Component\Routing\Exception\ResourceNotFoundException',
+        ];
     }
 
     protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)

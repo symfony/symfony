@@ -318,22 +318,100 @@ class RouteCompiler implements RouteCompilerInterface
 
     private static function transformCapturingGroupsToNonCapturings(string $regexp): string
     {
-        for ($i = 0; $i < \strlen($regexp); ++$i) {
-            if ('\\' === $regexp[$i]) {
+        $new = '';
+        $len = \strlen($regexp);
+        $i = 0;
+
+        while ($i < $len) {
+            $char = $regexp[$i];
+
+            if ('\\' === $char && $i + 1 < $len) {
+                $new .= $char.$regexp[$i + 1];
+                $i += 2;
+                continue;
+            }
+
+            if ('(' !== $char) {
+                $new .= $char;
                 ++$i;
                 continue;
             }
-            if ('(' !== $regexp[$i] || !isset($regexp[$i + 2])) {
-                continue;
+
+            $new .= '(';
+            ++$i;
+
+            if ($i >= $len) {
+                break;
             }
-            if ('*' === $regexp[++$i] || '?' === $regexp[$i]) {
+
+            $next_char = $regexp[$i];
+
+            // Preserve PCRE verbs, e.g., (*FAIL), (*PRUNE)
+            if ('*' === $next_char) {
+                $new .= $next_char;
                 ++$i;
+                while ($i < $len && ctype_alpha($regexp[$i])) {
+                    $new .= $regexp[$i];
+                    ++$i;
+                }
+                if ($i < $len && ')' === $regexp[$i]) {
+                    $new .= ')';
+                    ++$i;
+                }
                 continue;
             }
-            $regexp = substr_replace($regexp, '?:', $i, 0);
+
+            if ('?' !== $next_char) {
+                $new .= '?:';
+                continue;
+            }
+
+            $new .= '?';
+            ++$i;
+
+            if ($i >= $len) {
+                break;
+            }
+
+            $next = $regexp[$i];
+
+            // Preserve special groups (non-capturing, assertions, comments), e.g., (?:), (?=), (?#)
+            if (\in_array($next, [':', '=', '!', '#'], true) || ('<' === $next && $i + 1 < $len && \in_array($regexp[$i + 1], ['=', '!'], true))) {
+                $new .= $next;
+                ++$i;
+                if ('<' === $next && $i < $len) {
+                    $new .= $regexp[$i];
+                    ++$i;
+                }
+                continue;
+            }
+
+            // Neutralize named capturing group (?P<name>, ?<name>, ?'name')
+            if (\in_array($next, ['P', '<', "'"], true)) {
+                $closer = "'" === $next ? "'" : '>';
+                if ('P' === $next) {
+                    ++$i;
+                    if ($i >= $len || '<' !== $regexp[$i]) {
+                        continue;
+                    }
+                }
+                ++$i;
+                while ($i < $len && $regexp[$i] !== $closer) {
+                    ++$i;
+                }
+                if ($i >= $len) {
+                    break;
+                }
+                ++$i;
+                $new .= ':'; // Add ':' to make it non-capturing.
+                continue;
+            }
+
+            // Preserve other modifiers, e.g., (?i) for case-insensitivity.
+            $new .= $next;
             ++$i;
         }
 
-        return $regexp;
+        return $new;
     }
 }

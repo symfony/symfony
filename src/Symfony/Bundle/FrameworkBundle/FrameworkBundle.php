@@ -82,6 +82,7 @@ use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\Registry;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowServiceCreatorPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 
 // Help opcache.preload discover always-needed symbols
@@ -189,6 +190,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, FormPass::class);
         $this->addCompilerPassIfExists($container, WorkflowGuardListenerPass::class);
         $this->addCompilerPassIfExists($container, WorkflowValidatorPass::class);
+        $this->addCompilerPassIfExists($container, WorkflowServiceCreatorPass::class, priority: 2); // Must be before the validator
         $container->addCompilerPass(new ResettableServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);

@@ -100,6 +100,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\Workflow\Arc;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowServiceCreatorPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
@@ -688,6 +689,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testWorkflowTransitionsPerformNoDeepMerging()
     {
         $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->addCompilerPass(new WorkflowServiceCreatorPass());
         $container->registerExtension(new FrameworkExtension());
 
         $this->loadFromFile($container, 'workflow_base_config');
@@ -2885,6 +2887,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
         $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new LoggerPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
+        if (class_exists(WorkflowServiceCreatorPass::class)) {
+            $container->addCompilerPass(new WorkflowServiceCreatorPass());
+        }
 
         if (!$compile) {
             return $container;

@@ -8,6 +8,7 @@ $container->loadFromExtension('framework', [
     'profiler' => [
         'enabled' => true,
         'collect_serializer_data' => true,
+        'hide_server_vars' => true
     ],
     'serializer' => [
         'enabled' => true,

@@ -268,6 +268,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertTrue($container->hasDefinition('profiler'), '->registerProfilerConfiguration() loads profiling.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
+        $this->assertTrue($container->getDefinition('data_collector.request')->getArgument(1));
     }
 
     public function testDisabledProfiler()

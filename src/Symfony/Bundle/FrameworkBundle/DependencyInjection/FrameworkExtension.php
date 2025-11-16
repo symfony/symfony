@@ -1041,6 +1041,11 @@ class FrameworkExtension extends Extension
         if (!class_exists(CommandDataCollector::class)) {
             $container->removeDefinition('.data_collector.command');
         }
+
+        if ($config['hide_server_vars']) {
+            $container->getDefinition('data_collector.request')
+                ->addArgument($config['hide_server_vars']);
+        }
     }
 
     private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

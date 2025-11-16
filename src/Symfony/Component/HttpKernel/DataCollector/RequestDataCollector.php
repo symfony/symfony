@@ -39,6 +39,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function __construct(
         private ?RequestStack $requestStack = null,
+        private bool $hideServerVars = false,
     ) {
         $this->controllers = new \SplObjectStorage();
     }
@@ -97,7 +98,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'request_request' => $request->request->all(),
             'request_files' => $request->files->all(),
             'request_headers' => $request->headers->all(),
-            'request_server' => $request->server->all(),
+            'request_server' => !$this->hideServerVars ? $request->server->all() : [],
             'request_cookies' => $request->cookies->all(),
             'request_attributes' => $attributes,
             'route' => $route,

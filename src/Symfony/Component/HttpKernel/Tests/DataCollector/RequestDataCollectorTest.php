@@ -467,4 +467,28 @@ class RequestDataCollectorTest extends TestCase
             ['', null],
         ];
     }
+
+    public function testHidingServerVars()
+    {
+        $response = $this->createResponse();
+        $request = Request::create('/', 'GET', [], [], [], ['API_KEY' => 'abcXYZ']);
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $response);
+
+        $refClass = new \ReflectionClass(RequestDataCollector::class);
+        $refProperty = $refClass->getProperty('data');
+        $data = $refProperty->getValue($c);
+
+        $this->assertArrayHasKey('request_server', $data);
+        $this->assertArrayHasKey('API_KEY', $data['request_server']);
+        $this->assertEquals('abcXYZ', $data['request_server']['API_KEY']);
+
+        $c = new RequestDataCollector(null, true);
+        $c->collect($request, $response);
+
+        $data = $refProperty->getValue($c);
+
+        $this->assertArrayNotHasKey('API_KEY', $data['request_server']);
+    }
 }

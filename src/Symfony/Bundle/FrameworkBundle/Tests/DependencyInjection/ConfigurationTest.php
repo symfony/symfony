@@ -763,6 +763,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'only_exceptions' => false,
                 'only_main_requests' => false,
+                'hide_server_vars' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
                 'collect_parameter' => null,

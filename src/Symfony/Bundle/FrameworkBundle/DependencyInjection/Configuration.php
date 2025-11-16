@@ -354,6 +354,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('collect_parameter')->defaultNull()->info('The name of the parameter to use to enable or disable collection on a per request basis.')->end()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_main_requests')->defaultFalse()->end()
+                        ->booleanNode('hide_server_vars')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
                         ->booleanNode('collect_serializer_data')->info('Enables the serializer data collector and profiler panel.')->defaultFalse()->end()
                     ->end()

@@ -59,6 +59,7 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             [new \DateTime('2001-01-01'), '2000-01-01'],
             [new \DateTime('2000-01-01 UTC'), '2000-01-01 UTC'],
             [null, 1],
+            [['foo' => 'bar'], ['key' => 'value']]
         ];
     }
 
@@ -93,6 +94,7 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             ['a', '"a"', 'a', '"a"', 'string'],
             [$date, self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), $date, self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), 'DateTime'],
             [$object, '2', $object, '2', __NAMESPACE__.'\ComparisonTest_Class'],
+            [['foo' => 'bar'], 'array', ['foo' => 'bar'], 'array', 'array'],
         ];
     }
 }

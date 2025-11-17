@@ -27,4 +27,11 @@ class IdenticalTo extends AbstractComparison
     ];
 
     public string $message = 'This value should be identical to {{ compared_value_type }} {{ compared_value }}.';
+
+    public function __construct(mixed $value = null, ?string $propertyPath = null, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
+    {
+        $options['value'] = $value;
+
+        parent::__construct(null, $propertyPath, $message, $groups, $payload, $options);
+    }
 }

@@ -71,6 +71,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             [$date, $date],
             [$object, $object],
             [null, 1],
+            [['foo' => 'bar'], ['foo' => 'bar']]
         ];
 
         $immutableDate = new \DateTimeImmutable('2000-01-01');
@@ -95,6 +96,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             [new \DateTime('2001-01-01'), self::normalizeIcuSpaces("Jan 1, 2001, 12:00\u{202F}AM"), new \DateTime('2001-01-01'), self::normalizeIcuSpaces("Jan 1, 2001, 12:00\u{202F}AM"), 'DateTime'],
             [new \DateTime('2001-01-01'), self::normalizeIcuSpaces("Jan 1, 2001, 12:00\u{202F}AM"), new \DateTime('1999-01-01'), self::normalizeIcuSpaces("Jan 1, 1999, 12:00\u{202F}AM"), 'DateTime'],
             [new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
+            [['foo' => 'bar'], 'array', ['key' => 'value'], 'array', 'array'],
         ];
     }
 

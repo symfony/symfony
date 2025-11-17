@@ -38,6 +38,9 @@ class NotIdenticalToTest extends TestCase
         self::assertSame('b', $cConstraint->propertyPath);
         self::assertSame('myMessage', $cConstraint->message);
         self::assertSame(['foo'], $cConstraint->groups);
+
+        [$cConstraint] = $metadata->properties['d']->getConstraints();
+        self::assertSame(['foo' => 'bar'], $cConstraint->value);
     }
 }
 
@@ -51,4 +54,7 @@ class NotIdenticalToDummy
 
     #[NotIdenticalTo(propertyPath: 'b', message: 'myMessage', groups: ['foo'])]
     private $c;
+
+    #[NotIdenticalTo(value: ['foo' => 'bar'])]
+    private $d;
 }

@@ -182,10 +182,8 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
         trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getTypeFromConstructor()" instead.', __METHOD__, self::class);
 
         // Give priority to @var declarations, fallback on @param if not found
-        if (null === $tagDocNode = $this->getDocBlockFromPromotedProperty($class, $property)) {
-            if (null === $tagDocNode = $this->getDocBlockFromConstructor($class, $property)) {
-                return null;
-            }
+        if (!$tagDocNode = $this->getDocBlockFromPromotedProperty($class, $property) ?? $this->getDocBlockFromConstructor($class, $property)) {
+            return null;
         }
 
         $types = [];
@@ -251,10 +249,8 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
         $declaringClass = $class;
 
         // Give priority to @var declarations, fallback on @param if not found
-        if (!$tagDocNode = $this->getDocBlockFromPromotedProperty($declaringClass, $property)) {
-            if (!$tagDocNode = $this->getDocBlockFromConstructor($declaringClass, $property)) {
-                return null;
-            }
+        if (!$tagDocNode = $this->getDocBlockFromPromotedProperty($declaringClass, $property) ?? $this->getDocBlockFromConstructor($declaringClass, $property)) {
+            return null;
         }
 
         $typeContext = $this->typeContextFactory->createFromClassName($class, $declaringClass);
@@ -431,21 +427,16 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             return null;
         }
 
-        $rawDocNode = $reflectionProperty->getDocComment();
-        if (!$rawDocNode) {
+        if (!$rawDocNode = $reflectionProperty->getDocComment()) {
             return null;
         }
 
         $phpDocNode = $this->getPhpDocNode($rawDocNode);
         $class = $reflectionProperty->class;
 
-        $tags = array_values(array_filter($phpDocNode->getTagsByName('@var'), fn ($tagNode) => $tagNode->value instanceof VarTagValueNode));
+        $tags = array_values(array_filter($phpDocNode->getTagsByName('@var'), static fn ($tagNode) => $tagNode->value instanceof VarTagValueNode));
 
-        if (!$tags) {
-            return null;
-        }
-
-        return $tags[0]->value;
+        return $tags ? $tags[0]->value : null;
     }
 
     /**

@@ -184,9 +184,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getTypeFromConstructor()" instead.', __METHOD__, self::class);
 
         // Give priority to @var declarations, fallback on @param on constructor if not found
-        $docBlock = $this->getDocBlockFromPromotedProperty($class, $property);
-
-        if (!$docBlock) {
+        if (!$docBlock = $this->getDocBlockFromPromotedProperty($class, $property)) {
             if (!$docBlock = $this->getDocBlockFromConstructor($class, $property)) {
                 return null;
             }

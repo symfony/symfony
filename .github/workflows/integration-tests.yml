@@ -91,7 +91,7 @@ jobs:
           REDIS_MASTER_HOST: redis-authenticated
           REDIS_MASTER_PASSWORD: "$tr0ngPassword"
           REDIS_MASTER_SET: redis_sentinel
-          REDIS_SENTINEL_PASSWORD: "$tr0ngPassword"
+          REDIS_SENTINEL_PASSWORD: "$tr0ngSentinelPassword"
           REDIS_SENTINEL_QUORUM: 1
       redis-primary:
         image: bitnamilegacy/redis:latest
@@ -274,7 +274,7 @@ jobs:
           REDIS_SENTINEL_HOSTS: 'unreachable-host:26379 localhost:26379 localhost:26379'
           REDIS_SENTINEL_AUTHENTICATED_HOSTS: 'localhost:26380 localhost:26380'
           REDIS_SENTINEL_SERVICE: redis_sentinel
-          REDIS_SENTINEL_PASSWORD: "$tr0ngPassword"
+          REDIS_SENTINEL_PASSWORD: "$tr0ngSentinelPassword"
           REDIS_REPLICATION_HOSTS: 'localhost:16382 localhost:16381'
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
           MESSENGER_REDIS_SENTINEL_MASTER: redis_sentinel

@@ -402,13 +402,18 @@ class ConnectionTest extends TestCase
     }
 
     #[Group('integration')]
-    public function testSentinelSuccessfulAuthentication()
+    #[DataProvider('successSentinelAuthDsnDataProvider')]
+    public function testSentinelSuccessfulAuthentication(string $dsn)
     {
         if (!$hosts = getenv('REDIS_SENTINEL_AUTHENTICATED_HOSTS')) {
             $this->markTestSkipped('REDIS_SENTINEL_AUTHENTICATED_HOSTS env var is not defined.');
         }
 
-        if (!$password = getenv('REDIS_SENTINEL_PASSWORD')) {
+        if (!$masterPassword = getenv('REDIS_MASTER_PASSWORD')) {
+            $this->markTestSkipped('REDIS_MASTER_PASSWORD env var is not defined.');
+        }
+
+        if (!$sentinelPassword = getenv('REDIS_SENTINEL_PASSWORD')) {
             $this->markTestSkipped('REDIS_SENTINEL_PASSWORD env var is not defined.');
         }
 
@@ -417,12 +422,16 @@ class ConnectionTest extends TestCase
         }
 
         $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', $hosts));
-        $dsn = 'redis:?'.implode('&', $hosts).'&auth='.urlencode($password);
+        $dsn = strtr($dsn, [
+            '{master_auth}' => urlencode($masterPassword),
+            '{sentinel_auth}' => urlencode($sentinelPassword),
+            '{hosts}' => implode('&', $hosts),
+        ]);
 
         $redis = $this->createRedisMock();
         $redis->expects($this->once())
             ->method('auth')
-            ->with($password)
+            ->with($masterPassword)
             ->willReturn(true);
 
         try {
@@ -430,6 +439,14 @@ class ConnectionTest extends TestCase
         } catch (\Exception $e) {
             $this->fail('Failed to connect to redis sentinel. Reason: '.$e->getMessage());
         }
+    }
+
+    public static function successSentinelAuthDsnDataProvider(): \Generator
+    {
+        yield 'auth via master_auth & sentinel_auth' => ['redis:?{hosts}&master_auth={master_auth}&sentinel_auth={sentinel_auth}'];
+        yield 'auth via master_auth & old auth options' => ['redis:?{hosts}&master_auth={master_auth}&auth={sentinel_auth}'];
+        yield 'auth via old auth param & sentinel_auth' => ['redis:{master_auth}@?{hosts}&sentinel_auth={sentinel_auth}'];
+        yield 'fallback on BC: old auth param & old auth options' => ['redis:{master_auth}@?{hosts}&auth={sentinel_auth}'];
     }
 
     #[Group('integration')]
@@ -448,7 +465,7 @@ class ConnectionTest extends TestCase
 
         $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', $hosts));
         $password = 'wr0ngpassword';
-        $dsn = 'redis:?'.implode('&', $hosts).'&auth='.urlencode($password);
+        $dsn = 'redis:?'.implode('&', $hosts).'&sentinel_auth='.urlencode($password);
 
         $redis = $this->createRedisMock();
         $redis->expects($this->never())

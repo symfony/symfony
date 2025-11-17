@@ -45,6 +45,8 @@ class Connection
         'claim_interval' => 60000, // Interval by which pending/abandoned messages should be checked
         'lazy' => false,
         'auth' => null,
+        'master_auth' => null, // password for master instance
+        'sentinel_auth' => null, // password for sentinel instances
         'serializer' => 1, // see \Redis::SERIALIZER_PHP,
         'sentinel' => null, // String, master to look for (optional, default is NULL meaning Sentinel support is disabled)
         'timeout' => 0.0, // Float, value in seconds (optional, default is 0 meaning unlimited)
@@ -74,7 +76,8 @@ class Connection
         $options += self::DEFAULT_OPTIONS;
         $host = $options['host'];
         $port = $options['port'];
-        $auth = $options['auth'];
+        $masterAuth = $options['master_auth'] ?? $options['auth'];
+        $sentinelAuth = $options['sentinel_auth'];
 
         $sentinelMaster = $options['sentinel'] ?? $options['redis_sentinel'] ?? $options['sentinel_master'] ?? null;
 
@@ -94,14 +97,14 @@ class Connection
 
         if ((\is_array($host) && null === $sentinelMaster) || $redis instanceof \RedisCluster) {
             $hosts = \is_string($host) ? [$host.':'.$port] : $host; // Always ensure we have an array
-            $this->redisInitializer = static fn () => self::initializeRedisCluster($redis, $hosts, $auth, $options);
+            $this->redisInitializer = static fn () => self::initializeRedisCluster($redis, $hosts, $masterAuth, $options);
         } else {
-            $this->redisInitializer = static function () use ($redis, $sentinelMaster, $host, $port, $options, $auth) {
+            $this->redisInitializer = static function () use ($redis, $sentinelMaster, $host, $port, $options, $masterAuth, $sentinelAuth) {
                 if (null !== $sentinelMaster) {
                     $sentinelClass = \extension_loaded('redis') ? \RedisSentinel::class : Sentinel::class;
                     $hostIndex = 0;
                     $hosts = \is_array($host) ? $host : [['scheme' => 'tcp', 'host' => $host, 'port' => $port]];
-                    $passAuth = isset($auth) && (!\extension_loaded('redis') || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
+                    $passSentinelAuth = null !== $sentinelAuth && (!\extension_loaded('redis') || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
                     do {
                         $host = $hosts[$hostIndex]['host'];
                         $port = $hosts[$hostIndex]['port'] ?? 0;
@@ -127,13 +130,13 @@ class Connection
                                     $params['ssl'] = $options['ssl'];
                                 }
 
-                                if ($passAuth) {
-                                    $params['auth'] = $auth;
+                                if ($passSentinelAuth) {
+                                    $params['auth'] = $sentinelAuth;
                                 }
 
                                 $sentinel = @new \RedisSentinel($params);
                             } else {
-                                $extra = $passAuth ? [$auth] : [];
+                                $extra = $passSentinelAuth ? [$sentinelAuth] : [];
 
                                 $sentinel = @new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout'], ...$extra);
                             }
@@ -150,7 +153,7 @@ class Connection
                     }
                 }
 
-                return self::initializeRedis($redis ?? (\extension_loaded('redis') ? new \Redis() : new Relay()), $host, $port, $auth, $options);
+                return self::initializeRedis($redis ?? (\extension_loaded('redis') ? new \Redis() : new Relay()), $host, $port, $masterAuth, $options);
             };
         }
 
@@ -177,17 +180,25 @@ class Connection
     }
 
     /**
-     * @param string|string[]|null $auth
+     * @param string|string[]|null $masterAuth
      */
-    private static function initializeRedis(\Redis|Relay $redis, string $host, int $port, string|array|null $auth, array $params): \Redis|Relay
+    private static function initializeRedis(\Redis|Relay $redis, string $host, int $port, string|array|null $masterAuth, array $params): \Redis|Relay
     {
         if ($redis->isConnected()) {
             return $redis;
         }
 
+        $extra = [
+            'stream' => $params['ssl'] ?? null,
+        ];
+
+        if (null !== $masterAuth) {
+            $extra['auth'] = $masterAuth;
+        }
+
         $connect = isset($params['persistent_id']) ? 'pconnect' : 'connect';
 
-        @$redis->{$connect}($host, $port, $params['timeout'], $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...(\defined('Redis::SCAN_PREFIX') || \extension_loaded('relay')) ? [['stream' => $params['ssl'] ?? null]] : []);
+        @$redis->{$connect}($host, $port, $params['timeout'], $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...(\defined('Redis::SCAN_PREFIX') || \extension_loaded('relay')) ? [$extra] : []);
 
         $error = null;
         set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
@@ -204,7 +215,7 @@ class Connection
 
         $redis->setOption($redis instanceof \Redis ? \Redis::OPT_SERIALIZER : Relay::OPT_SERIALIZER, $params['serializer']);
 
-        if (null !== $auth && !$redis->auth($auth)) {
+        if (null !== $masterAuth && !$redis->auth($masterAuth)) {
             throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
         }
 
@@ -216,11 +227,11 @@ class Connection
     }
 
     /**
-     * @param string|string[]|null $auth
+     * @param string|string[]|null $masterAuth
      */
-    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, string|array|null $auth, array $params): \RedisCluster
+    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, string|array|null $masterAuth, array $params): \RedisCluster
     {
-        $redis ??= new \RedisCluster(null, $hosts, $params['timeout'], $params['read_timeout'], (bool) ($params['persistent'] ?? false), $auth, ...\defined('Redis::SCAN_PREFIX') ? [$params['ssl'] ?? null] : []);
+        $redis ??= new \RedisCluster(null, $hosts, $params['timeout'], $params['read_timeout'], (bool) ($params['persistent'] ?? false), $masterAuth, ...\defined('Redis::SCAN_PREFIX') ? [$params['ssl'] ?? null] : []);
         $redis->setOption(\Redis::OPT_SERIALIZER, $params['serializer']);
 
         return $redis;
@@ -268,6 +279,10 @@ class Connection
             throw new InvalidArgumentException('Cannot use both "redis_sentinel" and "sentinel_master" at the same time.');
         }
 
+        if (isset($options['sentinel_auth']) && isset($options['auth']) && $options['sentinel_auth'] !== $options['auth']) {
+            throw new InvalidArgumentException('Cannot use both "sentinel_auth" and "auth" at the same time.');
+        }
+
         $options['sentinel'] ??= $options['redis_sentinel'] ?? $options['sentinel_master'] ?? null;
         unset($options['redis_sentinel'], $options['sentinel_master']);
 
@@ -285,7 +300,15 @@ class Connection
 
         $pass = '' !== ($params['pass'] ?? '') ? rawurldecode($params['pass']) : null;
         $user = '' !== ($params['user'] ?? '') ? rawurldecode($params['user']) : null;
-        $options['auth'] ??= null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user);
+        $masterAuthFromParams = null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user);
+
+        if (isset($options['master_auth']) && null !== $masterAuthFromParams && $options['master_auth'] !== $masterAuthFromParams) {
+            throw new InvalidArgumentException('Cannot use both "auth" param and "master_auth" option at the same time.');
+        }
+
+        $options['master_auth'] ??= $masterAuthFromParams ?? $options['auth'];
+        $options['sentinel_auth'] ??= $options['auth'];
+        unset($options['auth']);
 
         if (isset($params['query'])) {
             parse_str($params['query'], $query);
@@ -344,6 +367,7 @@ class Connection
             $url = str_replace($scheme.':', 'file:', $dsn);
         }
 
+        $auth = null;
         $url = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
             if (isset($m['password'])) {
                 if (!\in_array($m['user'], ['', 'default'], true)) {

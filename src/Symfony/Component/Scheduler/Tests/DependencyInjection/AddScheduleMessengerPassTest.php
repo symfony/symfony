@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -19,9 +20,7 @@ use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
 
 class AddScheduleMessengerPassTest extends TestCase
 {
-    /**
-     * @dataProvider processSchedulerTaskCommandProvider
-     */
+    #[DataProvider('processSchedulerTaskCommandProvider')]
     public function testProcessSchedulerTaskCommand(array $arguments, string $exceptedCommand)
     {
         $container = new ContainerBuilder();

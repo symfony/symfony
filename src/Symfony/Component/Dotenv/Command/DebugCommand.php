@@ -30,16 +30,6 @@ use Symfony\Component\Dotenv\Dotenv;
 #[AsCommand(name: 'debug:dotenv', description: 'List all dotenv files with variables and values')]
 final class DebugCommand extends Command
 {
-    /**
-     * @deprecated since Symfony 6.1
-     */
-    protected static $defaultName = 'debug:dotenv';
-
-    /**
-     * @deprecated since Symfony 6.1
-     */
-    protected static $defaultDescription = 'List all dotenv files with variables and values';
-
     public function __construct(
         private string $kernelEnvironment,
         private string $projectDirectory,
@@ -54,15 +44,15 @@ final class DebugCommand extends Command
                 new InputArgument('filter', InputArgument::OPTIONAL, 'The name of an environment variable or a filter.', null, $this->getAvailableVars(...)),
             ])
             ->setHelp(<<<'EOT'
-The <info>%command.full_name%</info> command displays all the environment variables configured by dotenv:
+                The <info>%command.full_name%</info> command displays all the environment variables configured by dotenv:
 
-  <info>php %command.full_name%</info>
+                  <info>php %command.full_name%</info>
 
-To get specific variables, specify its full or partial name:
+                To get specific variables, specify its full or partial name:
 
-    <info>php %command.full_name% FOO_BAR</info>
+                    <info>php %command.full_name% FOO_BAR</info>
 
-EOT
+                EOT
             );
     }
 

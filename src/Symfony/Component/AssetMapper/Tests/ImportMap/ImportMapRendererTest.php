@@ -92,7 +92,7 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString('"app_css_preload": "data:application/javascript,', $html);
         $this->assertStringContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-preload-d1g35t.css">', $html);
         // non-preloaded CSS file
-        $this->assertStringContainsString('"app_css_no_preload": "data:application/javascript,document.head.appendChild%28Object.assign%28document.createElement%28%22link%22%29%2C%7Brel%3A%22stylesheet%22%2Chref%3A%22%2Fsubdirectory%2Fassets%2Fstyles%2Fapp-nopreload-d1g35t.css%22%7D', $html);
+        $this->assertStringContainsString('"app_css_no_preload": "data:application/javascript,document.head.appendChild(Object.assign(document.createElement(\'link\'),{rel:\'stylesheet\',href:\'/subdirectory/assets/styles/app-nopreload-d1g35t.css\'}))', $html);
         $this->assertStringNotContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-nopreload-d1g35t.css">', $html);
         // remote js
         $this->assertStringContainsString('"remote_js": "https://cdn.example.com/assets/remote-d1g35t.js"', $html);
@@ -134,10 +134,12 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString('<script type="importmap" something data-turbo-track="reload">', $html);
         $this->assertStringContainsString('<script something data-turbo-track="reload">', $html);
         $this->assertStringContainsString(<<<EOTXT
-            script.src = 'https://polyfillUrl.example';
-            script.setAttribute('something', 'something');
-            script.setAttribute('data-turbo-track', 'reload');
-        EOTXT, $html);
+                script.src = 'https://polyfillUrl.example';
+                script.setAttribute('something', 'something');
+                script.setAttribute('data-turbo-track', 'reload');
+            EOTXT,
+            $html
+        );
     }
 
     public function testWithEntrypoint()

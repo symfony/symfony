@@ -234,7 +234,8 @@ class QuestionHelper extends Helper
     /**
      * Autocompletes a question.
      *
-     * @param resource $inputStream
+     * @param resource                  $inputStream
+     * @param callable(string):string[] $autocomplete
      */
     private function autocomplete(OutputInterface $output, Question $question, $inputStream, callable $autocomplete): string
     {
@@ -264,7 +265,7 @@ class QuestionHelper extends Helper
             if (false === $c || ('' === $ret && '' === $c && null === $question->getDefault())) {
                 // Restore the terminal so it behaves normally again
                 $inputHelper->finish();
-                throw new MissingInputException('Aborted.');
+                throw new MissingInputException('Aborted while asking: '.$question->getQuestion());
             } elseif ("\177" === $c) { // Backspace Character
                 if (0 === $numMatches && 0 !== $i) {
                     --$i;
@@ -378,12 +379,13 @@ class QuestionHelper extends Helper
             return $entered;
         }
 
-        $choices = explode(',', $entered);
-        if ('' !== $lastChoice = trim($choices[\count($choices) - 1])) {
-            return $lastChoice;
+        if (false === $lastCommaPos = strrpos($entered, ',')) {
+            return $entered;
         }
 
-        return $entered;
+        $lastChoice = trim(substr($entered, $lastCommaPos + 1));
+
+        return '' !== $lastChoice ? $lastChoice : $entered;
     }
 
     /**
@@ -498,6 +500,18 @@ class QuestionHelper extends Helper
      */
     private function readInput($inputStream, Question $question): string|false
     {
+        if (null !== $question->getTimeout() && $this->isInteractiveInput($inputStream)) {
+            $read = [$inputStream];
+            $write = null;
+            $except = null;
+            $timeoutSeconds = $question->getTimeout();
+            $changedStreams = stream_select($read, $write, $except, $timeoutSeconds);
+
+            if (0 === $changedStreams) {
+                throw new MissingInputException(\sprintf('Timed out after waiting for input for %d second%s.', $timeoutSeconds, 1 === $timeoutSeconds ? '' : 's'));
+            }
+        }
+
         if (!$question->isMultiline()) {
             $cp = $this->setIOCodepage();
             $ret = fgets($inputStream, 4096);
@@ -577,7 +591,7 @@ class QuestionHelper extends Helper
 
         // For seekable and writable streams, add all the same data to the
         // cloned stream and then seek to the same offset.
-        if (true === $seekable && !\in_array($mode, ['r', 'rb', 'rt'])) {
+        if (true === $seekable && !\in_array($mode, ['r', 'rb', 'rt'], true)) {
             $offset = ftell($inputStream);
             rewind($inputStream);
             stream_copy_to_stream($inputStream, $cloneStream);

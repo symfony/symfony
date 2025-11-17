@@ -18,8 +18,6 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @experimental
- *
  * @template T of array<string, mixed>
  */
 interface StreamReaderInterface

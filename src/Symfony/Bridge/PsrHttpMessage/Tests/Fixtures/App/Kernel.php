@@ -47,13 +47,8 @@ class Kernel extends SymfonyKernel
     protected function configureContainer(ContainerConfigurator $container): void
     {
         $container->extension('framework', [
-            'router' => ['utf8' => true],
             'secret' => 'for your eyes only',
             'test' => true,
-            'annotations' => false,
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
         ]);
 
         $container->services()

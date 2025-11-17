@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -29,7 +30,7 @@ final class AffirmativeStrategy implements AccessDecisionStrategyInterface, \Str
     ) {
     }
 
-    public function decide(\Traversable $results): bool
+    public function decide(\Traversable $results, ?AccessDecision $accessDecision = null): bool
     {
         $deny = 0;
         foreach ($results as $result) {

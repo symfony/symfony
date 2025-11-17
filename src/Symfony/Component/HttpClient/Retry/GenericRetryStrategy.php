@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  */
 class GenericRetryStrategy implements RetryStrategyInterface
 {
-    public const IDEMPOTENT_METHODS = ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE'];
+    public const IDEMPOTENT_METHODS = ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE', 'QUERY'];
     public const DEFAULT_RETRY_STATUS_CODES = [
         0 => self::IDEMPOTENT_METHODS, // for transport exceptions
         423,

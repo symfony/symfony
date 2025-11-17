@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests\Trigger;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger;
@@ -18,9 +19,7 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class PeriodicalTriggerTest extends TestCase
 {
-    /**
-     * @dataProvider provideForConstructor
-     */
+    #[DataProvider('provideForConstructor')]
     public function testConstructor(PeriodicalTrigger $trigger, bool $optimizable = true)
     {
         $run = new \DateTimeImmutable('2922-02-22 12:34:00+00:00');
@@ -57,9 +56,7 @@ class PeriodicalTriggerTest extends TestCase
         yield [new PeriodicalTrigger(new \DateInterval('P1D'), $now), false];
     }
 
-    /**
-     * @dataProvider getInvalidIntervals
-     */
+    #[DataProvider('getInvalidIntervals')]
     public function testInvalidInterval($interval, $expectedExceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -78,9 +75,7 @@ class PeriodicalTriggerTest extends TestCase
         yield [0, 'The "$interval" argument must be greater than zero.'];
     }
 
-    /**
-     * @dataProvider provideForToString
-     */
+    #[DataProvider('provideForToString')]
     public function testToString(string $expected, PeriodicalTrigger $trigger)
     {
         $this->assertSame($expected, (string) $trigger);
@@ -102,9 +97,7 @@ class PeriodicalTriggerTest extends TestCase
         yield ['last day of next month', new PeriodicalTrigger(\DateInterval::createFromDateString('last day of next month'), $from, $until)];
     }
 
-    /**
-     * @dataProvider providerGetNextRunDates
-     */
+    #[DataProvider('providerGetNextRunDates')]
     public function testGetNextRunDates(\DateTimeImmutable $from, TriggerInterface $trigger, array $expected, int $count)
     {
         $this->assertEquals($expected, $this->getNextRunDates($from, $trigger, $count));
@@ -155,9 +148,7 @@ class PeriodicalTriggerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerGetNextRunDateAgain
-     */
+    #[DataProvider('providerGetNextRunDateAgain')]
     public function testGetNextRunDateAgain(PeriodicalTrigger $trigger, \DateTimeImmutable $lastRun, ?\DateTimeImmutable $expected)
     {
         $this->assertEquals($expected, $trigger->getNextRunDate($lastRun));

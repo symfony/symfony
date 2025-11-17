@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\CardScheme;
 use Symfony\Component\Validator\Constraints\CardSchemeValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -36,9 +37,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidNumbers
-     */
+    #[DataProvider('getValidNumbers')]
     public function testValidNumbers($scheme, $number)
     {
         $this->validator->validate($number, new CardScheme(schemes: $scheme));
@@ -46,9 +45,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidNumbers
-     */
+    #[DataProvider('getValidNumbers')]
     public function testValidNumbersWithNewLine($scheme, $number)
     {
         $this->validator->validate($number."\n", new CardScheme(schemes: $scheme, message: 'myMessage'));
@@ -69,9 +66,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getInvalidNumbers
-     */
+    #[DataProvider('getInvalidNumbers')]
     public function testInvalidNumbers($scheme, $number, $code)
     {
         $constraint = new CardScheme(

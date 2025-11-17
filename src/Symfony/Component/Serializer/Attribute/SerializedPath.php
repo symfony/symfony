@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 class SerializedPath
 {
-    private PropertyPath $serializedPath;
+    public readonly PropertyPath $serializedPath;
 
     /**
      * @param string $serializedPath A path using a valid PropertyAccess syntax where the value is stored in a normalized representation
@@ -30,17 +30,8 @@ class SerializedPath
     {
         try {
             $this->serializedPath = new PropertyPath($serializedPath);
-        } catch (InvalidPropertyPathException $pathException) {
+        } catch (InvalidPropertyPathException) {
             throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a valid property path.', self::class));
         }
     }
-
-    public function getSerializedPath(): PropertyPath
-    {
-        return $this->serializedPath;
-    }
-}
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\SerializedPath::class, false)) {
-    class_alias(SerializedPath::class, \Symfony\Component\Serializer\Annotation\SerializedPath::class);
 }

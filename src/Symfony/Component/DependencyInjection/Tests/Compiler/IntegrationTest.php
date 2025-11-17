@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
@@ -245,9 +246,7 @@ class IntegrationTest extends TestCase
         $this->assertSame($container->get('service'), $container->get('decorator'));
     }
 
-    /**
-     * @dataProvider getYamlCompileTests
-     */
+    #[DataProvider('getYamlCompileTests')]
     public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ?ContainerBuilder $mainContainer = null)
     {
         // allow a container to be passed in, which might have autoconfigure settings

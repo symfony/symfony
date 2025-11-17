@@ -25,8 +25,8 @@ class HtmlSanitizerCustomTest extends TestCase
         ;
 
         $this->assertSame(
-            ' world',
-            (new HtmlSanitizer($config))->sanitizeFor('head', '<div style="width: 100px">Hello</div> world')
+            '',
+            (new HtmlSanitizer($config))->sanitizeFor('head', '<div style="width: 100px">Hello world</div>')
         );
     }
 
@@ -65,8 +65,8 @@ class HtmlSanitizerCustomTest extends TestCase
 
     public function testSanitizeNullByte()
     {
-        $this->assertSame('Null byte', $this->sanitize(new HtmlSanitizerConfig(), "Null byte\0"));
-        $this->assertSame('Null byte', $this->sanitize(new HtmlSanitizerConfig(), 'Null byte&#0;'));
+        $this->assertSame('Null byte�', $this->sanitize(new HtmlSanitizerConfig(), "Null byte\0"));
+        $this->assertSame('Null byte�', $this->sanitize(new HtmlSanitizerConfig(), 'Null byte&#0;'));
     }
 
     public function testSanitizeDefaultBody()

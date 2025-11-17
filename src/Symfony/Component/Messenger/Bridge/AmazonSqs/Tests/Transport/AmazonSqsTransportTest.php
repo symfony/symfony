@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransport;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -114,6 +115,22 @@ class AmazonSqsTransportTest extends TestCase
         $envelope = new Envelope(new \stdClass());
         $this->sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
         $this->assertSame($envelope, $this->transport->send($envelope));
+    }
+
+    public function testItSendsAMessageViaTheSenderWithRedeliveryStamp()
+    {
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(1)]);
+        $this->sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
+        $this->assertSame($envelope, $this->transport->send($envelope));
+    }
+
+    public function testItDoesNotSendRedeliveredMessageWhenNotHandlingRetries()
+    {
+        $transport = new AmazonSqsTransport($this->connection, null, $this->receiver, $this->sender, false);
+
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(1)]);
+        $this->sender->expects($this->never())->method('send')->with($envelope)->willReturn($envelope);
+        $this->assertSame($envelope, $transport->send($envelope));
     }
 
     public function testItCanSetUpTheConnection()

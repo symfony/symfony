@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Change default value of `default_protocol` option in `UrlType` from `'http'` to `null`
+ * Remove the `VersionAwareTest` trait, use feature detection instead
+ * Remove deprecated `ResizeFormListener::preSetData()` method, use `postSetData()` instead
+ * Remove `validation.xml` in `Resources/config`, replaced by attributes on the `Form` class
+
+7.4
+---
+
+ * Add `input=date_point` to `DateTimeType`, `DateType` and `TimeType`
+ * Add support for guessing form type of enum properties
+ * Add `active_at`, `not_active_at` and `legal_tender`, `include_undated` options to `CurrencyType`
+ * Add `FormFlow` for multistep forms management
+
 7.3
 ---
 
@@ -15,6 +31,7 @@ CHANGELOG
  * Add `LazyChoiceLoader` and `choice_lazy` option in `ChoiceType` for loading and rendering choices on demand
  * Use `form.post_set_data` instead of `form.pre_set_data` in `ResizeFormListener`
  * Change the priority of `DataCollectorListener` from 255 to -255
+ * Make `ResizeFormListener::postSetData()` method `final`
 
 7.1
 ---

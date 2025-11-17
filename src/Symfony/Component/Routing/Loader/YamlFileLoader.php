@@ -74,33 +74,7 @@ class YamlFileLoader extends FileLoader
             throw new \InvalidArgumentException(\sprintf('The file "%s" must contain a YAML array.', $path));
         }
 
-        foreach ($parsedConfig as $name => $config) {
-            if (str_starts_with($name, 'when@')) {
-                if (!$this->env || 'when@'.$this->env !== $name) {
-                    continue;
-                }
-
-                foreach ($config as $name => $config) {
-                    $this->validate($config, $name.'" when "@'.$this->env, $path);
-
-                    if (isset($config['resource'])) {
-                        $this->parseImport($collection, $config, $path, $file);
-                    } else {
-                        $this->parseRoute($collection, $name, $config, $path);
-                    }
-                }
-
-                continue;
-            }
-
-            $this->validate($config, $name, $path);
-
-            if (isset($config['resource'])) {
-                $this->parseImport($collection, $config, $path, $file);
-            } else {
-                $this->parseRoute($collection, $name, $config, $path);
-            }
-        }
+        $this->loadContent($collection, $parsedConfig, $path, $file);
 
         return $collection;
     }
@@ -246,7 +220,7 @@ class YamlFileLoader extends FileLoader
     protected function validate(mixed $config, string $name, string $path): void
     {
         if (!\is_array($config)) {
-            throw new \InvalidArgumentException(\sprintf('The definition of "%s" in "%s" must be a YAML array.', $name, $path));
+            throw new \InvalidArgumentException(\sprintf('The definition of "%s" in "%s" must be an array.', $name, $path));
         }
         if (isset($config['alias'])) {
             $this->validateAlias($config, $name, $path);
@@ -270,6 +244,29 @@ class YamlFileLoader extends FileLoader
         }
         if (isset($config['stateless']) && isset($config['defaults']['_stateless'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "stateless" key and the defaults key "_stateless" for "%s".', $path, $name));
+        }
+    }
+
+    private function loadContent(RouteCollection $collection, array $config, string $path, string $file): void
+    {
+        foreach ($config as $name => $config) {
+            if (!str_starts_with($when = $name, 'when@')) {
+                $config = [$name => $config];
+            } elseif (!$this->env || 'when@'.$this->env !== $name) {
+                continue;
+            } else {
+                $when .= '" when "@'.$this->env;
+            }
+
+            foreach ($config as $name => $config) {
+                $this->validate($config, $when, $path);
+
+                if (isset($config['resource'])) {
+                    $this->parseImport($collection, $config, $path, $file);
+                } else {
+                    $this->parseRoute($collection, $name, $config, $path);
+                }
+            }
         }
     }
 

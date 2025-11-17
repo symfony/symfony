@@ -47,10 +47,10 @@ class CharsetTest extends TestCase
         $loader = new AttributeLoader();
         $this->assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         $this->assertSame('UTF-8', $aConstraint->encodings);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         $this->assertSame(['ASCII', 'UTF-8'], $bConstraint->encodings);
     }
 }

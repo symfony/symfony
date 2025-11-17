@@ -16,16 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
-        "doctrine/dbal": "^3.6|^4",
-        "predis/predis": "^1.1|^2.0"
+        "doctrine/dbal": "^4.3",
+        "predis/predis": "^1.1|^2.0",
+        "symfony/serializer": "^6.4|^7.0"
     },
     "conflict": {
-        "doctrine/dbal": "<3.6",
-        "symfony/cache": "<6.4"
+        "doctrine/dbal": "<4.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Lock\\": "" },

@@ -1,6 +1,372 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove support for configuring constraint options implicitly with the XML format
+
+   Before:
+
+   ```xml
+   <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity">
+     <constraint name="Callback">
+       <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+       <value>callback</value>
+     </constraint>
+   </class>
+   ```
+
+   After:
+
+   ```xml
+   <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity">
+     <constraint name="Callback">
+       <option name="callback">
+         <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+         <value>callback</value>
+       </option>
+     </constraint>
+   </class>
+   ```
+ * Remove support for configuring constraint options implicitly with the YAML format
+
+   Before:
+
+   ```yaml
+   Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+     constraints:
+       - Callback: validateMeStatic
+       - Callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+   ```
+
+   After:
+
+   ```yaml
+   Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+     constraints:
+       - Callback:
+           callback: validateMeStatic
+       - Callback:
+           callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+   ```
+ * Remove support for passing associative arrays to `GroupSequence`
+
+   Before:
+
+   ```php
+   $groupSequence = GroupSequence(['value' => ['group 1', 'group 2']]);
+   ```
+
+   After:
+
+   ```php
+   $groupSequence = GroupSequence(['group 1', 'group 2']);
+   ```
+ * Change the default value of the `$requireTld` option of the `Url` constraint to `true`
+ * Add method `getGroupProvider()` to `ClassMetadataInterface`
+ * Replace `__sleep/wakeup()` by `__(un)serialize()`  on `GenericMetadata` implementations
+ * Remove the `getRequiredOptions()` and `getDefaultOption()` methods from the `All`, `AtLeastOneOf`, `CardScheme`, `Collection`,
+   `CssColor`, `Expression`, `Regex`, `Sequentially`, `Type`, and `When` constraints
+ * Remove support for evaluating options in the base `Constraint` class. Initialize properties in the constructor of the concrete constraint
+   class instead.
+
+   Before:
+
+   ```php
+   class CustomConstraint extends Constraint
+   {
+       public $option1;
+       public $option2;
+
+       public function __construct(?array $options = null)
+       {
+           parent::__construct($options);
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   class CustomConstraint extends Constraint
+   {
+       public function __construct(
+           public $option1 = null,
+           public $option2 = null,
+           ?array $groups = null,
+           mixed $payload = null,
+       ) {
+           parent::__construct(null, $groups, $payload);
+       }
+   }
+   ```
+
+ * Remove the `getRequiredOptions()` method from the base `Constraint` class. Use mandatory constructor arguments instead.
+
+   Before:
+
+   ```php
+   class CustomConstraint extends Constraint
+   {
+       public $option1;
+       public $option2;
+
+       public function __construct(?array $options = null)
+       {
+           parent::__construct($options);
+       }
+
+       public function getRequiredOptions()
+       {
+           return ['option1'];
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   class CustomConstraint extends Constraint
+   {
+       public function __construct(
+           public $option1,
+           public $option2 = null,
+           ?array $groups = null,
+           mixed $payload = null,
+       ) {
+           parent::__construct(null, $groups, $payload);
+       }
+   }
+   ```
+ * Remove the `normalizeOptions()` and `getDefaultOption()` methods of the base `Constraint` class without replacements.
+   Overriding them in child constraint does not have any effects.
+ * Remove support for passing an array of options to the `Composite` constraint class. Initialize the properties referenced with `getNestedConstraints()`
+   in child classes before calling the constructor of `Composite`.
+
+   Before:
+
+   ```php
+   class CustomCompositeConstraint extends Composite
+   {
+       public array $constraints = [];
+
+       public function __construct(?array $options = null)
+       {
+           parent::__construct($options);
+       }
+
+       protected function getCompositeOption(): string
+       {
+           return 'constraints';
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   class CustomCompositeConstraint extends Composite
+   {
+       public function __construct(
+           public array $constraints,
+           ?array $groups = null,
+           mixed $payload = null,
+       ) {
+           parent::__construct(null, $groups, $payload);
+       }
+   }
+   ```
+ * Remove `Bic::INVALID_BANK_CODE_ERROR` constant. This error code was not used in the Bic constraint validator anymore
+
+7.4
+---
+
+ * Deprecate handling associative arrays in `GroupSequence`
+
+   Before:
+
+   ```php
+   $groupSequence = GroupSequence(['value' => ['group 1', 'group 2']]);
+   ```
+
+   After:
+
+   ```php
+   $groupSequence = GroupSequence(['group 1', 'group 2']);
+   ```
+ * Deprecate configuring constraint options implicitly with the XML format
+
+   Before:
+
+   ```xml
+   <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity">
+    <constraint name="Callback">
+      <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+      <value>callback</value>
+    </constraint>
+   </class>
+   ```
+
+   After:
+
+   ```xml
+   <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity">
+     <constraint name="Callback">
+       <option name="callback">
+         <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+         <value>callback</value>
+       </option>
+     </constraint>
+   </class>
+   ```
+ * Deprecate configuring constraint options implicitly with the YAML format
+
+   Before:
+
+   ```yaml
+   Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+     constraints:
+       - Callback: validateMeStatic
+       - Callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+   ```
+
+   After:
+
+   ```yaml
+   Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+     constraints:
+       - Callback:
+           callback: validateMeStatic
+       - Callback:
+           callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+   ```
+ * Add `#[ExtendsValidationFor]` to declare new constraints for a class
+ * Add `ValidatorBuilder::addAttributeMappings()` and `AttributeMetadataPass` to declare compile-time constraint metadata using attributes
+ * Add the `Video` constraint for validating video files
+ * Deprecate implementing `__sleep/wakeup()` on `GenericMetadata` implementations; use `__(un)serialize()` instead
+ * Deprecate passing a list of choices to the first argument of the `Choice` constraint. Use the `choices` option instead
+ * Add the `min` and `max` parameter to the `Length` constraint violation
+ * Deprecate `getRequiredOptions()` and `getDefaultOption()` methods of the `All`, `AtLeastOneOf`, `CardScheme`, `Collection`,
+   `CssColor`, `Expression`, `Regex`, `Sequentially`, `Type`, and `When` constraints
+ * Deprecate evaluating options in the base `Constraint` class. Initialize properties in the constructor of the concrete constraint
+   class instead.
+
+   Before:
+
+   ```php
+   class CustomConstraint extends Constraint
+   {
+       public $option1;
+       public $option2;
+
+       public function __construct(?array $options = null)
+       {
+           parent::__construct($options);
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Attribute\HasNamedArguments;
+
+   class CustomConstraint extends Constraint
+   {
+       #[HasNamedArguments]
+       public function __construct(
+           public $option1 = null,
+           public $option2 = null,
+           ?array $groups = null,
+           mixed $payload = null,
+       ) {
+           parent::__construct(null, $groups, $payload);
+       }
+   }
+   ```
+ * Deprecate the `getRequiredOptions()` method of the base `Constraint` class. Use mandatory constructor arguments instead.
+
+   Before:
+
+   ```php
+   class CustomConstraint extends Constraint
+   {
+       public $option1;
+       public $option2;
+
+       public function __construct(?array $options = null)
+       {
+           parent::__construct($options);
+       }
+
+       public function getRequiredOptions()
+       {
+           return ['option1'];
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Attribute\HasNamedArguments;
+
+   class CustomConstraint extends Constraint
+   {
+       #[HasNamedArguments]
+       public function __construct(
+           public $option1,
+           public $option2 = null,
+           ?array $groups = null,
+           mixed $payload = null,
+       ) {
+           parent::__construct(null, $groups, $payload);
+       }
+   }
+   ```
+ * Deprecate the `normalizeOptions()` and `getDefaultOption()` methods of the base `Constraint` class without replacements.
+   Overriding them in child constraint will not have any effects starting with Symfony 8.0.
+ * Deprecate passing an array of options to the `Composite` constraint class. Initialize the properties referenced with `getNestedConstraints()`
+   in child classes before calling the constructor of `Composite`.
+
+   Before:
+
+   ```php
+   class CustomCompositeConstraint extends Composite
+   {
+       public array $constraints = [];
+
+       public function __construct(?array $options = null)
+       {
+           parent::__construct($options);
+       }
+
+       protected function getCompositeOption(): string
+       {
+           return 'constraints';
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Validator\Attribute\HasNamedArguments;
+
+   class CustomCompositeConstraint extends Composite
+   {
+       #[HasNamedArguments]
+       public function __construct(
+           public array $constraints,
+           ?array $groups = null,
+           mixed $payload = null)
+       {
+           parent::__construct(null, $groups, $payload);
+       }
+   }
+   ```
+
 7.3
 ---
 

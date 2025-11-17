@@ -12,6 +12,7 @@
 namespace Symfony\Contracts\HttpClient\Test;
 
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -346,6 +347,8 @@ abstract class HttpClientTestCase extends TestCase
      * @testWith [[]]
      *           [["Content-Length: 7"]]
      */
+    #[TestWith([[]])]
+    #[TestWith([['Content-Length: 7']])]
     public function testRedirects(array $headers = [])
     {
         $client = $this->getHttpClient(__FUNCTION__);

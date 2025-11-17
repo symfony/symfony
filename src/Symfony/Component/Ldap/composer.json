@@ -16,16 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "ext-ldap": "*",
-        "symfony/options-resolver": "^7.3"
+        "symfony/options-resolver": "^7.4|^8.0"
     },
     "require-dev": {
-        "symfony/security-core": "^6.4|^7.0",
-        "symfony/security-http": "^6.4|^7.0"
+        "symfony/security-core": "^8.0",
+        "symfony/security-http": "^7.4|^8.0"
     },
     "conflict": {
-        "symfony/security-core": "<6.4"
+        "symfony/security-core": "<8.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Ldap\\": "" },

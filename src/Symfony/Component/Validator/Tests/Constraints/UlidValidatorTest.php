@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Ulid;
 use Symfony\Component\Validator\Constraints\UlidValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -67,9 +68,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getInvalidUlids
-     */
+    #[DataProvider('getInvalidUlids')]
     public function testInvalidUlid(string $ulid, string $code)
     {
         $constraint = new Ulid(message: 'testMessage');
@@ -96,9 +95,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidBase58Ulids
-     */
+    #[DataProvider('getInvalidBase58Ulids')]
     public function testInvalidBase58Ulid(string $ulid, string $code)
     {
         $constraint = new Ulid(message: 'testMessage', format: Ulid::FORMAT_BASE_58);
@@ -124,9 +121,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidRfc4122Ulids
-     */
+    #[DataProvider('getInvalidRfc4122Ulids')]
     public function testInvalidInvalid4122Ulid(string $ulid, string $code)
     {
         $constraint = new Ulid(message: 'testMessage', format: Ulid::FORMAT_RFC_4122);

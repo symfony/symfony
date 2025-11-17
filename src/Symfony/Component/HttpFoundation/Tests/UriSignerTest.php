@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Exception\ExpiredSignedUriException;
@@ -20,9 +21,7 @@ use Symfony\Component\HttpFoundation\Exception\UnverifiedSignedUriException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class UriSignerTest extends TestCase
 {
     public function testSign()

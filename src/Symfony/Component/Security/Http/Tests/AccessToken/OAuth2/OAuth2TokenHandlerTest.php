@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 class OAuth2TokenHandlerTest extends TestCase
 {
-    public static function testGetsUserIdentifierFromOAuth2ServerResponse(): void
+    public function testGetsUserIdentifierFromOAuth2ServerResponse()
     {
         $accessToken = 'a-secret-token';
         $claims = [
@@ -35,7 +35,6 @@ class OAuth2TokenHandlerTest extends TestCase
             'iat' => 1419350238,
             'extension_field' => 'twenty-seven',
         ];
-        $expectedUser = new OAuth2User(...$claims);
 
         $client = new MockHttpClient([
             new MockResponse(json_encode($claims, \JSON_THROW_ON_ERROR)),
@@ -44,9 +43,11 @@ class OAuth2TokenHandlerTest extends TestCase
         $userBadge = (new Oauth2TokenHandler($client))->getUserBadgeFrom($accessToken);
         $actualUser = $userBadge->getUserLoader()();
 
-        self::assertEquals(new UserBadge('Z5O3upPC88QrAjx00dis', fn () => $expectedUser, $claims), $userBadge);
-        self::assertInstanceOf(OAuth2User::class, $actualUser);
-        self::assertSame($claims, $userBadge->getAttributes());
-        self::assertSame($claims['sub'], $actualUser->getUserIdentifier());
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame('Z5O3upPC88QrAjx00dis', $userBadge->getUserIdentifier());
+        $this->assertSame($claims, $userBadge->getAttributes());
+        $this->assertInstanceOf(OAuth2User::class, $actualUser);
+        $this->assertSame($claims, $userBadge->getAttributes());
+        $this->assertSame($claims['sub'], $actualUser->getUserIdentifier());
     }
 }

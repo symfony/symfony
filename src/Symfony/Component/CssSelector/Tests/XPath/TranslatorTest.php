@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\CssSelector\Tests\XPath;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\Exception\ExpressionErrorException;
 use Symfony\Component\CssSelector\Node\ElementNode;
@@ -22,13 +23,13 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 
 class TranslatorTest extends TestCase
 {
-    /** @dataProvider getXpathLiteralTestData */
+    #[DataProvider('getXpathLiteralTestData')]
     public function testXpathLiteral($value, $literal)
     {
         $this->assertEquals($literal, Translator::getXpathLiteral($value));
     }
 
-    /** @dataProvider getCssToXPathTestData */
+    #[DataProvider('getCssToXPathTestData')]
     public function testCssToXPath($css, $xpath)
     {
         $translator = new Translator();
@@ -103,7 +104,7 @@ class TranslatorTest extends TestCase
         $translator->addAttributeMatching($xpath, '', '', '');
     }
 
-    /** @dataProvider getXmlLangTestData */
+    #[DataProvider('getXmlLangTestData')]
     public function testXmlLang($css, array $elementsId)
     {
         $translator = new Translator();
@@ -115,7 +116,7 @@ class TranslatorTest extends TestCase
         }
     }
 
-    /** @dataProvider getHtmlIdsTestData */
+    #[DataProvider('getHtmlIdsTestData')]
     public function testHtmlIds($css, array $elementsId)
     {
         $translator = new Translator();
@@ -136,7 +137,7 @@ class TranslatorTest extends TestCase
         libxml_use_internal_errors($internalErrors);
     }
 
-    /** @dataProvider getHtmlShakespearTestData */
+    #[DataProvider('getHtmlShakespearTestData')]
     public function testHtmlShakespear($css, $count)
     {
         $translator = new Translator();
@@ -156,18 +157,18 @@ class TranslatorTest extends TestCase
         $translator->registerExtension(new HtmlExtension($translator));
         $document = new \DOMDocument();
         $document->loadHTML(<<<'HTML'
-<html>
-  <body>
-    <p>
-      <span>A</span>
-    </p>
-    <p>
-      <span>B</span>
-      <span>C</span>
-    </p>
-  </body>
-</html>
-HTML
+            <html>
+              <body>
+                <p>
+                  <span>A</span>
+                </p>
+                <p>
+                  <span>B</span>
+                  <span>C</span>
+                </p>
+              </body>
+            </html>
+            HTML
         );
 
         $xpath = new \DOMXPath($document);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
@@ -23,10 +24,8 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class SlackOptionsTest extends TestCase
 {
-    /**
-     * @dataProvider toArrayProvider
-     * @dataProvider toArraySimpleOptionsProvider
-     */
+    #[DataProvider('toArrayProvider')]
+    #[DataProvider('toArraySimpleOptionsProvider')]
     public function testToArray(array $options, ?array $expected = null)
     {
         $this->assertSame($expected ?? $options, (new SlackOptions($options))->toArray());
@@ -72,9 +71,7 @@ final class SlackOptionsTest extends TestCase
         yield [['thread_ts' => '1503435956.000247']];
     }
 
-    /**
-     * @dataProvider getRecipientIdProvider
-     */
+    #[DataProvider('getRecipientIdProvider')]
     public function testGetRecipientId(?string $expected, SlackOptions $options)
     {
         $this->assertSame($expected, $options->getRecipientId());
@@ -88,11 +85,7 @@ final class SlackOptionsTest extends TestCase
         yield ['foo', new SlackOptions(['recipient_id' => 'foo'])];
     }
 
-    /**
-     * @dataProvider setProvider
-     *
-     * @param mixed $value
-     */
+    #[DataProvider('setProvider')]
     public function testSet(string $method, string $optionsKey, $value)
     {
         $options = (new SlackOptions())->$method($value);
@@ -121,9 +114,7 @@ final class SlackOptionsTest extends TestCase
         $this->assertSame([['type' => 'divider']], $options->toArray()['blocks']);
     }
 
-    /**
-     * @dataProvider fromNotificationProvider
-     */
+    #[DataProvider('fromNotificationProvider')]
     public function testFromNotification(array $expected, Notification $notification)
     {
         $options = SlackOptions::fromNotification($notification);

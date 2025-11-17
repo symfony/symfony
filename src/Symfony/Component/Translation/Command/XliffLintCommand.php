@@ -58,26 +58,26 @@ class XliffLintCommand extends Command
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())))
             ->setHelp(<<<EOF
-The <info>%command.name%</info> command lints an XLIFF file and outputs to STDOUT
-the first encountered syntax error.
+                The <info>%command.name%</info> command lints an XLIFF file and outputs to STDOUT
+                the first encountered syntax error.
 
-You can validates XLIFF contents passed from STDIN:
+                You can validates XLIFF contents passed from STDIN:
 
-  <info>cat filename | php %command.full_name% -</info>
+                  <info>cat filename | php %command.full_name% -</info>
 
-You can also validate the syntax of a file:
+                You can also validate the syntax of a file:
 
-  <info>php %command.full_name% filename</info>
+                  <info>php %command.full_name% filename</info>
 
-Or of a whole directory:
+                Or of a whole directory:
 
-  <info>php %command.full_name% dirname</info>
+                  <info>php %command.full_name% dirname</info>
 
-The <info>--format</info> option specifies the format of the command output:
+                The <info>--format</info> option specifies the format of the command output:
 
-  <info>php %command.full_name% dirname --format=json</info>
+                  <info>php %command.full_name% dirname --format=json</info>
 
-EOF
+                EOF
             )
         ;
     }
@@ -226,7 +226,7 @@ EOF
         }
 
         foreach ($this->getDirectoryIterator($fileOrDirectory) as $file) {
-            if (!\in_array($file->getExtension(), ['xlf', 'xliff'])) {
+            if (!\in_array($file->getExtension(), ['xlf', 'xliff'], true)) {
                 continue;
             }
 

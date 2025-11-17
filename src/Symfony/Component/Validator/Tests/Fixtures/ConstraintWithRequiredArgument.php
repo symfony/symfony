@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 #[\Attribute]
@@ -19,10 +18,9 @@ final class ConstraintWithRequiredArgument extends Constraint
 {
     public string $requiredArg;
 
-    #[HasNamedArguments]
     public function __construct(string $requiredArg, ?array $groups = null, mixed $payload = null)
     {
-        parent::__construct([], $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->requiredArg = $requiredArg;
     }

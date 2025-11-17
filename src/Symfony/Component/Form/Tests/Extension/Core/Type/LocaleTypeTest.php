@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -36,9 +37,7 @@ class LocaleTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('zh_Hant_HK', 'zh_Hant_HK', 'Chinese (Traditional, Hong Kong SAR China)'), $choices);
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testChoiceTranslationLocaleOption()
     {
         $choices = $this->factory

@@ -54,7 +54,7 @@ class FormPass implements CompilerPassInterface
             // Add form type service to the service locator
             $serviceDefinition = $container->getDefinition($serviceId);
             $servicesMap[$formType = $serviceDefinition->getClass()] = new Reference($serviceId);
-            $namespaces[substr($formType, 0, strrpos($formType, '\\'))] = true;
+            $namespaces[substr($formType, 0, strrpos($formType, '\\') ?: \strlen($formType))] = true;
 
             if (isset($tag[0]['csrf_token_id'])) {
                 $csrfTokenIds[$formType] = $tag[0]['csrf_token_id'];

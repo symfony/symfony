@@ -33,7 +33,7 @@ class RequestContext
     private string $queryString;
     private array $parameters = [];
 
-    public function __construct(string $baseUrl = '', string $method = 'GET', string $host = 'localhost', string $scheme = 'http', int $httpPort = 80, int $httpsPort = 443, string $path = '/', string $queryString = '')
+    public function __construct(string $baseUrl = '', string $method = 'GET', string $host = 'localhost', string $scheme = 'http', int $httpPort = 80, int $httpsPort = 443, string $path = '/', string $queryString = '', ?array $parameters = null)
     {
         $this->setBaseUrl($baseUrl);
         $this->setMethod($method);
@@ -43,6 +43,7 @@ class RequestContext
         $this->setHttpsPort($httpsPort);
         $this->setPathInfo($path);
         $this->setQueryString($queryString);
+        $this->parameters = $parameters ?? $this->parameters;
     }
 
     public static function fromUri(string $uri, string $host = 'localhost', string $scheme = 'http', int $httpPort = 80, int $httpsPort = 443): self

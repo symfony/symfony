@@ -32,9 +32,6 @@ class JsonLoginLdapTest extends AbstractWebTestCase
 
     public function testDefaultJsonLdapLoginSuccess()
     {
-        if (!interface_exists(\Symfony\Component\Ldap\Security\RoleFetcherInterface::class)) {
-            $this->markTestSkipped('The "LDAP" component does not support LDAP roles.');
-        }
         // Given
         $client = $this->createClient(['test_case' => 'JsonLoginLdap', 'root_config' => 'config.yml', 'debug' => true]);
         $container = $client->getContainer();

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests\Generator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
@@ -24,9 +25,7 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class MessageGeneratorTest extends TestCase
 {
-    /**
-     * @dataProvider messagesProvider
-     */
+    #[DataProvider('messagesProvider')]
     public function testGetMessagesFromSchedule(string $startTime, array $runs, array $schedule)
     {
         $clock = new MockClock(self::makeDateTime($startTime));
@@ -50,9 +49,7 @@ class MessageGeneratorTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider messagesProvider
-     */
+    #[DataProvider('messagesProvider')]
     public function testGetMessagesFromScheduleProvider(string $startTime, array $runs, array $schedule)
     {
         $clock = new MockClock(self::makeDateTime($startTime));

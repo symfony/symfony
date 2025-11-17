@@ -20,26 +20,13 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  *
  * @final
  *
- * @internal since Symfony 7.3
+ * @internal
  */
 class ResourceCaster
 {
-    /**
-     * @deprecated since Symfony 7.3
-     */
-    public static function castCurl(\CurlHandle $h, array $a, Stub $stub, bool $isNested): array
+    public static function castDba(\Dba\Connection $dba, array $a, Stub $stub, bool $isNested): array
     {
-        trigger_deprecation('symfony/var-dumper', '7.3', 'The "%s()" method is deprecated without replacement.', __METHOD__);
-
-        return CurlCaster::castCurl($h, $a, $stub, $isNested);
-    }
-
-    /**
-     * @param resource|\Dba\Connection $dba
-     */
-    public static function castDba(mixed $dba, array $a, Stub $stub, bool $isNested): array
-    {
-        if (\PHP_VERSION_ID < 80402 && !\is_resource($dba)) {
+        if (\PHP_VERSION_ID < 80402) {
             // @see https://github.com/php/php-src/issues/16990
             return $a;
         }
@@ -68,25 +55,5 @@ class ResourceCaster
     public static function castStreamContext($stream, array $a, Stub $stub, bool $isNested): array
     {
         return @stream_context_get_params($stream) ?: $a;
-    }
-
-    /**
-     * @deprecated since Symfony 7.3
-     */
-    public static function castGd(\GdImage $gd, array $a, Stub $stub, bool $isNested): array
-    {
-        trigger_deprecation('symfony/var-dumper', '7.3', 'The "%s()" method is deprecated without replacement.', __METHOD__);
-
-        return GdCaster::castGd($gd, $a, $stub, $isNested);
-    }
-
-    /**
-     * @deprecated since Symfony 7.3
-     */
-    public static function castOpensslX509(\OpenSSLCertificate $h, array $a, Stub $stub, bool $isNested): array
-    {
-        trigger_deprecation('symfony/var-dumper', '7.3', 'The "%s()" method is deprecated without replacement.', __METHOD__);
-
-        return OpenSSLCaster::castOpensslX509($h, $a, $stub, $isNested);
     }
 }

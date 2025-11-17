@@ -39,7 +39,7 @@ final class DateTimeTypePropertyMetadataLoader implements PropertyMetadataLoader
             if ($type instanceof ObjectType && is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                 $metadata = $metadata
                     ->withType(DateTimeToStringValueTransformer::getStreamValueType())
-                    ->withAdditionalNativeToStreamValueTransformer('json_streamer.value_transformer.date_time_to_string');
+                    ->withAdditionalValueTransformer('json_streamer.value_transformer.date_time_to_string');
             }
         }
 

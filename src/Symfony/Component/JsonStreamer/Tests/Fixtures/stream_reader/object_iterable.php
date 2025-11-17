@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @return iterable<int|string, Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>
+ */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\Instantiator $instantiator, array $options): mixed {
     $providers['iterable<int|string, Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
         $iterable = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {

@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransport;
-use Symfony\Component\Notifier\Exception\LengthException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -43,16 +42,6 @@ final class DiscordTransportTest extends TransportTestCase
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
         yield [new DummyMessage()];
-    }
-
-    public function testSendChatMessageWithMoreThan2000CharsThrowsLogicException()
-    {
-        $transport = self::createTransport();
-
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('The subject length of a Discord message must not exceed 2000 characters.');
-
-        $transport->send(new ChatMessage(str_repeat('囍', 2001)));
     }
 
     public function testSendWithErrorResponseThrows()

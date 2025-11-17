@@ -30,7 +30,7 @@ class YamlFileLoader extends FileLoader
     private ?Parser $yamlParser = null;
 
     /**
-     * An array of YAML class descriptions.
+     * @var array<class-string, array>
      */
     private ?array $classes = null;
 
@@ -144,13 +144,16 @@ class YamlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[]
+     * @return class-string[]
      */
     public function getMappedClasses(): array
     {
         return array_keys($this->classes ??= $this->getClassesFromYaml());
     }
 
+    /**
+     * @return array<class-string, array>
+     */
     private function getClassesFromYaml(): array
     {
         if (!stream_is_local($this->file)) {

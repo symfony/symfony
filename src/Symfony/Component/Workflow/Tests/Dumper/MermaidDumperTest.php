@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\DefinitionBuilder;
@@ -23,9 +24,7 @@ class MermaidDumperTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    /**
-     * @dataProvider provideWorkflowDefinitionWithoutMarking
-     */
+    #[DataProvider('provideWorkflowDefinitionWithoutMarking')]
     public function testDumpWithoutMarking(Definition $definition, string $expected)
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
@@ -35,9 +34,7 @@ class MermaidDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    /**
-     * @dataProvider provideWorkflowWithReservedWords
-     */
+    #[DataProvider('provideWorkflowWithReservedWords')]
     public function testDumpWithReservedWordsAsPlacenames(Definition $definition, string $expected)
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
@@ -47,9 +44,7 @@ class MermaidDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    /**
-     * @dataProvider provideStateMachine
-     */
+    #[DataProvider('provideStateMachine')]
     public function testDumpAsStateMachine(Definition $definition, string $expected)
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_STATEMACHINE);
@@ -59,9 +54,7 @@ class MermaidDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    /**
-     * @dataProvider provideWorkflowWithMarking
-     */
+    #[DataProvider('provideWorkflowWithMarking')]
     public function testDumpWorkflowWithMarking(Definition $definition, Marking $marking, string $expected)
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
@@ -148,10 +141,10 @@ class MermaidDumperTest extends TestCase
     {
         $builder = new DefinitionBuilder();
 
-        $builder->addPlaces(['start', 'subgraph', 'end', 'finis']);
+        $builder->addPlaces(['start', 'subgraph', 'end', 'finish']);
         $builder->addTransitions([
             new Transition('t0', ['start', 'subgraph'], ['end']),
-            new Transition('t1', ['end'], ['finis']),
+            new Transition('t1', ['end'], ['finish']),
         ]);
 
         $definition = $builder->build();
@@ -162,7 +155,7 @@ class MermaidDumperTest extends TestCase
             ."place0([\"start\"])\n"
             ."place1((\"subgraph\"))\n"
             ."place2((\"end\"))\n"
-            ."place3((\"finis\"))\n"
+            ."place3((\"finish\"))\n"
             ."transition0[\"t0\"]\n"
             ."place0-->transition0\n"
             ."transition0-->place2\n"

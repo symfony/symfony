@@ -60,11 +60,17 @@ return static function (ContainerConfigurator $container) {
                 'priority' => 240,
             ])
 
+        ->set('.lazy.data_collector.dump', DumpDataCollector::class)
+            ->factory('current')
+            ->args([[service('data_collector.dump')]])
+            ->lazy()
+
         ->set('debug.dump_listener', DumpListener::class)
             ->args([
                 service('var_dumper.cloner'),
                 service('var_dumper.cli_dumper'),
                 null,
+                service('.lazy.data_collector.dump'),
             ])
             ->tag('kernel.event_subscriber')
 

@@ -21,7 +21,6 @@ class AToBMapper implements ObjectMapperInterface
     {
     }
 
-    // TODO: change attribute
     #[Map(source: 'propertyA', target: 'propertyD')]
     #[Map(source: 'propertyB', if: false)]
     public function map(object $source, object|string|null $target = null): object

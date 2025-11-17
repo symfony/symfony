@@ -18,8 +18,6 @@ namespace Symfony\Component\JsonStreamer\Mapping;
  * an appropriate ObjectNode.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- *
- * @experimental
  */
 interface PropertyMetadataLoaderInterface
 {

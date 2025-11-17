@@ -13,8 +13,6 @@ namespace Symfony\Component\JsonPath\Exception;
 
 /**
  * @author Alexandre Daubois <alex.daubois@gmail.com>
- *
- * @experimental
  */
 interface ExceptionInterface extends \Throwable
 {

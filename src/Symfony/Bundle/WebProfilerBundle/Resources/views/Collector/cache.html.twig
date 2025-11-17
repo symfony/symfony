@@ -30,7 +30,7 @@
         </div>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url}) }}
     {% endif %}
 {% endblock %}
 
@@ -94,7 +94,7 @@
                                         <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
                                         <td class="nowrap">{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
                                         <td class="nowrap">{{ call.name }}({{ call.namespace|default('') }})</td>
-                                        <td>{{ profiler_dump(call.value.result, maxDepth=2) }}</td>
+                                        <td>{{ profiler_dump(call.value.result, maxDepth: 2) }}</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>

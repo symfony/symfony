@@ -65,16 +65,13 @@ class LazyServiceDumperTest extends TestCase
         $dumper->getProxyCode($definition);
     }
 
-    /**
-     * @requires PHP 8.3
-     */
     public function testReadonlyClass()
     {
         $dumper = new LazyServiceDumper();
         $definition = (new Definition(ReadOnlyClass::class))->setLazy(true);
 
         $this->assertTrue($dumper->isProxyCandidate($definition));
-        $this->assertStringContainsString(\PHP_VERSION_ID >= 80400 ? '' : 'readonly class ReadOnlyClassGhost', $dumper->getProxyCode($definition));
+        $this->assertStringContainsString('', $dumper->getProxyCode($definition));
     }
 }
 

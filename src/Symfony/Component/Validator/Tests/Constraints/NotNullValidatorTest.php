@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotNullValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -22,9 +23,7 @@ class NotNullValidatorTest extends ConstraintValidatorTestCase
         return new NotNullValidator();
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testValidValues($value)
     {
         $this->validator->validate($value, new NotNull());
@@ -45,21 +44,6 @@ class NotNullValidatorTest extends ConstraintValidatorTestCase
     public function testNullIsInvalid()
     {
         $this->validator->validate(null, new NotNull(message: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 'null')
-            ->setCode(NotNull::IS_NULL_ERROR)
-            ->assertRaised();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testNullIsInvalidDoctrineStyle()
-    {
-        $this->validator->validate(null, new NotNull([
-            'message' => 'myMessage',
-        ]));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'null')

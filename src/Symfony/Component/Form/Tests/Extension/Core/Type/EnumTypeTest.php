@@ -11,6 +11,7 @@
 
 namespace Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -50,9 +51,7 @@ class EnumTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    /**
-     * @dataProvider provideSingleSubmitData
-     */
+    #[DataProvider('provideSingleSubmitData')]
     public function testSubmitSingleNonExpanded(string $class, string $submittedData, \UnitEnum $expectedData)
     {
         $form = $this->factory->create($this->getTestedType(), null, [
@@ -68,9 +67,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    /**
-     * @dataProvider provideSingleSubmitData
-     */
+    #[DataProvider('provideSingleSubmitData')]
     public function testSubmitSingleExpanded(string $class, string $submittedData, \UnitEnum $expectedData)
     {
         $form = $this->factory->create($this->getTestedType(), null, [
@@ -192,9 +189,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame([Suit::Spades], $form->getData());
     }
 
-    /**
-     * @dataProvider provideMultiSubmitData
-     */
+    #[DataProvider('provideMultiSubmitData')]
     public function testSubmitMultipleNonExpanded(string $class, array $submittedValues, array $expectedValues)
     {
         $form = $this->factory->create($this->getTestedType(), null, [
@@ -210,9 +205,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    /**
-     * @dataProvider provideMultiSubmitData
-     */
+    #[DataProvider('provideMultiSubmitData')]
     public function testSubmitMultipleExpanded(string $class, array $submittedValues, array $expectedValues)
     {
         $form = $this->factory->create($this->getTestedType(), null, [

@@ -179,9 +179,6 @@ class PropertyNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
-    /**
-     * @requires PHP 8.2
-     */
     public function testDenormalizeWithReadOnlyClass()
     {
         /** @var ChildClassDummy $object */
@@ -195,9 +192,6 @@ class PropertyNormalizerTest extends TestCase
         $this->assertSame('childProp', $object->childProp);
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testDenormalizeWithAsymmetricPropertyVisibility()
     {
         /** @var SpecialBookDummy $object */

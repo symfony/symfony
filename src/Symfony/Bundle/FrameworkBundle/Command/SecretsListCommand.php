@@ -43,14 +43,14 @@ final class SecretsListCommand extends Command
         $this
             ->addOption('reveal', 'r', InputOption::VALUE_NONE, 'Display decrypted values alongside names')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command list all stored secrets.
+                The <info>%command.name%</info> command list all stored secrets.
 
-    <info>%command.full_name%</info>
+                    <info>%command.full_name%</info>
 
-When the option <info>--reveal</info> is provided, the decrypted secrets are also displayed.
+                When the option <info>--reveal</info> is provided, the decrypted secrets are also displayed.
 
-    <info>%command.full_name% --reveal</info>
-EOF
+                    <info>%command.full_name% --reveal</info>
+                EOF
             )
         ;
     }

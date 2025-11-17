@@ -71,7 +71,8 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
 
         try {
             return $accessDecision->isGranted = $this->strategy->decide(
-                $this->collectResults($token, $attributes, $object, $accessDecision)
+                $this->collectResults($token, $attributes, $object, $accessDecision),
+                $accessDecision,
             );
         } finally {
             array_pop($this->accessDecisionStack);

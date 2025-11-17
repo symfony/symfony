@@ -66,7 +66,7 @@ final class MailchimpRequestParser extends AbstractRequestParser
         // First add url to signedData.
         $signedData = $webhookUrl;
 
-        // When no params is set we know its a test and we set the key to test.
+        // When no params is set we know it's a test and we set the key to test.
         if ('[]' === $content['mandrill_events']) {
             $secret = 'test-webhook';
         }

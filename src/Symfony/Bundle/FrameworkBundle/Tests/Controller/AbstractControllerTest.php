@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -101,7 +103,7 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
+        $this->expectExceptionMessage('::getParameter()" method is missing a parameter bag');
 
         $controller->getParameter('foo');
     }
@@ -390,12 +392,10 @@ class AbstractControllerTest extends TestCase
             ->expects($this->once())
             ->method('isGranted')
             ->willReturnCallback(function ($attribute, $subject, ?AccessDecision $accessDecision = null) {
-                if (class_exists(AccessDecision::class)) {
-                    $this->assertInstanceOf(AccessDecision::class, $accessDecision);
-                    $accessDecision->votes[] = $vote = new Vote();
-                    $vote->result = VoterInterface::ACCESS_DENIED;
-                    $vote->reasons[] = 'Why should I.';
-                }
+                $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+                $accessDecision->votes[] = $vote = new Vote();
+                $vote->result = VoterInterface::ACCESS_DENIED;
+                $vote->reasons[] = 'Why should I.';
 
                 return false;
             });
@@ -407,22 +407,18 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->expectException(AccessDeniedException::class);
-        $this->expectExceptionMessage('Access Denied.'.(class_exists(AccessDecision::class) ? ' Why should I.' : ''));
+        $this->expectExceptionMessage('Access Denied. Why should I.');
 
         try {
             $controller->denyAccessUnlessGranted('foo');
         } catch (AccessDeniedException $e) {
-            if (class_exists(AccessDecision::class)) {
-                $this->assertFalse($e->getAccessDecision()->isGranted);
-            }
+            $this->assertFalse($e->getAccessDecision()->isGranted);
 
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider provideDenyAccessUnlessGrantedSetsAttributesAsArray
-     */
+    #[DataProvider('provideDenyAccessUnlessGrantedSetsAttributesAsArray')]
     public function testdenyAccessUnlessGrantedSetsAttributesAsArray($attribute, $exceptionAttributes)
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -557,9 +553,7 @@ class AbstractControllerTest extends TestCase
         $this->assertSame(302, $response->getStatusCode());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testAddFlash()
     {
         $flashBag = new FlashBag();

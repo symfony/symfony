@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
- * @requires extension curl
- */
+#[RequiresPhpExtension('curl')]
 class CurlCasterTest extends TestCase
 {
     use VarDumperTestTrait;
@@ -29,12 +28,14 @@ class CurlCasterTest extends TestCase
 
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
-CurlHandle {
-  url: "http://example.com/"
-  content_type: "text/html"
-  http_code: %d
-%A
-}
-EODUMP, $ch);
+                CurlHandle {
+                  url: "http://example.com/"
+                  content_type: "text/html"
+                  http_code: %d
+                %A
+                }
+                EODUMP,
+            $ch
+        );
     }
 }

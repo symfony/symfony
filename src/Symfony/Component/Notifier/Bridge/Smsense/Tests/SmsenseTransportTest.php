@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsense\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Notifier\Bridge\Smsense\SmsenseTransport;
@@ -68,9 +69,7 @@ class SmsenseTransportTest extends TransportTestCase
         $this->assertSame('63444830-5857-50da-d5f6-69f3719aa916', $sentMessage->getMessageId());
     }
 
-    /**
-     * @dataProvider errorProvider
-     */
+    #[DataProvider('errorProvider')]
     public function testExceptionIsThrownWhenSendFailed(int $statusCode, string $content, string $expectedExceptionMessage)
     {
         $response = $this->createMock(ResponseInterface::class);

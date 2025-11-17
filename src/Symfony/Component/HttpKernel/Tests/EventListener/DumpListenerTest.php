@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\EventListener\DumpListener;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -62,6 +66,44 @@ class DumpListenerTest extends TestCase
             throw $exception;
         }
     }
+
+    #[TestWith([false, false, '+foo-+bar-', []])]
+    #[TestWith([true, false, '+foo-+bar-', []])]
+    #[TestWith([true, true, '', ['foo-', 'bar-']])]
+    public function testConfigureWithProfilerDumper(bool $hasOption, bool $option, string $expectedOutput, array $expectedData)
+    {
+        $prevDumper = VarDumper::setHandler('var_dump');
+        VarDumper::setHandler($prevDumper);
+
+        $cloner = new MockCloner();
+        $dumper = new MockDumper();
+        $profilerDumper = new MockProfilerDumper();
+
+        $input = $this->createMock(InputInterface::class);
+        $input->method('hasOption')->willReturn($hasOption);
+        $input->method('getOption')->willReturn($option);
+
+        ob_start();
+        $exception = null;
+        $listener = new DumpListener($cloner, $dumper, null, $profilerDumper);
+
+        try {
+            $listener->configure(new ConsoleCommandEvent(null, $input, new BufferedOutput()));
+
+            VarDumper::dump('foo');
+            VarDumper::dump('bar');
+
+            $this->assertSame($expectedOutput, ob_get_clean());
+            $this->assertSame($expectedData, $profilerDumper->data);
+        } catch (\Exception $exception) {
+        }
+
+        VarDumper::setHandler($prevDumper);
+
+        if (null !== $exception) {
+            throw $exception;
+        }
+    }
 }
 
 class MockCloner implements ClonerInterface
@@ -77,6 +119,18 @@ class MockDumper implements DataDumperInterface
     public function dump(Data $data): ?string
     {
         echo '+'.$data->getValue();
+
+        return null;
+    }
+}
+
+class MockProfilerDumper implements DataDumperInterface
+{
+    public array $data = [];
+
+    public function dump(Data $data): ?string
+    {
+        $this->data[] = $data->getValue();
 
         return null;
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Formatter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -159,9 +160,7 @@ class OutputFormatterTest extends TestCase
         $this->assertEquals("\033[34;41msome text\033[39;49m", $formatter->format('<fg=blue;bg=red>some text</fg=blue;bg=red>'));
     }
 
-    /**
-     * @dataProvider provideInlineStyleOptionsCases
-     */
+    #[DataProvider('provideInlineStyleOptionsCases')]
     public function testInlineStyleOptions(string $tag, ?string $expected = null, ?string $input = null, bool $truecolor = false)
     {
         if ($truecolor && 'truecolor' !== getenv('COLORTERM')) {
@@ -177,7 +176,7 @@ class OutputFormatterTest extends TestCase
             $expected = $tag.$input.'</'.$styleString.'>';
             $this->assertSame($expected, $formatter->format($expected));
         } else {
-            /** @var OutputFormatterStyle $result */
+            /* @var OutputFormatterStyle $result */
             $this->assertInstanceOf(OutputFormatterStyle::class, $result);
             $this->assertSame($expected, $formatter->format($tag.$input.'</>'));
             $this->assertSame($expected, $formatter->format($tag.$input.'</'.$styleString.'>'));
@@ -241,9 +240,7 @@ class OutputFormatterTest extends TestCase
         $this->assertTrue($formatter->hasStyle('question'));
     }
 
-    /**
-     * @dataProvider provideDecoratedAndNonDecoratedOutput
-     */
+    #[DataProvider('provideDecoratedAndNonDecoratedOutput')]
     public function testNotDecoratedFormatterOnJediTermEmulator(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput, bool $shouldBeJediTerm = false)
     {
         $terminalEmulator = $shouldBeJediTerm ? 'JetBrains-JediTerm' : 'Unknown';
@@ -259,9 +256,7 @@ class OutputFormatterTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideDecoratedAndNonDecoratedOutput
-     */
+    #[DataProvider('provideDecoratedAndNonDecoratedOutput')]
     public function testNotDecoratedFormatterOnIDEALikeEnvironment(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput, bool $expectsIDEALikeTerminal = false)
     {
         // Backup previous env variable
@@ -307,50 +302,54 @@ class OutputFormatterTest extends TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(<<<EOF
-\033[32m
-some text\033[39m
-EOF
-            , $formatter->format(<<<'EOF'
-<info>
-some text</info>
-EOF
-            ));
+            \033[32m
+            some text\033[39m
+            EOF,
+            $formatter->format(<<<'EOF'
+                <info>
+                some text</info>
+                EOF
+            )
+        );
 
         $this->assertEquals(<<<EOF
-\033[32msome text
-\033[39m
-EOF
-            , $formatter->format(<<<'EOF'
-<info>some text
-</info>
-EOF
-            ));
+            \033[32msome text
+            \033[39m
+            EOF,
+            $formatter->format(<<<'EOF'
+                <info>some text
+                </info>
+                EOF
+            )
+        );
 
         $this->assertEquals(<<<EOF
-\033[32m
-some text
-\033[39m
-EOF
-            , $formatter->format(<<<'EOF'
-<info>
-some text
-</info>
-EOF
-            ));
+            \033[32m
+            some text
+            \033[39m
+            EOF,
+            $formatter->format(<<<'EOF'
+                <info>
+                some text
+                </info>
+                EOF
+            )
+        );
 
         $this->assertEquals(<<<EOF
-\033[32m
-some text
-more text
-\033[39m
-EOF
-            , $formatter->format(<<<'EOF'
-<info>
-some text
-more text
-</info>
-EOF
-            ));
+            \033[32m
+            some text
+            more text
+            \033[39m
+            EOF,
+            $formatter->format(<<<'EOF'
+                <info>
+                some text
+                more text
+                </info>
+                EOF
+            )
+        );
     }
 
     public function testFormatAndWrap()

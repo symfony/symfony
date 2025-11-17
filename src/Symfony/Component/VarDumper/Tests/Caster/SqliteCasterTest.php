@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
- * @requires extension sqlite3
- */
+#[RequiresPhpExtension('sqlite3')]
 class SqliteCasterTest extends TestCase
 {
     use VarDumperTestTrait;
@@ -31,12 +30,14 @@ class SqliteCasterTest extends TestCase
 
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
-SQLite3Result {
-  columnNames: array:2 [
-    0 => "id"
-    1 => "bar"
-  ]
-}
-EODUMP, $result);
+                SQLite3Result {
+                  columnNames: array:2 [
+                    0 => "id"
+                    1 => "bar"
+                  ]
+                }
+                EODUMP,
+            $result
+        );
     }
 }

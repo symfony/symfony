@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -19,9 +20,7 @@ use Symfony\Component\Console\Input\StringInput;
 
 class StringInputTest extends TestCase
 {
-    /**
-     * @dataProvider getTokenizeData
-     */
+    #[DataProvider('getTokenizeData')]
     public function testTokenize($input, $tokens, $message)
     {
         $input = new StringInput($input);

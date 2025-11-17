@@ -30,21 +30,13 @@ class GenericMetadata implements MetadataInterface
 {
     /**
      * @var Constraint[]
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getConstraints()} and {@link findConstraints()} instead.
      */
-    public array $constraints = [];
+    private array $constraints = [];
 
     /**
      * @var array<string, Constraint[]>
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link findConstraints()} instead.
      */
-    public array $constraintsByGroup = [];
+    private array $constraintsByGroup = [];
 
     /**
      * The strategy for cascading objects.
@@ -52,12 +44,8 @@ class GenericMetadata implements MetadataInterface
      * By default, objects are not cascaded.
      *
      * @var CascadingStrategy::*
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getCascadingStrategy()} instead.
      */
-    public int $cascadingStrategy = CascadingStrategy::NONE;
+    private int $cascadingStrategy = CascadingStrategy::NONE;
 
     /**
      * The strategy for traversing traversable objects.
@@ -65,43 +53,27 @@ class GenericMetadata implements MetadataInterface
      * By default, traversable objects are not traversed.
      *
      * @var TraversalStrategy::*
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getTraversalStrategy()} instead.
      */
-    public int $traversalStrategy = TraversalStrategy::NONE;
+    private int $traversalStrategy = TraversalStrategy::NONE;
 
     /**
      * Is auto-mapping enabled?
      *
      * @var AutoMappingStrategy::*
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getAutoMappingStrategy()} instead.
      */
-    public int $autoMappingStrategy = AutoMappingStrategy::NONE;
+    private int $autoMappingStrategy = AutoMappingStrategy::NONE;
 
-    /**
-     * Returns the names of the properties that should be serialized.
-     *
-     * @return string[]
-     */
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        return [
-            'constraints',
-            'constraintsByGroup',
-            'cascadingStrategy',
-            'traversalStrategy',
-            'autoMappingStrategy',
-        ];
+        return array_filter([
+            'constraints' => $this->constraints,
+            'constraintsByGroup' => $this->constraintsByGroup,
+            'cascadingStrategy' => CascadingStrategy::NONE !== $this->cascadingStrategy ? $this->cascadingStrategy : null,
+            'traversalStrategy' => TraversalStrategy::NONE !== $this->traversalStrategy ? $this->traversalStrategy : null,
+            'autoMappingStrategy' => AutoMappingStrategy::NONE !== $this->autoMappingStrategy ? $this->autoMappingStrategy : null,
+        ]);
     }
 
-    /**
-     * Clones this object.
-     */
     public function __clone()
     {
         $constraints = $this->constraints;
@@ -138,13 +110,9 @@ class GenericMetadata implements MetadataInterface
 
         if ($constraint instanceof Valid && null === $constraint->groups) {
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
+            $this->traversalStrategy = $constraint->traverse ? TraversalStrategy::IMPLICIT : TraversalStrategy::NONE;
 
-            if ($constraint->traverse) {
-                $this->traversalStrategy = TraversalStrategy::IMPLICIT;
-            } else {
-                $this->traversalStrategy = TraversalStrategy::NONE;
-            }
-
+            // The constraint is not added
             return $this;
         }
 
@@ -155,19 +123,23 @@ class GenericMetadata implements MetadataInterface
             return $this;
         }
 
-        $this->constraints[] = $constraint;
+        if (!\in_array($constraint, $this->constraints, true)) {
+            $this->constraints[] = $constraint;
+        }
 
         foreach ($constraint->groups as $group) {
-            $this->constraintsByGroup[$group][] = $constraint;
+            if (!\in_array($constraint, $this->constraintsByGroup[$group] ??= [], true)) {
+                $this->constraintsByGroup[$group][] = $constraint;
+            }
         }
 
         return $this;
     }
 
     /**
-     * Adds an list of constraints.
+     * Adds a list of constraints.
      *
-     * @param Constraint[] $constraints The constraints to add
+     * @param Constraint[] $constraints
      *
      * @return $this
      */

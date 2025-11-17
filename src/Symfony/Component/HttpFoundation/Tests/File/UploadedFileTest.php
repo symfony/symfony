@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\File;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 use Symfony\Component\HttpFoundation\File\Exception\ExtensionFileException;
@@ -168,9 +169,7 @@ class UploadedFileTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider failedUploadedFile
-     */
+    #[DataProvider('failedUploadedFile')]
     public function testMoveFailed(UploadedFile $file)
     {
         $exceptionClass = match ($file->getError()) {
@@ -268,9 +267,7 @@ class UploadedFileTest extends TestCase
         $this->assertTrue($file->isValid());
     }
 
-    /**
-     * @dataProvider uploadedFileErrorProvider
-     */
+    #[DataProvider('uploadedFileErrorProvider')]
     public function testIsInvalidOnUploadError($error)
     {
         $file = new UploadedFile(

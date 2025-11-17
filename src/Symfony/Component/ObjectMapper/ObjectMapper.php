@@ -25,33 +25,40 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
 /**
  * Object to object mapper.
  *
- * @experimental
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class ObjectMapper implements ObjectMapperInterface
+final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInterface
 {
     /**
      * Tracks recursive references.
      */
-    private ?\SplObjectStorage $objectMap = null;
+    private ?\WeakMap $objectMap = null;
 
     public function __construct(
         private readonly ObjectMapperMetadataFactoryInterface $metadataFactory = new ReflectionObjectMapperMetadataFactory(),
         private readonly ?PropertyAccessorInterface $propertyAccessor = null,
         private readonly ?ContainerInterface $transformCallableLocator = null,
         private readonly ?ContainerInterface $conditionCallableLocator = null,
+        private ?ObjectMapperInterface $objectMapper = null,
     ) {
     }
 
     public function map(object $source, object|string|null $target = null): object
     {
-        $objectMapInitialized = false;
-        if (null === $this->objectMap) {
-            $this->objectMap = new \SplObjectStorage();
-            $objectMapInitialized = true;
+        if ($this->objectMap) {
+            return $this->doMap($source, $target, $this->objectMap, false);
         }
 
+        $this->objectMap = new \WeakMap();
+        try {
+            return $this->doMap($source, $target, $this->objectMap, true);
+        } finally {
+            $this->objectMap = null;
+        }
+    }
+
+    private function doMap(object $source, object|string|null $target, \WeakMap $objectMap, bool $rootCall): object
+    {
         $metadata = $this->metadataFactory->create($source);
         $map = $this->getMapTarget($metadata, null, $source, null);
         $target ??= $map?->target;
@@ -90,7 +97,7 @@ final class ObjectMapper implements ObjectMapperInterface
             throw new MappingException(\sprintf('Expected the mapped object to be an instance of "%s" but got "%s".', $targetRefl->getName(), get_debug_type($mappedTarget)));
         }
 
-        $this->objectMap[$source] = $mappedTarget;
+        $objectMap[$source] = $mappedTarget;
         $ctorArguments = [];
         $targetConstructor = $targetRefl->getConstructor();
         foreach ($targetConstructor?->getParameters() ?? [] as $parameter) {
@@ -147,7 +154,7 @@ final class ObjectMapper implements ObjectMapperInterface
                     continue;
                 }
 
-                $value = $this->getSourceValue($source, $mappedTarget, $value, $this->objectMap, $mapping);
+                $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping);
                 $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value);
             }
 
@@ -157,12 +164,12 @@ final class ObjectMapper implements ObjectMapperInterface
                     continue;
                 }
 
-                $value = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $this->objectMap);
+                $value = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap);
                 $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value);
             }
         }
 
-        if (!$mappingToObject && !$map?->transform && $targetConstructor) {
+        if ((!$mappingToObject || !$rootCall) && !$map?->transform && $targetConstructor) {
             try {
                 $mappedTarget->__construct(...$ctorArguments);
             } catch (\ReflectionException $e) {
@@ -180,10 +187,6 @@ final class ObjectMapper implements ObjectMapperInterface
 
         foreach ($mapToProperties as $property => $value) {
             $this->propertyAccessor ? $this->propertyAccessor->setValue($mappedTarget, $property, $value) : ($mappedTarget->{$property} = $value);
-        }
-
-        if ($objectMapInitialized) {
-            $this->objectMap = null;
         }
 
         return $mappedTarget;
@@ -219,7 +222,7 @@ final class ObjectMapper implements ObjectMapperInterface
         return $source->{$propertyName};
     }
 
-    private function getSourceValue(object $source, object $target, mixed $value, \SplObjectStorage $objectMap, ?Mapping $mapping = null): mixed
+    private function getSourceValue(object $source, object $target, mixed $value, \WeakMap $objectMap, ?Mapping $mapping = null): mixed
     {
         if ($mapping?->transform) {
             $value = $this->applyTransforms($mapping, $value, $source, $target);
@@ -238,7 +241,18 @@ final class ObjectMapper implements ObjectMapperInterface
             } elseif ($objectMap->offsetExists($value)) {
                 $value = $objectMap[$value];
             } else {
-                $value = $this->map($value, $mapTo->target);
+                $refl = new \ReflectionClass($mapTo->target);
+                $mapper = $this->objectMapper ?? $this;
+
+                return $refl->newLazyGhost(function ($target) use ($mapper, $value, $objectMap) {
+                    $previousMap = $this->objectMap;
+                    $this->objectMap = $objectMap;
+                    try {
+                        $objectMap[$value] = $mapper->map($value, $target);
+                    } finally {
+                        $this->objectMap = $previousMap;
+                    }
+                });
             }
         }
 
@@ -342,7 +356,7 @@ final class ObjectMapper implements ObjectMapperInterface
 
         if ($source instanceof LazyObjectInterface) {
             $source->initializeLazyObject();
-        } elseif (\PHP_VERSION_ID >= 80400 && $refl->isUninitializedLazyObject($source)) {
+        } elseif ($refl->isUninitializedLazyObject($source)) {
             $refl->initializeLazyObject($source);
         }
 
@@ -362,5 +376,13 @@ final class ObjectMapper implements ObjectMapperInterface
     private function propertyIsMappable(\ReflectionClass $targetRefl, int|string $property): bool
     {
         return $targetRefl->hasProperty($property) && $targetRefl->getProperty($property)->isPublic();
+    }
+
+    public function withObjectMapper(ObjectMapperInterface $objectMapper): static
+    {
+        $clone = clone $this;
+        $clone->objectMapper = $objectMapper;
+
+        return $clone;
     }
 }

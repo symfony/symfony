@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Deprecations\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
+// Skip if we're using PHPUnit >=10
+if (class_exists(PHPUnit\Metadata\Metadata::class)) {
+    return;
+}
+
 // Detect if we need to serialize deprecations to a file.
-if (
-    // Skip if we're using PHPUnit >=10
-    !class_exists(PHPUnit\Metadata\Metadata::class)
-    && in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && $file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')
-) {
+if (in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && $file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
     DeprecationErrorHandler::collectDeprecations($file);
 
     return;
@@ -35,25 +35,8 @@ if (isset($fileIdentifier)) {
 
 if (class_exists(Deprecation::class)) {
     Deprecation::withoutDeduplication();
-
-    if (\PHP_VERSION_ID < 80000) {
-        // Ignore deprecations about the annotation mapping driver when it's not possible to move to the attribute driver yet
-        Deprecation::ignoreDeprecations('https://github.com/doctrine/orm/issues/10098');
-    }
 }
 
-if (!class_exists(AnnotationRegistry::class, false) && class_exists(AnnotationRegistry::class)) {
-    if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
-        AnnotationRegistry::registerUniqueLoader('class_exists');
-    } elseif (method_exists(AnnotationRegistry::class, 'registerLoader')) {
-        AnnotationRegistry::registerLoader('class_exists');
-    }
-}
-
-if (
-    // Skip if we're using PHPUnit >=10
-    !class_exists(PHPUnit\Metadata\Metadata::class, false)
-    && 'disabled' !== getenv('SYMFONY_DEPRECATIONS_HELPER')
-) {
+if ('disabled' !== getenv('SYMFONY_DEPRECATIONS_HELPER')) {
     DeprecationErrorHandler::register(getenv('SYMFONY_DEPRECATIONS_HELPER'));
 }

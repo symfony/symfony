@@ -18,8 +18,6 @@ use Symfony\Component\ObjectMapper\Exception\NoSuchPropertyException;
 /**
  * Object to object mapper.
  *
- * @experimental
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 interface ObjectMapperInterface

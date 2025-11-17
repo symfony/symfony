@@ -93,8 +93,8 @@ final class BrevoApiTransport extends AbstractApiTransport
             'to' => $this->formatAddresses($this->getRecipients($email, $envelope)),
             'subject' => $email->getSubject(),
         ];
-        if ($attachements = $this->prepareAttachments($email)) {
-            $payload['attachment'] = $attachements;
+        if ($attachments = $this->prepareAttachments($email)) {
+            $payload['attachment'] = $attachments;
         }
         if ($emails = $email->getReplyTo()) {
             $payload['replyTo'] = current($this->formatAddresses($emails));
@@ -139,9 +139,8 @@ final class BrevoApiTransport extends AbstractApiTransport
     private function prepareHeadersAndTags(Headers $headers): array
     {
         $headersAndTags = [];
-        $headersToBypass = ['from', 'sender', 'to', 'cc', 'bcc', 'subject', 'reply-to', 'content-type', 'accept', 'api-key'];
         foreach ($headers->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            if (\in_array($name, ['from', 'sender', 'to', 'cc', 'bcc', 'subject', 'reply-to', 'content-type', 'accept', 'api-key'], true)) {
                 continue;
             }
             if ($header instanceof TagHeader) {

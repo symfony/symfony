@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
@@ -28,6 +29,7 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
@@ -151,6 +153,9 @@ return static function (ContainerConfigurator $container) {
         ->set('serializer.mapping.chain_loader', LoaderChain::class)
             ->args([[]])
 
+        ->set('serializer.mapping.attribute_loader', AttributeLoader::class)
+            ->args([true, []])
+
         // Class Metadata Factory
         ->set('serializer.mapping.class_metadata_factory', ClassMetadataFactory::class)
             ->args([service('serializer.mapping.chain_loader')])
@@ -214,7 +219,10 @@ return static function (ContainerConfigurator $container) {
                 inline_service()
                     ->factory([SerializerErrorRenderer::class, 'getPreferredFormat'])
                     ->args([service('request_stack')]),
-                service('error_renderer.html'),
+                inline_service(ErrorRendererInterface::class)
+                    ->factory([\Closure::class, 'fromCallable'])
+                    ->args([[service('error_renderer.default'), 'render']])
+                    ->lazy(),
                 inline_service()
                     ->factory([HtmlErrorRenderer::class, 'isDebug'])
                     ->args([service('request_stack'), param('kernel.debug')]),

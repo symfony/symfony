@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Yaml;
 use Symfony\Component\Validator\Constraints\YamlValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -26,9 +27,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
         return new YamlValidator();
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testYamlIsValid($value)
     {
         $this->validator->validate($value, new Yaml());
@@ -42,9 +41,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
+    #[DataProvider('getInvalidValues')]
     public function testInvalidValues($value, $message, $line)
     {
         $constraint = new Yaml(
@@ -71,9 +68,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getDeprecationOnLinesData
-     */
+    #[DataProvider('getDeprecationOnLinesData')]
     public function testDeprecationTriggersParseException(int $yamlLine, string $yamlValue)
     {
         $lines = explode("\n", $yamlValue);

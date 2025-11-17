@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
@@ -446,6 +445,8 @@ class MessengerPassTest extends TestCase
             null,
             null,
             null,
+            null,
+            [],
         ]);
 
         $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', ['alias' => 'amqp']);
@@ -483,8 +484,10 @@ class MessengerPassTest extends TestCase
         $container->register('messenger.receiver_locator', ServiceLocator::class)
             ->setArguments([[]]);
 
-        $container->register('console.command.messenger_consume_messages', Command::class)
+        $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)
             ->setArguments([
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -809,6 +812,68 @@ class MessengerPassTest extends TestCase
         ], $container->getDefinition('console.command.messenger_debug')->getArgument(0));
     }
 
+    public function testCreatesSigningSerializerChildrenFromMapping()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.middleware.handle_message', HandleMessageMiddleware::class)
+            ->setAbstract(true)
+        ;
+
+        $container
+            ->register(DummyHandler::class)
+            ->addTag('messenger.message_handler', ['sign' => true])
+        ;
+
+        $container->register('messenger.signing_serializer')
+            ->setArguments([null, null, [DummyMessage::class => ['messenger.default_serializer']]])
+        ;
+
+        (new ResolveClassPass())->process($container);
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([DummyMessage::class], $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+
+        $child = $container->getDefinition('.signing.messenger.default_serializer');
+        $this->assertInstanceOf(ChildDefinition::class, $child);
+        $this->assertSame(['messenger.default_serializer', null, 0], $child->getDecoratedService());
+    }
+
+    public function testDecoratesAllSerializersFromMappingRegardlessOfSignedTypes()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container
+            ->register(DummyHandler::class)
+            ->addTag('messenger.message_handler', ['sign' => true])
+        ;
+        // Do not sign SecondMessage on purpose; we only include it in the mapping below
+
+        $container->register('messenger.signing_serializer')
+            ->setArguments([null, null, [
+                DummyMessage::class => ['messenger.serializer.one', 'messenger.serializer.two'],
+                SecondMessage::class => ['messenger.serializer.three'],
+            ]])
+        ;
+
+        (new ResolveClassPass())->process($container);
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([DummyMessage::class], $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+
+        $childOne = $container->getDefinition('.signing.messenger.serializer.one');
+        $this->assertInstanceOf(ChildDefinition::class, $childOne);
+        $this->assertSame(['messenger.serializer.one', null, 0], $childOne->getDecoratedService());
+
+        $childTwo = $container->getDefinition('.signing.messenger.serializer.two');
+        $this->assertInstanceOf(ChildDefinition::class, $childTwo);
+        $this->assertSame(['messenger.serializer.two', null, 0], $childTwo->getDecoratedService());
+
+        $childThree = $container->getDefinition('.signing.messenger.serializer.three');
+        $this->assertInstanceOf(ChildDefinition::class, $childThree);
+        $this->assertSame(['messenger.serializer.three', null, 0], $childThree->getDecoratedService());
+    }
+
     private function getContainerBuilder(string $busId = 'message_bus'): ContainerBuilder
     {
         $container = new ContainerBuilder();
@@ -896,6 +961,43 @@ class MessengerPassTest extends TestCase
 
         $removeDefinition = $container->getDefinition('console.command.messenger_failed_messages_remove');
         $this->assertNotNull($removeDefinition->getArgument(1));
+    }
+
+    public function testCollectsSignedMessageTypesFromTaggedHandlers()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container
+            ->register(DummyHandler::class)
+            ->addTag('messenger.message_handler', ['sign' => true])
+        ;
+
+        $container->register('messenger.signing_serializer')
+            ->setArguments([null, null, [DummyMessage::class => ['messenger.default_serializer']]]);
+
+        (new ResolveClassPass())->process($container);
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([DummyMessage::class], $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+        $this->assertInstanceOf(ChildDefinition::class, $container->getDefinition('.signing.messenger.default_serializer'));
+    }
+
+    public function testRemovesSigningSerializerWhenNoSignedHandlers()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container
+            ->register(DummyHandler::class)
+            ->addTag('messenger.message_handler')
+        ;
+
+        $container->register('messenger.signing_serializer')
+            ->setArguments([null, null, [DummyMessage::class => ['messenger.default_serializer']]]);
+
+        (new ResolveClassPass())->process($container);
+        (new MessengerPass())->process($container);
+
+        $this->assertFalse($container->hasDefinition('messenger.signing_serializer'));
     }
 }
 

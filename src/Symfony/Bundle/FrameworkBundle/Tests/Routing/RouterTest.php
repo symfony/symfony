@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -438,9 +439,7 @@ class RouterTest extends TestCase
         $router->getRouteCollection();
     }
 
-    /**
-     * @dataProvider getNonStringValues
-     */
+    #[DataProvider('getNonStringValues')]
     public function testDefaultValuesAsNonStrings($value)
     {
         $routes = new RouteCollection();
@@ -455,9 +454,7 @@ class RouterTest extends TestCase
         $this->assertSame($value, $route->getDefault('foo'));
     }
 
-    /**
-     * @dataProvider getNonStringValues
-     */
+    #[DataProvider('getNonStringValues')]
     public function testDefaultValuesAsNonStringsWithSfContainer($value)
     {
         $routes = new RouteCollection();
@@ -525,9 +522,7 @@ class RouterTest extends TestCase
         return [[null], [false], [true], [new \stdClass()], [['foo', 'bar']], [[[]]]];
     }
 
-    /**
-     * @dataProvider getContainerParameterForRoute
-     */
+    #[DataProvider('getContainerParameterForRoute')]
     public function testCacheValidityWithContainerParameters($parameter)
     {
         $cacheDir = tempnam(sys_get_temp_dir(), 'sf_router_');

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
@@ -585,9 +586,7 @@ class CompoundFormTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider requestMethodProvider
-     */
+    #[DataProvider('requestMethodProvider')]
     public function testSubmitPostOrPutRequest($method)
     {
         $path = tempnam(sys_get_temp_dir(), 'sf');
@@ -633,9 +632,7 @@ class CompoundFormTest extends TestCase
         unlink($path);
     }
 
-    /**
-     * @dataProvider requestMethodProvider
-     */
+    #[DataProvider('requestMethodProvider')]
     public function testSubmitPostOrPutRequestWithEmptyRootFormName($method)
     {
         $path = tempnam(sys_get_temp_dir(), 'sf');
@@ -681,9 +678,7 @@ class CompoundFormTest extends TestCase
         unlink($path);
     }
 
-    /**
-     * @dataProvider requestMethodProvider
-     */
+    #[DataProvider('requestMethodProvider')]
     public function testSubmitPostOrPutRequestWithSingleChildForm($method)
     {
         $path = tempnam(sys_get_temp_dir(), 'sf');
@@ -718,9 +713,7 @@ class CompoundFormTest extends TestCase
         unlink($path);
     }
 
-    /**
-     * @dataProvider requestMethodProvider
-     */
+    #[DataProvider('requestMethodProvider')]
     public function testSubmitPostOrPutRequestWithSingleChildFormUploadedFile($method)
     {
         $path = tempnam(sys_get_temp_dir(), 'sf');

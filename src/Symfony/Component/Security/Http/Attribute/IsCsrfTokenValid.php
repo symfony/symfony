@@ -16,6 +16,10 @@ use Symfony\Component\ExpressionLanguage\Expression;
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
 final class IsCsrfTokenValid
 {
+    public const SOURCE_PAYLOAD = 0b0001;
+    public const SOURCE_QUERY = 0b0010;
+    public const SOURCE_HEADER = 0b0100;
+
     public function __construct(
         /**
          * Sets the id, or an Expression evaluated to the id, used when generating the token.
@@ -32,6 +36,13 @@ final class IsCsrfTokenValid
          * If not set, the token will be validated for all methods.
          */
         public array|string $methods = [],
+
+        /**
+         * Sets the source targeted to read the tokenKey.
+         *
+         * @var int-mask-of<self::SOURCE_*>
+         */
+        public int $tokenSource = self::SOURCE_PAYLOAD,
     ) {
     }
 }

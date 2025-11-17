@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\TokenParser;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
@@ -24,9 +25,7 @@ use Twig\Source;
 
 class FormThemeTokenParserTest extends TestCase
 {
-    /**
-     * @dataProvider getTestsForFormTheme
-     */
+    #[DataProvider('getTestsForFormTheme')]
     public function testCompile($source, $expected)
     {
         $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);

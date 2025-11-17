@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Wraps errors in forms.
@@ -38,7 +39,7 @@ class FormError
      * @param int|null    $messagePluralization The value for error message pluralization
      * @param mixed       $cause                The cause of the error
      *
-     * @see \Symfony\Component\Translation\Translator
+     * @see Translator
      */
     public function __construct(
         private string $message,

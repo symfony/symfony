@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
-
 /**
  * A sequence of validation groups.
  *
@@ -77,9 +75,8 @@ class GroupSequence
      *
      * @param array<string|string[]|GroupSequence> $groups The groups in the sequence
      */
-    #[HasNamedArguments]
     public function __construct(array $groups)
     {
-        $this->groups = $groups['value'] ?? $groups;
+        $this->groups = $groups;
     }
 }

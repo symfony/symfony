@@ -33,8 +33,6 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
  * @implements StreamReaderInterface<array<string, mixed>>
- *
- * @experimental
  */
 final class JsonStreamReader implements StreamReaderInterface
 {
@@ -46,16 +44,11 @@ final class JsonStreamReader implements StreamReaderInterface
         private ContainerInterface $valueTransformers,
         PropertyMetadataLoaderInterface $propertyMetadataLoader,
         string $streamReadersDir,
-        ConfigCacheFactoryInterface|string|null $configCacheFactory = null,
-        ?string $lazyGhostsDir = null,
+        ?ConfigCacheFactoryInterface $configCacheFactory = null,
     ) {
-        if (\is_string($configCacheFactory)) {
-            $lazyGhostsDir = $configCacheFactory;
-            $configCacheFactory = null;
-        }
         $this->streamReaderGenerator = new StreamReaderGenerator($propertyMetadataLoader, $streamReadersDir, $configCacheFactory);
         $this->instantiator = new Instantiator();
-        $this->lazyInstantiator = new LazyInstantiator($lazyGhostsDir);
+        $this->lazyInstantiator = new LazyInstantiator();
     }
 
     public function read($input, Type $type, array $options = []): mixed
@@ -69,10 +62,9 @@ final class JsonStreamReader implements StreamReaderInterface
     /**
      * @param array<string, ValueTransformerInterface> $valueTransformers
      */
-    public static function create(array $valueTransformers = [], ?string $streamReadersDir = null, ?string $lazyGhostsDir = null): self
+    public static function create(array $valueTransformers = [], ?string $streamReadersDir = null): self
     {
         $streamReadersDir ??= sys_get_temp_dir().'/json_streamer/read';
-        $lazyGhostsDir ??= sys_get_temp_dir().'/json_streamer/lazy_ghost';
         $valueTransformers += [
             'json_streamer.value_transformer.string_to_date_time' => new StringToDateTimeValueTransformer(),
         ];
@@ -107,6 +99,6 @@ final class JsonStreamReader implements StreamReaderInterface
             $typeContextFactory,
         );
 
-        return new self($valueTransformersContainer, $propertyMetadataLoader, $streamReadersDir, $lazyGhostsDir);
+        return new self($valueTransformersContainer, $propertyMetadataLoader, $streamReadersDir);
     }
 }

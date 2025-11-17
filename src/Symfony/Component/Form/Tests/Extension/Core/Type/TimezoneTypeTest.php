@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
@@ -74,9 +75,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testIntlTimeZoneInput()
     {
         $form = $this->factory->create(static::TESTED_TYPE, \IntlTimeZone::createTimeZone('America/New_York'), ['input' => 'intltimezone']);
@@ -96,9 +95,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertEquals([\IntlTimeZone::createTimeZone('Europe/Amsterdam'), \IntlTimeZone::createTimeZone('Europe/Paris')], $form->getData());
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testIntlTimeZoneInputWithBc()
     {
         $reflector = new \ReflectionExtension('intl');
@@ -119,9 +116,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertNotContains('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testIntlTimeZoneInputWithBcAndIntl()
     {
         $reflector = new \ReflectionExtension('intl');
@@ -153,9 +148,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('Etc/UTC', 'Etc/UTC', 'Coordinated Universal Time'), $choices);
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testChoiceTranslationLocaleOptionWithIntl()
     {
         $choices = $this->factory

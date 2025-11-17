@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Restrict `ProxyHelper::generateLazyProxy()` to generating abstraction-based lazy decorators; use native lazy proxies otherwise
+ * Remove `LazyGhostTrait` and `LazyProxyTrait`, use native lazy objects instead
+ * Remove `ProxyHelper::generateLazyGhost()`, use native lazy objects instead
+
+7.4
+---
+
+ * Add support for exporting named closures
+
 7.3
 ---
 

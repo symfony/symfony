@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Yaml\Parser;
@@ -32,7 +31,6 @@ class Yaml extends Constraint
      * @param int-mask-of<\Symfony\Component\Yaml\Yaml::PARSE_*> $flags
      * @param string[]|null                                      $groups
      */
-    #[HasNamedArguments]
     public function __construct(
         public string $message = 'This value is not valid YAML.',
         public int $flags = 0,

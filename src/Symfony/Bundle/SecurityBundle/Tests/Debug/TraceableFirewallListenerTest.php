@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Debug;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
@@ -29,21 +30,31 @@ use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterf
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\AuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class TraceableFirewallListenerTest extends TestCase
 {
     public function testOnKernelRequestRecordsListeners()
     {
         $request = new Request();
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
-        $event->setResponse($response = new Response());
-        $listener = function ($e) use ($event, &$listenerCalled) {
-            $listenerCalled += $e === $event;
+        $event->setResponse(new Response());
+        $listener = new class extends AbstractListener {
+            public int $callCount = 0;
+
+            public function supports(Request $request): ?bool
+            {
+                return true;
+            }
+
+            public function authenticate(RequestEvent $event): void
+            {
+                ++$this->callCount;
+            }
         };
         $firewallMap = $this->createMock(FirewallMap::class);
         $firewallMap
@@ -63,7 +74,8 @@ class TraceableFirewallListenerTest extends TestCase
 
         $listeners = $firewall->getWrappedListeners();
         $this->assertCount(1, $listeners);
-        $this->assertSame($listener, $listeners[0]['stub']);
+        $this->assertInstanceOf(ClassStub::class, $listeners[0]['stub']);
+        $this->assertSame((string) new ClassStub($listener::class), (string) $listeners[0]['stub']);
     }
 
     public function testOnKernelRequestRecordsAuthenticatorsInfo()

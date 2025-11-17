@@ -38,6 +38,11 @@ class MailtrapTransportFactoryTest extends AbstractTransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('mailtrap+sandbox', 'default'),
+            true,
+        ];
+
+        yield [
             new Dsn('mailtrap', 'default'),
             true,
         ];
@@ -73,6 +78,16 @@ class MailtrapTransportFactoryTest extends AbstractTransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('mailtrap+sandbox', 'default', self::USER, null, null, ['inboxId' => '123456']),
+            new MailtrapApiTransport(self::USER, new MockHttpClient(), null, $logger, 123456),
+        ];
+
+        yield [
+            new Dsn('mailtrap+sandbox', 'example.com', self::USER, null, 8080, ['inboxId' => '123456']),
+            (new MailtrapApiTransport(self::USER, new MockHttpClient(), null, $logger, 123456))->setHost('example.com')->setPort(8080),
+        ];
+
+        yield [
             new Dsn('mailtrap', 'default', self::USER),
             new MailtrapSmtpTransport(self::USER, null, $logger),
         ];
@@ -92,7 +107,7 @@ class MailtrapTransportFactoryTest extends AbstractTransportFactoryTestCase
     {
         yield [
             new Dsn('mailtrap+foo', 'default', self::USER),
-            'The "mailtrap+foo" scheme is not supported; supported schemes for mailer "mailtrap" are: "mailtrap", "mailtrap+api", "mailtrap+smtp", "mailtrap+smtps".',
+            'The "mailtrap+foo" scheme is not supported; supported schemes for mailer "mailtrap" are: "mailtrap", "mailtrap+api", "mailtrap+sandbox", "mailtrap+smtp", "mailtrap+smtps".',
         ];
     }
 

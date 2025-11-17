@@ -34,7 +34,9 @@ class MoneyTypeTest extends BaseTypeTestCase
 
     protected function tearDown(): void
     {
-        \Locale::setDefault($this->defaultLocale);
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
     public function testPassMoneyPatternToView()

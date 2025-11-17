@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * Checks that at least one of the given constraint is satisfied.
@@ -34,34 +34,25 @@ class AtLeastOneOf extends Composite
     public bool $includeInternalMessages = true;
 
     /**
-     * @param array<Constraint>|array<string,mixed>|null $constraints             An array of validation constraints
-     * @param string[]|null                              $groups
-     * @param string|null                                $message                 Intro of the failure message that will be followed by the failed constraint(s) message(s)
-     * @param string|null                                $messageCollection       Failure message for All and Collection inner constraints
-     * @param bool|null                                  $includeInternalMessages Whether to include inner constraint messages (defaults to true)
+     * @param array<Constraint>|null $constraints             An array of validation constraints
+     * @param string[]|null          $groups
+     * @param string|null            $message                 Intro of the failure message that will be followed by the failed constraint(s) message(s)
+     * @param string|null            $messageCollection       Failure message for All and Collection inner constraints
+     * @param bool|null              $includeInternalMessages Whether to include inner constraint messages (defaults to true)
      */
-    #[HasNamedArguments]
-    public function __construct(mixed $constraints = null, ?array $groups = null, mixed $payload = null, ?string $message = null, ?string $messageCollection = null, ?bool $includeInternalMessages = null)
+    public function __construct(array|Constraint|null $constraints = null, ?array $groups = null, mixed $payload = null, ?string $message = null, ?string $messageCollection = null, ?bool $includeInternalMessages = null)
     {
-        if (\is_array($constraints) && !array_is_list($constraints)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null === $constraints || [] === $constraints) {
+            throw new MissingOptionsException(\sprintf('The options "constraints" must be set for constraint "%s".', self::class), ['constraints']);
         }
 
-        parent::__construct($constraints ?? [], $groups, $payload);
+        $this->constraints = $constraints;
+
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->messageCollection = $messageCollection ?? $this->messageCollection;
         $this->includeInternalMessages = $includeInternalMessages ?? $this->includeInternalMessages;
-    }
-
-    public function getDefaultOption(): ?string
-    {
-        return 'constraints';
-    }
-
-    public function getRequiredOptions(): array
-    {
-        return ['constraints'];
     }
 
     protected function getCompositeOption(): string

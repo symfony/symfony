@@ -56,7 +56,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[]
+     * @return class-string[]
      */
     public function getMappedClasses(): array
     {
@@ -84,12 +84,6 @@ class YamlFileLoader extends FileLoader
 
                 if (\is_array($options)) {
                     $options = $this->parseNodes($options);
-                }
-
-                if (null !== $options && (!\is_array($options) || array_is_list($options))) {
-                    $options = [
-                        'value' => $options,
-                    ];
                 }
 
                 $values[] = $this->newConstraint(key($childNodes), $options);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
@@ -19,8 +20,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
-use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -309,9 +308,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertFalse($container->getDefinition('foo')->isLazy());
     }
 
-    /**
-     * @dataProvider provideBindings
-     */
+    #[DataProvider('provideBindings')]
     public function testBindings($bindingName)
     {
         $container = new ContainerBuilder();
@@ -341,9 +338,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideBindScalarValueToControllerArgument
-     */
+    #[DataProvider('provideBindScalarValueToControllerArgument')]
     public function testBindScalarValueToControllerArgument($bindingKey)
     {
         $container = new ContainerBuilder();
@@ -517,46 +512,6 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertInstanceOf(LazyClosure::class, $autowireCallable);
         $this->assertInstanceOf(\stdClass::class, $autowireCallable->service);
         $this->assertFalse($locator->has('service2'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testTaggedIteratorAndTaggedLocatorAttributes()
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('some.parameter', 'bar');
-        $resolver = $container->register('argument_resolver.service', \stdClass::class)->addArgument([]);
-
-        $container->register('bar', \stdClass::class)->addTag('foobar');
-        $container->register('baz', \stdClass::class)->addTag('foobar');
-
-        $container->register('foo', WithTaggedIteratorAndTaggedLocator::class)
-            ->addTag('controller.service_arguments');
-
-        (new RegisterControllerArgumentLocatorsPass())->process($container);
-
-        $locatorId = (string) $resolver->getArgument(0);
-        $container->getDefinition($locatorId)->setPublic(true);
-
-        $container->compile();
-
-        /** @var ServiceLocator $locator */
-        $locator = $container->get($locatorId)->get('foo::fooAction');
-
-        $this->assertCount(2, $locator->getProvidedServices());
-
-        $this->assertTrue($locator->has('iterator1'));
-        $this->assertInstanceOf(RewindableGenerator::class, $argIterator = $locator->get('iterator1'));
-        $this->assertCount(2, $argIterator);
-
-        $this->assertTrue($locator->has('locator1'));
-        $this->assertInstanceOf(ServiceLocator::class, $argLocator = $locator->get('locator1'));
-        $this->assertCount(2, $argLocator);
-        $this->assertTrue($argLocator->has('bar'));
-        $this->assertTrue($argLocator->has('baz'));
-
-        $this->assertSame(iterator_to_array($argIterator), [$argLocator->get('bar'), $argLocator->get('baz')]);
     }
 
     public function testAutowireIteratorAndAutowireLocatorAttributes()
@@ -763,15 +718,6 @@ class WithAutowireAttribute
         FooInterface $autowireCallable,
         #[Autowire(service: 'invalid.id')]
         ?\stdClass $service2 = null,
-    ) {
-    }
-}
-
-class WithTaggedIteratorAndTaggedLocator
-{
-    public function fooAction(
-        #[TaggedIterator('foobar')] iterable $iterator1,
-        #[TaggedLocator('foobar')] ServiceLocator $locator1,
     ) {
     }
 }

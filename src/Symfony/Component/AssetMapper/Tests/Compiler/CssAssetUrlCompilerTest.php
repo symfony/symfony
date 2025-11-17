@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -20,9 +21,7 @@ use Symfony\Component\AssetMapper\MappedAsset;
 
 class CssAssetUrlCompilerTest extends TestCase
 {
-    /**
-     * @dataProvider provideCompileTests
-     */
+    #[DataProvider('provideCompileTests')]
     public function testCompile(string $input, string $expectedOutput, array $expectedDependencies)
     {
         $assetMapper = $this->createMock(AssetMapperInterface::class);
@@ -254,9 +253,7 @@ class CssAssetUrlCompilerTest extends TestCase
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
     }
 
-    /**
-     * @dataProvider provideStrictModeTests
-     */
+    #[DataProvider('provideStrictModeTests')]
     public function testStrictMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage)
     {
         if (null !== $expectedExceptionMessage) {

@@ -33,15 +33,15 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         if (null === $ulid) {
             $this->uid = static::generate();
         } elseif (self::NIL === $ulid) {
-            $this->uid = $ulid;
-        } elseif (self::MAX === strtr($ulid, 'z', 'Z')) {
-            $this->uid = $ulid;
+            $this->uid = self::NIL;
         } else {
-            if (!self::isValid($ulid)) {
+            $this->uid = strtoupper($ulid);
+
+            if (self::MAX === $this->uid) {
+                $this->uid = self::MAX;
+            } elseif (!self::isValid($ulid)) {
                 throw new InvalidArgumentException(\sprintf('Invalid ULID: "%s".', $ulid));
             }
-
-            $this->uid = strtoupper($ulid);
         }
     }
 

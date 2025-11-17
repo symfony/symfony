@@ -65,19 +65,27 @@ class RegisterListenersPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('kernel.event_listener', true) as $id => $events) {
             $noPreload = 0;
 
+            $resolvedEvents = [];
             foreach ($events as $event) {
-                $priority = $event['priority'] ?? 0;
-
                 if (!isset($event['event'])) {
                     if ($container->getDefinition($id)->hasTag('kernel.event_subscriber')) {
                         continue;
                     }
 
                     $event['method'] ??= '__invoke';
-                    $event['event'] = $this->getEventFromTypeDeclaration($container, $id, $event['method']);
+                    $eventNames = $this->getEventFromTypeDeclaration($container, $id, $event['method']);
+                } else {
+                    $eventNames = [$event['event']];
                 }
 
-                $event['event'] = $aliases[$event['event']] ?? $event['event'];
+                foreach ($eventNames as $eventName) {
+                    $event['event'] = $aliases[$eventName] ?? $eventName;
+                    $resolvedEvents[] = $event;
+                }
+            }
+
+            foreach ($resolvedEvents as $event) {
+                $priority = $event['priority'] ?? 0;
 
                 if (!isset($event['method'])) {
                     $event['method'] = 'on'.preg_replace_callback([
@@ -167,21 +175,40 @@ class RegisterListenersPass implements CompilerPassInterface
         }
     }
 
-    private function getEventFromTypeDeclaration(ContainerBuilder $container, string $id, string $method): string
+    /**
+     * @return string[]
+     */
+    private function getEventFromTypeDeclaration(ContainerBuilder $container, string $id, string $method): array
     {
         if (
             null === ($class = $container->getDefinition($id)->getClass())
             || !($r = $container->getReflectionClass($class, false))
             || !$r->hasMethod($method)
             || 1 > ($m = $r->getMethod($method))->getNumberOfParameters()
-            || !($type = $m->getParameters()[0]->getType()) instanceof \ReflectionNamedType
-            || $type->isBuiltin()
-            || Event::class === ($name = $type->getName())
+            || !(($type = $m->getParameters()[0]->getType()) instanceof \ReflectionNamedType || $type instanceof \ReflectionUnionType)
         ) {
             throw new InvalidArgumentException(\sprintf('Service "%s" must define the "event" attribute on "kernel.event_listener" tags.', $id));
         }
 
-        return $name;
+        $types = $type instanceof \ReflectionUnionType ? $type->getTypes() : [$type];
+
+        $names = [];
+        foreach ($types as $type) {
+            if (!$type instanceof \ReflectionNamedType
+                || $type->isBuiltin()
+                || Event::class === ($name = $type->getName())
+            ) {
+                continue;
+            }
+
+            $names[] = $name;
+        }
+
+        if (!$names) {
+            throw new InvalidArgumentException(\sprintf('Service "%s" must define the "event" attribute on "kernel.event_listener" tags.', $id));
+        }
+
+        return $names;
     }
 }
 

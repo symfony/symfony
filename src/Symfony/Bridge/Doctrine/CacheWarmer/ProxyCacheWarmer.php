@@ -21,10 +21,8 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  * since this information is necessary to build the proxies in the first place.
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
- *
- * @final since Symfony 7.1
  */
-class ProxyCacheWarmer implements CacheWarmerInterface
+final class ProxyCacheWarmer implements CacheWarmerInterface
 {
     public function __construct(
         private readonly ManagerRegistry $registry,
@@ -45,7 +43,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
         foreach ($this->registry->getManagers() as $em) {
             // we need the directory no matter the proxy cache generation strategy
             if (!is_dir($proxyCacheDir = $em->getConfiguration()->getProxyDir())) {
-                if (false === @mkdir($proxyCacheDir, 0777, true) && !is_dir($proxyCacheDir)) {
+                if (false === @mkdir($proxyCacheDir, 0o777, true) && !is_dir($proxyCacheDir)) {
                     throw new \RuntimeException(\sprintf('Unable to create the Doctrine Proxy directory "%s".', $proxyCacheDir));
                 }
             } elseif (!is_writable($proxyCacheDir)) {

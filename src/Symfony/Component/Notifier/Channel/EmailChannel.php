@@ -54,7 +54,7 @@ class EmailChannel implements ChannelInterface
             $message = $notification->asEmailMessage($recipient, $transportName);
         }
 
-        $message ??= EmailMessage::fromNotification($notification, $recipient, $transportName);
+        $message ??= EmailMessage::fromNotification($notification, $recipient);
         $email = $message->getMessage();
         if ($email instanceof Email) {
             if (!$email->getFrom()) {

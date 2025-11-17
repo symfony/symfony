@@ -7,10 +7,10 @@
 | Host         | localhost                                                                                     |
 | Host Regex   | #HOST_REGEX#                                                                                  |
 | Scheme       | http|https                                                                                    |
-| Method       | GET|HEAD                                                                                      |
+| Method       | [34mGET[39m|[35mHEAD[39m                                                                                      |
 | Requirements | name: [a-z]+                                                                                  |
 | Class        | Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub                             |
-| Defaults     | _controller: ]8;;myeditor://open?file=[:file:]&line=58\Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\MyController::__invoke()]8;;\ |
+| Defaults     | _controller: ]8;;myeditor://open?file=[:file:]&line=59\Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\MyController::__invoke()]8;;\ |
 |              | name: Joseph                                                                                  |
 | Options      | compiler_class: Symfony\Component\Routing\RouteCompiler                                       |
 |              | opt1: val1                                                                                    |

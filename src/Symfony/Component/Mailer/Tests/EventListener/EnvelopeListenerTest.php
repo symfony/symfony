@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
@@ -20,9 +21,7 @@ use Symfony\Component\Mime\RawMessage;
 
 class EnvelopeListenerTest extends TestCase
 {
-    /**
-     * @dataProvider provideRecipientsTests
-     */
+    #[DataProvider('provideRecipientsTests')]
     public function testRecipients(array $expected, ?array $recipients = null, array $allowedRecipients = [])
     {
         $listener = new EnvelopeListener(null, $recipients, $allowedRecipients);

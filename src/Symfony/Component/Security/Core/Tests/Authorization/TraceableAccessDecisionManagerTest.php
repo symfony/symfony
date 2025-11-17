@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -23,9 +24,7 @@ use Symfony\Component\Security\Core\Tests\Fixtures\DummyVoter;
 
 class TraceableAccessDecisionManagerTest extends TestCase
 {
-    /**
-     * @dataProvider provideObjectsAndLogs
-     */
+    #[DataProvider('provideObjectsAndLogs')]
     public function testDecideLog(array $expectedLog, array $attributes, $object, array $voterVotes, bool $result)
     {
         $token = $this->createMock(TokenInterface::class);
@@ -290,9 +289,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
         $traceableAccessDecisionManager->decide($tokenMock, ['attr1', 'attr2']);
     }
 
-    /**
-     * @dataProvider allowMultipleAttributesProvider
-     */
+    #[DataProvider('allowMultipleAttributesProvider')]
     public function testAllowMultipleAttributes(array $attributes, bool $allowMultipleAttributes)
     {
         $accessDecisionManager = new AccessDecisionManager();

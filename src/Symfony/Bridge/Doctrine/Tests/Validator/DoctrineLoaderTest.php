@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Validator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\BaseUser;
@@ -175,9 +176,7 @@ class DoctrineLoaderTest extends TestCase
         $this->assertCount(0, $constraints);
     }
 
-    /**
-     * @dataProvider regexpProvider
-     */
+    #[DataProvider('regexpProvider')]
     public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null)
     {
         $doctrineLoader = new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), $classValidatorRegexp, false);

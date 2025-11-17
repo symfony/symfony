@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -42,7 +43,37 @@ class MicroKernelTraitTest extends TestCase
             $this->kernel = null;
             $fs = new Filesystem();
             $fs->remove($kernel->getCacheDir());
+            $fs->remove($kernel->getProjectDir().'/config/reference.php');
         }
+    }
+
+    #[BackupGlobals(true)]
+    public function testGetShareDirDisabledByEnv()
+    {
+        $_SERVER['APP_SHARE_DIR'] = 'false';
+
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
+
+        $this->assertNull($kernel->getShareDir());
+
+        $parameters = $kernel->getKernelParameters();
+        $this->assertArrayNotHasKey('kernel.share_dir', $parameters);
+    }
+
+    #[BackupGlobals(true)]
+    public function testGetShareDirCustomPathFromEnv()
+    {
+        $_SERVER['APP_SHARE_DIR'] = sys_get_temp_dir();
+
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
+
+        $expected = rtrim(sys_get_temp_dir(), '/').'/test';
+        $this->assertSame($expected, $kernel->getShareDir());
+
+        $parameters = $kernel->getKernelParameters();
+        $this->assertArrayHasKey('kernel.share_dir', $parameters);
+        $this->assertNotNull($parameters['kernel.share_dir']);
+        $this->assertSame(realpath($expected), realpath($parameters['kernel.share_dir']));
     }
 
     public function test()
@@ -85,7 +116,7 @@ class MicroKernelTraitTest extends TestCase
 
     public function testFlexStyle()
     {
-        $kernel = new FlexStyleMicroKernel('test', false);
+        $kernel = $this->kernel = new FlexStyleMicroKernel('test', false);
         $kernel->boot();
 
         $request = Request::create('/');
@@ -122,13 +153,7 @@ class MicroKernelTraitTest extends TestCase
 
             protected function configureContainer(ContainerConfigurator $c): void
             {
-                $c->extension('framework', [
-                    'annotations' => false,
-                    'http_method_override' => false,
-                    'handle_all_throwables' => true,
-                    'php_errors' => ['log' => true],
-                    'router' => ['utf8' => true],
-                ]);
+                $c->extension('framework', []);
                 $c->services()->set('logger', NullLogger::class);
             }
 
@@ -183,5 +208,35 @@ class MicroKernelTraitTest extends TestCase
         $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
 
         $this->assertSame('OK', $response->getContent());
+    }
+
+    public function testGetKernelParameters()
+    {
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
+
+        $parameters = $kernel->getKernelParameters();
+
+        $this->assertSame($kernel->getConfigDir(), $parameters['.kernel.config_dir']);
+        $this->assertSame(['test'], $parameters['.container.known_envs']);
+        $this->assertSame(['Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true]], $parameters['.kernel.bundles_definition']);
+    }
+
+    public function testGetKernelParametersWithBundlesFile()
+    {
+        $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
+
+        $configDir = $kernel->getConfigDir();
+        mkdir($configDir, 0o777, true);
+
+        $bundlesContent = "<?php\nreturn [\n    'Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true],\n    'TestBundle' => ['test' => true, 'dev' => true],\n];";
+        file_put_contents($configDir.'/bundles.php', $bundlesContent);
+
+        $parameters = $kernel->getKernelParameters();
+
+        $this->assertSame(['test', 'dev'], $parameters['.container.known_envs']);
+        $this->assertSame([
+            'Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true],
+            'TestBundle' => ['test' => true, 'dev' => true],
+        ], $parameters['.kernel.bundles_definition']);
     }
 }

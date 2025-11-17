@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * Validates that a value is of a specific data type.
@@ -32,41 +32,18 @@ class Type extends Constraint
     public string|array|null $type = null;
 
     /**
-     * @param string|list<string>|array<string,mixed>|null $type    The type(s) to enforce on the value
-     * @param string[]|null                                $groups
-     * @param array<string,mixed>|null                     $options
+     * @param string|list<string>|null $type   The type(s) to enforce on the value
+     * @param string[]|null            $groups
      */
-    #[HasNamedArguments]
-    public function __construct(string|array|null $type, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
+    public function __construct(string|array|null $type, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
-        if (\is_array($type) && \is_string(key($type))) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-            $options = array_merge($type, $options ?? []);
-        } elseif (null !== $type) {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-            } else {
-                $options = [];
-            }
-
-            $options['value'] = $type;
-        } elseif (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null === $type) {
+            throw new MissingOptionsException(\sprintf('The options "type" must be set for constraint "%s".', self::class), ['type']);
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
-    }
-
-    public function getDefaultOption(): ?string
-    {
-        return 'type';
-    }
-
-    public function getRequiredOptions(): array
-    {
-        return ['type'];
+        $this->type = $type;
     }
 }

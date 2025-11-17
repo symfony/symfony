@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Twig;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -19,9 +20,7 @@ use Twig\Loader\ArrayLoader;
 
 class WebProfilerExtensionTest extends TestCase
 {
-    /**
-     * @dataProvider provideMessages
-     */
+    #[DataProvider('provideMessages')]
     public function testDumpHeaderIsDisplayed(string $message, array $context, bool $dump1HasHeader, bool $dump2HasHeader)
     {
         $twigEnvironment = new Environment(new ArrayLoader());

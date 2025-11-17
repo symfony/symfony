@@ -39,7 +39,7 @@ trait FilesystemCommonTrait
             $directory .= \DIRECTORY_SEPARATOR.'@';
         }
         if (!is_dir($directory)) {
-            @mkdir($directory, 0777, true);
+            @mkdir($directory, 0o777, true);
         }
         $directory .= \DIRECTORY_SEPARATOR;
         // On Windows the whole path is limited to 258 chars
@@ -130,7 +130,7 @@ trait FilesystemCommonTrait
         $dir = ($directory ?? $this->directory).strtoupper($hash[0].\DIRECTORY_SEPARATOR.$hash[1].\DIRECTORY_SEPARATOR);
 
         if ($mkdir && !is_dir($dir)) {
-            @mkdir($dir, 0777, true);
+            @mkdir($dir, 0o777, true);
         }
 
         return $dir.substr($hash, 2, 20);

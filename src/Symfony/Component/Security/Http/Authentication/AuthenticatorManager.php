@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Http\Authentication;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
@@ -47,8 +46,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {
-    private ExposeSecurityLevel $exposeSecurityErrors;
-
     /**
      * @param iterable<mixed, AuthenticatorInterface> $authenticators
      */
@@ -59,27 +56,17 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         private string $firewallName,
         private ?LoggerInterface $logger = null,
         private bool $eraseCredentials = true,
-        ExposeSecurityLevel|bool $exposeSecurityErrors = ExposeSecurityLevel::None,
+        private ExposeSecurityLevel $exposeSecurityErrors = ExposeSecurityLevel::None,
         private array $requiredBadges = [],
     ) {
-        if (\is_bool($exposeSecurityErrors)) {
-            trigger_deprecation('symfony/security-http', '7.3', 'Passing a boolean as "exposeSecurityErrors" parameter is deprecated, use %s value instead.', ExposeSecurityLevel::class);
-
-            // The old parameter had an inverted meaning ($hideUserNotFoundExceptions), for that reason the current name does not reflect the behavior
-            $exposeSecurityErrors = $exposeSecurityErrors ? ExposeSecurityLevel::None : ExposeSecurityLevel::All;
-        }
-
-        $this->exposeSecurityErrors = $exposeSecurityErrors;
     }
 
     /**
      * @param BadgeInterface[]     $badges     Optionally, pass some Passport badges to use for the manual login
      * @param array<string, mixed> $attributes Optionally, pass some Passport attributes to use for the manual login
      */
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = [] /* , array $attributes = [] */): ?Response
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = [], array $attributes = []): ?Response
     {
-        $attributes = 4 < \func_num_args() ? func_get_arg(4) : [];
-
         // create an authentication token for the User
         $passport = new SelfValidatingPassport(new UserBadge($user->getUserIdentifier(), fn () => $user), $badges);
         foreach ($attributes as $k => $v) {
@@ -209,10 +196,6 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             // announce the authentication token
             $authenticatedToken = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($authenticatedToken, $passport))->getAuthenticatedToken();
 
-            if ($this->eraseCredentials) {
-                self::checkEraseCredentials($authenticatedToken)?->eraseCredentials();
-            }
-
             $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);
 
             $this->logger?->info('Authenticator successful!', ['token' => $authenticatedToken, 'authenticator' => ($authenticator instanceof TraceableAuthenticator ? $authenticator->getAuthenticator() : $authenticator)::class]);
@@ -287,42 +270,5 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         }
 
         return false;
-    }
-
-    /**
-     * @deprecated since Symfony 7.3
-     */
-    private static function checkEraseCredentials(TokenInterface|UserInterface|null $token): TokenInterface|UserInterface|null
-    {
-        if (!$token || !method_exists($token, 'eraseCredentials')) {
-            return null;
-        }
-
-        static $genericImplementations = [];
-        $m = null;
-
-        if (!isset($genericImplementations[$token::class])) {
-            $m = new \ReflectionMethod($token, 'eraseCredentials');
-            $genericImplementations[$token::class] = AbstractToken::class === $m->class;
-        }
-
-        if ($genericImplementations[$token::class]) {
-            return self::checkEraseCredentials($token->getUser());
-        }
-
-        static $deprecatedImplementations = [];
-
-        if (!isset($deprecatedImplementations[$token::class])) {
-            $m ??= new \ReflectionMethod($token, 'eraseCredentials');
-            $deprecatedImplementations[$token::class] = !$m->getAttributes(\Deprecated::class);
-        }
-
-        if ($deprecatedImplementations[$token::class]) {
-            trigger_deprecation('symfony/security-http', '7.3', 'Implementing "%s::eraseCredentials()" is deprecated since Symfony 7.3; add the #[\Deprecated] attribute on the method to signal its either empty or that you moved the logic elsewhere, typically to the "__serialize()" method.', get_debug_type($token));
-
-            return $token;
-        }
-
-        return null;
     }
 }

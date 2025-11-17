@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Tests\Channel;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,9 +30,7 @@ use Symfony\Component\Notifier\Recipient\Recipient;
  */
 class BrowserChannelTest extends TestCase
 {
-    /**
-     * @dataProvider defaultFlashMessageImportanceDataProvider
-     */
+    #[DataProvider('defaultFlashMessageImportanceDataProvider')]
     public function testImportanceLevelIsReflectedInFlashMessageType(
         FlashMessageImportanceMapperInterface $mapper,
         string $importance,

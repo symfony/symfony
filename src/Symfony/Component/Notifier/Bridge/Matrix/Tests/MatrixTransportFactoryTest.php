@@ -29,9 +29,14 @@ final class MatrixTransportFactoryTest extends AbstractTransportFactoryTestCase
         yield [
             'matrix://host.test',
             'matrix://host.test/?accessToken=1234',
+        ];
+        yield [
+            'matrix://host.test:8008',
             'matrix://host.test:8008/?accessToken=1234',
+        ];
+        yield [
+            'matrix://host.test:8008',
             'matrix://host.test:8008/?accessToken=1234&ssl=true',
-            'matrix://host.test/?ssl=true',
         ];
     }
 

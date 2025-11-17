@@ -20,6 +20,7 @@ use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\Message;
 use Composer\InstalledVersions;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -285,9 +286,7 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
-    /**
-     * @dataProvider provideQueueUrl
-     */
+    #[DataProvider('provideQueueUrl')]
     public function testInjectQueueUrl(string $dsn, string $queueUrl)
     {
         $connection = Connection::fromDsn($dsn);
@@ -305,9 +304,7 @@ class ConnectionTest extends TestCase
         yield ['https://sqs.us-east-2.amazonaws.com/123456/queue?auto_setup=1', 'https://sqs.us-east-2.amazonaws.com/123456/queue'];
     }
 
-    /**
-     * @dataProvider provideNotQueueUrl
-     */
+    #[DataProvider('provideNotQueueUrl')]
     public function testNotInjectQueueUrl(string $dsn)
     {
         $connection = Connection::fromDsn($dsn);
@@ -375,6 +372,50 @@ class ConnectionTest extends TestCase
         $connection->keepalive($id);
     }
 
+    public function testDeleteOnReject()
+    {
+        $expectedParams = [
+            'QueueUrl' => $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+            'ReceiptHandle' => $id = 'abc',
+        ];
+
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->once())->method('deleteMessage')->with($expectedParams);
+
+        $connection = new Connection([], $client, $queueUrl);
+        $connection->reject($id);
+    }
+
+    public function testDoNotDeleteOnRejection()
+    {
+        $expectedParams = [
+            'QueueUrl' => $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+            'ReceiptHandle' => $id = 'abc',
+            'VisibilityTimeout' => 0,
+        ];
+
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->once())->method('changeMessageVisibility')->with($expectedParams);
+
+        $connection = new Connection(['delete_on_rejection' => false, 'visibility_timeout' => 30], $client, $queueUrl);
+        $connection->reject($id);
+    }
+
+    public function testDoNotDeleteOnRejectionWithRetryDelay()
+    {
+        $expectedParams = [
+            'QueueUrl' => $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+            'ReceiptHandle' => $id = 'abc',
+            'VisibilityTimeout' => $retryDelay = 5,
+        ];
+
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->once())->method('changeMessageVisibility')->with($expectedParams);
+
+        $connection = new Connection(['delete_on_rejection' => false, 'retry_delay' => $retryDelay], $client, $queueUrl);
+        $connection->reject($id);
+    }
+
     public function testKeepaliveWithTooSmallTtl()
     {
         $client = $this->createMock(SqsClient::class);
@@ -429,23 +470,23 @@ class ConnectionTest extends TestCase
         if ($this->isAsyncAwsSqsVersion2Installed()) {
             return new MockResponse(
                 <<<JSON
-{
-    "QueueUrl": "https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue"
-}
-JSON
+                    {
+                        "QueueUrl": "https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue"
+                    }
+                    JSON
             );
         }
 
         return new MockResponse(<<<XML
-<GetQueueUrlResponse>
-    <GetQueueUrlResult>
-        <QueueUrl>https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue</QueueUrl>
-    </GetQueueUrlResult>
-    <ResponseMetadata>
-        <RequestId>470a6f13-2ed9-4181-ad8a-2fdea142988e</RequestId>
-    </ResponseMetadata>
-</GetQueueUrlResponse>
-XML
+            <GetQueueUrlResponse>
+                <GetQueueUrlResult>
+                    <QueueUrl>https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue</QueueUrl>
+                </GetQueueUrlResult>
+                <ResponseMetadata>
+                    <RequestId>470a6f13-2ed9-4181-ad8a-2fdea142988e</RequestId>
+                </ResponseMetadata>
+            </GetQueueUrlResponse>
+            XML
         );
     }
 
@@ -453,61 +494,61 @@ XML
     {
         if ($this->isAsyncAwsSqsVersion2Installed()) {
             return new MockResponse(<<<JSON
-{
-    "Messages": [
-        {
-            "Attributes": {
-                "SenderId": "195004372649",
-                "ApproximateFirstReceiveTimestamp": "1250700979248",
-                "ApproximateReceiveCount": "5",
-                "SentTimestamp": "1238099229000"
-            },
-            "Body": "This is a test message",
-            "MD5OfBody": "fafb00f5732ab283681e124bf8747ed1",
-            "MessageId": "5fea7756-0ea4-451a-a703-a558b933e274",
-            "ReceiptHandle": "MbZj6wDWli+JvwwJaBV+3dcjk2YW2vA3+STFFljTM8tJJg6HRG6PYSasuWXPJB+CwLj1FjgXUv1uSj1gUPAWV66FU/WeR4mq2OKpEGYWbnLmpRCJVAyeMjeU5ZBdtcQ+QEauMZc8ZRv37sIW2iJKq3M9MFx1YvV11A2x/KSbkJ0="
-        }
-    ]
-}
-JSON
+                {
+                    "Messages": [
+                        {
+                            "Attributes": {
+                                "SenderId": "195004372649",
+                                "ApproximateFirstReceiveTimestamp": "1250700979248",
+                                "ApproximateReceiveCount": "5",
+                                "SentTimestamp": "1238099229000"
+                            },
+                            "Body": "This is a test message",
+                            "MD5OfBody": "fafb00f5732ab283681e124bf8747ed1",
+                            "MessageId": "5fea7756-0ea4-451a-a703-a558b933e274",
+                            "ReceiptHandle": "MbZj6wDWli+JvwwJaBV+3dcjk2YW2vA3+STFFljTM8tJJg6HRG6PYSasuWXPJB+CwLj1FjgXUv1uSj1gUPAWV66FU/WeR4mq2OKpEGYWbnLmpRCJVAyeMjeU5ZBdtcQ+QEauMZc8ZRv37sIW2iJKq3M9MFx1YvV11A2x/KSbkJ0="
+                        }
+                    ]
+                }
+                JSON
             );
         }
 
         return new MockResponse(<<<XML
-<ReceiveMessageResponse>
-  <ReceiveMessageResult>
-    <Message>
-      <MessageId>5fea7756-0ea4-451a-a703-a558b933e274</MessageId>
-      <ReceiptHandle>
-        MbZj6wDWli+JvwwJaBV+3dcjk2YW2vA3+STFFljTM8tJJg6HRG6PYSasuWXPJB+Cw
-        Lj1FjgXUv1uSj1gUPAWV66FU/WeR4mq2OKpEGYWbnLmpRCJVAyeMjeU5ZBdtcQ+QE
-        auMZc8ZRv37sIW2iJKq3M9MFx1YvV11A2x/KSbkJ0=
-      </ReceiptHandle>
-      <MD5OfBody>fafb00f5732ab283681e124bf8747ed1</MD5OfBody>
-      <Body>This is a test message</Body>
-      <Attribute>
-        <Name>SenderId</Name>
-        <Value>195004372649</Value>
-      </Attribute>
-      <Attribute>
-        <Name>SentTimestamp</Name>
-        <Value>1238099229000</Value>
-      </Attribute>
-      <Attribute>
-        <Name>ApproximateReceiveCount</Name>
-        <Value>5</Value>
-      </Attribute>
-      <Attribute>
-        <Name>ApproximateFirstReceiveTimestamp</Name>
-        <Value>1250700979248</Value>
-      </Attribute>
-    </Message>
-  </ReceiveMessageResult>
-  <ResponseMetadata>
-    <RequestId>b6633655-283d-45b4-aee4-4e84e0ae6afa</RequestId>
-  </ResponseMetadata>
-</ReceiveMessageResponse>
-XML
+            <ReceiveMessageResponse>
+              <ReceiveMessageResult>
+                <Message>
+                  <MessageId>5fea7756-0ea4-451a-a703-a558b933e274</MessageId>
+                  <ReceiptHandle>
+                    MbZj6wDWli+JvwwJaBV+3dcjk2YW2vA3+STFFljTM8tJJg6HRG6PYSasuWXPJB+Cw
+                    Lj1FjgXUv1uSj1gUPAWV66FU/WeR4mq2OKpEGYWbnLmpRCJVAyeMjeU5ZBdtcQ+QE
+                    auMZc8ZRv37sIW2iJKq3M9MFx1YvV11A2x/KSbkJ0=
+                  </ReceiptHandle>
+                  <MD5OfBody>fafb00f5732ab283681e124bf8747ed1</MD5OfBody>
+                  <Body>This is a test message</Body>
+                  <Attribute>
+                    <Name>SenderId</Name>
+                    <Value>195004372649</Value>
+                  </Attribute>
+                  <Attribute>
+                    <Name>SentTimestamp</Name>
+                    <Value>1238099229000</Value>
+                  </Attribute>
+                  <Attribute>
+                    <Name>ApproximateReceiveCount</Name>
+                    <Value>5</Value>
+                  </Attribute>
+                  <Attribute>
+                    <Name>ApproximateFirstReceiveTimestamp</Name>
+                    <Value>1250700979248</Value>
+                  </Attribute>
+                </Message>
+              </ReceiveMessageResult>
+              <ResponseMetadata>
+                <RequestId>b6633655-283d-45b4-aee4-4e84e0ae6afa</RequestId>
+              </ResponseMetadata>
+            </ReceiveMessageResponse>
+            XML
         );
     }
 

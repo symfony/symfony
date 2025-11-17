@@ -189,7 +189,8 @@ class ResolveBindingsPass extends AbstractRecursivePass
                 if (
                     $value->isAutowired()
                     && !$value->hasTag('container.ignore_attributes')
-                    && $parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF)
+                    && ($parameter->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF)
+                    || $parameter->getAttributes(Target::class, \ReflectionAttribute::IS_INSTANCEOF))
                 ) {
                     continue;
                 }

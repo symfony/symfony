@@ -214,7 +214,7 @@ class MarkdownDescriptor extends Descriptor
         }
 
         $output .= '- Class: `'.$definition->getClass().'`'
-            ."\n".'- Public: '.($definition->isPublic() && !$definition->isPrivate() ? 'yes' : 'no')
+            ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
             ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no')
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
             ."\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no')
@@ -276,7 +276,7 @@ class MarkdownDescriptor extends Descriptor
     protected function describeContainerAlias(Alias $alias, array $options = [], ?ContainerBuilder $container = null): void
     {
         $output = '- Service: `'.$alias.'`'
-            ."\n".'- Public: '.($alias->isPublic() && !$alias->isPrivate() ? 'yes' : 'no');
+            ."\n".'- Public: '.($alias->isPublic() ? 'yes' : 'no');
 
         if (!isset($options['id'])) {
             $this->write($output);

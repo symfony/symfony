@@ -11,18 +11,16 @@
 
 namespace Symfony\Component\Emoji\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Finder\Finder;
 
-/**
- * @requires extension intl
- */
+#[RequiresPhpExtension('intl')]
 class EmojiTransliteratorTest extends TestCase
 {
-    /**
-     * @dataProvider provideTransliterateTests
-     */
+    #[DataProvider('provideTransliterateTests')]
     public function testTransliterate(string $locale, string $input, string $expected)
     {
         $tr = EmojiTransliterator::create('emoji-'.$locale);
@@ -87,9 +85,7 @@ class EmojiTransliteratorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideLocaleTest
-     */
+    #[DataProvider('provideLocaleTest')]
     public function testAllTransliterator(string $locale)
     {
         $tr = EmojiTransliterator::create($locale);

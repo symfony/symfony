@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdPriorityStamp;
@@ -90,9 +91,7 @@ final class BeanstalkdReceiverTest extends TestCase
         $receiver->get();
     }
 
-    /**
-     * @dataProvider provideRejectCases
-     */
+    #[DataProvider('provideRejectCases')]
     public function testReject(array $stamps, ?int $priority, bool $forceDelete)
     {
         $serializer = $this->createSerializer();

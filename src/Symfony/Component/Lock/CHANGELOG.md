@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `LockKeyNormalizer`
+
 7.3
 ---
 

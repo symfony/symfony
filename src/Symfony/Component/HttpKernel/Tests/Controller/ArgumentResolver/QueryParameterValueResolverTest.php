@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,17 +41,13 @@ class QueryParameterValueResolverTest extends TestCase
         $this->assertSame([], $this->resolver->resolve(Request::create('/'), $metadata));
     }
 
-    /**
-     * @dataProvider validDataProvider
-     */
+    #[DataProvider('validDataProvider')]
     public function testResolvingSuccessfully(Request $request, ArgumentMetadata $metadata, array $expected)
     {
         $this->assertEquals($expected, $this->resolver->resolve($request, $metadata));
     }
 
-    /**
-     * @dataProvider invalidArgumentTypeProvider
-     */
+    #[DataProvider('invalidArgumentTypeProvider')]
     public function testResolvingWithInvalidArgumentType(Request $request, ArgumentMetadata $metadata, string $exceptionMessage)
     {
         $this->expectException(\LogicException::class);
@@ -59,9 +56,7 @@ class QueryParameterValueResolverTest extends TestCase
         $this->resolver->resolve($request, $metadata);
     }
 
-    /**
-     * @dataProvider invalidOrMissingArgumentProvider
-     */
+    #[DataProvider('invalidOrMissingArgumentProvider')]
     public function testResolvingWithInvalidOrMissingArgument(Request $request, ArgumentMetadata $metadata, HttpException $expectedException)
     {
         try {

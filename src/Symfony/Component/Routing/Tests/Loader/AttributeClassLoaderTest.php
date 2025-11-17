@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Alias;
 use Symfony\Component\Routing\Exception\LogicException;
@@ -67,9 +68,7 @@ class AttributeClassLoaderTest extends TestCase
         $loader->getResolver();
     }
 
-    /**
-     * @dataProvider provideTestSupportsChecksResource
-     */
+    #[DataProvider('provideTestSupportsChecksResource')]
     public function testSupportsChecksResource($resource, $expectedSupports)
     {
         $this->assertSame($expectedSupports, $this->loader->supports($resource), '->supports() returns true if the resource is loadable');
@@ -335,8 +334,10 @@ class AttributeClassLoaderTest extends TestCase
 
         $this->setUp('some-env');
         $routes = $this->loader->load(RouteWithEnv::class);
-        $this->assertCount(1, $routes);
+        $this->assertCount(3, $routes);
         $this->assertSame('/path', $routes->get('action')->getPath());
+        $this->assertSame('/path4', $routes->get('action4')->getPath());
+        $this->assertSame('/path5', $routes->get('action5')->getPath());
     }
 
     public function testMethodsAndSchemes()

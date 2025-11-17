@@ -138,19 +138,19 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     protected function doDeleteYieldTags(array $ids): iterable
     {
         $lua = <<<'EOLUA'
-            local v = redis.call('GET', KEYS[1])
-            local e = redis.pcall('UNLINK', KEYS[1])
+                        local v = redis.call('GET', KEYS[1])
+                        local e = redis.pcall('UNLINK', KEYS[1])
 
-            if type(e) ~= 'number' then
-                redis.call('DEL', KEYS[1])
-            end
+                        if type(e) ~= 'number' then
+                            redis.call('DEL', KEYS[1])
+                        end
 
-            if not v or v:len() <= 13 or v:byte(1) ~= 0x9D or v:byte(6) ~= 0 or v:byte(10) ~= 0x5F then
-                return ''
-            end
+                        if not v or v:len() <= 13 or v:byte(1) ~= 0x9D or v:byte(6) ~= 0 or v:byte(10) ~= 0x5F then
+                            return ''
+                        end
 
-            return v:sub(14, 13 + v:byte(13) + v:byte(12) * 256 + v:byte(11) * 65536)
-EOLUA;
+                        return v:sub(14, 13 + v:byte(13) + v:byte(12) * 256 + v:byte(11) * 65536)
+            EOLUA;
 
         $results = $this->pipeline(function () use ($ids, $lua) {
             foreach ($ids as $id) {
@@ -197,31 +197,31 @@ EOLUA;
         // garbage collect that set from the client side.
 
         $lua = <<<'EOLUA'
-            redis.replicate_commands()
+                        redis.replicate_commands()
 
-            local cursor = '0'
-            local id = KEYS[1]
-            repeat
-                local result = redis.call('SSCAN', id, cursor, 'COUNT', 5000);
-                cursor = result[1];
-                local rems = {}
+                        local cursor = '0'
+                        local id = KEYS[1]
+                        repeat
+                            local result = redis.call('SSCAN', id, cursor, 'COUNT', 5000);
+                            cursor = result[1];
+                            local rems = {}
 
-                for _, v in ipairs(result[2]) do
-                    local ok, _ = pcall(redis.call, 'DEL', ARGV[1]..v)
-                    if ok then
-                        table.insert(rems, v)
-                    end
-                end
-                if 0 < #rems then
-                    redis.call('SREM', id, unpack(rems))
-                end
-            until '0' == cursor;
+                            for _, v in ipairs(result[2]) do
+                                local ok, _ = pcall(redis.call, 'DEL', ARGV[1]..v)
+                                if ok then
+                                    table.insert(rems, v)
+                                end
+                            end
+                            if 0 < #rems then
+                                redis.call('SREM', id, unpack(rems))
+                            end
+                        until '0' == cursor;
 
-            redis.call('SUNIONSTORE', '{'..id..'}'..id, id)
-            redis.call('DEL', id)
+                        redis.call('SUNIONSTORE', '{'..id..'}'..id, id)
+                        redis.call('DEL', id)
 
-            return redis.call('SSCAN', '{'..id..'}'..id, '0', 'COUNT', 5000)
-EOLUA;
+                        return redis.call('SSCAN', '{'..id..'}'..id, '0', 'COUNT', 5000)
+            EOLUA;
 
         $results = $this->pipeline(function () use ($tagIds, $lua) {
             if ($this->redis instanceof \Predis\ClientInterface) {
@@ -236,14 +236,14 @@ EOLUA;
         });
 
         $lua = <<<'EOLUA'
-            redis.replicate_commands()
+                        redis.replicate_commands()
 
-            local id = KEYS[1]
-            local cursor = table.remove(ARGV)
-            redis.call('SREM', '{'..id..'}'..id, unpack(ARGV))
+                        local id = KEYS[1]
+                        local cursor = table.remove(ARGV)
+                        redis.call('SREM', '{'..id..'}'..id, unpack(ARGV))
 
-            return redis.call('SSCAN', '{'..id..'}'..id, cursor, 'COUNT', 5000)
-EOLUA;
+                        return redis.call('SSCAN', '{'..id..'}'..id, cursor, 'COUNT', 5000)
+            EOLUA;
 
         $success = true;
         foreach ($results as $id => $values) {

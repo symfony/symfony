@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\EnteredEvent;
 use Symfony\Component\Workflow\Event\Event;
@@ -27,6 +30,7 @@ use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Workflow\WorkflowEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowTest extends TestCase
 {
@@ -439,9 +443,7 @@ class WorkflowTest extends TestCase
         yield [true, []];
     }
 
-    /**
-     * @dataProvider provideApplyWithEventDispatcherForAnnounceTests
-     */
+    #[DataProvider('provideApplyWithEventDispatcherForAnnounceTests')]
     public function testApplyWithEventDispatcherForAnnounce(bool $fired, array $context)
     {
         $definition = $this->createComplexWorkflowDefinition();
@@ -820,10 +822,8 @@ class WorkflowTest extends TestCase
         $this->assertSame('to_a', $transitions[2]->getName());
     }
 
-    /**
-     * @@testWith ["back1"]
-     *            ["back2"]
-     */
+    #[TestWith(['back1'])]
+    #[TestWith(['back2'])]
     public function testApplyWithSameNameBackTransition(string $transition)
     {
         $definition = $this->createWorkflowWithSameNameBackTransition();
@@ -870,6 +870,133 @@ class WorkflowTest extends TestCase
         ], $marking);
     }
 
+    public function testWithArcAndWeight()
+    {
+        //              ┌───────────────────┐     ┌─────────────┐     ┌─────────────┐  4
+        //              │    prepare_leg    │ ──▶ │  build_leg  │ ──▶ │ leg_created │ ───────────────────────────┐
+        //              └───────────────────┘     └─────────────┘     └─────────────┘                            │
+        //                ▲                                                                                      │
+        //                │ 4                                                                                    │
+        //                │                                                                                      ▼
+        // ┌──────┐     ┌───────────────────┐     ┌─────────────┐     ┌─────────────┐      ┌─────────────┐     ┌──────┐     ┌──────────┐
+        // │ init │ ──▶ │       start       │ ──▶ │ prepare_top │ ──▶ │  build_top  │ ───▶ │ top_created │ ──▶ │ join │ ──▶ │ finished │
+        // └──────┘     └───────────────────┘     └─────────────┘     └─────────────┘      └─────────────┘     └──────┘     └──────────┘
+        //                │                                                                                      ▲
+        //                │                                                                                      │
+        //                ▼                                                                                      │
+        //              ┌───────────────────┐                                                                    │
+        //              │ stopwatch_running │ ───────────────────────────────────────────────────────────────────┘
+        //              └───────────────────┘
+        //
+        // make_table:
+        //     transitions:
+        //         start:
+        //             from: init
+        //             to:
+        //                 -   place: prepare_leg
+        //                     weight: 4
+        //                 -   place: prepare_top
+        //                     weight: 1
+        //                 -   place: stopwatch_running
+        //                     weight: 1
+        //         build_leg:
+        //             from: prepare_leg
+        //             to: leg_created
+        //         build_top:
+        //             from: prepare_top
+        //             to: top_created
+        //         join:
+        //             from:
+        //                 - place: leg_created
+        //                   weight: 4
+        //                 - top_created
+        //                 - stopwatch_running
+        //             to: finished
+
+        $definition = new Definition(
+            [],
+            [
+                new Transition('start', 'init', [new Arc('prepare_leg', 4), 'prepare_top', 'stopwatch_running']),
+                new Transition('build_leg', 'prepare_leg', 'leg_created'),
+                new Transition('build_top', 'prepare_top', 'top_created'),
+                new Transition('join', [new Arc('leg_created', 4), 'top_created', 'stopwatch_running'], 'finished'),
+            ]
+        );
+
+        $subject = new Subject();
+        $workflow = new Workflow($definition);
+
+        $this->assertTrue($workflow->can($subject, 'start'));
+        $this->assertFalse($workflow->can($subject, 'build_leg'));
+        $this->assertFalse($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'start');
+
+        $this->assertSame([
+            'prepare_leg' => 4,
+            'prepare_top' => 1,
+            'stopwatch_running' => 1,
+        ], $subject->getMarking());
+        $this->assertTrue($workflow->can($subject, 'build_leg'));
+        $this->assertTrue($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'build_leg');
+
+        $this->assertSame([
+            'prepare_leg' => 3,
+            'prepare_top' => 1,
+            'stopwatch_running' => 1,
+            'leg_created' => 1,
+        ], $subject->getMarking());
+        $this->assertTrue($workflow->can($subject, 'build_leg'));
+        $this->assertTrue($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'build_top');
+
+        $this->assertSame([
+            'prepare_leg' => 3,
+            'stopwatch_running' => 1,
+            'leg_created' => 1,
+            'top_created' => 1,
+        ], $subject->getMarking());
+        $this->assertTrue($workflow->can($subject, 'build_leg'));
+        $this->assertFalse($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'build_leg');
+
+        $this->assertSame([
+            'prepare_leg' => 2,
+            'stopwatch_running' => 1,
+            'leg_created' => 2,
+            'top_created' => 1,
+        ], $subject->getMarking());
+        $this->assertTrue($workflow->can($subject, 'build_leg'));
+        $this->assertFalse($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'build_leg');
+        $workflow->apply($subject, 'build_leg');
+
+        $this->assertSame([
+            'stopwatch_running' => 1,
+            'leg_created' => 4,
+            'top_created' => 1,
+        ], $subject->getMarking());
+        $this->assertFalse($workflow->can($subject, 'build_leg'));
+        $this->assertFalse($workflow->can($subject, 'build_top'));
+        $this->assertTrue($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'join');
+
+        $this->assertSame([
+            'finished' => 1,
+        ], $subject->getMarking());
+    }
+
     private function assertPlaces(array $expected, Marking $marking)
     {
         $places = $marking->getPlaces();
@@ -878,7 +1005,7 @@ class WorkflowTest extends TestCase
     }
 }
 
-class EventDispatcherMock implements \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+class EventDispatcherMock implements EventDispatcherInterface
 {
     public array $dispatchedEvents = [];
 

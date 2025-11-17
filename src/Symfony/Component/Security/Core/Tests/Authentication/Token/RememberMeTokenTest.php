@@ -27,17 +27,6 @@ class RememberMeTokenTest extends TestCase
         $this->assertSame($user, $token->getUser());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testSecret()
-    {
-        $user = $this->getUser();
-        $token = new RememberMeToken($user, 'fookey', 'foo');
-
-        $this->assertEquals('foo', $token->getSecret());
-    }
-
     protected function getUser($roles = ['ROLE_FOO'])
     {
         $user = $this->createMock(UserInterface::class);

@@ -15,9 +15,9 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "symfony/filesystem": "^6.4|^7.0",
-        "symfony/finder": "^6.4|^7.0",
-        "symfony/var-exporter": "^6.4|^7.0",
+        "symfony/filesystem": "^7.4|^8.0",
+        "symfony/finder": "^7.4|^8.0",
+        "symfony/var-exporter": "^7.4|^8.0",
         "unicode-org/cldr": "*"
     }
 }

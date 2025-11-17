@@ -11,6 +11,9 @@
 
 namespace Symfony\Bridge\Twig\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Command\LintCommand;
 use Symfony\Component\Console\Application;
@@ -71,10 +74,9 @@ class LintCommandTest extends TestCase
     }
 
     /**
-     * When deprecations are not reported by the command, the testsuite reporter will catch them so we need to mark the test as legacy.
-     *
-     * @group legacy
+     * When deprecations are not reported by the command, the testsuite reporter will catch them so we need to mark the test as ignoring deprecations.
      */
+    #[IgnoreDeprecations]
     public function testLintFileWithNotReportedDeprecation()
     {
         $tester = $this->createCommandTester();
@@ -111,9 +113,7 @@ class LintCommandTest extends TestCase
         $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
     }
 
-    /**
-     * @group tty
-     */
+    #[Group('tty')]
     public function testLintDefaultPaths()
     {
         $tester = $this->createCommandTester();
@@ -150,9 +150,7 @@ class LintCommandTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $tester = new CommandCompletionTester($this->createCommand());
@@ -179,7 +177,7 @@ class LintCommandTest extends TestCase
         $command = new LintCommand($environment);
 
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
 
         return $application->find('lint:twig');
     }

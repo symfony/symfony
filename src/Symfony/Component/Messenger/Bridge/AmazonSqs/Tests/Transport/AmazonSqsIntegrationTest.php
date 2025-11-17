@@ -12,13 +12,12 @@
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
 use AsyncAws\Sqs\SqsClient;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class AmazonSqsIntegrationTest extends TestCase
 {
     public function testConnectionSendToFifoQueueAndGet()

@@ -15,8 +15,6 @@ namespace Symfony\Component\JsonPath\Exception;
  * Thrown when a string passed as an input is not a valid JSON string, e.g. in {@see JsonCrawler}.
  *
  * @author Alexandre Daubois <alex.daubois@gmail.com>
- *
- * @experimental
  */
 class InvalidJsonStringInputException extends InvalidArgumentException
 {

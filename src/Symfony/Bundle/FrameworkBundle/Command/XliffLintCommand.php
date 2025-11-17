@@ -47,11 +47,11 @@ class XliffLintCommand extends BaseLintCommand
 
         $this->setHelp($this->getHelp().<<<'EOF'
 
-Or find all files in a bundle:
+            Or find all files in a bundle:
 
-  <info>php %command.full_name% @AcmeDemoBundle</info>
+              <info>php %command.full_name% @AcmeDemoBundle</info>
 
-EOF
+            EOF
         );
     }
 }

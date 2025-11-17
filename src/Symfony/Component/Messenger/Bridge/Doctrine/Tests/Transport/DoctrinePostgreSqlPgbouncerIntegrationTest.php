@@ -14,20 +14,19 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
 /**
  * This tests using PostgreSqlConnection with PgBouncer between pgsql and the application.
- *
- * @requires extension pdo_pgsql
- *
- * @group integration
  */
+#[RequiresPhpExtension('pdo_pgsql')]
+#[Group('integration')]
 class DoctrinePostgreSqlPgbouncerIntegrationTest extends TestCase
 {
     private Connection $driverConnection;
@@ -64,11 +63,9 @@ class DoctrinePostgreSqlPgbouncerIntegrationTest extends TestCase
         }
 
         $url = "pdo-pgsql://postgres:password@$host";
-        $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($url) : ['url' => $url];
+        $params = (new DsnParser())->parse($url);
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $this->driverConnection = DriverManager::getConnection($params, $config);
         $this->connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $this->driverConnection);
@@ -76,14 +73,10 @@ class DoctrinePostgreSqlPgbouncerIntegrationTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->createSchemaManager()->dropTable('queue_table');
+        if (!isset($this->driverConnection)) {
+            return;
+        }
+        $this->driverConnection->createSchemaManager()->dropTable('queue_table');
         $this->driverConnection->close();
-    }
-
-    private function createSchemaManager(): AbstractSchemaManager
-    {
-        return method_exists($this->driverConnection, 'createSchemaManager')
-            ? $this->driverConnection->createSchemaManager()
-            : $this->driverConnection->getSchemaManager();
     }
 }

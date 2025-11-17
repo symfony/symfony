@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties
+ */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\Instantiator $instantiator, array $options): mixed {
     $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
         return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties::class, \array_filter(['value' => \array_key_exists('value', $data) ? $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null|string']($data['value']) : '_symfony_missing_value'], static function ($v) {

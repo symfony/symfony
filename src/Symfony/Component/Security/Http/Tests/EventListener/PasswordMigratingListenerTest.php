@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,9 +49,7 @@ class PasswordMigratingListenerTest extends TestCase
         $this->listener = new PasswordMigratingListener($this->hasherFactory);
     }
 
-    /**
-     * @dataProvider provideUnsupportedEvents
-     */
+    #[DataProvider('provideUnsupportedEvents')]
     public function testUnsupportedEvents($event)
     {
         $this->hasherFactory->expects($this->never())->method('getPasswordHasher');

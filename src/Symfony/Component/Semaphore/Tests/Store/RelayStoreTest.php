@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Relay\Relay;
 
-/**
- * @requires extension relay
- */
+#[RequiresPhpExtension('relay')]
 class RelayStoreTest extends AbstractRedisStoreTestCase
 {
     protected function setUp(): void

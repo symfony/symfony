@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\BrowserKit\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
@@ -650,9 +652,7 @@ class AbstractBrowserTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider getTestsForMetaRefresh
-     */
+    #[DataProvider('getTestsForMetaRefresh')]
     public function testFollowMetaRefresh(string $content, string $expectedEndingUrl, bool $followMetaRefresh = true)
     {
         $client = $this->getBrowser();
@@ -701,6 +701,8 @@ class AbstractBrowserTest extends TestCase
         $this->assertArrayHasKey('myfile.foo', $client->getRequest()->getFiles(), '->back() keeps files');
         $this->assertArrayHasKey('X_TEST_FOO', $client->getRequest()->getServer(), '->back() keeps $_SERVER');
         $this->assertSame($content, $client->getRequest()->getContent(), '->back() keeps content');
+        $this->assertTrue($client->getHistory()->isFirstPage());
+        $this->assertFalse($client->getHistory()->isLastPage());
     }
 
     public function testForward()
@@ -741,6 +743,8 @@ class AbstractBrowserTest extends TestCase
         $client->forward();
 
         $this->assertSame('http://www.example.com/redirected', $client->getRequest()->getUri(), '->forward() goes forward in the history skipping redirects');
+        $this->assertTrue($client->getHistory()->isLastPage());
+        $this->assertFalse($client->getHistory()->isFirstPage());
     }
 
     public function testReload()
@@ -772,9 +776,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame([], $client->getCookieJar()->all(), '->restart() clears the cookies');
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testInsulatedRequests()
     {
         $client = $this->getBrowser();

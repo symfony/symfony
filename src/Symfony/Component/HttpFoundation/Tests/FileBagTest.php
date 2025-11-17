@@ -209,7 +209,7 @@ class FileBagTest extends TestCase
 
     protected function setUp(): void
     {
-        mkdir(sys_get_temp_dir().'/form_test', 0777, true);
+        mkdir(sys_get_temp_dir().'/form_test', 0o777, true);
     }
 
     protected function tearDown(): void

@@ -60,16 +60,6 @@ class UniqueEntityTest extends TestCase
         self::assertSame('some attached data', $constraint->payload);
         self::assertSame(['some_group'], $constraint->groups);
     }
-
-    /**
-     * @group legacy
-     */
-    public function testValueOptionConfiguresFields()
-    {
-        $constraint = new UniqueEntity(['value' => 'email']);
-
-        $this->assertSame('email', $constraint->fields);
-    }
 }
 
 #[UniqueEntity(['email'], message: 'myMessage')]

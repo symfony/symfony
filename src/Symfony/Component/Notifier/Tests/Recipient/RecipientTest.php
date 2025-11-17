@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Tests\Recipient;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Recipient\Recipient;
@@ -27,9 +28,7 @@ class RecipientTest extends TestCase
         new Recipient('', '');
     }
 
-    /**
-     * @dataProvider provideValidEmailAndPhone
-     */
+    #[DataProvider('provideValidEmailAndPhone')]
     public function testCanBeConstructed(string $email, string $phone)
     {
         $recipient = new Recipient($email, $phone);

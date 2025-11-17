@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove `NotFoundActivationStrategy`, use `HttpCodeActivationStrategy` instead
+
+7.4
+---
+
+ * Deprecate class `NotFoundActivationStrategy`, use `HttpCodeActivationStrategy` instead
+
 7.0
 ---
 

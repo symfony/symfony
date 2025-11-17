@@ -84,33 +84,17 @@ abstract class DataCollector implements DataCollectorInterface
         ] + ReflectionCaster::UNSET_CLOSURE_FILE_INFO;
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        return ['data'];
+        return ['data' => $this->data];
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
+        $this->data = $data['data'] ?? $data["\0*\0data"];
     }
 
-    /**
-     * @internal to prevent implementing \Serializable
-     */
-    final protected function serialize(): void
-    {
-    }
-
-    /**
-     * @internal to prevent implementing \Serializable
-     */
-    final protected function unserialize(string $data): void
-    {
-    }
-
-    /**
-     * @return void
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }

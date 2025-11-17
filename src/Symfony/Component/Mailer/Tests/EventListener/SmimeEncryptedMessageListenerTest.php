@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
@@ -26,9 +27,7 @@ use Symfony\Component\Mime\Part\TextPart;
 
 class SmimeEncryptedMessageListenerTest extends TestCase
 {
-    /**
-     * @requires extension openssl
-     */
+    #[RequiresPhpExtension('openssl')]
     public function testSmimeMessageEncryptionProcess()
     {
         $repository = $this->createMock(SmimeCertificateRepositoryInterface::class);
@@ -51,9 +50,7 @@ class SmimeEncryptedMessageListenerTest extends TestCase
         $this->assertFalse($event->getMessage()->getHeaders()->has('X-SMime-Encrypt'));
     }
 
-    /**
-     * @requires extension openssl
-     */
+    #[RequiresPhpExtension('openssl')]
     public function testMessageNotEncryptedWhenOneRecipientCertificateIsMissing()
     {
         $repository = $this->createMock(SmimeCertificateRepositoryInterface::class);
@@ -78,9 +75,7 @@ class SmimeEncryptedMessageListenerTest extends TestCase
         $this->assertInstanceOf(TextPart::class, $event->getMessage()->getBody());
     }
 
-    /**
-     * @requires extension openssl
-     */
+    #[RequiresPhpExtension('openssl')]
     public function testMessageNotExplicitlyAskedForNonEncryption()
     {
         $repository = $this->createMock(SmimeCertificateRepositoryInterface::class);

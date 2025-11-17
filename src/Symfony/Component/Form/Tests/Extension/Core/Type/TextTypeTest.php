@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class TextTypeTest extends BaseTypeTestCase
@@ -44,10 +45,9 @@ class TextTypeTest extends BaseTypeTestCase
     }
 
     /**
-     * @dataProvider provideZeros
-     *
      * @see https://github.com/symfony/symfony/issues/1986
      */
+    #[DataProvider('provideZeros')]
     public function testSetDataThroughParamsWithZero($data, $dataAsString)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array_merge($this->getTestOptions(), [

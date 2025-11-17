@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\TestWithJson;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
@@ -18,7 +19,6 @@ use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
@@ -26,17 +26,6 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class CollectionTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testRejectNonConstraints()
-    {
-        $this->expectException(InvalidOptionsException::class);
-        new Collection([
-            'foo' => 'bar',
-        ]);
-    }
-
     public function testRejectValidConstraint()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -103,25 +92,6 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Default'], $constraint->fields['bar']->groups);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testOnlySomeKeysAreKnowOptions()
-    {
-        $constraint = new Collection([
-            'fields' => [new Required()],
-            'properties' => [new Required()],
-            'catalog' => [new Optional()],
-        ]);
-
-        $this->assertArrayHasKey('fields', $constraint->fields);
-        $this->assertInstanceOf(Required::class, $constraint->fields['fields']);
-        $this->assertArrayHasKey('properties', $constraint->fields);
-        $this->assertInstanceOf(Required::class, $constraint->fields['properties']);
-        $this->assertArrayHasKey('catalog', $constraint->fields);
-        $this->assertInstanceOf(Optional::class, $constraint->fields['catalog']);
-    }
-
     public function testAllKeysAreKnowOptions()
     {
         $constraint = new Collection(
@@ -166,10 +136,8 @@ class CollectionTest extends TestCase
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 
-    /**
-     * @testWith [[]]
-     *           [null]
-     */
+    #[TestWithJson('[[]]')]
+    #[TestWithJson('[null]')]
     public function testEmptyConstraintListForField(?array $fieldConstraint)
     {
         $constraint = new Collection(
@@ -189,10 +157,8 @@ class CollectionTest extends TestCase
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 
-    /**
-     * @testWith [[]]
-     *           [null]
-     */
+    #[TestWithJson('[[]]')]
+    #[TestWithJson('[null]')]
     public function testEmptyConstraintListForFieldInOptions(?array $fieldConstraint)
     {
         $constraint = new Collection(

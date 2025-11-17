@@ -34,9 +34,7 @@ interface UserCheckerInterface
     /**
      * Checks the user account after authentication.
      *
-     * @param ?TokenInterface $token
-     *
      * @throws AccountStatusException
      */
-    public function checkPostAuth(UserInterface $user /* , ?TokenInterface $token = null */): void;
+    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void;
 }

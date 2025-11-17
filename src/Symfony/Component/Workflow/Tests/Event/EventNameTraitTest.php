@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests\Event;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Event\AnnounceEvent;
 use Symfony\Component\Workflow\Event\CompletedEvent;
@@ -23,10 +24,9 @@ use Symfony\Component\Workflow\Event\TransitionEvent;
 class EventNameTraitTest extends TestCase
 {
     /**
-     * @dataProvider getEvents
-     *
      * @param class-string $class
      */
+    #[DataProvider('getEvents')]
     public function testEventNames(string $class, ?string $workflowName, ?string $transitionOrPlaceName, string $expected)
     {
         $name = $class::getName($workflowName, $transitionOrPlaceName);

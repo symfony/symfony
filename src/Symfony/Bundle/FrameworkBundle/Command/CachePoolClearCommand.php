@@ -51,10 +51,10 @@ final class CachePoolClearCommand extends Command
             ->addOption('all', null, InputOption::VALUE_NONE, 'Clear all cache pools')
             ->addOption('exclude', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'A list of cache pools or cache pool clearers to exclude')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
+                The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
 
-    %command.full_name% <cache pool or clearer 1> [...<cache pool or clearer N>]
-EOF
+                    %command.full_name% <cache pool or clearer 1> [...<cache pool or clearer N>]
+                EOF
             )
         ;
     }

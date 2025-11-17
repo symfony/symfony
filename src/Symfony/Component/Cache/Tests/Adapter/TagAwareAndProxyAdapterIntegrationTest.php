@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -20,9 +21,7 @@ use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 
 class TagAwareAndProxyAdapterIntegrationTest extends TestCase
 {
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
     public function testIntegrationUsingProxiedAdapter(CacheItemPoolInterface $proxiedAdapter)
     {
         $cache = new TagAwareAdapter(new ProxyAdapter($proxiedAdapter));

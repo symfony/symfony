@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Validates that a value is one of a given set of valid choices.
@@ -45,11 +45,6 @@ class Choice extends Constraint
     public string $maxMessage = 'You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.';
     public bool $match = true;
 
-    public function getDefaultOption(): ?string
-    {
-        return 'choices';
-    }
-
     /**
      * @param array|null           $choices  An array of choices (required unless a callback is specified)
      * @param callable|string|null $callback Callback method to use instead of the choice option to get the choices
@@ -60,9 +55,8 @@ class Choice extends Constraint
      * @param string[]|null        $groups
      * @param bool|null            $match    Whether to validate the values are part of the choices or not (defaults to true)
      */
-    #[HasNamedArguments]
     public function __construct(
-        string|array $options = [],
+        string|array|null $options = null,
         ?array $choices = null,
         callable|string|null $callback = null,
         ?bool $multiple = null,
@@ -77,24 +71,18 @@ class Choice extends Constraint
         mixed $payload = null,
         ?bool $match = null,
     ) {
-        if (\is_array($options) && $options && array_is_list($options)) {
-            $choices ??= $options;
-            $options = [];
-        } elseif (\is_array($options) && [] !== $options) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        if (null !== $choices) {
-            $options['value'] = $choices;
-        }
+        parent::__construct(null, $groups, $payload);
 
-        parent::__construct($options, $groups, $payload);
-
-        $this->callback = $callback ?? $this->callback;
+        $this->choices = $choices;
+        $this->callback = $callback;
         $this->multiple = $multiple ?? $this->multiple;
         $this->strict = $strict ?? $this->strict;
-        $this->min = $min ?? $this->min;
-        $this->max = $max ?? $this->max;
+        $this->min = $min;
+        $this->max = $max;
         $this->message = $message ?? $this->message;
         $this->multipleMessage = $multipleMessage ?? $this->multipleMessage;
         $this->minMessage = $minMessage ?? $this->minMessage;

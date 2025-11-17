@@ -47,10 +47,6 @@ final class DoctrineTestHelper
         $config ??= self::createTestConfiguration();
         $eventManager = new EventManager();
 
-        if (\PHP_VERSION_ID >= 80400 && method_exists($config, 'enableNativeLazyObjects')) {
-            $config->enableNativeLazyObjects(true);
-        }
-
         return new EntityManager(DriverManager::getConnection($params, $config, $eventManager), $config, $eventManager);
     }
 
@@ -58,14 +54,9 @@ final class DoctrineTestHelper
     {
         $config = ORMSetup::createConfiguration(true);
         $config->setEntityNamespaces(['SymfonyTestsDoctrine' => 'Symfony\Bridge\Doctrine\Tests\Fixtures']);
-        if (\PHP_VERSION_ID < 80400 || !method_exists($config, 'enableNativeLazyObjects')) {
-            $config->setAutoGenerateProxyClasses(true);
-            $config->setProxyDir(sys_get_temp_dir());
-            $config->setProxyNamespace('SymfonyTests\Doctrine');
-        }
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Tests/Fixtures' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'], true));
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        $config->setLazyGhostObjectEnabled(true);
+        $config->enableNativeLazyObjects(true);
 
         return $config;
     }

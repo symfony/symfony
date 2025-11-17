@@ -168,4 +168,12 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     {
         return $this->with(XmlEncoder::IGNORE_EMPTY_ATTRIBUTES, $ignoreEmptyAttributes);
     }
+
+    /**
+     * Configures whether to preserve numeric keys in array.
+     */
+    public function withPreserveNumericKeys(?bool $preserveNumericKeys): static
+    {
+        return $this->with(XmlEncoder::PRESERVE_NUMERIC_KEYS, $preserveNumericKeys);
+    }
 }

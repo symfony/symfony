@@ -2,7 +2,7 @@
 
 {% macro profile_search_filter(request, result, property) %}
     {%- if request.hasSession -%}
-        <a href="{{ path('_profiler_search_results', request.query.all|merge({token: result.token})|merge({ (property): result[property] })) }}" title="Search"><span title="Search" class="sf-icon sf-search">{{ source('@WebProfiler/Icon/search.svg') }}</span></a>
+        <a href="{{ path('_profiler_search_results', request.query.all|merge({token: result.token})|merge({(property): result[property]})) }}" title="Search"><span title="Search" class="sf-icon sf-search">{{ source('@WebProfiler/Icon/search.svg') }}</span></a>
     {%- endif -%}
 {% endmacro %}
 
@@ -37,7 +37,7 @@
 {% block sidebar_search_css_class %}{% endblock %}
 {% block sidebar_shortcuts_links %}
     {{ parent() }}
-    {{ render(controller('web_profiler.controller.profiler::searchBarAction', query={type: profile_type }|merge(request.query.all))) }}
+    {{ render(controller('web_profiler.controller.profiler::searchBarAction', query: {type: profile_type}|merge(request.query.all))) }}
 {% endblock %}
 
 {% block panel %}
@@ -124,7 +124,7 @@
                                 {{ result.time|date('H:i:s') }}
                             </time>
                         </td>
-                        <td class="nowrap"><a href="{{ path('_profiler', { token: result.token }) }}">{{ result.token }}</a></td>
+                        <td class="nowrap"><a href="{{ path('_profiler', {token: result.token}) }}">{{ result.token }}</a></td>
                     </tr>
                 {% endfor %}
             </tbody>

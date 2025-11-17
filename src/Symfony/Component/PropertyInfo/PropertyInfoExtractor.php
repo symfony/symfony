@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo;
 
-use Symfony\Component\PropertyInfo\Util\LegacyTypeConverter;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -57,32 +56,12 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     public function getType(string $class, string $property, array $context = []): ?Type
     {
         foreach ($this->typeExtractors as $extractor) {
-            if (!method_exists($extractor, 'getType')) {
-                $legacyTypes = $extractor->getTypes($class, $property, $context);
-
-                if (null !== $legacyTypes) {
-                    return LegacyTypeConverter::toTypeInfoType($legacyTypes);
-                }
-
-                continue;
-            }
-
             if (null !== $value = $extractor->getType($class, $property, $context)) {
                 return $value;
             }
         }
 
         return null;
-    }
-
-    /**
-     * @deprecated since Symfony 7.3, use "getType" instead
-     */
-    public function getTypes(string $class, string $property, array $context = []): ?array
-    {
-        trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
-
-        return $this->extract($this->typeExtractors, 'getTypes', [$class, $property, $context]);
     }
 
     public function isReadable(string $class, string $property, array $context = []): ?bool

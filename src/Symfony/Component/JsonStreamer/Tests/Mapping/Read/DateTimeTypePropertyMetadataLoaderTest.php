@@ -29,8 +29,8 @@ class DateTimeTypePropertyMetadataLoaderTest extends TestCase
         ]));
 
         $this->assertEquals([
-            'interface' => new PropertyMetadata('interface', Type::string(), [], ['json_streamer.value_transformer.string_to_date_time']),
-            'immutable' => new PropertyMetadata('immutable', Type::string(), [], ['json_streamer.value_transformer.string_to_date_time']),
+            'interface' => new PropertyMetadata('interface', Type::string(), ['json_streamer.value_transformer.string_to_date_time']),
+            'immutable' => new PropertyMetadata('immutable', Type::string(), ['json_streamer.value_transformer.string_to_date_time']),
             'other' => new PropertyMetadata('other', Type::object(self::class)),
         ], $loader->load(self::class));
     }

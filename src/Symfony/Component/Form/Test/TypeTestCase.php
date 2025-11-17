@@ -32,7 +32,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
     /**
      * @return FormExtensionInterface[]
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $extensions = [];
 
@@ -43,18 +43,12 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         return $extensions;
     }
 
-    /**
-     * @return void
-     */
-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual): void
     {
         self::assertEquals($expected->format('c'), $actual->format('c'));
     }
 
-    /**
-     * @return void
-     */
-    public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)
+    public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual): void
     {
         self::assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));
     }

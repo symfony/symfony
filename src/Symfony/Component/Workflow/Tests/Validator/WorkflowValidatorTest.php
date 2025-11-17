@@ -12,6 +12,7 @@
 namespace Symfony\Component\Workflow\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
@@ -80,6 +81,34 @@ class WorkflowValidatorTest extends TestCase
 
         $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('The marking store of workflow "foo" cannot store many places. But the definition has 2 initial places. Only one is supported.');
+
+        (new WorkflowValidator(true))->validate($definition, 'foo');
+    }
+
+    public function testWithArcInFromTooHeavy()
+    {
+        $places = ['a', 'b'];
+        $transitions = [
+            new Transition('t1', [new Arc('a', 2)], [new Arc('b', 1)]),
+        ];
+        $definition = new Definition($places, $transitions);
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The marking store of workflow "t1" cannot store many places. But the transition "foo" has an arc from the transition to "a" with a weight equals to 2.');
+
+        (new WorkflowValidator(true))->validate($definition, 'foo');
+    }
+
+    public function testWithArcInToTooHeavy()
+    {
+        $places = ['a', 'b'];
+        $transitions = [
+            new Transition('t1', [new Arc('a', 1)], [new Arc('b', 2)]),
+        ];
+        $definition = new Definition($places, $transitions);
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The marking store of workflow "t1" cannot store many places. But the transition "foo" has an arc from "b" to the transition with a weight equals to 2.');
 
         (new WorkflowValidator(true))->validate($definition, 'foo');
     }

@@ -1,9 +1,4 @@
 framework:
-    annotations: false
-    http_method_override: false
-    handle_all_throwables: true
-    php_errors:
-        log: true
     cache:
         app: cache.redis_tag_aware.foo
         pools:

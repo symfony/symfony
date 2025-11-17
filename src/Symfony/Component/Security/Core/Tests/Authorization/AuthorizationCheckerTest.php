@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
@@ -44,9 +45,7 @@ class AuthorizationCheckerTest extends TestCase
         $authorizationChecker->isGranted('ROLE_FOO');
     }
 
-    /**
-     * @dataProvider isGrantedProvider
-     */
+    #[DataProvider('isGrantedProvider')]
     public function testIsGranted($decide)
     {
         $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
@@ -79,9 +78,7 @@ class AuthorizationCheckerTest extends TestCase
         $this->assertTrue($this->authorizationChecker->isGranted($attribute));
     }
 
-    /**
-     * @dataProvider isGrantedForUserProvider
-     */
+    #[DataProvider('isGrantedForUserProvider')]
     public function testIsGrantedForUser(bool $decide, array $roles)
     {
         $user = new InMemoryUser('username', 'password', $roles);

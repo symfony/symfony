@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Csrf\Tests;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -114,6 +115,31 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertSame(1 << 8, $request->attributes->get('csrf-token'));
     }
 
+    public function testSecFetchSiteSameOrigin()
+    {
+        $request = new Request();
+        $request->headers->set('Sec-Fetch-Site', 'same-origin');
+        $this->requestStack->push($request);
+
+        $token = new CsrfToken('test_token', str_repeat('a', 24));
+
+        $this->logger->expects($this->once())->method('debug')->with('CSRF validation accepted using origin info.');
+        $this->assertTrue($this->csrfTokenManager->isTokenValid($token));
+        $this->assertSame(1 << 8, $request->attributes->get('csrf-token'));
+    }
+
+    public function testSecFetchSiteCrossSite()
+    {
+        $request = new Request();
+        $request->headers->set('Sec-Fetch-Site', 'cross-site');
+        $this->requestStack->push($request);
+
+        $token = new CsrfToken('test_token', str_repeat('a', 24));
+
+        $this->logger->expects($this->once())->method('warning')->with('CSRF validation failed: origin info doesn\'t match.');
+        $this->assertFalse($this->csrfTokenManager->isTokenValid($token));
+    }
+
     public function testValidOriginAfterDoubleSubmit()
     {
         $session = $this->createMock(Session::class);
@@ -180,11 +206,9 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertFalse($csrfTokenManager->isTokenValid(new CsrfToken('test_token', str_repeat('b', 24))));
     }
 
-    /**
-     * @testWith [0]
-     *           [1]
-     *           [2]
-     */
+    #[TestWith([0])]
+    #[TestWith([1])]
+    #[TestWith([2])]
     public function testValidOriginMissingDoubleSubmit(int $checkHeader)
     {
         $csrfTokenManager = new SameOriginCsrfTokenManager($this->requestStack, $this->logger, null, [], $checkHeader);

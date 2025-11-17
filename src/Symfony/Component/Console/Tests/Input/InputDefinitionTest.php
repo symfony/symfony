@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -359,9 +360,7 @@ class InputDefinitionTest extends TestCase
         $this->assertSame($defaults, $definition->getOptionDefaults(), '->getOptionDefaults() returns the default values for all options');
     }
 
-    /**
-     * @dataProvider getGetSynopsisData
-     */
+    #[DataProvider('getGetSynopsisData')]
     public function testGetSynopsis(InputDefinition $definition, $expectedSynopsis, $message = null)
     {
         $this->assertSame($expectedSynopsis, $definition->getSynopsis(), $message ? '->getSynopsis() '.$message : '');

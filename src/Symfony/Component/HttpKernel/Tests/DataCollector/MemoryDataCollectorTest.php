@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +29,7 @@ class MemoryDataCollectorTest extends TestCase
         $this->assertSame('memory', $collector->getName());
     }
 
-    /** @dataProvider getBytesConversionTestData */
+    #[DataProvider('getBytesConversionTestData')]
     public function testBytesConversion($limit, $bytes)
     {
         $collector = new MemoryDataCollector();

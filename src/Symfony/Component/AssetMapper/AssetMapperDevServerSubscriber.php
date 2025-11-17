@@ -146,7 +146,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         if ($mediaType = $this->getMediaType($asset->publicPath)) {
             $response->headers->set('Content-Type', $mediaType);
         }
-        $response->headers->set('X-Assets-Dev', true);
+        $response->headers->set('X-Assets-Dev', '1');
 
         $event->setResponse($response);
         $event->stopPropagation();

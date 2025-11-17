@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -19,9 +20,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGrantedContext;
 
-/**
- * @requires function Symfony\Component\Security\Http\Attribute\IsGrantedContext::isGranted
- */
+#[RequiresMethod(IsGrantedContext::class, 'isGranted')]
 class ClosureVoterTest extends TestCase
 {
     private ClosureVoter $voter;

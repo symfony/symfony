@@ -1,10 +1,7 @@
 framework:
-    annotations: false
-    http_method_override: false
-    handle_all_throwables: true
     secret:        test
-    router:        { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
-    validation:    { enabled: true, enable_attributes: true, email_validation_mode: html5 }
+    router:        { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml" }
+    validation:    { enabled: true, enable_attributes: true }
     csrf_protection: true
     form:
         enabled: true
@@ -16,8 +13,6 @@ framework:
         storage_factory_id: session.storage.factory.mock_file
         cookie_secure: auto
         cookie_samesite: lax
-    php_errors:
-        log: true
     profiler:
         collect_serializer_data: true
 

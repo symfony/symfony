@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Exception\InvalidArgumentException;
@@ -22,9 +23,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class UrlPackageTest extends TestCase
 {
-    /**
-     * @dataProvider getConfigs
-     */
+    #[DataProvider('getConfigs')]
     public function testGetUrl($baseUrls, string $format, string $path, string $expected)
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format));
@@ -62,9 +61,7 @@ class UrlPackageTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getContextConfigs
-     */
+    #[DataProvider('getContextConfigs')]
     public function testGetUrlWithContext(bool $secure, $baseUrls, string $format, string $path, string $expected)
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format), $this->getContext($secure));
@@ -107,9 +104,7 @@ class UrlPackageTest extends TestCase
         new UrlPackage([], new EmptyVersionStrategy());
     }
 
-    /**
-     * @dataProvider getWrongBaseUrlConfig
-     */
+    #[DataProvider('getWrongBaseUrlConfig')]
     public function testWrongBaseUrl(string $baseUrls)
     {
         $this->expectException(InvalidArgumentException::class);

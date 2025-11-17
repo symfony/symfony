@@ -1,11 +1,9 @@
 <?php
 
-use Symfony\Component\DependencyInjection\Tests\Fixtures\AcmeConfig;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-return function (AcmeConfig $config, string $env) {
-    if ('prod' === $env) {
-        $config->color('blue');
-    } else {
-        $config->color('red');
-    }
+return function (ContainerConfigurator $container, string $env) {
+    $container->extension('acme', [
+        'color' => 'prod' === $env ? 'blue' : 'red',
+    ]);
 };

@@ -207,7 +207,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 break;
 
             case Type::class:
-                if (\in_array($constraint->type, ['double', 'float', 'numeric', 'real'])) {
+                if (\in_array($constraint->type, ['double', 'float', 'numeric', 'real'], true)) {
                     return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
                 }
                 break;
@@ -249,7 +249,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 break;
 
             case Type::class:
-                if (\in_array($constraint->type, ['double', 'float', 'numeric', 'real'])) {
+                if (\in_array($constraint->type, ['double', 'float', 'numeric', 'real'], true)) {
                     return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
                 }
                 break;

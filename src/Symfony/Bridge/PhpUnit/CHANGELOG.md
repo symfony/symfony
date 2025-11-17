@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add support for mocking the `strtotime()` function
+
 7.3
 ---
 

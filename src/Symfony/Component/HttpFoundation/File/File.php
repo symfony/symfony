@@ -96,7 +96,7 @@ class File extends \SplFileInfo
             throw new FileException(\sprintf('Could not move the file "%s" to "%s" (%s).', $this->getPathname(), $target, strip_tags($error)));
         }
 
-        @chmod($target, 0666 & ~umask());
+        @chmod($target, 0o666 & ~umask());
 
         return $target;
     }
@@ -114,10 +114,11 @@ class File extends \SplFileInfo
 
     protected function getTargetFile(string $directory, ?string $name = null): self
     {
-        if (!is_dir($directory)) {
-            if (false === @mkdir($directory, 0777, true) && !is_dir($directory)) {
-                throw new FileException(\sprintf('Unable to create the "%s" directory.', $directory));
+        if (!is_dir($directory) && !@mkdir($directory, 0o777, true) && !is_dir($directory)) {
+            if (is_file($directory)) {
+                throw new FileException(\sprintf('Unable to create the "%s" directory: a similarly-named file exists.', $directory));
             }
+            throw new FileException(\sprintf('Unable to create the "%s" directory.', $directory));
         } elseif (!is_writable($directory)) {
             throw new FileException(\sprintf('Unable to write in the "%s" directory.', $directory));
         }

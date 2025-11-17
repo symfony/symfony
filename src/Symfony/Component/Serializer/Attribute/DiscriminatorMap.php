@@ -27,9 +27,9 @@ class DiscriminatorMap
      * @throws InvalidArgumentException
      */
     public function __construct(
-        private readonly string $typeProperty,
-        private readonly array $mapping,
-        private readonly ?string $defaultType = null,
+        public readonly string $typeProperty,
+        public readonly array $mapping,
+        public readonly ?string $defaultType = null,
     ) {
         if (!$typeProperty) {
             throw new InvalidArgumentException(\sprintf('Parameter "typeProperty" given to "%s" cannot be empty.', static::class));
@@ -43,23 +43,4 @@ class DiscriminatorMap
             throw new InvalidArgumentException(\sprintf('Default type "%s" given to "%s" must be present in "mapping" types.', $this->defaultType, static::class));
         }
     }
-
-    public function getTypeProperty(): string
-    {
-        return $this->typeProperty;
-    }
-
-    public function getMapping(): array
-    {
-        return $this->mapping;
-    }
-
-    public function getDefaultType(): ?string
-    {
-        return $this->defaultType;
-    }
-}
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\DiscriminatorMap::class, false)) {
-    class_alias(DiscriminatorMap::class, \Symfony\Component\Serializer\Annotation\DiscriminatorMap::class);
 }

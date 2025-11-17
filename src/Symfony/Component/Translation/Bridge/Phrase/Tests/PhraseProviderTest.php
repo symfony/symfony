@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Bridge\Phrase\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
@@ -48,9 +49,7 @@ class PhraseProviderTest extends TestCase
     private array $readConfig;
     private array $writeConfig;
 
-    /**
-     * @dataProvider toStringProvider
-     */
+    #[DataProvider('toStringProvider')]
     public function testToString(?string $endpoint, string $expected)
     {
         $provider = $this->createProvider(endpoint: $endpoint);
@@ -58,9 +57,7 @@ class PhraseProviderTest extends TestCase
         self::assertSame($expected, (string) $provider);
     }
 
-    /**
-     * @dataProvider readProvider
-     */
+    #[DataProvider('readProvider')]
     public function testRead(string $locale, string $localeId, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
     {
         $item = $this->createMock(CacheItemInterface::class);
@@ -110,9 +107,7 @@ class PhraseProviderTest extends TestCase
         $this->assertSame($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
     }
 
-    /**
-     * @dataProvider readProvider
-     */
+    #[DataProvider('readProvider')]
     public function testReadCached(string $locale, string $localeId, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
     {
         $item = $this->createMock(CacheItemInterface::class);
@@ -260,9 +255,7 @@ class PhraseProviderTest extends TestCase
         $provider->read([$domain], [$locale]);
     }
 
-    /**
-     * @dataProvider cacheKeyProvider
-     */
+    #[DataProvider('cacheKeyProvider')]
     public function testCacheKeyOptionsSort(array $options, string $expectedKey)
     {
         $this->getCache()->expects(self::once())->method('getItem')->with($expectedKey);
@@ -291,9 +284,7 @@ class PhraseProviderTest extends TestCase
         $provider->read(['messages'], ['en_GB']);
     }
 
-    /**
-     * @dataProvider cacheItemProvider
-     */
+    #[DataProvider('cacheItemProvider')]
     public function testGetCacheItem(mixed $cachedValue, bool $hasMatchHeader)
     {
         $item = $this->createMock(CacheItemInterface::class);
@@ -376,9 +367,7 @@ class PhraseProviderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider readProviderExceptionsProvider
-     */
+    #[DataProvider('readProviderExceptionsProvider')]
     public function testReadProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
         $this->getLogger()
@@ -412,9 +401,7 @@ class PhraseProviderTest extends TestCase
         $provider->read(['messages'], ['en_GB']);
     }
 
-    /**
-     * @dataProvider initLocalesExceptionsProvider
-     */
+    #[DataProvider('initLocalesExceptionsProvider')]
     public function testInitLocalesExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
         $this->getLogger()
@@ -536,9 +523,7 @@ class PhraseProviderTest extends TestCase
         $provider->read(['messages'], ['nl_NL']);
     }
 
-    /**
-     * @dataProvider createLocalesExceptionsProvider
-     */
+    #[DataProvider('createLocalesExceptionsProvider')]
     public function testCreateLocaleExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
         $this->getLogger()
@@ -624,9 +609,7 @@ class PhraseProviderTest extends TestCase
         $provider->delete($bag);
     }
 
-    /**
-     * @dataProvider deleteExceptionsProvider
-     */
+    #[DataProvider('deleteExceptionsProvider')]
     public function testDeleteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
         $this->getLogger()
@@ -666,9 +649,7 @@ class PhraseProviderTest extends TestCase
         $provider->delete($bag);
     }
 
-    /**
-     * @dataProvider writeProvider
-     */
+    #[DataProvider('writeProvider')]
     public function testWrite(string $locale, string $localeId, string $domain, string $content, TranslatorBag $bag)
     {
         $this->getWriteConfig($domain, $localeId);
@@ -742,9 +723,7 @@ class PhraseProviderTest extends TestCase
         $provider->write($bag);
     }
 
-    /**
-     * @dataProvider writeExceptionsProvider
-     */
+    #[DataProvider('writeExceptionsProvider')]
     public function testWriteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
         $this->getLogger()
@@ -792,26 +771,26 @@ class PhraseProviderTest extends TestCase
     public static function writeProvider(): \Generator
     {
         $expectedEnglishXliff = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en-GB" target-language="en-GB" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="general.back">
-        <source>general.back</source>
-        <target><![CDATA[back &!]]></target>
-      </trans-unit>
-      <trans-unit id="%s" resname="general.cancel">
-        <source>general.cancel</source>
-        <target>Cancel</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en-GB" target-language="en-GB" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="general.back">
+                    <source>general.back</source>
+                    <target><![CDATA[back &!]]></target>
+                  </trans-unit>
+                  <trans-unit id="%s" resname="general.cancel">
+                    <source>general.cancel</source>
+                    <target>Cancel</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $bag = new TranslatorBag();
         $bag->addCatalogue(new MessageCatalogue('en_GB', [
@@ -832,26 +811,26 @@ XLIFF;
         ];
 
         $expectedGermanXliff = <<<'XLIFF'
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en-GB" target-language="de" datatype="plaintext" original="file.ext">
-    <header>
-      <tool tool-id="symfony" tool-name="Symfony"/>
-    </header>
-    <body>
-      <trans-unit id="%s" resname="general.back">
-        <source>general.back</source>
-        <target>zurück</target>
-      </trans-unit>
-      <trans-unit id="%s" resname="general.cancel">
-        <source>general.cancel</source>
-        <target>Abbrechen</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en-GB" target-language="de" datatype="plaintext" original="file.ext">
+                <header>
+                  <tool tool-id="symfony" tool-name="Symfony"/>
+                </header>
+                <body>
+                  <trans-unit id="%s" resname="general.back">
+                    <source>general.back</source>
+                    <target>zurück</target>
+                  </trans-unit>
+                  <trans-unit id="%s" resname="general.cancel">
+                    <source>general.cancel</source>
+                    <target>Abbrechen</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
 
-XLIFF;
+            XLIFF;
 
         $bag = new TranslatorBag();
         $bag->addCatalogue(new MessageCatalogue('de', [
@@ -960,23 +939,23 @@ XLIFF;
             'localeId' => '13604ec993beefcdaba732812cdb828c',
             'domain' => 'messages',
             'responseContent' => <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file original="global" datatype="plaintext" source-language="de" target-language="en-GB">
-    <body>
-      <trans-unit id="general.back" resname="general.back">
-        <source xml:lang="de"><![CDATA[zurück </rant >]]></source>
-        <target xml:lang="en" state="signed-off"><![CDATA[back  {{ placeholder }} </rant >]]></target>
-        <note>this should have a cdata section</note>
-      </trans-unit>
-      <trans-unit id="general.cancel" resname="general.cancel">
-        <source xml:lang="de">Abbrechen</source>
-        <target xml:lang="en" state="translated">Cancel</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF,
+                <?xml version="1.0" encoding="UTF-8"?>
+                <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+                  <file original="global" datatype="plaintext" source-language="de" target-language="en-GB">
+                    <body>
+                      <trans-unit id="general.back" resname="general.back">
+                        <source xml:lang="de"><![CDATA[zurück </rant >]]></source>
+                        <target xml:lang="en" state="signed-off"><![CDATA[back  {{ placeholder }} </rant >]]></target>
+                        <note>this should have a cdata section</note>
+                      </trans-unit>
+                      <trans-unit id="general.cancel" resname="general.cancel">
+                        <source xml:lang="de">Abbrechen</source>
+                        <target xml:lang="en" state="translated">Cancel</target>
+                      </trans-unit>
+                    </body>
+                  </file>
+                </xliff>
+                XLIFF,
             'expectedTranslatorBag' => $bag,
         ];
 
@@ -1008,23 +987,23 @@ XLIFF,
             'localeId' => '5fea6ed5c21767730918a9400e420832',
             'domain' => 'validators',
             'responseContent' => <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file original="file.ext" datatype="plaintext" source-language="de" target-language="de">
-    <body>
-      <trans-unit id="A PHP extension caused the upload to fail." resname="A PHP extension caused the upload to fail.">
-        <source xml:lang="de">Eine PHP-Erweiterung verhinderte den Upload.</source>
-        <target xml:lang="de" state="signed-off">Eine PHP-Erweiterung verhinderte den Upload.</target>
-      </trans-unit>
-      <trans-unit id="An empty file is not allowed." resname="An empty file is not allowed.">
-        <source xml:lang="de">Eine leere Datei ist nicht erlaubt.</source>
-        <target xml:lang="de" state="signed-off">Eine leere Datei ist nicht erlaubt.</target>
-        <note>be sure not to allow an empty file</note>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF,
+                <?xml version="1.0" encoding="UTF-8"?>
+                <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+                  <file original="file.ext" datatype="plaintext" source-language="de" target-language="de">
+                    <body>
+                      <trans-unit id="A PHP extension caused the upload to fail." resname="A PHP extension caused the upload to fail.">
+                        <source xml:lang="de">Eine PHP-Erweiterung verhinderte den Upload.</source>
+                        <target xml:lang="de" state="signed-off">Eine PHP-Erweiterung verhinderte den Upload.</target>
+                      </trans-unit>
+                      <trans-unit id="An empty file is not allowed." resname="An empty file is not allowed.">
+                        <source xml:lang="de">Eine leere Datei ist nicht erlaubt.</source>
+                        <target xml:lang="de" state="signed-off">Eine leere Datei ist nicht erlaubt.</target>
+                        <note>be sure not to allow an empty file</note>
+                      </trans-unit>
+                    </body>
+                  </file>
+                </xliff>
+                XLIFF,
             'expectedTranslatorBag' => $bag,
         ];
     }

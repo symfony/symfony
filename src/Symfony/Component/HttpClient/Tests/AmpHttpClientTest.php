@@ -11,17 +11,14 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
- * @group dns-sensitive
- */
+#[Group('dns-sensitive')]
 class AmpHttpClientTest extends HttpClientTestCase
 {
-    /**
-     * @group transient
-     */
+    #[Group('transient')]
     public function testNonBlockingStream()
     {
         parent::testNonBlockingStream();

@@ -119,11 +119,6 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    #[\Deprecated]
-    public function eraseCredentials(): void
-    {
-    }
-
     public function getAttributes(): array
     {
     }

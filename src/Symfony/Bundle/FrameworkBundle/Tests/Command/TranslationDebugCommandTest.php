@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -223,7 +224,7 @@ class TranslationDebugCommandTest extends TestCase
         $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths, $enabledLocales);
 
         $application = new Application($kernel);
-        $application->add($command);
+        $application->addCommand($command);
 
         return $application->find('debug:translation');
     }
@@ -240,9 +241,7 @@ class TranslationDebugCommandTest extends TestCase
         return $bundle;
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $extractedMessagesWithDomains = [

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Cidr;
 use Symfony\Component\Validator\Constraints\CidrValidator;
 use Symfony\Component\Validator\Constraints\Ip;
@@ -55,9 +56,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(123456, new Cidr());
     }
 
-    /**
-     * @dataProvider getWithInvalidNetmask
-     */
+    #[DataProvider('getWithInvalidNetmask')]
     public function testInvalidNetmask(string $cidr)
     {
         $this->validator->validate($cidr, new Cidr());
@@ -68,9 +67,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getWithInvalidIps
-     */
+    #[DataProvider('getWithInvalidIps')]
     public function testInvalidIpValue(string $cidr)
     {
         $this->validator->validate($cidr, new Cidr());
@@ -81,9 +78,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getValid
-     */
+    #[DataProvider('getValid')]
     public function testValidCidr(string|\Stringable $cidr, string $version)
     {
         $this->validator->validate($cidr, new Cidr(version: $version));
@@ -91,9 +86,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getWithInvalidMasksAndIps
-     */
+    #[DataProvider('getWithInvalidMasksAndIps')]
     public function testInvalidIpAddressAndNetmask(string|\Stringable $cidr)
     {
         $this->validator->validate($cidr, new Cidr());
@@ -103,9 +96,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getOutOfRangeNetmask
-     */
+    #[DataProvider('getOutOfRangeNetmask')]
     public function testOutOfRangeNetmask(string $cidr, int $maxExpected, ?string $version = null, ?int $min = null, ?int $max = null)
     {
         $cidrConstraint = new Cidr(
@@ -123,9 +114,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getWithWrongVersion
-     */
+    #[DataProvider('getWithWrongVersion')]
     public function testWrongVersion(string $cidr, string $version)
     {
         $this->validator->validate($cidr, new Cidr(version: $version));

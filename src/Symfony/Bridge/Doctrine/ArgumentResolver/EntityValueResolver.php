@@ -189,9 +189,6 @@ final class EntityValueResolver implements ValueResolverInterface
             }
 
             return $criteria;
-        } elseif (null === $mapping) {
-            trigger_deprecation('symfony/doctrine-bridge', '7.1', 'Relying on auto-mapping for Doctrine entities is deprecated for argument $%s of "%s": declare the mapping using either the #[MapEntity] attribute or mapped route parameters.', $argument->getName(), method_exists($argument, 'getControllerName') ? $argument->getControllerName() : 'n/a');
-            $mapping = $request->attributes->keys();
         }
 
         if ($mapping && array_is_list($mapping)) {

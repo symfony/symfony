@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Exception\TransportException;
 
-/**
- * @requires extension redis
- */
+#[RequiresPhpExtension('redis')]
 class ConnectionTest extends TestCase
 {
     public function testFromInvalidDsn()
@@ -31,7 +32,7 @@ class ConnectionTest extends TestCase
 
     public function testFromDsn()
     {
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             new Connection([
                 'stream' => 'queue',
                 'host' => 'localhost',
@@ -43,7 +44,7 @@ class ConnectionTest extends TestCase
 
     public function testFromDsnOnUnixSocket()
     {
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             new Connection([
                 'stream' => 'queue',
                 'host' => '/var/run/redis/redis.sock',
@@ -55,7 +56,7 @@ class ConnectionTest extends TestCase
 
     public function testFromDsnWithOptions()
     {
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2], $this->createRedisMock()),
             Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createRedisMock())
         );
@@ -63,7 +64,7 @@ class ConnectionTest extends TestCase
 
     public function testFromDsnWithOptionsAndTrailingSlash()
     {
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2], $this->createRedisMock()),
             Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createRedisMock())
         );
@@ -85,7 +86,7 @@ class ConnectionTest extends TestCase
 
     public function testFromDsnWithQueryOptions()
     {
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             new Connection([
                 'stream' => 'queue',
                 'group' => 'group1',
@@ -100,12 +101,12 @@ class ConnectionTest extends TestCase
 
     public function testFromDsnWithMixDsnQueryOptions()
     {
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             Connection::fromDsn('redis://localhost/queue/group1?serializer=2', ['consumer' => 'specific-consumer'], $this->createRedisMock()),
             Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2', [], $this->createRedisMock())
         );
 
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['consumer' => 'specific-consumer'], $this->createRedisMock()),
             Connection::fromDsn('redis://localhost/queue/group1/consumer1', [], $this->createRedisMock())
         );
@@ -131,9 +132,7 @@ class ConnectionTest extends TestCase
         $this->assertNotNull($connection->get());
     }
 
-    /**
-     * @dataProvider provideAuthDsn
-     */
+    #[DataProvider('provideAuthDsn')]
     public function testAuth(string|array $expected, string $dsn)
     {
         $redis = $this->createRedisMock();
@@ -384,9 +383,7 @@ class ConnectionTest extends TestCase
         $this->assertSame('xack error', $e->getMessage());
     }
 
-    /**
-     * @dataProvider provideIdPatterns
-     */
+    #[DataProvider('provideIdPatterns')]
     public function testAddReturnId(string $expected, int $delay, string $method, string $return)
     {
         $redis = $this->createRedisMock();
@@ -404,9 +401,7 @@ class ConnectionTest extends TestCase
         yield '100ms delay' => ['/^[A-Z\d\/+]+$/i', 100, 'rawCommand', '1'];
     }
 
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function testInvalidSentinelMasterName()
     {
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
@@ -441,7 +436,7 @@ class ConnectionTest extends TestCase
             ->with(['user', 'password'])
             ->willReturn(true);
 
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             new Connection([
                 'stream' => 'queue',
                 'delete_after_ack' => true,
@@ -461,7 +456,7 @@ class ConnectionTest extends TestCase
             ->with('password')
             ->willReturn(true);
 
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             new Connection([
                 'stream' => 'queue',
                 'delete_after_ack' => true,
@@ -481,7 +476,7 @@ class ConnectionTest extends TestCase
             ->with('user')
             ->willReturn(true);
 
-        $this->assertEquals(
+        $this->assertEqualsConnection(
             new Connection([
                 'stream' => 'queue',
                 'delete_after_ack' => true,
@@ -543,5 +538,18 @@ class ConnectionTest extends TestCase
             ->willReturnOnConsecutiveCalls(false, true, true);
 
         return $redis;
+    }
+
+    private function assertEqualsConnection(Connection $expected, $actual)
+    {
+        $this->assertInstanceOf(Connection::class, $actual);
+
+        foreach ((new \ReflectionClass(Connection::class))->getProperties() as $property) {
+            if ('redisInitializer' === $property->getName()) {
+                continue;
+            }
+
+            $this->assertEquals($property->getValue($expected), $property->getValue($actual));
+        }
     }
 }

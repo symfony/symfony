@@ -24,12 +24,12 @@ class NegativeOrZeroTest extends TestCase
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame(0, $aConstraint->value);
         self::assertNull($aConstraint->propertyPath);
         self::assertSame(['Default', 'NegativeOrZeroDummy'], $aConstraint->groups);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['foo'], $bConstraint->groups);
     }

@@ -34,16 +34,6 @@ class CascadeTest extends TestCase
 
         self::assertSame(['foo' => 0, 'bar' => 1], $constraint->exclude);
     }
-
-    /**
-     * @group legacy
-     */
-    public function testExcludePropertiesDoctrineStyle()
-    {
-        $constraint = new Cascade(['exclude' => ['foo', 'bar']]);
-
-        self::assertSame(['foo' => 0, 'bar' => 1], $constraint->exclude);
-    }
 }
 
 #[Cascade]

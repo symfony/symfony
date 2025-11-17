@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 
 class BaseNodeTest extends TestCase
 {
-    /**
-     * @dataProvider providePath
-     */
+    #[DataProvider('providePath')]
     public function testGetPathForChildNode(string $expected, array $params)
     {
         $constructorArgs = [];

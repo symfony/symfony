@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
@@ -38,9 +39,7 @@ class SerializerCacheWarmerTest extends TestCase
         return $this->arrayPool = new PhpArrayAdapter($file, new NullAdapter());
     }
 
-    /**
-     * @dataProvider loaderProvider
-     */
+    #[DataProvider('loaderProvider')]
     public function testWarmUp(array $loaders)
     {
         $file = sys_get_temp_dir().'/cache-serializer.php';
@@ -57,9 +56,7 @@ class SerializerCacheWarmerTest extends TestCase
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
-    /**
-     * @dataProvider loaderProvider
-     */
+    #[DataProvider('loaderProvider')]
     public function testWarmUpAbsoluteFilePath(array $loaders)
     {
         $file = sys_get_temp_dir().'/0/cache-serializer.php';
@@ -79,9 +76,7 @@ class SerializerCacheWarmerTest extends TestCase
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
-    /**
-     * @dataProvider loaderProvider
-     */
+    #[DataProvider('loaderProvider')]
     public function testWarmUpWithoutBuildDir(array $loaders)
     {
         $file = sys_get_temp_dir().'/cache-serializer.php';

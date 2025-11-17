@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 trait InvalidComparisonToValueTestTrait
 {
-    /**
-     * @dataProvider provideAllInvalidComparisons
-     */
+    #[DataProvider('provideAllInvalidComparisons')]
     public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType)
     {
         // Conversion of dates to string differs between ICU versions

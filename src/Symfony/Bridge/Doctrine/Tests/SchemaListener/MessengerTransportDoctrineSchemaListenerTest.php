@@ -12,10 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\SchemaListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Event\SchemaCreateTableEventArgs;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use PHPUnit\Framework\TestCase;
@@ -38,72 +35,12 @@ class MessengerTransportDoctrineSchemaListenerTest extends TestCase
         $doctrineTransport = $this->createMock(DoctrineTransport::class);
         $doctrineTransport->expects($this->once())
             ->method('configureSchema')
-            ->with($schema, $dbalConnection, fn () => true);
+            ->with($schema, $dbalConnection, $this->callback(fn () => true));
         $otherTransport = $this->createMock(TransportInterface::class);
         $otherTransport->expects($this->never())
             ->method($this->anything());
 
         $subscriber = new MessengerTransportDoctrineSchemaListener([$doctrineTransport, $otherTransport]);
         $subscriber->postGenerateSchema($event);
-    }
-
-    public function testOnSchemaCreateTable()
-    {
-        if (!class_exists(SchemaCreateTableEventArgs::class)) {
-            self::markTestSkipped('This test requires DBAL < 4.');
-        }
-
-        $platform = $this->createMock(AbstractPlatform::class);
-        $table = new Table('queue_table');
-        $event = new SchemaCreateTableEventArgs($table, [], [], $platform);
-
-        $otherTransport = $this->createMock(TransportInterface::class);
-        $otherTransport->expects($this->never())
-            ->method($this->anything());
-
-        $doctrineTransport = $this->createMock(DoctrineTransport::class);
-        $doctrineTransport->expects($this->once())
-            ->method('getExtraSetupSqlForTable')
-            ->with($table)
-            ->willReturn(['ALTER TABLE pizza ADD COLUMN extra_cheese boolean']);
-
-        // we use the platform to generate the full create table sql
-        $platform->expects($this->once())
-            ->method('getCreateTableSQL')
-            ->with($table)
-            ->willReturn('CREATE TABLE pizza (id integer NOT NULL)');
-
-        $subscriber = new MessengerTransportDoctrineSchemaListener([$otherTransport, $doctrineTransport]);
-
-        $subscriber->onSchemaCreateTable($event);
-        $this->assertTrue($event->isDefaultPrevented());
-        $this->assertSame([
-            'CREATE TABLE pizza (id integer NOT NULL)',
-            'ALTER TABLE pizza ADD COLUMN extra_cheese boolean',
-        ], $event->getSql());
-    }
-
-    public function testOnSchemaCreateTableNoExtraSql()
-    {
-        if (!class_exists(SchemaCreateTableEventArgs::class)) {
-            self::markTestSkipped('This test requires DBAL < 4.');
-        }
-
-        $platform = $this->createMock(AbstractPlatform::class);
-        $table = new Table('queue_table');
-        $event = new SchemaCreateTableEventArgs($table, [], [], $platform);
-
-        $doctrineTransport = $this->createMock(DoctrineTransport::class);
-        $doctrineTransport->expects($this->once())
-            ->method('getExtraSetupSqlForTable')
-            ->willReturn([]);
-
-        $platform->expects($this->never())
-            ->method('getCreateTableSQL');
-
-        $subscriber = new MessengerTransportDoctrineSchemaListener([$doctrineTransport]);
-
-        $subscriber->onSchemaCreateTable($event);
-        $this->assertFalse($event->isDefaultPrevented());
     }
 }

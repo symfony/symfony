@@ -27,9 +27,40 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class AttributeLoader implements LoaderInterface
 {
+    /**
+     * @param array<class-string, class-string[]> $mappedClasses
+     */
+    public function __construct(
+        private bool $allowAnyClass = true,
+        private array $mappedClasses = [],
+    ) {
+    }
+
+    /**
+     * @return class-string[]
+     */
+    public function getMappedClasses(): array
+    {
+        return array_keys($this->mappedClasses);
+    }
+
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
-        $reflClass = $metadata->getReflectionClass();
+        if (!$sourceClasses = $this->mappedClasses[$metadata->getClassName()] ??= $this->allowAnyClass ? [$metadata->getClassName()] : []) {
+            return false;
+        }
+
+        $success = false;
+        foreach ($sourceClasses as $sourceClass) {
+            $reflClass = $metadata->getClassName() === $sourceClass ? $metadata->getReflectionClass() : new \ReflectionClass($sourceClass);
+            $success = $this->doLoadClassMetadata($reflClass, $metadata) || $success;
+        }
+
+        return $success;
+    }
+
+    public function doLoadClassMetadata(\ReflectionClass $reflClass, ClassMetadata $metadata): bool
+    {
         $className = $reflClass->name;
         $success = false;
 

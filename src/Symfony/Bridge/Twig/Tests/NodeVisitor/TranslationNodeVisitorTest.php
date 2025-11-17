@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Twig\Environment;
@@ -25,7 +26,7 @@ use Twig\TwigFilter;
 
 class TranslationNodeVisitorTest extends TestCase
 {
-    /** @dataProvider getMessagesExtractionTestData */
+    #[DataProvider('getMessagesExtractionTestData')]
     public function testMessagesExtraction(Node $node, array $expectedMessages)
     {
         $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);

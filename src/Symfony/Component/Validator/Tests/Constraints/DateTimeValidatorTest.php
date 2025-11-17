@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\DateTimeValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -58,9 +59,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getValidDateTimes
-     */
+    #[DataProvider('getValidDateTimes')]
     public function testValidDateTimes($format, $dateTime)
     {
         $constraint = new DateTime(format: $format);
@@ -81,9 +80,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidDateTimes
-     */
+    #[DataProvider('getInvalidDateTimes')]
     public function testInvalidDateTimes($format, $dateTime, $code)
     {
         $constraint = new DateTime(

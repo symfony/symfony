@@ -97,7 +97,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $this->restoreDefaultTimezone();
 
-        if (class_exists(\Locale::class)) {
+        if (class_exists(\Locale::class) && isset($this->defaultLocale)) {
             \Locale::setDefault($this->defaultLocale);
         }
     }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\RateLimiter\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
@@ -23,9 +25,7 @@ use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
 class RateLimiterFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider validConfigProvider
-     */
+    #[DataProvider('validConfigProvider')]
     public function testValidConfig(string $expectedClass, array $config)
     {
         $factory = new RateLimiterFactory($config, new InMemoryStorage());
@@ -61,9 +61,7 @@ class RateLimiterFactoryTest extends TestCase
         ]];
     }
 
-    /**
-     * @dataProvider invalidConfigProvider
-     */
+    #[DataProvider('invalidConfigProvider')]
     public function testInvalidConfig(string $exceptionClass, array $config)
     {
         $this->expectException($exceptionClass);
@@ -78,9 +76,7 @@ class RateLimiterFactoryTest extends TestCase
         ]];
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testExpirationTimeCalculationWhenUsingDefaultTimezoneRomeWithIntervalAfterCETChange()
     {
         $originalTimezone = date_default_timezone_get();

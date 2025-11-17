@@ -39,7 +39,7 @@ abstract class FormIntegrationTestCase extends TestCase
     /**
      * @return FormExtensionInterface[]
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [];
     }
@@ -47,7 +47,7 @@ abstract class FormIntegrationTestCase extends TestCase
     /**
      * @return FormTypeExtensionInterface[]
      */
-    protected function getTypeExtensions()
+    protected function getTypeExtensions(): array
     {
         return [];
     }
@@ -55,7 +55,7 @@ abstract class FormIntegrationTestCase extends TestCase
     /**
      * @return FormTypeInterface[]
      */
-    protected function getTypes()
+    protected function getTypes(): array
     {
         return [];
     }
@@ -63,7 +63,7 @@ abstract class FormIntegrationTestCase extends TestCase
     /**
      * @return FormTypeGuesserInterface[]
      */
-    protected function getTypeGuessers()
+    protected function getTypeGuessers(): array
     {
         return [];
     }

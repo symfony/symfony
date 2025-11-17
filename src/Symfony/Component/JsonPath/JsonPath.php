@@ -15,8 +15,6 @@ namespace Symfony\Component\JsonPath;
  * @author Alexandre Daubois <alex.daubois@gmail.com>
  *
  * @immutable
- *
- * @experimental
  */
 final class JsonPath
 {

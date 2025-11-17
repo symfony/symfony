@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+* Add support for specifying a subaccount using the `X-MC-Subaccount` header
+
 7.2
 ---
 

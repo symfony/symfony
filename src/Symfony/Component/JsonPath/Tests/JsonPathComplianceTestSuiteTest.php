@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\JsonPath\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonPath\Exception\JsonCrawlerException;
 use Symfony\Component\JsonPath\JsonCrawler;
 
 final class JsonPathComplianceTestSuiteTest extends TestCase
 {
-    /**
-     * @dataProvider complianceCaseProvider
-     */
+    #[DataProvider('complianceCaseProvider')]
     public function testComplianceTestCase(string $selector, mixed $document, array $expectedResults, bool $invalidSelector)
     {
         $jsonCrawler = new JsonCrawler(json_encode($document));
@@ -35,9 +34,7 @@ final class JsonPathComplianceTestSuiteTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider resourceComplianceCaseProvider
-     */
+    #[DataProvider('resourceComplianceCaseProvider')]
     public function testComplianceTestCaseWithResource(string $selector, mixed $document, array $expectedResults, bool $invalidSelector)
     {
         $json = json_encode($document);

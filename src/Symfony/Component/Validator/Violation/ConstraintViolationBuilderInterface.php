@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Violation;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 /**
  * Builds {@link \Symfony\Component\Validator\ConstraintViolationInterface}
  * objects.
@@ -69,7 +71,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      *
-     * @see \Symfony\Contracts\Translation\TranslatorInterface
+     * @see TranslatorInterface
      */
     public function setTranslationDomain(string $translationDomain): static;
 

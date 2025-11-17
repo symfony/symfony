@@ -268,7 +268,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
 
         [$scheme, $rest] = explode(':', $dsn, 2);
         $driver = substr($scheme, 0, strpos($scheme, '+') ?: null);
-        if (!\in_array($driver, ['pgsql', 'postgres', 'postgresql'])) {
+        if (!\in_array($driver, ['pgsql', 'postgres', 'postgresql'], true)) {
             throw new InvalidArgumentException(\sprintf('The adapter "%s" does not support the "%s" driver.', __CLASS__, $driver));
         }
 

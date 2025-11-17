@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Factory;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -35,9 +36,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->tmpDir = sys_get_temp_dir();
     }
 
-    /**
-     * @dataProvider provideFactories
-     */
+    #[DataProvider('provideFactories')]
     public function testCreateRequest(PsrHttpFactory $factory)
     {
         $stdClass = new \stdClass();
@@ -137,9 +136,7 @@ class PsrHttpFactoryTest extends TestCase
         return new UploadedFile($path, $originalName, $mimeType, $error, true);
     }
 
-    /**
-     * @dataProvider provideFactories
-     */
+    #[DataProvider('provideFactories')]
     public function testCreateResponse(PsrHttpFactory $factory)
     {
         $response = new Response(

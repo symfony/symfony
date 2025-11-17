@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Scheduler\Tests\Trigger;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Trigger\CronExpressionTrigger;
 
 class CronExpressionTriggerTest extends TestCase
 {
-    /**
-     * @dataProvider hashedExpressionProvider
-     */
+    #[DataProvider('hashedExpressionProvider')]
     public function testHashedExpressionParsing(string $input, string $expected)
     {
         $triggerA = CronExpressionTrigger::fromSpec($input, 'my task');

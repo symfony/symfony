@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarExporter\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
@@ -24,6 +25,7 @@ use Symfony\Component\VarExporter\Tests\Fixtures\GoodNight;
 use Symfony\Component\VarExporter\Tests\Fixtures\MySerializable;
 use Symfony\Component\VarExporter\Tests\Fixtures\MyWakeup;
 use Symfony\Component\VarExporter\Tests\Fixtures\Php74Serializable;
+use Symfony\Component\VarExporter\Tests\Fixtures\PrivateFCC;
 use Symfony\Component\VarExporter\VarExporter;
 
 $errorHandler = set_error_handler(static function (int $errno, string $errstr) use (&$errorHandler) {
@@ -66,9 +68,7 @@ class VarExporterTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideFailingSerialization
-     */
+    #[DataProvider('provideFailingSerialization')]
     public function testFailingSerialization($value)
     {
         $this->expectException(NotInstantiableTypeException::class);
@@ -104,13 +104,11 @@ class VarExporterTest extends TestCase
         yield [$a];
     }
 
-    /**
-     * @dataProvider provideExport
-     */
+    #[DataProvider('provideExport')]
     public function testExport(string $testName, $value, bool $staticValueExpected = false)
     {
         $dumpedValue = $this->getDump($value);
-        $isStaticValue = true;
+        $isStaticValue = null;
         $marshalledValue = VarExporter::export($value, $isStaticValue);
 
         $this->assertSame($staticValueExpected, $isStaticValue);
@@ -129,7 +127,7 @@ class VarExporterTest extends TestCase
         }
         $marshalledValue = include $fixtureFile;
 
-        if (!$isStaticValue) {
+        if (!$isStaticValue || 'named-closure-static' === $testName || 'private-fcc' === $testName) {
             if ($value instanceof MyWakeup) {
                 $value->bis = null;
             }
@@ -249,11 +247,16 @@ class VarExporterTest extends TestCase
         yield ['unit-enum', [FooUnitEnum::Bar], true];
         yield ['readonly', new FooReadonly('k', 'v')];
 
-        if (\PHP_VERSION_ID < 80400) {
+        yield ['named-closure-method', (new TestClass())->testMethod(...)];
+        yield ['named-closure-static', TestClass::testStaticMethod(...), true];
+
+        yield ['backed-property', new BackedProperty('name')];
+
+        if (\PHP_VERSION_ID < 80500) {
             return;
         }
 
-        yield ['backed-property', new BackedProperty('name')];
+        yield ['private-fcc', (new \ReflectionClass(PrivateFCC::class))->getAttributes(PrivateFCC::class)[0]->getArguments()[0], true];
     }
 
     public function testUnicodeDirectionality()
@@ -290,6 +293,19 @@ class PrivateConstructor
     private function __construct($prop)
     {
         $this->prop = $prop;
+    }
+}
+
+class TestClass
+{
+    public function testMethod()
+    {
+        return 'test';
+    }
+
+    public static function testStaticMethod()
+    {
+        return 'test';
     }
 }
 

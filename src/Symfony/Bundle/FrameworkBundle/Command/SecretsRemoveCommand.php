@@ -45,10 +45,10 @@ final class SecretsRemoveCommand extends Command
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret')
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Update the local vault.')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command removes a secret from the vault.
+                The <info>%command.name%</info> command removes a secret from the vault.
 
-    <info>%command.full_name% <name></info>
-EOF
+                    <info>%command.full_name% <name></info>
+                EOF
             )
         ;
     }

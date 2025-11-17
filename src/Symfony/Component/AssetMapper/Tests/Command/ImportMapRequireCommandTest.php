@@ -32,9 +32,7 @@ class ImportMapRequireCommandTest extends KernelTestCase
         return ImportMapTestAppKernel::class;
     }
 
-    /**
-     * @dataProvider getRequirePackageTests
-     */
+    #[DataProvider('getRequirePackageTests')]
     public function testDryRunOptionToShowInformationBeforeApplyInstallation(int $verbosity, array $packageEntries, array $packagesToInstall, string $expected, ?string $path = null)
     {
         $importMapManager = $this->createMock(ImportMapManager::class);
@@ -72,54 +70,54 @@ class ImportMapRequireCommandTest extends KernelTestCase
             OutputInterface::VERBOSITY_NORMAL,
             [self::createRemoteEntry('bootstrap', '4.2.3', 'assets/vendor/bootstrap/bootstrap.js')],
             ['bootstrap'], <<<EOF
- [DRY-RUN] No changes will apply to the importmap configuration.
+                [DRY-RUN] No changes will apply to the importmap configuration.
 
- [OK] Package "bootstrap" added to importmap.php.
+                [OK] Package "bootstrap" added to importmap.php.
 
- Use the new package normally by importing "bootstrap".
+                Use the new package normally by importing "bootstrap".
 
- [DRY-RUN] No changes applied to the importmap configuration.
- EOF,
+                [DRY-RUN] No changes applied to the importmap configuration.
+                EOF,
         ];
 
         yield 'remote package requested with a version with dry run and verbosity verbose options' => [
             OutputInterface::VERBOSITY_VERBOSE,
             [self::createRemoteEntry('bootstrap', '5.3.3', 'assets/vendor/bootstrap/bootstrap.js')],
             ['bootstrap'], <<<EOF
- [DRY-RUN] No changes will apply to the importmap configuration.
+                [DRY-RUN] No changes will apply to the importmap configuration.
 
- ----------- --------- --------------------------------------
-  Package     Version   Path
- ----------- --------- --------------------------------------
-  bootstrap   5.3.3     assets/vendor/bootstrap/bootstrap.js
- ----------- --------- --------------------------------------
+                ----------- --------- --------------------------------------
+                 Package     Version   Path
+                ----------- --------- --------------------------------------
+                 bootstrap   5.3.3     assets/vendor/bootstrap/bootstrap.js
+                ----------- --------- --------------------------------------
 
- [OK] Package "bootstrap" added to importmap.php.
+                [OK] Package "bootstrap" added to importmap.php.
 
- Use the new package normally by importing "bootstrap".
+                Use the new package normally by importing "bootstrap".
 
- [DRY-RUN] No changes applied to the importmap configuration.
- EOF,
+                [DRY-RUN] No changes applied to the importmap configuration.
+                EOF,
         ];
 
         yield 'local package require a path, with dry run and verbosity verbose options' => [
             OutputInterface::VERBOSITY_VERBOSE,
             [ImportMapEntry::createLocal('alice.js', ImportMapType::JS, 'assets/js/alice.js', false)],
             ['alice.js'], <<<EOF
- [DRY-RUN] No changes will apply to the importmap configuration.
+                 [DRY-RUN] No changes will apply to the importmap configuration.
 
- ---------- --------- --------------------
-  Package    Version   Path
- ---------- --------- --------------------
-  alice.js   -         assets/js/alice.js
- ---------- --------- --------------------
+                 ---------- --------- --------------------
+                  Package    Version   Path
+                 ---------- --------- --------------------
+                  alice.js   -         assets/js/alice.js
+                 ---------- --------- --------------------
 
- [OK] Package "alice.js" added to importmap.php.
+                 [OK] Package "alice.js" added to importmap.php.
 
- Use the new package normally by importing "alice.js".
+                 Use the new package normally by importing "alice.js".
 
- [DRY-RUN] No changes applied to the importmap configuration.
-EOF,
+                 [DRY-RUN] No changes applied to the importmap configuration.
+                EOF,
             './assets/alice.js',
         ];
 
@@ -129,12 +127,12 @@ EOF,
                 self::createRemoteEntry('lodash', '4.17.20', 'assets/vendor/lodash/lodash.index.js'),
             ],
             ['bootstrap lodash@4.17.21'], <<<EOF
- [DRY-RUN] No changes will apply to the importmap configuration.
+                [DRY-RUN] No changes will apply to the importmap configuration.
 
- [OK] 2 new items (bootstrap, lodash) added to the importmap.php!
+                [OK] 2 new items (bootstrap, lodash) added to the importmap.php!
 
- [DRY-RUN] No changes applied to the importmap configuration.
- EOF,
+                [DRY-RUN] No changes applied to the importmap configuration.
+                EOF,
         ];
 
         yield 'multi remote packages requested with dry run and verbosity verbose options' => [
@@ -143,19 +141,19 @@ EOF,
                 self::createRemoteEntry('lodash', '4.17.20', 'assets/vendor/lodash/lodash.index.js'),
             ],
             ['bootstrap lodash@4.17.21'], <<<EOF
-  [DRY-RUN] No changes will apply to the importmap configuration.
+                 [DRY-RUN] No changes will apply to the importmap configuration.
 
- ----------- --------- --------------------------------------
-  Package     Version   Path
- ----------- --------- --------------------------------------
-  bootstrap   5.3.3     assets/vendor/bootstrap/bootstrap.js
-  lodash      4.17.20   assets/vendor/lodash/lodash.index.js
- ----------- --------- --------------------------------------
+                ----------- --------- --------------------------------------
+                 Package     Version   Path
+                ----------- --------- --------------------------------------
+                 bootstrap   5.3.3     assets/vendor/bootstrap/bootstrap.js
+                 lodash      4.17.20   assets/vendor/lodash/lodash.index.js
+                ----------- --------- --------------------------------------
 
- [OK] 2 new items (bootstrap, lodash) added to the importmap.php!
+                [OK] 2 new items (bootstrap, lodash) added to the importmap.php!
 
- [DRY-RUN] No changes applied to the importmap configuration.
- EOF,
+                [DRY-RUN] No changes applied to the importmap configuration.
+                EOF,
         ];
     }
 

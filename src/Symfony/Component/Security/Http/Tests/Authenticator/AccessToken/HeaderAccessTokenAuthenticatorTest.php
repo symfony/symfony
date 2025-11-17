@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator\AccessToken;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -34,9 +35,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         $this->accessTokenHandler = new InMemoryAccessTokenHandler();
     }
 
-    /**
-     * @dataProvider provideSupportData
-     */
+    #[DataProvider('provideSupportData')]
     public function testSupport($request)
     {
         $this->setUpAuthenticator();
@@ -50,9 +49,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer INVALID_ACCESS_TOKEN'])];
     }
 
-    /**
-     * @dataProvider provideSupportsWithCustomTokenTypeData
-     */
+    #[DataProvider('provideSupportsWithCustomTokenTypeData')]
     public function testSupportsWithCustomTokenType($request, $result)
     {
         $this->setUpAuthenticator('Authorization', 'JWT');
@@ -68,9 +65,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer INVALID_ACCESS_TOKEN']), false];
     }
 
-    /**
-     * @dataProvider provideSupportsWithCustomHeaderParameter
-     */
+    #[DataProvider('provideSupportsWithCustomHeaderParameter')]
     public function testSupportsWithCustomHeaderParameter($request, $result)
     {
         $this->setUpAuthenticator('X-FOO');
@@ -106,9 +101,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
     }
 
-    /**
-     * @dataProvider provideInvalidAuthenticateData
-     */
+    #[DataProvider('provideInvalidAuthenticateData')]
     public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType)
     {
         $this->setUpAuthenticator();

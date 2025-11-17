@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Dotenv\Tests\Command;
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -22,9 +23,7 @@ use Symfony\Component\Dotenv\Dotenv;
 
 class DebugCommandTest extends TestCase
 {
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testErrorOnUninitializedDotenv()
     {
         unset($_SERVER['SYMFONY_DOTENV_VARS']);
@@ -38,9 +37,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('[ERROR] Dotenv component is not initialized', $output);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testEmptyDotEnvVarsList()
     {
         $_SERVER['SYMFONY_DOTENV_VARS'] = '';
@@ -50,17 +47,17 @@ class DebugCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute([]);
         $expectedFormat = <<<'OUTPUT'
-%a
- ---------- ------- ------------ ------%S
-  Variable   Value   .env.local   .env%S
- ---------- ------- ------------ ------%S
-  FOO                baz          bar%S
-  TEST123            n/a          true%S
- ---------- ------- ------------ ------%S
+            %a
+             ---------- ------- ------------ ------%S
+              Variable   Value   .env.local   .env%S
+             ---------- ------- ------------ ------%S
+              FOO                baz          bar%S
+              TEST123            n/a          true%S
+             ---------- ------- ------------ ------%S
 
- // Note that values might be different between web and CLI.%S
-%a
-OUTPUT;
+             // Note that values might be different between web and CLI.%S
+            %a
+            OUTPUT;
 
         $this->assertStringMatchesFormat($expectedFormat, $tester->getDisplay());
     }
@@ -275,9 +272,7 @@ OUTPUT;
         $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testCompletion()
     {
         $env = 'prod';
@@ -288,7 +283,7 @@ OUTPUT;
 
         $command = new DebugCommand($env, $projectDirectory);
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
         $tester = new CommandCompletionTester($application->get('debug:dotenv'));
         $this->assertSame(['FOO', 'TEST'], $tester->complete(['']));
     }

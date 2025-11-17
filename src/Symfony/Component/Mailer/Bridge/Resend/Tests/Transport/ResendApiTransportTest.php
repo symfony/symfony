@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Resend\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -26,9 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ResendApiTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(ResendApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);

@@ -14,8 +14,6 @@ namespace Symfony\Component\ObjectMapper\Attribute;
 /**
  * Configures a class or a property to map to.
  *
- * @experimental
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]

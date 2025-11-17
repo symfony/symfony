@@ -119,7 +119,7 @@ class ApplicationTest extends TestCase
 
         $application = new Application($kernel);
         $newCommand = new Command('example');
-        $application->add($newCommand);
+        $application->addCommand($newCommand);
 
         $this->assertSame($newCommand, $application->get('example'));
     }

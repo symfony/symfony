@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Tests\Read;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Exception\InvalidStreamException;
 use Symfony\Component\JsonStreamer\Read\Splitter;
@@ -39,9 +40,7 @@ class SplitterTest extends TestCase
         $this->assertDictBoundaries(['k' => [5, 4]], '{"k":[10]}');
     }
 
-    /**
-     * @dataProvider splitDictInvalidDataProvider
-     */
+    #[DataProvider('splitDictInvalidDataProvider')]
     public function testSplitDictInvalidThrowException(string $expectedMessage, string $content)
     {
         $this->expectException(InvalidStreamException::class);
@@ -74,9 +73,7 @@ class SplitterTest extends TestCase
         yield ['Expected end, but got ""x"".', '{"a": true} "x"'];
     }
 
-    /**
-     * @dataProvider splitListInvalidDataProvider
-     */
+    #[DataProvider('splitListInvalidDataProvider')]
     public function testSplitListInvalidThrowException(string $expectedMessage, string $content)
     {
         $this->expectException(InvalidStreamException::class);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
@@ -18,9 +19,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class DsnTest extends TestCase
 {
-    /**
-     * @dataProvider constructProvider
-     */
+    #[DataProvider('constructProvider')]
     public function testConstruct(string $dsnString, string $scheme, string $host, ?string $user = null, ?string $password = null, ?int $port = null, array $options = [], ?string $path = null)
     {
         $dsn = new Dsn($dsnString);
@@ -140,9 +139,7 @@ final class DsnTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidDsnProvider
-     */
+    #[DataProvider('invalidDsnProvider')]
     public function testInvalidDsn(string $dsnString, string $exceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -169,9 +166,7 @@ final class DsnTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getOptionProvider
-     */
+    #[DataProvider('getOptionProvider')]
     public function testGetOption($expected, string $dsnString, string $option, ?string $default = null)
     {
         $dsn = new Dsn($dsnString);
@@ -207,9 +202,7 @@ final class DsnTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getRequiredOptionProvider
-     */
+    #[DataProvider('getRequiredOptionProvider')]
     public function testGetRequiredOption(string $expectedValue, string $options, string $option)
     {
         $dsn = new Dsn(\sprintf('scheme://localhost?%s', $options));
@@ -232,9 +225,7 @@ final class DsnTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getRequiredOptionThrowsMissingRequiredOptionExceptionProvider
-     */
+    #[DataProvider('getRequiredOptionThrowsMissingRequiredOptionExceptionProvider')]
     public function testGetRequiredOptionThrowsMissingRequiredOptionException(string $expectedExceptionMessage, string $options, string $option)
     {
         $dsn = new Dsn(\sprintf('scheme://localhost?%s', $options));
@@ -260,9 +251,7 @@ final class DsnTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getBooleanOptionProvider
-     */
+    #[DataProvider('getBooleanOptionProvider')]
     public function testGetBooleanOption(bool $expected, string $dsnString, string $option, bool $default)
     {
         $dsn = new Dsn($dsnString);

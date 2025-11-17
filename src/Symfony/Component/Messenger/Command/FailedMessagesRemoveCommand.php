@@ -39,16 +39,16 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
                 new InputOption('class-filter', null, InputOption::VALUE_REQUIRED, 'Filter by a specific class name'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> removes given messages that are pending in the failure transport.
+                The <info>%command.name%</info> removes given messages that are pending in the failure transport.
 
-    <info>php %command.full_name% {id1} [{id2} ...]</info>
+                    <info>php %command.full_name% {id1} [{id2} ...]</info>
 
-The specific ids can be found via the messenger:failed:show command.
+                The specific ids can be found via the messenger:failed:show command.
 
-You can remove all failed messages from the failure transport by using the "--all" option:
+                You can remove all failed messages from the failure transport by using the "--all" option:
 
-    <info>php %command.full_name% --all</info>
-EOF
+                    <info>php %command.full_name% --all</info>
+                EOF
             )
         ;
     }

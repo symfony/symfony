@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
  */
-final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
+final class MetadataAwareNameConverter implements NameConverterInterface
 {
     /**
      * @var array<string, array<string, string|null>>

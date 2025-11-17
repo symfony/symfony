@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Scripts;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-/**
- * @group intl-data
- */
+#[Group('intl-data')]
 class ScriptsTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
@@ -238,9 +238,7 @@ class ScriptsTest extends ResourceBundleTestCase
         $this->assertSame(self::$scripts, Scripts::getScriptCodes());
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetNames($displayLocale)
     {
         if ('en' !== $displayLocale) {
@@ -266,9 +264,7 @@ class ScriptsTest extends ResourceBundleTestCase
         $this->assertSame(Scripts::getNames('de_AT'), Scripts::getNames());
     }
 
-    /**
-     * @dataProvider provideLocaleAliases
-     */
+    #[DataProvider('provideLocaleAliases')]
     public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
         if ('en' !== $ofLocale) {
@@ -281,9 +277,7 @@ class ScriptsTest extends ResourceBundleTestCase
         $this->assertEquals(Scripts::getNames($ofLocale), Scripts::getNames($alias));
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetName($displayLocale)
     {
         if ('en' !== $displayLocale) {

@@ -11,8 +11,11 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -65,9 +68,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertFalse($security->isGrantedForUser($offlineUser, 'ROLE_FOO'));
     }
 
-    /**
-     * @dataProvider userWillBeMarkedAsChangedIfRolesHasChangedProvider
-     */
+    #[DataProvider('userWillBeMarkedAsChangedIfRolesHasChangedProvider')]
     public function testUserWillBeMarkedAsChangedIfRolesHasChanged(UserInterface $userWithAdminRole, UserInterface $userWithoutAdminRole)
     {
         $client = $this->createClient(['test_case' => 'AbstractTokenCompareRoles', 'root_config' => 'config.yml']);
@@ -108,10 +109,8 @@ class SecurityTest extends AbstractWebTestCase
         ];
     }
 
-    /**
-     * @testWith    ["form_login"]
-     *              ["Symfony\\Bundle\\SecurityBundle\\Tests\\Functional\\Bundle\\AuthenticatorBundle\\ApiAuthenticator"]
-     */
+    #[TestWith(['form_login'])]
+    #[TestWith([ApiAuthenticator::class])]
     public function testLogin(string $authenticator)
     {
         $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml', 'debug' > true]);

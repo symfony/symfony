@@ -26,11 +26,12 @@ final class MailtrapTransportFactory extends AbstractTransportFactory
         $scheme = $dsn->getScheme();
         $user = $this->getUser($dsn);
 
-        if ('mailtrap+api' === $scheme) {
+        if ('mailtrap+api' === $scheme || 'mailtrap+sandbox' === $scheme) {
             $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
             $port = $dsn->getPort();
+            $inboxId = 'mailtrap+sandbox' === $scheme ? $dsn->getOption('inboxId') : null;
 
-            return (new MailtrapApiTransport($user, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
+            return (new MailtrapApiTransport($user, $this->client, $this->dispatcher, $this->logger, $inboxId))->setHost($host)->setPort($port);
         }
 
         if ('mailtrap+smtp' === $scheme || 'mailtrap+smtps' === $scheme || 'mailtrap' === $scheme) {
@@ -42,6 +43,6 @@ final class MailtrapTransportFactory extends AbstractTransportFactory
 
     protected function getSupportedSchemes(): array
     {
-        return ['mailtrap', 'mailtrap+api', 'mailtrap+smtp', 'mailtrap+smtps'];
+        return ['mailtrap', 'mailtrap+api', 'mailtrap+sandbox', 'mailtrap+smtp', 'mailtrap+smtps'];
     }
 }

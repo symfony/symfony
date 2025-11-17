@@ -26,10 +26,12 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
         $this->assertSame(<<<EOF
-        /* file1.css */
-        body {}
+            /* file1.css */
+            body {}
 
-        EOF, $response->getFile()->getContent());
+            EOF,
+            $response->getFile()->getContent()
+        );
         $this->assertSame('"b3445cb7a86a0795a7af7f2004498aef"', $response->headers->get('ETag'));
         $this->assertSame('immutable, max-age=604800, public', $response->headers->get('Cache-Control'));
         $this->assertTrue($response->headers->has('X-Assets-Dev'));
@@ -43,10 +45,12 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $response = $client->getResponse();
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(<<<EOF
-        /* voilà.css */
-        body {}
+            /* voilà.css */
+            body {}
 
-        EOF, $client->getInternalResponse()->getContent());
+            EOF,
+            $client->getInternalResponse()->getContent()
+        );
     }
 
     public function test404OnUnknownAsset()
@@ -77,10 +81,12 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
         $this->assertSame(<<<EOF
-        /* already-abcdefVWXYZ0123456789.digested.css */
-        body {}
+            /* already-abcdefVWXYZ0123456789.digested.css */
+            body {}
 
-        EOF, $response->getFile()->getContent());
+            EOF,
+            $response->getFile()->getContent()
+        );
     }
 
     protected static function getKernelClass(): string

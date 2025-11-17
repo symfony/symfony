@@ -44,6 +44,7 @@ class ValidatorBuilder
     private array $xmlMappings = [];
     private array $yamlMappings = [];
     private array $methodMappings = [];
+    private array $attributeMappings = [];
     private bool $enableAttributeMapping = false;
     private ?MetadataFactoryInterface $metadataFactory = null;
     private ConstraintValidatorFactoryInterface $validatorFactory;
@@ -149,6 +150,27 @@ class ValidatorBuilder
     }
 
     /**
+     * Adds classes with mapping constraints as attributes.
+     *
+     * The keys are the classes on which the constraints should be added.
+     * The values are the classes that contain the constraints to add as attributes.
+     *
+     * @param array<class-string, list<class-string>> $classes
+     *
+     * @return $this
+     */
+    public function addAttributeMappings(array $classes): static
+    {
+        if (null !== $this->metadataFactory) {
+            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+        }
+
+        $this->attributeMappings = array_merge_recursive($this->attributeMappings, $classes);
+
+        return $this;
+    }
+
+    /**
      * Enables constraint mapping using the given static method.
      *
      * @return $this
@@ -217,7 +239,7 @@ class ValidatorBuilder
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory): static
     {
-        if (\count($this->xmlMappings) > 0 || \count($this->yamlMappings) > 0 || \count($this->methodMappings) > 0 || $this->enableAttributeMapping) {
+        if ($this->xmlMappings || $this->yamlMappings || $this->methodMappings || $this->attributeMappings || $this->enableAttributeMapping) {
             throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
         }
 
@@ -331,8 +353,8 @@ class ValidatorBuilder
             $loaders[] = new StaticMethodLoader($methodName);
         }
 
-        if ($this->enableAttributeMapping) {
-            $loaders[] = new AttributeLoader();
+        if ($this->enableAttributeMapping || $this->attributeMappings) {
+            $loaders[] = new AttributeLoader($this->enableAttributeMapping, $this->attributeMappings);
         }
 
         return array_merge($loaders, $this->loaders);

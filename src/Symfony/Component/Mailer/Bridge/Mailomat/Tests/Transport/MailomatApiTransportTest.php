@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailomat\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -24,9 +25,7 @@ class MailomatApiTransportTest extends TestCase
 {
     private const KEY = 'K3Y';
 
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(MailomatApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);

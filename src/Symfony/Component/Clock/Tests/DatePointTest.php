@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Clock\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
@@ -45,9 +47,7 @@ class DatePointTest extends TestCase
         DatePoint::createFromFormat('Y-m-d H:i:s', 'Bad Date');
     }
 
-    /**
-     * @dataProvider provideValidTimestamps
-     */
+    #[DataProvider('provideValidTimestamps')]
     public function testCreateFromTimestamp(int|float $timestamp, string $expected)
     {
         $date = DatePoint::createFromTimestamp($timestamp);
@@ -68,9 +68,7 @@ class DatePointTest extends TestCase
         yield 'negative integer-ish float' => [-100.0, '1969-12-31T23:58:20.000000+00:00'];
     }
 
-    /**
-     * @dataProvider provideOutOfRangeFloatTimestamps
-     */
+    #[DataProvider('provideOutOfRangeFloatTimestamps')]
     public function testCreateFromTimestampWithFloatOutOfRange(float $timestamp)
     {
         $this->expectException(\DateRangeError::class);
@@ -115,12 +113,10 @@ class DatePointTest extends TestCase
         $date->setMicrosecond(1000000);
     }
 
-    /**
-     * @testWith ["2024-04-01 00:00:00.000000", "2024-04"]
-     *           ["2024-04-09 00:00:00.000000", "2024-04-09"]
-     *           ["2024-04-09 03:00:00.000000", "2024-04-09 03:00"]
-     *           ["2024-04-09 00:00:00.123456", "2024-04-09 00:00:00.123456"]
-     */
+    #[TestWith(['2024-04-01 00:00:00.000000', '2024-04'])]
+    #[TestWith(['2024-04-09 00:00:00.000000', '2024-04-09'])]
+    #[TestWith(['2024-04-09 03:00:00.000000', '2024-04-09 03:00'])]
+    #[TestWith(['2024-04-09 00:00:00.123456', '2024-04-09 00:00:00.123456'])]
     public function testTimeDefaultsToMidnight(string $expected, string $datetime)
     {
         $date = new \DateTimeImmutable($datetime);

@@ -2,7 +2,6 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
-    http_method_override: false
     esi: true
     ssi: true
     fragments: true
@@ -15,8 +14,6 @@ framework:
     translator: true
     validation: true
     serializer: true
-    property_info:
-        enabled: true
-        with_constructor_extractor: true
+    property_info: true
     csrf_protection: true
     form: true

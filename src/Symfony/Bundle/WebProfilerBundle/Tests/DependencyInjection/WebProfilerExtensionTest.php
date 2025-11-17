@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
@@ -88,9 +89,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container = null;
     }
 
-    /**
-     * @dataProvider getDebugModes
-     */
+    #[DataProvider('getDebugModes')]
     public function testDefaultConfig($debug)
     {
         $this->container->setParameter('kernel.debug', $debug);
@@ -112,9 +111,7 @@ class WebProfilerExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getToolbarConfig
-     */
+    #[DataProvider('getToolbarConfig')]
     public function testToolbarConfig(bool $toolbarEnabled, bool $listenerInjected, bool $listenerEnabled)
     {
         $extension = new WebProfilerExtension();
@@ -146,9 +143,7 @@ class WebProfilerExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getInterceptRedirectsToolbarConfig
-     */
+    #[DataProvider('getInterceptRedirectsToolbarConfig')]
     public function testToolbarConfigUsingInterceptRedirects(
         bool $toolbarEnabled,
         bool $interceptRedirects,

@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Mime\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\RawMessage;
 
 class RawMessageTest extends TestCase
 {
-    /**
-     * @dataProvider provideMessages
-     */
+    #[DataProvider('provideMessages')]
     public function testToString(mixed $messageParameter, bool $supportReuse)
     {
         $message = new RawMessage($messageParameter);
@@ -33,9 +32,7 @@ class RawMessageTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideMessages
-     */
+    #[DataProvider('provideMessages')]
     public function testSerialization(mixed $messageParameter, bool $supportReuse)
     {
         $message = new RawMessage($messageParameter);
@@ -47,9 +44,7 @@ class RawMessageTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideMessages
-     */
+    #[DataProvider('provideMessages')]
     public function testToIterable(mixed $messageParameter, bool $supportReuse)
     {
         $message = new RawMessage($messageParameter);
@@ -61,9 +56,7 @@ class RawMessageTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideMessages
-     */
+    #[DataProvider('provideMessages')]
     public function testToIterableLegacy(mixed $messageParameter, bool $supportReuse)
     {
         $message = new RawMessage($messageParameter);

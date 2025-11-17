@@ -36,7 +36,7 @@
             </div>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: status_color}) }}
     {% endif %}
 {% endblock %}
 
@@ -214,7 +214,7 @@
 
                         <div id="parameters-{{ loop.index }}" class="hidden">
                             {% for parameters in message.parameters %}
-                                {{ profiler_dump(parameters, maxDepth=1) }}
+                                {{ profiler_dump(parameters, maxDepth: 1) }}
                             {% endfor %}
                         </div>
                     {% endif %}

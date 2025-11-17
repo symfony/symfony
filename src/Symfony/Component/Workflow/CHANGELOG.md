@@ -1,6 +1,88 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Add method `getEnabledTransition()` to `WorkflowInterface`
+ * Add `$nbToken` argument to `Marking::mark()` and `Marking::unmark()`
+ * Add `$asArc` argument to `Transition::getFroms()` and `Transition::getTos()`
+ * Remove `Event::getWorkflow()` method
+
+   *Before*
+   ```php
+   use Symfony\Component\Workflow\Attribute\AsCompletedListener;
+   use Symfony\Component\Workflow\Event\CompletedEvent;
+
+   class MyListener
+   {
+       #[AsCompletedListener('my_workflow', 'to_state2')]
+       public function terminateOrder(CompletedEvent $event): void
+       {
+           $subject = $event->getSubject();
+           if ($event->getWorkflow()->can($subject, 'to_state3')) {
+               $event->getWorkflow()->apply($subject, 'to_state3');
+           }
+       }
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\DependencyInjection\Attribute\Target;
+   use Symfony\Component\Workflow\Attribute\AsCompletedListener;
+   use Symfony\Component\Workflow\Event\CompletedEvent;
+   use Symfony\Component\Workflow\WorkflowInterface;
+
+   class MyListener
+   {
+       public function __construct(
+           #[Target('my_workflow')]
+           private readonly WorkflowInterface $workflow,
+       ) {
+       }
+
+       #[AsCompletedListener('my_workflow', 'to_state2')]
+       public function terminateOrder(CompletedEvent $event): void
+       {
+           $subject = $event->getSubject();
+           if ($this->workflow->can($subject, 'to_state3')) {
+               $this->workflow->apply($subject, 'to_state3');
+           }
+       }
+   }
+   ```
+
+   *Or*
+   ```php
+   use Symfony\Component\DependencyInjection\ServiceLocator;
+   use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+   use Symfony\Component\Workflow\Attribute\AsTransitionListener;
+   use Symfony\Component\Workflow\Event\TransitionEvent;
+
+   class GenericListener
+   {
+       public function __construct(
+           #[AutowireLocator('workflow', 'name')]
+           private ServiceLocator $workflows
+       ) {
+       }
+
+       #[AsTransitionListener]
+       public function doSomething(TransitionEvent $event): void
+       {
+           $workflow = $this->workflows->get($event->getWorkflowName());
+       }
+   }
+   ```
+
+7.4
+---
+
+ * Add support for `BackedEnum` in `MethodMarkingStore`
+ * Add support for weighted transitions
+ * Add a command to dump a workflow definition in different formats (dot, plantuml, mermaid)
+
 7.3
 ---
 

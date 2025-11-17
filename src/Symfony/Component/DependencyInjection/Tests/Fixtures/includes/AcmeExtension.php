@@ -10,16 +10,6 @@ class AcmeExtension implements ExtensionInterface
         $configuration->setParameter('acme.configs', $configs);
     }
 
-    public function getXsdValidationBasePath(): string|false
-    {
-        return false;
-    }
-
-    public function getNamespace(): string
-    {
-        return 'http://www.example.com/schema/acme';
-    }
-
     public function getAlias(): string
     {
         return 'acme';

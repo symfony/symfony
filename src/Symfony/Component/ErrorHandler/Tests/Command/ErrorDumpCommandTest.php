@@ -102,7 +102,7 @@ class ErrorDumpCommandTest extends TestCase
         $entrypointLookup = $this->createMock(EntrypointLookupInterface::class);
 
         $application = new Application($kernel);
-        $application->add(new ErrorDumpCommand(
+        $application->addCommand(new ErrorDumpCommand(
             new Filesystem(),
             $errorRenderer,
             $entrypointLookup,

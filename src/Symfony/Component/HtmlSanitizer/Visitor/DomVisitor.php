@@ -75,7 +75,7 @@ final class DomVisitor
         $this->defaultAction = $config->getDefaultAction();
     }
 
-    public function visit(\DOMDocumentFragment $domNode): ?NodeInterface
+    public function visit(\Dom\Node|\DOMNode $domNode): ?NodeInterface
     {
         $cursor = new Cursor(new DocumentNode());
         $this->visitChildren($domNode, $cursor);
@@ -83,7 +83,7 @@ final class DomVisitor
         return $cursor->node;
     }
 
-    private function visitNode(\DOMNode $domNode, Cursor $cursor): void
+    private function visitNode(\Dom\Node|\DOMNode $domNode, Cursor $cursor): void
     {
         $nodeName = StringSanitizer::htmlLower($domNode->nodeName);
 
@@ -94,7 +94,7 @@ final class DomVisitor
         }
     }
 
-    private function enterNode(string $domNodeName, \DOMNode $domNode, Cursor $cursor): bool
+    private function enterNode(string $domNodeName, \Dom\Node|\DOMNode $domNode, Cursor $cursor): bool
     {
         if (!\array_key_exists($domNodeName, $this->elementsConfig)) {
             $action = $this->defaultAction;
@@ -138,14 +138,14 @@ final class DomVisitor
         return true;
     }
 
-    private function visitChildren(\DOMNode $domNode, Cursor $cursor): void
+    private function visitChildren(\Dom\Node|\DOMNode $domNode, Cursor $cursor): void
     {
-        /** @var \DOMNode $child */
+        /** @var \Dom\Node|\DOMNode $child */
         foreach ($domNode->childNodes ?? [] as $child) {
             if ('#text' === $child->nodeName) {
                 // Add text directly for performance
-                $cursor->node->addChild(new TextNode($cursor->node, $child->nodeValue));
-            } elseif (!$child instanceof \DOMText && !$child instanceof \DOMProcessingInstruction) {
+                $cursor->node->addChild(new TextNode($cursor->node, $child instanceof \Dom\Node ? ($child->textContent ?? '') : $child->nodeValue));
+            } elseif (!$child instanceof \Dom\Text && !$child instanceof \Dom\ProcessingInstruction && !$child instanceof \DOMText && !$child instanceof \DOMProcessingInstruction) {
                 // Otherwise continue the visit recursively
                 // Ignore comments for security reasons (interpreted differently by browsers)
                 // Ignore processing instructions (treated as comments)
@@ -157,10 +157,10 @@ final class DomVisitor
     /**
      * Set attributes from a DOM node to a sanitized node.
      */
-    private function setAttributes(string $domNodeName, \DOMNode $domNode, Node $node, array $allowedAttributes = []): void
+    private function setAttributes(string $domNodeName, \Dom\Node|\DOMNode $domNode, Node $node, array $allowedAttributes = []): void
     {
-        /** @var iterable<\DOMAttr> $domAttributes */
-        if (!$domAttributes = $domNode->attributes ? $domNode->attributes->getIterator() : []) {
+        /** @var iterable<\Dom\Attr|\DOMAttr> $domAttributes */
+        if (!$domAttributes = $domNode->attributes?->getIterator()) {
             return;
         }
 
@@ -178,7 +178,10 @@ final class DomVisitor
                 );
 
                 foreach ($attributeSanitizers as $sanitizer) {
-                    $value = $sanitizer->sanitizeAttribute($domNodeName, $name, $value, $this->config);
+                    if (null === $sanitizedValue = $sanitizer->sanitizeAttribute($domNodeName, $name, $value, $this->config)) {
+                        continue 2;
+                    }
+                    $value = $sanitizedValue;
                 }
 
                 $node->setAttribute($name, $value);

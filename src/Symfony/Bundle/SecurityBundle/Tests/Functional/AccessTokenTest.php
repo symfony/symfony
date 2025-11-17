@@ -20,6 +20,8 @@ use Jose\Component\Encryption\Serializer\CompactSerializer as JweCompactSerializ
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer as JwsCompactSerializer;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -63,9 +65,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    /**
-     * @dataProvider defaultFormEncodedBodyFailureData
-     */
+    #[DataProvider('defaultFormEncodedBodyFailureData')]
     public function testDefaultFormEncodedBodyFailure(array $parameters, array $headers)
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_body_default.yml']);
@@ -99,9 +99,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Good game @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    /**
-     * @dataProvider customFormEncodedBodyFailure
-     */
+    #[DataProvider('customFormEncodedBodyFailure')]
     public function testCustomFormEncodedBodyFailure(array $parameters, array $headers)
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_body_custom.yml']);
@@ -156,9 +154,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    /**
-     * @dataProvider defaultHeaderAccessTokenFailureData
-     */
+    #[DataProvider('defaultHeaderAccessTokenFailureData')]
     public function testDefaultHeaderAccessTokenFailure(array $headers)
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_header_default.yml']);
@@ -171,9 +167,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
     }
 
-    /**
-     * @dataProvider defaultMissingHeaderAccessTokenFailData
-     */
+    #[DataProvider('defaultMissingHeaderAccessTokenFailData')]
     public function testDefaultMissingHeaderAccessTokenFail(array $headers)
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_header_default.yml']);
@@ -195,9 +189,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Good game @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    /**
-     * @dataProvider customHeaderAccessTokenFailure
-     */
+    #[DataProvider('customHeaderAccessTokenFailure')]
     public function testCustomHeaderAccessTokenFailure(array $headers, int $errorCode)
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_header_custom.yml']);
@@ -209,9 +201,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertFalse($response->headers->has('WWW-Authenticate'));
     }
 
-    /**
-     * @dataProvider customMissingHeaderAccessTokenShouldFail
-     */
+    #[DataProvider('customMissingHeaderAccessTokenShouldFail')]
     public function testCustomMissingHeaderAccessTokenShouldFail(array $headers)
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_header_custom.yml']);
@@ -256,9 +246,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    /**
-     * @dataProvider defaultQueryAccessTokenFailureData
-     */
+    #[DataProvider('defaultQueryAccessTokenFailureData')]
     public function testDefaultQueryAccessTokenFailure(string $query)
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_query_default.yml']);
@@ -292,9 +280,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Good game @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    /**
-     * @dataProvider customQueryAccessTokenFailure
-     */
+    #[DataProvider('customQueryAccessTokenFailure')]
     public function testCustomQueryAccessTokenFailure(string $query)
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_query_custom.yml']);
@@ -351,11 +337,8 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    /**
-     * @dataProvider validAccessTokens
-     *
-     * @requires extension openssl
-     */
+    #[DataProvider('validAccessTokens')]
+    #[RequiresPhpExtension('openssl')]
     public function testOidcSuccess(callable $tokenFactory)
     {
         try {
@@ -373,11 +356,8 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
     }
 
-    /**
-     * @dataProvider invalidAccessTokens
-     *
-     * @requires extension openssl
-     */
+    #[DataProvider('invalidAccessTokens')]
+    #[RequiresPhpExtension('openssl')]
     public function testOidcFailure(callable $tokenFactory)
     {
         try {
@@ -395,9 +375,7 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
     }
 
-    /**
-     * @requires extension openssl
-     */
+    #[RequiresPhpExtension('openssl')]
     public function testOidcFailureWithJweEnforced()
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc_jwe.yml']);
@@ -421,13 +399,13 @@ class AccessTokenTest extends AbstractWebTestCase
     public function testCasSuccess()
     {
         $casResponse = new MockResponse(<<<BODY
-            <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
-                <cas:authenticationSuccess>
-                    <cas:user>dunglas</cas:user>
-                    <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
-                </cas:authenticationSuccess>
-            </cas:serviceResponse>
-        BODY
+                <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                    <cas:authenticationSuccess>
+                        <cas:user>dunglas</cas:user>
+                        <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
+                    </cas:authenticationSuccess>
+                </cas:serviceResponse>
+            BODY
         );
 
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_cas.yml']);

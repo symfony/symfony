@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -37,7 +36,6 @@ final class Week extends Constraint
      * @param non-empty-string|null $min
      * @param non-empty-string|null $max
      */
-    #[HasNamedArguments]
     public function __construct(
         public ?string $min = null,
         public ?string $max = null,

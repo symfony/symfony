@@ -11,13 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractAttributeRoutingTestCase extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider getRoutes
-     */
+    #[DataProvider('getRoutes')]
     public function testAnnotatedController(string $path, string $expectedValue)
     {
         $client = $this->createClient(['test_case' => $this->getTestCaseApp(), 'root_config' => 'config.yml']);

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp;
@@ -31,11 +33,8 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-/**
- * @requires extension amqp
- *
- * @group integration
- */
+#[RequiresPhpExtension('amqp')]
+#[Group('integration')]
 class AmqpExtIntegrationTest extends TestCase
 {
     protected function setUp(): void
@@ -144,7 +143,7 @@ class AmqpExtIntegrationTest extends TestCase
 
         // this should be the custom routing key message first
         $this->assertCount(1, $envelopes);
-        /** @var Envelope $envelope */
+        /* @var Envelope $envelope */
         $receiver->ack($envelopes[0]);
         $this->assertEquals($customRoutingKeyMessage, $envelopes[0]->getMessage());
 
@@ -153,7 +152,7 @@ class AmqpExtIntegrationTest extends TestCase
         // duration should be about 2 seconds
         $this->assertApproximateDuration($startTime, 2);
 
-        /** @var RedeliveryStamp|null $retryStamp */
+        /* @var RedeliveryStamp|null $retryStamp */
         // verify the stamp still exists from the last send
         $this->assertCount(1, $envelopes);
         $retryStamp = $envelopes[0]->last(RedeliveryStamp::class);
@@ -240,18 +239,19 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertFalse($process->isRunning());
         $this->assertLessThan($amqpReadTimeout, microtime(true) - $signalTime);
         $this->assertSame($expectedOutput.<<<'TXT'
-Get envelope with message: Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage
-with stamps: [
-    "Symfony\\Component\\Messenger\\Stamp\\SerializedMessageStamp",
-    "Symfony\\Component\\Messenger\\Bridge\\Amqp\\Transport\\AmqpReceivedStamp",
-    "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp",
-    "Symfony\\Component\\Messenger\\Stamp\\ConsumedByWorkerStamp",
-    "Symfony\\Component\\Messenger\\Stamp\\AckStamp"
-]
-Done.
+            Get envelope with message: Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage
+            with stamps: [
+                "Symfony\\Component\\Messenger\\Stamp\\SerializedMessageStamp",
+                "Symfony\\Component\\Messenger\\Bridge\\Amqp\\Transport\\AmqpReceivedStamp",
+                "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp",
+                "Symfony\\Component\\Messenger\\Stamp\\ConsumedByWorkerStamp",
+                "Symfony\\Component\\Messenger\\Stamp\\AckStamp"
+            ]
+            Done.
 
-TXT
-            , $process->getOutput());
+            TXT,
+            $process->getOutput()
+        );
     }
 
     public function testItCountsMessagesInQueue()

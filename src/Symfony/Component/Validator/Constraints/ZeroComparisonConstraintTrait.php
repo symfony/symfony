@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * @internal
@@ -22,22 +21,13 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 trait ZeroComparisonConstraintTrait
 {
-    #[HasNamedArguments]
     public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         if (null !== $options) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        if (\is_array($options) && isset($options['propertyPath'])) {
-            throw new ConstraintDefinitionException(\sprintf('The "propertyPath" option of the "%s" constraint cannot be set.', static::class));
-        }
-
-        if (\is_array($options) && isset($options['value'])) {
-            throw new ConstraintDefinitionException(\sprintf('The "value" option of the "%s" constraint cannot be set.', static::class));
-        }
-
-        parent::__construct(0, null, $message, $groups, $payload, $options);
+        parent::__construct(0, null, $message, $groups, $payload);
     }
 
     public function validatedBy(): string

@@ -13,8 +13,6 @@ namespace Symfony\Component\JsonStreamer\Attribute;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- *
- * @experimental
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class JsonStreamable

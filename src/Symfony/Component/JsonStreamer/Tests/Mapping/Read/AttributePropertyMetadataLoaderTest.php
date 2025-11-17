@@ -42,10 +42,10 @@ class AttributePropertyMetadataLoaderTest extends TestCase
         ]), TypeResolver::create());
 
         $this->assertEquals([
-            'id' => new PropertyMetadata('id', Type::string(), [], [DivideStringAndCastToIntValueTransformer::class]),
-            'active' => new PropertyMetadata('active', Type::string(), [], [StringToBooleanValueTransformer::class]),
-            'name' => new PropertyMetadata('name', Type::string(), [], [\Closure::fromCallable('strtoupper')]),
-            'range' => new PropertyMetadata('range', Type::string(), [], [\Closure::fromCallable(DummyWithValueTransformerAttributes::explodeRange(...))]),
+            'id' => new PropertyMetadata('id', Type::string(), [DivideStringAndCastToIntValueTransformer::class]),
+            'active' => new PropertyMetadata('active', Type::string(), [StringToBooleanValueTransformer::class]),
+            'name' => new PropertyMetadata('name', Type::string(), [\Closure::fromCallable('strtoupper')]),
+            'range' => new PropertyMetadata('range', Type::string(), [\Closure::fromCallable(DummyWithValueTransformerAttributes::explodeRange(...))]),
         ], $loader->load(DummyWithValueTransformerAttributes::class));
     }
 

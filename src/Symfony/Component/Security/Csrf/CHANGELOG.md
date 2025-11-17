@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add support for `Sec-Fetch-Site` to `SameOriginCsrfTokenManager`
+
 7.2
 ---
 

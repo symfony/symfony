@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Config;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker;
@@ -34,9 +35,7 @@ class ContainerParametersResourceCheckerTest extends TestCase
         $this->assertTrue($this->resourceChecker->supports($this->resource));
     }
 
-    /**
-     * @dataProvider isFreshProvider
-     */
+    #[DataProvider('isFreshProvider')]
     public function testIsFresh(callable $mockContainer, $expected)
     {
         $mockContainer($this->container, $this);

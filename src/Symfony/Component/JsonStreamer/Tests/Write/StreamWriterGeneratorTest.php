@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Tests\Write;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
@@ -20,11 +21,14 @@ use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader
 use Symfony\Component\JsonStreamer\Mapping\Write\DateTimeTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyEnum;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDollarNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedArray;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithOtherDummies;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummy;
@@ -53,12 +57,10 @@ class StreamWriterGeneratorTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider generatedStreamWriterDataProvider
-     */
-    public function testGeneratedStreamWriter(string $fixture, Type $type)
+    #[DataProvider('generatedStreamWriterDataProvider')]
+    public function testGeneratedStreamWriter(string $fixture, Type $type, ?PropertyMetadataLoaderInterface $propertyMetadataLoader = null)
     {
-        $propertyMetadataLoader = new GenericTypePropertyMetadataLoader(
+        $propertyMetadataLoader ??= new GenericTypePropertyMetadataLoader(
             new DateTimeTypePropertyMetadataLoader(new AttributePropertyMetadataLoader(
                 new PropertyMetadataLoader(TypeResolver::create()),
                 new ServiceContainer([
@@ -79,7 +81,7 @@ class StreamWriterGeneratorTest extends TestCase
     }
 
     /**
-     * @return iterable<array{0: string, 1: Type}>
+     * @return iterable<array{0: string, 1: Type, 2?: PropertyMetadataLoaderInterface}>
      */
     public static function generatedStreamWriterDataProvider(): iterable
     {
@@ -110,6 +112,8 @@ class StreamWriterGeneratorTest extends TestCase
         yield ['object_in_object', Type::object(DummyWithOtherDummies::class)];
         yield ['object_with_value_transformer', Type::object(DummyWithValueTransformerAttributes::class)];
         yield ['self_referencing_object', Type::object(SelfReferencingDummy::class)];
+        yield ['object_with_dollar_named_properties', Type::object(DummyWithDollarNamedProperties::class)];
+        yield ['object_with_synthetic_properties', Type::object(DummyWithSyntheticProperties::class), new SyntheticPropertyMetadataLoader()];
 
         yield ['union', Type::union(Type::int(), Type::list(Type::enum(DummyBackedEnum::class)), Type::object(DummyWithNameAttributes::class))];
         yield ['object_with_union', Type::object(DummyWithUnionProperties::class)];

@@ -22,6 +22,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('twig.form.engine', TwigRendererEngine::class)
             ->args([param('twig.form.resources'), service('twig')])
+            ->tag('kernel.reset', ['method' => '?reset'])
 
         ->set('twig.form.renderer', FormRenderer::class)
             ->args([service('twig.form.engine'), service('security.csrf.token_manager')->nullOnInvalid()])

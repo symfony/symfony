@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -186,9 +187,7 @@ class DefinitionTest extends TestCase
         $this->assertSame('1.1', $deprecation['version']);
     }
 
-    /**
-     * @dataProvider invalidDeprecationMessageProvider
-     */
+    #[DataProvider('invalidDeprecationMessageProvider')]
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
     {
         $def = new Definition('stdClass');
@@ -205,7 +204,6 @@ class DefinitionTest extends TestCase
             "With \ns" => ["invalid \n message %service_id%"],
             'With */s' => ['invalid */ message %service_id%'],
             'message not containing require %service_id% variable' => ['this is deprecated'],
-            'template not containing require %service_id% variable' => [true],
         ];
     }
 
@@ -264,7 +262,7 @@ class DefinitionTest extends TestCase
         $def->addResourceTag('foo', ['bar' => true]);
 
         $this->assertSame([['bar' => true]], $def->getTag('foo'));
-        $this->assertTrue($def->isAbstract());
+        $this->assertFalse($def->isAbstract());
         $this->assertSame([['source' => 'by tag "foo"']], $def->getTag('container.excluded'));
     }
 

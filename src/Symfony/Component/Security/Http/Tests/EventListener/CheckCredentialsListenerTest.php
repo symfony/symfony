@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -40,9 +41,7 @@ class CheckCredentialsListenerTest extends TestCase
         $this->user = new InMemoryUser('wouter', 'password-hash');
     }
 
-    /**
-     * @dataProvider providePasswords
-     */
+    #[DataProvider('providePasswords')]
     public function testPasswordAuthenticated(string $password, bool $passwordValid, bool $result)
     {
         $hasher = $this->createMock(PasswordHasherInterface::class);
@@ -83,9 +82,7 @@ class CheckCredentialsListenerTest extends TestCase
         $this->listener->checkPassport($event);
     }
 
-    /**
-     * @dataProvider provideCustomAuthenticatedResults
-     */
+    #[DataProvider('provideCustomAuthenticatedResults')]
     public function testCustomAuthenticated(bool $result)
     {
         $this->hasherFactory->expects($this->never())->method('getPasswordHasher');

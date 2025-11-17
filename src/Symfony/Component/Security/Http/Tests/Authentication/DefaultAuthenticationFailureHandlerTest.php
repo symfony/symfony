@@ -46,9 +46,9 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->session = $this->createMock(SessionInterface::class);
-        $this->request = $this->createMock(Request::class);
-        $this->request->attributes = new ParameterBag(['_stateless' => false]);
-        $this->request->expects($this->any())->method('getSession')->willReturn($this->session);
+        $this->request = Request::create('/');
+        $this->request->attributes->set('_stateless', false);
+        $this->request->setSession($this->session);
         $this->exception = $this->getMockBuilder(AuthenticationException::class)->onlyMethods(['getMessage'])->getMock();
     }
 
@@ -56,9 +56,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     {
         $options = ['failure_forward' => true];
 
-        $subRequest = $this->getRequest();
-        $subRequest->attributes->expects($this->once())
-            ->method('set')->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $this->exception);
+        $subRequest = Request::create('/');
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')
             ->willReturn($subRequest);
@@ -67,6 +65,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
 
         $this->assertSame($this->response, $result);
+        $this->assertSame($this->exception, $subRequest->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
     public function testRedirect()
@@ -106,9 +105,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     {
         $options = ['failure_forward' => true];
 
-        $subRequest = $this->getRequest();
-        $subRequest->attributes->expects($this->once())
-            ->method('set')->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $this->exception);
+        $subRequest = Request::create('/');
 
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')
@@ -118,6 +115,8 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);
+
+        $this->assertSame($this->exception, $subRequest->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
     public function testRedirectIsLogged()
@@ -137,7 +136,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')
-            ->willReturn($this->getRequest());
+            ->willReturn(Request::create('/'));
 
         $this->logger
             ->expects($this->once())
@@ -161,9 +160,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
     public function testFailurePathCanBeOverwrittenWithRequest()
     {
-        $this->request->expects($this->once())
-            ->method('get')->with('_failure_path')
-            ->willReturn('/auth/login');
+        $this->request->attributes->set('_failure_path', '/auth/login');
 
         $this->httpUtils->expects($this->once())
             ->method('createRedirectResponse')->with($this->request, '/auth/login');
@@ -174,9 +171,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
     public function testFailurePathCanBeOverwrittenWithNestedAttributeInRequest()
     {
-        $this->request->expects($this->once())
-            ->method('get')->with('_failure_path')
-            ->willReturn(['value' => '/auth/login']);
+        $this->request->attributes->set('_failure_path', ['value' => '/auth/login']);
 
         $this->httpUtils->expects($this->once())
             ->method('createRedirectResponse')->with($this->request, '/auth/login');
@@ -189,9 +184,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     {
         $options = ['failure_path_parameter' => '_my_failure_path'];
 
-        $this->request->expects($this->once())
-            ->method('get')->with('_my_failure_path')
-            ->willReturn('/auth/login');
+        $this->request->attributes->set('_my_failure_path', '/auth/login');
 
         $this->httpUtils->expects($this->once())
             ->method('createRedirectResponse')->with($this->request, '/auth/login');
@@ -204,9 +197,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     {
         $options = ['failure_path_parameter' => '_my_failure_path'];
 
-        $this->request->expects($this->once())
-            ->method('get')->with('_my_failure_path')
-            ->willReturn('some_route_name');
+        $this->request->attributes->set('_my_failure_path', 'some_route_name');
 
         $this->logger->expects($this->exactly(2))
             ->method('debug')
@@ -229,22 +220,12 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     {
         $options = ['failure_path_parameter' => '_my_failure_path'];
 
-        $this->request->expects($this->once())
-            ->method('get')->with('_my_failure_path')
-            ->willReturn('https://localhost/some-path');
+        $this->request->attributes->set('_my_failure_path', 'https://localhost/some-path');
 
         $this->httpUtils->expects($this->once())
             ->method('createRedirectResponse')->with($this->request, 'https://localhost/some-path');
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);
-    }
-
-    private function getRequest()
-    {
-        $request = $this->createMock(Request::class);
-        $request->attributes = $this->createMock(ParameterBag::class);
-
-        return $request;
     }
 }

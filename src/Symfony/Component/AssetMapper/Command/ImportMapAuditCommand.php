@@ -51,10 +51,10 @@ class ImportMapAuditCommand extends Command
                 default: 'txt',
             )
             ->setHelp(<<<'EOT'
-The <info>--format</info> option specifies the format of the command output:
+                The <info>--format</info> option specifies the format of the command output:
 
-  <info>php %command.full_name% --format=json</info>
-EOT
+                  <info>php %command.full_name% --format=json</info>
+                EOT
             );
     }
 

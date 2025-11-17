@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\OAuth2User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
@@ -105,6 +106,19 @@ class UserValueResolverTest extends TestCase
 
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', InMemoryUser::class, false, false, null, false, [new CurrentUser()]);
+
+        $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
+    }
+
+    public function testResolveSucceedsWithUnionTypedAttribute()
+    {
+        $user = new InMemoryUser('username', 'password');
+        $token = new UsernamePasswordToken($user, 'provider');
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
+
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', InMemoryUser::class.'|'.OAuth2User::class, false, false, null, false, [new CurrentUser()]);
 
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }

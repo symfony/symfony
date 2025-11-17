@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Isin;
 use Symfony\Component\Validator\Constraints\IsinValidator;
 use Symfony\Component\Validator\Constraints\Luhn;
@@ -37,9 +38,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidIsin
-     */
+    #[DataProvider('getValidIsin')]
     public function testValidIsin($isin)
     {
         $this->validator->validate($isin, new Isin());
@@ -63,9 +62,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getIsinWithInvalidLenghFormat
-     */
+    #[DataProvider('getIsinWithInvalidLenghFormat')]
     public function testIsinWithInvalidFormat($isin)
     {
         $this->assertViolationRaised($isin, Isin::INVALID_LENGTH_ERROR);
@@ -88,9 +85,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getIsinWithInvalidPattern
-     */
+    #[DataProvider('getIsinWithInvalidPattern')]
     public function testIsinWithInvalidPattern($isin)
     {
         $this->assertViolationRaised($isin, Isin::INVALID_PATTERN_ERROR);
@@ -106,9 +101,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getIsinWithValidFormatButIncorrectChecksum
-     */
+    #[DataProvider('getIsinWithValidFormatButIncorrectChecksum')]
     public function testIsinWithValidFormatButIncorrectChecksum($isin)
     {
         $this->expectViolationsAt(0, $isin, new Luhn());

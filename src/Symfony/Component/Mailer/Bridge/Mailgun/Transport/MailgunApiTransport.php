@@ -116,9 +116,8 @@ class MailgunApiTransport extends AbstractApiTransport
             $payload['html'] = $html;
         }
 
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type'];
         foreach ($headers->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type'], true)) {
                 continue;
             }
 
@@ -136,7 +135,7 @@ class MailgunApiTransport extends AbstractApiTransport
 
             // Check if it is a valid prefix or header name according to Mailgun API
             $prefix = substr($name, 0, 2);
-            if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'])) {
+            if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'], true)) {
                 $headerName = $header->getName();
             } else {
                 $headerName = 'h:'.$header->getName();

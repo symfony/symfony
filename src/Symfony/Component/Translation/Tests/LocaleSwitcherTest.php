@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
-/**
- * @requires extension intl
- */
+#[RequiresPhpExtension('intl')]
 class LocaleSwitcherTest extends TestCase
 {
     private string $intlLocale;

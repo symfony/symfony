@@ -27,6 +27,7 @@ use Pheanstalk\Values\JobStats;
 use Pheanstalk\Values\TubeList;
 use Pheanstalk\Values\TubeName;
 use Pheanstalk\Values\TubeStats;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException as MessengerInvalidArgumentException;
@@ -266,11 +267,9 @@ final class ConnectionTest extends TestCase
         $connection->ack($id);
     }
 
-    /**
-     * @testWith [false, false]
-     *           [false, true]
-     *           [true, true]
-     */
+    #[TestWith([false, false])]
+    #[TestWith([false, true])]
+    #[TestWith([true, true])]
     public function testReject(bool $buryOnReject, bool $forceDelete)
     {
         $id = '123456';

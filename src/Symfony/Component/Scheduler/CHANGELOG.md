@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `TriggerNormalizer`
+ * Throw exception when multiple schedule provider services are registered under the same scheduler name
 
 7.2
 ---

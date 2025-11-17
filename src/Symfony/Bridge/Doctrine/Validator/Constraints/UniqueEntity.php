@@ -60,24 +60,10 @@ class UniqueEntity extends Constraint
         ?array $identifierFieldNames = null,
         ?array $groups = null,
         $payload = null,
-        ?array $options = null,
     ) {
-        if (\is_array($fields) && \is_string(key($fields)) && [] === array_diff(array_keys($fields), array_merge(array_keys(get_class_vars(static::class)), ['value']))) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        parent::__construct(null, $groups, $payload);
 
-            $options = array_merge($fields, $options ?? []);
-        } else {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-            } else {
-                $options = [];
-            }
-
-            $options['fields'] = $fields;
-        }
-
-        parent::__construct($options, $groups, $payload);
-
+        $this->fields = $fields ?? $this->fields;
         $this->message = $message ?? $this->message;
         $this->service = $service ?? $this->service;
         $this->em = $em ?? $this->em;
@@ -86,11 +72,6 @@ class UniqueEntity extends Constraint
         $this->errorPath = $errorPath ?? $this->errorPath;
         $this->ignoreNull = $ignoreNull ?? $this->ignoreNull;
         $this->identifierFieldNames = $identifierFieldNames ?? $this->identifierFieldNames;
-    }
-
-    public function getRequiredOptions(): array
-    {
-        return ['fields'];
     }
 
     /**
@@ -104,10 +85,5 @@ class UniqueEntity extends Constraint
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
-    }
-
-    public function getDefaultOption(): ?string
-    {
-        return 'fields';
     }
 }

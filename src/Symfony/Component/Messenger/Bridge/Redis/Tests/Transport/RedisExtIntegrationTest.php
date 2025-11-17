@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Relay\Relay;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
@@ -20,12 +23,9 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 
-/**
- * @requires extension redis
- *
- * @group time-sensitive
- * @group integration
- */
+#[RequiresPhpExtension('redis')]
+#[Group('time-sensitive')]
+#[Group('integration')]
 class RedisExtIntegrationTest extends TestCase
 {
     private \Redis|Relay|null $redis = null;
@@ -220,9 +220,7 @@ class RedisExtIntegrationTest extends TestCase
         $connection->ack($message['id']);
     }
 
-    /**
-     * @dataProvider sentinelOptionNames
-     */
+    #[DataProvider('sentinelOptionNames')]
     public function testSentinel(string $sentinelOptionName)
     {
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
@@ -364,9 +362,7 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testGetNonBlocking()
     {
         $redis = $this->createRedisClient();
@@ -383,9 +379,7 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testGetAfterReject()
     {
         $redis = $this->createRedisClient();
@@ -405,9 +399,7 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testItProperlyHandlesEmptyMessages()
     {
         $redisReceiver = new RedisReceiver($this->connection, new Serializer());

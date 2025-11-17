@@ -13,8 +13,6 @@ namespace Symfony\Component\JsonStreamer\Exception;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- *
- * @experimental
  */
 class UnsupportedException extends InvalidArgumentException
 {

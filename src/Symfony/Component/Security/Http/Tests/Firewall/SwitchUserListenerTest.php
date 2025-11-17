@@ -62,10 +62,7 @@ class SwitchUserListenerTest extends TestCase
     public function testEventIsIgnoredIfUsernameIsNotPassedWithTheRequest()
     {
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
-        $listener($this->event);
-
-        $this->assertNull($this->event->getResponse());
-        $this->assertNull($this->tokenStorage->getToken());
+        $this->assertFalse($listener->supports($this->event->getRequest()));
     }
 
     public function testExitUserThrowsAuthenticationExceptionIfNoCurrentToken()
@@ -76,7 +73,8 @@ class SwitchUserListenerTest extends TestCase
 
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
 
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
     }
 
     public function testExitUserThrowsAuthenticationExceptionIfOriginalTokenCannotBeFound()
@@ -90,7 +88,8 @@ class SwitchUserListenerTest extends TestCase
 
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
 
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
     }
 
     public function testExitUserUpdatesToken()
@@ -101,7 +100,8 @@ class SwitchUserListenerTest extends TestCase
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
 
         $this->assertSame([], $this->request->query->all());
         $this->assertSame('', $this->request->server->get('QUERY_STRING'));
@@ -118,7 +118,8 @@ class SwitchUserListenerTest extends TestCase
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, urlGenerator: $this->createMock(UrlGeneratorInterface::class), targetRoute: 'whatever');
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
 
         $this->assertInstanceOf(RedirectResponse::class, $this->event->getResponse());
         $this->assertSame($this->request->getUri(), $this->event->getResponse()->getTargetUrl());
@@ -149,7 +150,8 @@ class SwitchUserListenerTest extends TestCase
         ;
 
         $listener = new SwitchUserListener($this->tokenStorage, $userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
     }
 
     public function testSwitchUserIsDisallowed()
@@ -168,7 +170,8 @@ class SwitchUserListenerTest extends TestCase
 
         $this->expectException(AccessDeniedException::class);
 
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
     }
 
     public function testSwitchUserTurnsAuthenticationExceptionTo403()
@@ -185,7 +188,8 @@ class SwitchUserListenerTest extends TestCase
 
         $this->expectException(AccessDeniedException::class);
 
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
     }
 
     public function testSwitchUser()
@@ -203,7 +207,8 @@ class SwitchUserListenerTest extends TestCase
             ->method('checkPostAuth')->with($this->callback(fn ($user) => 'kuba' === $user->getUserIdentifier()), $token);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
 
         $this->assertSame([], $this->request->query->all());
         $this->assertSame('', $this->request->server->get('QUERY_STRING'));
@@ -232,7 +237,8 @@ class SwitchUserListenerTest extends TestCase
             ->method('checkPostAuth')->with($targetsUser);
 
         $listener = new SwitchUserListener($tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', null, false);
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
 
         $this->assertSame([], $this->request->query->all());
         $this->assertSame('', $this->request->server->get('QUERY_STRING'));
@@ -258,7 +264,8 @@ class SwitchUserListenerTest extends TestCase
             ->method('checkPostAuth')->with($this->callback(fn ($argUser) => $user->isEqualTo($argUser)));
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
 
         $this->assertSame([], $this->request->query->all());
         $this->assertSame('', $this->request->server->get('QUERY_STRING'));
@@ -285,7 +292,8 @@ class SwitchUserListenerTest extends TestCase
             ->method('checkPostAuth')->with($targetsUser);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
 
         $this->assertSame('page=3&section=2', $this->request->server->get('QUERY_STRING'));
         $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
@@ -323,7 +331,8 @@ class SwitchUserListenerTest extends TestCase
             );
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
 
         $this->assertSame($replacedToken, $this->tokenStorage->getToken());
     }
@@ -336,7 +345,8 @@ class SwitchUserListenerTest extends TestCase
 
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
 
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
     }
 
     public function testSwitchUserStateless()
@@ -355,7 +365,8 @@ class SwitchUserListenerTest extends TestCase
             ->method('checkPostAuth')->with($targetsUser);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', null, true);
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
 
         $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
         $this->assertFalse($this->event->hasResponse());
@@ -386,6 +397,7 @@ class SwitchUserListenerTest extends TestCase
         ;
 
         $listener = new SwitchUserListener($this->tokenStorage, $userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
-        $listener($this->event);
+        $this->assertTrue($listener->supports($this->event->getRequest()));
+        $listener->authenticate($this->event);
     }
 }

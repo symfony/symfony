@@ -1,6 +1,46 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove `CsvEncoder::ESCAPE_CHAR_KEY` constant and escape character functionality
+ * Remove `CsvEncoderContextBuilder::withEscapeChar()` method
+ * Remove `AbstractNormalizerContextBuilder::withDefaultContructorArguments()`, use `withDefaultConstructorArguments()` instead
+ * Change signature of `NameConverterInterface::normalize()` and `NameConverterInterface::denormalize()` methods:
+
+   Before:
+
+   ```php
+   public function normalize(string $propertyName): string;
+   public function denormalize(string $propertyName): string;
+   ```
+
+   After:
+
+   ```php
+   public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string;
+   public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string;
+   ```
+ * Remove `AdvancedNameConverterInterface`, use `NameConverterInterface` instead
+ * Remove `ClassMetadataFactoryCompiler`, `CompiledClassMetadataFactory` and `CompiledClassMetadataCacheWarmer`
+ * Remove class aliases in the `Annotation` namespace, use attributes instead
+ * Remove getters in attribute classes in favor of public properties
+
+7.4
+---
+
+ * Add `#[ExtendsSerializationFor]` to declare new serialization attributes for a class
+ * Add `AttributeMetadataPass` to declare compile-time constraint metadata using attributes
+ * Add `CDATA_WRAPPING_NAME_PATTERN` support to `XmlEncoder`
+ * Add support for `can*()` methods to `AttributeLoader`
+ * Make `AttributeMetadata` and `ClassMetadata` final
+ * Add `XmlEncoder::PRESERVE_NUMERIC_KEYS` context option
+ * Deprecate class aliases in the `Annotation` namespace, use attributes instead
+ * Deprecate getters in attribute classes in favor of public properties
+ * Deprecate `ClassMetadataFactoryCompiler`
+ * Add `FORCE_TIMEZONE_KEY` to `DateTimeNormalizer` to force the timezone during denormalization
+
 7.3
 ---
 
@@ -30,7 +70,7 @@ CHANGELOG
  * Add `Default` and "class name" default groups
  * Add `AbstractNormalizer::FILTER_BOOL` context option
  * Add `CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES` context option
- * Deprecate `AbstractNormalizerContextBuilder::withDefaultContructorArguments(?array $defaultContructorArguments)`, use `withDefaultConstructorArguments(?array $defaultConstructorArguments)` instead (note the missing `s` character in Contructor word in deprecated method)
+ * Deprecate `AbstractNormalizerContextBuilder::withDefaultContructorArguments(?array $defaultContructorArguments)`, use `withDefaultConstructorArguments(?array $defaultConstructorArguments)` instead (note the missing `s` character in Constructor word in deprecated method)
  * Add `XmlEncoder::CDATA_WRAPPING_PATTERN` context option
 
 7.0

@@ -32,9 +32,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastModernImplementation()
     {
         $implementation = new \Dom\Implementation();
@@ -64,9 +61,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastModernNode()
     {
         $doc = \Dom\XMLDocument::createFromString('<foo><bar/></foo>');
@@ -100,9 +94,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastXMLDocument()
     {
         $doc = \Dom\XMLDocument::createFromString('<foo><bar/></foo>');
@@ -121,9 +112,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastHTMLDocument()
     {
         $doc = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><html><body><p>foo</p></body></html>');
@@ -150,9 +138,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastModernText()
     {
         $text = \Dom\HTMLDocument::createEmpty()->createTextNode('foo');
@@ -178,9 +163,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastModernAttr()
     {
         $attr = \Dom\HTMLDocument::createEmpty()->createAttribute('attr');
@@ -207,9 +189,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastModernElement()
     {
         $attr = \Dom\HTMLDocument::createEmpty()->createElement('foo');
@@ -239,9 +218,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastModernDocumentType()
     {
         $implementation = new \Dom\Implementation();
@@ -269,9 +245,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastModernProcessingInstruction()
     {
         $entity = \Dom\HTMLDocument::createEmpty()->createProcessingInstruction('target', 'data');
@@ -299,9 +272,6 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testCastModernXPath()
     {
         $entity = new \Dom\XPath(\Dom\HTMLDocument::createEmpty());

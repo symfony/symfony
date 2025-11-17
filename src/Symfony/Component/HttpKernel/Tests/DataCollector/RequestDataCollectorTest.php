@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -76,9 +77,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertEquals([], $c->getRouteParams());
     }
 
-    /**
-     * @dataProvider provideControllerCallables
-     */
+    #[DataProvider('provideControllerCallables')]
     public function testControllerInspection($name, $callable, $expected)
     {
         $c = new RequestDataCollector();
@@ -117,7 +116,7 @@ class RequestDataCollectorTest extends TestCase
                 'Closure',
                 fn () => 'foo',
                 [
-                    'class' => \PHP_VERSION_ID >= 80400 ? \sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2) : __NAMESPACE__.'\{closure}',
+                    'class' => \sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2),
                     'method' => null,
                     'file' => __FILE__,
                     'line' => __LINE__ - 5,
@@ -414,9 +413,7 @@ class RequestDataCollectorTest extends TestCase
         throw new \InvalidArgumentException(\sprintf('Cookie named "%s" is not in response', $name));
     }
 
-    /**
-     * @dataProvider provideJsonContentTypes
-     */
+    #[DataProvider('provideJsonContentTypes')]
     public function testIsJson($contentType, $expected)
     {
         $response = $this->createResponse();
@@ -442,9 +439,7 @@ class RequestDataCollectorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providePrettyJson
-     */
+    #[DataProvider('providePrettyJson')]
     public function testGetPrettyJsonValidity($content, $expected)
     {
         $response = $this->createResponse();

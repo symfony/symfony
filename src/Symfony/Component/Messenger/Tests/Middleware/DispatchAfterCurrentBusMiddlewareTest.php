@@ -286,9 +286,9 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $handlingMiddleware,
         ]);
 
-        $enveloppe = $eventBus->dispatch($event, [new DispatchAfterCurrentBusStamp()]);
+        $envelope = $eventBus->dispatch($event, [new DispatchAfterCurrentBusStamp()]);
 
-        self::assertNull($enveloppe->last(DispatchAfterCurrentBusStamp::class));
+        self::assertNull($envelope->last(DispatchAfterCurrentBusStamp::class));
     }
 
     private function expectHandledMessage($message): Callback

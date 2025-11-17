@@ -78,10 +78,10 @@ class PlantUmlDumper implements DumperInterface
         }
         foreach ($definition->getTransitions() as $transition) {
             $transitionEscaped = $this->escape($transition->getName());
-            foreach ($transition->getFroms() as $from) {
-                $fromEscaped = $this->escape($from);
-                foreach ($transition->getTos() as $to) {
-                    $toEscaped = $this->escape($to);
+            foreach ($transition->getFroms(true) as $fromArc) {
+                $fromEscaped = $this->escape($fromArc->place);
+                foreach ($transition->getTos(true) as $toArc) {
+                    $toEscaped = $this->escape($toArc->place);
 
                     $transitionEscapedWithStyle = $this->getTransitionEscapedWithStyle($workflowMetadata, $transition, $transitionEscaped);
 

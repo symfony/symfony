@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -38,16 +37,10 @@ class DebugHandlersListener implements EventSubscriberInterface
     private bool $hasTerminatedWithException = false;
 
     /**
-     * @param bool          $webMode
      * @param callable|null $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
      */
-    public function __construct(?callable $exceptionHandler = null, bool|LoggerInterface|null $webMode = null)
+    public function __construct(?callable $exceptionHandler = null, ?bool $webMode = null)
     {
-        if ($webMode instanceof LoggerInterface) {
-            // BC with Symfony 5
-            $webMode = null;
-        }
-
         $handler = set_exception_handler('var_dump');
         $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();

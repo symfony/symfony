@@ -28,32 +28,32 @@ class TraceableSerializerTest extends TestCase
         $serializer
             ->expects($this->once())
             ->method('serialize')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('serialized');
         $serializer
             ->expects($this->once())
             ->method('deserialize')
-            ->with('data', 'type', 'format', $this->isType('array'))
+            ->with('data', 'type', 'format', $this->isArray())
             ->willReturn('deserialized');
         $serializer
             ->expects($this->once())
             ->method('normalize')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('normalized');
         $serializer
             ->expects($this->once())
             ->method('denormalize')
-            ->with('data', 'type', 'format', $this->isType('array'))
+            ->with('data', 'type', 'format', $this->isArray())
             ->willReturn('denormalized');
         $serializer
             ->expects($this->once())
             ->method('encode')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('encoded');
         $serializer
             ->expects($this->once())
             ->method('decode')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('decoded');
 
         $traceableSerializer = new TraceableSerializer($serializer, new SerializerDataCollector(), 'default');
@@ -74,27 +74,27 @@ class TraceableSerializerTest extends TestCase
         $dataCollector
             ->expects($this->once())
             ->method('collectSerialize')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
+            ->with($this->isString(), 'data', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDeserialize')
-            ->with($this->isType('string'), 'data', 'type', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
+            ->with($this->isString(), 'data', 'type', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectNormalize')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
+            ->with($this->isString(), 'data', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDenormalize')
-            ->with($this->isType('string'), 'data', 'type', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
+            ->with($this->isString(), 'data', 'type', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectEncode')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
+            ->with($this->isString(), 'data', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDecode')
-            ->with($this->isType('string'), 'data', 'format', $this->isType('array'), $this->isType('float'), $this->isType('array'), $serializerName);
+            ->with($this->isString(), 'data', 'format', $this->isArray(), $this->isFloat(), $this->isArray(), $serializerName);
 
         $traceableSerializer = new TraceableSerializer(new Serializer(), $dataCollector, $serializerName);
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -34,9 +35,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->userProvider = new InMemoryUserProvider();
     }
 
-    /**
-     * @dataProvider provideSupportData
-     */
+    #[DataProvider('provideSupportData')]
     public function testSupport($request)
     {
         $this->setUpAuthenticator();
@@ -53,9 +52,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [$request];
     }
 
-    /**
-     * @dataProvider provideSupportsWithCheckPathData
-     */
+    #[DataProvider('provideSupportsWithCheckPathData')]
     public function testSupportsWithCheckPath($request, $result)
     {
         $this->setUpAuthenticator(['check_path' => '/api/login']);
@@ -90,9 +87,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
     }
 
-    /**
-     * @dataProvider provideInvalidAuthenticateData
-     */
+    #[DataProvider('provideInvalidAuthenticateData')]
     public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType = BadRequestHttpException::class)
     {
         $this->setUpAuthenticator();

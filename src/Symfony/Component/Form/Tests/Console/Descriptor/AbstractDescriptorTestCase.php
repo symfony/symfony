@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Console\Descriptor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -41,7 +42,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
-    /** @dataProvider getDescribeDefaultsTestData */
+    #[DataProvider('getDescribeDefaultsTestData')]
     public function testDescribeDefaults($object, array $options, $fixtureName)
     {
         $describedObject = $this->getObjectDescription($object, $options);
@@ -54,7 +55,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         }
     }
 
-    /** @dataProvider getDescribeResolvedFormTypeTestData */
+    #[DataProvider('getDescribeResolvedFormTypeTestData')]
     public function testDescribeResolvedFormType(ResolvedFormTypeInterface $type, array $options, $fixtureName)
     {
         $describedObject = $this->getObjectDescription($type, $options);
@@ -67,7 +68,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         }
     }
 
-    /** @dataProvider getDescribeOptionTestData */
+    #[DataProvider('getDescribeOptionTestData')]
     public function testDescribeOption(OptionsResolver $optionsResolver, array $options, $fixtureName)
     {
         $describedObject = $this->getObjectDescription($optionsResolver, $options);

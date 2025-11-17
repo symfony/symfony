@@ -17,9 +17,6 @@ use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
- *
- * @method void   saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props =  null)
- * @method string whoami()
  */
 interface ConnectionInterface
 {
@@ -45,10 +42,10 @@ interface ConnectionInterface
      * @throws ConnectionTimeoutException  When the connection can't be created because of an LDAP_TIMEOUT error
      * @throws InvalidCredentialsException When the connection can't be created because of an LDAP_INVALID_CREDENTIALS error
      */
-    // public function saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props = null): void;
+    public function saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props = null): void;
 
     /*
      * Return authenticated and authorized (for SASL) DN.
      */
-    // public function whoami(): string;
+    public function whoami(): string;
 }

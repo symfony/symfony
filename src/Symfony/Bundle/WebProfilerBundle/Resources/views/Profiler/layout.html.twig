@@ -2,7 +2,7 @@
 
 {% block body %}
     <div class="container">
-        {{ include('@WebProfiler/Profiler/header.html.twig', {profile_type: profile_type}, with_context = false) }}
+        {{ include('@WebProfiler/Profiler/header.html.twig', {profile_type: profile_type}, with_context: false) }}
 
         <div id="summary">
         {% block summary %}
@@ -11,11 +11,11 @@
 
                 {{ include('@WebProfiler/Profiler/_%s_summary.html.twig'|format(profile_type), {
                     profile: profile,
-                    command_collector: profile.collectors.command|default(false) ,
+                    command_collector: profile.collectors.command|default(false),
                     request_collector: request_collector,
                     request: request,
-                    token: token
-                }, with_context=false) }}
+                    token: token,
+                }, with_context: false) }}
             {% endif %}
         {% endblock %}
     </div>
@@ -28,8 +28,8 @@
                             <div id="sidebar-shortcuts">
                                 {% block sidebar_shortcuts_links %}
                                     <div class="shortcuts">
-                                        <a class="btn btn-link" href="{{ path('_profiler_search', { limit: 10, type: profile_type }) }}">{{ source('@WebProfiler/Icon/search.svg') }} Search profiles</a>
-                                        <a class="btn btn-link" href="{{ path('_profiler', { token: 'latest', type: profile_type }|merge(request.query.all)) }}">Latest</a>
+                                        <a class="btn btn-link" href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}">{{ source('@WebProfiler/Icon/search.svg') }} Search profiles</a>
+                                        <a class="btn btn-link" href="{{ path('_profiler', {token: 'latest', type: profile_type}|merge(request.query.all)) }}">Latest</a>
                                     </div>
                                 {% endblock sidebar_shortcuts_links %}
                             </div>
@@ -45,14 +45,14 @@
                                     {% for name, template in templates|filter((t, n) => n not in excludes) %}
                                         {% set menu -%}
                                             {%- if block('menu', template) is defined -%}
-                                                {% with { collector: profile.getcollector(name), profiler_markup_version: profiler_markup_version } %}
+                                                {% with {collector: profile.getcollector(name), profiler_markup_version: profiler_markup_version} %}
                                                     {{- block('menu', template) -}}
                                                 {% endwith %}
                                             {%- endif -%}
                                         {%- endset %}
                                         {% if menu is not empty %}
                                             <li class="{{ name }} {{ name == panel ? 'selected' }}">
-                                                <a href="{{ path('_profiler', { token: token, panel: name, type: profile_type }) }}">{{ menu|raw }}</a>
+                                                <a href="{{ path('_profiler', {token: token, panel: name, type: profile_type}) }}">{{ menu|raw }}</a>
                                             </li>
                                         {% endif %}
                                     {% endfor %}

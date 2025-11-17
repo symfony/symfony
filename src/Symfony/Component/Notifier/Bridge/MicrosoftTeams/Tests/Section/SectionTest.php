@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Tests\Section;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\ActionCard;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\ActionInterface;
@@ -40,9 +41,7 @@ final class SectionTest extends TestCase
         $this->assertSame($value, $section->toArray()['text']);
     }
 
-    /**
-     * @dataProvider allowedActions
-     */
+    #[DataProvider('allowedActions')]
     public function testAction(array $expected, ActionInterface $action)
     {
         $section = (new Section())

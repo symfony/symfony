@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
- * @group dns-sensitive
- */
+#[Group('dns-sensitive')]
 class EmailValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): EmailValidator
@@ -60,9 +60,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Email());
     }
 
-    /**
-     * @dataProvider getValidEmails
-     */
+    #[DataProvider('getValidEmails')]
     public function testValidEmails($email)
     {
         $this->validator->validate($email, new Email());
@@ -70,9 +68,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidEmails
-     */
+    #[DataProvider('getValidEmails')]
     public function testValidEmailsWithNewLine($email)
     {
         $this->validator->validate($email."\n", new Email());
@@ -92,9 +88,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getValidEmailsWithWhitespaces
-     */
+    #[DataProvider('getValidEmailsWithWhitespaces')]
     public function testValidNormalizedEmails($email)
     {
         $this->validator->validate($email, new Email(normalizer: 'trim'));
@@ -110,9 +104,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getValidEmailsHtml5
-     */
+    #[DataProvider('getValidEmailsHtml5')]
     public function testValidEmailsHtml5($email)
     {
         $this->validator->validate($email, new Email(mode: Email::VALIDATION_MODE_HTML5));
@@ -130,9 +122,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidEmails
-     */
+    #[DataProvider('getInvalidEmails')]
     public function testInvalidEmails($email)
     {
         $constraint = new Email(message: 'myMessage');
@@ -155,9 +145,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidHtml5Emails
-     */
+    #[DataProvider('getInvalidHtml5Emails')]
     public function testInvalidHtml5Emails($email)
     {
         $constraint = new Email(
@@ -195,9 +183,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidAllowNoTldEmails
-     */
+    #[DataProvider('getInvalidAllowNoTldEmails')]
     public function testInvalidAllowNoTldEmails($email)
     {
         $constraint = new Email(
@@ -265,9 +251,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('example@example..com', $constraint);
     }
 
-    /**
-     * @dataProvider getInvalidEmailsForStrictChecks
-     */
+    #[DataProvider('getInvalidEmailsForStrictChecks')]
     public function testStrictWithInvalidEmails($email)
     {
         $constraint = new Email(

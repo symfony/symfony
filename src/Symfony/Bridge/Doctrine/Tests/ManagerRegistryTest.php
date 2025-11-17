@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests;
 
 use Doctrine\Persistence\ObjectManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DummyManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -49,11 +50,7 @@ class ManagerRegistryTest extends TestCase
         $this->assertFalse(isset($foo->bar));
     }
 
-    /**
-     * @requires PHP 8.4
-     *
-     * @dataProvider provideResetServiceWithNativeLazyObjectsCases
-     */
+    #[DataProvider('provideResetServiceWithNativeLazyObjectsCases')]
     public function testResetServiceWithNativeLazyObjects(string $class)
     {
         $container = new $class();
@@ -107,7 +104,7 @@ class ManagerRegistryTest extends TestCase
     }
 
     /**
-     * When performing an entity manager lazy service reset, the reset operations may re-use the container
+     * When performing an entity manager lazy service reset, the reset operations may reuse the container
      * to create a "fresh" service: when doing so, it can happen that the "fresh" service is itself a proxy.
      *
      * Because of that, the proxy will be populated with a wrapped value that is itself a proxy: repeating

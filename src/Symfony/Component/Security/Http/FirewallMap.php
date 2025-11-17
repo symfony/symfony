@@ -26,12 +26,12 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
 class FirewallMap implements FirewallMapInterface
 {
     /**
-     * @var list<array{RequestMatcherInterface, list<callable|FirewallListenerInterface>, ExceptionListener|null, LogoutListener|null}>
+     * @var list<array{RequestMatcherInterface, list<FirewallListenerInterface>, ExceptionListener|null, LogoutListener|null}>
      */
     private array $map = [];
 
     /**
-     * @param list<callable|FirewallListenerInterface> $listeners
+     * @param list<FirewallListenerInterface> $listeners
      */
     public function add(?RequestMatcherInterface $requestMatcher = null, array $listeners = [], ?ExceptionListener $exceptionListener = null, ?LogoutListener $logoutListener = null): void
     {

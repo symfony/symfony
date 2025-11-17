@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
@@ -355,9 +356,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->assertCount(2, $this->context->getViolations());
     }
 
-    /**
-     * @dataProvider provideCompileIsValid
-     */
+    #[DataProvider('provideCompileIsValid')]
     public function testCompileIsValid(string $expression, array $names, string $expected)
     {
         $expressionLanguage = new ExpressionLanguage();

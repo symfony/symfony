@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\NameConverter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\UnexpectedPropertyException;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -28,18 +29,14 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
         $this->assertInstanceOf(NameConverterInterface::class, $attributeMetadata);
     }
 
-    /**
-     * @dataProvider attributeProvider
-     */
+    #[DataProvider('attributeProvider')]
     public function testNormalize($underscored, $camelCased, $useLowerCamelCase)
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, $useLowerCamelCase);
         $this->assertEquals($nameConverter->normalize($camelCased), $underscored);
     }
 
-    /**
-     * @dataProvider attributeProvider
-     */
+    #[DataProvider('attributeProvider')]
     public function testDenormalize($underscored, $camelCased, $useLowerCamelCase)
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, $useLowerCamelCase);

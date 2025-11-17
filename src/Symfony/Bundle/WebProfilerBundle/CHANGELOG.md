@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove `profiler.xml` and `wdt.xml` routing configuration files (use their PHP equivalent instead)
+
+7.4
+---
+
+ * Add support for the `QUERY` HTTP method in the profiler
+ * Add support for Server-Sent Events / `EventSource` requests in the debug toolbar
+ * Add support for displaying the application runner class
+
 7.3
 ---
 

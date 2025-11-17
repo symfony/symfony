@@ -1,14 +1,38 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove `AddAnnotatedClassesToCachePass`
+ * Remove `Extension::getAnnotatedClassesToCompile()` and `Extension::addAnnotatedClassesToCompile()`
+ * Remove `Kernel::getAnnotatedClassesToCompile()` and `Kernel::setAnnotatedClassCache()`
+ * Make `ServicesResetter` class `final`
+ * Add argument `$logChannel` to `ErrorListener::logException()`
+ * Add argument `$event` to `DumpListener::configure()`
+ * Replace `__sleep/wakeup()` by `__(un)serialize()` on kernels and data collectors
+ * Add method `getShareDir()` to `KernelInterface`
+
+7.4
+---
+
+ * Add support for the `QUERY` HTTP method
+ * Deprecate implementing `__sleep/wakeup()` on kernels; use `__(un)serialize()` instead
+ * Deprecate implementing `__sleep/wakeup()` on data collectors; use `__(un)serialize()` instead
+ * Add `#[IsSignatureValid]` attribute to validate URI signatures
+ * Make `Profile` final and `Profiler::__sleep()` internal
+ * Collect the application runner class
+ * Allow configuring `DumpListener` to use a different dumper when CLI profiling is enabled
+
 7.3
 ---
 
+ * Record a `waiting` trace in the `HttpCache` when the cache had to wait for another request to finish
  * Add `$key` argument to `#[MapQueryString]` that allows using a specific key for argument resolving
  * Support `Uid` in `#[MapQueryParameter]`
  * Add `ServicesResetterInterface`, implemented by `ServicesResetter`
  * Allow configuring the logging channel per type of exceptions in ErrorListener
- 
+
 7.2
 ---
 

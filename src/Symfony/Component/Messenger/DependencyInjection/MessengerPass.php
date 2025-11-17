@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
@@ -32,9 +31,9 @@ class MessengerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $busIds = [];
-        foreach ($container->findTaggedServiceIds('messenger.bus') as $busId => $tags) {
-            $busIds[] = $busId;
+        $busIds = array_keys($container->findTaggedServiceIds('messenger.bus'));
+
+        foreach ($busIds as $busId) {
             if ($container->hasParameter($busMiddlewareParameter = $busId.'.middleware')) {
                 $this->registerBusMiddleware($container, $busId, $container->getParameter($busMiddlewareParameter));
 
@@ -49,6 +48,7 @@ class MessengerPass implements CompilerPassInterface
         if ($container->hasDefinition('messenger.receiver_locator')) {
             $this->registerReceivers($container, $busIds);
         }
+
         $this->registerHandlers($container, $busIds);
     }
 
@@ -57,6 +57,7 @@ class MessengerPass implements CompilerPassInterface
         $definitions = [];
         $handlersByBusAndMessage = [];
         $handlerToOriginalServiceIdMapping = [];
+        $signedMessageTypes = [];
 
         foreach ($container->findTaggedServiceIds('messenger.message_handler', true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
@@ -101,6 +102,7 @@ class MessengerPass implements CompilerPassInterface
                     $priority = $options['priority'] ?? 0;
                     $method = $options['method'] ?? '__invoke';
                     $fromTransport = $options['from_transport'] ?? '';
+                    $sign = $options['sign'] ?? false;
 
                     if (isset($options['bus'])) {
                         if (!\in_array($options['bus'], $busIds)) {
@@ -135,6 +137,10 @@ class MessengerPass implements CompilerPassInterface
                     foreach ($buses as $handlerBus) {
                         $handlersByBusAndMessage[$handlerBus][$message][$priority][] = [$definitionId, $options];
                     }
+
+                    if ($sign && '*' !== $message) {
+                        $signedMessageTypes[$message] = true;
+                    }
                 }
 
                 if (null === $message) {
@@ -163,6 +169,21 @@ class MessengerPass implements CompilerPassInterface
             }
         }
         $container->addDefinitions($definitions);
+
+        if ($signedMessageTypes && $container->hasDefinition('messenger.signing_serializer')) {
+            $signingSerializerDefinition = $container->getDefinition('messenger.signing_serializer');
+            $messageToSerializersMapping = $signingSerializerDefinition->getArgument(2);
+
+            $signedMessageTypes = array_intersect_key($signedMessageTypes, $messageToSerializersMapping);
+            $signingSerializerDefinition->replaceArgument(2, array_keys($signedMessageTypes));
+
+            // because transports accept any message types - not only listed ones - we have to decorate all serializers regardless of message signing
+            foreach (array_unique(array_merge(...array_values($messageToSerializersMapping))) as $serializerId) {
+                $container->setDefinition('.signing.'.$serializerId, (new ChildDefinition('messenger.signing_serializer'))->setDecoratedService($serializerId));
+            }
+        } else {
+            $container->removeDefinition('messenger.signing_serializer');
+        }
 
         foreach ($busIds as $bus) {
             $container->register($locatorId = $bus.'.messenger.handlers_locator', HandlersLocator::class)
@@ -299,11 +320,7 @@ class MessengerPass implements CompilerPassInterface
             }
 
             $consumeCommandDefinition->replaceArgument(4, $consumableReceiverNames);
-            try {
-                $consumeCommandDefinition->replaceArgument(6, $busIds);
-            } catch (OutOfBoundsException) {
-                // ignore to preserve compatibility with symfony/framework-bundle < 5.4
-            }
+            $consumeCommandDefinition->replaceArgument(6, $busIds);
         }
 
         if ($container->hasDefinition('console.command.messenger_setup_transports')) {

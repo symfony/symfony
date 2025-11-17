@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator\Passport\Badge;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -22,8 +23,6 @@ use function Symfony\Component\String\u;
 
 class UserBadgeTest extends TestCase
 {
-    use ExpectUserDeprecationMessageTrait;
-
     public function testUserNotFound()
     {
         $badge = new UserBadge('dummy', fn () => null);
@@ -31,19 +30,13 @@ class UserBadgeTest extends TestCase
         $badge->getUser();
     }
 
-    /**
-     * @group legacy
-     */
     public function testEmptyUserIdentifier()
     {
-        $this->expectUserDeprecationMessage('Since symfony/security-http 7.2: Using an empty string as user identifier is deprecated and will throw an exception in Symfony 8.0.');
-        // $this->expectException(BadCredentialsException::class)
+        $this->expectException(BadCredentialsException::class);
         new UserBadge('', fn () => null);
     }
 
-    /**
-     * @dataProvider provideUserIdentifierNormalizationData
-     */
+    #[DataProvider('provideUserIdentifierNormalizationData')]
     public function testUserIdentifierNormalization(string $identifier, string $expectedNormalizedIdentifier, callable $normalizer)
     {
         $badge = new UserBadge($identifier, fn () => null, identifierNormalizer: $normalizer);

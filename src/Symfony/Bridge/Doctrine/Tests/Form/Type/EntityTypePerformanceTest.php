@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
@@ -81,9 +82,8 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
     /**
      * This test case is realistic in collection forms where each
      * row contains the same entity field.
-     *
-     * @group benchmark
      */
+    #[Group('benchmark')]
     public function testCollapsedEntityField()
     {
         $this->setMaxRunningTime(1);
@@ -98,9 +98,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
         }
     }
 
-    /**
-     * @group benchmark
-     */
+    #[Group('benchmark')]
     public function testCollapsedEntityFieldWithChoices()
     {
         $choices = $this->em->createQuery('SELECT c FROM '.self::ENTITY_CLASS.' c')->getResult();
@@ -117,9 +115,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
         }
     }
 
-    /**
-     * @group benchmark
-     */
+    #[Group('benchmark')]
     public function testCollapsedEntityFieldWithPreferredChoices()
     {
         $choices = $this->em->createQuery('SELECT c FROM '.self::ENTITY_CLASS.' c')->getResult();

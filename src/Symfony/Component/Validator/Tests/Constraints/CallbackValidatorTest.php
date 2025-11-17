@@ -15,7 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\CallbackValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CallbackValidatorTest_Class
@@ -177,25 +176,9 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testExpectValidMethods()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $object = new CallbackValidatorTest_Object();
-
-        $this->validator->validate($object, new Callback(callback: ['foobar']));
-    }
-
-    public function testExpectValidCallbacks()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $object = new CallbackValidatorTest_Object();
-
-        $this->validator->validate($object, new Callback(callback: ['foo', 'bar']));
-    }
-
     public function testConstraintGetTargets()
     {
-        $constraint = new Callback(callback: []);
+        $constraint = new Callback(callback: 'strtolower');
         $targets = [Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT];
 
         $this->assertEquals($targets, $constraint->getTargets());

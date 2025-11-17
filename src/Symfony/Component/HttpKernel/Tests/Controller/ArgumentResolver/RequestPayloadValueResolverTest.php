@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
@@ -340,10 +342,8 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
-    /**
-     * @testWith [null]
-     *           [[]]
-     */
+    #[TestWith([null])]
+    #[TestWith([[]])]
     public function testRequestContentWithUntypedErrors(?array $types)
     {
         $this->expectException(HttpException::class);
@@ -572,9 +572,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    /**
-     * @dataProvider provideMatchedFormatContext
-     */
+    #[DataProvider('provideMatchedFormatContext')]
     public function testAcceptFormatPassed(mixed $acceptFormat, string $contentType, string $content)
     {
         $encoders = ['json' => new JsonEncoder(), 'xml' => new XmlEncoder()];
@@ -636,9 +634,7 @@ class RequestPayloadValueResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideMismatchedFormatContext
-     */
+    #[DataProvider('provideMismatchedFormatContext')]
     public function testAcceptFormatNotPassed(mixed $acceptFormat, string $contentType, string $content, string $expectedExceptionMessage)
     {
         $serializer = new Serializer([new ObjectNormalizer()]);
@@ -702,9 +698,7 @@ class RequestPayloadValueResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideValidationGroupsOnManyTypes
-     */
+    #[DataProvider('provideValidationGroupsOnManyTypes')]
     public function testValidationGroupsPassed(string $method, ValueResolver $attribute)
     {
         $input = ['price' => '50', 'title' => 'A long title, so the validation passes'];
@@ -731,9 +725,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
-    /**
-     * @dataProvider provideValidationGroupsOnManyTypes
-     */
+    #[DataProvider('provideValidationGroupsOnManyTypes')]
     public function testValidationGroupsNotPassed(string $method, ValueResolver $attribute)
     {
         $input = ['price' => '50', 'title' => 'Too short'];
@@ -858,9 +850,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideBoolArgument
-     */
+    #[DataProvider('provideBoolArgument')]
     public function testBoolArgumentInQueryString(mixed $expectedValue, ?string $parameterValue)
     {
         $serializer = new Serializer([new ObjectNormalizer()]);
@@ -881,9 +871,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertSame($expectedValue, $event->getArguments()[0]->value);
     }
 
-    /**
-     * @dataProvider provideBoolArgument
-     */
+    #[DataProvider('provideBoolArgument')]
     public function testBoolArgumentInBody(mixed $expectedValue, ?string $parameterValue)
     {
         $serializer = new Serializer([new ObjectNormalizer()]);
@@ -949,7 +937,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('filtered', QueryPayload::class, false, false, null, false, [
             MapQueryString::class => new MapQueryString(key: 'value'),
         ]);
-        $request = Request::create('/', Request::METHOD_GET, ['value' => ['page' => 1.0]]);
+        $request = Request::create('/', 'GET', ['value' => ['page' => 1.0]]);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);

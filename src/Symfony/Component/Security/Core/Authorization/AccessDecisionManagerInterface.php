@@ -27,5 +27,5 @@ interface AccessDecisionManagerInterface
      * @param mixed               $object         The object to secure
      * @param AccessDecision|null $accessDecision Should be used to explain the decision
      */
-    public function decide(TokenInterface $token, array $attributes, mixed $object = null/* , ?AccessDecision $accessDecision = null */): bool;
+    public function decide(TokenInterface $token, array $attributes, mixed $object = null, ?AccessDecision $accessDecision = null): bool;
 }

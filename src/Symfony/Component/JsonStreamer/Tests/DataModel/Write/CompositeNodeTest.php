@@ -12,7 +12,6 @@
 namespace Symfony\Component\JsonStreamer\Tests\DataModel\Write;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\JsonStreamer\DataModel\VariableDataAccessor;
 use Symfony\Component\JsonStreamer\DataModel\Write\CollectionNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ObjectNode;
@@ -27,7 +26,7 @@ class CompositeNodeTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('"%s" expects at least 2 nodes.', CompositeNode::class));
 
-        new CompositeNode(new VariableDataAccessor('data'), [new ScalarNode(new VariableDataAccessor('data'), Type::int())]);
+        new CompositeNode('$data', [new ScalarNode('$data', Type::int())]);
     }
 
     public function testCannotCreateWithCompositeNodeParts()
@@ -35,21 +34,21 @@ class CompositeNodeTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Cannot set "%s" as a "%s" node.', CompositeNode::class, CompositeNode::class));
 
-        new CompositeNode(new VariableDataAccessor('data'), [
-            new CompositeNode(new VariableDataAccessor('data'), [
-                new ScalarNode(new VariableDataAccessor('data'), Type::int()),
-                new ScalarNode(new VariableDataAccessor('data'), Type::int()),
+        new CompositeNode('$data', [
+            new CompositeNode('$data', [
+                new ScalarNode('$data', Type::int()),
+                new ScalarNode('$data', Type::int()),
             ]),
-            new ScalarNode(new VariableDataAccessor('data'), Type::int()),
+            new ScalarNode('$data', Type::int()),
         ]);
     }
 
     public function testSortNodesOnCreation()
     {
-        $composite = new CompositeNode(new VariableDataAccessor('data'), [
-            $scalar = new ScalarNode(new VariableDataAccessor('data'), Type::int()),
-            $object = new ObjectNode(new VariableDataAccessor('data'), Type::object(self::class), []),
-            $collection = new CollectionNode(new VariableDataAccessor('data'), Type::list(), new ScalarNode(new VariableDataAccessor('data'), Type::int()), new ScalarNode(new VariableDataAccessor('key'), Type::string())),
+        $composite = new CompositeNode('$data', [
+            $scalar = new ScalarNode('$data', Type::int()),
+            $object = new ObjectNode('$data', Type::object(self::class), []),
+            $collection = new CollectionNode('$data', Type::list(), new ScalarNode('$data', Type::int()), new ScalarNode('$key', Type::string())),
         ]);
 
         $this->assertSame([$collection, $object, $scalar], $composite->getNodes());
@@ -57,14 +56,14 @@ class CompositeNodeTest extends TestCase
 
     public function testWithAccessor()
     {
-        $composite = new CompositeNode(new VariableDataAccessor('data'), [
-            new ScalarNode(new VariableDataAccessor('foo'), Type::int()),
-            new ScalarNode(new VariableDataAccessor('bar'), Type::int()),
+        $composite = new CompositeNode('$data', [
+            new ScalarNode('$foo', Type::int()),
+            new ScalarNode('$bar', Type::int()),
         ]);
-        $composite = $composite->withAccessor($newAccessor = new VariableDataAccessor('baz'));
+        $composite = $composite->withAccessor('$baz');
 
         foreach ($composite->getNodes() as $node) {
-            $this->assertSame($newAccessor, $node->getAccessor());
+            $this->assertSame('$baz', $node->getAccessor());
         }
     }
 }

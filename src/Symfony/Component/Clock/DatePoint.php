@@ -30,17 +30,8 @@ final class DatePoint extends \DateTimeImmutable
                 $now = static::createFromInterface($now);
             }
 
-            if (\PHP_VERSION_ID < 80300) {
-                try {
-                    $builtInDate = new parent($datetime, $timezone ?? $now->getTimezone());
-                    $timezone = $builtInDate->getTimezone();
-                } catch (\Exception $e) {
-                    throw new \DateMalformedStringException($e->getMessage(), $e->getCode(), $e);
-                }
-            } else {
-                $builtInDate = new parent($datetime, $timezone ?? $now->getTimezone());
-                $timezone = $builtInDate->getTimezone();
-            }
+            $builtInDate = new parent($datetime, $timezone ?? $now->getTimezone());
+            $timezone = $builtInDate->getTimezone();
 
             $now = $now->setTimezone($timezone)->modify($datetime);
 
@@ -74,23 +65,7 @@ final class DatePoint extends \DateTimeImmutable
 
     public static function createFromTimestamp(int|float $timestamp): static
     {
-        if (\PHP_VERSION_ID >= 80400) {
-            return parent::createFromTimestamp($timestamp);
-        }
-
-        if (\is_int($timestamp) || !$ms = (int) $timestamp - $timestamp) {
-            return static::createFromFormat('U', (string) $timestamp);
-        }
-
-        if (!is_finite($timestamp) || \PHP_INT_MAX + 1.0 <= $timestamp || \PHP_INT_MIN > $timestamp) {
-            throw new \DateRangeError(\sprintf('DateTimeImmutable::createFromTimestamp(): Argument #1 ($timestamp) must be a finite number between %s and %s.999999, %s given', \PHP_INT_MIN, \PHP_INT_MAX, $timestamp));
-        }
-
-        if ($timestamp < 0) {
-            $timestamp = (int) $timestamp - 2.0 + $ms;
-        }
-
-        return static::createFromFormat('U.u', \sprintf('%.6F', $timestamp));
+        return parent::createFromTimestamp($timestamp);
     }
 
     public function add(\DateInterval $interval): static
@@ -108,10 +83,6 @@ final class DatePoint extends \DateTimeImmutable
      */
     public function modify(string $modifier): static
     {
-        if (\PHP_VERSION_ID < 80300) {
-            return @parent::modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? \sprintf('Invalid modifier: "%s".', $modifier));
-        }
-
         return parent::modify($modifier);
     }
 
@@ -151,19 +122,6 @@ final class DatePoint extends \DateTimeImmutable
             throw new \DateRangeError('DatePoint::setMicrosecond(): Argument #1 ($microsecond) must be between 0 and 999999, '.$microsecond.' given');
         }
 
-        if (\PHP_VERSION_ID < 80400) {
-            return $this->setTime(...explode('.', $this->format('H.i.s.'.$microsecond)));
-        }
-
         return parent::setMicrosecond($microsecond);
-    }
-
-    public function getMicrosecond(): int
-    {
-        if (\PHP_VERSION_ID >= 80400) {
-            return parent::getMicrosecond();
-        }
-
-        return $this->format('u');
     }
 }

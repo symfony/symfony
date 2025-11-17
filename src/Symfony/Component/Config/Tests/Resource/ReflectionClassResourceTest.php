@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Tests\Fixtures\FakeVendor\Base;
@@ -61,9 +62,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertFalse($res->isFresh($now), '->isFresh() returns false if the resource does not exist');
     }
 
-    /**
-     * @dataProvider provideHashedSignature
-     */
+    #[DataProvider('provideHashedSignature')]
     public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, int $resourceClassNameSuffix, ?\Closure $setContext = null)
     {
         if ($setContext) {
@@ -71,26 +70,26 @@ class ReflectionClassResourceTest extends TestCase
         }
 
         $code = <<<'EOPHP'
-/* 0*/
-/* 1*/  class %s extends %s
-/* 2*/  {
-/* 3*/      const FOO = 123;
-/* 4*/
-/* 5*/      public $pub = [];
-/* 6*/
-/* 7*/      protected $prot;
-/* 8*/
-/* 9*/      private $priv;
-/*10*/
-/*11*/      public function pub($arg = null) {}
-/*12*/
-/*13*/      protected function prot($a = []) {}
-/*14*/
-/*15*/      private function priv() {}
-/*16*/
-/*17*/      public function ccc($bar = A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC) {}
-/*18*/  }
-EOPHP;
+            /* 0*/
+            /* 1*/  class %s extends %s
+            /* 2*/  {
+            /* 3*/      const FOO = 123;
+            /* 4*/
+            /* 5*/      public $pub = [];
+            /* 6*/
+            /* 7*/      protected $prot;
+            /* 8*/
+            /* 9*/      private $priv;
+            /*10*/
+            /*11*/      public function pub($arg = null) {}
+            /*12*/
+            /*13*/      protected function prot($a = []) {}
+            /*14*/
+            /*15*/      private function priv() {}
+            /*16*/
+            /*17*/      public function ccc($bar = A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC) {}
+            /*18*/  }
+            EOPHP;
 
         static $expectedSignature, $signatureGenerator;
 

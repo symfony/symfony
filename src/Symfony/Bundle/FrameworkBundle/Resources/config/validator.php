@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
@@ -73,7 +74,6 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->load('Symfony\Component\Validator\Constraints\\', $validatorsDir.'/*Validator.php')
-            ->exclude($validatorsDir.'/ExpressionLanguageSyntaxValidator.php')
             ->abstract()
             ->tag('container.excluded')
             ->tag('validator.constraint_validator')
@@ -127,5 +127,9 @@ return static function (ContainerConfigurator $container) {
                 service('property_info'),
             ])
             ->tag('validator.auto_mapper')
+
+        ->set('validator.form.attribute_metadata', Form::class)
+            ->tag('container.excluded')
+            ->tag('validator.attribute_metadata')
     ;
 };

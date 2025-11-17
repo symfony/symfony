@@ -228,7 +228,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
                         continue;
                     }
 
-                    $uniqueErrors[$error->getPath()] = $uniqueErrors[$error->getPath()] ?? $error;
+                    $uniqueErrors[$error->getPath()] ??= $error;
                 }
 
                 throw new PartialDenormalizationException($denormalized, array_values($uniqueErrors));

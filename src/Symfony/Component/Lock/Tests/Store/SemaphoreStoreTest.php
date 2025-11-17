@@ -11,15 +11,16 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
- *
- * @requires extension sysvsem
  */
+#[RequiresPhpExtension('sysvsem')]
 class SemaphoreStoreTest extends AbstractStoreTestCase
 {
     use BlockingStoreTestTrait;

@@ -93,20 +93,13 @@ class ExpressionLanguage
     /**
      * Validates the syntax of an expression.
      *
-     * @param array|null                    $names The list of acceptable variable names in the expression
+     * @param array                         $names The list of acceptable variable names in the expression
      * @param int-mask-of<Parser::IGNORE_*> $flags
      *
      * @throws SyntaxError When the passed expression is invalid
      */
-    public function lint(Expression|string $expression, ?array $names, int $flags = 0): void
+    public function lint(Expression|string $expression, array $names, int $flags = 0): void
     {
-        if (null === $names) {
-            trigger_deprecation('symfony/expression-language', '7.1', 'Passing "null" as the second argument of "%s()" is deprecated, pass "%s\Parser::IGNORE_UNKNOWN_VARIABLES" instead as a third argument.', __METHOD__, __NAMESPACE__);
-
-            $flags |= Parser::IGNORE_UNKNOWN_VARIABLES;
-            $names = [];
-        }
-
         if ($expression instanceof ParsedExpression) {
             return;
         }
@@ -145,10 +138,7 @@ class ExpressionLanguage
         }
     }
 
-    /**
-     * @return void
-     */
-    protected function registerFunctions()
+    protected function registerFunctions(): void
     {
         $basicPhpFunctions = ['constant', 'min', 'max'];
         foreach ($basicPhpFunctions as $function) {

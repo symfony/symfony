@@ -23,24 +23,24 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  *
  * This manager is designed to be stateless and compatible with HTTP-caching.
  *
- * First, we validate the source of the request using the Origin/Referer headers. This relies
- * on the app being able to know its own target origin. Don't miss configuring your reverse proxy to
- * send the X-Forwarded-* / Forwarded headers if you're behind one.
+ * Requests are considered secure when either:
+ * - the Sec-Fetch-Site header contains 'same-origin';
+ * - the Origin or Referer headers contain the same origin as the request;
+ * - a special token was double-submitted in the request payload and as a cookie and/or a header.
  *
- * Then, we validate the request using a cookie and a CsrfToken. If the cookie is found, it should
- * contain the same value as the CsrfToken. A JavaScript snippet on the client side is responsible
- * for performing this double-submission. The token value should be regenerated on every request
- * using a cryptographically secure random generator.
+ * The check using the Origin/Referer headers relies on the app being able to know its own target
+ * origin. Don't miss configuring your reverse proxy to send the X-Forwarded-* / Forwarded headers
+ * if you're behind one.
  *
- * If either double-submit or Origin/Referer headers are missing, it typically indicates that
- * JavaScript is disabled on the client side, or that the JavaScript snippet was not properly
- * implemented, or that the Origin/Referer headers were filtered out.
- *
- * Requests lacking both double-submit and origin information are deemed insecure.
+ * The check relying on the double-submit requires a JavaScript snippet on the client side,
+ * responsible for generating a cryptographically-secure random token and attaching it to the request
+ * payload and as a cookie and/or a header. This check is meant to cover the case where neither
+ * Sec-Fetch-Site, nor Origin/Referer headers are present.
  *
  * When a session is found, a behavioral check is added to ensure that the validation method does not
- * downgrade from double-submit to origin checks. This prevents attackers from exploiting potentially
- * less secure validation methods once a more secure method has been confirmed as functional.
+ * downgrade from double-submit to origin checks, and vice versa. This prevents attackers from
+ * exploiting potentially less secure validation methods once a more secure method has been confirmed
+ * as functional.
  *
  * On HTTPS connections, the cookie is prefixed with "__Host-" to prevent it from being forged on an
  * HTTP channel. On the JS side, the cookie should be set with samesite=strict to strengthen the CSRF
@@ -50,8 +50,8 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  * cookie. This makes it harder for an attacker to forge a request, though it may also pose challenges
  * when setting the header depending on the client-side framework in use.
  *
- * When a fallback CSRF token manager is provided, only tokens listed in the $tokenIds argument will be
- * managed by this manager. All other tokens will be delegated to the fallback manager.
+ * When a fallback CSRF token manager is provided, only tokens listed in the $tokenIds argument will
+ * be managed by this manager. All other tokens will be delegated to the fallback manager.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -235,6 +235,10 @@ final class SameOriginCsrfTokenManager implements CsrfTokenManagerInterface
      */
     private function isValidOrigin(Request $request): ?bool
     {
+        if (null !== $header = $request->headers->get('Sec-Fetch-Site')) {
+            return 'same-origin' === $header;
+        }
+
         $target = $request->getSchemeAndHttpHost().'/';
         $source = 'null';
 

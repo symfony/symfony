@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Context\Encoder;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Context\Encoder\XmlEncoderContextBuilder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -27,9 +28,7 @@ class XmlEncoderContextBuilderTest extends TestCase
         $this->contextBuilder = new XmlEncoderContextBuilder();
     }
 
-    /**
-     * @dataProvider withersDataProvider
-     */
+    #[DataProvider('withersDataProvider')]
     public function testWithers(array $values)
     {
         $context = $this->contextBuilder

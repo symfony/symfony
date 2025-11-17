@@ -107,7 +107,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      */
     public function write(string $content, ?array $metadata = null): void
     {
-        $mode = 0666;
+        $mode = 0o666;
         $umask = umask();
         $filesystem = new Filesystem();
         $filesystem->dumpFile($this->file, $content);

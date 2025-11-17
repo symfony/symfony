@@ -11,18 +11,26 @@
 
 namespace Symfony\Component\Console\Tests\Tester;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tests\Fixtures\InvokableExtendingCommandTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveAttributesTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveHiddenQuestionAttributeTestCommand;
 
 class CommandTesterTest extends TestCase
 {
@@ -104,7 +112,7 @@ class CommandTesterTest extends TestCase
             return 0;
         });
 
-        $application->add($command);
+        $application->addCommand($command);
 
         $tester = new CommandTester($application->find('foo'));
 
@@ -244,7 +252,7 @@ class CommandTesterTest extends TestCase
         $tester = new CommandTester($command);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Aborted.');
+        $this->expectExceptionMessage('Aborted');
 
         $tester->execute([]);
     }
@@ -292,5 +300,214 @@ class CommandTesterTest extends TestCase
         );
 
         $this->assertSame('foo', $tester->getErrorOutput());
+    }
+
+    public function testAInvokableCommand()
+    {
+        $command = new InvokableTestCommand();
+
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
+    public function testAInvokableExtendedCommand()
+    {
+        $command = new InvokableExtendingCommandTestCommand();
+
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
+    public function testInvokableDefinitionWithInputAttribute()
+    {
+        $application = new Application();
+        $application->addCommand(new InvokableWithInputTestCommand());
+        $application->setAutoExit(false);
+
+        $bufferedOutput = new BufferedOutput();
+        $statusCode = $application->run(new ArrayInput(['command' => 'help', 'command_name' => 'invokable:input:test']), $bufferedOutput);
+
+        $expectedOutput = <<<TXT
+            Usage:
+              invokable:input:test [options] [--] <username> <email> <password>
+
+            Arguments:
+              username %S
+              email %S
+              password %S
+
+            Options:
+                  --group=GROUP                           [default: "users"]
+                  --group-description=GROUP-DESCRIPTION   [default: "Standard Users"]
+                  --admin %S
+                  --active|--no-active %S
+                  --status=STATUS                         [default: "unverified"]
+            %A
+            TXT;
+
+        self::assertSame(0, $statusCode);
+        self::assertStringMatchesFormat($expectedOutput, $bufferedOutput->fetch());
+    }
+
+    #[DataProvider('getInvokableWithInputData')]
+    public function testInvokableWithInputAttribute(array $input, string $output)
+    {
+        $command = new InvokableWithInputTestCommand();
+
+        $tester = new CommandTester($command);
+        $tester->execute($input);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertSame($output, $tester->getDisplay(true));
+    }
+
+    public static function getInvokableWithInputData(): iterable
+    {
+        yield 'all set' => [
+            'input' => [
+                'username' => 'user1',
+                'email' => 'user1@example.com',
+                'password' => 'password123',
+                '--admin' => true,
+                '--active' => false,
+                '--status' => 'verified',
+                '--group' => 'admins',
+                '--group-description' => 'Super Administrators',
+            ],
+            'output' => <<<TXT
+                user1
+                user1@example.com
+                password123
+                yes
+                no
+                verified
+                admins
+                Super Administrators
+
+                TXT,
+        ];
+
+        yield 'only required arguments' => [
+            'input' => [
+                'username' => 'test',
+                'email' => 'test@example.com',
+                'password' => 'password123',
+            ],
+            'output' => <<<TXT
+                test
+                test@example.com
+                password123
+                no
+                yes
+                unverified
+                users
+                Standard Users
+
+                TXT,
+        ];
+
+        yield 'admin enabled with defaults' => [
+            'input' => [
+                'username' => 'admin',
+                'email' => 'admin@example.com',
+                'password' => 'admin123',
+                '--admin' => true,
+            ],
+            'output' => <<<TXT
+                admin
+                admin@example.com
+                admin123
+                yes
+                yes
+                unverified
+                users
+                Standard Users
+
+                TXT,
+        ];
+
+        yield 'custom group with defaults' => [
+            'input' => [
+                'username' => 'user',
+                'email' => 'user@custom.com',
+                'password' => 'custom123',
+                '--group' => 'moderators',
+                '--group-description' => 'System Moderators',
+            ],
+            'output' => <<<TXT
+                user
+                user@custom.com
+                custom123
+                no
+                yes
+                unverified
+                moderators
+                System Moderators
+
+                TXT,
+        ];
+
+        yield 'defaults with interactive' => [
+            'input' => [
+                'username' => 'user',
+            ],
+            'output' => <<<TXT
+                user
+                user.interactive@command.com
+                user-dto-interactive-password
+                no
+                yes
+                unverified
+                users
+                Standard Users
+
+                TXT,
+        ];
+    }
+
+    public function testInvokableWithInteractiveQuestionParameter()
+    {
+        $tester = new CommandTester(new InvokableWithInteractiveAttributesTestCommand());
+        $tester->setInputs(['arg1-value', 'arg2-value', 'arg3-value', 'arg6-value', 'arg7-value', 'yes', 'arg9-v1', 'arg9-v2', '', 'arg4-value', 'arg5-value']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Enter arg1', $tester->getDisplay());
+        self::assertStringContainsString('Arg1: arg1-value', $tester->getDisplay());
+        self::assertStringContainsString('Enter arg2', $tester->getDisplay());
+        self::assertStringContainsString('Arg2: arg2-value', $tester->getDisplay());
+        self::assertStringContainsString('Enter arg3', $tester->getDisplay());
+        self::assertStringContainsString('Arg3: arg3-value', $tester->getDisplay());
+        self::assertStringContainsString('Enter arg6', $tester->getDisplay());
+        self::assertStringContainsString('Arg6: arg6-value', $tester->getDisplay());
+        self::assertStringContainsString('Enter arg7', $tester->getDisplay());
+        self::assertStringContainsString('Arg7: arg7-value', $tester->getDisplay());
+        self::assertStringContainsString('Enter arg8 (yes/no) [no]', $tester->getDisplay());
+        self::assertStringContainsString('Arg8: yes', $tester->getDisplay());
+        self::assertStringContainsString('Enter arg9', $tester->getDisplay());
+        self::assertStringContainsString('Arg9: arg9-v1,arg9-v2', $tester->getDisplay());
+        self::assertStringContainsString('Enter arg4', $tester->getDisplay());
+        self::assertStringContainsString('Arg4: arg4-value', $tester->getDisplay());
+        self::assertStringContainsString('Enter arg5', $tester->getDisplay());
+        self::assertStringContainsString('Arg5: arg5-value', $tester->getDisplay());
+    }
+
+    public function testInvokableWithInteractiveHiddenQuestionParameter()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Cannot test hidden questions on Windows');
+        }
+
+        $tester = new CommandTester(new InvokableWithInteractiveHiddenQuestionAttributeTestCommand());
+        $tester->setInputs(['arg1-value']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Enter arg1', $tester->getDisplay());
+        self::assertStringContainsString('Arg1: arg1-value', $tester->getDisplay());
     }
 }

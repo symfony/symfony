@@ -11,17 +11,18 @@
 
 namespace Symfony\Component\Security\Csrf\Tests\TokenStorage;
 
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
  */
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
 class NativeSessionTokenStorageTest extends TestCase
 {
     private const SESSION_NAMESPACE = 'foobar';
@@ -63,9 +64,7 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->assertSame([self::SESSION_NAMESPACE => ['token_id' => 'TOKEN']], $_SESSION);
     }
 
-    /**
-     * @depends testStoreTokenInClosedSession
-     */
+    #[Depends('testStoreTokenInClosedSession')]
     public function testCheckToken()
     {
         $this->assertFalse($this->storage->hasToken('token_id'));
@@ -75,9 +74,7 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->assertTrue($this->storage->hasToken('token_id'));
     }
 
-    /**
-     * @depends testStoreTokenInClosedSession
-     */
+    #[Depends('testStoreTokenInClosedSession')]
     public function testGetExistingToken()
     {
         $this->storage->setToken('token_id', 'TOKEN');
@@ -91,18 +88,14 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->storage->getToken('token_id');
     }
 
-    /**
-     * @depends testCheckToken
-     */
+    #[Depends('testCheckToken')]
     public function testRemoveNonExistingToken()
     {
         $this->assertNull($this->storage->removeToken('token_id'));
         $this->assertFalse($this->storage->hasToken('token_id'));
     }
 
-    /**
-     * @depends testCheckToken
-     */
+    #[Depends('testCheckToken')]
     public function testRemoveExistingToken()
     {
         $this->storage->setToken('token_id', 'TOKEN');

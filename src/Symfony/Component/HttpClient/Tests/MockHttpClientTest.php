@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
@@ -25,9 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MockHttpClientTest extends HttpClientTestCase
 {
-    /**
-     * @dataProvider mockingProvider
-     */
+    #[DataProvider('mockingProvider')]
     public function testMocking($factory, array $expectedResponses)
     {
         $client = new MockHttpClient($factory);
@@ -96,9 +95,7 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider validResponseFactoryProvider
-     */
+    #[DataProvider('validResponseFactoryProvider')]
     public function testValidResponseFactory($responseFactory)
     {
         (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
@@ -118,9 +115,7 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider transportExceptionProvider
-     */
+    #[DataProvider('transportExceptionProvider')]
     public function testTransportExceptionThrowsIfPerformedMoreRequestsThanConfigured($factory)
     {
         $client = new MockHttpClient($factory);
@@ -158,9 +153,7 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidResponseFactoryProvider
-     */
+    #[DataProvider('invalidResponseFactoryProvider')]
     public function testInvalidResponseFactory($responseFactory, string $expectedExceptionMessage)
     {
         $this->expectException(TransportException::class);

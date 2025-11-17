@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
@@ -21,13 +22,11 @@ use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\ValidatorBuilder;
 
 /**
- * Warms up XML and YAML validator metadata.
+ * Warms up validator metadata.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @final since Symfony 7.1
  */
-class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
+final class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     /**
      * @param string $phpArrayFile The PHP file where metadata are cached
@@ -77,14 +76,14 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * @param LoaderInterface[] $loaders
      *
-     * @return XmlFileLoader[]|YamlFileLoader[]
+     * @return list<XmlFileLoader|YamlFileLoader|AttributeLoader>
      */
     private function extractSupportedLoaders(array $loaders): array
     {
         $supportedLoaders = [];
 
         foreach ($loaders as $loader) {
-            if ($loader instanceof XmlFileLoader || $loader instanceof YamlFileLoader) {
+            if (method_exists($loader, 'getMappedClasses')) {
                 $supportedLoaders[] = $loader;
             } elseif ($loader instanceof LoaderChain) {
                 $supportedLoaders = array_merge($supportedLoaders, $this->extractSupportedLoaders($loader->getLoaders()));

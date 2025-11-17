@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -45,21 +46,22 @@ class LdapFactory implements UserProviderFactoryInterface
         return 'ldap';
     }
 
+    /**
+     * @param ArrayNodeDefinition $node
+     */
     public function addConfiguration(NodeDefinition $node): void
     {
         $node
-            ->fixXmlConfig('extra_field')
-            ->fixXmlConfig('default_role')
             ->children()
-                ->scalarNode('service')->isRequired()->cannotBeEmpty()->defaultValue('ldap')->end()
+                ->scalarNode('service')->isRequired()->cannotBeEmpty()->example('ldap')->end()
                 ->scalarNode('base_dn')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('search_dn')->defaultNull()->end()
                 ->scalarNode('search_password')->defaultNull()->end()
-                ->arrayNode('extra_fields')
+                ->arrayNode('extra_fields', 'extra_field')
                     ->prototype('scalar')->end()
                 ->end()
-                ->arrayNode('default_roles')
-                    ->beforeNormalization()->ifString()->then(fn ($v) => preg_split('/\s*,\s*/', $v))->end()
+                ->arrayNode('default_roles', 'default_role')
+                    ->beforeNormalization()->ifString()->then(static fn ($v) => preg_split('/\s*,\s*/', $v))->end()
                     ->requiresAtLeastOneElement()
                     ->prototype('scalar')->end()
                 ->end()

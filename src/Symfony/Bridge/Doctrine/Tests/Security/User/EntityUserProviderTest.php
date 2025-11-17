@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -238,13 +237,8 @@ class EntityUserProviderTest extends TestCase
         $provider = new EntityUserProvider($this->getManager($em), User::class);
         $refreshedUser = $provider->refreshUser($user);
 
-        if (\PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects')) {
-            $this->assertFalse((new \ReflectionClass(User::class))->isUninitializedLazyObject($refreshedUser));
-            $this->assertSame('user1', $refreshedUser->name);
-        } else {
-            $this->assertInstanceOf(Proxy::class, $refreshedUser);
-            $this->assertTrue($refreshedUser->__isInitialized());
-        }
+        $this->assertFalse((new \ReflectionClass(User::class))->isUninitializedLazyObject($refreshedUser));
+        $this->assertSame('user1', $refreshedUser->name);
     }
 
     private function getManager($em, $name = null)

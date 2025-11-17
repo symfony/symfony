@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Exception\CacheException;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class MemcachedAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [
@@ -67,9 +68,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         $this->assertSame(\Memcached::DISTRIBUTION_MODULA, $client->getOption(\Memcached::OPT_DISTRIBUTION));
     }
 
-    /**
-     * @dataProvider provideBadOptions
-     */
+    #[DataProvider('provideBadOptions')]
     public function testBadOptions($name, $value)
     {
         $this->expectException(\Error::class);
@@ -111,9 +110,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         new MemcachedAdapter(MemcachedAdapter::createConnection([], ['serializer' => 'json']));
     }
 
-    /**
-     * @dataProvider provideServersSetting
-     */
+    #[DataProvider('provideServersSetting')]
     public function testServersSetting(string $dsn, string $host, int $port)
     {
         $client1 = MemcachedAdapter::createConnection($dsn);
@@ -168,9 +165,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         }
     }
 
-    /**
-     * @requires extension memcached
-     */
+    #[RequiresPhpExtension('memcached')]
     public function testOptionsFromDsnWinOverAdditionallyPassedOptions()
     {
         $client = MemcachedAdapter::createConnection('memcached://localhost:11222?retry_timeout=10', [
@@ -180,9 +175,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         $this->assertSame(10, $client->getOption(\Memcached::OPT_RETRY_TIMEOUT));
     }
 
-    /**
-     * @requires extension memcached
-     */
+    #[RequiresPhpExtension('memcached')]
     public function testOptionsFromDsnAndAdditionallyPassedOptionsAreMerged()
     {
         $client = MemcachedAdapter::createConnection('memcached://localhost:11222?socket_recv_size=1&socket_send_size=2', [

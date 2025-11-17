@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Routing\Tests\Generator\Dumper;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
@@ -24,8 +24,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class CompiledUrlGeneratorDumperTest extends TestCase
 {
-    use ExpectUserDeprecationMessageTrait;
-
     private RouteCollection $routeCollection;
     private CompiledUrlGeneratorDumper $generatorDumper;
     private string $testTmpFilepath;
@@ -338,9 +336,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->generatorDumper->dump();
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testDeprecatedAlias()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
@@ -356,9 +352,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $compiledUrlGenerator->generate('b');
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testDeprecatedAliasWithCustomMessage()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
@@ -374,9 +368,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $compiledUrlGenerator->generate('b');
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');

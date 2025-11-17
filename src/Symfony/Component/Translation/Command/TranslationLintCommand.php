@@ -54,10 +54,10 @@ class TranslationLintCommand extends Command
                 new InputOption('locale', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Specify the locales to lint.', $this->enabledLocales),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</> command lint translations.
+                The <info>%command.name%</> command lint translations.
 
-  <info>php %command.full_name%</>
-EOF
+                  <info>php %command.full_name%</>
+                EOF
             );
     }
 
@@ -70,7 +70,7 @@ EOF
     {
         $locales = $input->getOption('locale');
 
-        /** @var array<string, array<string, array<string, \Throwable>> $errors */
+        /** @var array<string, array<string, array<string, \Throwable>>> $errors */
         $errors = [];
         $domainsByLocales = [];
 

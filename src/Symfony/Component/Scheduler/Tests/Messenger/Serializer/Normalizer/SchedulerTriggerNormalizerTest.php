@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests\Messenger\Serializer\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Messenger\Serializer\Normalizer\SchedulerTriggerNormalizer;
 use Symfony\Component\Scheduler\Trigger\CallbackTrigger;
@@ -26,9 +27,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
         $this->normalizer = new SchedulerTriggerNormalizer();
     }
 
-    /**
-     * @dataProvider normalizeProvider
-     */
+    #[DataProvider('normalizeProvider')]
     public function testNormalize(mixed $data, mixed $expected)
     {
         self::assertSame($expected, $this->normalizer->normalize($data));
@@ -40,9 +39,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
         yield 'PeriodicalTrigger' => [new PeriodicalTrigger(5), 'every 5 seconds'];
     }
 
-    /**
-     * @dataProvider supportsNormalizationProvider
-     */
+    #[DataProvider('supportsNormalizationProvider')]
     public function testSupportsNormalization(mixed $data, array $context, bool $expected)
     {
         self::assertSame($expected, $this->normalizer->supportsNormalization($data, 'json', $context));
@@ -58,9 +55,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
         yield 'stdClass, normal context' => [new \stdClass(), [], false];
     }
 
-    /**
-     * @dataProvider supportsDenormalizationProvider
-     */
+    #[DataProvider('supportsDenormalizationProvider')]
     public function testSupportsDenormalization(mixed $data, string $type, array $context, bool $expected)
     {
         self::assertSame($expected, $this->normalizer->supportsDenormalization($data, $type, 'json', $context));

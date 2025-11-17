@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Security;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -57,7 +58,7 @@ class FirewallMapTest extends TestCase
         $this->assertFalse($request->attributes->has('_stateless'));
     }
 
-    /** @dataProvider providesStatefulStatelessRequests */
+    #[DataProvider('providesStatefulStatelessRequests')]
     public function testGetListeners(Request $request, bool $expectedState)
     {
         $firewallContext = $this->createMock(FirewallContext::class);

@@ -63,13 +63,13 @@ class ExecutableFinder
         }
 
         $dirs = array_merge(
-            explode(\PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
+            explode(\PATH_SEPARATOR, getenv('PATH') ?: getenv('Path') ?: ''),
             $extraDirs
         );
 
         $suffixes = $this->suffixes;
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $pathExt = getenv('PATHEXT');
+            $pathExt = getenv('PATHEXT') ?: '';
             $suffixes = array_merge($suffixes, $pathExt ? explode(\PATH_SEPARATOR, $pathExt) : ['.exe', '.bat', '.cmd', '.com']);
         }
         $suffixes = '' !== pathinfo($name, \PATHINFO_EXTENSION) ? array_merge([''], $suffixes) : array_merge($suffixes, ['']);

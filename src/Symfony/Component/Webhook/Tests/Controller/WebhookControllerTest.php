@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Webhook\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,9 +33,7 @@ class WebhookControllerTest extends TestCase
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    /**
-     * @dataProvider rejectedParseProvider
-     */
+    #[DataProvider('rejectedParseProvider')]
     public function testParserRejectsPayload($return)
     {
         $secret = '1234';

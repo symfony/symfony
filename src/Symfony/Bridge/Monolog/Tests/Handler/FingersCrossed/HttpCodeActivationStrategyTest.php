@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Monolog\Tests\Handler\FingersCrossed;
 
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Level;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\FingersCrossed\HttpCodeActivationStrategy;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
@@ -34,9 +35,7 @@ class HttpCodeActivationStrategyTest extends TestCase
         new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], new ErrorLevelActivationStrategy(Level::Warning));
     }
 
-    /**
-     * @dataProvider isActivatedProvider
-     */
+    #[DataProvider('isActivatedProvider')]
     public function testIsActivated($url, $record, $expected)
     {
         $requestStack = new RequestStack();

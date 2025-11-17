@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -28,9 +29,7 @@ use Symfony\Component\Mime\RawMessage;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class AbstractTransportTest extends TestCase
 {
     public function testThrottling()

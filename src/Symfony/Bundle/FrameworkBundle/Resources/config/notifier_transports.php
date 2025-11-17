@@ -102,7 +102,6 @@ return static function (ContainerConfigurator $container) {
         'sms-biuras' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
         'sms-factor' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
         'sms-sluzba' => Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
-        'sms77' => Bridge\Sms77\Sms77TransportFactory::class,
         'smsapi' => Bridge\Smsapi\SmsapiTransportFactory::class,
         'smsbox' => Bridge\Smsbox\SmsboxTransportFactory::class,
         'smsc' => Bridge\Smsc\SmscTransportFactory::class,

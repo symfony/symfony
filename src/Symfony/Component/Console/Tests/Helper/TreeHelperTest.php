@@ -52,10 +52,12 @@ class TreeHelperTest extends TestCase
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-├── Child 1
-└── Child 2
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            ├── Child 1
+            └── Child 2
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderThreeLevelTree()
@@ -74,11 +76,13 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-├── Child 1
-│   └── SubChild 1
-└── Child 2
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            ├── Child 1
+            │   └── SubChild 1
+            └── Child 2
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderMultiLevelTree()
@@ -101,13 +105,15 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-├── Child 1
-│   ├── SubChild 1
-│   │   └── SubSubChild 1
-│   └── SubChild 2
-└── Child 2
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            ├── Child 1
+            │   ├── SubChild 1
+            │   │   └── SubSubChild 1
+            │   └── SubChild 2
+            └── Child 2
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderSingleNodeTree()
@@ -118,8 +124,10 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderEmptyTree()
@@ -130,8 +138,10 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderDeeplyNestedTree()
@@ -158,18 +168,20 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-└── Level 1
-  └── Level 2
-    └── Level 3
-      └── Level 4
-        └── Level 5
-          └── Level 6
-            └── Level 7
-              └── Level 8
-                └── Level 9
-                  └── Level 10
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            └── Level 1
+              └── Level 2
+                └── Level 3
+                  └── Level 4
+                    └── Level 5
+                      └── Level 6
+                        └── Level 7
+                          └── Level 8
+                            └── Level 9
+                              └── Level 10
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderNodeWithMultipleChildren()
@@ -188,11 +200,13 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-├── Child 1
-├── Child 2
-└── Child 3
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            ├── Child 1
+            ├── Child 2
+            └── Child 3
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderNodeWithMultipleChildrenWithStringConversion()
@@ -208,11 +222,13 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-├── Child 1
-├── Child 2
-└── Child 3
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            ├── Child 1
+            ├── Child 2
+            └── Child 3
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderTreeWithDuplicateNodeNames()
@@ -231,11 +247,13 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-├── Child
-│   └── Child
-└── Child
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            ├── Child
+            │   └── Child
+            └── Child
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderTreeWithComplexNodeNames()
@@ -254,11 +272,13 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-Root
-├── Child 1 (special)
-│   └── Node with spaces
-└── Child_2@#$
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            Root
+            ├── Child 1 (special)
+            │   └── Node with spaces
+            └── Child_2@#$
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRenderTreeWithCycle()
@@ -307,10 +327,12 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-root
-├── child1
-└── child2
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ├── child1
+            └── child2
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testCreateWithNestedArray()
@@ -322,14 +344,16 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-root
-├── child1
-├── child2
-│   ├── child2.1
-│   └── child2.2
-│      └── child2.2.1
-└── child3
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ├── child1
+            ├── child2
+            │   ├── child2.1
+            │   └── child2.2
+            │      └── child2.2.1
+            └── child3
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testCreateWithoutRoot()
@@ -341,9 +365,11 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
         $tree->render();
         $this->assertSame(<<<TREE
-├── child1
-└── child2
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            ├── child1
+            └── child2
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testCreateWithEmptyArray()

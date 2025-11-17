@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Container;
@@ -27,9 +29,7 @@ class EnvVarProcessorTest extends TestCase
 {
     public const TEST_CONST = 'test';
 
-    /**
-     * @dataProvider validStrings
-     */
+    #[DataProvider('validStrings')]
     public function testGetEnvString($value, $processed)
     {
         $container = new ContainerBuilder();
@@ -59,9 +59,7 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider validRealEnvValues
-     */
+    #[DataProvider('validRealEnvValues')]
     public function testGetEnvRealEnv($value, $processed)
     {
         $_ENV['FOO'] = $value;
@@ -120,9 +118,7 @@ class EnvVarProcessorTest extends TestCase
         unset($_ENV['FOO']);
     }
 
-    /**
-     * @dataProvider validBools
-     */
+    #[DataProvider('validBools')]
     public function testGetEnvBool($value, $processed)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -198,9 +194,7 @@ class EnvVarProcessorTest extends TestCase
         unset($_ENV['FOO'], $GLOBALS['ENV_FOO']);
     }
 
-    /**
-     * @dataProvider validBools
-     */
+    #[DataProvider('validBools')]
     public function testGetEnvNot($value, $processed)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -228,9 +222,7 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider validInts
-     */
+    #[DataProvider('validInts')]
     public function testGetEnvInt($value, $processed)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -253,9 +245,7 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidInts
-     */
+    #[DataProvider('invalidInts')]
     public function testGetEnvIntInvalid($value)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -279,9 +269,7 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider validFloats
-     */
+    #[DataProvider('validFloats')]
     public function testGetEnvFloat($value, $processed)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -304,9 +292,7 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidFloats
-     */
+    #[DataProvider('invalidFloats')]
     public function testGetEnvFloatInvalid($value)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -330,9 +316,7 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider validConsts
-     */
+    #[DataProvider('validConsts')]
     public function testGetEnvConst($value, $processed)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -354,9 +338,7 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidConsts
-     */
+    #[DataProvider('invalidConsts')]
     public function testGetEnvConstInvalid($value)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -411,9 +393,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame('hello', $result);
     }
 
-    /**
-     * @dataProvider validJson
-     */
+    #[DataProvider('validJson')]
     public function testGetEnvJson($value, $processed)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -450,9 +430,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    /**
-     * @dataProvider otherJsonValues
-     */
+    #[DataProvider('otherJsonValues')]
     public function testGetEnvJsonOther($value)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -504,9 +482,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    /**
-     * @dataProvider noArrayValues
-     */
+    #[DataProvider('noArrayValues')]
     public function testGetEnvKeyNoArrayResult($value)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -531,9 +507,7 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidArrayValues
-     */
+    #[DataProvider('invalidArrayValues')]
     public function testGetEnvKeyArrayKeyNotFound($value)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -557,9 +531,7 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider arrayValues
-     */
+    #[DataProvider('arrayValues')]
     public function testGetEnvKey($value)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -599,9 +571,7 @@ class EnvVarProcessorTest extends TestCase
         }));
     }
 
-    /**
-     * @dataProvider provideGetEnvEnum
-     */
+    #[DataProvider('provideGetEnvEnum')]
     public function testGetEnvEnum(\BackedEnum $backedEnum)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -665,9 +635,7 @@ class EnvVarProcessorTest extends TestCase
         $processor->getEnv('enum', StringBackedEnum::class.':foo', fn () => 'bogus');
     }
 
-    /**
-     * @dataProvider validNullables
-     */
+    #[DataProvider('validNullables')]
     public function testGetEnvNullable($value, $processed)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -715,9 +683,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertEquals('foo', $result);
     }
 
-    /**
-     * @dataProvider validResolve
-     */
+    #[DataProvider('validResolve')]
     public function testGetEnvResolve($value, $processed)
     {
         $container = new ContainerBuilder();
@@ -751,9 +717,7 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame('%', $result);
     }
 
-    /**
-     * @dataProvider notScalarResolve
-     */
+    #[DataProvider('notScalarResolve')]
     public function testGetEnvResolveNotScalar($value)
     {
         $container = new ContainerBuilder();
@@ -808,9 +772,7 @@ class EnvVarProcessorTest extends TestCase
         unset($_ENV['BAR']);
     }
 
-    /**
-     * @dataProvider validCsv
-     */
+    #[DataProvider('validCsv')]
     public function testGetEnvCsv($value, $processed)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -844,8 +806,8 @@ class EnvVarProcessorTest extends TestCase
     public static function validCsv()
     {
         $complex = <<<'CSV'
-,"""","foo""","\""",\,foo\
-CSV;
+            ,"""","foo""","\""",\,foo\
+            CSV;
 
         return [
             ['', []],
@@ -976,9 +938,7 @@ CSV;
         });
     }
 
-    /**
-     * @dataProvider provideGetEnvUrlPath
-     */
+    #[DataProvider('provideGetEnvUrlPath')]
     public function testGetEnvUrlPath(?string $expected, string $url)
     {
         $this->assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('url', 'foo', static fn (): string => $url)['path']);
@@ -996,18 +956,16 @@ CSV;
         ];
     }
 
-    /**
-     * @testWith ["http://foo.com\\bar"]
-     *           ["\\\\foo.com/bar"]
-     *           ["a\rb"]
-     *           ["a\nb"]
-     *           ["a\tb"]
-     *           ["\u0000foo"]
-     *           ["foo\u0000"]
-     *           [" foo"]
-     *           ["foo "]
-     *           [":"]
-     */
+    #[TestWith(['http://foo.com\\bar'])]
+    #[TestWith(['\\\\foo.com/bar'])]
+    #[TestWith(["a\rb"])]
+    #[TestWith(["a\nb"])]
+    #[TestWith(["a\tb"])]
+    #[TestWith(["\u0000foo"])]
+    #[TestWith(["foo\u0000"])]
+    #[TestWith([' foo'])]
+    #[TestWith(['foo '])]
+    #[TestWith([':'])]
     public function testGetEnvBadUrl(string $url)
     {
         $this->expectException(RuntimeException::class);
@@ -1017,14 +975,12 @@ CSV;
         });
     }
 
-    /**
-     * @testWith    ["", "string"]
-     *              [null, ""]
-     *              [false, "bool"]
-     *              [true, "not"]
-     *              [0, "int"]
-     *              [0.0, "float"]
-     */
+    #[TestWith(['', 'string'])]
+    #[TestWith([null, ''])]
+    #[TestWith([false, 'bool'])]
+    #[TestWith([true, 'not'])]
+    #[TestWith([0, 'int'])]
+    #[TestWith([0.0, 'float'])]
     public function testGetEnvCastsNullBehavior($expected, string $prefix)
     {
         $processor = new EnvVarProcessor(new Container());
@@ -1049,9 +1005,7 @@ CSV;
         }
     }
 
-    /**
-     * @dataProvider provideGetEnvDefined
-     */
+    #[DataProvider('provideGetEnvDefined')]
     public function testGetEnvDefined(bool $expected, callable $callback)
     {
         $this->assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('defined', 'NO_SOMETHING', $callback));

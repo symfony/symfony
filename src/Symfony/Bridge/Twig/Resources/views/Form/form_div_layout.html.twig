@@ -29,7 +29,7 @@
 
 {%- block collection_widget -%}
     {% if prototype is defined and not prototype.rendered %}
-        {%- set attr = attr|merge({'data-prototype': form_row(prototype) }) -%}
+        {%- set attr = attr|merge({'data-prototype': form_row(prototype)}) -%}
     {% endif %}
     {{- block('form_widget') -}}
 {%- endblock collection_widget -%}
@@ -61,7 +61,7 @@
     {%- endif -%}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {%- if placeholder is not none -%}
-            <option value=""{% if placeholder_attr|default({}) %}{% with { attr: placeholder_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+            <option value=""{% if placeholder_attr|default({}) %}{% with {attr: placeholder_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
         {%- endif -%}
         {%- if preferred_choices|length > 0 -%}
             {% set options = preferred_choices %}
@@ -89,7 +89,7 @@
                 {{- block('choice_widget_options') -}}
             </optgroup>
         {%- else -%}
-            <option value="{{ choice.value }}"{% if choice.attr %}{% with { attr: choice.attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if (not render_preferred_choices|default(false) or not (duplicate_preferred_choices ?? true)) and choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</option>
+            <option value="{{ choice.value }}"{% if choice.attr %}{% with {attr: choice.attr} %}{{ block('attributes') }}{% endwith %}{% endif %}{% if (not render_preferred_choices|default(false) or not (duplicate_preferred_choices ?? true)) and choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</option>
         {%- endif -%}
     {% endfor %}
 {%- endblock choice_widget_options -%}
@@ -121,9 +121,9 @@
     {%- else -%}
         <div {{ block('widget_container_attributes') }}>
             {{- date_pattern|replace({
-                '{{ year }}':  form_widget(form.year),
+                '{{ year }}': form_widget(form.year),
                 '{{ month }}': form_widget(form.month),
-                '{{ day }}':   form_widget(form.day),
+                '{{ day }}': form_widget(form.day),
             })|raw -}}
         </div>
     {%- endif -%}
@@ -133,7 +133,7 @@
     {%- if widget == 'single_text' -%}
         {{ block('form_widget_simple') }}
     {%- else -%}
-        {%- set vars = widget == 'text' ? { 'attr': { 'size': 1 }} : {} -%}
+        {%- set vars = widget == 'text' ? {attr: {size: 1}} : {} -%}
         <div {{ block('widget_container_attributes') }}>
             {{ form_widget(form.hour, vars) }}{% if with_minutes %}:{{ form_widget(form.minute, vars) }}{% endif %}{% if with_seconds %}:{{ form_widget(form.second, vars) }}{% endif %}
         </div>
@@ -226,30 +226,8 @@
 {%- endblock range_widget %}
 
 {%- block button_widget -%}
-    {%- if label is empty -%}
-        {%- if label_format is not empty -%}
-            {% set label = label_format|replace({
-                '%name%': name,
-                '%id%': id,
-            }) %}
-        {%- elseif label is not same as(false) -%}
-            {% set label = name|humanize %}
-        {%- endif -%}
-    {%- endif -%}
     <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>
-        {%- if translation_domain is same as(false) -%}
-            {%- if label_html is same as(false) -%}
-                {{- label -}}
-            {%- else -%}
-                {{- label|raw -}}
-            {%- endif -%}
-        {%- else -%}
-            {%- if label_html is same as(false) -%}
-                {{- label|trans(label_translation_parameters, translation_domain) -}}
-            {%- else -%}
-                {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
-            {%- endif -%}
-        {%- endif -%}
+        {{- block('form_label_content') -}}
     </button>
 {%- endblock button_widget -%}
 
@@ -277,7 +255,7 @@
     {%- if widget == 'single_text' -%}
         {{ block('form_widget_simple') }}
     {%- else -%}
-        {%- set vars = widget == 'text' ? { 'attr': { 'size': 1 }} : {} -%}
+        {%- set vars = widget == 'text' ? {attr: {size: 1}} : {} -%}
         <div {{ block('widget_container_attributes') }}>
             {{ form_widget(form.year, vars) }}-{{ form_widget(form.week, vars) }}
         </div>
@@ -289,19 +267,19 @@
 {%- block form_label -%}
     {% if label is not same as(false) -%}
         {% if not compound -%}
-            {% set label_attr = label_attr|merge({'for': id}) %}
+            {% set label_attr = label_attr|merge({for: id}) %}
         {%- endif -%}
         {% if required -%}
-            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+            {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
         {%- endif -%}
-        <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>
+        <{{ element|default('label') }}{% if label_attr %}{% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}>
             {{- block('form_label_content') -}}
         </{{ element|default('label') }}>
     {%- endif -%}
 {%- endblock form_label -%}
 
 {%- block form_label_content -%}
-    {%- if label is empty -%}
+    {%- if not label -%}
         {%- if label_format is not empty -%}
             {% set label = label_format|replace({
                 '%name%': name,
@@ -331,9 +309,9 @@
 {# Help #}
 
 {% block form_help -%}
-    {%- if help is not empty -%}
+    {%- if help -%}
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
-        <{{ element|default('div') }} id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+        <{{ element|default('div') }} id="{{ id }}_help"{% with {attr: help_attr} %}{{ block('attributes') }}{% endwith %}>
             {{- block('form_help_content') -}}
         </{{ element|default('div') }}>
     {%- endif -%}
@@ -366,17 +344,32 @@
 {%- endblock repeated_row -%}
 
 {%- block form_row -%}
-    {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- set attr = {} -%}
+    {%- set aria_describedby = [] -%}
+    {%- if help -%}
+        {%- set aria_describedby = aria_describedby|merge([id ~ '_help']) -%}
     {%- endif -%}
+    {%- if errors|length > 0 -%}
+        {%- set aria_describedby = aria_describedby|merge(errors|map((_, index) => id ~ '_error' ~ (index + 1))) -%}
+    {%- endif -%}
+    {%- if aria_describedby|length > 0 -%}
+        {%- set attr = attr|merge({'aria-describedby': aria_describedby|join(' ')}) -%}
+    {%- endif -%}
+    {%- if errors|length > 0 -%}
+        {%- set attr = attr|merge({'aria-invalid': 'true'}) -%}
+    {%- endif -%}
+    {%- set widget_attr = {attr: attr} -%}
+    {{- block('form_row_render') -}}
+{%- endblock form_row -%}
+
+{%- block form_row_render -%}
     <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) -}}
         {{- form_errors(form) -}}
         {{- form_widget(form, widget_attr) -}}
         {{- form_help(form) -}}
     </div>
-{%- endblock form_row -%}
+{%- endblock form_row_render -%}
 
 {%- block button_row -%}
     <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
@@ -399,10 +392,10 @@
 {%- block form_start -%}
     {%- do form.setMethodRendered() -%}
     {% set method = method|upper %}
-    {%- if method in ["GET", "POST"] -%}
+    {%- if method in ['GET', 'POST'] -%}
         {% set form_method = method %}
     {%- else -%}
-        {% set form_method = "POST" %}
+        {% set form_method = 'POST' %}
     {%- endif -%}
     <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{{ block('attributes') }}{% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
@@ -421,7 +414,7 @@
     {%- if errors|length > 0 -%}
     <ul>
         {%- for error in errors -%}
-            <li>{{ error.message }}</li>
+            <li id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</li>
         {%- endfor -%}
     </ul>
     {%- endif -%}
@@ -437,10 +430,10 @@
     {% if not form.methodRendered and form is rootform %}
         {%- do form.setMethodRendered() -%}
         {% set method = method|upper %}
-        {%- if method in ["GET", "POST"] -%}
+        {%- if method in ['GET', 'POST'] -%}
             {% set form_method = method %}
         {%- else -%}
-            {% set form_method = "POST" %}
+            {% set form_method = 'POST' %}
         {%- endif -%}
 
         {%- if form_method != method -%}
@@ -476,7 +469,7 @@
 
 {% block attributes -%}
     {%- for attrname, attrvalue in attr -%}
-        {{- " " -}}
+        {{- ' ' -}}
         {%- if attrname in ['placeholder', 'title'] -%}
             {{- attrname }}="{{ translation_domain is same as(false) or attrvalue is null ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain) }}"
         {%- elseif attrvalue is same as(true) -%}

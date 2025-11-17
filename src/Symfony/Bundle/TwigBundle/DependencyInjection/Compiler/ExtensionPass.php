@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
+use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Yaml\Yaml;
 
@@ -54,7 +56,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->removeDefinition('twig.runtime.importmap');
         }
 
-        $viewDir = \dirname((new \ReflectionClass(\Symfony\Bridge\Twig\Extension\FormExtension::class))->getFileName(), 2).'/Resources/views';
+        $viewDir = \dirname((new \ReflectionClass(FormExtension::class))->getFileName(), 2).'/Resources/views';
         $templateIterator = $container->getDefinition('twig.template_iterator');
         $templatePaths = $templateIterator->getArgument(1);
         $loader = $container->getDefinition('twig.loader.native_filesystem');
@@ -122,7 +124,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.yaml')->addTag('twig.extension');
         }
 
-        if (class_exists(\Symfony\Component\Stopwatch\Stopwatch::class)) {
+        if (class_exists(Stopwatch::class)) {
             $container->getDefinition('twig.extension.debug.stopwatch')->addTag('twig.extension');
         }
 

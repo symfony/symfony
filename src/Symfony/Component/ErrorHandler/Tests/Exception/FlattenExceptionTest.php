@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ErrorHandler\Tests\Exception;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\ErrorHandler\Tests\Fixtures\StringErrorCodeException;
@@ -88,10 +89,8 @@ class FlattenExceptionTest extends TestCase
         $flattened = FlattenException::createFromThrowable(new UnsupportedMediaTypeHttpException());
         $this->assertEquals('415', $flattened->getStatusCode());
 
-        if (class_exists(SuspiciousOperationException::class)) {
-            $flattened = FlattenException::createFromThrowable(new SuspiciousOperationException());
-            $this->assertEquals('400', $flattened->getStatusCode());
-        }
+        $flattened = FlattenException::createFromThrowable(new SuspiciousOperationException());
+        $this->assertEquals('400', $flattened->getStatusCode());
     }
 
     public function testHeadersForHttpException()
@@ -115,10 +114,8 @@ class FlattenExceptionTest extends TestCase
         $this->assertEquals(['Retry-After' => 120], $flattened->getHeaders());
     }
 
-    /**
-     * @dataProvider flattenDataProvider
-     */
-    public function testFlattenHttpException(\Throwable $exception)
+    #[DataProvider('flattenDataProvider')]
+    public function testFlattenHttpException(\Throwable $exception, string $expectedClass)
     {
         $flattened = FlattenException::createFromThrowable($exception);
         $flattened2 = FlattenException::createFromThrowable($exception);
@@ -140,10 +137,8 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame('DivisionByZeroError', $flattened->getClass(), 'The class is set to the class of the original error');
     }
 
-    /**
-     * @dataProvider flattenDataProvider
-     */
-    public function testPrevious(\Throwable $exception)
+    #[DataProvider('flattenDataProvider')]
+    public function testPrevious(\Throwable $exception, string $expectedClass)
     {
         $flattened = FlattenException::createFromThrowable($exception);
         $flattened2 = FlattenException::createFromThrowable($exception);
@@ -166,36 +161,28 @@ class FlattenExceptionTest extends TestCase
         $this->assertEquals('ParseError', $flattened->getClass(), 'The class is set to the class of the original exception');
     }
 
-    /**
-     * @dataProvider flattenDataProvider
-     */
-    public function testLine(\Throwable $exception)
+    #[DataProvider('flattenDataProvider')]
+    public function testLine(\Throwable $exception, string $expectedClass)
     {
         $flattened = FlattenException::createFromThrowable($exception);
         $this->assertSame($exception->getLine(), $flattened->getLine());
     }
 
-    /**
-     * @dataProvider flattenDataProvider
-     */
-    public function testFile(\Throwable $exception)
+    #[DataProvider('flattenDataProvider')]
+    public function testFile(\Throwable $exception, string $expectedClass)
     {
         $flattened = FlattenException::createFromThrowable($exception);
         $this->assertSame($exception->getFile(), $flattened->getFile());
     }
 
-    /**
-     * @dataProvider stringAndIntDataProvider
-     */
+    #[DataProvider('stringAndIntDataProvider')]
     public function testCode(\Throwable $exception)
     {
         $flattened = FlattenException::createFromThrowable($exception);
         $this->assertSame($exception->getCode(), $flattened->getCode());
     }
 
-    /**
-     * @dataProvider flattenDataProvider
-     */
+    #[DataProvider('flattenDataProvider')]
     public function testToArray(\Throwable $exception, string $expectedClass)
     {
         $flattened = FlattenException::createFromThrowable($exception);
@@ -286,7 +273,7 @@ class FlattenExceptionTest extends TestCase
     public function testToStringParent()
     {
         $exception = new \LogicException('This is message 1');
-        $exception = new \RuntimeException('This is messsage 2', 500, $exception);
+        $exception = new \RuntimeException('This is message 2', 500, $exception);
 
         $flattened = FlattenException::createFromThrowable($exception);
 

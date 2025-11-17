@@ -64,6 +64,49 @@ $sms->options($options);
 $texter->send($sms);
 ```
 
+Usage in Combination with the Notifier Component
+------------------------------------------------
+
+The usage of the Webhook component when using a third-party transport in
+the Notifier is very similar to the usage with the Mailer.
+
+Currently, the LOX24 SMS transport supports webhooks. Parser service name ``notifier.webhook.request_parser.lox24``.
+
+For SMS webhooks, react to the class:`Symfony\\Component\\RemoteEvent\\Event\\Sms\\SmsEvent` event.
+
+Other LOX24 webhooks are also possible to handle as class:`Symfony\\Component\\RemoteEvent\\RemoteEvent` instances:
+
+```
+    use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
+    use Symfony\Component\RemoteEvent\Consumer\ConsumerInterface;
+    use Symfony\Component\RemoteEvent\Event\Sms\SmsEvent;
+    use Symfony\Component\RemoteEvent\RemoteEvent;
+
+    #[AsRemoteEventConsumer('notifier_lox24')]
+    class WebhookListener implements ConsumerInterface
+    {
+        public function consume(RemoteEvent $event): void
+        {
+            if ($event instanceof SmsEvent) {
+                $this->handleSmsEvent($event);
+            } else {
+                // Handle other LOX24 webhook events
+                $this->handleRemoteEvent($event);
+            }
+        }
+
+        private function handleSmsEvent(SmsEvent $event): void
+        {
+            // Handle the SMS event
+        }
+
+        private function handleRemoteEvent(RemoteEvent $event): void
+        {
+            // Handle other LOX24 webhook events
+        }
+    }
+```
+
 Resources
 ---------
 

@@ -159,15 +159,9 @@ class ErrorListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * Logs an exception.
-     *
-     * @param ?string $logChannel
-     */
-    protected function logException(\Throwable $exception, string $message, ?string $logLevel = null/* , ?string $logChannel = null */): void
+    protected function logException(\Throwable $exception, string $message, ?string $logLevel = null, ?string $logChannel = null): void
     {
-        $logChannel = (3 < \func_num_args() ? func_get_arg(3) : null) ?? $this->resolveLogChannel($exception);
-
+        $logChannel ??= $this->resolveLogChannel($exception);
         $logLevel ??= $this->resolveLogLevel($exception);
 
         if (!$logger = $this->getLogger($logChannel)) {

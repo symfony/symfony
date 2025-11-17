@@ -101,11 +101,11 @@ class LazyString implements \Stringable, \JsonSerializable
         }
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         $this->__toString();
 
-        return ['value'];
+        return ['value' => $this->value];
     }
 
     public function jsonSerialize(): string

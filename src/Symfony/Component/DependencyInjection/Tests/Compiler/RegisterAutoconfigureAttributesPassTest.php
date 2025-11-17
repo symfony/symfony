@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureRepeatedCa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureRepeatedOverwrite;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureRepeatedProperties;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureRepeatedTag;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureResourceTagsAttributed;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LazyAutoconfigured;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LazyLoaded;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\MultipleAutoconfigureAttributed;
@@ -248,5 +249,21 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
             ->addTag('bar')
         ;
         $this->assertEquals([MultipleAutoconfigureAttributed::class => $expected], $container->getAutoconfiguredInstanceof());
+    }
+
+    public function testAutoconfiguredResourceTags()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', AutoconfigureResourceTagsAttributed::class)
+            ->setAutoconfigured(true);
+
+        (new RegisterAutoconfigureAttributesPass())->process($container);
+
+        $expected = (new ChildDefinition(''))
+            ->addResourceTag('my.tag', ['foo' => 'bar'])
+            ->addResourceTag('another.tag')
+        ;
+
+        $this->assertEquals([AutoconfigureResourceTagsAttributed::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Attribute;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -19,9 +20,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class AutowireTest extends TestCase
 {
-    /**
-     * @dataProvider provideMultipleParameters
-     */
+    #[DataProvider('provideMultipleParameters')]
     public function testCanOnlySetOneParameter(array $parameters)
     {
         $this->expectException(LogicException::class);

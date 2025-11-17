@@ -46,6 +46,11 @@ class AddScheduleMessengerPass implements CompilerPassInterface
         $scheduleProviderIds = [];
         foreach ($container->findTaggedServiceIds('scheduler.schedule_provider') as $serviceId => $tags) {
             $name = $tags[0]['name'];
+
+            if (isset($scheduleProviderIds[$name])) {
+                throw new InvalidArgumentException(\sprintf('Schedule provider service "%s" can not replace already registered service "%s" for schedule "%s". Make sure to register only one provider per schedule name.', $serviceId, $scheduleProviderIds[$name], $name), 1);
+            }
+
             $scheduleProviderIds[$name] = $serviceId;
         }
 
@@ -58,9 +63,8 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                 if ($serviceDefinition->hasTag('console.command')) {
                     /** @var AsCommand|null $attribute */
                     $attribute = ($container->getReflectionClass($serviceDefinition->getClass())->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
-                    $commandName = $attribute?->name ?? $serviceDefinition->getClass()::getDefaultName();
 
-                    $message = new Definition(RunCommandMessage::class, [$commandName.(($tagAttributes['arguments'] ?? null) ? " {$tagAttributes['arguments']}" : '')]);
+                    $message = new Definition(RunCommandMessage::class, [$attribute?->name.(($tagAttributes['arguments'] ?? null) ? " {$tagAttributes['arguments']}" : '')]);
                 } else {
                     $message = new Definition(ServiceCallMessage::class, [$serviceId, $tagAttributes['method'] ?? '__invoke', (array) ($tagAttributes['arguments'] ?? [])]);
                 }

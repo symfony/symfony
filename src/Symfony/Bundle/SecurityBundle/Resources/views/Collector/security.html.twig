@@ -184,7 +184,7 @@
             </div>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url}) }}
     {% endif %}
 {% endblock %}
 
@@ -238,7 +238,7 @@
                                 <tr>
                                     <th>Roles</th>
                                     <td>
-                                        {{ collector.roles is empty ? 'none' : profiler_dump(collector.roles, maxDepth=1) }}
+                                        {{ collector.roles is empty ? 'none' : profiler_dump(collector.roles, maxDepth: 1) }}
 
                                         {% if not collector.authenticated and collector.roles is empty %}
                                             <p class="help">User is not authenticated probably because they have no roles.</p>
@@ -249,7 +249,7 @@
                                 {% if collector.supportsRoleHierarchy %}
                                 <tr>
                                     <th>Inherited Roles</th>
-                                    <td>{{ collector.inheritedRoles is empty ? 'none' : profiler_dump(collector.inheritedRoles, maxDepth=1) }}</td>
+                                    <td>{{ collector.inheritedRoles is empty ? 'none' : profiler_dump(collector.inheritedRoles, maxDepth: 1) }}</td>
                                 </tr>
                                 {% endif %}
 
@@ -332,7 +332,7 @@
                                     </tr>
                                     <tr>
                                         <th>authenticators</th>
-                                        <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth=1) }}</td>
+                                        <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth: 1) }}</td>
                                     </tr>
                                 </tbody>
                             </table>

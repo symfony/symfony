@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -30,9 +31,7 @@ class TranslationExtractCommandCompletionTest extends TestCase
     private Filesystem $fs;
     private string $translationDir;
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $tester = $this->createCommandCompletionTester(['messages' => ['foo' => 'foo']]);
@@ -132,7 +131,7 @@ class TranslationExtractCommandCompletionTest extends TestCase
         $command = new TranslationExtractCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths, ['en', 'fr']);
 
         $application = new Application($kernel);
-        $application->add($command);
+        $application->addCommand($command);
 
         return new CommandCompletionTester($application->find('translation:extract'));
     }

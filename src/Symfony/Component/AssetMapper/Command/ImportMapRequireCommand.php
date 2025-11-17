@@ -36,12 +36,8 @@ final class ImportMapRequireCommand extends Command
     public function __construct(
         private readonly ImportMapManager $importMapManager,
         private readonly ImportMapVersionChecker $importMapVersionChecker,
-        private readonly ?string $projectDir = null,
+        private readonly string $projectDir,
     ) {
-        if (null === $projectDir) {
-            trigger_deprecation('symfony/asset-mapper', '7.3', 'The "%s()" method will have a new `string $projectDir` argument in version 8.0, not defining it is deprecated.', __METHOD__);
-        }
-
         parent::__construct();
     }
 
@@ -53,39 +49,39 @@ final class ImportMapRequireCommand extends Command
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The local path where the package lives relative to the project root')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simulate the installation of the packages')
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command adds packages to <comment>importmap.php</comment> usually
-by finding a CDN URL for the given package and version.
+                The <info>%command.name%</info> command adds packages to <comment>importmap.php</comment> usually
+                by finding a CDN URL for the given package and version.
 
-For example:
+                For example:
 
-    <info>php %command.full_name% lodash</info>
-    <info>php %command.full_name% "lodash@^4.15"</info>
+                    <info>php %command.full_name% lodash</info>
+                    <info>php %command.full_name% "lodash@^4.15"</info>
 
-You can also require specific paths of a package:
+                You can also require specific paths of a package:
 
-    <info>php %command.full_name% "chart.js/auto"</info>
+                    <info>php %command.full_name% "chart.js/auto"</info>
 
-Or require one package/file, but alias its name in your import map:
+                Or require one package/file, but alias its name in your import map:
 
-    <info>php %command.full_name% "vue/dist/vue.esm-bundler.js=vue"</info>
+                    <info>php %command.full_name% "vue/dist/vue.esm-bundler.js=vue"</info>
 
-Sometimes, a package may require other packages and multiple new items may be added
-to the import map.
+                Sometimes, a package may require other packages and multiple new items may be added
+                to the import map.
 
-You can also require multiple packages at once:
+                You can also require multiple packages at once:
 
-    <info>php %command.full_name% "lodash@^4.15" "@hotwired/stimulus"</info>
+                    <info>php %command.full_name% "lodash@^4.15" "@hotwired/stimulus"</info>
 
-To add an importmap entry pointing to a local file, use the <info>path</info> option:
+                To add an importmap entry pointing to a local file, use the <info>path</info> option:
 
-    <info>php %command.full_name% "any_module_name" --path=./assets/some_file.js</info>
+                    <info>php %command.full_name% "any_module_name" --path=./assets/some_file.js</info>
 
-To simulate the installation, use the <info>--dry-run</info> option:
+                To simulate the installation, use the <info>--dry-run</info> option:
 
-    <info>php %command.full_name% "any_module_name" --dry-run -v</info>
+                    <info>php %command.full_name% "any_module_name" --dry-run -v</info>
 
-When this option is enabled, this command does not perform any write operations to the filesystem.
-EOT
+                When this option is enabled, this command does not perform any write operations to the filesystem.
+                EOT
             );
     }
 
@@ -149,9 +145,7 @@ EOT
                 array_map(fn (ImportMapEntry $package): array => [
                     $package->importName,
                     $package->version ?? '-',
-                    // BC layer for AssetMapper < 7.3
-                    // When `projectDir` is not null, we use the absolute path of the package
-                    null !== $this->projectDir ? Path::makeRelative($package->path, $this->projectDir) : $package->path,
+                    Path::makeRelative($package->path, $this->projectDir),
                 ], $newPackages),
             );
         }

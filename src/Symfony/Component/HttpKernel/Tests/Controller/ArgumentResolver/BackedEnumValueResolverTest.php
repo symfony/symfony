@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
@@ -21,9 +22,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 
 class BackedEnumValueResolverTest extends TestCase
 {
-    /**
-     * @dataProvider provideTestSupportsData
-     */
+    #[DataProvider('provideTestSupportsData')]
     public function testSupports(Request $request, ArgumentMetadata $metadata, bool $expectedSupport)
     {
         $resolver = new BackedEnumValueResolver();
@@ -68,9 +67,7 @@ class BackedEnumValueResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideTestResolveData
-     */
+    #[DataProvider('provideTestResolveData')]
     public function testResolve(Request $request, ArgumentMetadata $metadata, $expected)
     {
         $resolver = new BackedEnumValueResolver();

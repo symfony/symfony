@@ -39,12 +39,8 @@ class ChannelListenerTest extends TestCase
             ->willReturn([[], 'http'])
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
-
         $listener = new ChannelListener($accessMap);
-        $listener($event);
-
-        $this->assertNull($event->getResponse());
+        $this->assertFalse($listener->supports($request));
     }
 
     public function testHandleWithSecuredRequestAndHttpsChannel()
@@ -64,12 +60,8 @@ class ChannelListenerTest extends TestCase
             ->willReturn([[], 'https'])
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
-
         $listener = new ChannelListener($accessMap);
-        $listener($event);
-
-        $this->assertNull($event->getResponse());
+        $this->assertFalse($listener->supports($request));
     }
 
     public function testHandleWithNotSecuredRequestAndHttpsChannel()
@@ -92,7 +84,9 @@ class ChannelListenerTest extends TestCase
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new ChannelListener($accessMap);
-        $listener($event);
+        $this->assertTrue($listener->supports($request));
+
+        $listener->authenticate($event);
 
         $response = $event->getResponse();
         $this->assertInstanceOf(RedirectResponse::class, $response);
@@ -119,7 +113,9 @@ class ChannelListenerTest extends TestCase
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new ChannelListener($accessMap);
-        $listener($event);
+        $this->assertTrue($listener->supports($request));
+
+        $listener->authenticate($event);
 
         $response = $event->getResponse();
         $this->assertInstanceOf(RedirectResponse::class, $response);

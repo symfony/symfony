@@ -27,8 +27,8 @@ class AuditTrailListener implements EventSubscriberInterface
 
     public function onLeave(Event $event): void
     {
-        foreach ($event->getTransition()->getFroms() as $place) {
-            $this->logger->info(\sprintf('Leaving "%s" for subject of class "%s" in workflow "%s".', $place, $event->getSubject()::class, $event->getWorkflowName()));
+        foreach ($event->getTransition()->getFroms(true) as $arc) {
+            $this->logger->info(\sprintf('Leaving "%s" for subject of class "%s" in workflow "%s".', $arc->place, $event->getSubject()::class, $event->getWorkflowName()));
         }
     }
 
@@ -39,8 +39,8 @@ class AuditTrailListener implements EventSubscriberInterface
 
     public function onEnter(Event $event): void
     {
-        foreach ($event->getTransition()->getTos() as $place) {
-            $this->logger->info(\sprintf('Entering "%s" for subject of class "%s" in workflow "%s".', $place, $event->getSubject()::class, $event->getWorkflowName()));
+        foreach ($event->getTransition()->getTos(true) as $arc) {
+            $this->logger->info(\sprintf('Entering "%s" for subject of class "%s" in workflow "%s".', $arc->place, $event->getSubject()::class, $event->getWorkflowName()));
         }
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -166,9 +167,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         ];
     }
 
-    /**
-     * @dataProvider provideBoolean
-     */
+    #[DataProvider('provideBoolean')]
     public function testValidateTokenOnSubmitIfRootAndCompound($valid)
     {
         $this->tokenManager->expects($this->once())
@@ -198,9 +197,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertSame($valid, $form->isValid());
     }
 
-    /**
-     * @dataProvider provideBoolean
-     */
+    #[DataProvider('provideBoolean')]
     public function testValidateTokenOnSubmitIfRootAndCompoundUsesFormNameAsIntentionByDefault($valid)
     {
         $this->tokenManager->expects($this->once())
@@ -229,9 +226,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertSame($valid, $form->isValid());
     }
 
-    /**
-     * @dataProvider provideBoolean
-     */
+    #[DataProvider('provideBoolean')]
     public function testValidateTokenOnSubmitIfRootAndCompoundUsesTypeClassAsIntentionIfEmptyFormName($valid)
     {
         $this->tokenManager->expects($this->once())

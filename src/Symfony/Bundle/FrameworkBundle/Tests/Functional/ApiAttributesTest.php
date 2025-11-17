@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,9 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ApiAttributesTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider mapQueryStringProvider
-     */
+    #[DataProvider('mapQueryStringProvider')]
     public function testMapQueryString(string $uri, array $query, string $expectedResponse, int $expectedStatusCode)
     {
         $client = self::createClient(['test_case' => 'ApiAttributesTest']);
@@ -146,24 +145,24 @@ class ApiAttributesTest extends AbstractWebTestCase
         ];
 
         $expectedResponse = <<<'JSON'
-                {
-                    "type": "https:\/\/symfony.com\/errors\/validation",
-                    "title": "Validation Failed",
-                    "status": 404,
-                    "detail": "filter: This value should be of type Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter.",
-                    "violations": [
-                        {
-                            "parameters": {
-                                "hint": "Failed to create object because the class misses the \"filter\" property.",
-                                "{{ type }}": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter"
-                            },
-                            "propertyPath": "filter",
-                            "template": "This value should be of type {{ type }}.",
-                            "title": "This value should be of type Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter."
-                        }
-                    ]
-                }
-                JSON;
+            {
+                "type": "https:\/\/symfony.com\/errors\/validation",
+                "title": "Validation Failed",
+                "status": 404,
+                "detail": "filter: This value should be of type Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter.",
+                "violations": [
+                    {
+                        "parameters": {
+                            "hint": "Failed to create object because the class misses the \"filter\" property.",
+                            "{{ type }}": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter"
+                        },
+                        "propertyPath": "filter",
+                        "template": "This value should be of type {{ type }}.",
+                        "title": "This value should be of type Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Filter."
+                    }
+                ]
+            }
+            JSON;
 
         yield 'empty query string mapping non-nullable attribute without default value' => [
             'uri' => '/map-query-string-to-non-nullable-attribute-without-default-value.json',
@@ -214,9 +213,7 @@ class ApiAttributesTest extends AbstractWebTestCase
         ];
     }
 
-    /**
-     * @dataProvider mapRequestPayloadProvider
-     */
+    #[DataProvider('mapRequestPayloadProvider')]
     public function testMapRequestPayload(string $uri, string $format, array $parameters, ?string $content, callable $responseAssertion, int $expectedStatusCode)
     {
         $client = self::createClient(['test_case' => 'ApiAttributesTest']);
@@ -603,7 +600,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                 self::assertIsArray($json['violations'] ?? null);
                 self::assertCount(1, $json['violations']);
                 self::assertSame('approved', $json['violations'][0]['propertyPath'] ?? null);
-},
+            },
             'expectedStatusCode' => 422,
         ];
 
@@ -947,11 +944,11 @@ class WithMapRequestToNullableAttributeController
 
         return new Response(
             <<<XML
-            <response>
-                <comment>{$body->comment}</comment>
-                <approved>{$body->approved}</approved>
-            </response>
-            XML
+                <response>
+                    <comment>{$body->comment}</comment>
+                    <approved>{$body->approved}</approved>
+                </response>
+                XML
         );
     }
 }
@@ -966,11 +963,11 @@ class WithMapRequestToAttributeWithDefaultValueController
 
         return new Response(
             <<<XML
-            <response>
-                <comment>{$body->comment}</comment>
-                <approved>{$body->approved}</approved>
-            </response>
-            XML
+                <response>
+                    <comment>{$body->comment}</comment>
+                    <approved>{$body->approved}</approved>
+                </response>
+                XML
         );
     }
 }
@@ -985,11 +982,11 @@ class WithMapRequestToNonNullableAttributeWithoutDefaultValueController
 
         return new Response(
             <<<XML
-            <response>
-                <comment>{$body->comment}</comment>
-                <approved>{$body->approved}</approved>
-            </response>
-            XML
+                <response>
+                    <comment>{$body->comment}</comment>
+                    <approved>{$body->approved}</approved>
+                </response>
+                XML
         );
     }
 }

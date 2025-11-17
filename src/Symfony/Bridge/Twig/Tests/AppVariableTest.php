@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Twig\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,9 +33,7 @@ class AppVariableTest extends TestCase
         $this->appVariable = new AppVariable();
     }
 
-    /**
-     * @dataProvider debugDataProvider
-     */
+    #[DataProvider('debugDataProvider')]
     public function testDebug($debugFlag)
     {
         $this->appVariable->setDebug($debugFlag);
@@ -56,9 +56,7 @@ class AppVariableTest extends TestCase
         $this->assertEquals('dev', $this->appVariable->getEnvironment());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testGetSession()
     {
         $request = $this->createMock(Request::class);
@@ -192,18 +190,14 @@ class AppVariableTest extends TestCase
         $this->assertEquals([], $this->appVariable->getFlashes());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testGetFlashesWithNoSessionStarted()
     {
         $flashMessages = $this->setFlashMessages(false);
         $this->assertEquals($flashMessages, $this->appVariable->getFlashes());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testGetFlashes()
     {
         $flashMessages = $this->setFlashMessages();

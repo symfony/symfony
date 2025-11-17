@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -35,9 +36,7 @@ class ScopingHttpClientTest extends TestCase
         $this->assertSame('http://example.com/foo?f=g&a=b', $client->request('GET', '/foo?f=g')->getInfo('url'));
     }
 
-    /**
-     * @dataProvider provideMatchingUrls
-     */
+    #[DataProvider('provideMatchingUrls')]
     public function testMatchingUrls(string $regexp, string $url, array $options)
     {
         $mockClient = new MockHttpClient();

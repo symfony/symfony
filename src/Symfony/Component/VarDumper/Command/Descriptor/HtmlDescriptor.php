@@ -70,24 +70,24 @@ class HtmlDescriptor implements DumpDescriptorInterface
         ]);
 
         $output->writeln(<<<HTML
-<article data-dedup-id="$dedupIdentifier">
-    <header>
-        <div class="row">
-            <h2 class="col">$title</h2>
-            <time class="col text-small" title="$isoDate" datetime="$isoDate">
-                {$this->extractDate($context)}
-            </time>
-        </div>
-        {$this->renderTags($tags)}
-    </header>
-    <section class="body">
-        <p class="text-small">
-            $sourceDescription
-        </p>
-        {$this->dumper->dump($data, true)}
-    </section>
-</article>
-HTML
+            <article data-dedup-id="$dedupIdentifier">
+                <header>
+                    <div class="row">
+                        <h2 class="col">$title</h2>
+                        <time class="col text-small" title="$isoDate" datetime="$isoDate">
+                            {$this->extractDate($context)}
+                        </time>
+                    </div>
+                    {$this->renderTags($tags)}
+                </header>
+                <section class="body">
+                    <p class="text-small">
+                        $sourceDescription
+                    </p>
+                    {$this->dumper->dump($data, true)}
+                </section>
+            </article>
+            HTML
         );
     }
 
@@ -108,11 +108,11 @@ HTML
         }
 
         return <<<HTML
-<div class="row">
-    <ul class="tags">
-        $renderedTags
-    </ul>
-</div>
-HTML;
+            <div class="row">
+                <ul class="tags">
+                    $renderedTags
+                </ul>
+            </div>
+            HTML;
     }
 }

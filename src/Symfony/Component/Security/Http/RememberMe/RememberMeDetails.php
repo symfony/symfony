@@ -22,7 +22,6 @@ class RememberMeDetails
     public const COOKIE_DELIMITER = ':';
 
     public function __construct(
-        private string $userFqcn,
         private string $userIdentifier,
         private int $expires,
         private string $value,
@@ -34,21 +33,25 @@ class RememberMeDetails
         if (!str_contains($rawCookie, self::COOKIE_DELIMITER)) {
             $rawCookie = base64_decode($rawCookie);
         }
+
         $cookieParts = explode(self::COOKIE_DELIMITER, $rawCookie, 4);
+
         if (4 !== \count($cookieParts)) {
             throw new AuthenticationException('The cookie contains invalid data.');
         }
+
         if (false === $cookieParts[1] = base64_decode(strtr($cookieParts[1], '-_~', '+/='), true)) {
             throw new AuthenticationException('The user identifier contains a character from outside the base64 alphabet.');
         }
-        $cookieParts[0] = strtr($cookieParts[0], '.', '\\');
+
+        unset($cookieParts[0]);
 
         return new static(...$cookieParts);
     }
 
-    public static function fromPersistentToken(PersistentToken $persistentToken, int $expires): self
+    public static function fromPersistentToken(PersistentToken $token, int $expires): self
     {
-        return new static($persistentToken->getClass(), $persistentToken->getUserIdentifier(), $expires, $persistentToken->getSeries().':'.$persistentToken->getTokenValue());
+        return new static($token->getUserIdentifier(), $expires, $token->getSeries().':'.$token->getTokenValue());
     }
 
     public function withValue(string $value): self
@@ -57,11 +60,6 @@ class RememberMeDetails
         $details->value = $value;
 
         return $details;
-    }
-
-    public function getUserFqcn(): string
-    {
-        return $this->userFqcn;
     }
 
     public function getUserIdentifier(): string
@@ -82,6 +80,6 @@ class RememberMeDetails
     public function toString(): string
     {
         // $userIdentifier is encoded because it might contain COOKIE_DELIMITER, we assume other values don't
-        return implode(self::COOKIE_DELIMITER, [strtr($this->userFqcn, '\\', '.'), strtr(base64_encode($this->userIdentifier), '+/=', '-_~'), $this->expires, $this->value]);
+        return implode(self::COOKIE_DELIMITER, ['', strtr(base64_encode($this->userIdentifier), '+/=', '-_~'), $this->expires, $this->value]);
     }
 }

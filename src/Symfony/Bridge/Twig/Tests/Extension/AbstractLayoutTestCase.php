@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Twig\Test\FormLayoutTestCase;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
@@ -57,7 +58,9 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     protected function tearDown(): void
     {
-        \Locale::setDefault($this->defaultLocale);
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
     protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath)
@@ -2711,9 +2714,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    /**
-     * @dataProvider submitFormNoValidateProvider
-     */
+    #[DataProvider('submitFormNoValidateProvider')]
     public function testSubmitFormNoValidate(bool $validate)
     {
         $form = $this->factory->create(SubmitType::class, null, [

@@ -17,8 +17,6 @@ use Symfony\Component\JsonPath\JsonPath;
 
 /**
  * @author Alexandre Daubois <alex.daubois@gmail.com>
- *
- * @experimental
  */
 class JsonPathNotContains extends Constraint
 {

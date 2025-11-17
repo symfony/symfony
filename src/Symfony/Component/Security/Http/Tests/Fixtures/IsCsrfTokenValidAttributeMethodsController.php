@@ -59,4 +59,19 @@ class IsCsrfTokenValidAttributeMethodsController
     public function withPostMethodAndInvalidTokenKey()
     {
     }
+
+    #[IsCsrfTokenValid('foo', tokenSource: IsCsrfTokenValid::SOURCE_QUERY)]
+    public function withCustomTokenSourceQuery()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', tokenSource: IsCsrfTokenValid::SOURCE_QUERY | IsCsrfTokenValid::SOURCE_PAYLOAD)]
+    public function withCustomTokenSourceQueryPayload()
+    {
+    }
+
+    #[IsCsrfTokenValid('foo', tokenKey: 'my_token_key', tokenSource: IsCsrfTokenValid::SOURCE_HEADER)]
+    public function withCustomTokenSourceHeaderAndCustomSourceToken()
+    {
+    }
 }

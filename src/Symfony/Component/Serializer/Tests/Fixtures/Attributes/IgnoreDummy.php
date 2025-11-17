@@ -28,4 +28,10 @@ class IgnoreDummy
     {
         return $this->ignored2;
     }
+
+    #[Ignore]
+    public function canBeIgnored(): bool
+    {
+        return true;
+    }
 }

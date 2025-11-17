@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-/**
- * @group intl-data
- */
+#[Group('intl-data')]
 class LocalesTest extends ResourceBundleTestCase
 {
     public function testGetLocales()
@@ -30,9 +30,7 @@ class LocalesTest extends ResourceBundleTestCase
         $this->assertSame(static::getLocaleAliases(), Locales::getAliases());
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetNames($displayLocale)
     {
         if ('en' !== $displayLocale) {
@@ -58,9 +56,7 @@ class LocalesTest extends ResourceBundleTestCase
         $this->assertSame(Locales::getNames('de_AT'), Locales::getNames());
     }
 
-    /**
-     * @dataProvider provideLocaleAliases
-     */
+    #[DataProvider('provideLocaleAliases')]
     public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
         if ('en' !== $ofLocale) {
@@ -73,9 +69,7 @@ class LocalesTest extends ResourceBundleTestCase
         $this->assertEquals(Locales::getNames($ofLocale), Locales::getNames($alias));
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetName($displayLocale)
     {
         if ('en' !== $displayLocale) {

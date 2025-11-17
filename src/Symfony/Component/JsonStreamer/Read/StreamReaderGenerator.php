@@ -11,20 +11,13 @@
 
 namespace Symfony\Component\JsonStreamer\Read;
 
-use PhpParser\PhpVersion;
-use PhpParser\PrettyPrinter;
-use PhpParser\PrettyPrinter\Standard;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
-use Symfony\Component\JsonStreamer\DataModel\DataAccessorInterface;
-use Symfony\Component\JsonStreamer\DataModel\FunctionDataAccessor;
 use Symfony\Component\JsonStreamer\DataModel\Read\BackedEnumNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\CollectionNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\DataModelNodeInterface;
 use Symfony\Component\JsonStreamer\DataModel\Read\ObjectNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\ScalarNode;
-use Symfony\Component\JsonStreamer\DataModel\ScalarDataAccessor;
-use Symfony\Component\JsonStreamer\DataModel\VariableDataAccessor;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
@@ -48,8 +41,7 @@ use Symfony\Component\TypeInfo\Type\UnionType;
 final class StreamReaderGenerator
 {
     private StreamerDumper $dumper;
-    private ?PhpAstBuilder $phpAstBuilder = null;
-    private ?PrettyPrinter $phpPrinter = null;
+    private ?PhpGenerator $phpGenerator = null;
 
     public function __construct(
         private PropertyMetadataLoaderInterface $propertyMetadataLoader,
@@ -68,13 +60,9 @@ final class StreamReaderGenerator
     {
         $path = \sprintf('%s%s%s.json%s.php', $this->streamReadersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type), $decodeFromStream ? '.stream' : '');
         $generateContent = function () use ($type, $decodeFromStream, $options): string {
-            $this->phpAstBuilder ??= new PhpAstBuilder();
-            $this->phpPrinter ??= new Standard(['phpVersion' => PhpVersion::fromComponents(8, 2)]);
+            $this->phpGenerator ??= new PhpGenerator();
 
-            $dataModel = $this->createDataModel($type, $options);
-            $nodes = $this->phpAstBuilder->build($dataModel, $decodeFromStream, $options);
-
-            return $this->phpPrinter->prettyPrintFile($nodes)."\n";
+            return $this->phpGenerator->generate($this->createDataModel($type, $options), $decodeFromStream, $options);
         };
 
         $this->dumper->dump($type, $path, $generateContent);
@@ -120,14 +108,17 @@ final class StreamReaderGenerator
             $propertiesMetadata = $this->propertyMetadataLoader->load($className, $options, $context);
 
             foreach ($propertiesMetadata as $streamedName => $propertyMetadata) {
+                if (!$propertyMetadata->getName()) {
+                    continue;
+                }
+
                 $propertiesNodes[$streamedName] = [
                     'name' => $propertyMetadata->getName(),
                     'value' => $this->createDataModel($propertyMetadata->getType(), $options, $context),
-                    'accessor' => function (DataAccessorInterface $accessor) use ($propertyMetadata): DataAccessorInterface {
-                        foreach ($propertyMetadata->getStreamToNativeValueTransformers() as $valueTransformer) {
+                    'accessor' => function (string $accessor) use ($propertyMetadata): string {
+                        foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {
                             if (\is_string($valueTransformer)) {
-                                $valueTransformerServiceAccessor = new FunctionDataAccessor('get', [new ScalarDataAccessor($valueTransformer)], new VariableDataAccessor('valueTransformers'));
-                                $accessor = new FunctionDataAccessor('transform', [$accessor, new VariableDataAccessor('options')], $valueTransformerServiceAccessor);
+                                $accessor = "\$valueTransformers->get('$valueTransformer')->transform($accessor, \$options)";
 
                                 continue;
                             }
@@ -141,9 +132,9 @@ final class StreamReaderGenerator
                             $functionName = !$functionReflection->getClosureCalledClass()
                                 ? $functionReflection->getName()
                                 : \sprintf('%s::%s', $functionReflection->getClosureCalledClass()->getName(), $functionReflection->getName());
-                            $arguments = $functionReflection->isUserDefined() ? [$accessor, new VariableDataAccessor('options')] : [$accessor];
+                            $arguments = $functionReflection->isUserDefined() ? "$accessor, \$options" : $accessor;
 
-                            $accessor = new FunctionDataAccessor($functionName, $arguments);
+                            $accessor = "$functionName($arguments)";
                         }
 
                         return $accessor;

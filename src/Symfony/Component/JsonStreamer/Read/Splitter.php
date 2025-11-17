@@ -17,8 +17,6 @@ use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
  * Splits collections to retrieve the offset and length of each element.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- *
- * @experimental
  */
 final class Splitter
 {
@@ -79,7 +77,7 @@ final class Splitter
             }
 
             [$value, $position] = $token;
-            $offset = $offset ?? $position;
+            $offset ??= $position;
 
             if (isset(self::NESTING_CHARS[$value])) {
                 ++$level;

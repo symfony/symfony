@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\CompiledRoute;
 use Symfony\Component\Routing\Route;
@@ -141,9 +142,7 @@ class RouteTest extends TestCase
         $this->assertTrue($route->hasRequirement('foo'));
     }
 
-    /**
-     * @dataProvider getInvalidRequirements
-     */
+    #[DataProvider('getInvalidRequirements')]
     public function testSetInvalidRequirement($req)
     {
         $route = new Route('/{foo}');
@@ -226,9 +225,7 @@ class RouteTest extends TestCase
         $this->assertNotSame($route, $unserialized);
     }
 
-    /**
-     * @dataProvider provideInlineDefaultAndRequirementCases
-     */
+    #[DataProvider('provideInlineDefaultAndRequirementCases')]
     public function testInlineDefaultAndRequirement(Route $route, string $expectedPath, string $expectedHost, array $expectedDefaults, array $expectedRequirements)
     {
         self::assertSame($expectedPath, $route->getPath());
@@ -323,9 +320,7 @@ class RouteTest extends TestCase
         $this->assertNotSame($route, $unserialized);
     }
 
-    /**
-     * @dataProvider provideNonLocalizedRoutes
-     */
+    #[DataProvider('provideNonLocalizedRoutes')]
     public function testLocaleDefaultWithNonLocalizedRoutes(Route $route)
     {
         $this->assertNotSame('fr', $route->getDefault('_locale'));
@@ -333,9 +328,7 @@ class RouteTest extends TestCase
         $this->assertSame('fr', $route->getDefault('_locale'));
     }
 
-    /**
-     * @dataProvider provideLocalizedRoutes
-     */
+    #[DataProvider('provideLocalizedRoutes')]
     public function testLocaleDefaultWithLocalizedRoutes(Route $route)
     {
         $expected = $route->getDefault('_locale');
@@ -345,9 +338,7 @@ class RouteTest extends TestCase
         $this->assertSame($expected, $route->getDefault('_locale'));
     }
 
-    /**
-     * @dataProvider provideNonLocalizedRoutes
-     */
+    #[DataProvider('provideNonLocalizedRoutes')]
     public function testLocaleRequirementWithNonLocalizedRoutes(Route $route)
     {
         $this->assertNotSame('fr', $route->getRequirement('_locale'));
@@ -355,9 +346,7 @@ class RouteTest extends TestCase
         $this->assertSame('fr', $route->getRequirement('_locale'));
     }
 
-    /**
-     * @dataProvider provideLocalizedRoutes
-     */
+    #[DataProvider('provideLocalizedRoutes')]
     public function testLocaleRequirementWithLocalizedRoutes(Route $route)
     {
         $expected = $route->getRequirement('_locale');

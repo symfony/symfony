@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Ldap\Tests\Adapter\ExtLdap;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Query;
@@ -20,11 +22,8 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Ldap\Tests\LdapTestCase;
 
-/**
- * @requires extension ldap
- *
- * @group integration
- */
+#[RequiresPhpExtension('ldap')]
+#[Group('integration')]
 class AdapterTest extends LdapTestCase
 {
     public function testLdapEscape()
@@ -34,9 +33,7 @@ class AdapterTest extends LdapTestCase
         $this->assertEquals('\20foo\3dbar\0d(baz)*\20', $ldap->escape(" foo=bar\r(baz)* ", '', LdapInterface::ESCAPE_DN));
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testSaslBind()
     {
         $h = @ldap_connect('ldap://'.getenv('LDAP_HOST').':'.getenv('LDAP_PORT'));
@@ -59,9 +56,7 @@ class AdapterTest extends LdapTestCase
         $this->assertEquals('cn=admin,dc=symfony,dc=com', $ldap->getConnection()->whoami());
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testWhoamiWithoutSaslBind()
     {
         $ldap = new Adapter($this->getLdapConfig());
@@ -72,9 +67,7 @@ class AdapterTest extends LdapTestCase
         $ldap->getConnection()->whoami();
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapQuery()
     {
         $ldap = new Adapter($this->getLdapConfig());
@@ -92,9 +85,7 @@ class AdapterTest extends LdapTestCase
         $this->assertEquals(['fabpot@symfony.com', 'fabien@potencier.com'], $entry->getAttribute('mail'));
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapQueryIterator()
     {
         $ldap = new Adapter($this->getLdapConfig());
@@ -110,9 +101,7 @@ class AdapterTest extends LdapTestCase
         $this->assertEquals(['fabpot@symfony.com', 'fabien@potencier.com'], $entry->getAttribute('mail'));
     }
 
-    /**
-     * @group functional
-     */
+    #[Group('functional')]
     public function testLdapQueryWithoutBind()
     {
         $ldap = new Adapter($this->getLdapConfig());

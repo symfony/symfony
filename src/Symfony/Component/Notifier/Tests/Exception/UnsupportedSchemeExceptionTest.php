@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Notifier\Tests\Exception;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Notifier\Bridge;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
-/**
- * @runTestsInSeparateProcesses
- */
+#[RunTestsInSeparateProcesses]
 final class UnsupportedSchemeExceptionTest extends TestCase
 {
     public static function setUpBeforeClass(): void
@@ -110,9 +110,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider messageWhereSchemeIsPartOfSchemeToPackageMapProvider
-     */
+    #[DataProvider('messageWhereSchemeIsPartOfSchemeToPackageMapProvider')]
     public function testMessageWhereSchemeIsPartOfSchemeToPackageMap(string $scheme, string $package)
     {
         $dsn = new Dsn(\sprintf('%s://localhost', $scheme));
@@ -182,7 +180,6 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['simpletextin', 'symfony/simple-textin-notifier'];
         yield ['sinch', 'symfony/sinch-notifier'];
         yield ['slack', 'symfony/slack-notifier'];
-        yield ['sms77', 'symfony/sms77-notifier'];
         yield ['smsapi', 'symfony/smsapi-notifier'];
         yield ['smsbiuras', 'symfony/sms-biuras-notifier'];
         yield ['smsc', 'symfony/smsc-notifier'];
@@ -203,9 +200,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['goip', 'symfony/go-ip-notifier'];
     }
 
-    /**
-     * @dataProvider messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider
-     */
+    #[DataProvider('messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider')]
     public function testMessageWhereSchemeIsNotPartOfSchemeToPackageMap(string $expected, Dsn $dsn, ?string $name, array $supported)
     {
         $this->assertSame(

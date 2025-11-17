@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-/**
- * @group intl-data
- */
+#[Group('intl-data')]
 class CountriesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
@@ -796,9 +797,7 @@ class CountriesTest extends ResourceBundleTestCase
         $this->assertSame(self::COUNTRIES, Countries::getCountryCodes());
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetNames($displayLocale)
     {
         if ('en' !== $displayLocale) {
@@ -821,9 +820,7 @@ class CountriesTest extends ResourceBundleTestCase
         $this->assertSame(Countries::getNames('de_AT'), Countries::getNames());
     }
 
-    /**
-     * @dataProvider provideLocaleAliases
-     */
+    #[DataProvider('provideLocaleAliases')]
     public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
         if ('en' !== $ofLocale) {
@@ -836,9 +833,7 @@ class CountriesTest extends ResourceBundleTestCase
         $this->assertEquals(Countries::getNames($ofLocale), Countries::getNames($alias));
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetName($displayLocale)
     {
         if ('en' !== $displayLocale) {
@@ -852,9 +847,7 @@ class CountriesTest extends ResourceBundleTestCase
         }
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testLocaleAliasesAreLoaded()
     {
         \Locale::setDefault('zh_TW');
@@ -911,9 +904,7 @@ class CountriesTest extends ResourceBundleTestCase
         $this->assertFalse(Countries::alpha3CodeExists('ZZZ'));
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetAlpha3Name($displayLocale)
     {
         if ('en' !== $displayLocale) {
@@ -935,9 +926,7 @@ class CountriesTest extends ResourceBundleTestCase
         Countries::getAlpha3Name('ZZZ');
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetAlpha3Names($displayLocale)
     {
         if ('en' !== $displayLocale) {

@@ -37,12 +37,12 @@ class GroupsTest extends TestCase
         $validData = ['a', 'b'];
 
         $groups = new Groups($validData);
-        $this->assertEquals($validData, $groups->getGroups());
+        $this->assertEquals($validData, $groups->groups);
     }
 
     public function testSingleGroup()
     {
         $groups = new Groups('a');
-        $this->assertEquals(['a'], $groups->getGroups());
+        $this->assertEquals(['a'], $groups->groups);
     }
 }

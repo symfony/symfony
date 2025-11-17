@@ -45,8 +45,8 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
     public function lateCollect(): void
     {
-        $this->data['request_count'] = $this->data['request_count'] ?? 0;
-        $this->data['error_count'] = $this->data['error_count'] ?? 0;
+        $this->data['request_count'] ??= 0;
+        $this->data['error_count'] ??= 0;
         $this->data += ['clients' => []];
 
         foreach ($this->clients as $name => $client) {

@@ -11,19 +11,26 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
+use Symfony\Component\Console\Cursor;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
 
 class InvokableCommandTest extends TestCase
 {
@@ -132,6 +139,88 @@ class InvokableCommandTest extends TestCase
         self::assertFalse($optInputOption->getDefault());
     }
 
+    public function testEnumArgument()
+    {
+        $command = new Command('foo');
+        $command->setCode(function (
+            #[Argument] StringEnum $enum,
+            #[Argument] StringEnum $enumWithDefault = StringEnum::Image,
+            #[Argument] ?StringEnum $nullableEnum = null,
+        ): int {
+            Assert::assertSame(StringEnum::Image, $enum);
+            Assert::assertSame(StringEnum::Image, $enumWithDefault);
+            Assert::assertNull($nullableEnum);
+
+            return 0;
+        });
+
+        $enumInputArgument = $command->getDefinition()->getArgument('enum');
+        self::assertTrue($enumInputArgument->isRequired());
+        self::assertNull($enumInputArgument->getDefault());
+        self::assertTrue($enumInputArgument->hasCompletion());
+
+        $enumWithDefaultInputArgument = $command->getDefinition()->getArgument('enum-with-default');
+        self::assertFalse($enumWithDefaultInputArgument->isRequired());
+        self::assertSame('image', $enumWithDefaultInputArgument->getDefault());
+        self::assertTrue($enumWithDefaultInputArgument->hasCompletion());
+
+        $nullableEnumInputArgument = $command->getDefinition()->getArgument('nullable-enum');
+        self::assertFalse($nullableEnumInputArgument->isRequired());
+        self::assertNull($nullableEnumInputArgument->getDefault());
+        self::assertTrue($nullableEnumInputArgument->hasCompletion());
+
+        $enumInputArgument->complete(CompletionInput::fromTokens([], 0), $suggestions = new CompletionSuggestions());
+        self::assertEquals([new Suggestion('image'), new Suggestion('video')], $suggestions->getValueSuggestions());
+
+        $command->run(new ArrayInput(['enum' => 'image']), new NullOutput());
+
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The value "incorrect" is not valid for the "enum" argument. Supported values are "image", "video".');
+
+        $command->run(new ArrayInput(['enum' => 'incorrect']), new NullOutput());
+    }
+
+    public function testEnumOption()
+    {
+        $command = new Command('foo');
+        $command->setCode(function (
+            #[Option] StringEnum $enum = StringEnum::Video,
+            #[Option] StringEnum $enumWithDefault = StringEnum::Image,
+            #[Option] ?StringEnum $nullableEnum = null,
+        ): int {
+            Assert::assertSame(StringEnum::Image, $enum);
+            Assert::assertSame(StringEnum::Image, $enumWithDefault);
+            Assert::assertNull($nullableEnum);
+
+            return 0;
+        });
+
+        $enumInputOption = $command->getDefinition()->getOption('enum');
+        self::assertTrue($enumInputOption->isValueRequired());
+        self::assertSame('video', $enumInputOption->getDefault());
+        self::assertTrue($enumInputOption->hasCompletion());
+
+        $enumWithDefaultInputOption = $command->getDefinition()->getOption('enum-with-default');
+        self::assertTrue($enumWithDefaultInputOption->isValueRequired());
+        self::assertSame('image', $enumWithDefaultInputOption->getDefault());
+        self::assertTrue($enumWithDefaultInputOption->hasCompletion());
+
+        $nullableEnumInputOption = $command->getDefinition()->getOption('nullable-enum');
+        self::assertTrue($nullableEnumInputOption->isValueRequired());
+        self::assertNull($nullableEnumInputOption->getDefault());
+        self::assertTrue($nullableEnumInputOption->hasCompletion());
+
+        $enumInputOption->complete(CompletionInput::fromTokens([], 0), $suggestions = new CompletionSuggestions());
+        self::assertEquals([new Suggestion('image'), new Suggestion('video')], $suggestions->getValueSuggestions());
+
+        $command->run(new ArrayInput(['--enum' => 'image']), new NullOutput());
+
+        self::expectException(InvalidOptionException::class);
+        self::expectExceptionMessage('The value "incorrect" is not valid for the "enum" option. Supported values are "image", "video".');
+
+        $command->run(new ArrayInput(['--enum' => 'incorrect']), new NullOutput());
+    }
+
     public function testInvalidArgumentType()
     {
         $command = new Command('foo');
@@ -208,9 +297,15 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput([]), new NullOutput());
     }
 
-    /**
-     * @dataProvider provideInputArguments
-     */
+    public function testGetCode()
+    {
+        $invokableTestCommand = new InvokableTestCommand();
+        $command = new Command(null, $invokableTestCommand);
+
+        $this->assertSame($invokableTestCommand, $command->getCode());
+    }
+
+    #[DataProvider('provideInputArguments')]
     public function testInputArguments(array $parameters, array $expected)
     {
         $command = new Command('foo');
@@ -238,9 +333,7 @@ class InvokableCommandTest extends TestCase
         yield 'required & without-value' => [['a' => 'x', 'b' => null, 'c' => null, 'd' => null], ['x', null, '', []]];
     }
 
-    /**
-     * @dataProvider provideBinaryInputOptions
-     */
+    #[DataProvider('provideBinaryInputOptions')]
     public function testBinaryInputOptions(array $parameters, array $expected)
     {
         $command = new Command('foo');
@@ -266,9 +359,7 @@ class InvokableCommandTest extends TestCase
         yield 'negative' => [['--no-a' => null, '--no-c' => null], [false, false, false]];
     }
 
-    /**
-     * @dataProvider provideNonBinaryInputOptions
-     */
+    #[DataProvider('provideNonBinaryInputOptions')]
     public function testNonBinaryInputOptions(array $parameters, array $expected)
     {
         $command = new Command('foo');
@@ -321,9 +412,7 @@ class InvokableCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidOptionDefinitions
-     */
+    #[DataProvider('provideInvalidOptionDefinitions')]
     public function testInvalidOptionDefinition(callable $code)
     {
         $command = new Command('foo');
@@ -376,8 +465,33 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--a' => null]), new NullOutput());
     }
 
+    public function testHelpersInjection()
+    {
+        $command = new Command('foo');
+        $command->setApplication(new Application());
+        $command->setCode(function (
+            InputInterface $input,
+            OutputInterface $output,
+            Cursor $cursor,
+            SymfonyStyle $io,
+            Application $application,
+        ): int {
+            $this->addToAssertionCount(1);
+
+            return 0;
+        });
+
+        $command->run(new ArrayInput([]), new NullOutput());
+    }
+
     public function getSuggestedRoles(CompletionInput $input): array
     {
         return ['ROLE_ADMIN', 'ROLE_USER'];
     }
+}
+
+enum StringEnum: string
+{
+    case Image = 'image';
+    case Video = 'video';
 }

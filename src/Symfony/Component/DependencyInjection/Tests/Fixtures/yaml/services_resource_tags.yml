@@ -1,0 +1,6 @@
+services:
+    foo:
+        class: stdClass
+        resource_tags:
+            - { name: 'my.tag', foo: 'bar' }
+            - 'another.tag'

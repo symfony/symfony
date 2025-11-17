@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
@@ -77,9 +78,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $this->fail('Exception not thrown.');
     }
 
-    /**
-     * @dataProvider itAddsHandledStampsProvider
-     */
+    #[DataProvider('itAddsHandledStampsProvider')]
     public function testItAddsHandledStamps(array $handlers, array $expectedStamps, bool $nextIsCalled)
     {
         $message = new DummyMessage('Hey');

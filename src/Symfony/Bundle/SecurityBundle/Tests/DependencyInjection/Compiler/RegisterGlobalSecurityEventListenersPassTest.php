@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -50,9 +51,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         $securityBundle->build($this->container);
     }
 
-    /**
-     * @dataProvider providePropagatedEvents
-     */
+    #[DataProvider('providePropagatedEvents')]
     public function testEventIsPropagated(string $configuredEvent, string $registeredEvent)
     {
         $this->container->loadFromExtension('security', [

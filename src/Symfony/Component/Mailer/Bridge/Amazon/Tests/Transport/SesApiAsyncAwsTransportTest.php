@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Tests\Transport;
 use AsyncAws\Core\Configuration;
 use AsyncAws\Core\Credentials\NullProvider;
 use AsyncAws\Ses\SesClient;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -26,9 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class SesApiAsyncAwsTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(SesApiAsyncAwsTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);

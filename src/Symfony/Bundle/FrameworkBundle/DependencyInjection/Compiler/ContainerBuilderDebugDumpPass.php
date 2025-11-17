@@ -13,8 +13,11 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ResolveEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Dumps the ContainerBuilder to a cache file so that it can be used by
@@ -31,9 +34,52 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
             return;
         }
 
-        $cache = new ConfigCache($container->getParameter('debug.container.dump'), true);
-        if (!$cache->isFresh()) {
-            $cache->write((new XmlDumper($container))->dump(), $container->getResources());
+        $file = $container->getParameter('debug.container.dump');
+        $cache = new ConfigCache($file, true);
+        if ($cache->isFresh()) {
+            return;
         }
+        $cache->write((new XmlDumper($container))->dump(), $container->getResources());
+
+        if (!str_ends_with($file, '.xml')) {
+            return;
+        }
+
+        $file = substr_replace($file, '.ser', -4);
+
+        try {
+            $dump = new ContainerBuilder(clone $container->getParameterBag());
+            $dump->setDefinitions(unserialize(serialize($container->getDefinitions())));
+            $dump->setAliases($container->getAliases());
+
+            if (($bag = $container->getParameterBag()) instanceof EnvPlaceholderParameterBag) {
+                (new ResolveEnvPlaceholdersPass(null))->process($dump);
+                $dump->__construct(new EnvPlaceholderParameterBag($container->resolveEnvPlaceholders($this->escapeParameters($bag->all()))));
+            }
+
+            $fs = new Filesystem();
+            $fs->dumpFile($file, serialize($dump));
+            $fs->chmod($file, 0o666, umask());
+        } catch (\Throwable $e) {
+            $container->getCompiler()->log($this, $e->getMessage());
+            // ignore serialization and file-system errors
+            if (file_exists($file)) {
+                @unlink($file);
+            }
+        }
+    }
+
+    private function escapeParameters(array $parameters): array
+    {
+        $params = [];
+        foreach ($parameters as $k => $v) {
+            $params[$k] = match (true) {
+                \is_array($v) => $this->escapeParameters($v),
+                \is_string($v) => str_replace('%', '%%', $v),
+                default => $v,
+            };
+        }
+
+        return $params;
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation\Bridge\Lokalise\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -602,9 +604,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    /**
-     * @dataProvider getResponsesForOneLocaleAndOneDomain
-     */
+    #[DataProvider('getResponsesForOneLocaleAndOneDomain')]
     public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
     {
         $response = function (string $method, string $url, array $options = []) use ($locale, $domain, $responseContent): ResponseInterface {
@@ -646,9 +646,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
     }
 
-    /**
-     * @dataProvider getResponsesForManyLocalesAndManyDomains
-     */
+    #[DataProvider('getResponsesForManyLocalesAndManyDomains')]
     public function testReadForManyLocalesAndManyDomains(array $locales, array $domains, array $responseContents, TranslatorBag $expectedTranslatorBag)
     {
         $consecutiveLoadArguments = [];
@@ -697,9 +695,7 @@ class LokaliseProviderTest extends ProviderTestCase
         }
     }
 
-    /**
-     * @requires extension zip
-     */
+    #[RequiresPhpExtension('zip')]
     public function testReadWithExportAsync()
     {
         $zipLocation = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'Symfony-locale.zip';
@@ -760,9 +756,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
     }
 
-    /**
-     * @requires extension zip
-     */
+    #[RequiresPhpExtension('zip')]
     public function testReadWithExportAsyncFailedProcess()
     {
         $firstResponse = function (): ResponseInterface {
@@ -910,26 +904,25 @@ class LokaliseProviderTest extends ProviderTestCase
         ], 'en'));
 
         yield ['en', 'messages', <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
-  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
-    <header>
-      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
-    </header>
-    <body>
-      <trans-unit id="index.greetings" resname="index.greetings">
-        <source>index.greetings</source>
-        <target>Welcome, {firstname}!</target>
-      </trans-unit>
-      <trans-unit id="index.hello" resname="index.hello">
-        <source>index.hello</source>
-        <target>Hello</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-            ,
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+              <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
+                <header>
+                  <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+                </header>
+                <body>
+                  <trans-unit id="index.greetings" resname="index.greetings">
+                    <source>index.greetings</source>
+                    <target>Welcome, {firstname}!</target>
+                  </trans-unit>
+                  <trans-unit id="index.hello" resname="index.hello">
+                    <source>index.hello</source>
+                    <target>Hello</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
+            XLIFF,
             $expectedTranslatorBagEn,
         ];
 
@@ -940,26 +933,25 @@ XLIFF
         ], 'en_US'));
 
         yield ['en_US', 'messages', <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
-  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en-US">
-    <header>
-      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
-    </header>
-    <body>
-      <trans-unit id="index.greetings" resname="index.greetings">
-        <source>index.greetings</source>
-        <target>Welcome, {firstname}!</target>
-      </trans-unit>
-      <trans-unit id="index.hello" resname="index.hello">
-        <source>index.hello</source>
-        <target>Hello</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-            ,
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+              <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en-US">
+                <header>
+                  <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+                </header>
+                <body>
+                  <trans-unit id="index.greetings" resname="index.greetings">
+                    <source>index.greetings</source>
+                    <target>Welcome, {firstname}!</target>
+                  </trans-unit>
+                  <trans-unit id="index.hello" resname="index.hello">
+                    <source>index.hello</source>
+                    <target>Hello</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
+            XLIFF,
             $expectedTranslatorBagEnUS,
         ];
 
@@ -970,26 +962,25 @@ XLIFF
         ], 'fr'));
 
         yield ['fr', 'messages', <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
-  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
-    <header>
-      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
-    </header>
-    <body>
-      <trans-unit id="index.greetings" resname="index.greetings">
-        <source>index.greetings</source>
-        <target>Bienvenue, {firstname} !</target>
-      </trans-unit>
-      <trans-unit id="index.hello" resname="index.hello">
-        <source>index.hello</source>
-        <target>Bonjour</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-            ,
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+              <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
+                <header>
+                  <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+                </header>
+                <body>
+                  <trans-unit id="index.greetings" resname="index.greetings">
+                    <source>index.greetings</source>
+                    <target>Bienvenue, {firstname} !</target>
+                  </trans-unit>
+                  <trans-unit id="index.hello" resname="index.hello">
+                    <source>index.hello</source>
+                    <target>Bonjour</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
+            XLIFF,
             $expectedTranslatorBagFr,
         ];
     }
@@ -1022,91 +1013,87 @@ XLIFF
             [
                 'en' => [
                     'messages' => <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
-  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
-    <header>
-      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
-    </header>
-    <body>
-      <trans-unit id="index.greetings" resname="index.greetings">
-        <source>index.greetings</source>
-        <target>Welcome, {firstname}!</target>
-      </trans-unit>
-      <trans-unit id="index.hello" resname="index.hello">
-        <source>index.hello</source>
-        <target>Hello</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-                    ,
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+                          <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
+                            <header>
+                              <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+                            </header>
+                            <body>
+                              <trans-unit id="index.greetings" resname="index.greetings">
+                                <source>index.greetings</source>
+                                <target>Welcome, {firstname}!</target>
+                              </trans-unit>
+                              <trans-unit id="index.hello" resname="index.hello">
+                                <source>index.hello</source>
+                                <target>Hello</target>
+                              </trans-unit>
+                            </body>
+                          </file>
+                        </xliff>
+                        XLIFF,
                     'validators' => <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
-  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
-    <header>
-      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
-    </header>
-    <body>
-      <trans-unit id="lastname.error" resname="lastname.error">
-        <source>lastname.error</source>
-        <target>Lastname must contains only letters.</target>
-      </trans-unit>
-      <trans-unit id="firstname.error" resname="firstname.error">
-        <source>firstname.error</source>
-        <target>Firstname must contains only letters.</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-                    ,
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+                          <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
+                            <header>
+                              <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+                            </header>
+                            <body>
+                              <trans-unit id="lastname.error" resname="lastname.error">
+                                <source>lastname.error</source>
+                                <target>Lastname must contains only letters.</target>
+                              </trans-unit>
+                              <trans-unit id="firstname.error" resname="firstname.error">
+                                <source>firstname.error</source>
+                                <target>Firstname must contains only letters.</target>
+                              </trans-unit>
+                            </body>
+                          </file>
+                        </xliff>
+                        XLIFF,
                 ],
                 'fr' => [
                     'messages' => <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
-  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
-    <header>
-      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
-    </header>
-    <body>
-      <trans-unit id="index.greetings" resname="index.greetings">
-        <source>index.greetings</source>
-        <target>Bienvenue, {firstname} !</target>
-      </trans-unit>
-      <trans-unit id="index.hello" resname="index.hello">
-        <source>index.hello</source>
-        <target>Bonjour</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-                    ,
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+                          <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
+                            <header>
+                              <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+                            </header>
+                            <body>
+                              <trans-unit id="index.greetings" resname="index.greetings">
+                                <source>index.greetings</source>
+                                <target>Bienvenue, {firstname} !</target>
+                              </trans-unit>
+                              <trans-unit id="index.hello" resname="index.hello">
+                                <source>index.hello</source>
+                                <target>Bonjour</target>
+                              </trans-unit>
+                            </body>
+                          </file>
+                        </xliff>
+                        XLIFF,
                     'validators' => <<<'XLIFF'
-<?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
-  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
-    <header>
-      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
-    </header>
-    <body>
-      <trans-unit id="lastname.error" resname="lastname.error">
-        <source>lastname.error</source>
-        <target>Le nom de famille ne peut contenir que des lettres.</target>
-      </trans-unit>
-      <trans-unit id="firstname.error" resname="firstname.error">
-        <source>firstname.error</source>
-        <target>Le prénom ne peut contenir que des lettres.</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF
-                    ,
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+                          <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
+                            <header>
+                              <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+                            </header>
+                            <body>
+                              <trans-unit id="lastname.error" resname="lastname.error">
+                                <source>lastname.error</source>
+                                <target>Le nom de famille ne peut contenir que des lettres.</target>
+                              </trans-unit>
+                              <trans-unit id="firstname.error" resname="firstname.error">
+                                <source>firstname.error</source>
+                                <target>Le prénom ne peut contenir que des lettres.</target>
+                              </trans-unit>
+                            </body>
+                          </file>
+                        </xliff>
+                        XLIFF,
                 ],
             ],
             $expectedTranslatorBag,

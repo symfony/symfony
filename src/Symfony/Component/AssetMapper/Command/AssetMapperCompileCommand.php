@@ -50,11 +50,11 @@ final class AssetMapperCompileCommand extends Command
     {
         $this
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command compiles and dumps all the assets in
-the asset mapper into the final public directory (usually <comment>public/assets</comment>).
+                The <info>%command.name%</info> command compiles and dumps all the assets in
+                the asset mapper into the final public directory (usually <comment>public/assets</comment>).
 
-This command is meant to be run during deployment.
-EOT
+                This command is meant to be run during deployment.
+                EOT
             );
     }
 

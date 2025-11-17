@@ -45,19 +45,4 @@ class IsTrueValidatorTest extends ConstraintValidatorTestCase
             ->setCode(IsTrue::NOT_TRUE_ERROR)
             ->assertRaised();
     }
-
-    /**
-     * @group legacy
-     */
-    public function testFalseIsInvalidDoctrineStyle()
-    {
-        $this->validator->validate(false, new IsTrue([
-            'message' => 'myMessage',
-        ]));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 'false')
-            ->setCode(IsTrue::NOT_TRUE_ERROR)
-            ->assertRaised();
-    }
 }

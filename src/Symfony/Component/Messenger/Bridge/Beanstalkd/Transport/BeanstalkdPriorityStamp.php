@@ -13,10 +13,10 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
-final readonly class BeanstalkdPriorityStamp implements StampInterface
+final class BeanstalkdPriorityStamp implements StampInterface
 {
     public function __construct(
-        public int $priority,
+        public readonly int $priority,
     ) {
     }
 }

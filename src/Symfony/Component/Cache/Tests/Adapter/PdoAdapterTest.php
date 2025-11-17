@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
-/**
- * @requires extension pdo_sqlite
- *
- * @group time-sensitive
- */
+#[RequiresPhpExtension('pdo_sqlite')]
+#[Group('time-sensitive')]
 class PdoAdapterTest extends AdapterTestCase
 {
     protected static string $dbFile;
@@ -76,9 +76,7 @@ class PdoAdapterTest extends AdapterTestCase
         $this->assertSame(0, $getCacheItemCount(), 'PDOAdapter must clean up expired items');
     }
 
-    /**
-     * @dataProvider provideDsnSQLite
-     */
+    #[DataProvider('provideDsnSQLite')]
     public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
         try {
@@ -101,11 +99,8 @@ class PdoAdapterTest extends AdapterTestCase
         yield 'SQLite in memory' => ['sqlite::memory:'];
     }
 
-    /**
-     * @requires extension pdo_pgsql
-     *
-     * @group integration
-     */
+    #[RequiresPhpExtension('pdo_pgsql')]
+    #[Group('integration')]
     public function testDsnWithPostgreSQL()
     {
         if (!$host = getenv('POSTGRES_HOST')) {

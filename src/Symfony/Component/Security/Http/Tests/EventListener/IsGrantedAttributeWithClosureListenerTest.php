@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
@@ -26,9 +28,7 @@ use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeMethodsWithClosureController;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeWithClosureController;
 
-/**
- * @requires PHP 8.5
- */
+#[RequiresPhp('>=8.5')]
 class IsGrantedAttributeWithClosureListenerTest extends TestCase
 {
     public function testAttribute()
@@ -213,9 +213,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    /**
-     * @dataProvider getAccessDeniedMessageTests
-     */
+    #[DataProvider('getAccessDeniedMessageTests')]
     public function testAccessDeniedMessages(string|array|null $subject, string $method, int $numOfArguments, string $expectedMessage)
     {
         $authChecker = new AuthorizationChecker(new TokenStorage(), new AccessDecisionManager((function () use (&$authChecker) {

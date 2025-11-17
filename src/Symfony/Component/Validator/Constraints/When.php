@@ -13,9 +13,10 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\LogicException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * Conditionally apply validation constraints based on an expression using the ExpressionLanguage syntax.
@@ -31,62 +32,33 @@ class When extends Composite
     public array|Constraint $otherwise = [];
 
     /**
-     * @param string|Expression|array<string,mixed>|\Closure(object): bool $expression The condition to evaluate, either as a closure or using the ExpressionLanguage syntax
-     * @param Constraint[]|Constraint|null          $constraints One or multiple constraints that are applied if the expression returns true
-     * @param array<string,mixed>|null              $values      The values of the custom variables used in the expression (defaults to [])
-     * @param string[]|null                         $groups
-     * @param array<string,mixed>|null              $options
-     * @param Constraint[]|Constraint               $otherwise   One or multiple constraints that are applied if the expression returns false
+     * @param string|Expression|\Closure(object): bool $expression  The condition to evaluate, either as a closure or using the ExpressionLanguage syntax
+     * @param Constraint[]|Constraint|null             $constraints One or multiple constraints that are applied if the expression returns true
+     * @param array<string,mixed>|null                 $values      The values of the custom variables used in the expression (defaults to [])
+     * @param string[]|null                            $groups
+     * @param Constraint[]|Constraint                  $otherwise   One or multiple constraints that are applied if the expression returns false
      */
-    #[HasNamedArguments]
-    public function __construct(string|Expression|array|\Closure $expression, array|Constraint|null $constraints = null, ?array $values = null, ?array $groups = null, $payload = null, ?array $options = null, array|Constraint $otherwise = [])
+    public function __construct(string|Expression|\Closure $expression, array|Constraint|null $constraints = null, ?array $values = null, ?array $groups = null, $payload = null, ?array $options = null, array|Constraint $otherwise = [])
     {
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(\sprintf('The "symfony/expression-language" component is required to use the "%s" constraint. Try running "composer require symfony/expression-language".', __CLASS__));
         }
 
-        if (\is_array($expression)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-            $options = array_merge($expression, $options ?? []);
-        } else {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-            } else {
-                $options = [];
-            }
-
-            $options['expression'] = $expression;
-            if (null !== $constraints) {
-                $options['constraints'] = $constraints;
-            }
-            $options['otherwise'] = $otherwise;
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        if (!\is_array($options['constraints'] ?? [])) {
-            $options['constraints'] = [$options['constraints']];
+        if (null === $constraints) {
+            throw new MissingOptionsException(\sprintf('The options "constraints" must be set for constraint "%s".', self::class), ['constraints']);
         }
 
-        if (!\is_array($options['otherwise'] ?? [])) {
-            $options['otherwise'] = [$options['otherwise']];
-        }
+        $this->expression = $expression;
+        $this->constraints = $constraints;
+        $this->otherwise = $otherwise;
 
-        if (null !== $groups) {
-            $options['groups'] = $groups;
-        }
-
-        if (null !== $payload) {
-            $options['payload'] = $payload;
-        }
-
-        parent::__construct($options);
+        parent::__construct(null, $groups, $payload);
 
         $this->values = $values ?? $this->values;
-    }
-
-    public function getRequiredOptions(): array
-    {
-        return ['expression', 'constraints'];
     }
 
     public function getTargets(): string|array

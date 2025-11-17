@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
@@ -601,9 +602,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         );
     }
 
-    /**
-     * @dataProvider themeBlockInheritanceProvider
-     */
+    #[DataProvider('themeBlockInheritanceProvider')]
     public function testThemeBlockInheritance($theme)
     {
         $view = $this->factory
@@ -626,9 +625,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         ];
     }
 
-    /**
-     * @dataProvider themeInheritanceProvider
-     */
+    #[DataProvider('themeInheritanceProvider')]
     public function testThemeInheritance($parentTheme, $childTheme)
     {
         $child = $this->factory->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType')

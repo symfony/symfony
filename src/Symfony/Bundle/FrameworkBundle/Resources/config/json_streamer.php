@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\JsonStreamer\CacheWarmer\LazyGhostCacheWarmer;
 use Symfony\Component\JsonStreamer\CacheWarmer\StreamerCacheWarmer;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
@@ -21,7 +20,6 @@ use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader 
 use Symfony\Component\JsonStreamer\Mapping\Read\DateTimeTypePropertyMetadataLoader as ReadDateTimeTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader as WriteAttributePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Write\DateTimeTypePropertyMetadataLoader as WriteDateTimeTypePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\JsonStreamer\ValueTransformer\DateTimeToStringValueTransformer;
 use Symfony\Component\JsonStreamer\ValueTransformer\StringToDateTimeValueTransformer;
 
@@ -40,8 +38,7 @@ return static function (ContainerConfigurator $container) {
                 tagged_locator('json_streamer.value_transformer'),
                 service('json_streamer.read.property_metadata_loader'),
                 param('.json_streamer.stream_readers_dir'),
-                class_exists(StreamerDumper::class) ? service('config_cache_factory')->ignoreOnInvalid() : param('.json_streamer.lazy_ghosts_dir'),
-                param('.json_streamer.lazy_ghosts_dir'),
+                service('config_cache_factory')->ignoreOnInvalid(),
             ])
         ->alias(JsonStreamWriter::class, 'json_streamer.stream_writer')
         ->alias(JsonStreamReader::class, 'json_streamer.stream_reader')
@@ -110,13 +107,6 @@ return static function (ContainerConfigurator $container) {
                 param('.json_streamer.stream_readers_dir'),
                 service('logger')->ignoreOnInvalid(),
                 service('config_cache_factory')->ignoreOnInvalid(),
-            ])
-            ->tag('kernel.cache_warmer')
-
-        ->set('.json_streamer.cache_warmer.lazy_ghost', LazyGhostCacheWarmer::class)
-            ->args([
-                abstract_arg('streamable class names'),
-                param('.json_streamer.lazy_ghosts_dir'),
             ])
             ->tag('kernel.cache_warmer')
     ;

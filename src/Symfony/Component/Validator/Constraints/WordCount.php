@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
@@ -34,7 +33,6 @@ final class WordCount extends Constraint
      * @param int<0, max>|null  $min
      * @param positive-int|null $max
      */
-    #[HasNamedArguments]
     public function __construct(
         public ?int $min = null,
         public ?int $max = null,

@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 
 final class PseudoLocalizationTranslatorTest extends TestCase
 {
-    /**
-     * @dataProvider provideTrans
-     */
+    #[DataProvider('provideTrans')]
     public function testTrans(string $expected, string $input, array $options = [])
     {
         mt_srand(987);
@@ -48,9 +47,7 @@ final class PseudoLocalizationTranslatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidExpansionFactor
-     */
+    #[DataProvider('provideInvalidExpansionFactor')]
     public function testInvalidExpansionFactor(float $expansionFactor)
     {
         $this->expectException(\InvalidArgumentException::class);

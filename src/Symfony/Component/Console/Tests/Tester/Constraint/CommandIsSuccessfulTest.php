@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Tester\Constraint;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
@@ -27,9 +28,7 @@ final class CommandIsSuccessfulTest extends TestCase
         $this->assertFalse($constraint->evaluate(Command::INVALID, '', true));
     }
 
-    /**
-     * @dataProvider providesUnsuccessful
-     */
+    #[DataProvider('providesUnsuccessful')]
     public function testUnsuccessfulCommand(string $expectedException, int $exitCode)
     {
         $constraint = new CommandIsSuccessful();

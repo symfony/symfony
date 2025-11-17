@@ -89,6 +89,13 @@ final class Key
         return null !== $this->expiringTime && $this->expiringTime <= microtime(true);
     }
 
+    public function __unserialize(array $data): void
+    {
+        $this->resource = $data['resource'];
+        $this->expiringTime = $data['expiringTime'];
+        $this->state = $data['state'];
+    }
+
     public function __serialize(): array
     {
         if (!$this->serializable) {

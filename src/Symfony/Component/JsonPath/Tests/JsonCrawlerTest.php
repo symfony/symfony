@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonPath\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonPath\Exception\InvalidArgumentException;
 use Symfony\Component\JsonPath\Exception\InvalidJsonStringInputException;
@@ -83,8 +84,8 @@ class JsonCrawlerTest extends TestCase
     public function testEscapedDoubleQuotesInFieldName()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": {"b\\"c": 42}}
-JSON);
+            {"a": {"b\\"c": 42}}
+            JSON);
 
         $result = $crawler->find('$["a"]["b\"c"]');
 
@@ -94,8 +95,8 @@ JSON);
     public function testMultipleKeysAtOnce()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": {"b\\"c": 42}, "b": {"c": 43}}
-JSON);
+            {"a": {"b\\"c": 42}, "b": {"c": 43}}
+            JSON);
 
         $result = $crawler->find("$['a', 'b', 3]");
 
@@ -108,8 +109,8 @@ JSON);
     public function testMultipleKeysAtOnceOnArray()
     {
         $crawler = new JsonCrawler(<<<JSON
-[{"a": 1}, {"b": 2}, {"c": 3}, {"a,b,c":  5}, {"d": 4}]
-JSON);
+            [{"a": 1}, {"b": 2}, {"c": 3}, {"a,b,c":  5}, {"d": 4}]
+            JSON);
 
         $result = $crawler->find("$[0, 2, 'a,b,c', -1]");
 
@@ -220,8 +221,8 @@ JSON);
     public function testSliceWithStep()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
+            JSON);
 
         $result = $crawler->find('$.a[1:5:2]');
         $this->assertSame([5, 2], $result);
@@ -230,8 +231,8 @@ JSON);
     public function testNegativeSlice()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
+            JSON);
 
         $result = $crawler->find('$.a[-3:]');
 
@@ -328,8 +329,8 @@ JSON);
     public function testBoundaryConditions()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6]}
+            JSON);
 
         $result = $crawler->find('$.a[0:6]');
         $this->assertSame([3, 5, 1, 2, 4, 6], $result);
@@ -344,8 +345,8 @@ JSON);
     public function testFilterByValue()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
+            JSON);
 
         $result = $crawler->find("$.a[?(@.b == 'kilo')]");
 
@@ -559,8 +560,8 @@ JSON);
     public function testStarAsKey()
     {
         $crawler = new JsonCrawler(<<<JSON
-{"*": {"a": 1, "b": 2}, "something else": {"c": 3}}
-JSON);
+            {"*": {"a": 1, "b": 2}, "something else": {"c": 3}}
+            JSON);
 
         $result = $crawler->find('$["*"]');
 
@@ -568,9 +569,7 @@ JSON);
         $this->assertSame(['a' => 1, 'b' => 2], $result[0]);
     }
 
-    /**
-     * @dataProvider provideUnicodeEscapeSequencesProvider
-     */
+    #[DataProvider('provideUnicodeEscapeSequencesProvider')]
     public function testUnicodeEscapeSequences(string $jsonPath, array $expected)
     {
         $this->assertSame($expected, self::getUnicodeDocumentCrawler()->find($jsonPath));
@@ -622,9 +621,7 @@ JSON);
         ];
     }
 
-    /**
-     * @dataProvider provideSingleQuotedStringProvider
-     */
+    #[DataProvider('provideSingleQuotedStringProvider')]
     public function testSingleQuotedStrings(string $jsonPath, array $expected)
     {
         $this->assertSame($expected, self::getUnicodeDocumentCrawler()->find($jsonPath));
@@ -676,9 +673,7 @@ JSON);
         ];
     }
 
-    /**
-     * @dataProvider provideFilterWithUnicodeProvider
-     */
+    #[DataProvider('provideFilterWithUnicodeProvider')]
     public function testFilterWithUnicodeStrings(string $jsonPath, int $expectedCount, string $expectedCountry)
     {
         $result = self::getUnicodeDocumentCrawler()->find($jsonPath);
@@ -721,9 +716,7 @@ JSON);
         ];
     }
 
-    /**
-     * @dataProvider provideComplexUnicodePath
-     */
+    #[DataProvider('provideComplexUnicodePath')]
     public function testComplexUnicodePaths(string $jsonPath, array $expected)
     {
         $complexJson = [
@@ -794,59 +787,59 @@ JSON);
     private static function getBookstoreCrawler(): JsonCrawler
     {
         return new JsonCrawler(<<<JSON
-{
-    "store": {
-        "book": [
             {
-                "category": "reference",
-                "author": "Nigel Rees",
-                "title": "Sayings of the Century",
-                "price": 8.95
-            },
-            {
-                "category": "fiction",
-                "author": "Evelyn Waugh",
-                "title": "Sword of Honour",
-                "price": 12.99,
-                "publisher": {
-                    "name": "my-publisher",
-                    "address": {
-                        "street": "1234 Elm St",
-                        "city": "Springfield",
-                        "state": "IL"
+                "store": {
+                    "book": [
+                        {
+                            "category": "reference",
+                            "author": "Nigel Rees",
+                            "title": "Sayings of the Century",
+                            "price": 8.95
+                        },
+                        {
+                            "category": "fiction",
+                            "author": "Evelyn Waugh",
+                            "title": "Sword of Honour",
+                            "price": 12.99,
+                            "publisher": {
+                                "name": "my-publisher",
+                                "address": {
+                                    "street": "1234 Elm St",
+                                    "city": "Springfield",
+                                    "state": "IL"
+                                }
+                            }
+                        },
+                        {
+                            "category": "fiction",
+                            "author": "Herman Melville",
+                            "title": "Moby Dick",
+                            "isbn": "0-553-21311-3",
+                            "price": 8.99,
+                            "extra": [42]
+                        },
+                        {
+                            "category": "fiction",
+                            "author": "J. R. R. Tolkien",
+                            "title": "The Lord of the Rings",
+                            "isbn": "0-395-19395-8",
+                            "price": 22.99
+                        }
+                    ],
+                    "bicycle": {
+                        "color": "red",
+                        "price": 399
                     }
                 }
-            },
-            {
-                "category": "fiction",
-                "author": "Herman Melville",
-                "title": "Moby Dick",
-                "isbn": "0-553-21311-3",
-                "price": 8.99,
-                "extra": [42]
-            },
-            {
-                "category": "fiction",
-                "author": "J. R. R. Tolkien",
-                "title": "The Lord of the Rings",
-                "isbn": "0-395-19395-8",
-                "price": 22.99
             }
-        ],
-        "bicycle": {
-            "color": "red",
-            "price": 399
-        }
-    }
-}
-JSON);
+            JSON);
     }
 
     private static function getSimpleCollectionCrawler(): JsonCrawler
     {
         return new JsonCrawler(<<<JSON
-{"a": [3, 5, 1, 2, 4, 6]}
-JSON);
+            {"a": [3, 5, 1, 2, 4, 6]}
+            JSON);
     }
 
     private static function getUnicodeDocumentCrawler(): JsonCrawler

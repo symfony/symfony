@@ -196,13 +196,8 @@ class DoctrineReceiverTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
         $receiver = new DoctrineReceiver($connection, $serializer);
 
-        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
-        if (!class_exists(Version::class)) {
-            // This is doctrine/dbal 3.x
-            $deadlockException = new DeadlockException($driverException, null);
-        } else {
-            $deadlockException = new DeadlockException('Deadlock', $driverException);
-        }
+        $driverException = Exception::new(new \PDOException('Deadlock', 40001));
+        $deadlockException = new DeadlockException($driverException, null);
 
         $connection
             ->expects($this->exactly(2))
@@ -224,13 +219,8 @@ class DoctrineReceiverTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
         $receiver = new DoctrineReceiver($connection, $serializer);
 
-        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
-        if (!class_exists(Version::class)) {
-            // This is doctrine/dbal 3.x
-            $deadlockException = new DeadlockException($driverException, null);
-        } else {
-            $deadlockException = new DeadlockException('Deadlock', $driverException);
-        }
+        $driverException = Exception::new(new \PDOException('Deadlock', 40001));
+        $deadlockException = new DeadlockException($driverException, null);
 
         $connection
             ->expects($this->exactly(4))
@@ -287,13 +277,8 @@ class DoctrineReceiverTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
         $receiver = new DoctrineReceiver($connection, $serializer);
 
-        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
-        if (!class_exists(Version::class)) {
-            // This is doctrine/dbal 3.x
-            $deadlockException = new DeadlockException($driverException, null);
-        } else {
-            $deadlockException = new DeadlockException('Deadlock', $driverException);
-        }
+        $driverException = Exception::new(new \PDOException('Deadlock', 40001));
+        $deadlockException = new DeadlockException($driverException, null);
 
         $connection
             ->expects($this->exactly(2))
@@ -315,13 +300,8 @@ class DoctrineReceiverTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
         $receiver = new DoctrineReceiver($connection, $serializer);
 
-        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
-        if (!class_exists(Version::class)) {
-            // This is doctrine/dbal 3.x
-            $deadlockException = new DeadlockException($driverException, null);
-        } else {
-            $deadlockException = new DeadlockException('Deadlock', $driverException);
-        }
+        $driverException = Exception::new(new \PDOException('Deadlock', 40001));
+        $deadlockException = new DeadlockException($driverException, null);
 
         $connection
             ->expects($this->exactly(4))

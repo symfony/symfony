@@ -52,22 +52,22 @@ final class DebugFirewallCommand extends Command
 
         $this
             ->setHelp(<<<EOF
-The <info>%command.name%</info> command displays the firewalls that are configured
-in your application:
+                The <info>%command.name%</info> command displays the firewalls that are configured
+                in your application:
 
-  <info>php %command.full_name%</info>
+                  <info>php %command.full_name%</info>
 
-You can pass a firewall name to display more detailed information about
-a specific firewall:
+                You can pass a firewall name to display more detailed information about
+                a specific firewall:
 
-  <info>php %command.full_name% $exampleName</info>
+                  <info>php %command.full_name% $exampleName</info>
 
-To include all events and event listeners for a specific firewall, use the
-<info>events</info> option:
+                To include all events and event listeners for a specific firewall, use the
+                <info>events</info> option:
 
-  <info>php %command.full_name% --events $exampleName</info>
+                  <info>php %command.full_name% --events $exampleName</info>
 
-EOF
+                EOF
             )
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, \sprintf('A firewall name (for example "%s")', $exampleName)),

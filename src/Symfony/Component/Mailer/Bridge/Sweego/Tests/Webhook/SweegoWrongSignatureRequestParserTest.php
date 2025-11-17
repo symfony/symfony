@@ -28,6 +28,22 @@ class SweegoWrongSignatureRequestParserTest extends AbstractRequestParserTestCas
         return new SweegoRequestParser(new SweegoPayloadConverter());
     }
 
+    public static function getPayloads(): iterable
+    {
+        $filename = 'delivered.json';
+        $currentDir = \dirname((new \ReflectionClass(static::class))->getFileName());
+
+        yield $filename => [
+            file_get_contents($currentDir.'/Fixtures/delivered.json'),
+            include ($currentDir.'/Fixtures/delivered.php'),
+        ];
+    }
+
+    protected function getSecret(): string
+    {
+        return 'GvLY88Uyj70jQm3fUwYyWmAaiz98wWim';
+    }
+
     protected function createRequest(string $payload): Request
     {
         return Request::create('/', 'POST', [], [], [], [

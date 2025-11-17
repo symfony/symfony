@@ -16,6 +16,7 @@ use Relay\Relay;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
 use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
+use Symfony\Component\Semaphore\Exception\SemaphoreStorageException;
 use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 
@@ -27,6 +28,8 @@ use Symfony\Component\Semaphore\PersistingStoreInterface;
  */
 class RedisStore implements PersistingStoreInterface
 {
+    private const NO_SCRIPT_ERROR_MESSAGE_PREFIX = 'NOSCRIPT';
+
     public function __construct(
         private \Redis|Relay|RelayCluster|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
     ) {
@@ -159,16 +162,79 @@ class RedisStore implements PersistingStoreInterface
 
     private function evaluate(string $script, string $resource, array $args): mixed
     {
+        $scriptSha = sha1($script);
+
         if ($this->redis instanceof \Redis || $this->redis instanceof Relay || $this->redis instanceof RelayCluster || $this->redis instanceof \RedisCluster) {
-            return $this->redis->eval($script, array_merge([$resource], $args), 1);
+            $this->redis->clearLastError();
+
+            $result = $this->redis->evalSha($scriptSha, array_merge([$resource], $args), 1);
+            if (null !== ($err = $this->redis->getLastError()) && str_starts_with($err, self::NO_SCRIPT_ERROR_MESSAGE_PREFIX)) {
+                $this->redis->clearLastError();
+
+                if ($this->redis instanceof \RedisCluster || $this->redis instanceof RelayCluster) {
+                    foreach ($this->redis->_masters() as $master) {
+                        $this->redis->script($master, 'LOAD', $script);
+                    }
+                } else {
+                    $this->redis->script('LOAD', $script);
+                }
+
+                if (null !== $err = $this->redis->getLastError()) {
+                    throw new SemaphoreStorageException($err);
+                }
+
+                $result = $this->redis->evalSha($scriptSha, array_merge([$resource], $args), 1);
+            }
+
+            if (null !== $err = $this->redis->getLastError()) {
+                throw new SemaphoreStorageException($err);
+            }
+
+            return $result;
         }
 
         if ($this->redis instanceof \RedisArray) {
-            return $this->redis->_instance($this->redis->_target($resource))->eval($script, array_merge([$resource], $args), 1);
+            $client = $this->redis->_instance($this->redis->_target($resource));
+            $client->clearLastError();
+            $result = $client->evalSha($scriptSha, array_merge([$resource], $args), 1);
+            if (null !== ($err = $client->getLastError()) && str_starts_with($err, self::NO_SCRIPT_ERROR_MESSAGE_PREFIX)) {
+                $client->clearLastError();
+
+                $client->script('LOAD', $script);
+
+                if (null !== $err = $client->getLastError()) {
+                    throw new SemaphoreStorageException($err);
+                }
+
+                $result = $client->evalSha($scriptSha, array_merge([$resource], $args), 1);
+            }
+
+            if (null !== $err = $client->getLastError()) {
+                throw new SemaphoreStorageException($err);
+            }
+
+            return $result;
         }
 
         if ($this->redis instanceof \Predis\ClientInterface) {
-            return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
+            try {
+                return $this->handlePredisError(fn () => $this->redis->evalSha($scriptSha, 1, $resource, ...$args));
+            } catch (SemaphoreStorageException $e) {
+                // Fallthrough only if we need to load the script
+                if (!str_starts_with($e->getMessage(), self::NO_SCRIPT_ERROR_MESSAGE_PREFIX)) {
+                    throw $e;
+                }
+            }
+
+            if ($this->redis->getConnection() instanceof \Predis\Connection\Cluster\ClusterInterface) {
+                foreach ($this->redis as $connection) {
+                    $this->handlePredisError(fn () => $connection->script('LOAD', $script));
+                }
+            } else {
+                $this->handlePredisError(fn () => $this->redis->script('LOAD', $script));
+            }
+
+            return $this->handlePredisError(fn () => $this->redis->evalSha($scriptSha, 1, $resource, ...$args));
         }
 
         throw new InvalidArgumentException(\sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
@@ -182,5 +248,27 @@ class RedisStore implements PersistingStoreInterface
         }
 
         return $key->getState(__CLASS__);
+    }
+
+    /**
+     * @template T
+     *
+     * @param callable(): T $callback
+     *
+     * @return T
+     */
+    private function handlePredisError(callable $callback): mixed
+    {
+        try {
+            $result = $callback();
+        } catch (\Predis\Response\ServerException $e) {
+            throw new SemaphoreStorageException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        if ($result instanceof \Predis\Response\Error) {
+            throw new SemaphoreStorageException($result->getMessage());
+        }
+
+        return $result;
     }
 }

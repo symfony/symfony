@@ -32,17 +32,23 @@ final class DiscordTransportFactoryTest extends AbstractTransportFactoryTestCase
             'discord://host.test?webhook_id=testWebhookId',
             'discord://token@host.test?webhook_id=testWebhookId',
         ];
+        yield [
+            'discord+bot://host.test',
+            'discord+bot://token@host.test',
+        ];
     }
 
     public static function supportsProvider(): iterable
     {
         yield [true, 'discord://host?webhook_id=testWebhookId'];
+        yield [true, 'discord+bot://token@host'];
         yield [false, 'somethingElse://host?webhook_id=testWebhookId'];
     }
 
     public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['discord://host.test?webhook_id=testWebhookId'];
+        yield 'missing bot token' => ['discord+bot://host.test', 'Invalid "discord+bot://host.test" notifier DSN: User is not set.'];
     }
 
     public static function missingRequiredOptionProvider(): iterable

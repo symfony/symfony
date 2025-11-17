@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,9 +41,7 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
     }
 
-    /**
-     * @dataProvider provideSupportData
-     */
+    #[DataProvider('provideSupportData')]
     public function testSupport(array $options, $request, bool $supported)
     {
         $this->setUpAuthenticator($options);

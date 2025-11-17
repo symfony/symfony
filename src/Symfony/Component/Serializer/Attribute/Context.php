@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Context
 {
-    private array $groups;
+    public readonly array $groups;
 
     /**
      * @param array<string, mixed> $context                The common context to use when serializing or deserializing
@@ -30,9 +30,9 @@ class Context
      * @throws InvalidArgumentException
      */
     public function __construct(
-        private readonly array $context = [],
-        private readonly array $normalizationContext = [],
-        private readonly array $denormalizationContext = [],
+        public readonly array $context = [],
+        public readonly array $normalizationContext = [],
+        public readonly array $denormalizationContext = [],
         string|array $groups = [],
     ) {
         if (!$context && !$normalizationContext && !$denormalizationContext) {
@@ -47,28 +47,4 @@ class Context
             }
         }
     }
-
-    public function getContext(): array
-    {
-        return $this->context;
-    }
-
-    public function getNormalizationContext(): array
-    {
-        return $this->normalizationContext;
-    }
-
-    public function getDenormalizationContext(): array
-    {
-        return $this->denormalizationContext;
-    }
-
-    public function getGroups(): array
-    {
-        return $this->groups;
-    }
-}
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\Context::class, false)) {
-    class_alias(Context::class, \Symfony\Component\Serializer\Annotation\Context::class);
 }

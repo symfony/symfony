@@ -30,7 +30,7 @@ class MailjetTransportFactory extends AbstractTransportFactory
             return (new MailjetApiTransport($user, $password, $this->client, $this->dispatcher, $this->logger, $sandbox))->setHost($host);
         }
 
-        if (\in_array($scheme, ['mailjet+smtp', 'mailjet+smtps', 'mailjet'])) {
+        if (\in_array($scheme, ['mailjet+smtp', 'mailjet+smtps', 'mailjet'], true)) {
             return new MailjetSmtpTransport($user, $password, $this->dispatcher, $this->logger);
         }
 

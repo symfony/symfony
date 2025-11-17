@@ -81,11 +81,11 @@ class WeekTest extends TestCase
         $loader = new AttributeLoader();
         $this->assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         $this->assertNull($aConstraint->min);
         $this->assertNull($aConstraint->max);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         $this->assertSame('2010-W01', $bConstraint->min);
         $this->assertSame('2010-W02', $bConstraint->max);
     }

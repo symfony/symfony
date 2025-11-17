@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
@@ -25,9 +26,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthenticatedVoterTest extends TestCase
 {
-    /**
-     * @dataProvider getVoteTests
-     */
+    #[DataProvider('getVoteTests')]
     public function testVote($authenticated, $attributes, $expected)
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
@@ -55,9 +54,7 @@ class AuthenticatedVoterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideAttributes
-     */
+    #[DataProvider('provideAttributes')]
     public function testSupportsAttribute(string $attribute, bool $expected)
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
@@ -87,9 +84,7 @@ class AuthenticatedVoterTest extends TestCase
         $this->assertTrue($voter->supportsType(get_debug_type(new \stdClass())));
     }
 
-    /**
-     * @dataProvider provideOfflineAttributes
-     */
+    #[DataProvider('provideOfflineAttributes')]
     public function testOfflineToken($attributes, $expected)
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
@@ -103,9 +98,7 @@ class AuthenticatedVoterTest extends TestCase
         yield [['ROLE_FOO'], VoterInterface::ACCESS_ABSTAIN];
     }
 
-    /**
-     * @dataProvider provideUnsupportedOfflineAttributes
-     */
+    #[DataProvider('provideUnsupportedOfflineAttributes')]
     public function testUnsupportedOfflineToken(string $attribute)
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -28,9 +29,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 
 class AddConsoleCommandPassTest extends TestCase
 {
-    /**
-     * @dataProvider visibilityProvider
-     */
+    #[DataProvider('visibilityProvider')]
     public function testProcess($public)
     {
         $container = new ContainerBuilder();
@@ -315,6 +314,7 @@ class AddConsoleCommandPassTest extends TestCase
         $definition->addTag('console.command', [
             'command' => 'invokable',
             'description' => 'The command description',
+            'usages' => ['usage1', 'usage2'],
             'help' => 'The %command.name% command help content.',
         ]);
         $container->setDefinition('invokable_command', $definition);
@@ -325,6 +325,8 @@ class AddConsoleCommandPassTest extends TestCase
         self::assertTrue($container->has('invokable_command.command'));
         self::assertSame('The command description', $command->getDescription());
         self::assertSame('The %command.name% command help content.', $command->getHelp());
+        self::assertCount(2, $command->getUsages());
+        $this->assertStringContainsString('usage1', $command->getUsages()[0]);
     }
 
     public function testProcessInvokableSignalableCommand()

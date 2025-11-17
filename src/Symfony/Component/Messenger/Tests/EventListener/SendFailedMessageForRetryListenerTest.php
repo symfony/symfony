@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -146,9 +147,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $listener->onMessageFailed($event);
     }
 
-    /**
-     * @dataProvider provideRetryDelays
-     */
+    #[DataProvider('provideRetryDelays')]
     public function testWrappedRecoverableExceptionRetryDelayOverridesStrategy(array $retries, int $expectedDelay)
     {
         $sender = $this->createMock(SenderInterface::class);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests\DataCollector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -164,9 +165,7 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertEquals(0, $sut->getRequestCount());
     }
 
-    /**
-     * @dataProvider provideCurlRequests
-     */
+    #[DataProvider('provideCurlRequests')]
     public function testItGeneratesCurlCommandsAsExpected(array $request, string $expectedCurlCommand)
     {
         $sut = new HttpClientDataCollector();

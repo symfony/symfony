@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\String\Tests\Inflector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\Inflector\SpanishInflector;
 
@@ -123,9 +124,7 @@ class SpanishInflectorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider singularizeProvider
-     */
+    #[DataProvider('singularizeProvider')]
     public function testSingularize(string $plural, $singular)
     {
         $this->assertSame(
@@ -134,9 +133,7 @@ class SpanishInflectorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider pluralizeProvider
-     */
+    #[DataProvider('pluralizeProvider')]
     public function testPluralize(string $singular, $plural)
     {
         $this->assertSame(
@@ -145,9 +142,7 @@ class SpanishInflectorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider uninflectedProvider
-     */
+    #[DataProvider('uninflectedProvider')]
     public function testUninflected(string $word)
     {
         $this->assertSame(

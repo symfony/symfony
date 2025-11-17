@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -21,7 +21,6 @@ use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultArrayAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultEnumAttribute;
@@ -36,21 +35,21 @@ class XmlDumperTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
+        self::$fixturesPath = realpath(__DIR__.'/../Fixtures');
     }
 
     public function testDump()
     {
         $dumper = new XmlDumper(new ContainerBuilder());
 
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services1.xml', $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
+        $this->assertXmlStringEqualsGeneratedXmlFile('services1.xml', $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
     }
 
     public function testExportParameters()
     {
-        $container = include self::$fixturesPath.'//containers/container8.php';
+        $container = include self::$fixturesPath.'/containers/container8.php';
         $dumper = new XmlDumper($container);
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services8.xml', $dumper->dump(), '->dump() dumps parameters');
+        $this->assertXmlStringEqualsGeneratedXmlFile('services8.xml', $dumper->dump(), '->dump() dumps parameters');
     }
 
     public function testAddService()
@@ -110,9 +109,7 @@ class XmlDumperTest extends TestCase
 ", $dumper->dump());
     }
 
-    /**
-     * @dataProvider provideDecoratedServicesData
-     */
+    #[DataProvider('provideDecoratedServicesData')]
     public function testDumpDecoratedServices($expectedXmlDump, $container)
     {
         $dumper = new XmlDumper($container);
@@ -151,9 +148,7 @@ class XmlDumperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideCompiledContainerData
-     */
+    #[DataProvider('provideCompiledContainerData')]
     public function testCompiledContainerCanBeDumped($containerFile)
     {
         $fixturesPath = __DIR__.'/../Fixtures';
@@ -181,7 +176,7 @@ class XmlDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container21.php';
         $dumper = new XmlDumper($container);
 
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services21.xml'), $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('services21.xml', $dumper->dump());
     }
 
     public function testDumpAutowireData()
@@ -189,19 +184,7 @@ class XmlDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container24.php';
         $dumper = new XmlDumper($container);
 
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services24.xml'), $dumper->dump());
-    }
-
-    public function testDumpLoad()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services_dump_load.xml');
-
-        $this->assertEquals([new Reference('bar', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)], $container->getDefinition('foo')->getArguments());
-
-        $dumper = new XmlDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_dump_load.xml', $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('services24.xml', $dumper->dump());
     }
 
     public function testTaggedArguments()
@@ -243,7 +226,7 @@ class XmlDumperTest extends TestCase
         ;
 
         $dumper = new XmlDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_tagged_arguments.xml', $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_tagged_arguments.xml', $dumper->dump());
     }
 
     public function testServiceClosure()
@@ -254,7 +237,7 @@ class XmlDumperTest extends TestCase
         ;
 
         $dumper = new XmlDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_service_closure.xml', $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_service_closure.xml', $dumper->dump());
     }
 
     public function testDumpAbstractServices()
@@ -262,7 +245,7 @@ class XmlDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container_abstract.php';
         $dumper = new XmlDumper($container);
 
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_abstract.xml'), $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_abstract.xml', $dumper->dump());
     }
 
     public function testDumpHandlesEnumeration()
@@ -279,12 +262,10 @@ class XmlDumperTest extends TestCase
         $container->compile();
         $dumper = new XmlDumper($container);
 
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_with_enumeration.xml'), $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_enumeration.xml', $dumper->dump());
     }
 
-    /**
-     * @dataProvider provideDefaultClasses
-     */
+    #[DataProvider('provideDefaultClasses')]
     public function testDumpHandlesDefaultAttribute($class, $expectedFile)
     {
         $container = new ContainerBuilder();
@@ -316,7 +297,7 @@ class XmlDumperTest extends TestCase
             ->setArgument('$bar', 'test');
 
         $dumper = new XmlDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_abstract_argument.xml', $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_abstract_argument.xml', $dumper->dump());
     }
 
     public function testDumpNonScalarTags()
@@ -324,6 +305,18 @@ class XmlDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container_non_scalar_tags.php';
         $dumper = new XmlDumper($container);
 
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_with_array_tags.xml'), $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_array_tags.xml', $dumper->dump());
+    }
+
+    private static function assertXmlStringEqualsGeneratedXmlFile(string $expectedFile, string $dumpedCode): void
+    {
+        $expectedFile = self::$fixturesPath.'/xml/'.$expectedFile;
+
+        if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
+            file_put_contents($expectedFile, $dumpedCode);
+            self::markTestIncomplete('TEST_GENERATE_FIXTURES is set');
+        }
+
+        self::assertXmlStringEqualsXmlFile($expectedFile, $dumpedCode);
     }
 }

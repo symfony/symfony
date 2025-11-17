@@ -548,21 +548,13 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curloptsToCheck[] = \CURLOPT_HEADEROPT;
         }
 
-        $methodOpts = [
-            \CURLOPT_POST,
-            \CURLOPT_PUT,
-            \CURLOPT_CUSTOMREQUEST,
-            \CURLOPT_HTTPGET,
-            \CURLOPT_NOBODY,
-        ];
-
         foreach ($options as $opt => $optValue) {
             if (isset($curloptsToConfig[$opt])) {
                 $constName = $this->findConstantName($opt) ?? $opt;
                 throw new InvalidArgumentException(\sprintf('Cannot set "%s" with "extra.curl", use option "%s" instead.', $constName, $curloptsToConfig[$opt]));
             }
 
-            if (\in_array($opt, $methodOpts, true)) {
+            if (\in_array($opt, [\CURLOPT_POST, \CURLOPT_PUT, \CURLOPT_CUSTOMREQUEST, \CURLOPT_HTTPGET, \CURLOPT_NOBODY], true)) {
                 throw new InvalidArgumentException('The HTTP method cannot be overridden using "extra.curl".');
             }
 

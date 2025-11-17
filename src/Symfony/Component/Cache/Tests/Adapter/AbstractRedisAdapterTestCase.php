@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Psr\Cache\CacheItemPoolInterface;
 use Relay\Cluster as RelayCluster;
 use Relay\Relay;
@@ -43,9 +44,7 @@ abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
         }
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testClearWithPrefix()
     {
         $cache = $this->createCachePool(0, __FUNCTION__);

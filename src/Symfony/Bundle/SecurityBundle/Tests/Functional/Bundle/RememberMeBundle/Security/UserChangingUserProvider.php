@@ -13,7 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle
 
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -51,7 +50,7 @@ class UserChangingUserProvider implements UserProviderInterface
     private function changeUser(UserInterface $user): UserInterface
     {
         if (self::$changePassword) {
-            $alterUser = \Closure::bind(function (InMemoryUser $user) { $user->password = 'changed!'; }, null, class_exists(User::class) ? User::class : InMemoryUser::class);
+            $alterUser = \Closure::bind(function (InMemoryUser $user) { $user->password = 'changed!'; }, null, InMemoryUser::class);
             $alterUser($user);
         }
 

@@ -19,7 +19,7 @@
             {{ redirect_route_name }}
         {% endif %}
 
-        (<a href="{{ path('_profiler', { token: redirect.token, panel: request.query.get('panel', 'request') }) }}">{{ redirect.token }}</a>)
+        (<a href="{{ path('_profiler', {token: redirect.token, panel: request.query.get('panel', 'request')}) }}">{{ redirect.token }}</a>)
     </div>
 {% endif %}
 
@@ -65,7 +65,7 @@
 
         <dt>IP</dt>
         <dd>
-            <a href="{{ path('_profiler_search_results', { token: token, limit: 10, ip: profile.ip }) }}">{{ profile.ip }}</a>
+            <a href="{{ path('_profiler_search_results', {token: token, limit: 10, ip: profile.ip}) }}">{{ profile.ip }}</a>
         </dd>
 
         <dt>Profiled on</dt>
@@ -93,7 +93,7 @@
                 {{- controller -}}
             {% endif %}
             {%- if link %}</a>{% endif %}
-        (<a href="{{ path('_profiler', { token: request_collector.forwardtoken }) }}">{{ request_collector.forwardtoken }}</a>)
+        (<a href="{{ path('_profiler', {token: request_collector.forwardtoken}) }}">{{ request_collector.forwardtoken }}</a>)
 
     </div>
 {%- endif %}

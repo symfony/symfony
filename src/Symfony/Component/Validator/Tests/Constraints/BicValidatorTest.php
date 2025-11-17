@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\BicValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -78,7 +79,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $classMetadata = new ClassMetadata(BicDummy::class);
         (new AttributeLoader())->loadClassMetadata($classMetadata);
 
-        [$constraint] = $classMetadata->properties['bic1']->constraints;
+        [$constraint] = $classMetadata->getPropertyMetadata('bic1')[0]->getConstraints();
 
         $this->setObject(new BicDummy());
 
@@ -129,7 +130,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $classMetadata = new ClassMetadata(BicDummy::class);
         (new AttributeLoader())->loadClassMetadata($classMetadata);
 
-        [$constraint] = $classMetadata->properties['bic1']->constraints;
+        [$constraint] = $classMetadata->getPropertyMetadata('bic1')[0]->getConstraints();
 
         $this->validator->validate('UNCRIT2B912', $constraint);
 
@@ -189,9 +190,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Bic());
     }
 
-    /**
-     * @dataProvider getValidBics
-     */
+    #[DataProvider('getValidBics')]
     public function testValidBics($bic)
     {
         $this->validator->validate($bic, new Bic());
@@ -212,9 +211,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidBics
-     */
+    #[DataProvider('getInvalidBics')]
     public function testInvalidBics($bic, $code)
     {
         $constraint = new Bic(
@@ -229,9 +226,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getInvalidBics
-     */
+    #[DataProvider('getInvalidBics')]
     public function testInvalidBicsNamed($bic, $code)
     {
         $constraint = new Bic(message: 'myMessage');
@@ -270,11 +265,10 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getValidBicSpecialCases
-     *
      * Some territories have their own ISO country code but can use another country code
      * for IBAN accounts. Example: "French Guiana" (country code "GF") can use FR too.
      */
+    #[DataProvider('getValidBicSpecialCases')]
     public function testValidBicSpecialCases(string $bic, string $iban)
     {
         $constraint = new Bic(iban: $iban);
@@ -313,9 +307,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         yield ['CAIXEABBXXX', 'ES79 2100 0813 6101 2345 6789'];
     }
 
-    /**
-     * @dataProvider getValidBicsWithNormalizerToUpper
-     */
+    #[DataProvider('getValidBicsWithNormalizerToUpper')]
     public function testValidBicsWithNormalizerToUpper($bic)
     {
         $this->validator->validate($bic, new Bic(mode: Bic::VALIDATION_MODE_CASE_INSENSITIVE));

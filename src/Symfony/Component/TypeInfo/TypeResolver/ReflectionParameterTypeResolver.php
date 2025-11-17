@@ -22,11 +22,11 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  */
-final readonly class ReflectionParameterTypeResolver implements TypeResolverInterface
+final class ReflectionParameterTypeResolver implements TypeResolverInterface
 {
     public function __construct(
-        private ReflectionTypeResolver $reflectionTypeResolver,
-        private TypeContextFactory $typeContextFactory,
+        private readonly ReflectionTypeResolver $reflectionTypeResolver,
+        private readonly TypeContextFactory $typeContextFactory,
     ) {
     }
 

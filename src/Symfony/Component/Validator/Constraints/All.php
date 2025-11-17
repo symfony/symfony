@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * When applied to an array (or Traversable object), this constraint allows you to apply
@@ -26,27 +26,18 @@ class All extends Composite
     public array|Constraint $constraints = [];
 
     /**
-     * @param array<Constraint>|array<string,mixed>|Constraint|null $constraints
-     * @param string[]|null                                         $groups
+     * @param array<Constraint>|Constraint|null $constraints
+     * @param string[]|null                     $groups
      */
-    #[HasNamedArguments]
-    public function __construct(mixed $constraints = null, ?array $groups = null, mixed $payload = null)
+    public function __construct(array|Constraint|null $constraints = null, ?array $groups = null, mixed $payload = null)
     {
-        if (\is_array($constraints) && !array_is_list($constraints)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null === $constraints || [] === $constraints) {
+            throw new MissingOptionsException(\sprintf('The options "constraints" must be set for constraint "%s".', self::class), ['constraints']);
         }
 
-        parent::__construct($constraints ?? [], $groups, $payload);
-    }
+        $this->constraints = $constraints;
 
-    public function getDefaultOption(): ?string
-    {
-        return 'constraints';
-    }
-
-    public function getRequiredOptions(): array
-    {
-        return ['constraints'];
+        parent::__construct(null, $groups, $payload);
     }
 
     protected function getCompositeOption(): string

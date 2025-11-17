@@ -40,22 +40,22 @@ class GenerateUlidCommand extends Command
                 new InputOption('format', 'f', InputOption::VALUE_REQUIRED, \sprintf('The ULID output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'base32'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command generates a ULID.
+                The <info>%command.name%</info> command generates a ULID.
 
-    <info>php %command.full_name%</info>
+                    <info>php %command.full_name%</info>
 
-To specify the timestamp:
+                To specify the timestamp:
 
-    <info>php %command.full_name% --time="2021-02-16 14:09:08"</info>
+                    <info>php %command.full_name% --time="2021-02-16 14:09:08"</info>
 
-To generate several ULIDs:
+                To generate several ULIDs:
 
-    <info>php %command.full_name% --count=10</info>
+                    <info>php %command.full_name% --count=10</info>
 
-To output a specific format:
+                To output a specific format:
 
-    <info>php %command.full_name% --format=rfc4122</info>
-EOF
+                    <info>php %command.full_name% --format=rfc4122</info>
+                EOF
             )
         ;
     }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\OvhCloud\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransport;
@@ -52,11 +54,8 @@ final class OvhCloudTransportTest extends TransportTestCase
         yield 'including a slash' => ['hel/lo'];
     }
 
-    /**
-     * @group time-sensitive
-     *
-     * @dataProvider validMessagesProvider
-     */
+    #[Group('time-sensitive')]
+    #[DataProvider('validMessagesProvider')]
     public function testValidSignature(string $message)
     {
         $smsMessage = new SmsMessage('0611223344', $message);

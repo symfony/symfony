@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -103,9 +104,7 @@ class CachePoolPassTest extends TestCase
         $this->assertSame('mVXLns1cYU', $cachePool->getArgument(0));
     }
 
-    /**
-     * @dataProvider providerAdaptersNotNamespace
-     */
+    #[DataProvider('providerAdaptersNotNamespace')]
     public function testNamespaceArgumentIsNotReplacedIfAdapterWithoutNamespace(string $adapterClass)
     {
         $container = new ContainerBuilder();

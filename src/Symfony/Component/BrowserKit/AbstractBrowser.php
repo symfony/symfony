@@ -19,6 +19,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\Process\PhpProcess;
+use Symfony\Component\Process\Process;
 
 /**
  * Simulates a browser.
@@ -45,7 +46,6 @@ abstract class AbstractBrowser
     /** @psalm-var TResponse */
     protected object $response;
     protected Crawler $crawler;
-    protected bool $useHtml5Parser = true;
     protected bool $insulated = false;
     protected ?string $redirect;
     protected bool $followRedirects = true;
@@ -114,7 +114,7 @@ abstract class AbstractBrowser
      */
     public function insulate(bool $insulated = true): void
     {
-        if ($insulated && !class_exists(\Symfony\Component\Process\Process::class)) {
+        if ($insulated && !class_exists(Process::class)) {
             throw new LogicException('Unable to isolate requests as the Symfony Process Component is not installed. Try running "composer require symfony/process".');
         }
 
@@ -198,18 +198,6 @@ abstract class AbstractBrowser
     public function getCrawler(): Crawler
     {
         return $this->crawler ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
-    }
-
-    /**
-     * Sets whether parsing should be done using "masterminds/html5".
-     *
-     * @return $this
-     */
-    public function useHtml5Parser(bool $useHtml5Parser): static
-    {
-        $this->useHtml5Parser = $useHtml5Parser;
-
-        return $this;
     }
 
     /**
@@ -413,13 +401,11 @@ abstract class AbstractBrowser
      *
      * @psalm-param TRequest $request
      *
-     * @return object
-     *
      * @psalm-return TResponse
      *
      * @throws \RuntimeException When processing returns exit code
      */
-    protected function doRequestInProcess(object $request)
+    protected function doRequestInProcess(object $request): object
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
         putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
@@ -452,11 +438,9 @@ abstract class AbstractBrowser
      *
      * @psalm-param TRequest $request
      *
-     * @return object
-     *
      * @psalm-return TResponse
      */
-    abstract protected function doRequest(object $request);
+    abstract protected function doRequest(object $request): object;
 
     /**
      * Returns the script to execute when the request must be insulated.
@@ -465,11 +449,9 @@ abstract class AbstractBrowser
      *
      * @psalm-param TRequest $request
      *
-     * @return string
-     *
      * @throws LogicException When this abstract class is not implemented
      */
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         throw new LogicException('To insulate requests, you need to override the getScript() method.');
     }
@@ -477,11 +459,9 @@ abstract class AbstractBrowser
     /**
      * Filters the BrowserKit request to the origin one.
      *
-     * @return object
-     *
      * @psalm-return TRequest
      */
-    protected function filterRequest(Request $request)
+    protected function filterRequest(Request $request): object
     {
         return $request;
     }
@@ -490,10 +470,8 @@ abstract class AbstractBrowser
      * Filters the origin response to the BrowserKit one.
      *
      * @psalm-param TResponse $response
-     *
-     * @return Response
      */
-    protected function filterResponse(object $response)
+    protected function filterResponse(object $response): Response
     {
         return $response;
     }
@@ -509,7 +487,7 @@ abstract class AbstractBrowser
             return null;
         }
 
-        $crawler = new Crawler(null, $uri, null, $this->useHtml5Parser);
+        $crawler = new Crawler(null, $uri, null);
         $crawler->addContent($content, $type);
 
         return $crawler;
@@ -567,7 +545,7 @@ abstract class AbstractBrowser
 
         $request = $this->internalRequest;
 
-        if (\in_array($this->internalResponse->getStatusCode(), [301, 302, 303])) {
+        if (\in_array($this->internalResponse->getStatusCode(), [301, 302, 303], true)) {
             $method = 'GET';
             $files = [];
             $content = null;

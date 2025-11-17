@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Tests\LoginLink;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -47,11 +49,8 @@ class LoginLinkHandlerTest extends TestCase
         $this->expiredLinkStorage = new ExpiredSignatureStorage($this->expiredLinkCache, 360);
     }
 
-    /**
-     * @group time-sensitive
-     *
-     * @dataProvider provideCreateLoginLinkData
-     */
+    #[DataProvider('provideCreateLoginLinkData')]
+    #[Group('time-sensitive')]
     public function testCreateLoginLink($user, array $extraProperties, ?Request $request = null)
     {
         $this->router->expects($this->once())

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -33,9 +35,8 @@ use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
- *
- * @group time-sensitive
  */
+#[Group('time-sensitive')]
 class ErrorListenerTest extends TestCase
 {
     public function testConstruct()
@@ -50,9 +51,7 @@ class ErrorListenerTest extends TestCase
         $this->assertSame('foo', $_controller->getValue($l));
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testHandleWithoutLogger($event, $event2)
     {
         $initialErrorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
@@ -77,9 +76,7 @@ class ErrorListenerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testHandleWithLogger($event, $event2)
     {
         $logger = new TestLogger();
@@ -234,9 +231,7 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogsForLevel('info'));
     }
 
-    /**
-     * @dataProvider exceptionWithAttributeProvider
-     */
+    #[DataProvider('exceptionWithAttributeProvider')]
     public function testHandleHttpAttribute(\Throwable $exception, int $expectedStatusCode, array $expectedHeaders)
     {
         $request = new Request();
@@ -333,9 +328,7 @@ class ErrorListenerTest extends TestCase
         $listener->onKernelException($event);
     }
 
-    /**
-     * @dataProvider controllerProvider
-     */
+    #[DataProvider('controllerProvider')]
     public function testOnControllerArguments(callable $controller)
     {
         $listener = new ErrorListener($controller, $this->createMock(LoggerInterface::class), true);

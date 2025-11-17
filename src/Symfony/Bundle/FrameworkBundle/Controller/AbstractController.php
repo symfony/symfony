@@ -67,18 +67,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
         return $previous;
     }
 
-    /**
-     * Gets a container parameter by its name.
-     */
-    protected function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
-    {
-        if (!$this->container->has('parameter_bag')) {
-            throw new ServiceNotFoundException('parameter_bag.', null, null, [], \sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', static::class));
-        }
-
-        return $this->container->get('parameter_bag')->get($name);
-    }
-
     public static function getSubscribedServices(): array
     {
         return [
@@ -94,6 +82,18 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'parameter_bag' => '?'.ContainerBagInterface::class,
             'web_link.http_header_serializer' => '?'.HttpHeaderSerializer::class,
         ];
+    }
+
+    /**
+     * Gets a container parameter by its name.
+     */
+    protected function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
+    {
+        if (!$this->container->has('parameter_bag')) {
+            throw new ServiceNotFoundException('parameter_bag.', null, null, [], \sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', static::class));
+        }
+
+        return $this->container->get('parameter_bag')->get($name);
     }
 
     /**
@@ -230,13 +230,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
      */
     protected function denyAccessUnlessGranted(mixed $attribute, mixed $subject = null, string $message = 'Access Denied.'): void
     {
-        if (class_exists(AccessDecision::class)) {
-            $accessDecision = $this->getAccessDecision($attribute, $subject);
-            $isGranted = $accessDecision->isGranted;
-        } else {
-            $accessDecision = null;
-            $isGranted = $this->isGranted($attribute, $subject);
-        }
+        $accessDecision = $this->getAccessDecision($attribute, $subject);
+        $isGranted = $accessDecision->isGranted;
 
         if (!$isGranted) {
             $e = $this->createAccessDeniedException(3 > \func_num_args() && $accessDecision ? $accessDecision->getMessage() : $message);

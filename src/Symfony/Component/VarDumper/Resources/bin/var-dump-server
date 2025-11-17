@@ -60,7 +60,7 @@ $app->getDefinition()->addOption(
     new InputOption('--host', null, InputOption::VALUE_REQUIRED, 'The address the server should listen to', $defaultHost)
 );
 
-$app->add($command = new ServerDumpCommand(new DumpServer($host, $logger)))
+$app->addCommand($command = new ServerDumpCommand(new DumpServer($host, $logger)))
     ->getApplication()
     ->setDefaultCommand($command->getName(), true)
     ->run($input, $output)

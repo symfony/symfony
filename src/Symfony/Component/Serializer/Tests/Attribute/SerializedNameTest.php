@@ -31,6 +31,6 @@ class SerializedNameTest extends TestCase
     public function testSerializedNameParameters()
     {
         $foo = new SerializedName('foo');
-        $this->assertEquals('foo', $foo->getSerializedName());
+        $this->assertEquals('foo', $foo->serializedName);
     }
 }

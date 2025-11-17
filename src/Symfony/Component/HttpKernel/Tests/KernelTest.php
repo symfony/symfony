@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -245,7 +246,7 @@ class KernelTest extends TestCase
         $env = 'test_env';
         $debug = true;
         $kernel = new KernelForTest($env, $debug);
-        $expected = \sprintf("O:48:\"%s\":2:{s:14:\"\0*\0environment\";s:8:\"test_env\";s:8:\"\0*\0debug\";b:1;}", KernelForTest::class);
+        $expected = \sprintf('O:48:"%s":2:{s:11:"environment";s:8:"test_env";s:5:"debug";b:1;}', KernelForTest::class);
         $this->assertEquals($expected, serialize($kernel));
     }
 
@@ -416,11 +417,17 @@ class KernelTest extends TestCase
                 $container->setParameter('test.extension-registered', true);
             }
 
+            /**
+             * To be removed when symfony/dependency-injection is bumped to 8.0+.
+             */
             public function getNamespace(): string
             {
                 return '';
             }
 
+            /**
+             * To be removed when symfony/dependency-injection is bumped to 8.0+.
+             */
             public function getXsdValidationBasePath(): string|false
             {
                 return false;
@@ -485,9 +492,7 @@ class KernelTest extends TestCase
         $this->assertEquals(1, ResettableService::$counter);
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testKernelStartTimeIsResetWhileBootingAlreadyBootedKernel()
     {
         $kernel = $this->getKernel(['initializeBundles'], [], true);

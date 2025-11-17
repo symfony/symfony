@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Bluesky\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\NullLogger;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -274,9 +275,7 @@ final class BlueskyTransportTest extends TransportTestCase
         $this->assertEquals($expected, $this->parseFacets($input));
     }
 
-    /**
-     * @dataProvider sendMessageWithEmbedDataProvider
-     */
+    #[DataProvider('sendMessageWithEmbedDataProvider')]
     public function testWithEmbed(BlueskyOptions $blueskyOptions, string $expectedJsonResponse)
     {
         // realistic sample values taken from https://docs.bsky.app/docs/advanced-guides/posts#post-record-structure
@@ -348,7 +347,7 @@ final class BlueskyTransportTest extends TransportTestCase
             'expectedJsonResponse' => '{"repo":null,"collection":"app.bsky.feed.post","record":{"$type":"app.bsky.feed.post","text":"Hello World!","createdAt":"2024-04-28T08:40:17.000000Z","embed":{"$type":"app.bsky.embed.images","images":[{"alt":"A fixture","image":{"$type":"blob","ref":{"$link":"bafkreibabalobzn6cd366ukcsjycp4yymjymgfxcv6xczmlgpemzkz3cfa"},"mimeType":"image\/png","size":760898}}]}}}',
         ];
 
-        yield 'With website preview card and all optionnal informations' => [
+        yield 'With website preview card and all optional informations' => [
             'blueskyOptions' => (new BlueskyOptions())
                 ->attachCard(
                     'https://example.com',

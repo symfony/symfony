@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\JsonStreamer\DataModel\Write;
 
-use Symfony\Component\JsonStreamer\DataModel\DataAccessorInterface;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 
 /**
@@ -24,14 +23,14 @@ use Symfony\Component\TypeInfo\Type\CollectionType;
 final class CollectionNode implements DataModelNodeInterface
 {
     public function __construct(
-        private DataAccessorInterface $accessor,
+        private string $accessor,
         private CollectionType $type,
         private DataModelNodeInterface $item,
         private DataModelNodeInterface $key,
     ) {
     }
 
-    public function withAccessor(DataAccessorInterface $accessor): self
+    public function withAccessor(string $accessor): self
     {
         return new self($accessor, $this->type, $this->item, $this->key);
     }
@@ -41,7 +40,7 @@ final class CollectionNode implements DataModelNodeInterface
         return (string) $this->getType();
     }
 
-    public function getAccessor(): DataAccessorInterface
+    public function getAccessor(): string
     {
         return $this->accessor;
     }

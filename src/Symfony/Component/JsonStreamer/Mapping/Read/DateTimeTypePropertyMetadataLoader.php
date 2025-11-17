@@ -44,7 +44,7 @@ final class DateTimeTypePropertyMetadataLoader implements PropertyMetadataLoader
 
                 $metadata = $metadata
                     ->withType(StringToDateTimeValueTransformer::getStreamValueType())
-                    ->withAdditionalStreamToNativeValueTransformer('json_streamer.value_transformer.string_to_date_time');
+                    ->withAdditionalValueTransformer('json_streamer.value_transformer.string_to_date_time');
             }
         }
 

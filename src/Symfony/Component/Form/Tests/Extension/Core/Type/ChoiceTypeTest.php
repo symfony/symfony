@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -1671,9 +1672,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertSame('', $view->vars['placeholder']);
     }
 
-    /**
-     * @dataProvider getOptionsWithPlaceholder
-     */
+    #[DataProvider('getOptionsWithPlaceholder')]
     public function testPassPlaceholderToView($multiple, $expanded, $required, $placeholder, $placeholderViewValue, $placeholderAttr, $placeholderAttrViewValue)
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
@@ -1691,9 +1690,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertFalse($view->vars['placeholder_in_choices']);
     }
 
-    /**
-     * @dataProvider getOptionsWithPlaceholder
-     */
+    #[DataProvider('getOptionsWithPlaceholder')]
     public function testDontPassPlaceholderIfContainedInChoices($multiple, $expanded, $required, $placeholder, $placeholderViewValue, $placeholderAttr, $placeholderAttrViewValue)
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
@@ -1946,9 +1943,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
     }
 
-    /**
-     * @dataProvider invalidNestedValueTestMatrix
-     */
+    #[DataProvider('invalidNestedValueTestMatrix')]
     public function testSubmitInvalidNestedValue($multiple, $expanded, $submissionData)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -2114,9 +2109,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertSame('choice_translation_domain', $form->children[1]->vars['translation_domain']);
     }
 
-    /**
-     * @dataProvider provideTrimCases
-     */
+    #[DataProvider('provideTrimCases')]
     public function testTrimIsDisabled($multiple, $expanded)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -2141,9 +2134,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         }
     }
 
-    /**
-     * @dataProvider provideTrimCases
-     */
+    #[DataProvider('provideTrimCases')]
     public function testSubmitValueWithWhiteSpace($multiple, $expanded)
     {
         $valueWhitWhiteSpace = '1 ';
@@ -2172,9 +2163,7 @@ class ChoiceTypeTest extends BaseTypeTestCase
         ];
     }
 
-    /**
-     * @dataProvider expandedIsEmptyWhenNoRealChoiceIsSelectedProvider
-     */
+    #[DataProvider('expandedIsEmptyWhenNoRealChoiceIsSelectedProvider')]
     public function testExpandedIsEmptyWhenNoRealChoiceIsSelected($expected, $submittedData, $multiple, $required, $placeholder)
     {
         $options = [

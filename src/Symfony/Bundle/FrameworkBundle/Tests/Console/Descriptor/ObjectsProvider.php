@@ -34,7 +34,32 @@ class ObjectsProvider
             $collection1->add($name, $route);
         }
 
-        return ['route_collection_1' => $collection1];
+        $routesWithGenericHost = new RouteCollection();
+        $routesWithGenericHost->add('some_route', new RouteStub(
+            '/some-route',
+            ['_controller' => 'Controller'],
+            [],
+            [],
+            null,
+            ['https'],
+        ));
+
+        $routesWithGenericScheme = new RouteCollection();
+        $routesWithGenericScheme->add('some_route_with_host', new RouteStub(
+            '/some-route',
+            ['_controller' => 'strpos'],
+            [],
+            [],
+            'symfony.com',
+            [],
+        ));
+
+        return [
+            'empty_route_collection' => new RouteCollection(),
+            'route_collection_1' => $collection1,
+            'route_with_generic_host' => $routesWithGenericHost,
+            'route_with_generic_scheme' => $routesWithGenericScheme,
+        ];
     }
 
     public static function getRouteCollectionsByHttpMethod(): array

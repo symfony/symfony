@@ -17,7 +17,7 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 trait RuntimeLoaderProvider
 {
-    protected function registerTwigRuntimeLoader(Environment $environment, FormRenderer $renderer)
+    protected function registerTwigRuntimeLoader(Environment $environment, FormRenderer $renderer): void
     {
         $loader = $this->createMock(RuntimeLoaderInterface::class);
         $loader->expects($this->any())->method('load')->willReturnMap([

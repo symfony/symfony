@@ -102,16 +102,6 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testThresholdNotReachedDoctrineStyle()
-    {
-        $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword(['threshold' => 10]));
-
-        $this->assertNoViolation();
-    }
-
     public function testValidPassword()
     {
         $this->validator->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
@@ -214,16 +204,6 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->expectNotToPerformAssertions();
 
         $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(skipOnError: true));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testApiErrorSkippedDoctrineStyle()
-    {
-        $this->expectNotToPerformAssertions();
-
-        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(['skipOnError' => true]));
     }
 
     private function createHttpClientStub(?string $returnValue = null): HttpClientInterface

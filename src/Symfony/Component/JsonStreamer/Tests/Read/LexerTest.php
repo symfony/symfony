@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Tests\Read;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Exception\InvalidStreamException;
 use Symfony\Component\JsonStreamer\Read\Lexer;
@@ -44,9 +45,8 @@ class LexerTest extends TestCase
 
     /**
      * Ensures that the lexer is compliant with RFC 8259.
-     *
-     * @dataProvider jsonDataProvider
      */
+    #[DataProvider('jsonDataProvider')]
     public function testValidJson(string $name, string $json, bool $valid)
     {
         $resource = fopen('php://temp', 'w');
@@ -98,10 +98,12 @@ class LexerTest extends TestCase
         yield ['array_just_minus', '[-]', false];
         yield ['array_missing_value', '[   , ""]', false];
         yield ['array_newlines_unclosed', <<<JSON
-["a",
-4
-,1,
-JSON, false];
+            ["a",
+            4
+            ,1,
+            JSON,
+            false,
+        ];
         yield ['array_number_and_comma', '[1,]', false];
         yield ['array_number_and_several_commas', '[1,,]', false];
         yield ['array_spaces_vertical_tab_formfeed', '["
@@ -110,10 +112,12 @@ a"\f]', false];
         yield ['array_unclosed', '[""', false];
         yield ['array_unclosed_trailing_comma', '[1,', false];
         yield ['array_unclosed_with_new_lines', <<<JSON
-[1,
-1
-,1
-JSON, false];
+            [1,
+            1
+            ,1
+            JSON,
+            false,
+        ];
         yield ['array_unclosed_with_object_inside', '[{}', false];
         yield ['incomplete_false', '[fals]', false];
         yield ['incomplete_null', '[nul]', false];
@@ -224,9 +228,11 @@ JSON, false];
         yield ['string_single_string_no_double_quotes', 'abc', false];
         yield ['string_start_escape_unclosed', '["\\', false];
         yield ['string_unescaped_newline', <<<JSON
-["new
-line"]
-JSON, false];
+            ["new
+            line"]
+            JSON,
+            false,
+        ];
         yield ['string_unescaped_tab', '["	"]', false];
         yield ['string_unicode_CapitalU', '"\\UA66D"', false];
         yield ['string_with_trailing_garbage', '""x', false];
@@ -284,9 +290,11 @@ JSON, false];
         yield ['array_heterogeneous', '[null, 1, "1", {}]', true];
         yield ['array_null', '[null]', true];
         yield ['array_with_1_and_newline', <<<JSON
-[1
-]
-JSON, true];
+            [1
+            ]
+            JSON,
+            true,
+        ];
         yield ['array_with_leading_space', '[1]', true];
         yield ['array_with_several_null', '[1,null,null,null,2]', true];
         yield ['array_with_trailing_space', '[2] ', true];
@@ -318,10 +326,12 @@ JSON, true];
         yield ['object_simple', '{"a":[]}', true];
         yield ['object_string_unicode', '{"title":"\\u041f\\u043e\\u043b\\u0442\\u043e\\u0440\\u0430 \\u0417\\u0435\\u043c\\u043b\\u0435\\u043a\\u043e\\u043f\\u0430" }', true];
         yield ['object_with_newlines', <<<JSON
-{
-"a": "b"
-}
-JSON, true];
+            {
+            "a": "b"
+            }
+            JSON,
+            true,
+        ];
         yield ['string_1_2_3_bytes_UTF-8_sequences', '["\\u0060\\u012a\\u12AB"]', true];
         yield ['string_accepted_surrogate_pair', '["\\uD801\\udc37"]', true];
         yield ['string_accepted_surrogate_pairs', '["\\ud83d\\ude39\\ud83d\\udc8d"]', true];
@@ -373,9 +383,11 @@ JSON, true];
         yield ['structure_lonely_true', 'true', true];
         yield ['structure_string_empty', '""', true];
         yield ['structure_trailing_newline', <<<JSON
-["a"]
+            ["a"]
 
-JSON, true];
+            JSON,
+            true,
+        ];
         yield ['structure_true_in_array', '[true]', true];
         yield ['structure_whitespace_array', '[] ', true];
 

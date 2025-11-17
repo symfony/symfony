@@ -26,11 +26,6 @@ class TranslatableMessage implements TranslatableInterface
     ) {
     }
 
-    public function __toString(): string
-    {
-        return $this->getMessage();
-    }
-
     public function getMessage(): string
     {
         return $this->message;

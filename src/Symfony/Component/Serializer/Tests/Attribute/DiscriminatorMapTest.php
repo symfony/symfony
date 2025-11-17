@@ -27,11 +27,11 @@ class DiscriminatorMapTest extends TestCase
             'bar' => 'BarClass',
         ]);
 
-        $this->assertEquals('type', $attribute->getTypeProperty());
+        $this->assertEquals('type', $attribute->typeProperty);
         $this->assertEquals([
             'foo' => 'FooClass',
             'bar' => 'BarClass',
-        ], $attribute->getMapping());
+        ], $attribute->mapping);
     }
 
     public function testExceptionWithEmptyTypeProperty()

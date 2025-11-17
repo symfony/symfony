@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sipgate\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Sipgate\SipgateTransport;
@@ -57,9 +58,7 @@ class SipgateTransportTest extends TransportTestCase
         $this->assertInstanceOf(SentMessage::class, $sentMessage);
     }
 
-    /**
-     * @dataProvider errorProvider
-     */
+    #[DataProvider('errorProvider')]
     public function testExceptionIsThrownWhenSendFailed(int $statusCode, string $content, string $expectedExceptionMessage)
     {
         $response = $this->createMock(ResponseInterface::class);

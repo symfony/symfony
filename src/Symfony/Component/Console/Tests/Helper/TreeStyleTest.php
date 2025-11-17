@@ -28,20 +28,22 @@ class TreeStyleTest extends TestCase
         $tree->render();
 
         $this->assertSame(<<<TREE
-root
-├── A
-│   ├── A1
-│   └── A2
-│      └── A2.1
-│         ├── A2.1.1
-│         └── A2.1.2
-├── B
-│   ├── B1
-│   │   ├── B11
-│   │   └── B12
-│   └── B2
-└── C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ├── A
+            │   ├── A1
+            │   └── A2
+            │      └── A2.1
+            │         ├── A2.1.1
+            │         └── A2.1.2
+            ├── B
+            │   ├── B1
+            │   │   ├── B11
+            │   │   └── B12
+            │   └── B2
+            └── C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testBoxStyle()
@@ -50,20 +52,22 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $this->createTree($output, TreeStyle::box())->render();
 
         $this->assertSame(<<<TREE
-root
-┃╸ A
-┃  ┃╸ A1
-┃  ┗╸ A2
-┃     ┗╸ A2.1
-┃        ┃╸ A2.1.1
-┃        ┗╸ A2.1.2
-┃╸ B
-┃  ┃╸ B1
-┃  ┃  ┃╸ B11
-┃  ┃  ┗╸ B12
-┃  ┗╸ B2
-┗╸ C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ┃╸ A
+            ┃  ┃╸ A1
+            ┃  ┗╸ A2
+            ┃     ┗╸ A2.1
+            ┃        ┃╸ A2.1.1
+            ┃        ┗╸ A2.1.2
+            ┃╸ B
+            ┃  ┃╸ B1
+            ┃  ┃  ┃╸ B11
+            ┃  ┃  ┗╸ B12
+            ┃  ┗╸ B2
+            ┗╸ C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testBoxDoubleStyle()
@@ -72,20 +76,22 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $this->createTree($output, TreeStyle::boxDouble())->render();
 
         $this->assertSame(<<<TREE
-root
-╠═ A
-║  ╠═ A1
-║  ╚═ A2
-║    ╚═ A2.1
-║      ╠═ A2.1.1
-║      ╚═ A2.1.2
-╠═ B
-║  ╠═ B1
-║  ║  ╠═ B11
-║  ║  ╚═ B12
-║  ╚═ B2
-╚═ C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ╠═ A
+            ║  ╠═ A1
+            ║  ╚═ A2
+            ║    ╚═ A2.1
+            ║      ╠═ A2.1.1
+            ║      ╚═ A2.1.2
+            ╠═ B
+            ║  ╠═ B1
+            ║  ║  ╠═ B11
+            ║  ║  ╚═ B12
+            ║  ╚═ B2
+            ╚═ C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testCompactStyle()
@@ -94,20 +100,22 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $this->createTree($output, TreeStyle::compact())->render();
 
         $this->assertSame(<<<'TREE'
-root
-├ A
-│ ├ A1
-│ └ A2
-│   └ A2.1
-│     ├ A2.1.1
-│     └ A2.1.2
-├ B
-│ ├ B1
-│ │ ├ B11
-│ │ └ B12
-│ └ B2
-└ C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ├ A
+            │ ├ A1
+            │ └ A2
+            │   └ A2.1
+            │     ├ A2.1.1
+            │     └ A2.1.2
+            ├ B
+            │ ├ B1
+            │ │ ├ B11
+            │ │ └ B12
+            │ └ B2
+            └ C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testLightStyle()
@@ -116,20 +124,22 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $this->createTree($output, TreeStyle::light())->render();
 
         $this->assertSame(<<<'TREE'
-root
-|-- A
-|   |-- A1
-|   `-- A2
-|       `-- A2.1
-|           |-- A2.1.1
-|           `-- A2.1.2
-|-- B
-|   |-- B1
-|   |   |-- B11
-|   |   `-- B12
-|   `-- B2
-`-- C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            |-- A
+            |   |-- A1
+            |   `-- A2
+            |       `-- A2.1
+            |           |-- A2.1.1
+            |           `-- A2.1.2
+            |-- B
+            |   |-- B1
+            |   |   |-- B11
+            |   |   `-- B12
+            |   `-- B2
+            `-- C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testMinimalStyle()
@@ -138,20 +148,22 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $this->createTree($output, TreeStyle::minimal())->render();
 
         $this->assertSame(<<<'TREE'
-root
-. A
-. . A1
-. . A2
-.   . A2.1
-.     . A2.1.1
-.     . A2.1.2
-. B
-. . B1
-. . . B11
-. . . B12
-. . B2
-. C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            . A
+            . . A1
+            . . A2
+            .   . A2.1
+            .     . A2.1.1
+            .     . A2.1.2
+            . B
+            . . B1
+            . . . B11
+            . . . B12
+            . . B2
+            . C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testRoundedStyle()
@@ -160,20 +172,22 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $this->createTree($output, TreeStyle::rounded())->render();
 
         $this->assertSame(<<<'TREE'
-root
-├─ A
-│  ├─ A1
-│  ╰─ A2
-│     ╰─ A2.1
-│        ├─ A2.1.1
-│        ╰─ A2.1.2
-├─ B
-│  ├─ B1
-│  │  ├─ B11
-│  │  ╰─ B12
-│  ╰─ B2
-╰─ C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ├─ A
+            │  ├─ A1
+            │  ╰─ A2
+            │     ╰─ A2.1
+            │        ├─ A2.1.1
+            │        ╰─ A2.1.2
+            ├─ B
+            │  ├─ B1
+            │  │  ├─ B11
+            │  │  ╰─ B12
+            │  ╰─ B2
+            ╰─ C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testCustomPrefix()
@@ -183,20 +197,22 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         self::createTree($output, $style)->render();
 
         $this->assertSame(<<<'TREE'
-root
-C A F A
-C D A F A1
-C D B F A2
-C D E B F A2.1
-C D E E A F A2.1.1
-C D E E B F A2.1.2
-C A F B
-C D A F B1
-C D D A F B11
-C D D B F B12
-C D B F B2
-C B F C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            C A F A
+            C D A F A1
+            C D B F A2
+            C D E B F A2.1
+            C D E E A F A2.1.1
+            C D E E B F A2.1.2
+            C A F B
+            C D A F B1
+            C D D A F B11
+            C D D B F B12
+            C D B F B2
+            C B F C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     private static function createTree(OutputInterface $output, ?TreeStyle $style = null): TreeHelper

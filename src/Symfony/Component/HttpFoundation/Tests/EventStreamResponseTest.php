@@ -42,14 +42,14 @@ class EventStreamResponseTest extends TestCase
         });
 
         $expected = <<<STR
-: bla bla
-id: 1
-retry: 100
-event: bar
-data: foo
+            : bla bla
+            id: 1
+            retry: 100
+            event: bar
+            data: foo
 
 
-STR;
+            STR;
 
         $this->assertSameResponseContent($expected, $response);
     }
@@ -69,17 +69,17 @@ STR;
         });
 
         $expected = <<<STR
-data: single line
+            data: single line
 
-data: first line
-data: second line
+            data: first line
+            data: second line
 
-data: first line
-data: second line
-data: third line
+            data: first line
+            data: second line
+            data: third line
 
 
-STR;
+            STR;
 
         $this->assertSameResponseContent($expected, $response);
     }
@@ -93,16 +93,16 @@ STR;
         }, retry: 1500);
 
         $expected = <<<STR
-retry: 1500
-data: foo
+            retry: 1500
+            data: foo
 
-data: bar
+            data: bar
 
-retry: 1000
-data: baz
+            retry: 1000
+            data: baz
 
 
-STR;
+            STR;
 
         $this->assertSameResponseContent($expected, $response);
     }

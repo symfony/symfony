@@ -54,21 +54,25 @@ class FirewallTest extends TestCase
 
     public function testOnKernelRequestStopsWhenThereIsAResponse()
     {
-        $called = [];
+        $listener = new class extends AbstractListener {
+            public int $callCount = 0;
 
-        $first = function () use (&$called) {
-            $called[] = 1;
-        };
+            public function supports(Request $request): ?bool
+            {
+                return true;
+            }
 
-        $second = function () use (&$called) {
-            $called[] = 2;
+            public function authenticate(RequestEvent $event): void
+            {
+                ++$this->callCount;
+            }
         };
 
         $map = $this->createMock(FirewallMapInterface::class);
         $map
             ->expects($this->once())
             ->method('getListeners')
-            ->willReturn([[$first, $second], null, null])
+            ->willReturn([[$listener, $listener], null, null])
         ;
 
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST);
@@ -77,7 +81,7 @@ class FirewallTest extends TestCase
         $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));
         $firewall->onKernelRequest($event);
 
-        $this->assertSame([1], $called);
+        $this->assertSame(1, $listener->callCount);
     }
 
     public function testOnKernelRequestWithSubRequest()
@@ -100,11 +104,10 @@ class FirewallTest extends TestCase
         $this->assertFalse($event->hasResponse());
     }
 
-    public function testListenersAreCalled()
+    public function testFirewallListenersAreCalled()
     {
         $calledListeners = [];
 
-        $callableListener = static function () use (&$calledListeners) { $calledListeners[] = 'callableListener'; };
         $firewallListener = new class($calledListeners) implements FirewallListenerInterface {
             public function __construct(private array &$calledListeners)
             {
@@ -148,7 +151,7 @@ class FirewallTest extends TestCase
             ->expects($this->once())
             ->method('getListeners')
             ->with($this->equalTo($request))
-            ->willReturn([[$callableListener, $firewallListener, $callableFirewallListener], null, null])
+            ->willReturn([[$firewallListener, $callableFirewallListener], null, null])
         ;
 
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
@@ -156,6 +159,6 @@ class FirewallTest extends TestCase
         $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));
         $firewall->onKernelRequest($event);
 
-        $this->assertSame(['callableListener', 'firewallListener', 'callableFirewallListener'], $calledListeners);
+        $this->assertSame(['firewallListener', 'callableFirewallListener'], $calledListeners);
     }
 }

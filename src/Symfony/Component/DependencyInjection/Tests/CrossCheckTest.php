@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class CrossCheckTest extends TestCase
 {
@@ -27,27 +30,22 @@ class CrossCheckTest extends TestCase
         require_once self::$fixturesPath.'/includes/foo.php';
     }
 
-    /**
-     * @dataProvider crossCheckLoadersDumpers
-     */
-    public function testCrossCheck($fixture, $type)
+    #[DataProvider('crossCheckYamlLoadersDumpers')]
+    public function testYamlCrossCheck($fixture)
     {
-        $loaderClass = 'Symfony\\Component\\DependencyInjection\\Loader\\'.ucfirst($type).'FileLoader';
-        $dumperClass = 'Symfony\\Component\\DependencyInjection\\Dumper\\'.ucfirst($type).'Dumper';
-
         $tmp = tempnam(sys_get_temp_dir(), 'sf');
 
-        copy(self::$fixturesPath.'/'.$type.'/'.$fixture, $tmp);
+        copy(self::$fixturesPath.'/yaml/'.$fixture, $tmp);
 
         $container1 = new ContainerBuilder();
-        $loader1 = new $loaderClass($container1, new FileLocator());
+        $loader1 = new YamlFileLoader($container1, new FileLocator());
         $loader1->load($tmp);
 
-        $dumper = new $dumperClass($container1);
+        $dumper = new YamlDumper($container1);
         file_put_contents($tmp, $dumper->dump());
 
         $container2 = new ContainerBuilder();
-        $loader2 = new $loaderClass($container2, new FileLocator());
+        $loader2 = new YamlFileLoader($container2, new FileLocator());
         $loader2->load($tmp);
 
         unlink($tmp);
@@ -71,19 +69,14 @@ class CrossCheckTest extends TestCase
         $this->assertEquals($services2, $services1, 'Iterator on the containers returns the same services');
     }
 
-    public static function crossCheckLoadersDumpers()
+    public static function crossCheckYamlLoadersDumpers()
     {
         return [
-            ['services1.xml', 'xml'],
-            ['services2.xml', 'xml'],
-            ['services6.xml', 'xml'],
-            ['services8.xml', 'xml'],
-            ['services9.xml', 'xml'],
-            ['services1.yml', 'yaml'],
-            ['services2.yml', 'yaml'],
-            ['services6.yml', 'yaml'],
-            ['services8.yml', 'yaml'],
-            ['services9.yml', 'yaml'],
+            ['services1.yml'],
+            ['services2.yml'],
+            ['services6.yml'],
+            ['services8.yml'],
+            ['services9.yml'],
         ];
     }
 }

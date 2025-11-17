@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsbox\Tests;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Charset;
@@ -130,10 +131,8 @@ class SmsboxOptionsTest extends TestCase
             ->dateTime(new \DateTimeImmutable('-1 day'));
     }
 
-    /**
-     * @testWith [0]
-     *           [9]
-     */
+    #[TestWith([0])]
+    #[TestWith([9])]
     public function testMaxPartIsInvalid(int $maxPart)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -143,10 +142,8 @@ class SmsboxOptionsTest extends TestCase
             ->maxParts($maxPart);
     }
 
-    /**
-     * @testWith [4]
-     *           [1441]
-     */
+    #[TestWith([4])]
+    #[TestWith([1441])]
     public function testValidityIsInvalid(int $validity)
     {
         $this->expectException(InvalidArgumentException::class);

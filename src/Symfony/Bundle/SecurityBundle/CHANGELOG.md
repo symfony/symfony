@@ -1,6 +1,41 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove the deprecated `hide_user_not_found` configuration option, use `expose_security_errors` instead
+ * Remove the deprecated `algorithm` and `key` options from the OIDC token handler configuration, use `algorithms` and `keyset` instead
+ * Remove `LazyFirewallContext::__invoke()`
+ * Make `ExpressionCacheWarmer` class `final`
+ * Remove autowiring aliases for `RateLimiterFactory`; use `RateLimiterFactoryInterface` instead
+
+7.4
+---
+
+ * Add `debug:security:role-hierarchy` command to dump role hierarchy graphs in the Mermaid.js flowchart format
+ * Add `Security::getAccessDecision()` and `getAccessDecisionForUser()` helpers
+ * Add options to configure a cache pool and storage service for login throttling rate limiters
+ * Register alias for argument for password hasher when its key is not a class name:
+
+    With the following configuration:
+    ```yaml
+    security:
+      password_hashers:
+          recovery_code: auto
+    ```
+
+    It is possible to inject the `recovery_code` password hasher in a service:
+
+    ```php
+    public function __construct(
+        #[Target('recovery_code')]
+        private readonly PasswordHasherInterface $passwordHasher,
+    ) {
+    }
+    ```
+ * Deprecate `LazyFirewallContext::__invoke()`
+
 7.3
 ---
 

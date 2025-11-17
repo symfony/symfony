@@ -84,9 +84,7 @@ final class NtfyOptions implements MessageOptionsInterface
 
     public function setPriority(int $priority): self
     {
-        if (\in_array($priority, [
-            self::PRIORITY_MIN, self::PRIORITY_LOW, self::PRIORITY_DEFAULT, self::PRIORITY_HIGH, self::PRIORITY_URGENT,
-        ])) {
+        if (\in_array($priority, [self::PRIORITY_MIN, self::PRIORITY_LOW, self::PRIORITY_DEFAULT, self::PRIORITY_HIGH, self::PRIORITY_URGENT], true)) {
             $this->options['priority'] = $priority;
         }
 

@@ -17,8 +17,6 @@ interface PrependExtensionInterface
 {
     /**
      * Allow an extension to prepend the extension configurations.
-     *
-     * @return void
      */
-    public function prepend(ContainerBuilder $container);
+    public function prepend(ContainerBuilder $container): void;
 }

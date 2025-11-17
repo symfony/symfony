@@ -25,11 +25,13 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
     public const FORMAT_KEY = 'datetime_format';
     public const TIMEZONE_KEY = 'datetime_timezone';
     public const CAST_KEY = 'datetime_cast';
+    public const FORCE_TIMEZONE_KEY = 'datetime_force_timezone';
 
     private array $defaultContext = [
         self::FORMAT_KEY => \DateTimeInterface::RFC3339,
         self::TIMEZONE_KEY => null,
         self::CAST_KEY => null,
+        self::FORCE_TIMEZONE_KEY => false,
     ];
 
     private const SUPPORTED_TYPES = [
@@ -112,7 +114,7 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
 
             if (null !== $dateTimeFormat) {
                 if (false !== $object = $type::createFromFormat($dateTimeFormat, $data, $timezone)) {
-                    return $object;
+                    return $this->enforceTimezone($object, $context);
                 }
 
                 $dateTimeErrors = $type::getLastErrors();
@@ -124,11 +126,11 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
 
             if (null !== $defaultDateTimeFormat) {
                 if (false !== $object = $type::createFromFormat($defaultDateTimeFormat, $data, $timezone)) {
-                    return $object;
+                    return $this->enforceTimezone($object, $context);
                 }
             }
 
-            return new $type($data, $timezone);
+            return $this->enforceTimezone(new $type($data, $timezone), $context);
         } catch (NotNormalizableValueException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -166,5 +168,17 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
         }
 
         return $dateTimeZone instanceof \DateTimeZone ? $dateTimeZone : new \DateTimeZone($dateTimeZone);
+    }
+
+    private function enforceTimezone(\DateTime|\DateTimeImmutable $object, array $context): \DateTimeInterface
+    {
+        $timezone = $this->getTimezone($context);
+        $forceTimezone = $context[self::FORCE_TIMEZONE_KEY] ?? $this->defaultContext[self::FORCE_TIMEZONE_KEY];
+
+        if (null === $timezone || !$forceTimezone) {
+            return $object;
+        }
+
+        return $object->setTimezone($timezone);
     }
 }

@@ -12,8 +12,8 @@
 namespace Symfony\Component\OptionsResolver\Tests;
 
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
 use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
@@ -27,8 +27,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OptionsResolverTest extends TestCase
 {
-    use ExpectUserDeprecationMessageTrait;
-
     private OptionsResolver $resolver;
 
     protected function setUp(): void
@@ -36,9 +34,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver = new OptionsResolver();
     }
 
-    /**
-     * @dataProvider provideResolveWithIgnoreUndefined
-     */
+    #[DataProvider('provideResolveWithIgnoreUndefined')]
     public function testResolveWithIgnoreUndefined(array $defaults, array $options, array $expected)
     {
         $this->resolver
@@ -544,9 +540,7 @@ class OptionsResolverTest extends TestCase
         $this->assertFalse($this->resolver->isDeprecated('foo'));
     }
 
-    /**
-     * @dataProvider provideDeprecationData
-     */
+    #[DataProvider('provideDeprecationData')]
     public function testDeprecationMessages(\Closure $configureOptions, array $options, ?array $expectedError, int $expectedCount)
     {
         $count = 0;
@@ -910,9 +904,7 @@ class OptionsResolverTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider provideInvalidTypes
-     */
+    #[DataProvider('provideInvalidTypes')]
     public function testResolveFailsIfInvalidType($actualType, $allowedType, $exceptionMessage)
     {
         $this->resolver->setDefined('option');
@@ -1092,44 +1084,6 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefault('bar', 'baz');
 
         $this->resolver->resolve();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyResolveFailsIfInvalidValueFromNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
-            $resolver
-                ->setDefined('bar')
-                ->setAllowedValues('bar', 'valid value');
-        });
-
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "foo[bar]" with value "invalid value" is invalid. Accepted values are: "valid value".');
-
-        $this->resolver->resolve(['foo' => ['bar' => 'invalid value']]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyResolveFailsIfInvalidTypeFromNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
-            $resolver
-                ->setDefined('bar')
-                ->setAllowedTypes('bar', 'string');
-        });
-
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "foo[bar]" with value 1 is expected to be of type "string", but is of type "int".');
-
-        $this->resolver->resolve(['foo' => ['bar' => 1]]);
     }
 
     public function testResolveFailsIfInvalidValue()
@@ -2042,6 +1996,141 @@ class OptionsResolverTest extends TestCase
         ]);
     }
 
+    #[DataProvider('provideValidDeeplyNestedUnionTypes')]
+    public function testDeeplyNestedUnionTypes(string $type, $validValue)
+    {
+        $this->resolver->setDefined('option');
+        $this->resolver->setAllowedTypes('option', $type);
+        $this->assertEquals(['option' => $validValue], $this->resolver->resolve(['option' => $validValue]));
+    }
+
+    #[DataProvider('provideInvalidDeeplyNestedUnionTypes')]
+    public function testDeeplyNestedUnionTypesException(string $type, $invalidValue, string $expectedExceptionMessage)
+    {
+        $this->resolver->setDefined('option');
+        $this->resolver->setAllowedTypes('option', $type);
+
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        $this->resolver->resolve(['option' => $invalidValue]);
+    }
+
+    public static function provideValidDeeplyNestedUnionTypes(): array
+    {
+        $resource = fopen('php://memory', 'r');
+        $object = new \stdClass();
+
+        return [
+            // Test 1 level of nesting
+            ['string|(int|bool)', 'test'],
+            ['string|(int|bool)', 42],
+            ['string|(int|bool)', true],
+
+            // Test 2 levels of nesting
+            ['string|(int|(bool|float))', 'test'],
+            ['string|(int|(bool|float))', 42],
+            ['string|(int|(bool|float))', true],
+            ['string|(int|(bool|float))', 3.14],
+
+            // Test 3 levels of nesting
+            ['string|(int|(bool|(float|null)))', 'test'],
+            ['string|(int|(bool|(float|null)))', 42],
+            ['string|(int|(bool|(float|null)))', true],
+            ['string|(int|(bool|(float|null)))', 3.14],
+            ['string|(int|(bool|(float|null)))', null],
+
+            // Test 4 levels of nesting
+            ['string|(int|(bool|(float|(null|object))))', 'test'],
+            ['string|(int|(bool|(float|(null|object))))', 42],
+            ['string|(int|(bool|(float|(null|object))))', true],
+            ['string|(int|(bool|(float|(null|object))))', 3.14],
+            ['string|(int|(bool|(float|(null|object))))', null],
+            ['string|(int|(bool|(float|(null|object))))', $object],
+
+            // Test complex case with multiple deep nesting
+            ['(string|(int|bool))|(float|(null|object))', 'test'],
+            ['(string|(int|bool))|(float|(null|object))', 42],
+            ['(string|(int|bool))|(float|(null|object))', true],
+            ['(string|(int|bool))|(float|(null|object))', 3.14],
+            ['(string|(int|bool))|(float|(null|object))', null],
+            ['(string|(int|bool))|(float|(null|object))', $object],
+
+            // Test nested at the beginning
+            ['((string|int)|bool)|float', 'test'],
+            ['((string|int)|bool)|float', 42],
+            ['((string|int)|bool)|float', true],
+            ['((string|int)|bool)|float', 3.14],
+
+            // Test multiple unions at different levels
+            ['string|(int|(bool|float))|null|(object|(array|resource))', 'test'],
+            ['string|(int|(bool|float))|null|(object|(array|resource))', 42],
+            ['string|(int|(bool|float))|null|(object|(array|resource))', true],
+            ['string|(int|(bool|float))|null|(object|(array|resource))', 3.14],
+            ['string|(int|(bool|float))|null|(object|(array|resource))', null],
+            ['string|(int|(bool|float))|null|(object|(array|resource))', $object],
+            ['string|(int|(bool|float))|null|(object|(array|resource))', []],
+            ['string|(int|(bool|float))|null|(object|(array|resource))', $resource],
+
+            // Test arrays with nested union types:
+            ['(string|int)[]|(bool|float)[]', ['test', 42]],
+            ['(string|int)[]|(bool|float)[]', [true, 3.14]],
+
+            // Test deeply nested arrays with unions
+            ['((string|int)|(bool|float))[]', ['test', 42, true, 3.14]],
+
+            // Test complex nested array types
+            ['(string|(int|bool)[])|(float|(null|object)[])', 'test'],
+            ['(string|(int|bool)[])|(float|(null|object)[])', [42, true]],
+            ['(string|(int|bool)[])|(float|(null|object)[])', 3.14],
+            ['(string|(int|bool)[])|(float|(null|object)[])', [null, $object]],
+
+            // Test multi-dimensional arrays with nesting
+            ['((string|int)[]|(bool|float)[])|null', ['test', 42]],
+            ['((string|int)[]|(bool|float)[])|null', [true, 3.14]],
+            ['((string|int)[]|(bool|float)[])|null', null],
+        ];
+    }
+
+    public static function provideInvalidDeeplyNestedUnionTypes(): array
+    {
+        $resource = fopen('php://memory', 'r');
+        $object = new \stdClass();
+
+        return [
+            // Test 1 level of nesting
+            ['string|(int|bool)', [], 'The option "option" with value array is expected to be of type "string|(int|bool)", but is of type "array".'],
+            ['string|(int|bool)', $object, 'The option "option" with value stdClass is expected to be of type "string|(int|bool)", but is of type "stdClass".'],
+            ['string|(int|bool)', $resource, 'The option "option" with value resource is expected to be of type "string|(int|bool)", but is of type "resource (stream)".'],
+            ['string|(int|bool)', null, 'The option "option" with value null is expected to be of type "string|(int|bool)", but is of type "null".'],
+            ['string|(int|bool)', 3.14, 'The option "option" with value 3.14 is expected to be of type "string|(int|bool)", but is of type "float".'],
+
+            // Test 2 levels of nesting
+            ['string|(int|(bool|float))', [], 'The option "option" with value array is expected to be of type "string|(int|(bool|float))", but is of type "array".'],
+            ['string|(int|(bool|float))', $object, 'The option "option" with value stdClass is expected to be of type "string|(int|(bool|float))", but is of type "stdClass".'],
+            ['string|(int|(bool|float))', $resource, 'The option "option" with value resource is expected to be of type "string|(int|(bool|float))", but is of type "resource (stream)".'],
+            ['string|(int|(bool|float))', null, 'The option "option" with value null is expected to be of type "string|(int|(bool|float))", but is of type "null".'],
+
+            // Test 3 levels of nesting
+            ['string|(int|(bool|(float|null)))', [], 'The option "option" with value array is expected to be of type "string|(int|(bool|(float|null)))", but is of type "array".'],
+            ['string|(int|(bool|(float|null)))', $object, 'The option "option" with value stdClass is expected to be of type "string|(int|(bool|(float|null)))", but is of type "stdClass".'],
+            ['string|(int|(bool|(float|null)))', $resource, 'The option "option" with value resource is expected to be of type "string|(int|(bool|(float|null)))", but is of type "resource (stream)".'],
+
+            // Test arrays with nested union types
+            ['(string|int)[]|(bool|float)[]', ['test', true], 'The option "option" with value array is expected to be of type "(string|int)[]|(bool|float)[]", but one of the elements is of type "array".'],
+            ['(string|int)[]|(bool|float)[]', [42, 3.14], 'The option "option" with value array is expected to be of type "(string|int)[]|(bool|float)[]", but one of the elements is of type "array".'],
+
+            // Test deeply nested arrays with unions
+            ['((string|int)|(bool|float))[]', 'test', 'The option "option" with value "test" is expected to be of type "((string|int)|(bool|float))[]", but is of type "string".'],
+            ['((string|int)|(bool|float))[]', [null], 'The option "option" with value array is expected to be of type "((string|int)|(bool|float))[]", but one of the elements is of type "null".'],
+            ['((string|int)|(bool|float))[]', [$object], 'The option "option" with value array is expected to be of type "((string|int)|(bool|float))[]", but one of the elements is of type "stdClass".'],
+
+            // Test complex nested array types
+            ['(string|(int|bool)[])|(float|(null|object)[])', ['test'], 'The option "option" with value array is expected to be of type "(string|(int|bool)[])|(float|(null|object)[])", but is of type "array".'],
+            ['(string|(int|bool)[])|(float|(null|object)[])', [3.14], 'The option "option" with value array is expected to be of type "(string|(int|bool)[])|(float|(null|object)[])", but is of type "array".'],
+        ];
+    }
+
     public function testNestedArrayException1()
     {
         $this->expectException(InvalidOptionsException::class);
@@ -2109,438 +2198,6 @@ class OptionsResolverTest extends TestCase
         ]);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyIsNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'database' => function (OptionsResolver $resolver) {
-                $resolver->setDefined(['host', 'port']);
-            },
-        ]);
-        $this->assertTrue($this->resolver->isNested('database'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFailsIfUndefinedNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'name' => 'default',
-            'database' => function (OptionsResolver $resolver) {
-                $resolver->setDefined(['host', 'port']);
-            },
-        ]);
-
-        $this->expectException(UndefinedOptionsException::class);
-        $this->expectExceptionMessage('The option "database[foo]" does not exist. Defined options are: "host", "port".');
-
-        $this->resolver->resolve([
-            'database' => ['foo' => 'bar'],
-        ]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFailsIfMissingRequiredNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'name' => 'default',
-            'database' => function (OptionsResolver $resolver) {
-                $resolver->setRequired('host');
-            },
-        ]);
-
-        $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage('The required option "database[host]" is missing.');
-
-        $this->resolver->resolve([
-            'database' => [],
-        ]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFailsIfInvalidTypeNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'name' => 'default',
-            'database' => function (OptionsResolver $resolver) {
-                $resolver
-                    ->setDefined('logging')
-                    ->setAllowedTypes('logging', 'bool');
-            },
-        ]);
-
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "database[logging]" with value null is expected to be of type "bool", but is of type "null".');
-
-        $this->resolver->resolve([
-            'database' => ['logging' => null],
-        ]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFailsIfNotArrayIsGivenForNestedOptions()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'name' => 'default',
-            'database' => function (OptionsResolver $resolver) {
-                $resolver->setDefined('host');
-            },
-        ]);
-
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The nested option "database" with value null is expected to be of type array, but is of type "null".');
-
-        $this->resolver->resolve([
-            'database' => null,
-        ]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyResolveNestedOptionsWithoutDefault()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'name' => 'default',
-            'database' => function (OptionsResolver $resolver) {
-                $resolver->setDefined(['host', 'port']);
-            },
-        ]);
-        $actualOptions = $this->resolver->resolve();
-        $expectedOptions = [
-            'name' => 'default',
-            'database' => [],
-        ];
-        $this->assertSame($expectedOptions, $actualOptions);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyResolveNestedOptionsWithDefault()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'name' => 'default',
-            'database' => function (OptionsResolver $resolver) {
-                $resolver->setDefaults([
-                    'host' => 'localhost',
-                    'port' => 3306,
-                ]);
-            },
-        ]);
-        $actualOptions = $this->resolver->resolve();
-        $expectedOptions = [
-            'name' => 'default',
-            'database' => [
-                'host' => 'localhost',
-                'port' => 3306,
-            ],
-        ];
-        $this->assertSame($expectedOptions, $actualOptions);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyResolveMultipleNestedOptions()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'name' => 'default',
-            'database' => function (OptionsResolver $resolver) {
-                $resolver
-                    ->setRequired(['dbname', 'host'])
-                    ->setDefaults([
-                        'port' => 3306,
-                        'replicas' => function (OptionsResolver $resolver) {
-                            $resolver->setDefaults([
-                                'host' => 'replica1',
-                                'port' => 3306,
-                            ]);
-                        },
-                    ]);
-            },
-        ]);
-        $actualOptions = $this->resolver->resolve([
-            'name' => 'custom',
-            'database' => [
-                'dbname' => 'test',
-                'host' => 'localhost',
-                'port' => null,
-                'replicas' => ['host' => 'replica2'],
-            ],
-        ]);
-        $expectedOptions = [
-            'name' => 'custom',
-            'database' => [
-                'port' => null,
-                'replicas' => ['port' => 3306, 'host' => 'replica2'],
-                'dbname' => 'test',
-                'host' => 'localhost',
-            ],
-        ];
-        $this->assertSame($expectedOptions, $actualOptions);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyResolveLazyOptionUsingNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'version' => fn (Options $options) => $options['database']['server_version'],
-            'database' => function (OptionsResolver $resolver) {
-                $resolver->setDefault('server_version', '3.15');
-            },
-        ]);
-        $actualOptions = $this->resolver->resolve();
-        $expectedOptions = [
-            'database' => ['server_version' => '3.15'],
-            'version' => '3.15',
-        ];
-        $this->assertSame($expectedOptions, $actualOptions);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyNormalizeNestedOptionValue()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver
-            ->setDefaults([
-                'database' => function (OptionsResolver $resolver) {
-                    $resolver->setDefaults([
-                        'port' => 3306,
-                        'host' => 'localhost',
-                        'dbname' => 'demo',
-                    ]);
-                },
-            ])
-            ->setNormalizer('database', function (Options $options, $value) {
-                ksort($value);
-
-                return $value;
-            });
-        $actualOptions = $this->resolver->resolve([
-            'database' => ['dbname' => 'test'],
-        ]);
-        $expectedOptions = [
-            'database' => ['dbname' => 'test', 'host' => 'localhost', 'port' => 3306],
-        ];
-        $this->assertSame($expectedOptions, $actualOptions);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testOverwrittenNestedOptionNotEvaluatedIfLazyDefault()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        // defined by superclass
-        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
-            Assert::fail('Should not be called');
-        });
-        // defined by subclass
-        $this->resolver->setDefault('foo', fn (Options $options) => 'lazy');
-        $this->assertSame(['foo' => 'lazy'], $this->resolver->resolve());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testOverwrittenNestedOptionNotEvaluatedIfScalarDefault()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        // defined by superclass
-        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
-            Assert::fail('Should not be called');
-        });
-        // defined by subclass
-        $this->resolver->setDefault('foo', 'bar');
-        $this->assertSame(['foo' => 'bar'], $this->resolver->resolve());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testOverwrittenLazyOptionNotEvaluatedIfNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        // defined by superclass
-        $this->resolver->setDefault('foo', function (Options $options) {
-            Assert::fail('Should not be called');
-        });
-        // defined by subclass
-        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
-            $resolver->setDefault('bar', 'baz');
-        });
-        $this->assertSame(['foo' => ['bar' => 'baz']], $this->resolver->resolve());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyResolveAllNestedOptionDefinitions()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        // defined by superclass
-        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
-            $resolver->setRequired('bar');
-        });
-        // defined by subclass
-        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
-            $resolver->setDefault('bar', 'baz');
-        });
-        // defined by subclass
-        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
-            $resolver->setDefault('ping', 'pong');
-        });
-        $this->assertSame(['foo' => ['ping' => 'pong', 'bar' => 'baz']], $this->resolver->resolve());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyNormalizeNestedValue()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        // defined by superclass
-        $this->resolver->setDefault('foo', function (OptionsResolver $resolver) {
-            $resolver->setDefault('bar', null);
-        });
-        // defined by subclass
-        $this->resolver->setNormalizer('foo', function (Options $options, $resolvedValue) {
-            $resolvedValue['bar'] ??= 'baz';
-
-            return $resolvedValue;
-        });
-        $this->assertSame(['foo' => ['bar' => 'baz']], $this->resolver->resolve());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFailsIfCyclicDependencyBetweenSameNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
-            $resolver->setDefault('replicas', $parent['database']);
-        });
-
-        $this->expectException(OptionDefinitionException::class);
-
-        $this->resolver->resolve();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFailsIfCyclicDependencyBetweenNestedOptionAndParentLazyOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'version' => fn (Options $options) => $options['database']['server_version'],
-            'database' => function (OptionsResolver $resolver, Options $parent) {
-                $resolver->setDefault('server_version', $parent['version']);
-            },
-        ]);
-
-        $this->expectException(OptionDefinitionException::class);
-
-        $this->resolver->resolve();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFailsIfCyclicDependencyBetweenNormalizerAndNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver
-            ->setDefault('name', 'default')
-            ->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
-                $resolver->setDefault('host', $parent['name']);
-            })
-            ->setNormalizer('name', function (Options $options, $value) {
-                $options['database'];
-            });
-
-        $this->expectException(OptionDefinitionException::class);
-
-        $this->resolver->resolve();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFailsIfCyclicDependencyBetweenNestedOptions()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
-            $resolver->setDefault('host', $parent['replica']['host']);
-        });
-        $this->resolver->setDefault('replica', function (OptionsResolver $resolver, Options $parent) {
-            $resolver->setDefault('host', $parent['database']['host']);
-        });
-
-        $this->expectException(OptionDefinitionException::class);
-
-        $this->resolver->resolve();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetAccessToParentOptionFromNestedOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'version' => 3.15,
-            'database' => function (OptionsResolver $resolver, Options $parent) {
-                $resolver->setDefault('server_version', $parent['version']);
-            },
-        ]);
-        $this->assertSame(['version' => 3.15, 'database' => ['server_version' => 3.15]], $this->resolver->resolve());
-    }
-
     public function testNestedClosureWithoutTypeHintNotInvoked()
     {
         $closure = function ($resolver) {
@@ -2557,62 +2214,6 @@ class OptionsResolverTest extends TestCase
         };
         $this->resolver->setDefault('foo', $closure);
         $this->assertSame(['foo' => $closure], $this->resolver->resolve());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyResolveLazyOptionWithTransitiveDefaultDependency()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'ip' => null,
-            'database' => function (OptionsResolver $resolver, Options $parent) {
-                $resolver->setDefault('host', $parent['ip']);
-                $resolver->setDefault('primary_replica', function (OptionsResolver $resolver, Options $parent) {
-                    $resolver->setDefault('host', $parent['host']);
-                });
-            },
-            'secondary_replica' => fn (Options $options) => $options['database']['primary_replica']['host'],
-        ]);
-        $actualOptions = $this->resolver->resolve(['ip' => '127.0.0.1']);
-        $expectedOptions = [
-            'ip' => '127.0.0.1',
-            'database' => [
-                'host' => '127.0.0.1',
-                'primary_replica' => ['host' => '127.0.0.1'],
-            ],
-            'secondary_replica' => '127.0.0.1',
-        ];
-        $this->assertSame($expectedOptions, $actualOptions);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAccessToParentOptionFromNestedNormalizerAndLazyOption()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver->setDefaults([
-            'debug' => true,
-            'database' => function (OptionsResolver $resolver, Options $parent) {
-                $resolver
-                    ->setDefined('logging')
-                    ->setDefault('profiling', fn (Options $options) => $parent['debug'])
-                    ->setNormalizer('logging', fn (Options $options, $value) => false === $parent['debug'] ? true : $value);
-            },
-        ]);
-        $actualOptions = $this->resolver->resolve([
-            'debug' => false,
-            'database' => ['logging' => false],
-        ]);
-        $expectedOptions = [
-            'debug' => false,
-            'database' => ['profiling' => false, 'logging' => true],
-        ];
-        $this->assertSame($expectedOptions, $actualOptions);
     }
 
     public function testFailsIfOptionIsAlreadyDefined()
@@ -2719,102 +2320,12 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve(['expires' => new \DateTimeImmutable('-1 hour')]);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyInvalidValueForPrototypeDefinition()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver
-            ->setDefault('connections', static function (OptionsResolver $resolver) {
-                $resolver
-                    ->setPrototype(true)
-                    ->setDefined(['table', 'user', 'password']);
-            });
-
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The value of the option "connections" is expected to be of type array of array, but is of type array of "string".');
-
-        $this->resolver->resolve(['connections' => ['foo']]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyMissingOptionForPrototypeDefinition()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver
-            ->setDefault('connections', static function (OptionsResolver $resolver) {
-                $resolver
-                    ->setPrototype(true)
-                    ->setRequired('table');
-            });
-
-        $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage('The required option "connections[1][table]" is missing.');
-
-        $this->resolver->resolve(['connections' => [
-            ['table' => 'default'],
-            [], // <- missing required option "table"
-        ]]);
-    }
-
     public function testAccessExceptionOnPrototypeDefinition()
     {
         $this->expectException(AccessException::class);
         $this->expectExceptionMessage('The prototype property cannot be set from a root definition.');
 
         $this->resolver->setPrototype(true);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyPrototypeDefinition()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/options-resolver 7.3: Defining nested options via "Symfony\Component\OptionsResolver\OptionsResolver::setDefault()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.');
-
-        $this->resolver
-            ->setDefault('connections', static function (OptionsResolver $resolver) {
-                $resolver
-                    ->setPrototype(true)
-                    ->setRequired('table')
-                    ->setDefaults(['user' => 'root', 'password' => null])
-                ;
-            })
-        ;
-
-        $actualOptions = $this->resolver->resolve([
-            'connections' => [
-                'default' => [
-                    'table' => 'default',
-                ],
-                'custom' => [
-                    'user' => 'foo',
-                    'password' => 'pa$$',
-                    'table' => 'symfony',
-                ],
-            ],
-        ]);
-        $expectedOptions = [
-            'connections' => [
-                'default' => [
-                    'user' => 'root',
-                    'password' => null,
-                    'table' => 'default',
-                ],
-                'custom' => [
-                    'user' => 'foo',
-                    'password' => 'pa$$',
-                    'table' => 'symfony',
-                ],
-            ],
-        ];
-
-        $this->assertSame($expectedOptions, $actualOptions);
     }
 
     public function testPrototypeDefinition()
@@ -3350,50 +2861,5 @@ class OptionsResolverTest extends TestCase
         } finally {
             restore_error_handler();
         }
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testNestedPrototypeErrorPathHasFullContext()
-    {
-        $resolver = new OptionsResolver();
-
-        $resolver->setDefault('connections', static function (OptionsResolver $connResolver) {
-            $connResolver->setPrototype(true);
-            $connResolver->setRequired(['host', 'database']);
-            $connResolver->setDefault('user', 'root');
-
-            $connResolver->setDefault('replicas', static function (OptionsResolver $replicaResolver) {
-                $replicaResolver->setPrototype(true);
-                $replicaResolver->setRequired(['host']);
-                $replicaResolver->setDefault('user', 'read_only');
-            });
-        });
-
-        $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage('The required option "connections[main_db][replicas][1][host]" is missing.');
-
-        $options = [
-            'connections' => [
-                'main_db' => [
-                    'host' => 'localhost',
-                    'database' => 'app_db',
-                    'replicas' => [
-                        ['host' => 'replica-01.local', 'user' => 'read_only'],
-                        ['user' => 'other_user'], // Index 1 -> "host" is missing here
-                    ],
-                ],
-                'audit_db' => [
-                    'host' => 'audit.local',
-                    'database' => 'audit_db',
-                    'replicas' => [
-                        ['host' => 'audit-replica.local'],
-                    ],
-                ],
-            ],
-        ];
-
-        $resolver->resolve($options);
     }
 }

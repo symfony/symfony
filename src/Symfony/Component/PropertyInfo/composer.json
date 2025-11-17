@@ -23,24 +23,20 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
-        "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/string": "^6.4|^7.0",
-        "symfony/type-info": "^7.3.5"
+        "php": ">=8.4",
+        "symfony/string": "^7.4|^8.0",
+        "symfony/type-info": "^7.4|^8.0"
     },
     "require-dev": {
-        "symfony/serializer": "^6.4|^7.0",
-        "symfony/cache": "^6.4|^7.0",
-        "symfony/dependency-injection": "^6.4|^7.0",
         "phpdocumentor/reflection-docblock": "^5.2",
-        "phpstan/phpdoc-parser": "^1.0|^2.0"
+        "phpstan/phpdoc-parser": "^1.0|^2.0",
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/serializer": "^7.4|^8.0"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<5.2",
-        "phpdocumentor/type-resolver": "<1.5.1",
-        "symfony/dependency-injection": "<6.4",
-        "symfony/cache": "<6.4",
-        "symfony/serializer": "<6.4"
+        "phpdocumentor/type-resolver": "<1.5.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\PropertyInfo\\": "" },

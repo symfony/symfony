@@ -17,8 +17,6 @@ namespace Symfony\Component\ObjectMapper;
  * @template T of object
  * @template T2 of object
  *
- * @experimental
- *
  * {@see Symfony\Component\ObjectMapper\Attribute\Map}
  */
 interface ConditionCallableInterface

@@ -68,23 +68,23 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
                 new InputOption('keepalive', null, InputOption::VALUE_REQUIRED, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> retries message in the failure transport.
+                The <info>%command.name%</info> retries message in the failure transport.
 
-    <info>php %command.full_name%</info>
+                    <info>php %command.full_name%</info>
 
-The command will interactively ask if each message should be retried,
-discarded or skipped.
+                The command will interactively ask if each message should be retried,
+                discarded or skipped.
 
-Some transports support retrying a specific message id, which comes
-from the <info>messenger:failed:show</info> command.
+                Some transports support retrying a specific message id, which comes
+                from the <info>messenger:failed:show</info> command.
 
-    <info>php %command.full_name% {id}</info>
+                    <info>php %command.full_name% {id}</info>
 
-Or pass multiple ids at once to process multiple messages:
+                Or pass multiple ids at once to process multiple messages:
 
-<info>php %command.full_name% {id1} {id2} {id3}</info>
+                <info>php %command.full_name% {id1} {id2} {id3}</info>
 
-EOF
+                EOF
             )
         ;
     }

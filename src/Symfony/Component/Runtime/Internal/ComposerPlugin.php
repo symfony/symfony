@@ -74,7 +74,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             }
         }
 
-        $projectDir = $fs->makePathRelative($projectDir, $vendorDir);
+        $projectDir = $fs->makePathRelative(realpath($projectDir.'/'.($extra['project_dir'] ?? '')), $vendorDir);
         $nestingLevel = 0;
 
         while (str_starts_with($projectDir, '../')) {
@@ -91,7 +91,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
 
         $runtimeClass = $extra['class'] ?? SymfonyRuntime::class;
 
-        unset($extra['class'], $extra['autoload_template']);
+        unset($extra['class'], $extra['autoload_template'], $extra['project_dir']);
 
         $code = strtr(file_get_contents($autoloadTemplate), [
             '%project_dir%' => $projectDir,

@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Finder\Tests;
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
 
 class FinderOpenBasedirTest extends Iterator\RealIteratorTestCase
 {
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testIgnoreVCSIgnoredWithOpenBasedir()
     {
         $this->markTestIncomplete('Test case needs to be refactored so that PHPUnit can run it');

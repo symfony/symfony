@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Tests\Event;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Event\FailedMessageEvent;
 use Symfony\Component\Notifier\Event\MessageEvent;
@@ -25,25 +26,19 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class FailedMessageEventTest extends TestCase
 {
-    /**
-     * @dataProvider messagesProvider
-     */
+    #[DataProvider('messagesProvider')]
     public function testConstruct(MessageInterface $message, \Throwable $error, FailedMessageEvent $event)
     {
         $this->assertEquals($event, new FailedMessageEvent($message, $error));
     }
 
-    /**
-     * @dataProvider messagesProvider
-     */
+    #[DataProvider('messagesProvider')]
     public function testGetMessage(MessageInterface $message, \Throwable $error, FailedMessageEvent $event)
     {
         $this->assertSame($message, $event->getMessage());
     }
 
-    /**
-     * @dataProvider messagesProvider
-     */
+    #[DataProvider('messagesProvider')]
     public function testGetError(MessageInterface $message, \Throwable $error, FailedMessageEvent $event)
     {
         $this->assertSame($error, $event->getError());

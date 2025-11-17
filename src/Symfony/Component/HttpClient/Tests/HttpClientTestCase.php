@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
@@ -603,9 +605,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame(302, $response->getStatusCode());
     }
 
-    /**
-     * @dataProvider getRedirectWithAuthTests
-     */
+    #[DataProvider('getRedirectWithAuthTests')]
     public function testRedirectWithAuth(string $url, bool $redirectWithAuth)
     {
         $p = TestHttpServer::start(8067);
@@ -679,11 +679,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame('HEAD', $vars['REQUEST_METHOD']);
     }
 
-    /**
-     * @testWith [301]
-     *           [302]
-     *           [303]
-     */
+    #[TestWith([301])]
+    #[TestWith([302])]
+    #[TestWith([303])]
     public function testPostToGetRedirect(int $status)
     {
         $p = TestHttpServer::start(8067);

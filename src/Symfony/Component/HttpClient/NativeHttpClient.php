@@ -80,9 +80,6 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             if (str_starts_with($options['bindto'], 'host!')) {
                 $options['bindto'] = substr($options['bindto'], 5);
             }
-            if ((\PHP_VERSION_ID < 80223 || 80300 <= \PHP_VERSION_ID && 80311 < \PHP_VERSION_ID) && '\\' === \DIRECTORY_SEPARATOR && '[' === $options['bindto'][0]) {
-                $options['bindto'] = preg_replace('{^\[[^\]]++\]}', '[$0]', $options['bindto']);
-            }
         }
 
         $hasContentLength = isset($options['normalized_headers']['content-length']);
@@ -429,11 +426,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                     $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], $filterContentHeaders);
                     $redirectHeaders['with_auth'] = array_filter($redirectHeaders['with_auth'], $filterContentHeaders);
 
-                    if (\PHP_VERSION_ID >= 80300) {
-                        stream_context_set_options($context, ['http' => $options]);
-                    } else {
-                        stream_context_set_option($context, ['http' => $options]);
-                    }
+                    stream_context_set_options($context, ['http' => $options]);
                 }
             }
 

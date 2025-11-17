@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\Compiler\Parser;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\Compiler\Parser\JavascriptSequenceParser;
 
@@ -53,9 +54,7 @@ class JavascriptSequenceParserTest extends TestCase
         $this->assertTrue($parser->isExecutable());
     }
 
-    /**
-     * @dataProvider provideSequenceCases
-     */
+    #[DataProvider('provideSequenceCases')]
     public function testParseSequence(string $content, int $position, bool $isExcecutable)
     {
         $parser = new JavascriptSequenceParser($content);
@@ -103,9 +102,7 @@ class JavascriptSequenceParserTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideCommentCases
-     */
+    #[DataProvider('provideCommentCases')]
     public function testIdentifyComment(string $content, int $position, bool $isComment)
     {
         $parser = new JavascriptSequenceParser($content);
@@ -169,9 +166,7 @@ class JavascriptSequenceParserTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideStringCases
-     */
+    #[DataProvider('provideStringCases')]
     public function testIdentifyStrings(string $content, int $position, bool $isString)
     {
         $parser = new JavascriptSequenceParser($content);

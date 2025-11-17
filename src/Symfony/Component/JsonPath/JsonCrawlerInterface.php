@@ -16,8 +16,6 @@ use Symfony\Component\JsonPath\Exception\JsonCrawlerException;
 
 /**
  * @author Alexandre Daubois <alex.daubois@gmail.com>
- *
- * @experimental
  */
 interface JsonCrawlerInterface
 {

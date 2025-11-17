@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -89,9 +90,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
     }
 
-    /**
-     * @dataProvider provideRememberMeOptInValues
-     */
+    #[DataProvider('provideRememberMeOptInValues')]
     public function testSuccessfulHttpLoginWithOptInRequestParameter($optInValue)
     {
         $this->createHttpRequest();
@@ -104,9 +103,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
     }
 
-    /**
-     * @dataProvider provideRememberMeOptInValues
-     */
+    #[DataProvider('provideRememberMeOptInValues')]
     public function testSuccessfulJsonLoginWithOptInRequestParameter($optInValue)
     {
         $this->createJsonRequest(['_remember_me' => $optInValue]);

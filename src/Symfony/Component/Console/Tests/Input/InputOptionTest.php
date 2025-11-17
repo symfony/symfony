@@ -73,8 +73,6 @@ class InputOptionTest extends TestCase
         $this->assertSame('0|z', $option->getShortcut(), '-0 is an acceptable shortcut value when embedded in an array');
         $option = new InputOption('foo', '0|z');
         $this->assertSame('0|z', $option->getShortcut(), '-0 is an acceptable shortcut value when embedded in a string-list');
-        $option = new InputOption('foo', false);
-        $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null when given a false as value');
     }
 
     public function testModes()

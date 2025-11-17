@@ -104,15 +104,15 @@ final class Definition
 
     private function addTransition(Transition $transition): void
     {
-        foreach ($transition->getFroms() as $from) {
-            if (!\array_key_exists($from, $this->places)) {
-                $this->addPlace($from);
+        foreach ($transition->getFroms(true) as $arc) {
+            if (!\array_key_exists($arc->place, $this->places)) {
+                $this->addPlace($arc->place);
             }
         }
 
-        foreach ($transition->getTos() as $to) {
-            if (!\array_key_exists($to, $this->places)) {
-                $this->addPlace($to);
+        foreach ($transition->getTos(true) as $arc) {
+            if (!\array_key_exists($arc->place, $this->places)) {
+                $this->addPlace($arc->place);
             }
         }
 

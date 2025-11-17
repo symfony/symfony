@@ -92,6 +92,56 @@ class PropertiesMarkingStoreTest extends TestCase
         $this->assertCount(0, $marking->getPlaces());
     }
 
+    public function testSetMarkingWithMultipleSubjectsSharingCachedSetter()
+    {
+        $subject1 = new SubjectWithProperties();
+        $subject2 = new SubjectWithProperties();
+        $subject3 = new SubjectWithProperties();
+
+        $markingStore = new MethodMarkingStore(false);
+
+        // First call caches the setter for SubjectWithProperties class
+        $marking1 = $markingStore->getMarking($subject1);
+        $marking1->mark('place1');
+        $markingStore->setMarking($subject1, $marking1, ['context1' => 'value1']);
+
+        // Subsequent calls should use the cached setter but operate on different subjects
+        $marking2 = $markingStore->getMarking($subject2);
+        $marking2->mark('place2');
+        $markingStore->setMarking($subject2, $marking2, ['context2' => 'value2']);
+
+        $marking3 = $markingStore->getMarking($subject3);
+        $marking3->mark('place3');
+        $markingStore->setMarking($subject3, $marking3, ['context3' => 'value3']);
+
+        // Each subject should have its own marking set correctly
+        $this->assertSame(['place1' => 1], $subject1->marking);
+        $this->assertSame(['place2' => 1], $subject2->marking);
+        $this->assertSame(['place3' => 1], $subject3->marking);
+    }
+
+    public function testSetMarkingWithMultipleSubjectsSharingCachedSetterSingleState()
+    {
+        $subject1 = new SubjectWithProperties();
+        $subject2 = new SubjectWithProperties();
+
+        $markingStore = new MethodMarkingStore(true, 'place');
+
+        // First call caches the setter for SubjectWithProperties class
+        $marking1 = $markingStore->getMarking($subject1);
+        $marking1->mark('place1');
+        $markingStore->setMarking($subject1, $marking1, ['context1' => 'value1']);
+
+        // Second call should use the cached setter but operate on a different subject
+        $marking2 = $markingStore->getMarking($subject2);
+        $marking2->mark('place2');
+        $markingStore->setMarking($subject2, $marking2, ['context2' => 'value2']);
+
+        // Each subject should have its own marking set correctly
+        $this->assertSame('place1', $subject1->place);
+        $this->assertSame('place2', $subject2->place);
+    }
+
     private function createValueObject(string $markingValue): object
     {
         return new class($markingValue) {

@@ -57,6 +57,13 @@ final class UserValueResolver implements ValueResolverInterface
             return [$user];
         }
 
+        $types = explode('|', $argument->getType());
+        foreach ($types as $type) {
+            if ($user instanceof $type) {
+                return [$user];
+            }
+        }
+
         throw new AccessDeniedException(\sprintf('The logged-in user is an instance of "%s" but a user of type "%s" is expected.', $user::class, $argument->getType()));
     }
 }

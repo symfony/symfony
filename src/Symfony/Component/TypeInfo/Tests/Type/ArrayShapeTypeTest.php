@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo\Tests\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
@@ -18,9 +19,7 @@ use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 
 class ArrayShapeTypeTest extends TestCase
 {
-    /**
-     * @dataProvider cannotConstructWithInvalidExtraDataProvider
-     */
+    #[DataProvider('cannotConstructWithInvalidExtraDataProvider')]
     public function testCannotConstructWithInvalidExtra(string $expectedMessage, ?Type $extraKeyType, ?Type $extraValueType)
     {
         $this->expectException(InvalidArgumentException::class);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonPath\Tests\Tokenizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonPath\Exception\InvalidJsonPathException;
 use Symfony\Component\JsonPath\JsonPath;
@@ -19,9 +20,7 @@ use Symfony\Component\JsonPath\Tokenizer\TokenType;
 
 class JsonPathTokenizerTest extends TestCase
 {
-    /**
-     * @dataProvider simplePathProvider
-     */
+    #[DataProvider('simplePathProvider')]
     public function testSimplePath(string $path, array $expectedTokens)
     {
         $jsonPath = new JsonPath($path);
@@ -62,9 +61,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider bracketNotationProvider
-     */
+    #[DataProvider('bracketNotationProvider')]
     public function testBracketNotation(string $path, array $expectedTokens)
     {
         $jsonPath = new JsonPath($path);
@@ -102,9 +99,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider filterExpressionProvider
-     */
+    #[DataProvider('filterExpressionProvider')]
     public function testFilterExpressions(string $path, array $expectedTokens)
     {
         $jsonPath = new JsonPath($path);
@@ -147,9 +142,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider complexPathProvider
-     */
+    #[DataProvider('complexPathProvider')]
     public function testComplexPaths(string $path, array $expectedTokens)
     {
         $jsonPath = new JsonPath($path);
@@ -310,9 +303,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store...name'));
     }
 
-    /**
-     * @dataProvider provideValidUtf8Chars
-     */
+    #[DataProvider('provideValidUtf8Chars')]
     public function testUtf8ValidChars(string $propertyName)
     {
         $jsonPath = new JsonPath(\sprintf('$.%s', $propertyName));
@@ -337,9 +328,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidUtf8PropertyName
-     */
+    #[DataProvider('provideInvalidUtf8PropertyName')]
     public function testUtf8InvalidPropertyName(string $propertyName)
     {
         $this->expectException(InvalidJsonPathException::class);

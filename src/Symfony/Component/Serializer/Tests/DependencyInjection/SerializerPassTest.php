@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -102,13 +104,11 @@ class SerializerPassTest extends TestCase
         $this->assertEquals($context, $container->getDefinition('serializer')->getArgument('$defaultContext'));
     }
 
-    /**
-     * @testWith [{}, {}]
-     *           [{"serializer.default_context": {"enable_max_depth": true}}, {"enable_max_depth": true}]
-     *           [{".serializer.circular_reference_handler": "foo"}, {"circular_reference_handler": "foo"}]
-     *           [{".serializer.max_depth_handler": "bar"}, {"max_depth_handler": "bar"}]
-     *           [{"serializer.default_context": {"enable_max_depth": true}, ".serializer.circular_reference_handler": "foo", ".serializer.max_depth_handler": "bar"}, {"enable_max_depth": true, "circular_reference_handler": "foo", "max_depth_handler": "bar"}]
-     */
+    #[TestWith([[], []])]
+    #[TestWith([['serializer.default_context' => ['enable_max_depth' => true]], ['enable_max_depth' => true]])]
+    #[TestWith([['.serializer.circular_reference_handler' => 'foo'], ['circular_reference_handler' => 'foo']])]
+    #[TestWith([['.serializer.max_depth_handler' => 'bar'], ['max_depth_handler' => 'bar']])]
+    #[TestWith([['serializer.default_context' => ['enable_max_depth' => true], '.serializer.circular_reference_handler' => 'foo', '.serializer.max_depth_handler' => 'bar'], ['enable_max_depth' => true, 'circular_reference_handler' => 'foo', 'max_depth_handler' => 'bar']])]
     public function testBindObjectNormalizerDefaultContext(array $parameters, array $context)
     {
         $container = new ContainerBuilder();
@@ -156,9 +156,7 @@ class SerializerPassTest extends TestCase
         $this->assertSame('default', $traceableEncoderDefinition->getArgument(2));
     }
 
-    /**
-     * @dataProvider provideDefaultSerializerTagsData
-     */
+    #[DataProvider('provideDefaultSerializerTagsData')]
     public function testDefaultSerializerTagsAreResolvedCorrectly(
         array $normalizerTagAttributes,
         array $encoderTagAttributes,
@@ -243,9 +241,7 @@ class SerializerPassTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideNamedSerializerTagsData
-     */
+    #[DataProvider('provideNamedSerializerTagsData')]
     public function testNamedSerializerTagsAreResolvedCorrectly(
         array $config,
         array $normalizerTagAttributes,
@@ -381,14 +377,9 @@ class SerializerPassTest extends TestCase
         $this->assertCount(2, $encoderDefinition->getTag('serializer.encoder.api2'));
     }
 
-    /**
-     * @dataProvider provideEmptyTagsData
-     */
-    public function testEmptyTagsAreIgnoredWhenNonEmptyArePresent(
-        array $tagAttributesList,
-        array $expectedDefaultTags,
-        array $expectedApiTags,
-    ) {
+    #[DataProvider('provideEmptyTagsData')]
+    public function testEmptyTagsAreIgnoredWhenNonEmptyArePresent(array $tagAttributesList, array $expectedDefaultTags, array $expectedApiTags)
+    {
         $container = new ContainerBuilder();
 
         $container->setParameter('kernel.debug', false);
@@ -477,10 +468,8 @@ class SerializerPassTest extends TestCase
         $serializerPass->process($container);
     }
 
-    /**
-     * @testWith [null]
-     *           ["some.converter"]
-     */
+    #[TestWith([null])]
+    #[TestWith(['some.converter'])]
     public function testChildNameConverterIsNotBuiltWhenExpected(?string $nameConverter)
     {
         $container = new ContainerBuilder();
@@ -500,9 +489,7 @@ class SerializerPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('serializer.name_converter.metadata_aware.'.ContainerBuilder::hash($nameConverter)));
     }
 
-    /**
-     * @dataProvider provideChildNameConverterCases
-     */
+    #[DataProvider('provideChildNameConverterCases')]
     public function testChildNameConverterIsBuiltWhenExpected(
         ?string $defaultSerializerNameConverter,
         ?string $namedSerializerNameConverter,
@@ -538,9 +525,7 @@ class SerializerPassTest extends TestCase
         yield ['some.converter', null, $withConverter, $withNull, []];
     }
 
-    /**
-     * @dataProvider provideDifferentNamedSerializerConfigsCases
-     */
+    #[DataProvider('provideDifferentNamedSerializerConfigsCases')]
     public function testNamedSerializersCreateNewServices(
         array $defaultSerializerDefaultContext,
         ?string $defaultSerializerNameConverter,
@@ -661,13 +646,11 @@ class SerializerPassTest extends TestCase
         $this->assertEquals($defaultContext, $container->getDefinition('serializer.api')->getArgument('$defaultContext'));
     }
 
-    /**
-     * @testWith [{}, {}, {}]
-     *           [{"enable_max_depth": true}, {}, {"enable_max_depth": true}]
-     *           [{}, {".serializer.circular_reference_handler": "foo"}, {"circular_reference_handler": "foo"}]
-     *           [{}, {".serializer.max_depth_handler": "bar"}, {"max_depth_handler": "bar"}]
-     *           [{"enable_max_depth": true}, {".serializer.circular_reference_handler": "foo", ".serializer.max_depth_handler": "bar"}, {"enable_max_depth": true, "circular_reference_handler": "foo", "max_depth_handler": "bar"}]
-     */
+    #[TestWith([[], [], []])]
+    #[TestWith([['enable_max_depth' => true], [], ['enable_max_depth' => true]])]
+    #[TestWith([[], ['.serializer.circular_reference_handler' => 'foo'], ['circular_reference_handler' => 'foo']])]
+    #[TestWith([[], ['.serializer.max_depth_handler' => 'bar'], ['max_depth_handler' => 'bar']])]
+    #[TestWith([['enable_max_depth' => true], ['.serializer.circular_reference_handler' => 'foo', '.serializer.max_depth_handler' => 'bar'], ['enable_max_depth' => true, 'circular_reference_handler' => 'foo', 'max_depth_handler' => 'bar']])]
     public function testBindNamedSerializerObjectNormalizerDefaultContext(array $defaultContext, array $parameters, array $context)
     {
         $container = new ContainerBuilder();

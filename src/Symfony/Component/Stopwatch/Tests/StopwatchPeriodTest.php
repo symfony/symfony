@@ -11,32 +11,27 @@
 
 namespace Symfony\Component\Stopwatch\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\StopwatchPeriod;
 
 class StopwatchPeriodTest extends TestCase
 {
-    /**
-     * @dataProvider provideTimeValues
-     */
+    #[DataProvider('provideTimeValues')]
     public function testGetStartTime($start, $useMorePrecision, $expected)
     {
         $period = new StopwatchPeriod($start, $start, $useMorePrecision);
         $this->assertSame($expected, $period->getStartTime());
     }
 
-    /**
-     * @dataProvider provideTimeValues
-     */
+    #[DataProvider('provideTimeValues')]
     public function testGetEndTime($end, $useMorePrecision, $expected)
     {
         $period = new StopwatchPeriod($end, $end, $useMorePrecision);
         $this->assertSame($expected, $period->getEndTime());
     }
 
-    /**
-     * @dataProvider provideDurationValues
-     */
+    #[DataProvider('provideDurationValues')]
     public function testGetDuration($start, $end, $useMorePrecision, $duration)
     {
         $period = new StopwatchPeriod($start, $end, $useMorePrecision);

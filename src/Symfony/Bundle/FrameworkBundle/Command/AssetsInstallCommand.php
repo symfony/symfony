@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -58,24 +57,24 @@ class AssetsInstallCommand extends Command
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
             ->addOption('no-cleanup', null, InputOption::VALUE_NONE, 'Do not remove the assets of the bundles that no longer exist')
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command installs bundle assets into a given
-directory (e.g. the <comment>public</comment> directory).
+                The <info>%command.name%</info> command installs bundle assets into a given
+                directory (e.g. the <comment>public</comment> directory).
 
-  <info>php %command.full_name% public</info>
+                  <info>php %command.full_name% public</info>
 
-A "bundles" directory will be created inside the target directory and the
-"Resources/public" directory of each bundle will be copied into it.
+                A "bundles" directory will be created inside the target directory and the
+                "Resources/public" directory of each bundle will be copied into it.
 
-To create a symlink to each bundle instead of copying its assets, use the
-<info>--symlink</info> option (will fall back to hard copies when symbolic links aren't possible:
+                To create a symlink to each bundle instead of copying its assets, use the
+                <info>--symlink</info> option (will fall back to hard copies when symbolic links aren't possible:
 
-  <info>php %command.full_name% public --symlink</info>
+                  <info>php %command.full_name% public --symlink</info>
 
-To make symlink relative, add the <info>--relative</info> option:
+                To make symlink relative, add the <info>--relative</info> option:
 
-  <info>php %command.full_name% public --symlink --relative</info>
+                  <info>php %command.full_name% public --symlink --relative</info>
 
-EOT
+                EOT
             )
         ;
     }
@@ -119,7 +118,6 @@ EOT
         $copyUsed = false;
         $exitCode = 0;
         $validAssetDirs = [];
-        /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
             if (!is_dir($originDir = $bundle->getPath().'/Resources/public') && !is_dir($originDir = $bundle->getPath().'/public')) {
                 continue;
@@ -239,7 +237,7 @@ EOT
      */
     private function hardCopy(string $originDir, string $targetDir): string
     {
-        $this->filesystem->mkdir($targetDir, 0777);
+        $this->filesystem->mkdir($targetDir, 0o777);
         // We use a custom iterator to ignore VCS files
         $this->filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
 

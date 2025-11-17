@@ -44,6 +44,11 @@ class AsMessageHandler
          * Priority of this handler when multiple handlers can process the same message.
          */
         public int $priority = 0,
+
+        /**
+         * Whether messages should be signed when sent on a transport.
+         */
+        public bool $sign = false,
     ) {
     }
 }

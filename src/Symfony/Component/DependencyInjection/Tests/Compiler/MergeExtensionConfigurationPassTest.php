@@ -33,12 +33,6 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
         $extension = $this->createMock(ExtensionInterface::class);
         $extension->expects($this->any())
-            ->method('getXsdValidationBasePath')
-            ->willReturn(false);
-        $extension->expects($this->any())
-            ->method('getNamespace')
-            ->willReturn('http://example.org/schema/dic/foo');
-        $extension->expects($this->any())
             ->method('getAlias')
             ->willReturn('foo');
         $extension->expects($this->once())
@@ -64,7 +58,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $extension = $this->getMockBuilder(FooExtension::class)->onlyMethods(['load'])->getMock();
         $extension->expects($this->once())
             ->method('load')
-            ->with($this->isType('array'), $this->isInstanceOf(MergeExtensionConfigurationContainerBuilder::class))
+            ->with($this->isArray(), $this->isInstanceOf(MergeExtensionConfigurationContainerBuilder::class))
         ;
 
         $container = new ContainerBuilder(new ParameterBag());

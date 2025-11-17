@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Locale;
 use Symfony\Component\Validator\Constraints\LocaleValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -43,9 +44,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Locale());
     }
 
-    /**
-     * @dataProvider getValidLocales
-     */
+    #[DataProvider('getValidLocales')]
     public function testValidLocales($locale)
     {
         $this->validator->validate($locale, new Locale());
@@ -66,9 +65,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidLocales
-     */
+    #[DataProvider('getInvalidLocales')]
     public function testInvalidLocales($locale)
     {
         $constraint = new Locale(message: 'myMessage');
@@ -102,9 +99,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getUncanonicalizedLocales
-     */
+    #[DataProvider('getUncanonicalizedLocales')]
     public function testValidLocalesWithCanonicalization(string $locale)
     {
         $constraint = new Locale(message: 'myMessage');
@@ -114,9 +109,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidLocales
-     */
+    #[DataProvider('getValidLocales')]
     public function testValidLocalesWithoutCanonicalization(string $locale)
     {
         $constraint = new Locale(
@@ -129,9 +122,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getUncanonicalizedLocales
-     */
+    #[DataProvider('getUncanonicalizedLocales')]
     public function testInvalidLocalesWithoutCanonicalization(string $locale)
     {
         $constraint = new Locale(

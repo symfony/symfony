@@ -16,34 +16,26 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
-        "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/polyfill-mbstring": "~1.0",
+        "php": ">=8.4",
+        "symfony/polyfill-mbstring": "^1.0",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/string": "^7.2"
+        "symfony/string": "^7.4|^8.0"
     },
     "require-dev": {
-        "symfony/config": "^6.4|^7.0",
-        "symfony/event-dispatcher": "^6.4|^7.0",
-        "symfony/http-foundation": "^6.4|^7.0",
-        "symfony/http-kernel": "^6.4|^7.0",
-        "symfony/dependency-injection": "^6.4|^7.0",
-        "symfony/lock": "^6.4|^7.0",
-        "symfony/messenger": "^6.4|^7.0",
-        "symfony/process": "^6.4|^7.0",
-        "symfony/stopwatch": "^6.4|^7.0",
-        "symfony/var-dumper": "^6.4|^7.0",
-        "psr/log": "^1|^2|^3"
+        "psr/log": "^1|^2|^3",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/lock": "^7.4|^8.0",
+        "symfony/messenger": "^7.4|^8.0",
+        "symfony/process": "^7.4|^8.0",
+        "symfony/stopwatch": "^7.4|^8.0",
+        "symfony/var-dumper": "^7.4|^8.0"
     },
     "provide": {
         "psr/log-implementation": "1.0|2.0|3.0"
-    },
-    "conflict": {
-        "symfony/dependency-injection": "<6.4",
-        "symfony/dotenv": "<6.4",
-        "symfony/event-dispatcher": "<6.4",
-        "symfony/lock": "<6.4",
-        "symfony/process": "<6.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Console\\": "" },

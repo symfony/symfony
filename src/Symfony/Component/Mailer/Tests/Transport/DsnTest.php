@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Transport\Dsn;
 
 class DsnTest extends TestCase
 {
-    /**
-     * @dataProvider fromStringProvider
-     */
+    #[DataProvider('fromStringProvider')]
     public function testFromString(string $string, Dsn $dsn)
     {
         $this->assertEquals($dsn, Dsn::fromString($string));
@@ -35,9 +34,7 @@ class DsnTest extends TestCase
         $this->assertSame('default', $dsn->getOption('not_existent_property', 'default'));
     }
 
-    /**
-     * @dataProvider invalidDsnProvider
-     */
+    #[DataProvider('invalidDsnProvider')]
     public function testInvalidDsn(string $dsn, string $exceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -106,9 +103,7 @@ class DsnTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getBooleanOptionProvider
-     */
+    #[DataProvider('getBooleanOptionProvider')]
     public function testGetBooleanOption(bool $expected, string $dsnString, string $option, bool $default)
     {
         $dsn = Dsn::fromString($dsnString);

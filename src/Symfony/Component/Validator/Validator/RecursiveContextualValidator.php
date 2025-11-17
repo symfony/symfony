@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Exception\UnsupportedMetadataException;
 use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\GroupSequenceProviderInterface;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
@@ -443,7 +444,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     } else {
                         // The group sequence is dynamically obtained from the validated
                         // object
-                        /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $object */
+                        /** @var GroupSequenceProviderInterface $object */
                         $group = $object->getGroupSequence();
                     }
                     $defaultOverridden = true;

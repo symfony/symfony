@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Sender;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -19,6 +20,8 @@ use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithAttribute;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithInterfaceWithAttribute;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithParentWithAttribute;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
@@ -55,11 +58,9 @@ class SendersLocatorTest extends TestCase
         $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
     }
 
-    /**
-     * @testWith ["\\Symfony\\Component\\Messenger\\Tests\\Fixtures\\DummyMessageWithAttribute", ["first_sender", "second_sender"]]
-     *           ["\\Symfony\\Component\\Messenger\\Tests\\Fixtures\\DummyMessageWithParentWithAttribute", ["third_sender", "first_sender", "second_sender"]]
-     *           ["\\Symfony\\Component\\Messenger\\Tests\\Fixtures\\DummyMessageWithInterfaceWithAttribute", ["first_sender", "third_sender", "second_sender"]]
-     */
+    #[TestWith([DummyMessageWithAttribute::class, ['first_sender', 'second_sender']])]
+    #[TestWith([DummyMessageWithParentWithAttribute::class, ['third_sender', 'first_sender', 'second_sender']])]
+    #[TestWith([DummyMessageWithInterfaceWithAttribute::class, ['first_sender', 'third_sender', 'second_sender']])]
     public function testItReturnsTheSenderBasedOnAsMessageAttribute(string $messageClass, array $expectedSenders)
     {
         $firstSender = $this->createMock(SenderInterface::class);

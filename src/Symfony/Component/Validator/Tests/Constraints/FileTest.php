@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -20,9 +21,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class FileTest extends TestCase
 {
-    /**
-     * @dataProvider provideValidSizes
-     */
+    #[DataProvider('provideValidSizes')]
     public function testMaxSize($maxSize, $bytes, $binaryFormat)
     {
         $file = new File(maxSize: $maxSize);
@@ -41,9 +40,7 @@ class FileTest extends TestCase
         $this->assertFalse($file->__isset('toto'));
     }
 
-    /**
-     * @dataProvider provideValidSizes
-     */
+    #[DataProvider('provideValidSizes')]
     public function testMaxSizeCanBeSetAfterInitialization($maxSize, $bytes, $binaryFormat)
     {
         $file = new File();
@@ -53,9 +50,7 @@ class FileTest extends TestCase
         $this->assertSame($binaryFormat, $file->binaryFormat);
     }
 
-    /**
-     * @dataProvider provideInvalidSizes
-     */
+    #[DataProvider('provideInvalidSizes')]
     public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
     {
         $file = new File(maxSize: 1000);
@@ -65,9 +60,7 @@ class FileTest extends TestCase
         $file->maxSize = $maxSize;
     }
 
-    /**
-     * @dataProvider provideInvalidSizes
-     */
+    #[DataProvider('provideInvalidSizes')]
     public function testMaxSizeCannotBeSetToInvalidValueAfterInitialization($maxSize)
     {
         $file = new File(maxSize: 1000);
@@ -105,9 +98,7 @@ class FileTest extends TestCase
         $file = new File(filenameCountUnit: 'nonExistentCountUnit');
     }
 
-    /**
-     * @dataProvider provideInValidSizes
-     */
+    #[DataProvider('provideInValidSizes')]
     public function testInvalidMaxSize($maxSize)
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -146,9 +137,7 @@ class FileTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideFormats
-     */
+    #[DataProvider('provideFormats')]
     public function testBinaryFormat($maxSize, $guessedFormat, $binaryFormat)
     {
         $file = new File(maxSize: $maxSize, binaryFormat: $guessedFormat);
@@ -176,15 +165,15 @@ class FileTest extends TestCase
         $metadata = new ClassMetadata(FileDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertNull($aConstraint->maxSize);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame(100, $bConstraint->maxSize);
         self::assertSame('myMessage', $bConstraint->notFoundMessage);
         self::assertSame(['Default', 'FileDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(100000, $cConstraint->maxSize);
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);

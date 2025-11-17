@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -37,9 +38,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends TestCase
 {
-    /**
-     * @dataProvider getPortData
-     */
+    #[DataProvider('getPortData')]
     public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
         $urlMatcher = $this->createMock(UrlMatcherInterface::class);
@@ -122,9 +121,7 @@ class RouterListenerTest extends TestCase
         $this->assertEquals('GET', $context->getMethod());
     }
 
-    /**
-     * @dataProvider getLoggingParameterData
-     */
+    #[DataProvider('getLoggingParameterData')]
     public function testLoggingParameter($parameter, $log, $parameters)
     {
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
@@ -266,9 +263,7 @@ class RouterListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    /**
-     * @dataProvider provideRouteMapping
-     */
+    #[DataProvider('provideRouteMapping')]
     public function testRouteMapping(array $expected, array $parameters)
     {
         $kernel = $this->createMock(HttpKernelInterface::class);

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -50,46 +49,25 @@ class Isbn extends Constraint
     public ?string $message = null;
 
     /**
-     * @param self::ISBN_*|array<string,mixed>|null $type    The type of ISBN to validate (i.e. {@see Isbn::ISBN_10}, {@see Isbn::ISBN_13} or null to accept both, defaults to null)
-     * @param string|null                           $message If defined, this message has priority over the others
-     * @param string[]|null                         $groups
-     * @param array<string,mixed>|null              $options
+     * @param self::ISBN_*|null $type    The type of ISBN to validate (i.e. {@see Isbn::ISBN_10}, {@see Isbn::ISBN_13} or null to accept both, defaults to null)
+     * @param string|null       $message If defined, this message has priority over the others
+     * @param string[]|null     $groups
      */
-    #[HasNamedArguments]
     public function __construct(
-        string|array|null $type = null,
+        ?string $type = null,
         ?string $message = null,
         ?string $isbn10Message = null,
         ?string $isbn13Message = null,
         ?string $bothIsbnMessage = null,
         ?array $groups = null,
         mixed $payload = null,
-        ?array $options = null,
     ) {
-        if (\is_array($type)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        parent::__construct(null, $groups, $payload);
 
-            $options = array_merge($type, $options ?? []);
-        } elseif (null !== $type) {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-            } else {
-                $options = [];
-            }
-
-            $options['value'] = $type;
-        }
-
-        parent::__construct($options, $groups, $payload);
-
-        $this->message = $message ?? $this->message;
+        $this->message = $message;
         $this->isbn10Message = $isbn10Message ?? $this->isbn10Message;
         $this->isbn13Message = $isbn13Message ?? $this->isbn13Message;
         $this->bothIsbnMessage = $bothIsbnMessage ?? $this->bothIsbnMessage;
-    }
-
-    public function getDefaultOption(): ?string
-    {
-        return 'type';
+        $this->type = $type;
     }
 }

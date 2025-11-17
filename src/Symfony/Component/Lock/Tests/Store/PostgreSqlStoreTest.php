@@ -11,19 +11,20 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PostgreSqlStore;
+use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
- *
- * @requires extension pdo_pgsql
- *
- * @group integration
  */
+#[RequiresPhpExtension('pdo_pgsql')]
+#[Group('integration')]
 class PostgreSqlStoreTest extends AbstractStoreTestCase
 {
     use BlockingStoreTestTrait;
@@ -45,9 +46,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         return new PostgreSqlStore('pgsql:host='.$host, ['db_username' => 'postgres', 'db_password' => 'password']);
     }
 
-    /**
-     * @requires extension pdo_sqlite
-     */
+    #[RequiresPhpExtension('pdo_sqlite')]
     public function testInvalidDriver()
     {
         $store = new PostgreSqlStore('sqlite:/tmp/foo.db');

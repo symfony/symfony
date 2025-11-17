@@ -62,8 +62,14 @@ final class StringTypeResolver implements TypeResolverInterface
     private readonly Lexer $lexer;
     private readonly TypeParser $parser;
 
-    public function __construct(?Lexer $lexer = null, ?TypeParser $parser = null)
-    {
+    /**
+     * @param array<string, string> $extraTypeAliases
+     */
+    public function __construct(
+        ?Lexer $lexer = null,
+        ?TypeParser $parser = null,
+        private readonly array $extraTypeAliases = [],
+    ) {
         if (class_exists(ParserConfig::class)) {
             $this->lexer = $lexer ?? new Lexer(new ParserConfig([]));
             $this->parser = $parser ?? new TypeParser($config = new ParserConfig([]), new ConstExprParser($config));
@@ -337,6 +343,10 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if (isset($typeContext?->typeAliases[$identifier])) {
             return $typeContext->typeAliases[$identifier];
+        }
+
+        if (isset($this->extraTypeAliases[$identifier])) {
+            return $this->resolve($this->extraTypeAliases[$identifier]);
         }
 
         throw new \DomainException(\sprintf('Unhandled "%s" identifier.', $identifier));

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
@@ -104,9 +105,7 @@ class UidNormalizerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider normalizeProvider
-     */
+    #[DataProvider('normalizeProvider')]
     public function testNormalize(string $expected, AbstractUid $uid, ?string $uidFormat)
     {
         $this->assertSame($expected, $this->normalizer->normalize($uid, null, null !== $uidFormat ? [
@@ -127,9 +126,7 @@ class UidNormalizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
     public function testSupportsDenormalization($uuidString, $class)
     {
         $this->assertTrue($this->normalizer->supportsDenormalization($uuidString, $class));
@@ -150,9 +147,7 @@ class UidNormalizerTest extends TestCase
         $this->assertTrue($this->normalizer->supportsDenormalization('ccc', TestAbstractCustomUid::class));
     }
 
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
     public function testDenormalize($uuidString, $class)
     {
         $this->assertEquals($class::fromString($uuidString), $this->normalizer->denormalize($uuidString, $class));

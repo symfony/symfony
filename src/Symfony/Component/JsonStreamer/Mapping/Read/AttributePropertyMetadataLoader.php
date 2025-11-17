@@ -42,8 +42,12 @@ final class AttributePropertyMetadataLoader implements PropertyMetadataLoaderInt
         $result = [];
 
         foreach ($initialResult as $initialStreamedName => $initialMetadata) {
+            if (!$initialName = $initialMetadata->getName()) {
+                continue;
+            }
+
             try {
-                $propertyReflection = new \ReflectionProperty($className, $initialMetadata->getName());
+                $propertyReflection = new \ReflectionProperty($className, $initialName);
             } catch (\ReflectionException $e) {
                 throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
             }
@@ -62,7 +66,7 @@ final class AttributePropertyMetadataLoader implements PropertyMetadataLoaderInt
 
                 $result[$streamedName] = $initialMetadata
                     ->withType($valueTransformerService::getStreamValueType())
-                    ->withAdditionalStreamToNativeValueTransformer($valueTransformer);
+                    ->withAdditionalValueTransformer($valueTransformer);
 
                 continue;
             }
@@ -79,7 +83,7 @@ final class AttributePropertyMetadataLoader implements PropertyMetadataLoaderInt
 
             $result[$streamedName] = $initialMetadata
                 ->withType($this->typeResolver->resolve($parameterReflection))
-                ->withAdditionalStreamToNativeValueTransformer($valueTransformer);
+                ->withAdditionalValueTransformer($valueTransformer);
         }
 
         return $result;

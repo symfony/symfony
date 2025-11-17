@@ -26,7 +26,7 @@ class XmlFileLoader extends FileLoader
     /**
      * The XML nodes of the mapping file.
      *
-     * @var \SimpleXMLElement[]
+     * @var array<class-string, \SimpleXMLElement>
      */
     protected array $classes;
 
@@ -55,7 +55,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[]
+     * @return class-string[]
      */
     public function getMappedClasses(): array
     {
@@ -79,11 +79,7 @@ class XmlFileLoader extends FileLoader
 
         foreach ($nodes as $node) {
             if (\count($node) > 0) {
-                if (\count($node->value) > 0) {
-                    $options = [
-                        'value' => $this->parseValues($node->value),
-                    ];
-                } elseif (\count($node->constraint) > 0) {
+                if (\count($node->constraint) > 0) {
                     $options = $this->parseConstraints($node->constraint);
                 } elseif (\count($node->option) > 0) {
                     $options = $this->parseOptions($node->option);

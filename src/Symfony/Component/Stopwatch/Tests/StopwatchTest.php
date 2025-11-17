@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Stopwatch\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\Section;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -20,9 +21,8 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  * StopwatchTest.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @group time-sensitive
  */
+#[Group('time-sensitive')]
 class StopwatchTest extends TestCase
 {
     private const DELTA = 20;

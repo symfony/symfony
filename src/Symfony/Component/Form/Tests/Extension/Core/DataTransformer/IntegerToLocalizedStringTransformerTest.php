@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStringTransformer;
@@ -82,9 +83,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider transformWithRoundingProvider
-     */
+    #[DataProvider('transformWithRoundingProvider')]
     public function testTransformWithRounding($input, $output, $roundingMode)
     {
         $transformer = new IntegerToLocalizedStringTransformer(null, $roundingMode);
@@ -178,9 +177,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider reverseTransformWithRoundingProvider
-     */
+    #[DataProvider('reverseTransformWithRoundingProvider')]
     public function testReverseTransformWithRounding($input, $output, $roundingMode)
     {
         $transformer = new IntegerToLocalizedStringTransformer(null, $roundingMode);
@@ -204,9 +201,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('foo');
     }
 
-    /**
-     * @dataProvider floatNumberProvider
-     */
+    #[DataProvider('floatNumberProvider')]
     public function testReverseTransformExpectsInteger($number, $locale)
     {
         $this->expectException(TransformationFailedException::class);

@@ -2,7 +2,6 @@ imports:
     - { resource: ./../config/framework.yml }
 
 framework:
-    http_method_override: false
     serializer: ~
     http_client:
         scoped_clients:

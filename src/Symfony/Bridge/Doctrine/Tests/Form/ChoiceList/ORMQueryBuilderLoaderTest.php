@@ -17,6 +17,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
@@ -111,9 +112,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader->getEntitiesByIds('id', [1, '', 2, 3, 'foo', '9223372036854775808']);
     }
 
-    /**
-     * @dataProvider provideGuidEntityClasses
-     */
+    #[DataProvider('provideGuidEntityClasses')]
     public function testFilterEmptyUuids(string $entityClass)
     {
         $em = DoctrineTestHelper::createTestEntityManager();
@@ -145,9 +144,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader->getEntitiesByIds('id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', '', 'b98e8e11-2897-44df-ad24-d2627eb7f499']);
     }
 
-    /**
-     * @dataProvider provideUidEntityClasses
-     */
+    #[DataProvider('provideUidEntityClasses')]
     public function testFilterUid(string $entityClass)
     {
         if (Type::hasType('uuid')) {
@@ -188,9 +185,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader->getEntitiesByIds('id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', '', 'b98e8e11-2897-44df-ad24-d2627eb7f499']);
     }
 
-    /**
-     * @dataProvider provideUidEntityClasses
-     */
+    #[DataProvider('provideUidEntityClasses')]
     public function testUidThrowProperException(string $entityClass)
     {
         if (Type::hasType('uuid')) {

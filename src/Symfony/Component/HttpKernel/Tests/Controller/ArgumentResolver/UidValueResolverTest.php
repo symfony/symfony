@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
@@ -24,9 +25,7 @@ use Symfony\Component\Uid\UuidV4;
 
 class UidValueResolverTest extends TestCase
 {
-    /**
-     * @dataProvider provideSupports
-     */
+    #[DataProvider('provideSupports')]
     public function testSupports(bool $expected, Request $request, ArgumentMetadata $argument)
     {
         $this->assertCount((int) $expected, (new UidValueResolver())->resolve($request, $argument));
@@ -47,9 +46,7 @@ class UidValueResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideResolveOK
-     */
+    #[DataProvider('provideResolveOK')]
     public function testResolveOK(AbstractUid $expected, string $requestUid)
     {
         $this->assertEquals([$expected], (new UidValueResolver())->resolve(
@@ -73,9 +70,7 @@ class UidValueResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideResolveKO
-     */
+    #[DataProvider('provideResolveKO')]
     public function testResolveKO(string $requestUid, string $argumentType)
     {
         $this->expectException(NotFoundHttpException::class);

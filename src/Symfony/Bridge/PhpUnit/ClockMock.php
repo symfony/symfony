@@ -109,6 +109,18 @@ class ClockMock
         return [(int) self::$now, (int) $ns];
     }
 
+    /**
+     * @return false|int
+     */
+    public static function strtotime(string $datetime, ?int $timestamp = null)
+    {
+        if (null === $timestamp) {
+            $timestamp = self::time();
+        }
+
+        return \strtotime($datetime, $timestamp);
+    }
+
     public static function register($class): void
     {
         $self = static::class;
@@ -117,7 +129,7 @@ class ClockMock
         if (0 < strpos($class, '\\Tests\\')) {
             $ns = str_replace('\\Tests\\', '\\', $class);
             $mockedNs[] = substr($ns, 0, strrpos($ns, '\\'));
-        } elseif (0 === strpos($class, 'Tests\\')) {
+        } elseif (str_starts_with($class, 'Tests\\')) {
             $mockedNs[] = substr($class, 6, strrpos($class, '\\') - 6);
         }
         foreach ($mockedNs as $ns) {
@@ -160,6 +172,11 @@ function gmdate(\$format, \$timestamp = null)
 function hrtime(\$asNumber = false)
 {
     return \\$self::hrtime(\$asNumber);
+}
+
+function strtotime(\$datetime, \$timestamp = null)
+{
+    return \\$self::strtotime(\$datetime, \$timestamp);
 }
 EOPHP
             );

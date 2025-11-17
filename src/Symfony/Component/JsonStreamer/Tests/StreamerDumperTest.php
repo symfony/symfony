@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
@@ -67,10 +68,9 @@ class StreamerDumperTest extends TestCase
     }
 
     /**
-     * @dataProvider getCacheResourcesDataProvider
-     *
      * @param list<class-string> $expectedClassNames
      */
+    #[DataProvider('getCacheResourcesDataProvider')]
     public function testGetCacheResources(Type $type, array $expectedClassNames)
     {
         $path = $this->cacheDir.'/streamer.php';

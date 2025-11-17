@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
@@ -66,9 +67,7 @@ class Psr4DirectoryLoaderTest extends TestCase
         $this->assertSame(MyChildController::class.'::someAction', $route->getDefault('_controller'));
     }
 
-    /**
-     * @dataProvider provideNamespacesThatNeedTrimming
-     */
+    #[DataProvider('provideNamespacesThatNeedTrimming')]
     public function testPsr4NamespaceTrim(string $namespace)
     {
         $route = $this->getLoader()
@@ -91,9 +90,7 @@ class Psr4DirectoryLoaderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidPsr4Namespaces
-     */
+    #[DataProvider('provideInvalidPsr4Namespaces')]
     public function testInvalidPsr4Namespace(string $namespace, string $expectedExceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);

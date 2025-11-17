@@ -53,7 +53,7 @@ class MyCommand extends Command
 
 $app = new Application();
 $app->setDispatcher(new \Symfony\Component\EventDispatcher\EventDispatcher());
-$app->add(new MyCommand('foo'));
+$app->addCommand(new MyCommand('foo'));
 
 $app
     ->setDefaultCommand('foo', true)

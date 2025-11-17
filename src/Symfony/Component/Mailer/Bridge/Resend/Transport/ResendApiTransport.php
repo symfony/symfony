@@ -140,9 +140,8 @@ final class ResendApiTransport extends AbstractApiTransport
     private function prepareHeadersAndTags(Headers $headers): array
     {
         $headersAndTags = [];
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'reply_to'];
         foreach ($headers->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'reply_to'], true)) {
                 continue;
             }
 

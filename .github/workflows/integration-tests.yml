@@ -23,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.2']
+        php: ['8.4']
       fail-fast: false
 
     services:
@@ -121,7 +121,7 @@ jobs:
           - 8093:8093
           - 8094:8094
           - 11210:11210
-      sqs:
+      aws:
         image: localstack/localstack:3.0.2
         ports:
           - 4566:4566
@@ -251,9 +251,10 @@ jobs:
           git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)
 
       - name: Run tests
-        run: ./phpunit --group integration -v
+        run: ./phpunit --group integration
         env:
           INTEGRATION_FTP_URL: 'ftp://test:test@localhost'
+          LOCK_DYNAMODB_DSN: "dynamodb://localhost:4566/lock_keys?sslmode=disable"
           REDIS_HOST: 'localhost:16379'
           REDIS_AUTHENTICATED_HOST: 'localhost:16380'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
@@ -268,12 +269,3 @@ jobs:
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
           PGBOUNCER_HOST: localhost:6432
-
-      #- name: Run HTTP push tests
-      #  if: matrix.php == '8.2'
-      #  run: |
-      #    [ -d .phpunit ] && mv .phpunit .phpunit.bak
-      #    wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin
-      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.1-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
-      #    sudo rm -rf .phpunit
-      #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit

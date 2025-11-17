@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -39,9 +40,7 @@ class ArgvInputTest extends TestCase
         $this->assertSame(['name' => 'foo'], $input->getArguments(), '->parse() is stateless');
     }
 
-    /**
-     * @dataProvider provideOptions
-     */
+    #[DataProvider('provideOptions')]
     public function testParseOptions($input, $options, $expectedOptions, $message)
     {
         $input = new ArgvInput($input);
@@ -50,9 +49,7 @@ class ArgvInputTest extends TestCase
         $this->assertSame($expectedOptions, $input->getOptions(), $message);
     }
 
-    /**
-     * @dataProvider provideNegatableOptions
-     */
+    #[DataProvider('provideNegatableOptions')]
     public function testParseOptionsNegatable($input, $options, $expectedOptions, $message)
     {
         $input = new ArgvInput($input);
@@ -234,9 +231,7 @@ class ArgvInputTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidInput
-     */
+    #[DataProvider('provideInvalidInput')]
     public function testInvalidInput($argv, $definition, $expectedExceptionMessage)
     {
         $this->expectException(\RuntimeException::class);
@@ -245,9 +240,7 @@ class ArgvInputTest extends TestCase
         (new ArgvInput($argv))->bind($definition);
     }
 
-    /**
-     * @dataProvider provideInvalidNegatableInput
-     */
+    #[DataProvider('provideInvalidNegatableInput')]
     public function testInvalidInputNegatable($argv, $definition, $expectedExceptionMessage)
     {
         $this->expectException(\RuntimeException::class);
@@ -509,9 +502,7 @@ class ArgvInputTest extends TestCase
         $this->assertSame('-f --bar=foo '.escapeshellarg('a b c d').' '.escapeshellarg("A\nB'C"), (string) $input);
     }
 
-    /**
-     * @dataProvider provideGetParameterOptionValues
-     */
+    #[DataProvider('provideGetParameterOptionValues')]
     public function testGetParameterOptionEqualSign($argv, $key, $default, $onlyParams, $expected)
     {
         $input = new ArgvInput($argv);
@@ -574,9 +565,7 @@ class ArgvInputTest extends TestCase
         $this->assertSame(['--foo', 'bar'], $input->getRawTokens());
     }
 
-    /**
-     * @dataProvider provideGetRawTokensTrueTests
-     */
+    #[DataProvider('provideGetRawTokensTrueTests')]
     public function testGetRawTokensTrue(array $argv, array $expected)
     {
         $input = new ArgvInput($argv);

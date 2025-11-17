@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Marshaller;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 
@@ -29,9 +30,7 @@ class DefaultMarshallerTest extends TestCase
         $this->assertSame(['b'], $failed);
     }
 
-    /**
-     * @requires extension igbinary
-     */
+    #[RequiresPhpExtension('igbinary')]
     public function testIgbinarySerialize()
     {
         if (version_compare('3.1.6', phpversion('igbinary'), '>')) {
@@ -58,9 +57,7 @@ class DefaultMarshallerTest extends TestCase
         $this->assertSame(0, $marshaller->unmarshall(serialize(0)));
     }
 
-    /**
-     * @requires extension igbinary
-     */
+    #[RequiresPhpExtension('igbinary')]
     public function testIgbinaryUnserialize()
     {
         if (version_compare('3.1.6', phpversion('igbinary'), '>')) {
@@ -81,9 +78,7 @@ class DefaultMarshallerTest extends TestCase
         (new DefaultMarshaller())->unmarshall('O:16:"NotExistingClass":0:{}');
     }
 
-    /**
-     * @requires extension igbinary
-     */
+    #[RequiresPhpExtension('igbinary')]
     public function testIgbinaryUnserializeNotFoundClass()
     {
         if (version_compare('3.1.6', phpversion('igbinary'), '>')) {
@@ -109,9 +104,7 @@ class DefaultMarshallerTest extends TestCase
         }
     }
 
-    /**
-     * @requires extension igbinary
-     */
+    #[RequiresPhpExtension('igbinary')]
     public function testIgbinaryUnserializeInvalid()
     {
         if (version_compare('3.1.6', phpversion('igbinary'), '>')) {

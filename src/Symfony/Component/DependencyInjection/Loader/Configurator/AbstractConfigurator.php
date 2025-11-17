@@ -101,6 +101,9 @@ abstract class AbstractConfigurator
             case $value instanceof \UnitEnum:
                 return $value;
 
+            case $value instanceof \Closure:
+                return self::processClosure($value);
+
             case $value instanceof ArgumentInterface:
             case $value instanceof Definition:
             case $value instanceof Expression:
@@ -113,5 +116,30 @@ abstract class AbstractConfigurator
         }
 
         throw new InvalidArgumentException(\sprintf('Cannot use values of type "%s" in service configuration files.', get_debug_type($value)));
+    }
+
+    /**
+     * Converts a named closure to dumpable callable.
+     *
+     * @throws InvalidArgumentException if the closure is anonymous or references a non-static method
+     */
+    private static function processClosure(\Closure $closure): callable
+    {
+        $function = new \ReflectionFunction($closure);
+        if ($function->isAnonymous()) {
+            throw new InvalidArgumentException('Anonymous closure not supported. The closure must be created from a static method or a global function.');
+        }
+
+        // Convert global_function(...) closure into 'global_function'
+        if (!$class = $function->getClosureCalledClass()) {
+            return $function->name;
+        }
+
+        // Convert Class::method(...) closure into ['Class', 'method']
+        if ($function->isStatic()) {
+            return [$class->name, $function->name];
+        }
+
+        throw new InvalidArgumentException(\sprintf('The method "%s::%s(...)" is not static.', $class->name, $function->name));
     }
 }

@@ -17,31 +17,35 @@ use Symfony\Component\TypeInfo\Type;
  * Holds stream reading/writing metadata about a given property.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- *
- * @experimental
  */
 final class PropertyMetadata
 {
     /**
-     * @param list<string|\Closure> $nativeToStreamValueTransformers
-     * @param list<string|\Closure> $streamToNativeValueTransformers
+     * @param list<string|\Closure> $valueTransformers
      */
     public function __construct(
-        private string $name,
+        private ?string $name,
         private Type $type,
-        private array $nativeToStreamValueTransformers = [],
-        private array $streamToNativeValueTransformers = [],
+        private array $valueTransformers = [],
     ) {
     }
 
-    public function getName(): string
+    /**
+     * @param list<string|\Closure> $valueTransformers
+     */
+    public static function createSynthetic(Type $type, array $valueTransformers = []): self
+    {
+        return new self(null, $type, $valueTransformers);
+    }
+
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function withName(string $name): self
+    public function withName(?string $name): self
     {
-        return new self($name, $this->type, $this->nativeToStreamValueTransformers, $this->streamToNativeValueTransformers);
+        return new self($name, $this->type, $this->valueTransformers);
     }
 
     public function getType(): Type
@@ -51,58 +55,32 @@ final class PropertyMetadata
 
     public function withType(Type $type): self
     {
-        return new self($this->name, $type, $this->nativeToStreamValueTransformers, $this->streamToNativeValueTransformers);
+        return new self($this->name, $type, $this->valueTransformers);
     }
 
     /**
      * @return list<string|\Closure>
      */
-    public function getNativeToStreamValueTransformer(): array
+    public function getValueTransformers(): array
     {
-        return $this->nativeToStreamValueTransformers;
+        return $this->valueTransformers;
     }
 
     /**
-     * @param list<string|\Closure> $nativeToStreamValueTransformers
+     * @param list<string|\Closure> $valueTransformers
      */
-    public function withNativeToStreamValueTransformers(array $nativeToStreamValueTransformers): self
+    public function withValueTransformers(array $valueTransformers): self
     {
-        return new self($this->name, $this->type, $nativeToStreamValueTransformers, $this->streamToNativeValueTransformers);
+        return new self($this->name, $this->type, $valueTransformers);
     }
 
-    public function withAdditionalNativeToStreamValueTransformer(string|\Closure $nativeToStreamValueTransformer): self
+    public function withAdditionalValueTransformer(string|\Closure $valueTransformer): self
     {
-        $nativeToStreamValueTransformers = $this->nativeToStreamValueTransformers;
+        $valueTransformers = $this->valueTransformers;
 
-        $nativeToStreamValueTransformers[] = $nativeToStreamValueTransformer;
-        $nativeToStreamValueTransformers = array_values(array_unique($nativeToStreamValueTransformers));
+        $valueTransformers[] = $valueTransformer;
+        $valueTransformers = array_values(array_unique($valueTransformers));
 
-        return $this->withNativeToStreamValueTransformers($nativeToStreamValueTransformers);
-    }
-
-    /**
-     * @return list<string|\Closure>
-     */
-    public function getStreamToNativeValueTransformers(): array
-    {
-        return $this->streamToNativeValueTransformers;
-    }
-
-    /**
-     * @param list<string|\Closure> $streamToNativeValueTransformers
-     */
-    public function withStreamToNativeValueTransformers(array $streamToNativeValueTransformers): self
-    {
-        return new self($this->name, $this->type, $this->nativeToStreamValueTransformers, $streamToNativeValueTransformers);
-    }
-
-    public function withAdditionalStreamToNativeValueTransformer(string|\Closure $streamToNativeValueTransformer): self
-    {
-        $streamToNativeValueTransformers = $this->streamToNativeValueTransformers;
-
-        $streamToNativeValueTransformers[] = $streamToNativeValueTransformer;
-        $streamToNativeValueTransformers = array_values(array_unique($streamToNativeValueTransformers));
-
-        return $this->withStreamToNativeValueTransformers($streamToNativeValueTransformers);
+        return $this->withValueTransformers($valueTransformers);
     }
 }

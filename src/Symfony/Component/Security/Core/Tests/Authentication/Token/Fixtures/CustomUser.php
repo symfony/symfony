@@ -35,9 +35,4 @@ final class CustomUser implements UserInterface
     {
         return null;
     }
-
-    #[\Deprecated]
-    public function eraseCredentials(): void
-    {
-    }
 }

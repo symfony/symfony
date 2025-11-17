@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
- * @requires extension openssl
- */
+#[RequiresPhpExtension('openssl')]
 class OpenSSLCasterTest extends TestCase
 {
     use VarDumperTestTrait;
@@ -34,19 +33,21 @@ class OpenSSLCasterTest extends TestCase
 
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
-OpenSSLAsymmetricKey {
-  bits: 1024
-  key: """
-    -----BEGIN PUBLIC KEY-----\n
-    %A
-    %A
-    %A
-    %A
-    -----END PUBLIC KEY-----\n
-    """
-  type: 0
-}
-EODUMP, $key);
+                OpenSSLAsymmetricKey {
+                  bits: 1024
+                  key: """
+                    -----BEGIN PUBLIC KEY-----\n
+                    %A
+                    %A
+                    %A
+                    %A
+                    -----END PUBLIC KEY-----\n
+                    """
+                  type: 0
+                }
+                EODUMP,
+            $key
+        );
     }
 
     public function testOpensslCsr()
@@ -69,15 +70,17 @@ EODUMP, $key);
 
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
-OpenSSLCertificateSigningRequest {
-  countryName: "FR"
-  stateOrProvinceName: "Ile-de-France"
-  localityName: "Paris"
-  organizationName: "Symfony"
-  organizationalUnitName: "Security"
-  commonName: "symfony.com"
-  emailAddress: "test@symfony.com"
-}
-EODUMP, $csr);
+                OpenSSLCertificateSigningRequest {
+                  countryName: "FR"
+                  stateOrProvinceName: "Ile-de-France"
+                  localityName: "Paris"
+                  organizationName: "Symfony"
+                  organizationalUnitName: "Security"
+                  commonName: "symfony.com"
+                  emailAddress: "test@symfony.com"
+                }
+                EODUMP,
+            $csr
+        );
     }
 }

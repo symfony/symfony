@@ -248,7 +248,7 @@ class JsonDescriptor extends Descriptor
     {
         $data = [
             'class' => (string) $definition->getClass(),
-            'public' => $definition->isPublic() && !$definition->isPrivate(),
+            'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
             'shared' => $definition->isShared(),
@@ -313,7 +313,7 @@ class JsonDescriptor extends Descriptor
     {
         return [
             'service' => (string) $alias,
-            'public' => $alias->isPublic() && !$alias->isPrivate(),
+            'public' => $alias->isPublic(),
         ];
     }
 

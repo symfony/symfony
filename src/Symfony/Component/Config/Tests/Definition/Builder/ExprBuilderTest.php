@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ExprBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -193,9 +194,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs([], $test);
     }
 
-    /**
-     * @dataProvider castToArrayValues
-     */
+    #[DataProvider('castToArrayValues')]
     public function testCastToArrayExpression($configValue, array $expectedValue)
     {
         $test = $this->getTestBuilder()

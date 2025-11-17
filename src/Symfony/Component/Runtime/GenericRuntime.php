@@ -49,7 +49,7 @@ class GenericRuntime implements RuntimeInterface
     protected array $options;
 
     /**
-     * @param array {
+     * @param array{
      *   debug?: ?bool,
      *   runtimes?: ?array,
      *   error_handler?: string|false,
@@ -69,7 +69,7 @@ class GenericRuntime implements RuntimeInterface
         }
 
         if ($debug) {
-            umask(0000);
+            umask(0o000);
             $_SERVER[$debugKey] = $_ENV[$debugKey] = '1';
         } else {
             $_SERVER[$debugKey] = $_ENV[$debugKey] = '0';

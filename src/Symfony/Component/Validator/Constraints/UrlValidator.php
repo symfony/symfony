@@ -75,8 +75,15 @@ class UrlValidator extends ConstraintValidator
             $value = ($constraint->normalizer)($value);
         }
 
+        if (['*'] === $constraint->protocols) {
+            // Use RFC 3986 compliant scheme pattern: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+            $protocols = '[a-zA-Z][a-zA-Z0-9+.-]*';
+        } else {
+            $protocols = implode('|', $constraint->protocols);
+        }
+
         $pattern = $constraint->relativeProtocol ? str_replace('(%s):', '(?:(%s):)?', static::PATTERN) : static::PATTERN;
-        $pattern = \sprintf($pattern, implode('|', $constraint->protocols));
+        $pattern = sprintf($pattern, $protocols);
 
         if (!preg_match($pattern, $value)) {
             $this->context->buildViolation($constraint->message)

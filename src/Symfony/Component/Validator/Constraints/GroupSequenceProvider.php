@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
-
 /**
  * Attribute to define a group sequence provider.
  *
@@ -21,7 +19,6 @@ use Symfony\Component\Validator\Attribute\HasNamedArguments;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class GroupSequenceProvider
 {
-    #[HasNamedArguments]
     public function __construct(public ?string $provider = null)
     {
     }

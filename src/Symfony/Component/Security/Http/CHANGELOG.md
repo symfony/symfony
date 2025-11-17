@@ -1,6 +1,79 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * When extending the `RememberMeDetails` class and overriding its constructor, the `$userFqcn` parameter has to be removed from its signature:
+
+   Before:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userFqcn, string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userFqcn, $userIdentifier, $expires, $value);
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userIdentifier, $expires, $value);
+       }
+   }
+   ```
+ * Remove `RememberMeDetails::getUserFqcn()`
+ * Remove callable firewall listeners support, extend `AbstractListener` or implement `FirewallListenerInterface` instead
+ * Remove `AbstractListener::__invoke`
+ * Throw a `BadCredentialsException` when passing an empty string as `$userIdentifier` argument to `UserBadge` constructor
+ * Accept only `ExposeSecurityLevel` enums for `AuthenticatorManager`'s `$exposeSecurityErrors` argument
+ * Respectively accept only `AlgorithmManager` and `JWKSet` for `OidcTokenHandler`'s `$signatureAlgorithm` and `$signatureKeyset` arguments
+ * Add argument `$attributes` to `UserAuthenticatorInterface::authenticateUser()`
+
+7.4
+---
+
+ * Deprecate extending the `RememberMeDetails` class with a constructor expecting the user FQCN
+
+   Before:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userFqcn, string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userFqcn, $userIdentifier, $expires, $value);
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userIdentifier, $expires, $value);
+       }
+   }
+   ```
+ * Add support for union types with `#[CurrentUser]`
+ * Deprecate callable firewall listeners, extend `AbstractListener` or implement `FirewallListenerInterface` instead
+ * Deprecate `AbstractListener::__invoke`
+ * Add `$methods` argument to `#[IsGranted]` to restrict validation to specific HTTP methods
+ * Allow subclassing `#[IsGranted]`
+ * Add `$tokenSource` argument to `#[IsCsrfTokenValid]` to support reading tokens from the query string or headers
+ * Deprecate `RememberMeDetails::getUserFqcn()`, the user FQCN will be removed from the remember-me cookie in 8.0
+ * Allow configuring multiple OIDC discovery base URIs
+
 7.3
 ---
 

@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Console\Tests\SignalRegistry;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 
-/**
- * @requires extension pcntl
- */
+#[RequiresPhpExtension('pcntl')]
 class SignalRegistryTest extends TestCase
 {
     protected function tearDown(): void

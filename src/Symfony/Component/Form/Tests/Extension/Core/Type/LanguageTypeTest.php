@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\Type\LanguageType;
@@ -37,9 +38,7 @@ class LanguageTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('my', 'my', 'Burmese'), $choices);
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testChoiceTranslationLocaleOption()
     {
         $choices = $this->factory
@@ -69,9 +68,7 @@ class LanguageTypeTest extends BaseTypeTestCase
         $this->assertNotContainsEquals(new ChoiceView('my', 'my', 'Burmese'), $choices);
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testChoiceTranslationLocaleAndAlpha3Option()
     {
         $choices = $this->factory
@@ -88,9 +85,7 @@ class LanguageTypeTest extends BaseTypeTestCase
         $this->assertNotContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testChoiceSelfTranslationOption()
     {
         $choices = $this->factory
@@ -108,9 +103,7 @@ class LanguageTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('zh', 'zh', '中文'), $choices);
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testChoiceSelfTranslationAndAlpha3Options()
     {
         $choices = $this->factory

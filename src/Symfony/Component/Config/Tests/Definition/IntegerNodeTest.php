@@ -11,24 +11,21 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\IntegerNode;
 
 class IntegerNodeTest extends TestCase
 {
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testNormalize(int $value)
     {
         $node = new IntegerNode('test');
         $this->assertSame($value, $node->normalize($value));
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testValidNonEmptyValues(int $value)
     {
         $node = new IntegerNode('test');
@@ -46,9 +43,7 @@ class IntegerNodeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
+    #[DataProvider('getInvalidValues')]
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
         $node = new IntegerNode('test');

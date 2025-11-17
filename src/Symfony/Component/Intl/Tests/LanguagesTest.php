@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Languages;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-/**
- * @group intl-data
- */
+#[Group('intl-data')]
 class LanguagesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
@@ -1701,9 +1701,7 @@ class LanguagesTest extends ResourceBundleTestCase
         $this->assertEquals(self::LANGUAGES, Languages::getLanguageCodes());
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetNames($displayLocale)
     {
         if ('en' !== $displayLocale) {
@@ -1734,9 +1732,7 @@ class LanguagesTest extends ResourceBundleTestCase
         $this->assertSame(Languages::getNames('de_AT'), Languages::getNames());
     }
 
-    /**
-     * @dataProvider provideLocaleAliases
-     */
+    #[DataProvider('provideLocaleAliases')]
     public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
         if ('en' !== $ofLocale) {
@@ -1749,9 +1745,7 @@ class LanguagesTest extends ResourceBundleTestCase
         $this->assertEquals(Languages::getNames($ofLocale), Languages::getNames($alias));
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetName($displayLocale)
     {
         if ('en' !== $displayLocale) {
@@ -1793,9 +1787,7 @@ class LanguagesTest extends ResourceBundleTestCase
         );
     }
 
-    /**
-     * @dataProvider provideLanguagesWithAlpha3Equivalent
-     */
+    #[DataProvider('provideLanguagesWithAlpha3Equivalent')]
     public function testGetAlpha3Code($language)
     {
         $this->assertSame(self::ALPHA2_TO_ALPHA3[$language], Languages::getAlpha3Code($language));
@@ -1809,9 +1801,7 @@ class LanguagesTest extends ResourceBundleTestCase
         );
     }
 
-    /**
-     * @dataProvider provideLanguagesWithoutAlpha3Equivalent
-     */
+    #[DataProvider('provideLanguagesWithoutAlpha3Equivalent')]
     public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($language)
     {
         $this->expectException(MissingResourceException::class);
@@ -1843,9 +1833,7 @@ class LanguagesTest extends ResourceBundleTestCase
         );
     }
 
-    /**
-     * @dataProvider provideLanguagesWithAlpha2Equivalent
-     */
+    #[DataProvider('provideLanguagesWithAlpha2Equivalent')]
     public function testGetAlpha2Code($language)
     {
         $this->assertSame(self::ALPHA3_TO_ALPHA2[$language], Languages::getAlpha2Code($language));
@@ -1859,9 +1847,7 @@ class LanguagesTest extends ResourceBundleTestCase
         );
     }
 
-    /**
-     * @dataProvider provideLanguagesWithoutAlpha2Equivalent
-     */
+    #[DataProvider('provideLanguagesWithoutAlpha2Equivalent')]
     public function testGetAlpha2CodeFailsIfNoAlpha2Equivalent($language)
     {
         $this->expectException(MissingResourceException::class);
@@ -1881,9 +1867,7 @@ class LanguagesTest extends ResourceBundleTestCase
         $this->assertFalse(Languages::alpha3CodeExists('zzz'));
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetAlpha3Name($displayLocale)
     {
         if ('en' !== $displayLocale) {
@@ -1904,9 +1888,7 @@ class LanguagesTest extends ResourceBundleTestCase
         Languages::getAlpha3Name('zzz');
     }
 
-    /**
-     * @dataProvider provideLocales
-     */
+    #[DataProvider('provideLocales')]
     public function testGetAlpha3Names($displayLocale)
     {
         if ('en' !== $displayLocale) {

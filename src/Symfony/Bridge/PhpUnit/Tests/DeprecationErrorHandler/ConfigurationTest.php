@@ -11,15 +11,15 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\DeprecationGroup;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
-/**
- * @requires PHPUnit < 10
- */
+#[RequiresPhpunit('<10')]
 class ConfigurationTest extends TestCase
 {
     private $files;
@@ -195,6 +195,7 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider provideItCanBeDisabled
      */
+    #[DataProvider('provideItCanBeDisabled')]
     public function testItCanBeDisabled(string $encodedString, bool $expectedEnabled)
     {
         $configuration = Configuration::fromUrlEncodedString($encodedString);
@@ -241,6 +242,7 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider provideDataForToleratesForGroup
      */
+    #[DataProvider('provideDataForToleratesForGroup')]
     public function testToleratesForIndividualGroups(string $deprecationsHelper, array $deprecationsPerType, array $expected)
     {
         $configuration = Configuration::fromUrlEncodedString($deprecationsHelper);
@@ -248,7 +250,7 @@ class ConfigurationTest extends TestCase
         $groups = $this->buildGroups($deprecationsPerType);
 
         foreach ($expected as $groupName => $tolerates) {
-            $this->assertSame($tolerates, $configuration->toleratesForGroup($groupName, $groups), sprintf('Deprecation type "%s" is %s', $groupName, $tolerates ? 'tolerated' : 'not tolerated'));
+            $this->assertSame($tolerates, $configuration->toleratesForGroup($groupName, $groups), \sprintf('Deprecation type "%s" is %s', $groupName, $tolerates ? 'tolerated' : 'not tolerated'));
         }
     }
 
@@ -515,7 +517,7 @@ class ConfigurationTest extends TestCase
         $filename = $this->createFile();
         unlink($filename);
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The baselineFile "%s" does not exist.', $filename));
+        $this->expectExceptionMessage(\sprintf('The baselineFile "%s" does not exist.', $filename));
         Configuration::fromUrlEncodedString('baselineFile='.urlencode($filename));
     }
 
@@ -529,7 +531,7 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessageMatches('/[Ff]ailed to open stream: Permission denied/');
 
         set_error_handler(static function (int $errno, string $errstr, ?string $errfile = null, ?int $errline = null): bool {
-            if ($errno & (E_WARNING | E_WARNING)) {
+            if ($errno & (\E_WARNING | \E_WARNING)) {
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
             }
 
@@ -595,7 +597,7 @@ class ConfigurationTest extends TestCase
         $filename = $this->createFile();
         unlink($filename);
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The ignoreFile "%s" does not exist.', $filename));
+        $this->expectExceptionMessage(\sprintf('The ignoreFile "%s" does not exist.', $filename));
         Configuration::fromUrlEncodedString('ignoreFile='.urlencode($filename));
     }
 

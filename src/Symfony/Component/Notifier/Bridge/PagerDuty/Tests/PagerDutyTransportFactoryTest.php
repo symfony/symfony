@@ -29,6 +29,9 @@ final class PagerDutyTransportFactoryTest extends AbstractTransportFactoryTestCa
         yield [
             'pagerduty://subdomain.pagerduty.com',
             'pagerduty://token@subdomain.pagerduty.com',
+        ];
+        yield [
+            'pagerduty://subdomain.eu.pagerduty.com',
             'pagerduty://token@subdomain.eu.pagerduty.com',
         ];
     }

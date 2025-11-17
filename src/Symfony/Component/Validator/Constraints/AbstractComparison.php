@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -29,27 +28,13 @@ abstract class AbstractComparison extends Constraint
     public mixed $value = null;
     public ?string $propertyPath = null;
 
-    #[HasNamedArguments]
-    public function __construct(mixed $value = null, ?string $propertyPath = null, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
+    public function __construct(mixed $value = null, ?string $propertyPath = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
-        if (\is_array($value)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-            $options = array_merge($value, $options ?? []);
-        } elseif (null !== $value) {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-            } else {
-                $options = [];
-            }
-
-            $options['value'] = $value;
-        }
-
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
-        $this->propertyPath = $propertyPath ?? $this->propertyPath;
+        $this->value = $value;
+        $this->propertyPath = $propertyPath;
 
         if (null === $this->value && null === $this->propertyPath) {
             throw new ConstraintDefinitionException(\sprintf('The "%s" constraint requires either the "value" or "propertyPath" option to be set.', static::class));
@@ -62,10 +47,5 @@ abstract class AbstractComparison extends Constraint
         if (null !== $this->propertyPath && !class_exists(PropertyAccess::class)) {
             throw new LogicException(\sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "propertyPath" option. Try running "composer require symfony/property-access".', static::class));
         }
-    }
-
-    public function getDefaultOption(): ?string
-    {
-        return 'value';
     }
 }

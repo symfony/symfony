@@ -21,6 +21,8 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  */
 final class Countries extends ResourceBundle
 {
+    private static bool $withUserAssigned;
+
     /**
      * Returns all available countries.
      *
@@ -35,7 +37,11 @@ final class Countries extends ResourceBundle
      */
     public static function getCountryCodes(): array
     {
-        return self::readEntry(['Regions'], 'meta');
+        if (!self::withUserAssigned()) {
+            return self::readEntry(['Regions'], 'meta');
+        }
+
+        return array_merge(self::readEntry(['Regions'], 'meta'), self::readEntry(['UserAssignedRegions'], 'meta'));
     }
 
     /**
@@ -49,7 +55,11 @@ final class Countries extends ResourceBundle
      */
     public static function getAlpha3Codes(): array
     {
-        return self::readEntry(['Alpha2ToAlpha3'], 'meta');
+        if (!self::withUserAssigned()) {
+            return self::readEntry(['Alpha2ToAlpha3'], 'meta');
+        }
+
+        return array_merge(self::readEntry(['Alpha2ToAlpha3'], 'meta'), self::readEntry(['UserAssignedAlpha2ToAlpha3'], 'meta'));
     }
 
     /**
@@ -65,26 +75,58 @@ final class Countries extends ResourceBundle
      */
     public static function getNumericCodes(): array
     {
-        return self::readEntry(['Alpha2ToNumeric'], 'meta');
+        if (!self::withUserAssigned()) {
+            return self::readEntry(['Alpha2ToNumeric'], 'meta');
+        }
+
+        return array_merge(self::readEntry(['Alpha2ToNumeric'], 'meta'), self::readEntry(['UserAssignedAlpha2ToNumeric'], 'meta'));
     }
 
     public static function getAlpha3Code(string $alpha2Code): string
     {
+        if (self::withUserAssigned()) {
+            try {
+                return self::readEntry(['UserAssignedAlpha2ToAlpha3', $alpha2Code], 'meta');
+            } catch (MissingResourceException) {
+            }
+        }
+
         return self::readEntry(['Alpha2ToAlpha3', $alpha2Code], 'meta');
     }
 
     public static function getAlpha2Code(string $alpha3Code): string
     {
+        if (self::withUserAssigned()) {
+            try {
+                return self::readEntry(['UserAssignedAlpha3ToAlpha2', $alpha3Code], 'meta');
+            } catch (MissingResourceException) {
+            }
+        }
+
         return self::readEntry(['Alpha3ToAlpha2', $alpha3Code], 'meta');
     }
 
     public static function getNumericCode(string $alpha2Code): string
     {
+        if (self::withUserAssigned()) {
+            try {
+                return self::readEntry(['UserAssignedAlpha2ToNumeric', $alpha2Code], 'meta');
+            } catch (MissingResourceException) {
+            }
+        }
+
         return self::readEntry(['Alpha2ToNumeric', $alpha2Code], 'meta');
     }
 
     public static function getAlpha2FromNumeric(string $numericCode): string
     {
+        if (self::withUserAssigned()) {
+            try {
+                return self::readEntry(['UserAssignedNumericToAlpha2', '_'.$numericCode], 'meta');
+            } catch (MissingResourceException) {
+            }
+        }
+
         // Use an underscore prefix to force numeric strings with leading zeros to remain as strings
         return self::readEntry(['NumericToAlpha2', '_'.$numericCode], 'meta');
     }
@@ -92,7 +134,7 @@ final class Countries extends ResourceBundle
     public static function exists(string $alpha2Code): bool
     {
         try {
-            self::readEntry(['Names', $alpha2Code]);
+            self::getAlpha3Code($alpha2Code);
 
             return true;
         } catch (MissingResourceException) {
@@ -129,6 +171,13 @@ final class Countries extends ResourceBundle
      */
     public static function getName(string $country, ?string $displayLocale = null): string
     {
+        if (self::withUserAssigned()) {
+            try {
+                return self::readEntry(['UserAssignedNames', $country], $displayLocale);
+            } catch (MissingResourceException) {
+            }
+        }
+
         return self::readEntry(['Names', $country], $displayLocale);
     }
 
@@ -149,7 +198,11 @@ final class Countries extends ResourceBundle
      */
     public static function getNames(?string $displayLocale = null): array
     {
-        return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
+        if (!self::withUserAssigned()) {
+            return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
+        }
+
+        return self::asort(array_merge(self::readEntry(['Names'], $displayLocale), self::readEntry(['UserAssignedNames'], $displayLocale)), $displayLocale);
     }
 
     /**
@@ -168,6 +221,23 @@ final class Countries extends ResourceBundle
         }
 
         return $alpha3Names;
+    }
+
+    /**
+     * Sets the internal `withUserAssigned` flag, overriding the default `SYMFONY_INTL_WITH_USER_ASSIGNED` env var.
+     *
+     * The ISO 3166/MA has received information that the CE Commission has allocated the alpha-2 user-assigned code "XK"
+     * to represent Kosovo in the interim of being recognized by the UN as a member state.
+     *
+     * Set `$withUserAssigned` to true to have `XK`, `XKK` and `983` available in the other functions of this class.
+     */
+    public static function withUserAssigned(?bool $withUserAssigned = null): bool
+    {
+        if (null === $withUserAssigned) {
+            return self::$withUserAssigned ??= filter_var($_ENV['SYMFONY_INTL_WITH_USER_ASSIGNED'] ?? $_SERVER['SYMFONY_INTL_WITH_USER_ASSIGNED'] ?? getenv('SYMFONY_INTL_WITH_USER_ASSIGNED'), \FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return self::$withUserAssigned = $withUserAssigned;
     }
 
     protected static function getPath(): string

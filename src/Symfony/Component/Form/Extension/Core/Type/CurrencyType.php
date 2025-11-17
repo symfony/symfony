@@ -17,6 +17,7 @@ use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Currencies;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -31,15 +32,65 @@ class CurrencyType extends AbstractType
                 }
 
                 $choiceTranslationLocale = $options['choice_translation_locale'];
+                $activeAt = $options['active_at'];
+                $notActiveAt = $options['not_active_at'];
+                $legalTender = $options['legal_tender'];
+                $includeUndated = $options['include_undated'];
 
-                return ChoiceList::loader($this, new IntlCallbackChoiceLoader(static fn () => array_flip(Currencies::getNames($choiceTranslationLocale))), $choiceTranslationLocale);
+                if (null !== $activeAt && null !== $notActiveAt) {
+                    throw new InvalidOptionsException('The "active_at" and "not_active_at" options cannot be used together.');
+                }
+
+                $legalTenderCacheKey = match ($legalTender) {
+                    null => 'X',
+                    true => '1',
+                    false => '0',
+                };
+
+                return ChoiceList::loader(
+                    $this,
+                    new IntlCallbackChoiceLoader(
+                        static function () use ($choiceTranslationLocale, $activeAt, $notActiveAt, $legalTender, $includeUndated) {
+                            if (null === $activeAt && null === $notActiveAt && null === $legalTender) {
+                                return array_flip(Currencies::getNames($choiceTranslationLocale));
+                            }
+
+                            $filteredCurrencyNames = [];
+
+                            $active = match (true) {
+                                null !== $activeAt => true,
+                                null !== $notActiveAt => false,
+                                default => null,
+                            };
+
+                            foreach (Currencies::getCurrencyCodes() as $code) {
+                                if (!Currencies::isValidInAnyCountry($code, $legalTender, $active, $activeAt ?? $notActiveAt, $includeUndated)) {
+                                    continue;
+                                }
+
+                                $filteredCurrencyNames[$code] = Currencies::getName($code, $choiceTranslationLocale);
+                            }
+
+                            return array_flip($filteredCurrencyNames);
+                        },
+                    ),
+                    $choiceTranslationLocale.($activeAt ?? $notActiveAt)?->format('Y-m-d\TH:i:s').$legalTenderCacheKey.(int) $includeUndated,
+                );
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
+            'active_at' => new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')),
+            'not_active_at' => null,
+            'include_undated' => true,
+            'legal_tender' => true,
             'invalid_message' => 'Please select a valid currency.',
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
+        $resolver->setAllowedTypes('active_at', [\DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('not_active_at', [\DateTimeInterface::class, 'null']);
+        $resolver->setAllowedTypes('legal_tender', ['bool', 'null']);
+        $resolver->setAllowedTypes('include_undated', 'bool');
     }
 
     public function getParent(): ?string

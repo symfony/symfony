@@ -15,8 +15,6 @@ namespace Symfony\Component\JsonStreamer\Attribute;
  * Defines the streamed property name.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- *
- * @experimental
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class StreamedName

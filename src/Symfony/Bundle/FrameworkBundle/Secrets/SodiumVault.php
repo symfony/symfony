@@ -228,7 +228,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
     private function createSecretsDir(): void
     {
-        if ($this->secretsDir && !is_dir($this->secretsDir) && !@mkdir($this->secretsDir, 0777, true) && !is_dir($this->secretsDir)) {
+        if ($this->secretsDir && !is_dir($this->secretsDir) && !@mkdir($this->secretsDir, 0o777, true) && !is_dir($this->secretsDir)) {
             throw new \RuntimeException(\sprintf('Unable to create the secrets directory (%s).', $this->secretsDir));
         }
 

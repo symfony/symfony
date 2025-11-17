@@ -28,51 +28,51 @@ class XliffFileLoaderTest extends TestCase
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
         $this->assertSame([], libxml_get_errors());
-        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+        $this->assertContainsOnlyString($catalogue->all('domain1'));
     }
 
     public function testLoadRawXliff()
     {
         $loader = new XliffFileLoader();
         $resource = <<<XLIFF
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" datatype="plaintext" original="file.ext">
-    <body>
-      <trans-unit id="1">
-        <source>foo</source>
-        <target>bar</target>
-      </trans-unit>
-      <trans-unit id="2">
-        <source>extra</source>
-      </trans-unit>
-      <trans-unit id="3">
-        <source>key</source>
-        <target></target>
-      </trans-unit>
-      <trans-unit id="4">
-        <source>test</source>
-        <target state="needs-translation">with</target>
-        <note>note</note>
-      </trans-unit>
-      <trans-unit id="5">
-        <source>baz</source>
-        <target state="needs-translation">baz</target>
-      </trans-unit>
-      <trans-unit id="6" resname="buz">
-        <source>baz</source>
-        <target state="needs-translation">buz</target>
-      </trans-unit>
-    </body>
-  </file>
-</xliff>
-XLIFF;
+            <?xml version="1.0" encoding="utf-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+              <file source-language="en" datatype="plaintext" original="file.ext">
+                <body>
+                  <trans-unit id="1">
+                    <source>foo</source>
+                    <target>bar</target>
+                  </trans-unit>
+                  <trans-unit id="2">
+                    <source>extra</source>
+                  </trans-unit>
+                  <trans-unit id="3">
+                    <source>key</source>
+                    <target></target>
+                  </trans-unit>
+                  <trans-unit id="4">
+                    <source>test</source>
+                    <target state="needs-translation">with</target>
+                    <note>note</note>
+                  </trans-unit>
+                  <trans-unit id="5">
+                    <source>baz</source>
+                    <target state="needs-translation">baz</target>
+                  </trans-unit>
+                  <trans-unit id="6" resname="buz">
+                    <source>baz</source>
+                    <target state="needs-translation">buz</target>
+                  </trans-unit>
+                </body>
+              </file>
+            </xliff>
+            XLIFF;
 
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertSame([], libxml_get_errors());
-        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+        $this->assertContainsOnlyString($catalogue->all('domain1'));
         $this->assertSame(['foo', 'extra', 'key', 'test'], array_keys($catalogue->all('domain1')));
     }
 
@@ -252,7 +252,7 @@ XLIFF;
 
         $domains = $catalogue->all();
         $this->assertCount(3, $domains['domain1']);
-        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+        $this->assertContainsOnlyString($catalogue->all('domain1'));
 
         // target attributes
         $this->assertEquals(['target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));

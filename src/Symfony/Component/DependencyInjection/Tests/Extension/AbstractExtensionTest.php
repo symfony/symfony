@@ -182,7 +182,6 @@ class AbstractExtensionTest extends TestCase
     {
         return new ContainerBuilder(new ParameterBag([
             'kernel.environment' => 'test',
-            'kernel.build_dir' => 'test',
         ]));
     }
 }

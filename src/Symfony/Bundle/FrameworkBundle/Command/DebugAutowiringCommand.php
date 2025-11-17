@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 
 /**
@@ -48,16 +47,16 @@ class DebugAutowiringCommand extends ContainerDebugCommand
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Show also services that are not aliased'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command displays the classes and interfaces that
-you can use as type-hints for autowiring:
+                The <info>%command.name%</info> command displays the classes and interfaces that
+                you can use as type-hints for autowiring:
 
-  <info>php %command.full_name%</info>
+                  <info>php %command.full_name%</info>
 
-You can also pass a search term to filter the list:
+                You can also pass a search term to filter the list:
 
-  <info>php %command.full_name% log</info>
+                  <info>php %command.full_name% log</info>
 
-EOF
+                EOF
             )
         ;
     }
@@ -137,7 +136,7 @@ EOF
                     }
                     $target = substr($id, \strlen($previousId) + 3);
 
-                    if ($previousId.' $'.(new Target($target))->getParsedName() === $serviceId) {
+                    if ($container->findDefinition($id) === $container->findDefinition($serviceId)) {
                         $serviceLine .= ' - <fg=magenta>target:</><fg=cyan>'.$target.'</>';
                         break;
                     }
@@ -185,7 +184,7 @@ EOF
             return '';
         }
 
-        return (string) $this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine());
+        return $r->getFileName() ? ($this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine()) ?: '') : '';
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

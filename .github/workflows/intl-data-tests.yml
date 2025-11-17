@@ -63,7 +63,7 @@ jobs:
           coverage: "none"
           extensions: "zip,intl-${{env.SYMFONY_ICU_VERSION}}"
           ini-values: "memory_limit=-1"
-          php-version: "8.2"
+          php-version: "8.4"
 
       - name: Install dependencies
         run: |
@@ -84,7 +84,11 @@ jobs:
         run: uconv -V && php -i | grep 'ICU version'
 
       - name: Run intl-data tests
-        run: ./phpunit --group intl-data -v
+        run: |
+          ./phpunit --group intl-data --exclude-group intl-data-isolate
+          ./phpunit --group intl-data --filter testWhenEnvVarNotSet
+          ./phpunit --group intl-data --filter testWhenEnvVarSetFalse
+          ./phpunit --group intl-data --filter testWhenEnvVarSetTrue
 
       - name: Test intl-data with compressed data
         run: |
@@ -96,7 +100,7 @@ jobs:
           ./phpunit src/Symfony/Component/Intl
 
       - name: Run Emoji tests
-        run: ./phpunit src/Symfony/Component/Emoji -v
+        run: ./phpunit src/Symfony/Component/Emoji
 
       - name: Test Emoji with compressed data
         run: |

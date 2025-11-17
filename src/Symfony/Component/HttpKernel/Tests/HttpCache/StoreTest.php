@@ -499,4 +499,87 @@ class StoreTest extends TestCase
 
         return $m->invoke($this->store, $key);
     }
+
+    public function testQueryMethodCacheKeyIncludesBody()
+    {
+        $response = new Response('test', 200, ['Cache-Control' => 'max-age=420']);
+
+        $request1 = Request::create('/', 'QUERY', [], [], [], [], '{"query": "users"}');
+        $request2 = Request::create('/', 'QUERY', [], [], [], [], '{"query": "posts"}');
+        $request3 = Request::create('/', 'QUERY', [], [], [], [], '{"query": "users"}');
+
+        $key1 = $this->store->write($request1, $response);
+        $key2 = $this->store->write($request2, $response);
+        $key3 = $this->store->write($request3, $response);
+
+        $this->assertNotSame($key1, $key2);
+        $this->assertSame($key1, $key3);
+
+        $this->assertNotEmpty($this->getStoreMetadata($key1));
+        $this->assertNotEmpty($this->getStoreMetadata($key2));
+
+        $this->assertNotNull($this->store->lookup($request1));
+        $this->assertNotNull($this->store->lookup($request2));
+        $this->assertNotNull($this->store->lookup($request3));
+    }
+
+    public function testQueryMethodCacheKeyDiffersFromGet()
+    {
+        $response = new Response('test', 200, ['Cache-Control' => 'max-age=420']);
+
+        $getRequest = Request::create('/');
+        $queryRequest = Request::create('/', 'QUERY', [], [], [], [], '{"query": "test"}');
+
+        $getKey = $this->store->write($getRequest, $response);
+        $queryKey = $this->store->write($queryRequest, $response);
+
+        $this->assertNotSame($getKey, $queryKey);
+
+        $this->assertNotEmpty($this->getStoreMetadata($getKey));
+        $this->assertNotEmpty($this->getStoreMetadata($queryKey));
+
+        $this->assertNotNull($this->store->lookup($getRequest));
+        $this->assertNotNull($this->store->lookup($queryRequest));
+    }
+
+    public function testOtherMethodsCacheKeyIgnoresBody()
+    {
+        $response1 = new Response('test 1', 200, ['Cache-Control' => 'max-age=420']);
+        $response2 = new Response('test 2', 200, ['Cache-Control' => 'max-age=420']);
+
+        $getRequest1 = Request::create('/', 'GET', [], [], [], [], '{"data": "test"}');
+        $getRequest2 = Request::create('/', 'GET', [], [], [], [], '{"data": "different"}');
+
+        $key1 = $this->store->write($getRequest1, $response1);
+        $key2 = $this->store->write($getRequest2, $response2);
+
+        $this->assertSame($key1, $key2);
+
+        $lookup1 = $this->store->lookup($getRequest1);
+        $lookup2 = $this->store->lookup($getRequest2);
+        $this->assertNotNull($lookup1);
+        $this->assertNotNull($lookup2);
+
+        $this->assertCount(1, $this->getStoreMetadata($key1));
+        $this->assertSame($lookup1->getContent(), $lookup2->getContent());
+    }
+
+    public function testQueryMethodCacheKeyAvoidsBoundaryCollisions()
+    {
+        $response = new Response('test', 200, ['Cache-Control' => 'max-age=420']);
+
+        $request1 = Request::create('/api/query', 'QUERY', [], [], [], [], 'test');
+        $request2 = Request::create('/api/que', 'QUERY', [], [], [], [], 'rytest');
+
+        $key1 = $this->store->write($request1, $response);
+        $key2 = $this->store->write($request2, $response);
+
+        $this->assertNotSame($key1, $key2);
+
+        $this->assertNotEmpty($this->getStoreMetadata($key1));
+        $this->assertNotEmpty($this->getStoreMetadata($key2));
+
+        $this->assertNotNull($this->store->lookup($request1));
+        $this->assertNotNull($this->store->lookup($request2));
+    }
 }

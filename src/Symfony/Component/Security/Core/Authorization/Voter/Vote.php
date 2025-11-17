@@ -28,6 +28,11 @@ class Vote
      */
     public array $reasons = [];
 
+    /**
+     * @var array<string, mixed>
+     */
+    public array $extraData = [];
+
     public function addReason(string $reason): void
     {
         $this->reasons[] = $reason;

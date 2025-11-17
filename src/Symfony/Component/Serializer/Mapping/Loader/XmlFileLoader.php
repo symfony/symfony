@@ -29,7 +29,7 @@ class XmlFileLoader extends FileLoader
     /**
      * An array of {@class \SimpleXMLElement} instances.
      *
-     * @var \SimpleXMLElement[]|null
+     * @var array<class-string, \SimpleXMLElement>|null
      */
     private ?array $classes = null;
 
@@ -121,7 +121,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[]
+     * @return class-string[]
      */
     public function getMappedClasses(): array
     {
@@ -144,6 +144,9 @@ class XmlFileLoader extends FileLoader
         return simplexml_import_dom($dom);
     }
 
+    /**
+     * @return array<class-string, \SimpleXMLElement>
+     */
     private function getClassesFromXml(): array
     {
         $xml = $this->parseFile($this->file);

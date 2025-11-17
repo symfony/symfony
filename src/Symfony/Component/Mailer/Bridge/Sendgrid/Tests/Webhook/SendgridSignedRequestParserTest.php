@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Webhook;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
@@ -19,9 +20,8 @@ use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 /**
  * @author WoutervanderLoop.nl <info@woutervanderloop.nl>
- *
- * @requires extension openssl
  */
+#[RequiresPhpExtension('openssl')]
 class SendgridSignedRequestParserTest extends AbstractRequestParserTestCase
 {
     private const PRIVATE_KEY = <<<'KEY'

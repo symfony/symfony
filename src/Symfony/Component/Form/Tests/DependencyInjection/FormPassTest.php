@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -60,7 +61,7 @@ class FormPassTest extends TestCase
         $extDefinition = $container->getDefinition('form.extension');
 
         $locator = $extDefinition->getArgument(0);
-        $this->assertTrue(!$locator->isPublic() || $locator->isPrivate());
+        $this->assertTrue($locator->isPrivate());
         $this->assertEquals(
             (new Definition(ServiceLocator::class, [[
                 __CLASS__.'_Type1' => new ServiceClosureArgument(new Reference('my.type1')),
@@ -115,9 +116,7 @@ class FormPassTest extends TestCase
         $this->assertSame([__CLASS__.'_Type1' => 'the_token_id'], $csrfDefinition->getArgument(7));
     }
 
-    /**
-     * @dataProvider addTaggedTypeExtensionsDataProvider
-     */
+    #[DataProvider('addTaggedTypeExtensionsDataProvider')]
     public function testAddTaggedTypeExtensions(array $extensions, array $expectedRegisteredExtensions, array $parameters = [])
     {
         $container = $this->createContainerBuilder();
@@ -280,9 +279,7 @@ class FormPassTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider privateTaggedServicesProvider
-     */
+    #[DataProvider('privateTaggedServicesProvider')]
     public function testPrivateTaggedServices($id, $class, $tagName, callable $assertion, array $tagAttributes = [])
     {
         $formPass = new FormPass();

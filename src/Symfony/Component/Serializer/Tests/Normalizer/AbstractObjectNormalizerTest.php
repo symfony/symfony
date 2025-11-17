@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\PropertyDocBlockExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\SerializedName;
@@ -440,20 +439,7 @@ class AbstractObjectNormalizerTest extends TestCase
     private function getDenormalizerForDummyCollection()
     {
         $extractor = $this->createMock(PhpDocExtractor::class);
-
-        if (method_exists(PhpDocExtractor::class, 'getType')) {
-            $extractor->method('getType')
-                ->willReturn(
-                    Type::list(Type::object(DummyChild::class)),
-                    null,
-                );
-        } else {
-            $extractor->method('getTypes')
-                ->willReturn(
-                    [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('object', false, DummyChild::class))],
-                    null
-                );
-        }
+        $extractor->method('getType')->willReturn(Type::list(Type::object(DummyChild::class)), null);
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -504,20 +490,7 @@ class AbstractObjectNormalizerTest extends TestCase
     private function getDenormalizerForStringCollection()
     {
         $extractor = $this->createMock(PhpDocExtractor::class);
-
-        if (method_exists(PhpDocExtractor::class, 'getType')) {
-            $extractor->method('getType')
-                ->willReturn(
-                    Type::list(Type::string()),
-                    null,
-                );
-        } else {
-            $extractor->method('getTypes')
-                ->willReturn(
-                    [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('string'))],
-                    null
-                );
-        }
+        $extractor->method('getType')->willReturn(Type::list(Type::string()), null);
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -528,9 +501,7 @@ class AbstractObjectNormalizerTest extends TestCase
         return $denormalizer;
     }
 
-    /**
-     * @dataProvider provideInvalidDiscriminatorTypes
-     */
+    #[DataProvider('provideInvalidDiscriminatorTypes')]
     public function testDenormalizeWithDiscriminatorMapHandlesInvalidTypeValue(mixed $typeValue, bool $shouldFail)
     {
         if ($shouldFail) {
@@ -574,9 +545,9 @@ class AbstractObjectNormalizerTest extends TestCase
     }
 
     /**
-     * @return array<array{0: mixed, 1: bool}>
+     * @return iterable<array{0: mixed, 1: bool}>
      */
-    public static function provideInvalidDiscriminatorTypes(): array
+    public static function provideInvalidDiscriminatorTypes(): iterable
     {
         $toStringObject = new class {
             public function __toString()
@@ -585,14 +556,12 @@ class AbstractObjectNormalizerTest extends TestCase
             }
         };
 
-        return [
-            [[], true],
-            [new \stdClass(), true],
-            [123, true],
-            [false, true],
-            ['first', false],
-            [$toStringObject, false],
-        ];
+        yield [[], true];
+        yield [new \stdClass(), true];
+        yield [123, true];
+        yield [false, true];
+        yield ['first', false];
+        yield [$toStringObject, false];
     }
 
     public function testDenormalizeWithDiscriminatorMapUsesCorrectClassname()
@@ -802,40 +771,21 @@ class AbstractObjectNormalizerTest extends TestCase
     private function getDenormalizerForObjectWithBasicProperties()
     {
         $extractor = $this->createMock(PhpDocExtractor::class);
-
-        if (method_exists(PhpDocExtractor::class, 'getType')) {
-            $extractor->method('getType')
-                ->willReturn(
-                    Type::bool(),
-                    Type::bool(),
-                    Type::bool(),
-                    Type::bool(),
-                    Type::int(),
-                    Type::int(),
-                    Type::float(),
-                    Type::float(),
-                    Type::float(),
-                    Type::float(),
-                    Type::float(),
-                    Type::float(),
-                );
-        } else {
-            $extractor->method('getTypes')
-                ->willReturn(
-                    [new LegacyType('bool')],
-                    [new LegacyType('bool')],
-                    [new LegacyType('bool')],
-                    [new LegacyType('bool')],
-                    [new LegacyType('int')],
-                    [new LegacyType('int')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')]
-                );
-        }
+        $extractor->method('getType')
+            ->willReturn(
+                Type::bool(),
+                Type::bool(),
+                Type::bool(),
+                Type::bool(),
+                Type::int(),
+                Type::int(),
+                Type::float(),
+                Type::float(),
+                Type::float(),
+                Type::float(),
+                Type::float(),
+                Type::float(),
+            );
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -1285,9 +1235,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->denormalize(['foo' => 'bar'], MixedPropertyDummy::class));
     }
 
-    /**
-     * @dataProvider provideBooleanTypesData
-     */
+    #[DataProvider('provideBooleanTypesData')]
     public function testDenormalizeBooleanTypesWithNotMatchingData(array $data, string $type)
     {
         $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
@@ -1324,9 +1272,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals($example, $deserialized);
     }
 
-    /**
-     * @dataProvider provideDenormalizeWithFilterBoolData
-     */
+    #[DataProvider('provideDenormalizeWithFilterBoolData')]
     public function testDenormalizeBooleanTypeWithFilterBool(array $data, ?bool $expectedFoo)
     {
         $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
@@ -1415,10 +1361,6 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeTemplateType()
     {
-        if (!interface_exists(PropertyDocBlockExtractorInterface::class)) {
-            $this->markTestSkipped('The PropertyInfo component before Symfony 7.1 does not support template types.');
-        }
-
         $normalizer = new class(classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()), propertyTypeExtractor: new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
             protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
             {
@@ -1462,7 +1404,7 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 
     protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
     {
-        return \in_array($attribute, ['foo', 'baz', 'quux', 'value']);
+        return \in_array($attribute, ['foo', 'baz', 'quux', 'value'], true);
     }
 
     public function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, ?string $format = null): object

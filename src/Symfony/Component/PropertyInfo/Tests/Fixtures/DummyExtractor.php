@@ -17,7 +17,6 @@ use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -35,19 +34,9 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
         return 'long';
     }
 
-    public function getTypes($class, $property, array $context = []): ?array
-    {
-        return [new LegacyType(LegacyType::BUILTIN_TYPE_INT)];
-    }
-
     public function getType($class, $property, array $context = []): ?Type
     {
         return Type::int();
-    }
-
-    public function getTypesFromConstructor(string $class, string $property): ?array
-    {
-        return [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
     }
 
     public function getTypeFromConstructor(string $class, string $property): ?Type

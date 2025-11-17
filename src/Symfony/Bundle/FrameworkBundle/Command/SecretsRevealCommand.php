@@ -38,10 +38,10 @@ final class SecretsRevealCommand extends Command
         $this
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret to reveal', null, fn () => array_keys($this->vault->list()))
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command reveals a stored secret.
+                The <info>%command.name%</info> command reveals a stored secret.
 
-    <info>%command.full_name%</info>
-EOF
+                    <info>%command.full_name%</info>
+                EOF
             )
         ;
     }

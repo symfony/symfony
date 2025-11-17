@@ -116,14 +116,12 @@
         Contains a constraint definition. The name of the constraint should be
         given in the "name" option.
 
-        May contain a single value, multiple "constraint" elements,
-        multiple "value" elements or multiple "option" elements.
+        May contain multiple "constraint" elements or multiple "option" elements.
       ]]></xsd:documentation>
     </xsd:annotation>
     <xsd:choice minOccurs="0">
       <xsd:element name="constraint" type="constraint" minOccurs="1" maxOccurs="unbounded" />
       <xsd:element name="option" type="option" minOccurs="1" maxOccurs="unbounded" />
-      <xsd:element name="value" type="value" minOccurs="1" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="name" type="xsd:string" use="required" />
   </xsd:complexType>

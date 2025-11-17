@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -75,7 +74,6 @@ class Cidr extends Constraint
     /** @var callable|null */
     public $normalizer;
 
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $version = null,
@@ -86,22 +84,20 @@ class Cidr extends Constraint
         $payload = null,
         ?callable $normalizer = null,
     ) {
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        $this->version = $version ?? $options['version'] ?? $this->version;
+        $this->version = $version ?? $this->version;
 
         if (!\array_key_exists($this->version, self::NET_MAXES)) {
             throw new ConstraintDefinitionException(\sprintf('The option "version" must be one of "%s".', implode('", "', array_keys(self::NET_MAXES))));
         }
 
-        $this->netmaskMin = $netmaskMin ?? $options['netmaskMin'] ?? $this->netmaskMin;
-        $this->netmaskMax = $netmaskMax ?? $options['netmaskMax'] ?? self::NET_MAXES[$this->version];
+        $this->netmaskMin = $netmaskMin ?? $this->netmaskMin;
+        $this->netmaskMax = $netmaskMax ?? self::NET_MAXES[$this->version];
         $this->message = $message ?? $this->message;
-        $this->normalizer = $normalizer ?? $this->normalizer;
-
-        unset($options['netmaskMin'], $options['netmaskMax'], $options['version']);
+        $this->normalizer = $normalizer;
 
         if ($this->netmaskMin < 0 || $this->netmaskMax > self::NET_MAXES[$this->version] || $this->netmaskMin > $this->netmaskMax) {
             throw new ConstraintDefinitionException(\sprintf('The netmask range must be between 0 and %d.', self::NET_MAXES[$this->version]));
@@ -111,6 +107,6 @@ class Cidr extends Constraint
             throw new InvalidArgumentException(\sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
     }
 }

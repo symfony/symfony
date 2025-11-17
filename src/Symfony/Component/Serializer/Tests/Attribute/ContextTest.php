@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Attribute;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -49,25 +50,23 @@ class ContextTest extends TestCase
     {
         $context = new Context(['foo' => 'bar']);
 
-        self::assertSame(['foo' => 'bar'], $context->getContext());
-        self::assertSame([], $context->getNormalizationContext());
-        self::assertSame([], $context->getDenormalizationContext());
-        self::assertSame([], $context->getGroups());
+        self::assertSame(['foo' => 'bar'], $context->context);
+        self::assertSame([], $context->normalizationContext);
+        self::assertSame([], $context->denormalizationContext);
+        self::assertSame([], $context->groups);
     }
 
     public function testAsContextArg()
     {
         $context = new Context(context: ['foo' => 'bar']);
 
-        self::assertSame(['foo' => 'bar'], $context->getContext());
-        self::assertSame([], $context->getNormalizationContext());
-        self::assertSame([], $context->getDenormalizationContext());
-        self::assertSame([], $context->getGroups());
+        self::assertSame(['foo' => 'bar'], $context->context);
+        self::assertSame([], $context->normalizationContext);
+        self::assertSame([], $context->denormalizationContext);
+        self::assertSame([], $context->groups);
     }
 
-    /**
-     * @dataProvider provideValidInputs
-     */
+    #[DataProvider('provideValidInputs')]
     public function testValidInputs(callable $factory, string $expectedDump)
     {
         $this->assertDumpEquals($expectedDump, $factory());
@@ -78,76 +77,76 @@ class ContextTest extends TestCase
         yield 'named arguments: with context option' => [
             fn () => new Context(context: ['foo' => 'bar']),
             <<<DUMP
-Symfony\Component\Serializer\Attribute\Context {
-  -groups: []
-  -context: [
-    "foo" => "bar",
-  ]
-  -normalizationContext: []
-  -denormalizationContext: []
-}
-DUMP,
+                Symfony\Component\Serializer\Attribute\Context {
+                  +groups: []
+                  +context: [
+                    "foo" => "bar",
+                  ]
+                  +normalizationContext: []
+                  +denormalizationContext: []
+                }
+                DUMP,
         ];
 
         yield 'named arguments: with normalization context option' => [
             fn () => new Context(normalizationContext: ['foo' => 'bar']),
             <<<DUMP
-Symfony\Component\Serializer\Attribute\Context {
-  -groups: []
-  -context: []
-  -normalizationContext: [
-    "foo" => "bar",
-  ]
-  -denormalizationContext: []
-}
-DUMP,
+                Symfony\Component\Serializer\Attribute\Context {
+                  +groups: []
+                  +context: []
+                  +normalizationContext: [
+                    "foo" => "bar",
+                  ]
+                  +denormalizationContext: []
+                }
+                DUMP,
         ];
 
         yield 'named arguments: with denormalization context option' => [
             fn () => new Context(denormalizationContext: ['foo' => 'bar']),
             <<<DUMP
-Symfony\Component\Serializer\Attribute\Context {
-  -groups: []
-  -context: []
-  -normalizationContext: []
-  -denormalizationContext: [
-    "foo" => "bar",
-  ]
-}
-DUMP,
+                Symfony\Component\Serializer\Attribute\Context {
+                  +groups: []
+                  +context: []
+                  +normalizationContext: []
+                  +denormalizationContext: [
+                    "foo" => "bar",
+                  ]
+                }
+                DUMP,
         ];
 
         yield 'named arguments: with groups option as string' => [
             fn () => new Context(context: ['foo' => 'bar'], groups: 'a'),
             <<<DUMP
-Symfony\Component\Serializer\Attribute\Context {
-  -groups: [
-    "a",
-  ]
-  -context: [
-    "foo" => "bar",
-  ]
-  -normalizationContext: []
-  -denormalizationContext: []
-}
-DUMP,
+                Symfony\Component\Serializer\Attribute\Context {
+                  +groups: [
+                    "a",
+                  ]
+                  +context: [
+                    "foo" => "bar",
+                  ]
+                  +normalizationContext: []
+                  +denormalizationContext: []
+                }
+                DUMP,
         ];
 
         yield 'named arguments: with groups option as array' => [
             fn () => new Context(context: ['foo' => 'bar'], groups: ['a', 'b']),
             <<<DUMP
-Symfony\Component\Serializer\Attribute\Context {
-  -groups: [
-    "a",
-    "b",
-  ]
-  -context: [
-    "foo" => "bar",
-  ]
-  -normalizationContext: []
-  -denormalizationContext: []
-}
-DUMP,
+                Symfony\Component\Serializer\Attribute\Context {
+                  +groups: [
+                    "a",
+                    "b",
+                  ]
+                  +context: [
+                    "foo" => "bar",
+                  ]
+                  +normalizationContext: []
+                  +denormalizationContext: []
+                }
+                DUMP,
         ];
     }
 }

@@ -35,4 +35,3 @@ route_2
     - `opt1`: val1
     - `opt2`: val2
 - Condition: context.getMethod() in ['GET', 'HEAD', 'POST']
-

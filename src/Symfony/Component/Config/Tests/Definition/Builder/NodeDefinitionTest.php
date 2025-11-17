@@ -11,9 +11,15 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\StringNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 
 class NodeDefinitionTest extends TestCase
 {
@@ -60,10 +66,44 @@ class NodeDefinitionTest extends TestCase
 
     public function testUnknownPackageThrowsException()
     {
+        $node = new ArrayNodeDefinition('node');
+
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Package "phpunit/invalid" is not installed');
 
-        $node = new ArrayNodeDefinition('node');
         $node->docUrl('https://example.com/doc/{package}/{version:major}.{version:minor}', 'phpunit/invalid');
+    }
+
+    #[DataProvider('provideDefinitionClassesAndDefaultValues')]
+    public function testIncoherentRequiredAndDefaultValue(string $class, mixed $defaultValue)
+    {
+        $node = new $class('foo');
+        self::assertInstanceOf(NodeDefinition::class, $node);
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The node "foo" cannot be required and have a default value.');
+
+        $node->defaultValue($defaultValue)->isRequired();
+    }
+
+    #[DataProvider('provideDefinitionClassesAndDefaultValues')]
+    public function testIncoherentDefaultValueAndRequired(string $class, mixed $defaultValue)
+    {
+        $node = new $class('foo');
+        self::assertInstanceOf(NodeDefinition::class, $node);
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The node "foo" cannot be required and have a default value.');
+
+        $node->isRequired()->defaultValue($defaultValue);
+    }
+
+    public static function provideDefinitionClassesAndDefaultValues()
+    {
+        yield [ArrayNodeDefinition::class, []];
+        yield [ScalarNodeDefinition::class, null];
+        yield [BooleanNodeDefinition::class, false];
+        yield [StringNodeDefinition::class, 'default'];
+        yield [VariableNodeDefinition::class, 'default'];
     }
 }

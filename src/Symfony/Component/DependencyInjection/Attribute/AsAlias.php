@@ -17,7 +17,7 @@ namespace Symfony\Component\DependencyInjection\Attribute;
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-final class AsAlias
+class AsAlias
 {
     /**
      * @var list<string>

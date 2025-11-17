@@ -83,7 +83,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(CustomDefinition::class, $locator('bar')::class);
         $this->assertSame(CustomDefinition::class, $locator('baz')::class);
         $this->assertSame(CustomDefinition::class, $locator('some.service')::class);
-        $this->assertSame(CustomDefinition::class, \get_class($locator('inlines.service')));
+        $this->assertSame(CustomDefinition::class, $locator('inlines.service')::class);
     }
 
     public function testServiceListIsOrdered()

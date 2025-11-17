@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ObjectMapper\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
@@ -30,6 +31,10 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\Recursive;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\RecursiveDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\Relation;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\RelationDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\OrderSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\OrderTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\UserSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\UserTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultValueStdClass\TargetDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\TargetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\User;
@@ -70,17 +75,25 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\ConditionCallab
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\TransformCallable;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\SourceEntity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\TargetDto as TargetTransformTargetDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionA;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionC;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionD;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class ObjectMapperTest extends TestCase
 {
-    /**
-     * @dataProvider mapProvider
-     */
+    #[DataProvider('mapProvider')]
     public function testMap($expect, $args, array $deps = [])
     {
         $mapper = new ObjectMapper(...$deps);
-        $this->assertEquals($expect, $mapper->map(...$args));
+        $mapped = $mapper->map(...$args);
+
+        if (isset($mapped->relation) && $mapped->relation instanceof D ) {
+            $mapped->relation->baz;
+        }
+
+        $this->assertEquals($expect, $mapped);
     }
 
     /**
@@ -389,9 +402,7 @@ final class ObjectMapperTest extends TestCase
         $this->assertNull($b->optional);
     }
 
-    /**
-     * @dataProvider objectMapperProvider
-     */
+    #[DataProvider('objectMapperProvider')]
     public function testUpdateObjectWithConstructorPromotedProperties(ObjectMapperInterface $mapper)
     {
         $a = new PromotedConstructorSource(1, 'foo');
@@ -400,9 +411,7 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame($v->name, 'foo');
     }
 
-    /**
-     * @dataProvider objectMapperProvider
-     */
+    #[DataProvider('objectMapperProvider')]
     public function testUpdateMappedObjectWithAdditionalConstructorPromotedProperties(ObjectMapperInterface $mapper)
     {
         $a = new PromotedConstructorWithMetadataSource(3, 'foo-will-get-updated');
@@ -431,9 +440,6 @@ final class ObjectMapperTest extends TestCase
         $this->assertTrue($lazy->isLazyObjectInitialized());
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testMapInitializesNativePhp84LazyObject()
     {
         $initialized = false;
@@ -455,9 +461,45 @@ final class ObjectMapperTest extends TestCase
         $this->assertTrue($initialized);
     }
 
-    /**
-     * @dataProvider validPartialInputProvider
-     */
+    public function testDecorateObjectMapper()
+    {
+        $mapper = new ObjectMapper();
+        $myMapper = new class($mapper) implements ObjectMapperInterface {
+            public function __construct(private ObjectMapperInterface $mapper)
+            {
+                $this->mapper = $mapper->withObjectMapper($this);
+            }
+
+            public function map(object $source, object|string|null $target = null): object
+            {
+                $mapped = $this->mapper->map($source, $target);
+
+                if ($source instanceof C) {
+                    $mapped->baz = 'got decorated';
+                }
+
+                return $mapped;
+            }
+        };
+
+        $d = new D(baz: 'foo', bat: 'bar');
+        $c = new C(foo: 'foo', bar: 'bar');
+        $myNewD = $myMapper->map($c);
+        $this->assertSame('got decorated', $myNewD->baz);
+
+        $a = new A();
+        $a->foo = 'test';
+        $a->transform = 'test';
+        $a->baz = 'me';
+        $a->notinb = 'test';
+        $a->relation = $c;
+        $a->relationNotMapped = $d;
+
+        $b = $myMapper->map($a);
+        $this->assertSame('got decorated', $b->relation->baz);
+    }
+
+    #[DataProvider('validPartialInputProvider')]
     public function testMapPartially(PartialInput $actual, FinalInput $expected)
     {
         $mapper = new ObjectMapper();
@@ -509,5 +551,33 @@ final class ObjectMapperTest extends TestCase
         $this->assertInstanceOf(TargetTransformTargetDto::class, $target);
         $this->assertTrue($target->transformed);
         $this->assertSame('test', $target->name);
+    }
+
+    public function testTransformCollection()
+    {
+        $u = new TransformCollectionA();
+        $u->foo = [new TransformCollectionC('a'), new TransformCollectionC('b')];
+        $mapper = new ObjectMapper();
+
+        $transformed = $mapper->map($u, TransformCollectionB::class);
+
+        $this->assertEquals([new TransformCollectionD('a'), new TransformCollectionD('b')], $transformed->foo);
+    }
+
+    public function testEmbedsAreLazyLoadedByDefault()
+    {
+        $mapper = new ObjectMapper();
+        $source = new OrderSource();
+        $source->id = 123;
+        $source->user = new UserSource();
+        $source->user->name = 'Test User';
+        $target = $mapper->map($source, OrderTarget::class);
+        $this->assertInstanceOf(OrderTarget::class, $target);
+        $this->assertSame(123, $target->id);
+        $this->assertInstanceOf(UserTarget::class, $target->user);
+        $refl = new \ReflectionClass(UserTarget::class);
+        $this->assertTrue($refl->isUninitializedLazyObject($target->user));
+        $this->assertSame('Test User', $target->user->name);
+        $this->assertFalse($refl->isUninitializedLazyObject($target->user));
     }
 }

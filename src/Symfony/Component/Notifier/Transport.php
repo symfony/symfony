@@ -87,7 +87,6 @@ final class Transport
         Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
         Bridge\Sinch\SinchTransportFactory::class,
         Bridge\Slack\SlackTransportFactory::class,
-        Bridge\Sms77\Sms77TransportFactory::class,
         Bridge\Smsapi\SmsapiTransportFactory::class,
         Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
         Bridge\Smsbox\SmsboxTransportFactory::class,

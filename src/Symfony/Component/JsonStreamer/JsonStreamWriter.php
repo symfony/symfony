@@ -30,9 +30,10 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @implements StreamWriterInterface<array<string, mixed>>
- *
- * @experimental
+ * @implements StreamWriterInterface<array{
+ *     include_null_properties?: bool,
+ *     ...<string, mixed>,
+ * }>
  */
 final class JsonStreamWriter implements StreamWriterInterface
 {

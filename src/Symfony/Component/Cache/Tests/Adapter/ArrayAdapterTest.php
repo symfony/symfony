@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\TestEnum;
 use Symfony\Component\Clock\MockClock;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class ArrayAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [

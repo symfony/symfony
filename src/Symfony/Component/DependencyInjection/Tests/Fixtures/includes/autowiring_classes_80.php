@@ -125,6 +125,23 @@ class AsDecoratorBaz implements AsDecoratorInterface
     }
 }
 
+class AsDecoratorMultipleFoo implements AsDecoratorInterface
+{
+}
+
+class AsDecoratorMultipleBar implements AsDecoratorInterface
+{
+}
+
+#[AsDecorator(decorates: AsDecoratorMultipleFoo::class)]
+#[AsDecorator(decorates: AsDecoratorMultipleBar::class)]
+class AsDecoratorMultiple implements AsDecoratorInterface
+{
+    public function __construct(string $arg1, #[AutowireDecorated] AsDecoratorInterface $inner)
+    {
+    }
+}
+
 #[AsDecorator(decorates: AsDecoratorFoo::class)]
 class AutowireNestedAttributes implements AsDecoratorInterface
 {

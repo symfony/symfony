@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
@@ -43,35 +44,6 @@ class ResizeFormListenerTest extends TestCase
         return new FormBuilder($name, null, new EventDispatcher(), $this->factory);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testPreSetDataResizesForm()
-    {
-        $this->builder->add($this->getBuilder('0'));
-        $this->builder->add($this->getBuilder('1'));
-        $this->builder->addEventSubscriber(new class(TextType::class, ['attr' => ['maxlength' => 10]], false, false) extends ResizeFormListener {
-            public function preSetData(FormEvent $event): void
-            {
-                parent::preSetData($event);
-            }
-        });
-
-        $form = $this->builder->getForm();
-
-        $this->assertTrue($form->has('0'));
-
-        // initialize the form
-        $form->setData([1 => 'string', 2 => 'string']);
-
-        $this->assertFalse($form->has('0'));
-        $this->assertTrue($form->has('1'));
-        $this->assertTrue($form->has('2'));
-
-        $this->assertSame('string', $form->get('1')->getData());
-        $this->assertSame('string', $form->get('2')->getData());
-    }
-
     public function testPostSetDataResizesForm()
     {
         $this->builder->add($this->getBuilder('0'));
@@ -93,54 +65,19 @@ class ResizeFormListenerTest extends TestCase
         $this->assertSame('string', $form->get('2')->getData());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testPreSetDataRequiresArrayOrTraversable()
-    {
-        $this->expectException(UnexpectedTypeException::class);
-        $data = 'no array or traversable';
-        $event = new FormEvent($this->builder->getForm(), $data);
-        $listener = new class(TextType::class, [], false, false) extends ResizeFormListener {
-            public function preSetData(FormEvent $event): void
-            {
-                parent::preSetData($event);
-            }
-        };
-        $listener->preSetData($event);
-    }
-
     public function testPostSetDataRequiresArrayOrTraversable()
     {
         $this->expectException(UnexpectedTypeException::class);
         $data = 'no array or traversable';
-        $event = new FormEvent($this->builder->getForm(), $data);
+        $event = new PostSetDataEvent($this->builder->getForm(), $data);
         $listener = new ResizeFormListener(TextType::class, [], false, false);
         $listener->postSetData($event);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testPreSetDataDealsWithNullData()
-    {
-        $data = null;
-        $event = new FormEvent($this->builder->getForm(), $data);
-        $listener = new class(TextType::class, [], false, false) extends ResizeFormListener {
-            public function preSetData(FormEvent $event): void
-            {
-                parent::preSetData($event);
-            }
-        };
-        $listener->preSetData($event);
-
-        $this->assertSame(0, $this->builder->count());
     }
 
     public function testPostSetDataDealsWithNullData()
     {
         $data = null;
-        $event = new FormEvent($this->builder->getForm(), $data);
+        $event = new PostSetDataEvent($this->builder->getForm(), $data);
         $listener = new ResizeFormListener(TextType::class, [], false, false);
         $listener->postSetData($event);
 

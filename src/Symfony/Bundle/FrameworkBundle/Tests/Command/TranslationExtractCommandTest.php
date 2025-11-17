@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -154,12 +155,12 @@ class TranslationExtractCommandTest extends TestCase
 
             if (preg_match('/\.[a-z]+$/', $transPath)) {
                 if (!realpath(\dirname($transPath))) {
-                    mkdir(\dirname($transPath), 0777, true);
+                    mkdir(\dirname($transPath), 0o777, true);
                 }
 
                 touch($transPath);
             } else {
-                mkdir($transPath, 0777, true);
+                mkdir($transPath, 0o777, true);
             }
         }
 
@@ -177,9 +178,7 @@ class TranslationExtractCommandTest extends TestCase
         $this->assertEquals($expectedPaths, $filteredTransPaths);
     }
 
-    /**
-     * @dataProvider removeNoFillProvider
-     */
+    #[DataProvider('removeNoFillProvider')]
     public function testRemoveNoFillTranslationsMethod($noFillCounter, $messages)
     {
         // Preparing mock
@@ -304,7 +303,7 @@ class TranslationExtractCommandTest extends TestCase
         $command = new TranslationExtractCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths);
 
         $application = new Application($kernel);
-        $application->add($command);
+        $application->addCommand($command);
 
         return new CommandTester($application->find('translation:extract'));
     }

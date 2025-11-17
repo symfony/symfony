@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class ProfilerTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider getConfigs
-     */
+    #[DataProvider('getConfigs')]
     public function testProfilerIsDisabled($insulate)
     {
         $client = $this->createClient(['test_case' => 'Profiler', 'root_config' => 'config.yml']);
@@ -36,9 +36,7 @@ class ProfilerTest extends AbstractWebTestCase
         $this->assertNull($client->getProfile());
     }
 
-    /**
-     * @dataProvider getConfigs
-     */
+    #[DataProvider('getConfigs')]
     public function testProfilerCollectParameter($insulate)
     {
         $client = $this->createClient(['test_case' => 'ProfilerCollectParameter', 'root_config' => 'config.yml']);

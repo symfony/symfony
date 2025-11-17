@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\TypeValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -58,9 +59,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testValidValues($value, $type)
     {
         $constraint = new Type(type: $type);
@@ -118,9 +117,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
+    #[DataProvider('getInvalidValues')]
     public function testInvalidValues($value, $type, $valueAsString)
     {
         $constraint = new Type(
@@ -190,9 +187,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getValidValuesMultipleTypes
-     */
+    #[DataProvider('getValidValuesMultipleTypes')]
     public function testValidValuesMultipleTypes($value, array $types)
     {
         $constraint = new Type(type: $types);
@@ -213,23 +208,6 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidValuesMultipleTypes()
     {
         $this->validator->validate('12345', new Type(type: ['boolean', 'array'], message: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"12345"')
-            ->setParameter('{{ type }}', implode('|', ['boolean', 'array']))
-            ->setCode(Type::INVALID_TYPE_ERROR)
-            ->assertRaised();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testInvalidValuesMultipleTypesDoctrineStyle()
-    {
-        $this->validator->validate('12345', new Type([
-            'type' => ['boolean', 'array'],
-            'message' => 'myMessage',
-        ]));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"12345"')

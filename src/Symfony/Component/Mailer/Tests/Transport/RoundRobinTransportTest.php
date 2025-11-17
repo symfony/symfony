@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
@@ -20,9 +22,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class RoundRobinTransportTest extends TestCase
 {
     public function testSendNoTransports()
@@ -167,19 +167,45 @@ class RoundRobinTransportTest extends TestCase
         $this->assertFalse($message->getHeaders()->has('X-Transport-1'));
     }
 
+    public function testLoggerReceivesExceptions()
+    {
+        $t1 = $this->createMock(TransportInterface::class);
+        $t1->expects($this->exactly(2))->method('send');
+
+        $ex = new TransportException();
+        $t2 = $this->createMock(TransportInterface::class);
+        $t2->expects($this->exactly(1))
+            ->method('send')
+            ->willReturnCallback(fn () => throw $ex);
+        $t2->expects($this->atLeast(1))->method('__toString')->willReturn('t2');
+
+        $log = $this->createMock(LoggerInterface::class);
+        $log->expects($this->exactly(1))
+            ->method('error')
+            ->with('Transport "t2" failed.', ['exception' => $ex]);
+
+        $t = new RoundRobinTransport([$t1, $t2], logger: $log);
+        $p = new \ReflectionProperty($t, 'cursor');
+        $p->setValue($t, 0);
+        $t->send(new RawMessage(''));
+        $this->assertTransports($t, 1, []);
+        $t->send(new RawMessage(''));
+        $this->assertTransports($t, 1, [$t2]);
+    }
+
     public function testFailureDebugInformation()
     {
         $t1 = $this->createMock(TransportInterface::class);
         $e1 = new TransportException();
         $e1->appendDebug('Debug message 1');
         $t1->expects($this->once())->method('send')->willThrowException($e1);
-        $t1->expects($this->once())->method('__toString')->willReturn('t1');
+        $t1->expects($this->atLeast(1))->method('__toString')->willReturn('t1');
 
         $t2 = $this->createMock(TransportInterface::class);
         $e2 = new TransportException();
         $e2->appendDebug('Debug message 2');
         $t2->expects($this->once())->method('send')->willThrowException($e2);
-        $t2->expects($this->once())->method('__toString')->willReturn('t2');
+        $t2->expects($this->atLeast(1))->method('__toString')->willReturn('t2');
 
         $t = new RoundRobinTransport([$t1, $t2]);
 

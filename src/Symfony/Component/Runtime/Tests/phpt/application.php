@@ -25,11 +25,7 @@ return function (array $context) {
     });
 
     $app = new Application();
-    if (method_exists($app, 'addCommand')) {
-        $app->addCommand($command);
-    } else {
-        $app->add($command);
-    }
+    $app->addCommand($command);
     $app->setDefaultCommand('go', true);
 
     return $app;

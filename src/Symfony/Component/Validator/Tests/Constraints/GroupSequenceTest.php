@@ -25,11 +25,4 @@ class GroupSequenceTest extends TestCase
 
         $this->assertSame(['Group 1', 'Group 2'], $sequence->groups);
     }
-
-    public function testCreateDoctrineStyle()
-    {
-        $sequence = new GroupSequence(['value' => ['Group 1', 'Group 2']]);
-
-        $this->assertSame(['Group 1', 'Group 2'], $sequence->groups);
-    }
 }

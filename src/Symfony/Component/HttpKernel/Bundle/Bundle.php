@@ -31,27 +31,19 @@ abstract class Bundle implements BundleInterface
 
     private string $namespace;
 
-    /**
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
     }
 
-    /**
-     * @return void
-     */
-    public function shutdown()
+    public function shutdown(): void
     {
     }
 
     /**
      * This method can be overridden to register compilation passes,
      * other extensions, ...
-     *
-     * @return void
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
     }
 
@@ -118,10 +110,7 @@ abstract class Bundle implements BundleInterface
         return $this->name;
     }
 
-    /**
-     * @return void
-     */
-    public function registerCommands(Application $application)
+    public function registerCommands(Application $application): void
     {
     }
 

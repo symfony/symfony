@@ -23,10 +23,10 @@ class FiberCasterTest extends TestCase
         $fiber = new \Fiber(static fn () => true);
 
         $expected = <<<EODUMP
-Fiber {
-  status: "not started"
-}
-EODUMP;
+            Fiber {
+              status: "not started"
+            }
+            EODUMP;
 
         $this->assertDumpEquals($expected, $fiber);
     }
@@ -37,10 +37,10 @@ EODUMP;
         $fiber->start();
 
         $expected = <<<EODUMP
-Fiber {
-  status: "terminated"
-}
-EODUMP;
+            Fiber {
+              status: "terminated"
+            }
+            EODUMP;
 
         $this->assertDumpEquals($expected, $fiber);
     }
@@ -51,10 +51,10 @@ EODUMP;
         $fiber->start();
 
         $expected = <<<EODUMP
-Fiber {
-  status: "suspended"
-}
-EODUMP;
+            Fiber {
+              status: "suspended"
+            }
+            EODUMP;
 
         $this->assertDumpEquals($expected, $fiber);
     }
@@ -63,10 +63,10 @@ EODUMP;
     {
         $fiber = new \Fiber(function () {
             $expected = <<<EODUMP
-Fiber {
-  status: "running"
-}
-EODUMP;
+                Fiber {
+                  status: "running"
+                }
+                EODUMP;
 
             $this->assertDumpEquals($expected, \Fiber::getCurrent());
         });

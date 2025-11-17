@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
 use Symfony\Bridge\Doctrine\Types\DatePointType;
+use Symfony\Bridge\Doctrine\Types\DayPointType;
+use Symfony\Bridge\Doctrine\Types\TimePointType;
 use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -31,6 +33,8 @@ final class RegisterDatePointTypePass implements CompilerPassInterface
         $types = $container->getParameter('doctrine.dbal.connection_factory.types');
 
         $types['date_point'] ??= ['class' => DatePointType::class];
+        $types['day_point'] ??= ['class' => DayPointType::class];
+        $types['time_point'] ??= ['class' => TimePointType::class];
 
         $container->setParameter('doctrine.dbal.connection_factory.types', $types);
     }

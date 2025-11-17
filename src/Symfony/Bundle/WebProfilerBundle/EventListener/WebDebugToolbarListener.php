@@ -14,8 +14,10 @@ namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\EventStreamResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ServerEvent;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -113,6 +115,27 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location'), 'host' => $request->getSchemeAndHttpHost()]));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
+        }
+
+        if ($response->headers->has('X-Debug-Token') && $response instanceof EventStreamResponse) {
+            $callback = $response->getCallback();
+            $response->setCallback(static function () use ($callback, $response) {
+                $response->sendEvent(new ServerEvent(
+                    [
+                        $response->headers->get('X-Debug-Token') ?? '',
+                        $response->headers->get('X-Debug-Token-Link') ?? '',
+                    ],
+                    'symfony:debug:started',
+                ));
+                try {
+                    $callback();
+                } catch (\Throwable $e) {
+                    $response->sendEvent(new ServerEvent('error', 'symfony:debug:error'));
+                    throw $e;
+                } finally {
+                    $response->sendEvent(new ServerEvent('-', 'symfony:debug:finished'));
+                }
+            });
         }
 
         if (self::DISABLED === $this->mode

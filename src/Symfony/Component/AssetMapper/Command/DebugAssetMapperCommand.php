@@ -43,41 +43,41 @@ final class DebugAssetMapperCommand extends Command
     {
         $this
             ->addArgument('name', InputArgument::OPTIONAL, 'An asset name (or a path) to search for (e.g. "app")')
-            ->addOption('ext', null, InputOption::VALUE_REQUIRED, 'Filter assets by extension (e.g. "css")', null, ['js', 'css', 'png'])
+            ->addOption('ext', null, InputOption::VALUE_REQUIRED, 'Filter assets by extension (e.g. "css")', null, ['js', 'css', 'json'])
             ->addOption('full', null, null, 'Whether to show the full paths')
             ->addOption('vendor', null, InputOption::VALUE_NEGATABLE, 'Only show assets from vendor packages')
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command displays information about the Asset
-Mapper for debugging purposes.
+                The <info>%command.name%</info> command displays information about the Asset
+                Mapper for debugging purposes.
 
-To list all configured paths (with local paths and their namespace prefixes) and
-all mapped assets (with their logical path and filesystem path), run:
+                To list all configured paths (with local paths and their namespace prefixes) and
+                all mapped assets (with their logical path and filesystem path), run:
 
-  <info>php %command.full_name%</info>
+                  <info>php %command.full_name%</info>
 
-You can filter the results by providing a name to search for in the asset name
-or path:
+                You can filter the results by providing a name to search for in the asset name
+                or path:
 
-  <info>php %command.full_name% bootstrap.js</info>
-  <info>php %command.full_name% style/</info>
+                  <info>php %command.full_name% bootstrap.js</info>
+                  <info>php %command.full_name% style/</info>
 
-To filter the assets by extension, use the <info>--ext</info> option:
+                To filter the assets by extension, use the <info>--ext</info> option:
 
-  <info>php %command.full_name% --ext=css</info>
+                  <info>php %command.full_name% --ext=css</info>
 
-To show only assets from vendor packages, use the <info>--vendor</info> option:
+                To show only assets from vendor packages, use the <info>--vendor</info> option:
 
-  <info>php %command.full_name% --vendor</info>
+                  <info>php %command.full_name% --vendor</info>
 
-To exclude assets from vendor packages, use the <info>--no-vendor</info> option:
+                To exclude assets from vendor packages, use the <info>--no-vendor</info> option:
 
-  <info>php %command.full_name% --no-vendor</info>
+                  <info>php %command.full_name% --no-vendor</info>
 
-To see the full paths, use the <info>--full</info> option:
+                To see the full paths, use the <info>--full</info> option:
 
-    <info>php %command.full_name% --full</info>
+                    <info>php %command.full_name% --full</info>
 
-EOT
+                EOT
             );
     }
 

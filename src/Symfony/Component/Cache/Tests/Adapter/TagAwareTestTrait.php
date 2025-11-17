@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
 
 /**
@@ -25,7 +26,7 @@ trait TagAwareTestTrait
         $pool = $this->createCachePool();
         $item = $pool->getItem('foo');
 
-        $this->expectException(\Psr\Cache\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $item->tag(':');
     }

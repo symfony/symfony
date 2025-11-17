@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo\Tests\TypeResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpDoc;
@@ -22,9 +23,7 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 class PhpDocAwareReflectionTypeResolverTest extends TestCase
 {
-    /**
-     * @dataProvider readPhpDocDataProvider
-     */
+    #[DataProvider('readPhpDocDataProvider')]
     public function testReadPhpDoc(Type $expected, \Reflector $reflector)
     {
         $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(), new StringTypeResolver(), new TypeContextFactory(new StringTypeResolver()));

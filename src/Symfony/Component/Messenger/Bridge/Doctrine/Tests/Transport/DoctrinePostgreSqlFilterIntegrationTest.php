@@ -21,16 +21,16 @@ use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Tools\DsnParser;
 use Doctrine\DBAL\Types\Type;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
 /**
  * This test checks on a postgres connection whether the doctrine asset filter works as expected.
- *
- * @requires extension pdo_pgsql
- *
- * @group integration
  */
+#[RequiresPhpExtension('pdo_pgsql')]
+#[Group('integration')]
 class DoctrinePostgreSqlFilterIntegrationTest extends TestCase
 {
     private Connection $driverConnection;
@@ -44,9 +44,7 @@ class DoctrinePostgreSqlFilterIntegrationTest extends TestCase
         $url = "pdo-pgsql://postgres:password@$host";
         $params = (new DsnParser())->parse($url);
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $this->driverConnection = DriverManager::getConnection($params, $config);
 
@@ -55,8 +53,10 @@ class DoctrinePostgreSqlFilterIntegrationTest extends TestCase
 
     protected function tearDown(): void
     {
+        if (!isset($this->driverConnection)) {
+            return;
+        }
         $this->removeAssets();
-
         $this->driverConnection->close();
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonPath\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonPath\JsonPath;
 
@@ -63,9 +64,7 @@ class JsonPathTest extends TestCase
         $this->assertSame('$["users"][-1]', (string) $path);
     }
 
-    /**
-     * @dataProvider provideKeysToEscape
-     */
+    #[DataProvider('provideKeysToEscape')]
     public function testEscapedKey(string $key, string $expectedPath)
     {
         $path = new JsonPath();

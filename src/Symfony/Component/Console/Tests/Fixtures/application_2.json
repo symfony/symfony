@@ -245,7 +245,7 @@
                 "help [--format FORMAT] [--raw] [--] [<command_name>]"
             ],
             "description": "Display help for a command",
-            "help": "The <info>help<\/info> command displays help for a given command:\n\n  <info>%%PHP_SELF%% help list<\/info>\n\nYou can also output the help in other formats by using the <comment>--format<\/comment> option:\n\n  <info>%%PHP_SELF%% help --format=xml list<\/info>\n\nTo display the list of available commands, please use the <info>list<\/info> command.",
+            "help": "The <info>help<\/info> command displays help for a given command:\n\n  <info>%%PHP_SELF%% help list<\/info>\n\nYou can also output the help in other formats by using the <info>--format<\/info> option:\n\n  <info>%%PHP_SELF%% help --format=xml list<\/info>\n\nTo display the list of available commands, please use the <info>list<\/info> command.",
             "definition": {
                 "arguments": {
                     "command_name": {
@@ -357,7 +357,7 @@
                 "list [--raw] [--format FORMAT] [--short] [--] [<namespace>]"
             ],
             "description": "List commands",
-            "help": "The <info>list<\/info> command lists all commands:\n\n  <info>%%PHP_SELF%% list<\/info>\n\nYou can also display the commands for a specific namespace:\n\n  <info>%%PHP_SELF%% list test<\/info>\n\nYou can also output the information in other formats by using the <comment>--format<\/comment> option:\n\n  <info>%%PHP_SELF%% list --format=xml<\/info>\n\nIt's also possible to get raw list of commands (useful for embedding command runner):\n\n  <info>%%PHP_SELF%% list --raw<\/info>",
+            "help": "The <info>list<\/info> command lists all commands:\n\n  <info>%%PHP_SELF%% list<\/info>\n\nYou can also display the commands for a specific namespace:\n\n  <info>%%PHP_SELF%% list test<\/info>\n\nYou can also output the information in other formats by using the <info>--format<\/info> option:\n\n  <info>%%PHP_SELF%% list --format=xml<\/info>\n\nIt's also possible to get raw list of commands (useful for embedding command runner):\n\n  <info>%%PHP_SELF%% list --raw<\/info>",
             "definition": {
                 "arguments": {
                     "namespace": {

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\JsonStreamer\DataModel\Write;
 
-use Symfony\Component\JsonStreamer\DataModel\DataAccessorInterface;
-use Symfony\Component\JsonStreamer\DataModel\FunctionDataAccessor;
-use Symfony\Component\JsonStreamer\DataModel\PropertyDataAccessor;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 
 /**
@@ -29,29 +26,23 @@ final class ObjectNode implements DataModelNodeInterface
      * @param array<string, DataModelNodeInterface> $properties
      */
     public function __construct(
-        private DataAccessorInterface $accessor,
+        private string $accessor,
         private ObjectType $type,
         private array $properties,
         private bool $mock = false,
     ) {
     }
 
-    public static function createMock(DataAccessorInterface $accessor, ObjectType $type): self
+    public static function createMock(string $accessor, ObjectType $type): self
     {
         return new self($accessor, $type, [], true);
     }
 
-    public function withAccessor(DataAccessorInterface $accessor): self
+    public function withAccessor(string $accessor): self
     {
         $properties = [];
         foreach ($this->properties as $key => $property) {
-            $propertyAccessor = $property->getAccessor();
-
-            if ($propertyAccessor instanceof PropertyDataAccessor || $propertyAccessor instanceof FunctionDataAccessor && $propertyAccessor->getObjectAccessor()) {
-                $propertyAccessor = $propertyAccessor->withObjectAccessor($accessor);
-            }
-
-            $properties[$key] = $property->withAccessor($propertyAccessor);
+            $properties[$key] = $property->withAccessor(str_replace($this->accessor, $accessor, $property->getAccessor()));
         }
 
         return new self($accessor, $this->type, $properties, $this->mock);
@@ -62,7 +53,7 @@ final class ObjectNode implements DataModelNodeInterface
         return (string) $this->getType();
     }
 
-    public function getAccessor(): DataAccessorInterface
+    public function getAccessor(): string
     {
         return $this->accessor;
     }

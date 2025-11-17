@@ -1,6 +1,46 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove the `WorkflowDumpCommand` class; the `workflow:dump` command works the same as before but its class is now defined in the Workflow component
+ * Remove `errors.xml` and `webhook.xml` routing configuration files (use their PHP equivalent instead)
+ * Enable the property info constructor extractor by default
+ * Remove deprecated `Symfony\Bundle\FrameworkBundle\Console\Application::add()` method in favor of `Symfony\Bundle\FrameworkBundle\Console\Application::addCommand()`
+ * Make `Router` class `final`
+ * Make `SerializerCacheWarmer` class `final`
+ * Make `Translator` class `final`
+ * Make `TranslationsCacheWarmer` class `final`
+ * Make `ValidatorCacheWarmer` class `final`
+ * Remove autowiring aliases for `RateLimiterFactory`; use `RateLimiterFactoryInterface` instead
+ * Remove `session.sid_length` and `session.sid_bits_per_character` config options
+ * Remove the `router.cache_dir` config option
+ * Remove the `validation.cache` option
+ * Remove `TranslationUpdateCommand` in favor of `TranslationExtractCommand`
+ * Remove `ConfigBuilderCacheWarmer`, return PHP arrays from your config instead
+
+7.4
+---
+
+ * Auto-generate `config/reference.php` to assist in writing and discovering app's configuration
+ * Auto-register routes from attributes found on controller services
+ * Add `ControllerHelper`; the helpers from AbstractController as a standalone service
+ * Allow using their name without added suffix when using `#[Target]` for custom services
+ * Deprecate `Symfony\Bundle\FrameworkBundle\Console\Application::add()` in favor of `Symfony\Bundle\FrameworkBundle\Console\Application::addCommand()`
+ * Add `assertEmailAddressNotContains()` to the `MailerAssertionsTrait`
+ * Add `framework.type_info.aliases` option
+ * Add `KernelBrowser::getSession()`
+ * Add support for configuring workflow places with glob patterns matching consts/backed enums
+ * Add support for configuring the `CachingHttpClient`
+ * Add support for weighted transitions in workflows
+ * Add support for union types with `Symfony\Component\EventDispatcher\Attribute\AsEventListener`
+ * Add `framework.allowed_http_method_override` option
+ * Initialize `router.request_context`'s `_locale` parameter to `%kernel.default_locale%`
+ * Deprecate `ConfigBuilderCacheWarmer`, return PHP arrays from your config instead
+ * Add support for selecting the appropriate error renderer based on the `APP_RUNTIME_MODE` env var
+ * Add `KernelInterface::getShareDir()`, `APP_SHARE_DIR` and `%kernel.share_dir%` to store application data that are shared between all front-end servers
+
 7.3
 ---
 
@@ -699,7 +739,7 @@ CHANGELOG
  * added Client::enableProfiler()
  * a new parameter has been added to the DIC: `router.request_context.base_url`
    You can customize it for your functional tests or for generating URLs with
-   the right base URL when your are in the CLI context.
+   the right base URL when you are in the CLI context.
  * added support for default templates per render tag
 
 2.1.0

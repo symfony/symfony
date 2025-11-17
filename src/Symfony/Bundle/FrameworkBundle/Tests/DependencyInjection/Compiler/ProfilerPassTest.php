@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 use Symfony\Bundle\FrameworkBundle\DataCollector\TemplateAwareDataCollectorInterface;
@@ -98,9 +99,7 @@ class ProfilerPassTest extends TestCase
         }];
     }
 
-    /**
-     * @dataProvider provideValidCollectorWithTemplateUsingAutoconfigure
-     */
+    #[DataProvider('provideValidCollectorWithTemplateUsingAutoconfigure')]
     public function testValidCollectorWithTemplateUsingAutoconfigure(TemplateAwareDataCollectorInterface $dataCollector)
     {
         $container = new ContainerBuilder();

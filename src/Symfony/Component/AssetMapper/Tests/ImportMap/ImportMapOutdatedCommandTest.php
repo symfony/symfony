@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\Command\ImportMapOutdatedCommand;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
@@ -18,9 +19,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class ImportMapOutdatedCommandTest extends TestCase
 {
-    /**
-     * @dataProvider provideNoOutdatedPackageCases
-     */
+    #[DataProvider('provideNoOutdatedPackageCases')]
     public function testCommandWhenNoOutdatedPackages(string $display, ?string $format = null)
     {
         $updateChecker = $this->createMock(ImportMapUpdateChecker::class);

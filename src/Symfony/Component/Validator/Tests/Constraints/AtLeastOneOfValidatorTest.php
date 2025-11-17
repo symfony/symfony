@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 use Symfony\Component\Validator\Constraints\AtLeastOneOfValidator;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -54,9 +55,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         return new AtLeastOneOfValidator();
     }
 
-    /**
-     * @dataProvider getValidCombinations
-     */
+    #[DataProvider('getValidCombinations')]
     public function testValidCombinations($value, $constraints)
     {
         $this->assertCount(0, Validation::createValidator()->validate($value, new AtLeastOneOf($constraints)));
@@ -96,9 +95,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidCombinations
-     */
+    #[DataProvider('getInvalidCombinations')]
     public function testInvalidCombinationsWithDefaultMessage($value, $constraints)
     {
         $atLeastOneOf = new AtLeastOneOf(constraints: $constraints);
@@ -118,9 +115,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertEquals(new ConstraintViolation(implode('', $message), implode('', $message), [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
-    /**
-     * @dataProvider getInvalidCombinations
-     */
+    #[DataProvider('getInvalidCombinations')]
     public function testInvalidCombinationsWithCustomMessage($value, $constraints)
     {
         $atLeastOneOf = new AtLeastOneOf(
@@ -317,7 +312,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
                 new Collection([
                     'bar' => new AtLeastOneOf([
                         new Type('int'),
-                        new Choice(['test1', 'test2']),
+                        new Choice(choices: ['test1', 'test2']),
                     ]),
                 ]),
                 new Collection([

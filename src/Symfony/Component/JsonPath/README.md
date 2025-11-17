@@ -3,11 +3,6 @@ JsonPath Component
 
 The JsonPath component eases JSON navigation using the JSONPath syntax as described in [RFC 9535](https://www.rfc-editor.org/rfc/rfc9535.html).
 
-**This Component is experimental**.
-[Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
-are not covered by Symfony's
-[Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
-
 Getting Started
 ---------------
 

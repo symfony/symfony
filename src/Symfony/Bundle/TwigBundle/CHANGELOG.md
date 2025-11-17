@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Make `TemplateCacheWarmer` class `final`
+ * Remove the `base_template_class` config option
+
 7.3
 ---
 

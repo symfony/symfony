@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -24,7 +25,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -55,9 +58,7 @@ class SecurityTest extends TestCase
         $this->assertSame($token, $security->getToken());
     }
 
-    /**
-     * @dataProvider getUserTests
-     */
+    #[DataProvider('getUserTests')]
     public function testGetUser($userInToken, $expectedUser)
     {
         $token = $this->createMock(TokenInterface::class);
@@ -99,9 +100,52 @@ class SecurityTest extends TestCase
         $this->assertTrue($security->isGranted('SOME_ATTRIBUTE', 'SOME_SUBJECT'));
     }
 
-    /**
-     * @dataProvider getFirewallConfigTests
-     */
+    public function testAccessDecision()
+    {
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+
+        $authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('SOME_ATTRIBUTE', 'SOME_SUBJECT', $this->isInstanceOf(AccessDecision::class))
+            ->willReturnCallback(function ($attribute, $subject, $accessDecision) {
+                $accessDecision->isGranted = true;
+
+                return true;
+            });
+
+        $container = $this->createContainer('security.authorization_checker', $authorizationChecker);
+
+        $security = new Security($container);
+        $accessDecision = $security->getAccessDecision('SOME_ATTRIBUTE', 'SOME_SUBJECT');
+
+        $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+        $this->assertTrue($accessDecision->isGranted);
+    }
+
+    public function testAccessDecisionForUser()
+    {
+        $user = new InMemoryUser('test_user', 'password');
+        $userAuthorizationChecker = $this->createMock(UserAuthorizationCheckerInterface::class);
+
+        $userAuthorizationChecker->expects($this->once())
+            ->method('isGrantedForUser')
+            ->with($user, 'SOME_ATTRIBUTE', 'SOME_SUBJECT', $this->isInstanceOf(AccessDecision::class))
+            ->willReturnCallback(function ($user, $attribute, $subject, $accessDecision) {
+                $accessDecision->isGranted = false;
+
+                return false;
+            });
+
+        $container = $this->createContainer('security.user_authorization_checker', $userAuthorizationChecker);
+
+        $security = new Security($container);
+        $accessDecision = $security->getAccessDecisionForUser($user, 'SOME_ATTRIBUTE', 'SOME_SUBJECT');
+
+        $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+        $this->assertFalse($accessDecision->isGranted);
+    }
+
+    #[DataProvider('getFirewallConfigTests')]
     public function testGetFirewallConfig(Request $request, ?FirewallConfig $expectedFirewallConfig)
     {
         $firewallMap = $this->createMock(FirewallMap::class);

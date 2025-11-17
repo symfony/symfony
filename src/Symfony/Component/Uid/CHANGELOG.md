@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Add argument `$format` to `Uuid::isValid()`
+
+7.4
+---
+
+ * Add microsecond precision to UUIDv7
+ * Default to `UuidV7` when using `UuidFactory`
+ * Add `MockUuidFactory` to allow deterministic and mockable UUID generation for testing purposes
+
 7.3
 ---
 

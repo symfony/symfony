@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\UniqueValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -31,9 +32,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('', new Unique());
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testValidValues($value)
     {
         $this->validator->validate($value, new Unique());
@@ -58,9 +57,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
+    #[DataProvider('getInvalidValues')]
     public function testInvalidValues($value, $expectedMessageParam)
     {
         $constraint = new Unique(message: 'myMessage');
@@ -97,9 +94,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getCallback
-     */
+    #[DataProvider('getCallback')]
     public function testExpectsUniqueObjects($callback)
     {
         $object1 = new \stdClass();
@@ -121,9 +116,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getCallback
-     */
+    #[DataProvider('getCallback')]
     public function testExpectsNonUniqueObjects($callback)
     {
         $object1 = new \stdClass();
@@ -215,9 +208,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getInvalidFieldNames
-     */
+    #[DataProvider('getInvalidFieldNames')]
     public function testCollectionFieldNamesMustBeString(string $type, mixed $field)
     {
         $this->expectException(UnexpectedTypeException::class);
@@ -235,9 +226,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidCollectionValues
-     */
+    #[DataProvider('getInvalidCollectionValues')]
     public function testInvalidCollectionValues(array $value, array $fields, string $expectedMessageParam)
     {
         $this->validator->validate($value, new Unique(

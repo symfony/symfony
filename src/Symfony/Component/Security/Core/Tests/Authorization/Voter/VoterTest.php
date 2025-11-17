@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -68,9 +69,7 @@ class VoterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getTests
-     */
+    #[DataProvider('getTests')]
     public function testVote(VoterInterface $voter, array $attributes, $expectedVote, $object, $message, ?Vote $vote = null)
     {
         $this->assertSame($expectedVote, $voter->vote($this->token, $object, $attributes, $vote), $message);
@@ -97,7 +96,7 @@ class VoterTest_Voter extends Voter
 
     protected function supports(string $attribute, $object): bool
     {
-        return $object instanceof \stdClass && \in_array($attribute, ['EDIT', 'CREATE']);
+        return $object instanceof \stdClass && \in_array($attribute, ['EDIT', 'CREATE'], true);
     }
 }
 

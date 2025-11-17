@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
@@ -41,7 +42,6 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
-use Symfony\Component\VarExporter\ProxyHelper;
 
 class PropertyAccessorTest extends TestCase
 {
@@ -83,26 +83,20 @@ class PropertyAccessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getValidReadPropertyPaths
-     */
+    #[DataProvider('getValidReadPropertyPaths')]
     public function testGetValue(array|object $objectOrArray, string $path, ?string $value)
     {
         $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingProperty
-     */
+    #[DataProvider('getPathsWithMissingProperty')]
     public function testGetValueThrowsExceptionIfPropertyNotFound(array|object $objectOrArray, string $path)
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
-    /**
-     * @dataProvider getPathsWithMissingProperty
-     */
+    #[DataProvider('getPathsWithMissingProperty')]
     public function testGetValueReturnsNullIfPropertyNotFoundAndExceptionIsDisabled(array|object $objectOrArray, string $path)
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET, PropertyAccessor::DO_NOT_THROW);
@@ -110,17 +104,13 @@ class PropertyAccessorTest extends TestCase
         $this->assertNull($this->propertyAccessor->getValue($objectOrArray, $path), $path);
     }
 
-    /**
-     * @dataProvider getPathsWithMissingIndex
-     */
+    #[DataProvider('getPathsWithMissingIndex')]
     public function testGetValueThrowsNoExceptionIfIndexNotFound(array|object $objectOrArray, string $path)
     {
         $this->assertNull($this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingIndex
-     */
+    #[DataProvider('getPathsWithMissingIndex')]
     public function testGetValueThrowsExceptionIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path)
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
@@ -315,28 +305,22 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame('constant value', $this->propertyAccessor->getValue(new TestClassMagicCall('Bernhard'), 'constantMagicCallProperty'));
     }
 
-    /**
-     * @dataProvider getValidWritePropertyPaths
-     */
-    public function testSetValue(array|object $objectOrArray, string $path)
+    #[DataProvider('getValidWritePropertyPaths')]
+    public function testSetValue(array|object $objectOrArray, string $path, ?string $value)
     {
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
         $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingProperty
-     */
+    #[DataProvider('getPathsWithMissingProperty')]
     public function testSetValueThrowsExceptionIfPropertyNotFound(array|object $objectOrArray, string $path)
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
     }
 
-    /**
-     * @dataProvider getPathsWithMissingIndex
-     */
+    #[DataProvider('getPathsWithMissingIndex')]
     public function testSetValueThrowsNoExceptionIfIndexNotFound(array|object $objectOrArray, string $path)
     {
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
@@ -344,9 +328,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingIndex
-     */
+    #[DataProvider('getPathsWithMissingIndex')]
     public function testSetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path)
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
@@ -419,34 +401,26 @@ class PropertyAccessorTest extends TestCase
         $this->assertNull($this->propertyAccessor->getValue(['index' => ['nullable' => null]], '[index][nullable]'));
     }
 
-    /**
-     * @dataProvider getValidReadPropertyPaths
-     */
-    public function testIsReadable(array|object $objectOrArray, string $path)
+    #[DataProvider('getValidReadPropertyPaths')]
+    public function testIsReadable(array|object $objectOrArray, string $path, ?string $value)
     {
         $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingProperty
-     */
+    #[DataProvider('getPathsWithMissingProperty')]
     public function testIsReadableReturnsFalseIfPropertyNotFound(array|object $objectOrArray, string $path)
     {
         $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingIndex
-     */
+    #[DataProvider('getPathsWithMissingIndex')]
     public function testIsReadableReturnsTrueIfIndexNotFound(array|object $objectOrArray, string $path)
     {
         // Non-existing indices can be read. In this case, null is returned
         $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingIndex
-     */
+    #[DataProvider('getPathsWithMissingIndex')]
     public function testIsReadableReturnsFalseIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path)
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
@@ -472,34 +446,26 @@ class PropertyAccessorTest extends TestCase
         $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
     }
 
-    /**
-     * @dataProvider getValidWritePropertyPaths
-     */
-    public function testIsWritable(array|object $objectOrArray, string $path)
+    #[DataProvider('getValidWritePropertyPaths')]
+    public function testIsWritable(array|object $objectOrArray, string $path, ?string $value)
     {
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingProperty
-     */
+    #[DataProvider('getPathsWithMissingProperty')]
     public function testIsWritableReturnsFalseIfPropertyNotFound(array|object $objectOrArray, string $path)
     {
         $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingIndex
-     */
+    #[DataProvider('getPathsWithMissingIndex')]
     public function testIsWritableReturnsTrueIfIndexNotFound(array|object $objectOrArray, string $path)
     {
         // Non-existing indices can be written. Arrays are created on-demand.
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
-    /**
-     * @dataProvider getPathsWithMissingIndex
-     */
+    #[DataProvider('getPathsWithMissingIndex')]
     public function testIsWritableReturnsTrueIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path)
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
@@ -596,9 +562,7 @@ class PropertyAccessorTest extends TestCase
         yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?][baz?]', null];
     }
 
-    /**
-     * @dataProvider getNullSafeIndexPaths
-     */
+    #[DataProvider('getNullSafeIndexPaths')]
     public function testNullSafeIndexWithThrowOnInvalidIndex(array|object $objectOrArray, string $path, ?string $value)
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
@@ -634,9 +598,7 @@ class PropertyAccessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getReferenceChainObjectsForSetValue
-     */
+    #[DataProvider('getReferenceChainObjectsForSetValue')]
     public function testSetValueForReferenceChainIssue($object, $path, $value)
     {
         $this->propertyAccessor->setValue($object, $path, $value);
@@ -653,9 +615,7 @@ class PropertyAccessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getReferenceChainObjectsForIsWritable
-     */
+    #[DataProvider('getReferenceChainObjectsForIsWritable')]
     public function testIsWritableForReferenceChainIssue($object, $path, $value)
     {
         $this->assertEquals($value, $this->propertyAccessor->isWritable($object, $path));
@@ -1032,29 +992,9 @@ class PropertyAccessorTest extends TestCase
 
     private function createUninitializedObjectPropertyGhost(): UninitializedObjectProperty
     {
-        if (\PHP_VERSION_ID < 80400) {
-            if (!class_exists(ProxyHelper::class)) {
-                $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', ProxyHelper::class));
-            }
-
-            $class = 'UninitializedObjectPropertyGhost';
-
-            if (!class_exists($class)) {
-                eval('class '.$class.ProxyHelper::generateLazyGhost(new \ReflectionClass(UninitializedObjectProperty::class)));
-            }
-
-            $this->assertTrue(class_exists($class));
-
-            return $class::createLazyGhost(initializer: function ($instance) {
-            });
-        }
-
-        return (new \ReflectionClass(UninitializedObjectProperty::class))->newLazyGhost(fn () => null);
+        return new \ReflectionClass(UninitializedObjectProperty::class)->newLazyGhost(fn () => null);
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testIsWritableWithAsymmetricVisibility()
     {
         $object = new AsymmetricVisibility();
@@ -1066,9 +1006,6 @@ class PropertyAccessorTest extends TestCase
         $this->assertFalse($this->propertyAccessor->isWritable($object, 'virtualNoSetHook'));
     }
 
-    /**
-     * @requires PHP 8.4
-     */
     public function testIsReadableWithAsymmetricVisibility()
     {
         $object = new AsymmetricVisibility();
@@ -1080,11 +1017,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertTrue($this->propertyAccessor->isReadable($object, 'virtualNoSetHook'));
     }
 
-    /**
-     * @requires PHP 8.4
-     *
-     * @dataProvider setValueWithAsymmetricVisibilityDataProvider
-     */
+    #[DataProvider('setValueWithAsymmetricVisibilityDataProvider')]
     public function testSetValueWithAsymmetricVisibility(string $propertyPath, ?string $expectedException)
     {
         $object = new AsymmetricVisibility();

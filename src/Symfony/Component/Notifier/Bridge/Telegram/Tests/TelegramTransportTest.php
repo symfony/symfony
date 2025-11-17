@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Telegram\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
@@ -430,9 +432,7 @@ final class TelegramTransportTest extends TransportTestCase
         ];
     }
 
-    /**
-     * @dataProvider sendFileByHttpUrlProvider
-     */
+    #[DataProvider('sendFileByHttpUrlProvider')]
     public function testSendFileByHttpUrlWithOptions(
         TelegramOptions $messageOptions,
         string $endpoint,
@@ -578,9 +578,7 @@ final class TelegramTransportTest extends TransportTestCase
         ];
     }
 
-    /**
-     * @dataProvider sendFileByFileIdProvider
-     */
+    #[DataProvider('sendFileByFileIdProvider')]
     public function testSendFileByFileIdWithOptions(
         TelegramOptions $messageOptions,
         string $endpoint,
@@ -779,11 +777,8 @@ final class TelegramTransportTest extends TransportTestCase
         ];
     }
 
-    /**
-     * @dataProvider sendFileByUploadProvider
-     *
-     * @requires extension fileinfo
-     */
+    #[DataProvider('sendFileByUploadProvider')]
+    #[RequiresPhpExtension('fileinfo')]
     public function testSendFileByUploadWithOptions(
         TelegramOptions $messageOptions,
         string $endpoint,
@@ -985,14 +980,14 @@ final class TelegramTransportTest extends TransportTestCase
     public function testSendContactWithOptions()
     {
         $vCard = <<<V_CARD
-BEGIN:VCARD
-VERSION:3.0
-N:Doe;John;;;
-FN:John Doe
-EMAIL;type=INTERNET;type=WORK;type=pref:johnDoe@example.org
-TEL;type=WORK;type=pref:+330186657200
-END:VCARD
-V_CARD;
+            BEGIN:VCARD
+            VERSION:3.0
+            N:Doe;John;;;
+            FN:John Doe
+            EMAIL;type=INTERNET;type=WORK;type=pref:johnDoe@example.org
+            TEL;type=WORK;type=pref:+330186657200
+            END:VCARD
+            V_CARD;
 
         $response = new JsonMockResponse([
             'ok' => true,
@@ -1076,9 +1071,7 @@ V_CARD;
         ];
     }
 
-    /**
-     * @dataProvider exclusiveOptionsDataProvider
-     */
+    #[DataProvider('exclusiveOptionsDataProvider')]
     public function testUsingMultipleExclusiveOptionsWillProvideExceptions(TelegramOptions $messageOptions)
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {

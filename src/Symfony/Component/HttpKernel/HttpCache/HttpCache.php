@@ -482,7 +482,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
          * stale-if-error case even if they have a `s-maxage` Cache-Control directive.
          */
         if (null !== $entry
-            && \in_array($response->getStatusCode(), [500, 502, 503, 504])
+            && \in_array($response->getStatusCode(), [500, 502, 503, 504], true)
             && !$entry->headers->hasCacheControlDirective('no-cache')
             && !$entry->mustRevalidate()
         ) {
@@ -563,6 +563,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
             return true;
         }
+
+        $this->record($request, 'waiting');
 
         // wait for the lock to be released
         if ($this->waitForLock($request)) {

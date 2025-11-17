@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Validator\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -25,9 +26,7 @@ class UserPasswordTest extends TestCase
         self::assertSame('security.validator.user_password', $constraint->validatedBy());
     }
 
-    /**
-     * @dataProvider provideServiceValidatedConstraints
-     */
+    #[DataProvider('provideServiceValidatedConstraints')]
     public function testValidatedByService(UserPassword $constraint)
     {
         self::assertSame('my_service', $constraint->validatedBy());
@@ -35,8 +34,6 @@ class UserPasswordTest extends TestCase
 
     public static function provideServiceValidatedConstraints(): iterable
     {
-        yield 'Doctrine style' => [new UserPassword(['service' => 'my_service'])];
-
         yield 'named arguments' => [new UserPassword(service: 'my_service')];
 
         $metadata = new ClassMetadata(UserPasswordDummy::class);

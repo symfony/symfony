@@ -25,9 +25,6 @@ class TextPart extends AbstractPart
 {
     private const DEFAULT_ENCODERS = ['quoted-printable', 'base64', '8bit'];
 
-    /** @internal */
-    protected Headers $_headers;
-
     private static array $encoders = [];
 
     /** @var resource|string|File */
@@ -238,7 +235,7 @@ class TextPart extends AbstractPart
         return 'quoted-printable';
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         // convert resources to strings for serialization
         if (null !== $this->seekable) {
@@ -246,15 +243,32 @@ class TextPart extends AbstractPart
             $this->seekable = null;
         }
 
-        $this->_headers = $this->getHeaders();
-
-        return ['_headers', 'body', 'charset', 'subtype', 'disposition', 'name', 'encoding'];
+        return [
+            '_headers' => $this->getHeaders(),
+            'body' => $this->body,
+            'charset' => $this->charset,
+            'subtype' => $this->subtype,
+            'disposition' => $this->disposition,
+            'name' => $this->name,
+            'encoding' => $this->encoding,
+        ];
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
-        $r = new \ReflectionProperty(AbstractPart::class, 'headers');
-        $r->setValue($this, $this->_headers);
-        unset($this->_headers);
+        if ($headers = $data['_headers'] ?? $data["\0*\0_headers"] ?? null) {
+            parent::__unserialize(['headers' => $headers]);
+        }
+
+        $this->body = $data['body'] ?? $data["\0".self::class."\0body"];
+        $this->charset = $data['charset'] ?? $data["\0".self::class."\0charset"] ?? null;
+        $this->subtype = $data['subtype'] ?? $data["\0".self::class."\0subtype"];
+        $this->disposition = $data['disposition'] ?? $data["\0".self::class."\0disposition"] ?? null;
+        $this->name = $data['name'] ?? $data["\0".self::class."\0name"] ?? null;
+        $this->encoding = $data['encoding'] ?? $data["\0".self::class."\0encoding"];
+
+        if (!\is_string($this->body) && !$this->body instanceof File) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        }
     }
 }

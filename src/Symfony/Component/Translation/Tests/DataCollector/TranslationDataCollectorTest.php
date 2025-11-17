@@ -16,15 +16,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
 use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
 
 class TranslationDataCollectorTest extends TestCase
 {
     public function testCollectEmptyMessages()
     {
-        $translator = $this->getTranslator();
-        $translator->expects($this->any())->method('getCollectedMessages')->willReturn([]);
-
-        $dataCollector = new TranslationDataCollector($translator);
+        $dataCollector = new TranslationDataCollector(new DataCollectorTranslator($this->createMock(Translator::class)));
         $dataCollector->lateCollect();
 
         $this->assertEquals(0, $dataCollector->getCountMissings());
@@ -35,53 +34,6 @@ class TranslationDataCollectorTest extends TestCase
 
     public function testCollect()
     {
-        $collectedMessages = [
-            [
-                'id' => 'foo',
-                'translation' => 'foo (en)',
-                'locale' => 'en',
-                'domain' => 'messages',
-                'state' => DataCollectorTranslator::MESSAGE_DEFINED,
-                'parameters' => [],
-                'transChoiceNumber' => null,
-            ],
-            [
-                'id' => 'bar',
-                'translation' => 'bar (fr)',
-                'locale' => 'fr',
-                'domain' => 'messages',
-                'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
-                'parameters' => [],
-                'transChoiceNumber' => null,
-            ],
-            [
-                'id' => 'choice',
-                'translation' => 'choice',
-                'locale' => 'en',
-                'domain' => 'messages',
-                'state' => DataCollectorTranslator::MESSAGE_MISSING,
-                'parameters' => ['%count%' => 3],
-                'transChoiceNumber' => 3,
-            ],
-            [
-                'id' => 'choice',
-                'translation' => 'choice',
-                'locale' => 'en',
-                'domain' => 'messages',
-                'state' => DataCollectorTranslator::MESSAGE_MISSING,
-                'parameters' => ['%count%' => 3],
-                'transChoiceNumber' => 3,
-            ],
-            [
-                'id' => 'choice',
-                'translation' => 'choice',
-                'locale' => 'en',
-                'domain' => 'messages',
-                'state' => DataCollectorTranslator::MESSAGE_MISSING,
-                'parameters' => ['%count%' => 4, '%foo%' => 'bar'],
-                'transChoiceNumber' => 4,
-            ],
-        ];
         $expectedMessages = [
             [
                 'id' => 'foo',
@@ -92,16 +44,18 @@ class TranslationDataCollectorTest extends TestCase
                 'count' => 1,
                 'parameters' => [],
                 'transChoiceNumber' => null,
+                'fallbackLocale' => null,
             ],
             [
                 'id' => 'bar',
                 'translation' => 'bar (fr)',
-                'locale' => 'fr',
+                'locale' => 'en',
                 'domain' => 'messages',
                 'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
                 'count' => 1,
                 'parameters' => [],
                 'transChoiceNumber' => null,
+                'fallbackLocale' => 'fr',
             ],
             [
                 'id' => 'choice',
@@ -116,13 +70,22 @@ class TranslationDataCollectorTest extends TestCase
                     ['%count%' => 4, '%foo%' => 'bar'],
                 ],
                 'transChoiceNumber' => 3,
+                'fallbackLocale' => null,
             ],
         ];
 
-        $translator = $this->getTranslator();
-        $translator->expects($this->any())->method('getCollectedMessages')->willReturn($collectedMessages);
-
-        $dataCollector = new TranslationDataCollector($translator);
+        $translator = new Translator('en');
+        $translator->setFallbackLocales(['fr']);
+        $translator->addLoader('memory', new ArrayLoader());
+        $translator->addResource('memory', ['foo' => 'foo (en)'], 'en');
+        $translator->addResource('memory', ['bar' => 'bar (fr)'], 'fr');
+        $dataCollectorTranslator = new DataCollectorTranslator($translator);
+        $dataCollectorTranslator->trans('foo');
+        $dataCollectorTranslator->trans('bar');
+        $dataCollectorTranslator->trans('choice', ['%count%' => 3]);
+        $dataCollectorTranslator->trans('choice', ['%count%' => 3]);
+        $dataCollectorTranslator->trans('choice', ['%count%' => 4, '%foo%' => 'bar']);
+        $dataCollector = new TranslationDataCollector($dataCollectorTranslator);
         $dataCollector->lateCollect();
 
         $this->assertEquals(1, $dataCollector->getCountMissings());
@@ -134,12 +97,10 @@ class TranslationDataCollectorTest extends TestCase
 
     public function testCollectAndReset()
     {
-        $translator = $this->getTranslator();
-        $translator->method('getLocale')->willReturn('fr');
-        $translator->method('getFallbackLocales')->willReturn(['en']);
-        $translator->method('getGlobalParameters')->willReturn(['welcome' => 'Welcome {name}!']);
-
-        $dataCollector = new TranslationDataCollector($translator);
+        $translator = new Translator('fr');
+        $translator->setFallbackLocales(['en']);
+        $translator->addGlobalParameter('welcome', 'Welcome {name}!');
+        $dataCollector = new TranslationDataCollector(new DataCollectorTranslator($translator));
         $dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
 
         $this->assertSame('fr', $dataCollector->getLocale());
@@ -151,16 +112,5 @@ class TranslationDataCollectorTest extends TestCase
         $this->assertNull($dataCollector->getLocale());
         $this->assertSame([], $dataCollector->getFallbackLocales());
         $this->assertSame([], $dataCollector->getGlobalParameters());
-    }
-
-    private function getTranslator()
-    {
-        $translator = $this
-            ->getMockBuilder(DataCollectorTranslator::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
-        return $translator;
     }
 }

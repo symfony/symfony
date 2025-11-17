@@ -93,4 +93,12 @@ class DirectoryResource implements SelfCheckingResourceInterface
 
         return true;
     }
+
+    public function __serialize(): array
+    {
+        return [
+            'resource' => $this->resource,
+            'pattern' => $this->pattern,
+        ];
+    }
 }

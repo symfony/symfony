@@ -128,16 +128,9 @@ class ProgressIndicator
 
     /**
      * Finish the indicator with message.
-     *
-     * @param ?string $finishedIndicator
      */
-    public function finish(string $message/* , ?string $finishedIndicator = null */): void
+    public function finish(string $message, ?string $finishedIndicator = null): void
     {
-        $finishedIndicator = 1 < \func_num_args() ? func_get_arg(1) : null;
-        if (null !== $finishedIndicator && !\is_string($finishedIndicator)) {
-            throw new \TypeError(\sprintf('Argument 2 passed to "%s()" must be of the type string or null, "%s" given.', __METHOD__, get_debug_type($finishedIndicator)));
-        }
-
         if (!$this->started) {
             throw new LogicException('Progress indicator has not yet been started.');
         }

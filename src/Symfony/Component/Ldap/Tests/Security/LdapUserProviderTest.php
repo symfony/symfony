@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Tests\Security;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
@@ -24,9 +25,7 @@ use Symfony\Component\Ldap\Security\RoleFetcherInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
-/**
- * @requires extension ldap
- */
+#[RequiresPhpExtension('ldap')]
 class LdapUserProviderTest extends TestCase
 {
     public function testLoadUserByIdentifierFailsIfCantConnectToLdap()

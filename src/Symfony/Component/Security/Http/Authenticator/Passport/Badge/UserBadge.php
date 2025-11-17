@@ -55,8 +55,7 @@ class UserBadge implements BadgeInterface
         ?\Closure $identifierNormalizer = null,
     ) {
         if ('' === $userIdentifier) {
-            trigger_deprecation('symfony/security-http', '7.2', 'Using an empty string as user identifier is deprecated and will throw an exception in Symfony 8.0.');
-            // throw new BadCredentialsException('Empty user identifier.');
+            throw new BadCredentialsException('Empty user identifier.');
         }
 
         if (\strlen($userIdentifier) > self::MAX_USERNAME_LENGTH) {

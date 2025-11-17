@@ -16,13 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "ext-redis": "*",
-        "symfony/messenger": "^7.3"
+        "symfony/messenger": "^7.4|^8.0"
     },
     "require-dev": {
-        "symfony/property-access": "^6.4|^7.0",
-        "symfony/serializer": "^6.4|^7.0"
+        "symfony/property-access": "^7.4|^8.0",
+        "symfony/serializer": "^7.4|^8.0",
+        "symfony/var-dumper": "^7.4|^8.0"
+    },
+    "conflict": {
+        "ext-redis": "<6.1",
+        "ext-relay": "<0.12"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\Redis\\": "" },

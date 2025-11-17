@@ -29,6 +29,7 @@ Console
 -------
 
  * Deprecate `Symfony\Component\Console\Application::add()` in favor of `addCommand()`
+ * Deprecate the `$command` property and the`setCommand` method of the `Symfony\Component\Console\Command\HelpCommand` class
 
 DependencyInjection
 -------------------

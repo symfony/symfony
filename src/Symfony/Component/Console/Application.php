@@ -278,6 +278,7 @@ class Application implements ResetInterface
                 $input = new ArrayInput(['command_name' => $this->defaultCommand]);
             } else {
                 $this->wantHelps = true;
+                $input = new ArrayInput(['command_name' => $name]);
             }
         }
 
@@ -609,18 +610,13 @@ class Application implements ResetInterface
             throw new CommandNotFoundException(\sprintf('The "%s" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".', $name));
         }
 
-        $command = $this->commands[$name];
-
         if ($this->wantHelps) {
             $this->wantHelps = false;
 
-            $helpCommand = $this->get('help');
-            $helpCommand->setCommand($command);
-
-            return $helpCommand;
+            return $this->get('help');
         }
 
-        return $command;
+        return $this->commands[$name];
     }
 
     /**

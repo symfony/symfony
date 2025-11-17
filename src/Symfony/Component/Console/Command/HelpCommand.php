@@ -25,6 +25,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class HelpCommand extends Command
 {
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0.
+     */
     private Command $command;
 
     protected function configure(): void
@@ -54,17 +57,22 @@ class HelpCommand extends Command
         ;
     }
 
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0.
+     */
     public function setCommand(Command $command): void
     {
+        trigger_deprecation('symfony/console', '7.4', 'The "%s()" method is deprecated and will be removed in Symfony 8.0.', __METHOD__);
+
         $this->command = $command;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->command ??= $this->getApplication()->find($input->getArgument('command_name'));
+        $command = $this->command ?? $this->getApplication()->find($input->getArgument('command_name'));
 
         $helper = new DescriptorHelper();
-        $helper->describe($output, $this->command, [
+        $helper->describe($output, $command, [
             'format' => $input->getOption('format'),
             'raw_text' => $input->getOption('raw'),
         ]);

@@ -11,6 +11,6 @@
 
 namespace Symfony\Contracts\Deprecation;
 
-interface PackageVersionInterface extends \StringBackedEnum
+interface PackageVersionInterface extends \BackedEnum
 {
 }

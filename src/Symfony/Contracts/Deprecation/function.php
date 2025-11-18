@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Contracts\Deprecation\PackageVersionInterface;
+
 if (!function_exists('trigger_deprecation')) {
     /**
      * Triggers a silenced deprecation notice.
@@ -26,8 +28,4 @@ if (!function_exists('trigger_deprecation')) {
 
         @trigger_error(($package || $version ? "Since $package $version: " : '').($args ? vsprintf($message, $args) : $message), \E_USER_DEPRECATED);
     }
-}
-
-interface PackageVersionInterface extends \StringBackedEnum
-{
 }

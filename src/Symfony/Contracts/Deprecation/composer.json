@@ -20,7 +20,8 @@
     "autoload": {
         "files": [
             "function.php"
-        ]
+        ],
+        "psr-4": { "Symfony\\Contracts\\Deprecation\\": "" }
     },
     "minimum-stability": "dev",
     "extra": {

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.7
+---
+
+ * Add `PackageVersionInterface` to support version-based deprecation messages
+
 3.6
 ---
 

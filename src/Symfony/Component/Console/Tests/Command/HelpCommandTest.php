@@ -12,6 +12,8 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\HelpCommand;
@@ -32,8 +34,12 @@ class HelpCommandTest extends TestCase
         $this->assertStringContainsString('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command alias');
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testExecuteForCommand()
     {
+        $this->expectUserDeprecationMessage('Since symfony/console 7.4: Method "Symfony\Component\Console\Command\HelpCommand::setCommand()" is deprecated and will be removed in Symfony 8.0, use the command_name input argument instead');
+
         $command = new HelpCommand();
         $commandTester = new CommandTester($command);
         $command->setCommand(new ListCommand());
@@ -43,8 +49,12 @@ class HelpCommandTest extends TestCase
         $this->assertStringContainsString('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testExecuteForCommandWithXmlOption()
     {
+        $this->expectUserDeprecationMessage('Since symfony/console 7.4: Method "Symfony\Component\Console\Command\HelpCommand::setCommand()" is deprecated and will be removed in Symfony 8.0, use the command_name input argument instead');
+
         $command = new HelpCommand();
         $commandTester = new CommandTester($command);
         $command->setCommand(new ListCommand());

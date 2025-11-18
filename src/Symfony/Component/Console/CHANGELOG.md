@@ -15,6 +15,7 @@ CHANGELOG
  * Add optional timeout for interaction in `QuestionHelper`
  * Add support for interactive invokable commands with `#[Interact]` and `#[Ask]` attributes
  * Add support for `Cursor` helper in invokable commands
+ * Deprecate `Symfony\Component\Console\Command\HelpCommand::setCommand()`, use the `command_name` input argument instead
 
 7.3
 ---

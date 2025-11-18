@@ -25,9 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class HelpCommand extends Command
 {
-    /**
-     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0.
-     */
     private Command $command;
 
     protected function configure(): void
@@ -62,7 +59,7 @@ class HelpCommand extends Command
      */
     public function setCommand(Command $command): void
     {
-        trigger_deprecation('symfony/console', '7.4', 'The "%s()" method is deprecated and will be removed in Symfony 8.0.', __METHOD__);
+        trigger_deprecation('symfony/console', '7.4', 'Method "%s()" is deprecated and will be removed in Symfony 8.0, use the command_name input argument instead', __METHOD__);
 
         $this->command = $command;
     }

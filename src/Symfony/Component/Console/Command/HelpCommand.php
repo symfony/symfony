@@ -25,6 +25,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class HelpCommand extends Command
 {
+    /**
+     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0.
+     */
     private Command $command;
 
     protected function configure(): void

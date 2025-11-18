@@ -7,10 +7,6 @@ in 7.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.4.0...v7.4.1
 
-* Unreleased
-
- * feature #62419 [Console] Deprecate `Symfony\Component\Console\Command\HelpCommand::setCommand()`
-
 * 7.4.0-RC2 (2025-11-16)
 
  * bug #62411 [HttpKernel] Conflict with symfony/flex < 2.10 (nicolas-grekas)
@@ -268,3 +264,4 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #60209 [Notifier] Allow to set block_id/value for SlackActionsBlock and SlackButtonBlockElement (miloszowi)
  * feature #60544 [JsonStreamer] Remove `nikic/php-parser` dependency (mtarld)
  * feature #60420 [WebLink] Add class to parse Link headers from HTTP responses (GromNaN)
+

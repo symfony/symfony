@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-17T09:14:52Z
+
+Isn't the cause of this phpstan not supporting `...<etc>` shapes?

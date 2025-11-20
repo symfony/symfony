@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by MrMitch at 2025-05-07T15:18:49Z
+
+Test failures look unrelated
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-07T17:55:17Z
+
+New features need to target the newest branch, which is 7.3
+
+---------------------------------------------------------------------------
+
+by MrMitch at 2025-05-08T10:48:11Z
+
+@OskarStark @bkosun Thank you for your feedback, I've applied all the suggested changes. Let me know if you would like me to make additional changes.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-05-16T07:50:14Z
+
+Is this Send-At header supported by their SMTP server ?
+
+---------------------------------------------------------------------------
+
+by MrMitch at 2025-05-16T08:23:52Z
+
+Hi @stof,
+
+Yes, the Send-At header is supported by their SMTP server as well, as per [the documentation](https://www.twilio.com/docs/sendgrid/for-developers/sending-email/scheduling-email#3-smtp-api) :
+> You can use the [SMTP API](https://www.twilio.com/docs/sendgrid/for-developers/sending-email/scheduling-parameters) header to schedule your emails when sending via [SMTP](https://www.twilio.com/docs/sendgrid/for-developers/sending-email/getting-started-smtp) or our [mail.send API endpoint](https://sendgrid.api-docs.io/v3.0/mail-send/v3-mail-send).
+
+---------------------------------------------------------------------------
+
+by MrMitch at 2025-11-14T15:30:43Z
+
+Test failures look unrelated, they all reference `Symfony\Bundle\FrameworkBundle\Tests\Command\SecretsListCommandTest::testExecute` which is outside the scope of this PR

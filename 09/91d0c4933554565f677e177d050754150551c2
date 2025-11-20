@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-06T08:07:09Z
+
+not sure why these directives were not added in #49306, maybe they were added to [the documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Clear-Site-Data#sign_out_of_a_web_site) afterwards
+
+/cc @maxbeckers
+
+---------------------------------------------------------------------------
+
+by stof at 2025-11-06T09:00:00Z
+
+Those ones are new experimental features in browsers (see the "experimental" icons in https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Clear-Site-Data#directives).
+They have not just been added later in the documentation, but also in the spec.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-06T09:04:08Z
+
+We currently already support the `executionContexts` directive which is also experimental. Though if they were later added to the spec I'd also be fine to add this as a new feature.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-11-06T10:15:18Z
+
+> We currently already support the `executionContexts` directive which is also experimental.
+
+This one is experimental since more time :smile:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-13T07:52:18Z
+
+rebased and relabeled so that we can merge it once we start the development of 8.1
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-17T07:40:15Z
+
+(rebase needed though)

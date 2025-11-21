@@ -128,7 +128,7 @@ jobs:
       zookeeper:
         image: zookeeper
       kafka:
-        image: bitnamilegacy/kafka:3.7
+        image: soldevelo/kafka:3.7
         ports:
           - 9092:9092
         env:

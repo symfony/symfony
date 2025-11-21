@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-11-20T11:31:55Z
+
+@fabpot The reason I considered this a bug is that the current behavior works in some cases but not in others. As mentioned in the description, when the command name is present, everything works as expected. So it feels broken when it doesn't work without one.

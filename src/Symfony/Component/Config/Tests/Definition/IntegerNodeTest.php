@@ -73,4 +73,12 @@ class IntegerNodeTest extends TestCase
             [new \stdClass()],
         ];
     }
+
+    public function testFinalizeWithNullAndAllowEmptyValue()
+    {
+        $node = new IntegerNode('test');
+        $node->setDefaultValue(null);
+
+        $this->assertNull($node->finalize(null));
+    }
 }

@@ -25,6 +25,10 @@ class FloatNode extends NumericNode
      */
     protected function validateType(mixed $value)
     {
+        if (null === $value && $this->hasDefaultValue() && null === $this->getDefaultValue()) {
+            return;
+        }
+
         // Integers are also accepted, we just cast them
         if (\is_int($value)) {
             $value = (float) $value;

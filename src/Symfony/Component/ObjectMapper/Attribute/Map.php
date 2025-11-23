@@ -18,7 +18,7 @@ namespace Symfony\Component\ObjectMapper\Attribute;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Map
 {
     /**

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Scheduler\Event\FailureEvent;
 use Symfony\Component\Scheduler\Event\PostRunEvent;
@@ -24,6 +25,7 @@ final class Schedule implements ScheduleProviderInterface
     /** @var array<string,RecurringMessage> */
     private array $messages = [];
     private ?LockInterface $lock = null;
+    private ?LockFactory $lockFactory = null;
     private ?CacheInterface $state = null;
     private bool $shouldRestart = false;
     private bool $onlyLastMissed = false;
@@ -95,10 +97,16 @@ final class Schedule implements ScheduleProviderInterface
     }
 
     /**
+     * lock to acquire a single lock for the whole schedule run.
+     *
      * @return $this
      */
     public function lock(LockInterface $lock): static
     {
+        if ($this->lockFactory) {
+            throw new LogicException(\sprintf('You cannot set a Lock with "%s" if a LockFactory is already set.', __METHOD__));
+        }
+
         $this->lock = $lock;
 
         return $this;
@@ -107,6 +115,27 @@ final class Schedule implements ScheduleProviderInterface
     public function getLock(): ?LockInterface
     {
         return $this->lock;
+    }
+
+    /**
+     * lock factory to acquire locks per message and run.
+     *
+     * @return $this
+     */
+    public function lockFactory(LockFactory $lockFactory): static
+    {
+        if ($this->lock) {
+            throw new LogicException(\sprintf('You cannot set a LockFactory with "%s" if a Lock is already set.', __METHOD__));
+        }
+
+        $this->lockFactory = $lockFactory;
+
+        return $this;
+    }
+
+    public function getLockFactory(): ?LockFactory
+    {
+        return $this->lockFactory;
     }
 
     /**

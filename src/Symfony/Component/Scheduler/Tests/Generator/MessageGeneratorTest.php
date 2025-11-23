@@ -15,12 +15,15 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\Scheduler\Generator\Checkpoint;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
+use Symfony\Component\Scheduler\Tests\Fixtures\SomeMessageStringable;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class MessageGeneratorTest extends TestCase
@@ -260,6 +263,83 @@ class MessageGeneratorTest extends TestCase
         $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
 
         $this->assertEquals(self::makeDateTime('22:23:10'), $clock->now());
+    }
+
+    public function testGranularLockAllowsSequentialAcquisition()
+    {
+        // message class stringable representation is used as lock key
+        $message1 = new SomeMessageStringable('message1');
+        $message2 = new SomeMessageStringable('message2');
+        $message3 = new SomeMessageStringable('message3');
+
+        $clock = new MockClock(self::makeDateTime('22:15:00'));
+
+        $lockFactory = new LockFactory(new InMemoryStore());
+        $cache = new ArrayAdapter();
+        // normally it should be the same cache for both consumers to share state
+        // but here we want to simulate two separate workers with their own state
+        $cache2 = new ArrayAdapter();
+
+        $schedule1 = (new Schedule())
+            ->add(RecurringMessage::every('1 minute', $message1))
+            ->add(RecurringMessage::every('1 minute', $message2))
+            ->add(RecurringMessage::every('1 minute', $message3))
+            ->stateful($cache)
+            ->lockFactory($lockFactory)
+        ;
+
+        // Clone schedule for second consumer with its own lock to simulate two separate workers
+        $schedule2 = (new Schedule())
+            ->add(RecurringMessage::every('1 minute', $message1))
+            ->add(RecurringMessage::every('1 minute', $message2))
+            ->add(RecurringMessage::every('1 minute', $message3))
+            ->stateful($cache2)
+            ->lockFactory($lockFactory)
+        ;
+
+        // First consumer
+        $generator1 = new MessageGenerator(
+            $schedule1,
+            'schedule_1',
+            $clock,
+        );
+
+        // Second consumer
+        $generator2 = new MessageGenerator(
+            $schedule2,
+            'schedule_1',
+            $clock,
+        );
+
+        // Warmup. The first run always returns nothing.
+        $this->assertSame([], iterator_to_array($generator1->getMessages(), false));
+        $this->assertSame([], iterator_to_array($generator2->getMessages(), false));
+        $this->assertEquals(self::makeDateTime('22:15:00'), $clock->now());
+
+        $clock->sleep(60 + 10); // 22:16:10
+        $message1 = $generator1->getMessages()->current();
+        $this->assertSame('message1', $message1->id);
+        $message2 = $generator2->getMessages()->current();
+        $this->assertSame('message2', $message2->id);
+        $message3 = $generator1->getMessages()->current();
+        $this->assertSame('message3', $message3->id);
+        $message4 = $generator2->getMessages()->current();
+        $this->assertNull($message4);
+        $message5 = $generator1->getMessages()->current();
+        $this->assertNull($message5);
+
+        $clock->sleep(60); // 22:17:10
+        $this->assertEquals(self::makeDateTime('22:17:10'), $clock->now());
+        $message1 = $generator2->getMessages()->current();
+        $this->assertSame('message1', $message1->id);
+        $message2 = $generator1->getMessages()->current();
+        $this->assertSame('message2', $message2->id);
+        $message3 = $generator1->getMessages()->current();
+        $this->assertSame('message3', $message3->id);
+        $message4 = $generator2->getMessages()->current();
+        $this->assertNull($message4);
+        $message5 = $generator1->getMessages()->current();
+        $this->assertNull($message5);
     }
 
     public static function messagesProvider(): \Generator

@@ -13,6 +13,8 @@ namespace Symfony\Component\Scheduler\Generator;
 
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
@@ -23,6 +25,9 @@ final class MessageGenerator implements MessageGeneratorInterface
     private ?Schedule $schedule = null;
     private TriggerHeap $triggerHeap;
     private ?\DateTimeImmutable $waitUntil;
+
+    /** @var LockInterface[] */
+    private array $locks = [];
 
     public function __construct(
         private readonly ScheduleProviderInterface $scheduleProvider,
@@ -86,10 +91,27 @@ final class MessageGenerator implements MessageGeneratorInterface
                 $heap->insert([$nextTime, $index, $recurringMessage]);
             }
 
-            if ($yield) {
+            $lockFactory = $this->schedule->getLockFactory();
+            if ($yield && !$lockFactory) {
                 $context = new MessageContext($this->name, $id, $trigger, $time, $nextTime);
                 try {
                     foreach ($recurringMessage->getMessages($context) as $message) {
+                        yield $context => $message;
+                    }
+                } finally {
+                    $checkpoint->save($time, $index);
+                }
+            } elseif ($yield) {
+                $context = new MessageContext($this->name, $id, $trigger, $time, $nextTime);
+                try {
+                    foreach ($recurringMessage->getMessages($context) as $message) {
+                        $messageKey = $this->getMessageIdAndRun($message, $context);
+                        $key = 'scheduler_lock_'.$this->name.'_'.$messageKey;
+                        // lock for one hour to avoid duplicate message dispatching
+                        $lock = ($this->locks[$key] ??= $lockFactory->createLock($key, 3600, false));
+                        if (!$lock->acquire()) {
+                            continue;
+                        }
                         yield $context => $message;
                     }
                 } finally {
@@ -136,5 +158,14 @@ final class MessageGenerator implements MessageGeneratorInterface
     private function checkpoint(): Checkpoint
     {
         return $this->checkpoint ??= new Checkpoint('scheduler_checkpoint_'.$this->name, $this->getSchedule()->getLock(), $this->getSchedule()->getState());
+    }
+
+    private function getMessageIdAndRun(object $message, MessageContext $contest): string
+    {
+        return match (true) {
+            $message instanceof ServiceCallMessage => $message->__toString().json_encode($message->getArguments()),
+            $message instanceof \Stringable => $message->__toString(),
+            default => $message::class,
+        }.$contest->triggeredAt->format('_YmdHis');
     }
 }

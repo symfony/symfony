@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by llupa at 2025-11-12T09:43:01Z
+
+I'll check the tests. I will not fix 'common typos' though.
+
+The high deps tests run with Sf 5.4 and the formatters were dropped in Sf 6.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-12T09:48:37Z
+
+You can ignore the unit test failures, but the intl data tests should indeed not fail.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-12T09:49:40Z
+
+and you need to bump the version in `Intl::getIcuStubVersion()`

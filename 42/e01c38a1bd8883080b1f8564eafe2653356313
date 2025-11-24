@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-11-24T08:05:08Z
+
+This is not a typo, it's the French word for "response" which is being used by the API (see https://en.smsbox.net/docs/doc-API-SMSBOX-1.1-EN.pdf)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-11-24T08:10:25Z
+
+Shall we merge it like this? (updated)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-11-24T11:09:08Z
+
+Careful, the target branch is 7.4 but I assume it should be 7.3 given the PR description?

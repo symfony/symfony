@@ -260,7 +260,7 @@ class Connection
         $confirmTimeout = ('' !== ($options['confirm_timeout'] ?? ''));
 
         if ($transactional && $confirmTimeout) {
-            throw new LogicException('Confirm timeout cannot be used on transactional channel.');
+            throw new LogicException('"confirm_timeout" option cannot be used on transactional channel.');
         }
     }
 

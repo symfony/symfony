@@ -341,8 +341,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             return $this->fetch($request, $catch);
         }
 
-        $entry->headers->set('Cache-Status', 'SymfonyCache, hit; ttl='.$entry->getTtl());
-
         if (!$this->isFreshEnough($request, $entry)) {
             $this->record($request, 'stale');
 
@@ -353,7 +351,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             return $this->validate($request, $entry, $catch);
         }
 
-        $this->record($request, 'hit');
         $this->record($request, 'fresh');
 
         $entry->headers->set('Age', $entry->getAge());

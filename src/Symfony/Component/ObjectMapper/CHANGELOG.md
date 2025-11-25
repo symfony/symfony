@@ -4,6 +4,7 @@ CHANGELOG
 8.1
 ---
 
+ * Add automatic conversion between `BackedEnum` and scalar types (both ways)
  * Add reverse class-map based on Map attribute
  * Merge nested properties when targeting the same class
  * Add a `targetClass` option to `MapCollection`

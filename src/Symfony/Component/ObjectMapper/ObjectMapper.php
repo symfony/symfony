@@ -20,6 +20,7 @@ use Symfony\Component\ObjectMapper\Exception\NoSuchPropertyException;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
+use Symfony\Component\ObjectMapper\Transform\MapEnum;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException as PropertyAccessorNoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\VarExporter\LazyObjectInterface;
@@ -165,6 +166,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
+                $mapping = $this->enrichMappingWithEnum($mapping, $source::class, $sourcePropertyName, $targetRefl, $targetPropertyName);
                 $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping);
                 $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value);
             }
@@ -183,7 +185,8 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $value = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap);
+                $enumMapping = $this->createEnumMappingIfNeeded($source::class, $propertyName, $targetRefl, $propertyName);
+                $value = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap, $enumMapping);
                 $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value);
                 continue;
             }
@@ -450,5 +453,59 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $clone->objectMapper = $objectMapper;
 
         return $clone;
+    }
+
+    private function enrichMappingWithEnum(Mapping $mapping, string $sourceClass, string $sourceProperty, \ReflectionClass $targetRefl, string $targetProperty): Mapping
+    {
+        $transforms = $mapping->transform;
+        $list = null === $transforms ? [] : (\is_array($transforms) ? $transforms : [$transforms]);
+        foreach ($list as $t) {
+            if ($t instanceof MapEnum) {
+                return $mapping;
+            }
+        }
+
+        $enumTransformer = $this->detectEnumTransformer($sourceClass, $sourceProperty, $targetRefl, $targetProperty);
+        if (null === $enumTransformer) {
+            return $mapping;
+        }
+
+        if (null === $transforms) {
+            $transforms = $enumTransformer;
+        } elseif (\is_array($transforms)) {
+            array_unshift($transforms, $enumTransformer);
+        } else {
+            $transforms = [$enumTransformer, $transforms];
+        }
+
+        return new Mapping($mapping->target, $mapping->source, $mapping->if, $transforms);
+    }
+
+    private function createEnumMappingIfNeeded(string $sourceClass, string $sourceProperty, \ReflectionClass $targetRefl, string $targetProperty): ?Mapping
+    {
+        $enumTransformer = $this->detectEnumTransformer($sourceClass, $sourceProperty, $targetRefl, $targetProperty);
+
+        return $enumTransformer ? new Mapping(null, null, null, $enumTransformer) : null;
+    }
+
+    private function detectEnumTransformer(string $sourceClass, string $sourceProperty, \ReflectionClass $targetRefl, string $targetProperty): ?MapEnum
+    {
+        if (!$targetRefl->hasProperty($targetProperty)) {
+            return null;
+        }
+
+        $sourceRefl = new \ReflectionClass($sourceClass);
+        if (!$sourceRefl->hasProperty($sourceProperty)) {
+            return null;
+        }
+
+        $sourceType = $sourceRefl->getProperty($sourceProperty)->getType();
+        $targetType = $targetRefl->getProperty($targetProperty)->getType();
+
+        if (!$sourceType instanceof \ReflectionNamedType || !$targetType instanceof \ReflectionNamedType) {
+            return null;
+        }
+
+        return MapEnum::detect($sourceType->getName(), $targetType->getName());
     }
 }

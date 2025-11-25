@@ -59,6 +59,8 @@ EOF
             $pool->prune();
         }
 
+        // fake change
+
         $io->success('Successfully pruned cache pool(s).');
 
         return 0;

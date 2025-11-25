@@ -356,7 +356,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('trim' === $prefix) {
-            return trim($env);
+            return trim($env, " \t\n\r\v");
         }
 
         throw new RuntimeException(\sprintf('Unsupported env var prefix "%s" for env name "%s".', $prefix, $name));

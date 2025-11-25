@@ -982,4 +982,25 @@ CSV;
         yield 'Null' => [false, fn () => null];
         yield 'Env var not defined' => [false, fn () => throw new EnvNotFoundException()];
     }
+
+    /**
+     * @dataProvider provideTrimScenarios
+     */
+    public function testTrimEnvVarProcessorPreservesNullBytes($input, $expected)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('trim', 'APP_SECRET', fn () => $input);
+
+        $this->assertSame($expected, $result);
+    }
+
+    public static function provideTrimScenarios(): iterable
+    {
+        yield 'standard_spaces' => ['  foo  ', 'foo'];
+        yield 'newlines_and_tabs' => ["\n\tbar\r\n", 'bar'];
+        yield 'binary_null_at_end' => ["MySecret\0\n", "MySecret\0"];
+        yield 'binary_null_at_start' => ["\n\0MySecret", "\0MySecret"];
+        yield 'binary_null_inside' => [" \tKey\0Value \n", "Key\0Value"];
+    }
 }

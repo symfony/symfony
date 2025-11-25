@@ -986,4 +986,5 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame('Charlie', $target->name);
         $this->assertSame(42, $target->points);
     }
+
 }

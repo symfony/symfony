@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add automatic conversion between `BackedEnum` and scalar types (both ways)
+
 8.1
 ---
 

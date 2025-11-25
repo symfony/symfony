@@ -19,6 +19,7 @@ CHANGELOG
  * Remove the `validation.cache` option
  * Remove `TranslationUpdateCommand` in favor of `TranslationExtractCommand`
  * Remove `ConfigBuilderCacheWarmer`, return PHP arrays from your config instead
+ * Remove `MailerAssertionsTrait` and `NotificationAssertionsTrait` from `KernelTestCase`, use those traits directly when you need them
 
 7.4
 ---

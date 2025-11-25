@@ -12,10 +12,13 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\RequiresMethod;
+use Symfony\Bundle\FrameworkBundle\Test\NotificationAssertionsTrait;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 
 final class NotificationTest extends AbstractWebTestCase
 {
+    use NotificationAssertionsTrait;
+
     #[RequiresMethod(MercureBundle::class, 'build')]
     public function testNotifierAssertion()
     {

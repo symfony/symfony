@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Test\MailerAssertionsTrait;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Mailer;
@@ -22,6 +23,8 @@ use Symfony\Component\Mime\Email;
 
 class MailerTest extends AbstractWebTestCase
 {
+    use MailerAssertionsTrait;
+
     public function testEnvelopeListener()
     {
         self::bootKernel(['test_case' => 'Mailer']);

@@ -59,7 +59,9 @@ EOF
             $pool->prune();
         }
 
-        // fake change
+        // Testing CI stability: This trivial change is intentionally added to verify that the test failure
+        // observed in https://github.com/symfony/symfony/actions/runs/19654656899/job/56288722627?pr=62490
+        // Related to: https://github.com/symfony/symfony/pull/62490
 
         $io->success('Successfully pruned cache pool(s).');
 

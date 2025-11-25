@@ -34,5 +34,8 @@
     "conflict": {
       "symfony/property-access": "<7.2"
     },
+    "suggest": {
+      "symfony/property-access": "To enable smart accessors and dot notation embed properties."
+    },
     "minimum-stability": "dev"
 }

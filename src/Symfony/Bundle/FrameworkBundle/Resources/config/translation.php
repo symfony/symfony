@@ -46,9 +46,11 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
+use Symfony\Component\Translation\TranslationDomainSwitcher;
 use Symfony\Component\Translation\Writer\TranslationWriter;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Contracts\Translation\TranslationDomainAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -188,5 +190,15 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.locale_aware')
         ->alias(LocaleAwareInterface::class, 'translation.locale_switcher')
         ->alias(LocaleSwitcher::class, 'translation.locale_switcher')
+
+        ->set('translation.domain_switcher', TranslationDomainSwitcher::class)
+            ->args([
+                'messages',
+                tagged_iterator('kernel.translation_domain_aware', exclude: 'translation.domain_switcher'),
+            ])
+            ->tag('kernel.reset', ['method' => 'reset'])
+            ->tag('kernel.translation_domain_aware')
+        ->alias(TranslationDomainAwareInterface::class, 'translation.domain_switcher')
+        ->alias(TranslationDomainSwitcher::class, 'translation.domain_switcher')
     ;
 };

@@ -219,6 +219,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Contracts\Translation\TranslationDomainAwareInterface;
 
 /**
  * Process the configuration and prepare the dependency injection container with
@@ -667,6 +668,8 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.event_subscriber');
         $container->registerForAutoconfiguration(LocaleAwareInterface::class)
             ->addTag('kernel.locale_aware');
+        $container->registerForAutoconfiguration(TranslationDomainAwareInterface::class)
+            ->addTag('kernel.translation_domain_aware');
         $container->registerForAutoconfiguration(ResetInterface::class)
             ->addTag('kernel.reset', ['method' => 'reset']);
         $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)

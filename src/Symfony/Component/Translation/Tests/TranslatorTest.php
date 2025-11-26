@@ -619,6 +619,17 @@ class TranslatorTest extends TestCase
         $this->assertSame('There are 42 apples', $translator->trans('apples', [], $domain));
         $this->assertSame('There is one apple', $translator->trans('apples', ['{apples}' => 1], $domain));
     }
+
+    public function testTransWithTempDomain()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['test' => 'Default Domain'], 'en');
+        $translator->addResource('array', ['test' => 'Test Domain'], 'en', 'test');
+        $translator->setDomain('test');
+
+        $this->assertSame('Test Domain', $translator->trans('test'));
+    }
 }
 
 class StringClass

@@ -23,6 +23,7 @@ use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslationDomainAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 // Help opcache.preload discover always-needed symbols
@@ -31,7 +32,7 @@ class_exists(MessageCatalogue::class);
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface
+class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface, TranslationDomainAwareInterface
 {
     /**
      * @var MessageCatalogueInterface[]
@@ -39,6 +40,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     protected array $catalogues = [];
 
     private string $locale;
+
+    private string $domain = 'messages';
 
     /**
      * @var string[]
@@ -111,7 +114,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function addResource(string $format, mixed $resource, string $locale, ?string $domain = null): void
     {
-        $domain ??= 'messages';
+        $domain ??= $this->getDomain();
 
         $this->assertValidLocale($locale);
         $locale ?: $locale = class_exists(\Locale::class) ? \Locale::getDefault() : 'en';
@@ -134,6 +137,16 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     public function getLocale(): string
     {
         return $this->locale ?: (class_exists(\Locale::class) ? \Locale::getDefault() : 'en');
+    }
+
+    public function setDomain(string $domain): void
+    {
+        $this->domain = $domain;
+    }
+
+    public function getDomain(): string
+    {
+        return $this->domain;
     }
 
     /**
@@ -182,7 +195,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
             return '';
         }
 
-        $domain ??= 'messages';
+        $domain ??= $this->getDomain();
 
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();

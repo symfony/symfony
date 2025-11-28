@@ -19,7 +19,7 @@ class ObjectOuter
     private $date;
 
     /**
-     * @var ObjectInner[]
+     * @var list<ObjectInner>
      */
     private $inners;
 

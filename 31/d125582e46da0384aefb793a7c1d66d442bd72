@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-11-22T16:56:58Z
+
+If it's a bugfix a deprecation is not needed IMHO
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-11-22T17:02:39Z
+
+> If it's a bugfix a deprecation is not needed IMHO
+
+That's a missing validation. Currently it's possible to set the `arguments` option, which is overridden when `from_callable` is handled. Throwing an exception is useful, but it is a breaking change.
+
+I would treat this as a feature.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-11-22T18:14:15Z
+
+Got it, makes sense!
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-22T23:31:58Z
+
+Hi @GromNaN @OskarStark, thank you for the reviews; I've updated the code and added an entry in the CHANGELOG

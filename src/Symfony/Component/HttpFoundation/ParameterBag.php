@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Exception\UnexpectedValueException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @implements \IteratorAggregate<string, mixed>
+ * @implements \IteratorAggregate<array-key, mixed>
  */
 class ParameterBag implements \IteratorAggregate, \Countable
 {
@@ -241,7 +241,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns an iterator for parameters.
      *
-     * @return \ArrayIterator<string, mixed>
+     * @return \ArrayIterator<array-key, mixed>
      */
     public function getIterator(): \ArrayIterator
     {

@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-11-21T13:33:19Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-11-21T13:37:29Z
+
+I see that you added tests in `cts.json`. This file is extracted from another repo maintaining the compliance test suite. If these tests were actually added to the repo, nothing more to do on this side 🙂 However, if these are new test cases you came up with, you should better add new separate unit tests. Otherwise, they may be overwritten if we update `cts.json` with a new version of the external repository.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-11-21T13:42:23Z
+
+I would suggest submitting those new tests upstream in https://github.com/jsonpath-standard/jsonpath-compliance-test-suite/ as they might be valuable to other implementations of the standard.
+
+---------------------------------------------------------------------------
+
+by TamasSzigeti at 2025-11-21T13:46:40Z
+
+Hah I just moved it to unit tests, will go back then
+
+---------------------------------------------------------------------------
+
+by TamasSzigeti at 2025-11-21T14:08:35Z
+
+@alexandre-daubois @stof [Done](https://github.com/jsonpath-standard/jsonpath-compliance-test-suite/pull/113), btw there are 2 (unrelated) test cases upstream which now fail here when we update the json:
+
+```
+1) Symfony\Component\JsonPath\Tests\JsonPathComplianceTestSuiteTest::testComplianceTestCase with data set "functions, length, non-singular query arg, multiple index selectors" ('$[?length(@[1, 2])<3]', array(), array(), true)
+Failed asserting that exception of type "Symfony\Component\JsonPath\Exception\JsonCrawlerException" is thrown.
+
+2) Symfony\Component\JsonPath\Tests\JsonPathComplianceTestSuiteTest::testComplianceTestCase with data set "functions, length, non-singular query arg, multiple name selectors" ('$[?length(@['a', 'b'])<3]', array(), array(), true)
+Failed asserting that exception of type "Symfony\Component\JsonPath\Exception\JsonCrawlerException" is thrown.
+```
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-11-21T14:15:13Z
+
+Thanks for taking care of the upstream change! I'll have a look at the failing test with the updated set.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-11-24T08:07:15Z
+
+It has been merged upstream. Can you update the `cts.json` file (if needed) with the new version please?
+
+---------------------------------------------------------------------------
+
+by TamasSzigeti at 2025-11-24T09:25:14Z
+
+> It has been merged upstream. Can you update the `cts.json` file (if needed) with the new version please?
+
+Done

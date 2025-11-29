@@ -379,4 +379,13 @@ class ParameterBagTest extends TestCase
 
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
+
+    public function testIteratorCanHandleNumericKeysAsInteger()
+    {
+        $bag = new ParameterBag(['0' => 'foo', '1' => 'bar', '80' => 'lux']);
+
+        foreach ($bag as $key => $val) {
+            $this->assertIsInt($key);
+        }
+    }
 }

@@ -14,14 +14,11 @@ namespace Symfony\Bundle\SecurityBundle\Command;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
+use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
@@ -30,8 +27,28 @@ use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 /**
  * @author Timo Bakx <timobakx@gmail.com>
  */
-#[AsCommand(name: 'debug:firewall', description: 'Display information about your security firewall(s)')]
-final class DebugFirewallCommand extends Command
+#[AsCommand(
+    name: 'debug:firewall',
+    description: 'Display information about your security firewall(s)',
+    help: <<<EOF
+        The <info>%command.name%</info> command displays the firewalls that are configured
+        in your application:
+
+          <info>php %command.full_name%</info>
+
+        You can pass a firewall name to display more detailed information about
+        a specific firewall:
+
+          <info>php %command.full_name% main</info>
+
+        To include all events and event listeners for a specific firewall, use the
+        <info>events</info> option:
+
+          <info>php %command.full_name% --events main</info>
+
+        EOF
+)]
+final class DebugFirewallCommand
 {
     /**
      * @param string[]                   $firewallNames
@@ -43,44 +60,13 @@ final class DebugFirewallCommand extends Command
         private ContainerInterface $eventDispatchers,
         private array $authenticators,
     ) {
-        parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $exampleName = $this->getExampleName();
-
-        $this
-            ->setHelp(<<<EOF
-                The <info>%command.name%</info> command displays the firewalls that are configured
-                in your application:
-
-                  <info>php %command.full_name%</info>
-
-                You can pass a firewall name to display more detailed information about
-                a specific firewall:
-
-                  <info>php %command.full_name% $exampleName</info>
-
-                To include all events and event listeners for a specific firewall, use the
-                <info>events</info> option:
-
-                  <info>php %command.full_name% --events $exampleName</info>
-
-                EOF
-            )
-            ->setDefinition([
-                new InputArgument('name', InputArgument::OPTIONAL, \sprintf('A firewall name (for example "%s")', $exampleName)),
-                new InputOption('events', null, InputOption::VALUE_NONE, 'Include a list of event listeners (only available in combination with the "name" argument)'),
-            ]);
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $io = new SymfonyStyle($input, $output);
-
-        $name = $input->getArgument('name');
-
+    public function __invoke(
+        SymfonyStyle $io,
+        #[Argument(description: 'A firewall name (for example "main")')] ?string $name = null,
+        #[Option(description: 'Include a list of event listeners (only available in combination with the "name" argument)')] bool $events = false,
+    ): int {
         if (null === $name) {
             $this->displayFirewallList($io);
 
@@ -104,7 +90,7 @@ final class DebugFirewallCommand extends Command
 
         $this->displaySwitchUser($context, $io);
 
-        if ($input->getOption('events')) {
+        if ($events) {
             $this->displayEventListeners($name, $context, $io);
         }
 

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for the `clientHints`, `prefetchCache`, and `prerenderCache` `ClearSite-Data` directives
+ * Migrate the `Symfony/Bundle/SecurityBundle/Command/DebugFirewallCommand` and `Symfony/Bundle/SecurityBundle/Command/SecurityRoleHierarchyDumpCommand` to the invokable console commands feature
 
 8.0
 ---

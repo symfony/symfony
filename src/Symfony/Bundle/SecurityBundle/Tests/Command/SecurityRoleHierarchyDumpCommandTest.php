@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Command\SecurityRoleHierarchyDumpCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
@@ -75,9 +76,9 @@ class SecurityRoleHierarchyDumpCommandTest extends TestCase
         $command = new SecurityRoleHierarchyDumpCommand($roleHierarchy);
         $commandTester = new CommandTester($command);
 
-        $exitCode = $commandTester->execute(['--direction' => 'INVALID']);
+        self::expectException(InvalidOptionException::class);
+        self::expectExceptionMessage('The value "INVALID" is not valid for the "direction" option.');
 
-        $this->assertSame(Command::FAILURE, $exitCode);
-        $this->assertStringContainsString('Invalid direction', $commandTester->getDisplay());
+        $commandTester->execute(['--direction' => 'INVALID']);
     }
 }

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-11-26T23:45:33Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "8.1 for features / 6.4, 7.3, 7.4, 8.0 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Kocal at 2025-11-27T09:12:10Z
+
+Failing checks are unrelated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-27T14:10:21Z
+
+I'd be fine having this on a lower branch like we do for Doctrine eg
+
+---------------------------------------------------------------------------
+
+by Kocal at 2025-11-27T16:16:58Z
+
+Like 7.3?
+Support for Mercure 0.6 was added in 7.2
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-11-29T08:01:00Z
+
+@Kocal Can you rebase the PR?
+
+---------------------------------------------------------------------------
+
+by Kocal at 2025-11-29T09:21:14Z
+
+@fabpot PR rebased

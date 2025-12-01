@@ -158,6 +158,65 @@ class Connection implements ResetInterface
         ]);
     }
 
+    /**
+     * Sends multiple messages in a single INSERT query.
+     *
+     * @param list<array{body: string, headers: array, delay: int}> $messages
+     *
+     * @throws DBALException
+     */
+    public function sendBatch(array $messages): void
+    {
+        if ([] === $messages) {
+            return;
+        }
+
+        $now = new \DateTimeImmutable('UTC');
+        $queueName = $this->configuration['queue_name'];
+        $queryBuilder = $this->driverConnection->createQueryBuilder()
+            ->insert($this->configuration['table_name'])
+            ->values([
+                'body' => '?',
+                'headers' => '?',
+                'queue_name' => '?',
+                'created_at' => '?',
+                'available_at' => '?',
+            ]);
+
+        $baseSql = $queryBuilder->getSQL();
+
+        $additionalPlaceholders = [];
+        $values = [];
+        $types = [];
+
+        foreach ($messages as $index => $message) {
+            $delay = $message['delay'];
+            $availableAt = $now->modify(\sprintf('%+d seconds', $delay / 1000));
+
+            if ($index > 0) {
+                $additionalPlaceholders[] = '(?, ?, ?, ?, ?)';
+            }
+
+            $values[] = $message['body'];
+            $values[] = json_encode($message['headers']);
+            $values[] = $queueName;
+            $values[] = $now;
+            $values[] = $availableAt;
+
+            $types[] = Types::STRING;
+            $types[] = Types::STRING;
+            $types[] = Types::STRING;
+            $types[] = Types::DATETIME_IMMUTABLE;
+            $types[] = Types::DATETIME_IMMUTABLE;
+        }
+
+        $sql = [] === $additionalPlaceholders
+            ? $baseSql
+            : $baseSql.', '.implode(', ', $additionalPlaceholders);
+
+        $this->executeBatchInsert($sql, $values, $types);
+    }
+
     public function get(): ?array
     {
         if ($this->doMysqlCleanup && $this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
@@ -515,6 +574,21 @@ class Connection implements ResetInterface
         }
 
         return $id;
+    }
+
+    private function executeBatchInsert(string $sql, array $parameters = [], array $types = []): void
+    {
+        insert:
+        try {
+            $this->driverConnection->executeStatement($sql, $parameters, $types);
+        } catch (TableNotFoundException $e) {
+            if (!$this->autoSetup) {
+                throw $e;
+            }
+
+            $this->setup();
+            goto insert;
+        }
     }
 
     private function getSchema(): Schema

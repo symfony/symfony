@@ -16,14 +16,14 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  */
-class DoctrineSender implements SenderInterface
+class DoctrineSender implements BatchSenderInterface
 {
     private SerializerInterface $serializer;
 
@@ -49,5 +49,39 @@ class DoctrineSender implements SenderInterface
         }
 
         return $envelope->with(new TransportMessageIdStamp($id));
+    }
+
+    public function getMaxBatchSize(): ?int
+    {
+        return null;
+    }
+
+    public function sendBatch(array $envelopes): array
+    {
+        if ([] === $envelopes) {
+            return [];
+        }
+
+        $messages = [];
+        foreach ($envelopes as $envelope) {
+            $encodedMessage = $this->serializer->encode($envelope);
+
+            /** @var DelayStamp|null $delayStamp */
+            $delayStamp = $envelope->last(DelayStamp::class);
+
+            $messages[] = [
+                'body' => $encodedMessage['body'],
+                'headers' => $encodedMessage['headers'] ?? [],
+                'delay' => null !== $delayStamp ? $delayStamp->getDelay() : 0,
+            ];
+        }
+
+        try {
+            $this->connection->sendBatch($messages);
+        } catch (DBALException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+
+        return $envelopes;
     }
 }

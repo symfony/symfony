@@ -37,8 +37,8 @@ interface BatchSenderInterface extends SenderInterface
      * The number of envelopes MUST NOT exceed getMaxBatchSize() if it returns
      * a non-null value.
      *
-     * The returned envelopes should contain a TransportMessageIdStamp and
-     * MUST be in the same order as the input envelopes.
+     * The returned envelopes MUST be in the same order as the input envelopes.
+     * The envelopes may contain a TransportMessageIdStamp if supported by the transport
      *
      * @param Envelope[] $envelopes
      *

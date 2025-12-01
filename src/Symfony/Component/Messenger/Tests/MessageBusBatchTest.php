@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\BatchStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Exception\BatchSizeExceededException;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -208,6 +209,112 @@ class MessageBusBatchTest extends TestCase
         for ($i = 0; $i < 10; ++$i) {
             $this->assertSame("Message $i", $envelopes[$i]->getMessage()->getMessage());
         }
+    }
+
+    public function testDispatchBatchThrowsWhenMaxBatchSizeExceeded()
+    {
+        $messages = [];
+        for ($i = 0; $i < 5; ++$i) {
+            $messages[] = new DummyMessage("Message $i");
+        }
+
+        $sender = $this->createMock(BatchSenderInterface::class);
+        $sender->method('getMaxBatchSize')->willReturn(3);
+        $sender->expects($this->never())->method('sendBatch');
+
+        $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['async']], ['async' => $sender]);
+        $middleware = new SendMessageMiddleware($sendersLocator);
+
+        $bus = new MessageBus([$middleware]);
+
+        $this->expectException(BatchSizeExceededException::class);
+        $this->expectExceptionMessage('Transport "async" supports a maximum batch size of 3, but 5 messages were provided.');
+
+        $bus->dispatchBatch($messages);
+    }
+
+    public function testDispatchBatchSucceedsWhenWithinMaxBatchSize()
+    {
+        $messages = [];
+        for ($i = 0; $i < 3; ++$i) {
+            $messages[] = new DummyMessage("Message $i");
+        }
+
+        $sender = $this->createMock(BatchSenderInterface::class);
+        $sender->method('getMaxBatchSize')->willReturn(3);
+        $sender->expects($this->once())
+            ->method('sendBatch')
+            ->willReturnArgument(0);
+
+        $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['async']], ['async' => $sender]);
+        $middleware = new SendMessageMiddleware($sendersLocator);
+
+        $bus = new MessageBus([$middleware]);
+        $envelopes = $bus->dispatchBatch($messages);
+
+        $this->assertCount(3, $envelopes);
+    }
+
+    public function testDispatchBatchWithUnlimitedMaxBatchSize()
+    {
+        $messages = [];
+        for ($i = 0; $i < 100; ++$i) {
+            $messages[] = new DummyMessage("Message $i");
+        }
+
+        $sender = $this->createMock(BatchSenderInterface::class);
+        $sender->method('getMaxBatchSize')->willReturn(null);
+        $sender->expects($this->once())
+            ->method('sendBatch')
+            ->willReturnArgument(0);
+
+        $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['async']], ['async' => $sender]);
+        $middleware = new SendMessageMiddleware($sendersLocator);
+
+        $bus = new MessageBus([$middleware]);
+        $envelopes = $bus->dispatchBatch($messages);
+
+        $this->assertCount(100, $envelopes);
+    }
+
+    public function testDispatchBatchValidatesAllTransportsBeforeSending()
+    {
+        $messages = [];
+        for ($i = 0; $i < 5; ++$i) {
+            $messages[] = new DummyMessage("Message $i");
+        }
+
+        // First transport has no limit
+        $sender1 = $this->createMock(BatchSenderInterface::class);
+        $sender1->method('getMaxBatchSize')->willReturn(null);
+        $sender1->expects($this->never())->method('sendBatch');
+
+        // Second transport has a limit that will be exceeded
+        $sender2 = $this->createMock(BatchSenderInterface::class);
+        $sender2->method('getMaxBatchSize')->willReturn(3);
+        $sender2->expects($this->never())->method('sendBatch');
+
+        $sendersLocator = $this->createSendersLocator(
+            [DummyMessage::class => ['doctrine', 'sqs']],
+            ['doctrine' => $sender1, 'sqs' => $sender2]
+        );
+        $middleware = new SendMessageMiddleware($sendersLocator);
+
+        $bus = new MessageBus([$middleware]);
+
+        $this->expectException(BatchSizeExceededException::class);
+        $this->expectExceptionMessage('Transport "sqs" supports a maximum batch size of 3, but 5 messages were provided.');
+
+        $bus->dispatchBatch($messages);
+    }
+
+    public function testBatchSizeExceededExceptionContainsDetails()
+    {
+        $exception = new BatchSizeExceededException('sqs', 15, 10);
+
+        $this->assertSame('sqs', $exception->getTransportName());
+        $this->assertSame(15, $exception->getBatchSize());
+        $this->assertSame(10, $exception->getMaxBatchSize());
     }
 
     private function createSendersLocator(array $sendersMap, array $senders): SendersLocator

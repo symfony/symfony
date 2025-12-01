@@ -16,6 +16,7 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\BatchSentToTransportsEvent;
 use Symfony\Component\Messenger\Event\MessageSentToTransportsEvent;
+use Symfony\Component\Messenger\Exception\BatchSizeExceededException;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 
 /**
@@ -69,52 +70,110 @@ final class BatchCollector
      * Flush all pending sends and return the final envelopes.
      *
      * @return Envelope[]
+     *
+     * @throws BatchSizeExceededException When a transport's max batch size is exceeded
      */
     public function flush(): array
     {
-        /** @var array<string, SenderInterface> $senders */
+        $this->validateBatchSizes();
+
+        $senders = $this->sendToTransports();
+
+        $this->pending = [];
+        ksort($this->envelopes);
+
+        $this->dispatchEvents($senders);
+
+        return $this->envelopes;
+    }
+
+    /**
+     * @return array<string, SenderInterface> Map of alias to sender
+     */
+    private function sendToTransports(): array
+    {
         $senders = [];
 
         foreach ($this->pending as $alias => $data) {
             $sender = $data['sender'];
             $senders[$alias] = $sender;
-            $envelopes = array_column($data['items'], 'envelope');
-            $indices = array_column($data['items'], 'index');
 
-            if ($sender instanceof BatchSenderInterface) {
-                $sent = $sender->sendBatch($envelopes);
-            } else {
-                $this->logger?->warning('Transport "{alias}" does not implement BatchSenderInterface, falling back to individual sends.', [
-                    'alias' => $alias,
-                    'sender' => $sender::class,
-                ]);
-                $sent = array_map(fn (Envelope $envelope) => $sender->send($envelope), $envelopes);
-            }
+            $sent = $this->sendToTransport($alias, $sender, $data['items']);
 
-            // Update tracked envelopes with results from transport
-            foreach ($sent as $i => $envelope) {
-                $this->envelopes[$indices[$i]] = $envelope;
+            foreach ($sent as $index => $envelope) {
+                $this->envelopes[$index] = $envelope;
             }
         }
 
-        $this->pending = [];
+        return $senders;
+    }
 
-        // Sort by index
-        ksort($this->envelopes);
+    /**
+     * @param list<array{envelope: Envelope, index: int}> $items
+     *
+     * @return array<int, Envelope> Map of original index to sent envelope
+     */
+    private function sendToTransport(string $alias, SenderInterface $sender, array $items): array
+    {
+        $envelopes = array_column($items, 'envelope');
+        $indices = array_column($items, 'index');
 
-        // Dispatch events
-        if (null !== $this->eventDispatcher && [] !== $senders) {
-            foreach ($this->envelopes as $envelope) {
-                $envelopeSenders = $this->getSendersForEnvelope($envelope, $senders);
-                if ([] !== $envelopeSenders) {
-                    $this->eventDispatcher->dispatch(new MessageSentToTransportsEvent($envelope, $envelopeSenders));
-                }
-            }
-
-            $this->eventDispatcher->dispatch(new BatchSentToTransportsEvent($this->batchId, $this->envelopes, $senders));
+        if ($sender instanceof BatchSenderInterface) {
+            $sent = $sender->sendBatch($envelopes);
+        } else {
+            $this->logger?->warning('Transport "{alias}" does not implement BatchSenderInterface, falling back to individual sends.', [
+                'alias' => $alias,
+                'sender' => $sender::class,
+            ]);
+            $sent = array_map(static fn (Envelope $envelope) => $sender->send($envelope), $envelopes);
         }
 
-        return $this->envelopes;
+        return array_combine($indices, $sent);
+    }
+
+    /**
+     * @param array<string, SenderInterface> $senders
+     */
+    private function dispatchEvents(array $senders): void
+    {
+        if (null === $this->eventDispatcher || [] === $senders) {
+            return;
+        }
+
+        foreach ($this->envelopes as $envelope) {
+            $envelopeSenders = $this->getSendersForEnvelope($envelope, $senders);
+            if ([] !== $envelopeSenders) {
+                $this->eventDispatcher->dispatch(new MessageSentToTransportsEvent($envelope, $envelopeSenders));
+            }
+        }
+
+        $this->eventDispatcher->dispatch(new BatchSentToTransportsEvent($this->batchId, $this->envelopes, $senders));
+    }
+
+    /**
+     * Validates that no transport's max batch size is exceeded.
+     *
+     * @throws BatchSizeExceededException
+     */
+    private function validateBatchSizes(): void
+    {
+        foreach ($this->pending as $alias => $data) {
+            $sender = $data['sender'];
+
+            if (!$sender instanceof BatchSenderInterface) {
+                continue;
+            }
+
+            $maxBatchSize = $sender->getMaxBatchSize();
+            if (null === $maxBatchSize) {
+                continue;
+            }
+
+            $batchSize = \count($data['items']);
+            if ($batchSize > $maxBatchSize) {
+                throw new BatchSizeExceededException($alias, $batchSize, $maxBatchSize);
+            }
+        }
     }
 
     /**

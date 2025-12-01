@@ -20,55 +20,40 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
 {
-    /**
-     * Transforms a normalized date into a localized date.
-     *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
-     *
-     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
-     */
-    public function transform(mixed $dateTime): string
+    public function transform(mixed $value): string
     {
-        if (null === $dateTime) {
+        if (null === $value) {
             return '';
         }
 
-        if (!$dateTime instanceof \DateTimeInterface) {
+        if (!$value instanceof \DateTimeInterface) {
             throw new TransformationFailedException('Expected a \DateTimeInterface.');
         }
 
         if ($this->inputTimezone !== $this->outputTimezone) {
-            $dateTime = \DateTimeImmutable::createFromInterface($dateTime);
-            $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+            $value = \DateTimeImmutable::createFromInterface($value);
+            $value = $value->setTimezone(new \DateTimeZone($this->outputTimezone));
         }
 
-        return preg_replace('/\+00:00$/', 'Z', $dateTime->format('c'));
+        return preg_replace('/\+00:00$/', 'Z', $value->format('c'));
     }
 
-    /**
-     * Transforms a formatted string following RFC 3339 into a normalized date.
-     *
-     * @param string $rfc3339 Formatted string
-     *
-     * @throws TransformationFailedException If the given value is not a string,
-     *                                       if the value could not be transformed
-     */
-    public function reverseTransform(mixed $rfc3339): ?\DateTime
+    public function reverseTransform(mixed $value): ?\DateTime
     {
-        if (!\is_string($rfc3339)) {
+        if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }
 
-        if ('' === $rfc3339) {
+        if ('' === $value) {
             return null;
         }
 
-        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})T\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|(?:(?:\+|-)\d{2}:\d{2}))$/', $rfc3339, $matches)) {
-            throw new TransformationFailedException(\sprintf('The date "%s" is not a valid date.', $rfc3339));
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})T\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|(?:(?:\+|-)\d{2}:\d{2}))$/', $value, $matches)) {
+            throw new TransformationFailedException(\sprintf('The date "%s" is not a valid date.', $value));
         }
 
         try {
-            $dateTime = new \DateTime($rfc3339);
+            $dateTime = new \DateTime($value);
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }

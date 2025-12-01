@@ -45,16 +45,9 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         $this->referenceDate = $referenceDate ?? new \DateTimeImmutable('1970-01-01 00:00:00');
     }
 
-    /**
-     * Transforms a normalized date into a localized date.
-     *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
-     *
-     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
-     */
-    public function transform(mixed $dateTime): array
+    public function transform(mixed $value): array
     {
-        if (null === $dateTime) {
+        if (null === $value) {
             return array_intersect_key([
                 'year' => '',
                 'month' => '',
@@ -65,22 +58,22 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             ], array_flip($this->fields));
         }
 
-        if (!$dateTime instanceof \DateTimeInterface) {
+        if (!$value instanceof \DateTimeInterface) {
             throw new TransformationFailedException('Expected a \DateTimeInterface.');
         }
 
         if ($this->inputTimezone !== $this->outputTimezone) {
-            $dateTime = \DateTimeImmutable::createFromInterface($dateTime);
-            $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+            $value = \DateTimeImmutable::createFromInterface($value);
+            $value = $value->setTimezone(new \DateTimeZone($this->outputTimezone));
         }
 
         $result = array_intersect_key([
-            'year' => $dateTime->format('Y'),
-            'month' => $dateTime->format('m'),
-            'day' => $dateTime->format('d'),
-            'hour' => $dateTime->format('H'),
-            'minute' => $dateTime->format('i'),
-            'second' => $dateTime->format('s'),
+            'year' => $value->format('Y'),
+            'month' => $value->format('m'),
+            'day' => $value->format('d'),
+            'hour' => $value->format('H'),
+            'minute' => $value->format('i'),
+            'second' => $value->format('s'),
         ], array_flip($this->fields));
 
         if (!$this->pad) {
@@ -95,14 +88,6 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         return $result;
     }
 
-    /**
-     * Transforms a localized date into a normalized date.
-     *
-     * @param array $value Localized date
-     *
-     * @throws TransformationFailedException If the given value is not an array,
-     *                                       if the value could not be transformed
-     */
     public function reverseTransform(mixed $value): ?\DateTime
     {
         if (null === $value) {

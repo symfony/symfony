@@ -42,14 +42,14 @@ class TextType extends AbstractType implements DataTransformerInterface
         return 'text';
     }
 
-    public function transform(mixed $data): mixed
+    public function transform(mixed $value): mixed
     {
         // Model data should not be transformed
-        return $data;
+        return $value;
     }
 
-    public function reverseTransform(mixed $data): mixed
+    public function reverseTransform(mixed $value): mixed
     {
-        return $data ?? '';
+        return $value ?? '';
     }
 }

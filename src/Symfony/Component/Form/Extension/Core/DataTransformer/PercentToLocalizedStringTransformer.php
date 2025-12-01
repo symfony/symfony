@@ -60,14 +60,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         $this->scale = $scale ?? 0;
     }
 
-    /**
-     * Transforms between a normalized format (integer or float) into a percentage value.
-     *
-     * @param int|float $value Normalized value
-     *
-     * @throws TransformationFailedException if the given value is not numeric or
-     *                                       if the value could not be transformed
-     */
     public function transform(mixed $value): string
     {
         if (null === $value) {
@@ -93,14 +85,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         return $value;
     }
 
-    /**
-     * Transforms between a percentage value into a normalized format (integer or float).
-     *
-     * @param string $value Percentage value
-     *
-     * @throws TransformationFailedException if the given value is not a string or
-     *                                       if the value could not be transformed
-     */
     public function reverseTransform(mixed $value): int|float|null
     {
         if (!\is_string($value)) {

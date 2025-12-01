@@ -27,9 +27,9 @@ class ChoiceToValueTransformer implements DataTransformerInterface
     ) {
     }
 
-    public function transform(mixed $choice): mixed
+    public function transform(mixed $value): mixed
     {
-        return (string) current($this->choiceList->getValuesForChoices([$choice]));
+        return (string) current($this->choiceList->getValuesForChoices([$value]));
     }
 
     public function reverseTransform(mixed $value): mixed

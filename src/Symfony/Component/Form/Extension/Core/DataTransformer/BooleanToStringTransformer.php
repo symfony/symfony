@@ -37,13 +37,6 @@ class BooleanToStringTransformer implements DataTransformerInterface
         }
     }
 
-    /**
-     * Transforms a Boolean into a string.
-     *
-     * @param bool $value Boolean value
-     *
-     * @throws TransformationFailedException if the given value is not a Boolean
-     */
     public function transform(mixed $value): ?string
     {
         if (null === $value) {
@@ -57,13 +50,6 @@ class BooleanToStringTransformer implements DataTransformerInterface
         return $value ? $this->trueValue : null;
     }
 
-    /**
-     * Transforms a string into a Boolean.
-     *
-     * @param string $value String value
-     *
-     * @throws TransformationFailedException if the given value is not a string
-     */
     public function reverseTransform(mixed $value): bool
     {
         if (\in_array($value, $this->falseValues, true)) {

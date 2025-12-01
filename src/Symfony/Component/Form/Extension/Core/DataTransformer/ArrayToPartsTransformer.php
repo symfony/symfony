@@ -26,28 +26,28 @@ class ArrayToPartsTransformer implements DataTransformerInterface
     ) {
     }
 
-    public function transform(mixed $array): mixed
+    public function transform(mixed $value): mixed
     {
-        if (!\is_array($array ??= [])) {
+        if (!\is_array($value ??= [])) {
             throw new TransformationFailedException('Expected an array.');
         }
 
         $result = [];
 
         foreach ($this->partMapping as $partKey => $originalKeys) {
-            if (!$array) {
+            if (!$value) {
                 $result[$partKey] = null;
             } else {
-                $result[$partKey] = array_intersect_key($array, array_flip($originalKeys));
+                $result[$partKey] = array_intersect_key($value, array_flip($originalKeys));
             }
         }
 
         return $result;
     }
 
-    public function reverseTransform(mixed $array): mixed
+    public function reverseTransform(mixed $value): mixed
     {
-        if (!\is_array($array)) {
+        if (!\is_array($value)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -55,10 +55,10 @@ class ArrayToPartsTransformer implements DataTransformerInterface
         $emptyKeys = [];
 
         foreach ($this->partMapping as $partKey => $originalKeys) {
-            if (!empty($array[$partKey])) {
+            if (!empty($value[$partKey])) {
                 foreach ($originalKeys as $originalKey) {
-                    if (isset($array[$partKey][$originalKey])) {
-                        $result[$originalKey] = $array[$partKey][$originalKey];
+                    if (isset($value[$partKey][$originalKey])) {
+                        $result[$originalKey] = $value[$partKey][$originalKey];
                     }
                 }
             } else {

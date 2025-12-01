@@ -20,45 +20,37 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @implements DataTransformerInterface<Collection, array>
+ * @implements DataTransformerInterface<Collection|array, array>
  */
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
-    /**
-     * Transforms a collection into an array.
-     *
-     * @throws TransformationFailedException
-     */
-    public function transform(mixed $collection): mixed
+    public function transform(mixed $value): mixed
     {
-        if (null === $collection) {
+        if (null === $value) {
             return [];
         }
 
         // For cases when the collection getter returns $collection->toArray()
         // in order to prevent modifications of the returned collection
-        if (\is_array($collection)) {
-            return $collection;
+        if (\is_array($value)) {
+            return $value;
         }
 
-        if (!$collection instanceof ReadableCollection) {
+        if (!$value instanceof ReadableCollection) {
             throw new TransformationFailedException(\sprintf('Expected a "%s" object.', ReadableCollection::class));
         }
 
-        return $collection->toArray();
+        return $value->toArray();
     }
 
-    /**
-     * Transforms an array into a collection.
-     */
-    public function reverseTransform(mixed $array): Collection
+    public function reverseTransform(mixed $value): Collection
     {
-        if ('' === $array || null === $array) {
-            $array = [];
+        if ('' === $value || null === $value) {
+            $value = [];
         } else {
-            $array = (array) $array;
+            $value = (array) $value;
         }
 
-        return new ArrayCollection($array);
+        return new ArrayCollection($value);
     }
 }

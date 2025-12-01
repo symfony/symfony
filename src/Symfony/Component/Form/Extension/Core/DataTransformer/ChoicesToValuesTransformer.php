@@ -27,40 +27,32 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     ) {
     }
 
-    /**
-     * @throws TransformationFailedException if the given value is not an array
-     */
-    public function transform(mixed $array): array
+    public function transform(mixed $value): array
     {
-        if (null === $array) {
+        if (null === $value) {
             return [];
         }
 
-        if (!\is_array($array)) {
+        if (!\is_array($value)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
-        return $this->choiceList->getValuesForChoices($array);
+        return $this->choiceList->getValuesForChoices($value);
     }
 
-    /**
-     * @throws TransformationFailedException if the given value is not an array
-     *                                       or if no matching choice could be
-     *                                       found for some given value
-     */
-    public function reverseTransform(mixed $array): array
+    public function reverseTransform(mixed $value): array
     {
-        if (null === $array) {
+        if (null === $value) {
             return [];
         }
 
-        if (!\is_array($array)) {
+        if (!\is_array($value)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
-        $choices = $this->choiceList->getChoicesForValues($array);
+        $choices = $this->choiceList->getChoicesForValues($value);
 
-        if (\count($choices) !== \count($array)) {
+        if (\count($choices) !== \count($value)) {
             throw new TransformationFailedException('Could not find all matching choices for the given values.');
         }
 

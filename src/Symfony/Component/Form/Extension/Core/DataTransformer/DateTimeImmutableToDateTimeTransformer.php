@@ -23,13 +23,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInterface
 {
-    /**
-     * Transforms a DateTimeImmutable into a DateTime object.
-     *
-     * @param \DateTimeImmutable|null $value A DateTimeImmutable object
-     *
-     * @throws TransformationFailedException If the given value is not a \DateTimeImmutable
-     */
     public function transform(mixed $value): ?\DateTime
     {
         if (null === $value) {
@@ -43,13 +36,6 @@ final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInt
         return \DateTime::createFromImmutable($value);
     }
 
-    /**
-     * Transforms a DateTime object into a DateTimeImmutable object.
-     *
-     * @param \DateTime|null $value A DateTime object
-     *
-     * @throws TransformationFailedException If the given value is not a \DateTime
-     */
     public function reverseTransform(mixed $value): ?\DateTimeImmutable
     {
         if (null === $value) {

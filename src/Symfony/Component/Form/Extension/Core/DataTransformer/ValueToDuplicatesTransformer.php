@@ -26,9 +26,6 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
     ) {
     }
 
-    /**
-     * Duplicates the given value through the array.
-     */
     public function transform(mixed $value): array
     {
         $result = [];
@@ -40,24 +37,18 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
         return $result;
     }
 
-    /**
-     * Extracts the duplicated value from an array.
-     *
-     * @throws TransformationFailedException if the given value is not an array or
-     *                                       if the given array cannot be transformed
-     */
-    public function reverseTransform(mixed $array): mixed
+    public function reverseTransform(mixed $value): mixed
     {
-        if (!\is_array($array)) {
+        if (!\is_array($value)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
-        $result = current($array);
+        $result = current($value);
         $emptyKeys = [];
 
         foreach ($this->keys as $key) {
-            if (isset($array[$key]) && false !== $array[$key] && [] !== $array[$key]) {
-                if ($array[$key] !== $result) {
+            if (isset($value[$key]) && false !== $value[$key] && [] !== $value[$key]) {
+                if ($value[$key] !== $result) {
                     throw new TransformationFailedException('All values in the array should be the same.');
                 }
             } else {

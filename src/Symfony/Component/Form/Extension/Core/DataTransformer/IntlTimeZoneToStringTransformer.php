@@ -28,25 +28,25 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
     ) {
     }
 
-    public function transform(mixed $intlTimeZone): mixed
+    public function transform(mixed $value): mixed
     {
-        if (null === $intlTimeZone) {
+        if (null === $value) {
             return null;
         }
 
         if ($this->multiple) {
-            if (!\is_array($intlTimeZone)) {
+            if (!\is_array($value)) {
                 throw new TransformationFailedException('Expected an array of \IntlTimeZone objects.');
             }
 
-            return array_map([new self(), 'transform'], $intlTimeZone);
+            return array_map([new self(), 'transform'], $value);
         }
 
-        if (!$intlTimeZone instanceof \IntlTimeZone) {
+        if (!$value instanceof \IntlTimeZone) {
             throw new TransformationFailedException('Expected a \IntlTimeZone object.');
         }
 
-        return $intlTimeZone->getID();
+        return $value->getID();
     }
 
     public function reverseTransform(mixed $value): mixed

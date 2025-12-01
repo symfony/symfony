@@ -22,13 +22,13 @@ class CallbackTransformer implements DataTransformerInterface
         $this->reverseTransform = $reverseTransform(...);
     }
 
-    public function transform(mixed $data): mixed
+    public function transform(mixed $value): mixed
     {
-        return ($this->transform)($data);
+        return ($this->transform)($value);
     }
 
-    public function reverseTransform(mixed $data): mixed
+    public function reverseTransform(mixed $value): mixed
     {
-        return ($this->reverseTransform)($data);
+        return ($this->reverseTransform)($value);
     }
 }

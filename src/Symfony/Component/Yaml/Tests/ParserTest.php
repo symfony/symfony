@@ -2648,6 +2648,30 @@ class ParserTest extends TestCase
         $this->parser->parse($yaml);
     }
 
+    /**
+     * @see https://github.com/symfony/symfony/issues/62581
+     */
+    public function testParseExceptionLineNumberForUnquotedMappingValueWithIndentedContent()
+    {
+        $yaml = <<<YAML
+            en:
+                NONAMESPACE: Include Entity without Namespace
+                Invalid: Foo
+                    About: 'About us'
+                    - Invalid
+            YAML;
+
+        try {
+            $this->parser->parse($yaml);
+            $this->fail('A ParseException should have been thrown.');
+        } catch (ParseException $e) {
+            $this->assertSame(4, $e->getParsedLine(), 'The line number is incorrect.');
+            $this->assertStringContainsString('A colon cannot be used in an unquoted mapping value', $e->getMessage());
+            $this->assertStringContainsString('at line 4', $e->getMessage());
+            $this->assertStringContainsString("About: 'About us'", $e->getSnippet(), 'The snippet is incorrect.');
+        }
+    }
+
     public function testPhpConstantTagMappingKey()
     {
         $yaml = <<<YAML

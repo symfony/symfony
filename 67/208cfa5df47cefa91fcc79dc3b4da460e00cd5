@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fperxas at 2025-11-27T15:27:15Z
+
+I see you moved the `handlingHttpCache` check just after booting in `handle()` method, nice. I have tested it in my local env and the profile bar came up just fine.

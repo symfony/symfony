@@ -54,16 +54,9 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         $this->fields = $fields ?? ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'invert'];
     }
 
-    /**
-     * Transforms a normalized date interval into an interval array.
-     *
-     * @param \DateInterval $dateInterval Normalized date interval
-     *
-     * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
-     */
-    public function transform(mixed $dateInterval): array
+    public function transform(mixed $value): array
     {
-        if (null === $dateInterval) {
+        if (null === $value) {
             return array_intersect_key(
                 [
                     'years' => '',
@@ -78,12 +71,12 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
                 array_flip($this->fields)
             );
         }
-        if (!$dateInterval instanceof \DateInterval) {
-            throw new UnexpectedTypeException($dateInterval, \DateInterval::class);
+        if (!$value instanceof \DateInterval) {
+            throw new UnexpectedTypeException($value, \DateInterval::class);
         }
         $result = [];
         foreach (self::AVAILABLE_FIELDS as $field => $char) {
-            $result[$field] = $dateInterval->format('%'.($this->pad ? strtoupper($char) : $char));
+            $result[$field] = $value->format('%'.($this->pad ? strtoupper($char) : $char));
         }
         if (\in_array('weeks', $this->fields, true)) {
             $result['weeks'] = '0';
@@ -97,14 +90,6 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         return array_intersect_key($result, array_flip($this->fields));
     }
 
-    /**
-     * Transforms an interval array into a normalized date interval.
-     *
-     * @param array $value Interval array
-     *
-     * @throws UnexpectedTypeException       if the given value is not an array
-     * @throws TransformationFailedException if the value could not be transformed
-     */
     public function reverseTransform(mixed $value): ?\DateInterval
     {
         if (null === $value) {

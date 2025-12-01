@@ -28,25 +28,28 @@ class DateTimeZoneToStringTransformer implements DataTransformerInterface
     ) {
     }
 
-    public function transform(mixed $dateTimeZone): mixed
+    public function transform(mixed $value): mixed
     {
-        if (null === $dateTimeZone) {
+        if (null === $value) {
             return null;
         }
 
         if ($this->multiple) {
-            if (!\is_array($dateTimeZone)) {
+            if (!\is_array($value)) {
                 throw new TransformationFailedException('Expected an array of \DateTimeZone objects.');
             }
 
-            return array_map([new self(), 'transform'], $dateTimeZone);
+            /** @var array<string> $result */
+            $result = array_map([new self(), 'transform'], $value);
+
+            return $result;
         }
 
-        if (!$dateTimeZone instanceof \DateTimeZone) {
+        if (!$value instanceof \DateTimeZone) {
             throw new TransformationFailedException('Expected a \DateTimeZone object.');
         }
 
-        return $dateTimeZone->getName();
+        return $value->getName();
     }
 
     public function reverseTransform(mixed $value): mixed

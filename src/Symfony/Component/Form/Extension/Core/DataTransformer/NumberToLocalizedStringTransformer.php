@@ -38,14 +38,6 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         $this->roundingMode = $roundingMode ?? \NumberFormatter::ROUND_HALFUP;
     }
 
-    /**
-     * Transforms a number type into localized number.
-     *
-     * @param int|float|string|null $value Number value
-     *
-     * @throws TransformationFailedException if the given value is not numeric
-     *                                       or if the value cannot be transformed
-     */
     public function transform(mixed $value): string
     {
         if (null === $value || '' === $value) {
@@ -67,14 +59,6 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         return str_replace(["\xc2\xa0", "\xe2\x80\xaf"], ' ', $value);
     }
 
-    /**
-     * Transforms a localized number into an integer or float.
-     *
-     * @param string $value The localized value
-     *
-     * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value cannot be transformed
-     */
     public function reverseTransform(mixed $value): int|float|null
     {
         if (null !== $value && !\is_string($value)) {

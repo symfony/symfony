@@ -163,12 +163,14 @@ class Connection implements ResetInterface
      *
      * @param list<array{body: string, headers: array, delay: int}> $messages
      *
+     * @return list<string>|null The inserted IDs if supported by the platform (PostgreSQL), null otherwise
+     *
      * @throws DBALException
      */
-    public function sendBatch(array $messages): void
+    public function sendBatch(array $messages): ?array
     {
         if ([] === $messages) {
-            return;
+            return [];
         }
 
         $now = new \DateTimeImmutable('UTC');
@@ -214,7 +216,7 @@ class Connection implements ResetInterface
             ? $baseSql
             : $baseSql.', '.implode(', ', $additionalPlaceholders);
 
-        $this->executeBatchInsert($sql, $values, $types);
+        return $this->executeBatchInsert($sql, $values, $types);
     }
 
     public function get(): ?array
@@ -576,11 +578,28 @@ class Connection implements ResetInterface
         return $id;
     }
 
-    private function executeBatchInsert(string $sql, array $parameters = [], array $types = []): void
+    /**
+     * @return list<string>|null The inserted IDs if supported by the platform (PostgreSQL), null otherwise
+     */
+    private function executeBatchInsert(string $sql, array $parameters = [], array $types = []): ?array
     {
+        $isPostgreSql = $this->driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+
+        if ($isPostgreSql) {
+            $sql .= ' RETURNING id';
+        }
+
         insert:
         try {
+            if ($isPostgreSql) {
+                $ids = $this->driverConnection->fetchFirstColumn($sql, $parameters, $types);
+
+                return array_map(strval(...), $ids);
+            }
+
             $this->driverConnection->executeStatement($sql, $parameters, $types);
+
+            return null;
         } catch (TableNotFoundException $e) {
             if (!$this->autoSetup) {
                 throw $e;

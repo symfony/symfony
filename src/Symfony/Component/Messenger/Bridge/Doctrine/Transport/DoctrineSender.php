@@ -77,9 +77,15 @@ class DoctrineSender implements BatchSenderInterface
         }
 
         try {
-            $this->connection->sendBatch($messages);
+            $ids = $this->connection->sendBatch($messages);
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+
+        if (null !== $ids) {
+            foreach ($envelopes as $index => $envelope) {
+                $envelopes[$index] = $envelope->with(new TransportMessageIdStamp($ids[$index]));
+            }
         }
 
         return $envelopes;

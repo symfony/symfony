@@ -761,6 +761,10 @@ class Parser
                 default:
                     $lines = [];
 
+                    $realCurrentLineNb = $this->getRealCurrentLineNb();
+
+                    $hasColonInHead = str_contains($value, ': ');
+
                     while ($this->moveToNextLine()) {
                         if ($this->isCurrentLineBlank()) {
                             $lines[] = '';
@@ -799,14 +803,29 @@ class Parser
                     $parsedValue = Inline::parse($value, $flags, $this->refs);
 
                     if ('mapping' === $context && \is_string($parsedValue) && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && str_contains($parsedValue, ': ')) {
-                        throw new ParseException('A colon cannot be used in an unquoted mapping value.', $this->getRealCurrentLineNb() + 1, $value, $this->filename);
+                        $line = $realCurrentLineNb + 1;
+                        $snippet = $value;
+
+                        if (!$hasColonInHead) {
+                            foreach ($lines as $i => $lineContent) {
+                                if (str_contains($lineContent, ': ')) {
+                                    $line += $i + 1;
+                                    $snippet = $lineContent;
+                                    break;
+                                }
+                            }
+                        }
+
+                        throw new ParseException('A colon cannot be used in an unquoted mapping value.', $line, $snippet, $this->filename);
                     }
 
                     return $parsedValue;
             }
         } catch (ParseException $e) {
-            $e->setParsedLine($this->getRealCurrentLineNb() + 1);
-            $e->setSnippet($this->currentLine);
+            if (-1 === $e->getParsedLine()) {
+                $e->setParsedLine($this->getRealCurrentLineNb() + 1);
+                $e->setSnippet($this->currentLine);
+            }
 
             throw $e;
         }

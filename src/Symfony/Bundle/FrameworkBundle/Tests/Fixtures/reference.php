@@ -123,6 +123,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     ...<string, DefinitionType|AliasType|PrototypeType|StackType|ArgumentsType|null>
  * }
  * @psalm-type ExtensionType = array<string, mixed>
+ * @psalm-type AppConfig = bool
  * @psalm-type TestConfig = array{
  *     enabled?: scalar|null, // Default: false
  *     options?: array{
@@ -131,7 +132,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     },
  *     fromBundle?: bool, // Default: false
  * }
- * @psalm-type AppConfig = bool
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,

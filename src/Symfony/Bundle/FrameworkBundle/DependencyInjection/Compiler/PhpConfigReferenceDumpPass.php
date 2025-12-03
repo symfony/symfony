@@ -92,7 +92,7 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
         $knownEnvs = array_unique($knownEnvs);
         sort($knownEnvs);
         $extensionsPerEnv = [];
-        $appTypes = '';
+        $configTypes = [];
 
         $anyEnvExtensions = [];
         $registeredExtensions = $container->getExtensions();
@@ -115,7 +115,7 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
             }
             $anyEnvExtensions[$extensionAlias] = $extension;
             $type = $this->camelCase($extensionAlias).'Config';
-            $appTypes .= \sprintf("\n * @psalm-type %s = %s", $type, ArrayShapeGenerator::generate($configuration->getConfigTreeBuilder()->buildTree()));
+            $configTypes[$type] = \sprintf("\n * @psalm-type %s = %s", $type, ArrayShapeGenerator::generate($configuration->getConfigTreeBuilder()->buildTree()));
 
             foreach ($knownEnvs as $env) {
                 if ($envs[$env] ?? $envs['all'] ?? false) {
@@ -131,9 +131,12 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
             }
             $anyEnvExtensions[$alias] = $extension;
             $type = $this->camelCase($alias).'Config';
-            $appTypes .= \sprintf("\n * @psalm-type %s = %s", $type, ArrayShapeGenerator::generate($configuration->getConfigTreeBuilder()->buildTree()));
+            $configTypes[$type] = \sprintf("\n * @psalm-type %s = %s", $type, ArrayShapeGenerator::generate($configuration->getConfigTreeBuilder()->buildTree()));
         }
+
         krsort($extensionsPerEnv);
+        ksort($configTypes);
+        $appTypes = implode('', $configTypes);
 
         $r = new \ReflectionClass(AppReference::class);
 

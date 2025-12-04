@@ -2873,8 +2873,8 @@ class FrameworkExtension extends Extension
             // 1. ThrottlingHttpClient (5) -> throttles requests
             // 2. UriTemplateHttpClient (10) -> expands URI templates
             // 3. ScopingHttpClient (15) -> resolves relative URLs and applies scope configuration
-            // 4. CachingHttpClient (20) -> caches responses
-            // 5. RetryableHttpClient (25) -> retries requests
+            // 4. RetryableHttpClient (20) -> retries requests
+            // 5. CachingHttpClient (25) -> caches responses
             // 6. TraceableHttpClient (100) -> traces requests
             $container->register($name, HttpClientInterface::class)
                 ->setFactory('current')
@@ -2951,7 +2951,7 @@ class FrameworkExtension extends Extension
 
         $container
             ->register($name.'.caching', CachingHttpClient::class)
-            ->setDecoratedService($name, null, 20)
+            ->setDecoratedService($name, null, 25)
             ->setArguments([
                 new Reference('.inner'),
                 new Reference($options['cache_pool']),
@@ -3008,7 +3008,7 @@ class FrameworkExtension extends Extension
 
         $container
             ->register($name.'.retryable', RetryableHttpClient::class)
-            ->setDecoratedService($name, null, 25)
+            ->setDecoratedService($name, null, 20)
             ->setArguments([new Reference('.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
             ->addTag('monolog.logger', ['channel' => 'http_client']);
     }

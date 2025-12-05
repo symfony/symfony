@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-11-23T12:19:32Z
+
+I would consider it as a new feature, and so it should target the 8.1 branch.
+
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2025-11-23T17:44:04Z
+
+> I would consider it as a new feature, and so it should target the 8.1 branch.
+
+I thought it was worth fixing in 7.4, but if you want to keep it for 8.1, why not.
+
+@nicolas-grekas, what do you think?

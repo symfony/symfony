@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-12-01T08:08:40Z
+
+> you can see, that the result is different
+
+The reason is that EnumNode exists for quite some time now and it was used before enum were introduced to only accept a set of scalar values (but no native enum support). Providing `->values(Enum::cases())` set the *enum cases* as permissible values.  Using `enumFqcn` is actually quite different as it converts each enum case to their scalar value:
+
+```php
+    public function getPermissibleValues(string $separator, bool $trim = true): string
+    {
+        if (is_subclass_of($this->enumFqcn, \BackedEnum::class)) {
+            return implode($separator, array_column($this->enumFqcn::cases(), 'value'));
+        }
+
+        // ...
+    }
+```
+
+I think it is better because when dealing with configuration, you don't necessarily want to expose the whole underlying enum FQCN and deal with long class names. Hope this helps!
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-01T13:43:26Z
+
+When using `enumFqcn`, the config actually accepts *both* the backing values or an enum instance. So the generated type should combine the set of backing values and the enum FQCN (or it should even generated it as `value-of<EnumFqcn>|EnumFqcn`, relying on the `value-of<>` type supported by all SA tools, instead of resolving the list of backing values manually).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-12-01T15:57:20Z
+
+So my fix is correct, when I interpret your comment @alexandre-daubois, right?
+
+While @stof your comment is an improvement I can implement if wanted
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-12-04T06:49:12Z
+
+> When using enumFqcn, the config actually accepts both the backing values or an enum instance. So the generated type should combine the set of backing values and the enum FQCN (or it should even generated it as value-of<EnumFqcn>|EnumFqcn, relying on the value-of<> type supported by all SA tools, instead of resolving the list of backing values manually).
+
+Like this @stof ?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-12-04T18:49:10Z
+
+Failures unrelated

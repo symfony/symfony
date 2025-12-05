@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-12-02T11:00:06Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "6.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alcohol at 2025-12-04T08:06:31Z
+
+I wonder, should it also duplicate the line regarding inputmode like numbertype does?
+
+See https://github.com/symfony/form/blob/a8f32aa19b322bf46cbaaafa89c132eb662ecfe5/Extension/Core/Type/NumberType.php#L49 and https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/inputmode for reference.
+
+---------------------------------------------------------------------------
+
+by crownbackend at 2025-12-04T12:42:22Z
+
+Thanks for the suggestion!
+
+You're right — NumberType sets the inputmode attribute when html5 is disabled, to help browsers provide the appropriate numeric keyboard.
+
+I'll update MoneyType to match the same behavior:
+
+```
+if (!$options['html5']) {
+    $view->vars['attr']['inputmode'] = 0 === $options['scale'] ? 'numeric' : 'decimal';
+}
+```
+
+I’ll push the update shortly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-04T17:10:27Z
+
+Test failures look related 🤔

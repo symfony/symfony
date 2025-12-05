@@ -15,6 +15,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\RuntimeException;
+use Symfony\Component\Mailer\Messenger\Stamp\TemplateEmailStamp;
+use Symfony\Component\Mailer\Mime\ProviderTemplatedEmail;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;

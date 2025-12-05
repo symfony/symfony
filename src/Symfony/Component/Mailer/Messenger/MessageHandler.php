@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Mailer\Messenger;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\Exception\UnsupportedFeatureException;
+use Symfony\Component\Mailer\Mime\ProviderTemplatedEmail;
 use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\ProviderTemplatedTransportInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
@@ -26,6 +30,11 @@ class MessageHandler
 
     public function __invoke(SendEmailMessage $message): ?SentMessage
     {
+        $email = $message->getMessage();
+        if ($email instanceof ProviderTemplatedEmail && !$this->transport instanceof ProviderTemplatedTransportInterface) {
+            throw new UnsupportedFeatureException();
+        }
+
         return $this->transport->send($message->getMessage(), $message->getEnvelope());
     }
 }

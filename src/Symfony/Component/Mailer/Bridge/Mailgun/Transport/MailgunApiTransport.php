@@ -17,8 +17,10 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Mime\ProviderTemplatedEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\ProviderTemplatedTransportInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -29,7 +31,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class MailgunApiTransport extends AbstractApiTransport
+class MailgunApiTransport extends AbstractApiTransport implements ProviderTemplatedTransportInterface
 {
     private const HOST = 'api.%region_dot%mailgun.net';
 
@@ -58,12 +60,18 @@ class MailgunApiTransport extends AbstractApiTransport
         }
 
         $endpoint = \sprintf('%s/v3/%s/messages', $this->getEndpoint(), urlencode($this->domain));
-        $response = $this->client->request('POST', 'https://'.$endpoint, [
+        $payload =  [
             'http_version' => '1.1',
             'auth_basic' => 'api:'.$this->key,
             'headers' => $headers,
-            'body' => $body->bodyToIterable(),
-        ]);
+        ];
+        if ($email instanceof ProviderTemplatedEmail) {
+            $payload['template'] = $email->getTemplateId();
+            $payload['t:variables'] = json_encode($email->getContext());
+        } else {
+            $payload['body'] = $body->bodyToIterable();
+        }
+        $response = $this->client->request('POST', 'https://'.$endpoint, $payload);
 
         try {
             $statusCode = $response->getStatusCode();

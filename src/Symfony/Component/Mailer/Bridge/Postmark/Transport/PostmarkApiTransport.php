@@ -19,8 +19,10 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Mime\ProviderTemplatedEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\ProviderTemplatedTransportInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -30,7 +32,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class PostmarkApiTransport extends AbstractApiTransport
+class PostmarkApiTransport extends AbstractApiTransport implements ProviderTemplatedTransportInterface
 {
     private const HOST = 'api.postmarkapp.com';
     private const CODE_INACTIVE_RECIPIENT = 406;
@@ -105,10 +107,16 @@ class PostmarkApiTransport extends AbstractApiTransport
             'Bcc' => implode(',', $this->stringifyAddresses($email->getBcc())),
             'ReplyTo' => implode(',', $this->stringifyAddresses($email->getReplyTo())),
             'Subject' => $email->getSubject(),
-            'TextBody' => $email->getTextBody(),
-            'HtmlBody' => $email->getHtmlBody(),
             'Attachments' => $this->getAttachments($email),
         ];
+
+        if ($email instanceof ProviderTemplatedEmail) {
+            $payload['TemplateId'] = $email->getTemplateId();
+            $payload['TemplateModel'] = $email->getContext();
+        } else {
+            $payload['TextBody'] = $email->getTextBody();
+            $payload['HtmlBody'] = $email->getHtmlBody();
+        }
 
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to', 'date'], true)) {

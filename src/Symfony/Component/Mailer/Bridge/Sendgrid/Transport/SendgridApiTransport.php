@@ -19,8 +19,10 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Mime\ProviderTemplatedEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\ProviderTemplatedTransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\DateHeader;
@@ -32,7 +34,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class SendgridApiTransport extends AbstractApiTransport
+class SendgridApiTransport extends AbstractApiTransport implements ProviderTemplatedTransportInterface
 {
     private const HOST = 'api.%region_dot%sendgrid.com';
 
@@ -157,6 +159,11 @@ class SendgridApiTransport extends AbstractApiTransport
 
         if ($customArguments) {
             $personalization['custom_args'] = $customArguments;
+        }
+
+        if ($email instanceof ProviderTemplatedEmail) {
+            $payload['template_id'] = $email->getTemplateId();
+            $personalization['dynamic_template_data'] = $email->getContext();
         }
 
         $payload['personalizations'][] = $personalization;

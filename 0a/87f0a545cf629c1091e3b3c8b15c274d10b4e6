@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-22T07:55:04Z
+
+I added this because there is a competition between bindings and autowiring for `Target` attributes.
+Maybe can have ResolveBindingsPass alias from the Target name before using the argument name?
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2025-11-22T15:41:25Z
+
+Hi @nicolas-grekas, I updated the logic as suggested to handle both cases:
+
+1. **Priority**: Look for a binding matching the `#[Target]` name.
+2. **Fallback**: Use the parameter name if no specific binding is found.
+
+I added a test case covering both scenarios.

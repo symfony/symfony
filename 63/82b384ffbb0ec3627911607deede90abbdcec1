@@ -1,0 +1,126 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-11-24T17:58:30Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Gonzalo1987 at 2025-11-26T15:18:17Z
+
+_(Spanish native)_ In general, I prefer the existing translations as they were before the pull request, except for adding the accent on the word vídeo.
+It is possible to use **ancho** instead of **anchura**, as shown here:
+[https://dle.rae.es/ancho](https://dle.rae.es/ancho?utm_source=chatgpt.com)
+
+Also, the existing translations are generally more accurate compared to the original phrases.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-11-26T15:32:26Z
+
+> It is possible to use **ancho** instead of **anchura**,
+
+This change was requested by other reviewers in github.com/symfony/symfony/pull/62239
+
+---------------------------------------------------------------------------
+
+by Gonzalo1987 at 2025-11-26T15:41:46Z
+
+> > It is possible to use **ancho** instead of **anchura**,
+>
+> This change was requested by other reviewers in github.com/[/pull/62239](https://github.com/symfony/symfony/pull/62239)
+
+I humbly accept it, "anchura" is also correct but it seemed less formal to me, if "altura" is being used in the same context it makes a lot of sense. 🙏
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-11-29T11:09:53Z
+
+> 👍🏽 Greate. Thank you. Please change `anchura` into `altura` as mentioned earlier.
+
+No, `anchura` is width and `altura` is height.
+
+---------------------------------------------------------------------------
+
+by fperxas at 2025-11-29T11:53:50Z
+
+I'm a native speaker too. I kept `anchura` instead of `ancho` because `altura` instead of `alto` was used throughout the file and because the reviewers on #62239 requested the change.
+
+I'm personaly more used to
+`El alto/ancho del vídeo` or `El ancho/ancho de la imagen`  than `La anchura/altura de la imagen`
+So I can change both and push the changes.  I also think that both should be consistent, we either use `anchura/altura` or `alto/ancho`  it's better to not mix them.
+
+BUT :D,  In fact, the sentence kinda feels weird on spanish speakers because, if we want to honor Cervantes, we might have to rephrase the whole sentece which, i don't know, if it's ok with everybody:
+
+`<target>La imagen es demasiado ancha ({{ width }}px). No debe sobrepasar los {{ max_width }}px de ancho.</target>`
+
+`<target>La imagen es demasiado estrecha ({{ width }}px). Como mínimo debe tener {{ min_width }}px de ancho.</target>`
+
+`<target>El vídeo es demasiado ancho ({{ width }}px). No debe sobrepasar los {{ max_width }}px de ancho.</target>`
+
+`<target>La vídeo es demasiado estrecho ({{ width }}px). Como mínimo debe tener {{ min_width }}px de ancho.</target>`
+
+And so on with the height:
+
+`<target>La imagen es demasiado alta ({{ height }}px). No debe sobrepasar los {{ max_height }}px de alto.</target>`
+
+`<target>La imagen no es suficientemente alta ({{ height }}px). Como mínimo de tener {{ min_height }}px de alto.</target>`
+
+`<target>El vídeo es demasiado alto ({{ height }}px). No debe sobrepasar los {{ max_height }}px de alto.</target>`
+
+`<target>El vídeo no es suficientemente alto ({{ height }}px). Como mínimo debe tener {{ min_height }}px de alto.</target>`
+
+I'm open to push whatever feels the best for everybody. I, myself, vote for the last ones.
+
+---------------------------------------------------------------------------
+
+by Gonzalo1987 at 2025-11-29T12:10:52Z
+
+> I'm a native speaker too. I kept `anchura` instead of `ancho` because `altura` instead of `alto` was used throughout the file and because the reviewers on #62239 requested the change.
+>
+> I'm personaly more used to `El alto/ancho del vídeo` or `El ancho/ancho de la imagen` than `La anchura/altura de la imagen` So I can change both and push the changes. I also think that both should be consistent, we either use `anchura/altura` or `alto/ancho` it's better to not mix them.
+>
+> BUT :D, In fact, the sentence kinda feels weird on spanish speakers because, if we want to honor Cervantes, we might have to rephrase the whole sentece which, i don't know, if it's ok with everybody:
+>
+> `<target>La imagen es demasiado ancha ({{ width }}px). No debe sobrepasar los {{ max_width }}px de ancho.</target>`
+>
+> `<target>La imagen es demasiado estrecha ({{ width }}px). Como mínimo debe tener {{ min_width }}px de ancho.</target>`
+>
+> `<target>El vídeo es demasiado ancho ({{ width }}px). No debe sobrepasar los {{ max_width }}px de ancho.</target>`
+>
+> `<target>La vídeo es demasiado estrecho ({{ width }}px). Como mínimo debe tener {{ min_width }}px de ancho.</target>`
+>
+> And so on with the height:
+>
+> `<target>La imagen es demasiado alta ({{ height }}px). No debe sobrepasar los {{ max_height }}px de alto.</target>`
+>
+> `<target>La imagen no es suficientemente alta ({{ height }}px). Como mínimo de tener {{ min_height }}px de alto.</target>`
+>
+> `<target>El vídeo es demasiado alto ({{ height }}px). No debe sobrepasar los {{ max_height }}px de alto.</target>`
+>
+> `<target>El vídeo no es suficientemente alto ({{ height }}px). Como mínimo debe tener {{ min_height }}px de alto.</target>`
+>
+> I'm open to push whatever feels the best for everybody. I, myself, vote for the last ones.
+
+I prefer the last ones too <3

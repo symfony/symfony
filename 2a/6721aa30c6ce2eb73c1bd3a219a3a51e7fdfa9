@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-12-02T08:07:43Z
+
+Fabbot error looks unexpected and not related to the changes.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-12-02T08:40:09Z
+
+Stuck with psalm and the correct defaults if somebody has any hints to tackle this correctly to make it as easy as possible to create config builders without devs need to think about any generics.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-12-03T15:51:34Z
+
+I'm kind of stucked here as not correctly understanding here the generics in all cases. But we sure should find a solution this kind of PHPStan errors not appear for everybody try to create a bundle config.
+
+If somebody want to take this over I'm fine.

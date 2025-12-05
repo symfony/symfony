@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-01T19:36:43Z
+
+We have the same concern on 6.4, isn't it?
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-12-01T23:30:47Z
+
+on 6.3 also. etc
+
+what is lowest branch you would like to receive Fixer changes nowadays ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-12-02T06:45:48Z
+
+If it's just about a configuration change that does not impact the code, 6.4 is the one (the oldest maintained). If it makes changes to the code base, then 8.1 (the upcoming version).
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-12-02T10:12:46Z
+
+rebased

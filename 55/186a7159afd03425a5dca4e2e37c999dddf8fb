@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-11-14T09:00:39Z
+
+this change is legitimate. None of the static analysis tools treat `bool[]` as meaning a list.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-14T09:35:10Z
+
+The tests need some love though.
+
+---------------------------------------------------------------------------
+
+by matijn-made at 2025-11-16T10:51:42Z
+
+Thank you all for your comments. I have addressed them in the latest commit.
+The tests are also updated and green.
+The low//high deps tests are failing because they install different version of TypeInfo instead of using the changes in this PR. Is it oke for these unit tests to fail now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-16T11:06:28Z
+
+The low-deps should be fixed by bumping the minimum version in framework-bundle
+
+---------------------------------------------------------------------------
+
+by matijn-made at 2025-11-16T12:13:51Z
+
+> The low-deps should be fixed by bumping the minimum version in framework-bundle
+
+Do you mean bump version in composer.json? I'm not sure which version should go there, since the code is in this PR?
+Also, Framework bundle tests are fine in low-deps, it's the PropertyInfo component tests which fail
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-16T12:31:30Z
+
+ah right, so property-info should bump to type-info `^7.3.8|^7.4`

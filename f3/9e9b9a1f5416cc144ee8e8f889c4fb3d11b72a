@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by Maxcastel at 2025-12-03T01:07:37Z
+
+In a shorter way:
+
+```diff
+if ($this->wantHelps) {
+    $this->wantHelps = false;
+
+    $helpCommand = $this->get('help');
+    $helpCommand->setCommand($command);
+
++    $this->wantHelps = true;
+
+    return $helpCommand;
+}
+```
+
+---------------------------------------------------------------------------
+
+by Maxcastel at 2025-12-03T01:08:03Z
+
+You added tests, but even without changing `Application.php`, the tests pass, and I think they shouldn’t pass.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-12-03T01:59:23Z
+
+Hi @Maxcastel, thank you so much for your feedback :smile:
+
+> You added tests, but even without changing `Application.php`, the tests pass, and I think they shouldn’t pass.
+
+You're right, the `testDoesNotFindHiddenCommandAsAlternativeIfHelpOptionIsPresent` test pass correctly without the new changes (my fault). The other tests didn't work correctly without the changes in my local. Could you give me an example of the problem, please, so I can try to fix it? :smile:
+
+> In a shorter way:
+
+I'm not sure about that change :thinking:
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-12-03T02:04:32Z
+
+> the `testDoesNotFindHiddenCommandAsAlternativeIfHelpOptionIsPresent` test pass correctly without the new changes (my fault)
+
+I modified the test `testDoesNotFindHiddenCommandAsAlternativeIfHelpOptionIsPresent` for tests correctly the new behavior
+
+Thanks again for your feedback :)
+
+---------------------------------------------------------------------------
+
+by Maxcastel at 2025-12-03T20:36:29Z
+
+I didn’t run the right tests :sweat_smile: Sorry @santysisi for the inconvenience.

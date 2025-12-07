@@ -187,18 +187,18 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setTags(['bar' => ['attr' => 'baz']])
+            ->setTags(['bar' => [['attr' => 'baz']]])
         ;
         $container
             ->register('baz')
-            ->setTags(['foobar' => ['attr' => 'bar']])
+            ->setTags(['foobar' => [['attr' => 'bar']]])
             ->setDecoratedService('foo')
         ;
 
         $this->process($container);
 
         $this->assertEmpty($container->getDefinition('baz.inner')->getTags());
-        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
+        $this->assertEquals(['bar' => [['attr' => 'baz']], 'foobar' => [['attr' => 'bar']], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
     public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinitionMultipleTimes()
@@ -207,7 +207,7 @@ class DecoratorServicePassTest extends TestCase
         $container
             ->register('foo')
             ->setPublic(true)
-            ->setTags(['bar' => ['attr' => 'baz']])
+            ->setTags(['bar' => [['attr' => 'baz']]])
         ;
         $container
             ->register('deco1')
@@ -221,7 +221,7 @@ class DecoratorServicePassTest extends TestCase
         $this->process($container);
 
         $this->assertEmpty($container->getDefinition('deco1')->getTags());
-        $this->assertEquals(['bar' => ['attr' => 'baz'], 'container.decorator' => [['id' => 'foo', 'inner' => 'deco1.inner']]], $container->getDefinition('deco2')->getTags());
+        $this->assertEquals(['bar' => [['attr' => 'baz']], 'container.decorator' => [['id' => 'foo', 'inner' => 'deco1.inner']]], $container->getDefinition('deco2')->getTags());
     }
 
     public function testProcessLeavesServiceLocatorTagOnOriginalDefinition()
@@ -229,18 +229,18 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setTags(['container.service_locator' => [0 => []], 'bar' => ['attr' => 'baz']])
+            ->setTags(['container.service_locator' => [0 => []], 'bar' => [['attr' => 'baz']]])
         ;
         $container
             ->register('baz')
-            ->setTags(['foobar' => ['attr' => 'bar']])
+            ->setTags(['foobar' => [['attr' => 'bar']]])
             ->setDecoratedService('foo')
         ;
 
         $this->process($container);
 
         $this->assertEquals(['container.service_locator' => [0 => []]], $container->getDefinition('baz.inner')->getTags());
-        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
+        $this->assertEquals(['bar' => [['attr' => 'baz']], 'foobar' => [['attr' => 'bar']], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
     public function testProcessLeavesServiceSubscriberTagOnOriginalDefinition()
@@ -248,18 +248,18 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setTags(['container.service_subscriber' => [], 'container.service_subscriber.locator' => [], 'bar' => ['attr' => 'baz']])
+            ->setTags(['container.service_subscriber' => [], 'container.service_subscriber.locator' => [], 'bar' => [['attr' => 'baz']]])
         ;
         $container
             ->register('baz')
-            ->setTags(['foobar' => ['attr' => 'bar']])
+            ->setTags(['foobar' => [['attr' => 'bar']]])
             ->setDecoratedService('foo')
         ;
 
         $this->process($container);
 
         $this->assertEquals(['container.service_subscriber' => [], 'container.service_subscriber.locator' => []], $container->getDefinition('baz.inner')->getTags());
-        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
+        $this->assertEquals(['bar' => [['attr' => 'baz']], 'foobar' => [['attr' => 'bar']], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
     public function testProcessLeavesProxyTagOnOriginalDefinition()
@@ -267,18 +267,18 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setTags(['proxy' => 'foo', 'bar' => ['attr' => 'baz']])
+            ->setTags(['proxy' => ['foo'], 'bar' => [['attr' => 'baz']]])
         ;
         $container
             ->register('baz')
-            ->setTags(['foobar' => ['attr' => 'bar']])
+            ->setTags(['foobar' => [['attr' => 'bar']]])
             ->setDecoratedService('foo')
         ;
 
         $this->process($container);
 
-        $this->assertEquals(['proxy' => 'foo'], $container->getDefinition('baz.inner')->getTags());
-        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
+        $this->assertEquals(['proxy' => ['foo']], $container->getDefinition('baz.inner')->getTags());
+        $this->assertEquals(['bar' => [['attr' => 'baz']], 'foobar' => [['attr' => 'bar']], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
     public function testCannotDecorateSyntheticService()

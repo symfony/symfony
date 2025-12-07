@@ -37,7 +37,7 @@ class TranslationPathsPassTest extends TestCase
             ->setArguments([null, null, null, null, null, null, [], []])
         ;
         $container->register(ControllerArguments::class, ControllerArguments::class)
-            ->setTags(['controller.service_arguments'])
+            ->setTags(['controller.service_arguments' => []])
         ;
         $container->register(ServiceArguments::class, ServiceArguments::class)
             ->setArguments([new Reference('translator')])

@@ -1,0 +1,31 @@
+{
+    "name": "symfony/access-control",
+    "type": "library",
+    "description": "Symfony Access Control Component",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "composer/semver": "^3.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\AccessControl\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

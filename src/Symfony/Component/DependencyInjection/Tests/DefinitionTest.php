@@ -216,6 +216,19 @@ class DefinitionTest extends TestCase
         $this->assertEquals('foo', $def->getConfigurator(), '->getConfigurator() returns the configurator');
     }
 
+    public function testSetTagsAreInList()
+    {
+        $def = new Definition('stdClass');
+        $def->setTags([
+            'tag1' => [5 => ['attr1' => 'value1'], 3 => []],
+            'tag2' => [1 => ['attr2' => 'value2']],
+        ]);
+        $this->assertSame([
+            'tag1' => [['attr1' => 'value1'], []],
+            'tag2' => [['attr2' => 'value2']],
+        ], $def->getTags(), '->setTags() reindex the tags arrays');
+    }
+
     public function testClearTags()
     {
         $def = new Definition('stdClass');

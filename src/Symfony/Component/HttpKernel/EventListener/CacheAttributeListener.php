@@ -170,6 +170,7 @@ class CacheAttributeListener implements EventSubscriberInterface
         }
 
         $hasPublicOrPrivateCacheControlDirective = $hasCacheControlDirective('public') || $hasCacheControlDirective('private');
+        $hasNoStoreCacheControlDirective = $hasCacheControlDirective('no-store');
 
         foreach ($attributes as $cache) {
             if (true === $cache->public && !$hasPublicOrPrivateCacheControlDirective) {
@@ -184,7 +185,7 @@ class CacheAttributeListener implements EventSubscriberInterface
                 $response->headers->addCacheControlDirective('no-store');
             }
 
-            if (false === $cache->noStore) {
+            if (false === $cache->noStore && !$hasNoStoreCacheControlDirective) {
                 $response->headers->removeCacheControlDirective('no-store');
             }
         }

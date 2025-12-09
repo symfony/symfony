@@ -407,6 +407,17 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('private'));
     }
 
+    public function testAttributeNoStoreDoesNotRemoveExplicitNoStore()
+    {
+        $request = $this->createRequest(new Cache(noStore: false));
+        $response = new Response();
+        $response->headers->addCacheControlDirective('no-store');
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $response));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('no-store'));
+    }
+
     public static function provideVaryHeaderScenarios(): \Traversable
     {
         yield 'no vary headers at all' => [

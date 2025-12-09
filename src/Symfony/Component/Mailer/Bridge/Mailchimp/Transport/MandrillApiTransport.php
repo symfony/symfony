@@ -97,6 +97,10 @@ class MandrillApiTransport extends AbstractApiTransport
             $payload['message']['subaccount'] = $email->getHeaders()->get('X-MC-Subaccount')->getBodyAsString();
         }
 
+        if ($email->getHeaders()->get('X-MC-Tags')) {
+            $payload['message']['tags'] = explode(',', $email->getHeaders()->get('X-MC-Tags')->getBodyAsString());
+        }
+
         if ('' !== $envelope->getSender()->getName()) {
             $payload['message']['from_name'] = $envelope->getSender()->getName();
         }
@@ -122,7 +126,7 @@ class MandrillApiTransport extends AbstractApiTransport
         }
 
         foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'x-mc-subaccount'], true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'x-mc-subaccount', 'x-mc-tags'], true)) {
                 continue;
             }
 

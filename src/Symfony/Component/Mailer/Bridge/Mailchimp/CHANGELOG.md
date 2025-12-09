@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+* Add support for specifying tags using the `X-MC-Tags` header
+
 7.4
 ---
 

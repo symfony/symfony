@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-12-08T08:18:37Z
+
+The 8.4 high-deps build failure seems unrelated and more related to https://github.com/symfony/symfony/pull/62577 (cc @xabbuh) because this build seems to run with SF 5.4 for unknown reason...
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-12-08T08:23:02Z
+
+Also, carsonbot is editing the PR to `[TypeInfo]` but it's `[PropertyInfo]` ; would it be possible for someone (@nicolas-grekas ?) to both
+- change/remove the label of the pr
+- edit the pr title ?
+
+thanks

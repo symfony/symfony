@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-12-07T22:17:55Z
+
+Milestone should be edited to 7.3 @OskarStark.
+
+Also I dunno how you want to handle this fix since the PR from 6.4 (https://github.com/symfony/symfony/pull/62686) will create conflict, so I opened the fix on 7.3 too to show the expected resutl.

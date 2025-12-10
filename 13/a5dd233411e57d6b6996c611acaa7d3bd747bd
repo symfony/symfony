@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-08T10:34:12Z
+
+Can you rebase for 7.4? The method call is missing there also.
+
+---------------------------------------------------------------------------
+
+by dbu at 2025-12-08T10:43:28Z
+
+> Can you rebase for 7.4? The method call is missing there also.
+
+in 7.4 we [check](https://github.com/symfony/symfony/blob/7.4/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1081) for the (deprecated) CliRequest::class
+
+i guess removing references to the deprecated class was the reason for this regression. i think i would leave 7.4 as is, it works fine. but if you prefer, i can do a PR against 7.4 to replace the class_exists check with a hasConsole call.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-08T10:53:58Z
+
+I'd keep both calls on 7.4: hasMethod because the method is protected so that it's a possible extension point, and class_exists as a feature test
+
+---------------------------------------------------------------------------
+
+by dbu at 2025-12-08T11:00:25Z
+
+okay, i target 7.4 now. there will be a conflict when merging up to 8.0

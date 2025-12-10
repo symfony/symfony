@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2025-12-09T17:58:16Z
+
+Isn't this issue exist in 6.4 as well?
+
+---------------------------------------------------------------------------
+
+by qconer at 2025-12-09T18:47:10Z
+
+> Isn't this issue exist in 6.4 as well?
+
+Found this issue https://github.com/symfony/symfony/issues/62712 after updating from 6.4 to 7.4
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-12-10T08:45:53Z
+
+> > Isn't this issue exist in 6.4 as well?
+>
+> Found this issue #62712 after updating from 6.4 to 7.4
+
+Probably because you enabled the `with_constructor_extractor` option in 7.4? I guess the behaviour would still be wrong on lower versions if the constructor extractor was used.
+
+---------------------------------------------------------------------------
+
+by qconer at 2025-12-10T08:47:40Z
+
+> > > Isn't this issue exist in 6.4 as well?
+> >
+> >
+> > Found this issue #62712 after updating from 6.4 to 7.4
+>
+> Probably because you enabled the `with_constructor_extractor` option in 7.4? I guess the behaviour would still be wrong on lower versions if the constructor extractor was used.
+
+yes. works fine with disabled constructor extractors as I mentioned here https://github.com/symfony/symfony/issues/62712#issuecomment-3635978368
+
+---------------------------------------------------------------------------
+
+by qconer at 2025-12-10T08:54:00Z
+
+should I prepare a separate PR with a fix for 6.4? It looks like the fix for 6.4 will conflict with this one
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-12-10T09:02:30Z
+
+> should I prepare a separate PR with a fix for 6.4? It looks like the fix for 6.4 will conflict with this one
+
+You can do that. We can then see if we can successfully resolve the conflicts when merging up (using this PR as a reference) or if we need to merge this PR then anyway).
+
+---------------------------------------------------------------------------
+
+by qconer at 2025-12-10T09:09:33Z
+
+> > should I prepare a separate PR with a fix for 6.4? It looks like the fix for 6.4 will conflict with this one
+>
+> You can do that. We can then see if we can successfully resolve the conflicts when merging up (using this PR as a reference) or if we need to merge this PR then anyway).
+
+https://github.com/symfony/symfony/pull/62717

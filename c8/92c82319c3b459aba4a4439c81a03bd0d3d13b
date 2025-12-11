@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-12-10T16:22:43Z
+
+The job failure seems related to this change.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-12-10T16:28:14Z
+
+It looks like it's already on 6.4: https://github.com/symfony/symfony/actions/runs/20098815118/job/57663981379
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-12-10T19:01:13Z
+
+> The job failure seems related to this change.
+
+That’s due to how our high deps job works. It checks out 5.4 for changed components. The only way to make this test pass without changing the CI job would be to patch 5.4.

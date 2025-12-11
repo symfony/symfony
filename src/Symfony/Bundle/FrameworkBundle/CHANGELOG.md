@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecate setting the `framework.profiler.collect_serializer_data` config option
  * Add support for `framework.secrets.decryption_env_var` to contain dots
+ * Add `object_mapper.transform.map_collection` service
 
 8.0
 ---

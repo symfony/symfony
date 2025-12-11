@@ -16,11 +16,18 @@ use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactor
 use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
+use Symfony\Component\ObjectMapper\Transform\MapCollection;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('object_mapper.metadata_factory', ReflectionObjectMapperMetadataFactory::class)
         ->alias(ObjectMapperMetadataFactoryInterface::class, 'object_mapper.metadata_factory')
+
+        ->set('object_mapper.transform.map_collection', MapCollection::class)
+            ->tag('object_mapper.transform_callable')
+            ->args([
+                service('object_mapper'),
+            ])
 
         ->set('object_mapper.metadata_factory.reverse_class', ReverseClassObjectMapperMetadataFactory::class)
             ->decorate('object_mapper.metadata_factory')

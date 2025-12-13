@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-12-11T10:58:13Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "7.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-12-11T13:38:01Z
+
+This should target 7.3. This version might be affected as well :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by sukei at 2025-12-11T14:45:31Z
+
+> This should target 7.3. This version might be affected as well 🙂
+
+I don't know, the 7.3 implementation build an AST to generate code while the 7.4 version concatenate strings.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-12-12T09:38:21Z
+
+@sukei, you're right, 7.3 is not affected.
+
+What about adding `var_export($string, true)` in the `quote()` method?
+
+---------------------------------------------------------------------------
+
+by sukei at 2025-12-12T11:18:31Z
+
+> What about adding `var_export($string, true)` in the `quote()` method?
+
+I don't know what to do with this. The quote method transform `$identifier = 'identifier'` to `$identifier = "'identifier'"` Which is a constant string. using `var_export` to protect from a null char will produce an expression: `var_export("value \0 with null char"); // 'value ' . "\0" . ' with null char'`. Therefore, the produced PHPDoc in code would never make sense `/** @return array{'value ' . "\0" . ' with null char': int} */`.
+
+BTW, I'm trying to fix an issue that break the feature based on the developer code, not an userland provided string. I hope that nobody create array shapes with null char as key. WDYT?

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-12-12T01:34:17Z
+
+Actually, we could clean even more things as we require PHP 8.2+, not PHP 8.1+.
+
+---------------------------------------------------------------------------
+
+by Koc at 2025-12-12T01:38:14Z
+
+I thought about that but `git grep -h '"php"' **/composer.json | uniq | sort` says that we still using 8.1. in the contracts.
+
+But I can try, let's see how build pass.
+
+---------------------------------------------------------------------------
+
+by Koc at 2025-12-12T01:44:32Z
+
+@stof Mate, you as always the best. This reminds me [old good times](https://symfony.com/blog/introducing-a-new-review-tool-for-the-symfony-ecosystem) :heart:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-12-12T10:17:04Z
+
+I think, we should keep the rules for PHP 8.1 in there and merge the change to the 6.4 branch instead. WDYT?

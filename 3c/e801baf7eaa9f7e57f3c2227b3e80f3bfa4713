@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-12-11T18:08:16Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "7.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-12-11T18:20:31Z
+
+Is this bug present in 6.4?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-11T19:32:42Z
+
+@OskarStark no. This bug was introduced in 7.4 when adding support for `_query`
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-12-11T19:47:40Z
+
+Thanks for the clarification 🙋‍♂️

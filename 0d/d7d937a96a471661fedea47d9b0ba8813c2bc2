@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-12-12T16:24:27Z
+
+Hello @SiebeVE,
+
+Thank you for the issue and the PR. You may have found the fix right after creating the issue, however, creating an issue is not required to open a PR.
+
+Could you rebase your branch to remove the merge commit?
+
+---------------------------------------------------------------------------
+
+by SiebeVE at 2025-12-12T16:28:27Z
+
+Aha, cool, won't create an issue then in the future :-).
+
+I've done a rebase, so the merge commit should be gone now.

@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by devnix at 2025-11-10T10:47:06Z
+
+I'm going to give it a try in production. I've never fully understood that `9999-12-31 23:59:59` at `delivered_at`, as it's not officially documented anywhere. Are those messages going to keep there forever then?
+
+---------------------------------------------------------------------------
+
+by psihius at 2025-11-24T15:06:01Z
+
+> I'm going to give it a try in production. I've never fully understood that `9999-12-31 23:59:59` at `delivered_at`, as it's not officially documented anywhere. Are those messages going to keep there forever then?
+
+No, they were just cleaned up by a special condition in the code. But that is also what leads to major deadlock issues on modern MySQL. My guess this was a fix for quite old versions of MySQL, but they now do more harm than good.
+
+---------------------------------------------------------------------------
+
+by devnix at 2025-11-24T15:28:51Z
+
+BTW, been using this patch all this time in production. Deadlocks gone, works flawlessly 👍
+
+---------------------------------------------------------------------------
+
+by psihius at 2025-11-25T08:34:46Z
+
+@nicolas-grekas I see it got modified to target 8.1 from 7.4, but what is stopping this to be merged already? What do i need to do more here? Cleanup unneeded indexes?
+
+---------------------------------------------------------------------------
+
+by psihius at 2025-11-26T11:59:21Z
+
+Update for my production server on query stats
+```
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+----------+-------------+
+| DIGEST_TEXT                                                                                                                                                                                                                                 | COUNT_STAR | total_sec  | lock_sec | avg_lock_ms |
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+----------+-------------+
+| DELETE FROM `messenger_messages` WHERE `id` = ?                                                                                                                                                                                             |  170997371 | 233997.904 |  129.992 |       0.001 |
+| SELECT `m` . * FROM `messenger_messages` `m` WHERE ( `m` . `queue_name` = ? ) AND ( `m` . `delivered_at` IS NULL OR `m` . `delivered_at` < ? ) AND ( `m` . `available_at` <= ? ) ORDER BY `available_at` ASC LIMIT ? FOR UPDATE SKIP LOCKED |  292846532 | 199106.604 |  322.081 |       0.001 |
+| INSERT INTO `messenger_messages` ( `body` , `headers` , `queue_name` , `created_at` , `available_at` ) VALUES (...)                                                                                                                         |  171169925 |  36069.314 |  193.945 |       0.001 |
+| UPDATE `messenger_messages` SET `delivered_at` = ? WHERE `id` = ?                                                                                                                                                                           |  171150023 |  21218.754 |   87.838 |       0.001 |
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+----------+-------------+
+10 rows in set (0.02 sec)
+
+```
+
+As you can see, multiple 100's of millions queries later, it runs like clockwork :)
+
+---------------------------------------------------------------------------
+
+by manuelkiessling at 2025-11-26T12:04:40Z
+
+Please for give me if this is a stupid question, but I'm not really familiar with the Symfony-internal development process. Where will this patch end up after all is said and done? At least 8.1 and 7.4, I assume? But also 8.0 and 6.4, as these are still in "maintained" mode?
+
+If I would integrate this fix into 5.4 and provide a proper PR, would this have a chance to be merged for 5.4, too? Asking for *ahem* a friend who still has to maintain a large-ish 5.4 codebase...
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2025-11-26T12:13:16Z
+
+Just my layman's knowledge: 5.4 is security only and would not receive such a bugfix. Since this is a bugfix it should be based against the oldest actively maintained version where this issue occurs, i.e. 6.4 (right?). It will then get merged upstream to 7.4 and 8.
+
+---------------------------------------------------------------------------
+
+by psihius at 2025-11-26T12:15:58Z
+
+> Please for give me if this is a stupid question, but I'm not really familiar with the Symfony-internal development process. Where will this patch end up after all is said and done? At least 8.1 and 7.4, I assume? But also 8.0 and 6.4, as these are still in "maintained" mode?
+>
+> If I would integrate this fix into 5.4 and provide a proper PR, would this have a chance to be merged for 5.4, too? Asking for _ahem_ a friend who still has to maintain a large-ish 5.4 codebase...
+
+By default in 8.1. They might not consider this innocent enough change to backport to older versions. IF they decide to, it will be only into activelly maintained once, so 5.4 is something you will have to do yourself.
+
+The good news is the parts of the code this touches haven't changed since pre symfony 4 versions, so it's extremely easy to adapt and do as a composer patcv via `cweagans/composer-patches` package - that's how I have this in my application at the moment.
+
+---------------------------------------------------------------------------
+
+by manuelkiessling at 2025-11-26T12:27:22Z
+
+> The good news is the parts of the code this touches haven't changed since pre symfony 4 versions, so it's extremely easy to adapt and do as a composer patcv via `cweagans/composer-patches` package - that's how I have this in my application at the moment.
+
+Ah, how could I live to this moment in total ignorance of composer-patches? Thanks a ton!
+
+---------------------------------------------------------------------------
+
+by psihius at 2025-12-08T15:22:53Z
+
+> LGTM, for 6.4 also. Can you please rebase to target that branch? Also remove the now needless indexes?
+
+Done, rebased on 6.4 and removed the indexes.
+I looked around how to maybe upgrade the schema, but it seems there's no way to do it if it's already setup, so my guess this will have to be a note in the UPGRADE file for users to manually execute this:
+
+```
+create index IDX_75EA56E0FB7336F0E3BD61CE16BA31DBBF396750 on messenger_messages (queue_name, available_at, delivered_at, id);
+drop index IDX_75EA56E016BA31DB on messenger_messages;
+drop index IDX_75EA56E0E3BD61CE on messenger_messages;
+drop index IDX_75EA56E0FB7336F0 on messenger_messages;
+```

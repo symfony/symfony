@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-12-11T18:16:08Z
+
+The variable $mockRuntimeLoader in src/Symfony/Bridge/Twig/Tests/Extension/SerializerExtensionTest.php now is not a Mock anymore, maybe rename it to $runtimeLoader?
+
+I cannot comment inline due to GitHub issues...

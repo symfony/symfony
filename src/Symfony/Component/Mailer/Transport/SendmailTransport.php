@@ -60,7 +60,7 @@ class SendmailTransport extends AbstractTransport
 
             $this->command = $command;
         } else {
-            $this->command = ini_get('sendmail_path') ?: '/usr/sbin/sendmail -bs';
+            $this->command = \ini_get('sendmail_path') ?: '/usr/sbin/sendmail -bs';
         }
 
         $this->stream = new ProcessStream();

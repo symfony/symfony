@@ -192,7 +192,7 @@ class Question
     /**
      * Gets the callback function used for the autocompleter.
      *
-     * @return (callable(string):string[])|null
+     * @return (callable(string):(string[]|\UnitEnum[]))|null
      */
     public function getAutocompleterCallback(): ?callable
     {

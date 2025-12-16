@@ -53,15 +53,20 @@ class SymfonyQuestionHelper extends QuestionHelper
                     $default[$key] = $choices[trim($value)];
                 }
 
+                /** @var array<string|bool|int|float|\Stringable> $default */
                 $text = \sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, OutputFormatter::escape(implode(', ', $default)));
 
                 break;
 
             case $question instanceof ChoiceQuestion:
                 $choices = $question->getChoices();
-                $defaultOutput = $default instanceof \UnitEnum
-                    ? $this->formatEnumValue($default)
-                    : ($choices[$default] ?? $default);
+
+                if ($default instanceof \UnitEnum) {
+                    $defaultOutput = $this->formatEnumValue($default);
+                } else {
+                    /** @var int|string $default */
+                    $defaultOutput = $choices[$default] ?? $default;
+                }
 
                 $text = \sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, OutputFormatter::escape($defaultOutput));
 

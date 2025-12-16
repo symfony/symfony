@@ -33,6 +33,11 @@ class ChoiceQuestion extends Question
     private array $choices = [];
 
     /**
+     * @var (\Closure(\UnitEnum):string)|null
+     */
+    private ?\Closure $customEnumRender = null;
+
+    /**
      * @param string                                                           $question      The question to ask to the user
      * @param array<string|bool|int|float|\Stringable>|class-string<\UnitEnum> $choicesOrEnum The list of available choices or an Enum FQCN
      * @param string|bool|int|float|\UnitEnum|null                             $default       The default answer to return
@@ -144,6 +149,30 @@ class ChoiceQuestion extends Question
         return parent::setMultiline($multiline);
     }
 
+    /**
+     * Sets a render function for the enum question.
+     *
+     * @param (callable(\UnitEnum):string)|null $customEnumRender
+     *
+     * @return $this
+     */
+    public function setCustomEnumRender(?callable $customEnumRender): static
+    {
+        $this->customEnumRender = null === $customEnumRender ? null : $customEnumRender(...);
+
+        return $this;
+    }
+
+    /**
+     * Gets the render function for the enum question.
+     *
+     * @return (callable(\UnitEnum):string)|null
+     */
+    public function getCustomEnumRender(): ?callable
+    {
+        return $this->customEnumRender;
+    }
+
     private function getDefaultValidator(): callable
     {
         $choices = $this->choices;
@@ -228,6 +257,16 @@ class ChoiceQuestion extends Question
     {
         if (!enum_exists($enumClass)) {
             return null;
+        }
+
+        if (null !== $this->customEnumRender) {
+            $enumCases = $enumClass::cases();
+            $renderFunction = $this->customEnumRender;
+
+            return array_find(
+                $enumCases,
+                fn ($case) => $renderFunction($case) === $value
+            );
         }
 
         $value = (string) s($value)->pascal();

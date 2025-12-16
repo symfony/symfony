@@ -214,7 +214,7 @@ class QuestionHelper extends Helper
             $messages[] = \sprintf(
                 "  [<$tag>%s$padding</$tag>] %s",
                 $key,
-                $value instanceof \UnitEnum ? $this->formatEnumValue($value) : $value
+                $value instanceof \UnitEnum ? $this->formatEnumValue($question, $value) : $value
             );
         }
 
@@ -308,7 +308,7 @@ class QuestionHelper extends Helper
             } elseif ('' === $c || \ord($c) < 32) {
                 if ("\t" === $c || "\n" === $c) {
                     if ($numMatches > 0 && -1 !== $ofs) {
-                        $ret = (string) ($matches[$ofs] instanceof \UnitEnum ? $this->formatEnumValue($matches[$ofs]) : $matches[$ofs]);
+                        $ret = (string) ($matches[$ofs] instanceof \UnitEnum ? $this->formatEnumValue($question, $matches[$ofs]) : $matches[$ofs]);
                         // Echo out remaining chars for current match
                         $remainingCharacters = substr($ret, \strlen(trim($this->mostRecentlyEnteredValue($fullChoice))));
                         $output->write($remainingCharacters);
@@ -317,13 +317,13 @@ class QuestionHelper extends Helper
 
                         $matches = array_filter(
                             $autocomplete($ret),
-                            function ($match) use ($ret) {
+                            function ($match) use ($ret, $question) {
                                 if ('' === $ret) {
                                     return true;
                                 }
 
                                 if ($match instanceof \UnitEnum) {
-                                    $match = $this->formatEnumValue($match);
+                                    $match = $this->formatEnumValue($question, $match);
                                 }
 
                                 return str_starts_with($match, $ret);
@@ -363,7 +363,7 @@ class QuestionHelper extends Helper
 
                 foreach ($autocomplete($ret) as $value) {
                     if ($value instanceof \UnitEnum) {
-                        $value = $this->formatEnumValue($value);
+                        $value = $this->formatEnumValue($question, $value);
                     }
 
                     // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
@@ -379,7 +379,7 @@ class QuestionHelper extends Helper
                 $cursor->savePosition();
                 // Write highlighted text, complete the partially entered response
                 $charactersEntered = \strlen(trim($this->mostRecentlyEnteredValue($fullChoice)));
-                $stringValue = $matches[$ofs] instanceof \UnitEnum ? $this->formatEnumValue($matches[$ofs]) : $matches[$ofs];
+                $stringValue = $matches[$ofs] instanceof \UnitEnum ? $this->formatEnumValue($question, $matches[$ofs]) : $matches[$ofs];
                 $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($stringValue, $charactersEntered)).'</hl>');
                 $cursor->restorePosition();
             }
@@ -644,8 +644,16 @@ class QuestionHelper extends Helper
     /**
      * Converts an enum value to a human-readable string.
      */
-    protected function formatEnumValue(\UnitEnum $value): string
+    protected function formatEnumValue(Question $question, \UnitEnum $value): string
     {
+        if (!($question instanceof ChoiceQuestion)) {
+            return '';
+        }
+
+        if (null !== $question->getCustomEnumRender()) {
+            return $question->getCustomEnumRender()($value);
+        }
+
         return (string) s($value->name)->snake()->replace('_', ' ')->title();
     }
 }

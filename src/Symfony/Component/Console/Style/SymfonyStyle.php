@@ -234,7 +234,7 @@ class SymfonyStyle extends OutputStyle
         return $this->askQuestion(new ConfirmationQuestion($question, $default));
     }
 
-    public function choice(string $question, array|string $choicesOrEnum, mixed $default = null, bool $multiSelect = false): mixed
+    public function choice(string $question, array|string $choicesOrEnum, mixed $default = null, bool $multiSelect = false, ?callable $customEnumRender = null): mixed
     {
         if (null !== $default && \is_array($choicesOrEnum)) {
             $values = array_flip($choicesOrEnum);
@@ -243,6 +243,7 @@ class SymfonyStyle extends OutputStyle
 
         $questionChoice = new ChoiceQuestion($question, $choicesOrEnum, $default);
         $questionChoice->setMultiselect($multiSelect);
+        $questionChoice->setCustomEnumRender($customEnumRender);
 
         return $this->askQuestion($questionChoice);
     }

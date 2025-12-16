@@ -1000,6 +1000,12 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $inputStream = $this->getInputStream("1\n");
         $result = $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
         $this->assertEquals(BasicEnumChoice::Second, $result);
+
+        $question = new ChoiceQuestion('What value?', BasicEnumChoice::class, BasicEnumChoice::First);
+        $question->setCustomEnumRender($this->createCustomEnumRender());
+        $inputStream = $this->getInputStream("1\n");
+        $result = $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
+        $this->assertEquals(BasicEnumChoice::Second, $result);
     }
 
     public function testSelectEnumValueByName()
@@ -1008,6 +1014,12 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
 
         $question = new ChoiceQuestion('What value?', BasicEnumChoice::class, BasicEnumChoice::First);
         $inputStream = $this->getInputStream("Third name\n");
+        $result = $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
+        $this->assertEquals(BasicEnumChoice::ThirdName, $result);
+
+        $question = new ChoiceQuestion('What value?', BasicEnumChoice::class, BasicEnumChoice::First);
+        $question->setCustomEnumRender($this->createCustomEnumRender());
+        $inputStream = $this->getInputStream("third\n");
         $result = $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
         $this->assertEquals(BasicEnumChoice::ThirdName, $result);
     }
@@ -1033,6 +1045,21 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         // Auto<KEYDOWN><KEYDOWN><TAB><NEWLINE>
         $inputStream = $this->getInputStream("Auto\033[A\033[A\t\n");
         $this->assertSame(BasicEnumChoice::AutocompleteValueFourth, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+
+        $question = new ChoiceQuestion('What value?', BasicEnumChoice::class, BasicEnumChoice::Second);
+        $question->setCustomEnumRender($this->createCustomEnumRender());
+
+        // Auto<TAB><NEWLINE>
+        $inputStream = $this->getInputStream("auto\t\n");
+        $this->assertSame(BasicEnumChoice::AutocompleteValueFourth, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+
+        // Auto<KEYDOWN><TAB><NEWLINE>
+        $inputStream = $this->getInputStream("auto\033[A\t\n");
+        $this->assertSame(BasicEnumChoice::AutocompleteValueFifth, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+
+        // Auto<KEYDOWN><KEYDOWN><TAB><NEWLINE>
+        $inputStream = $this->getInputStream("auto\033[A\033[A\t\n");
+        $this->assertSame(BasicEnumChoice::AutocompleteValueFourth, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
     protected function getInputStream($input)
@@ -1057,6 +1084,17 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
             ->willReturn($interactive);
 
         return $mock;
+    }
+
+    protected function createCustomEnumRender()
+    {
+        return fn (BasicEnumChoice $choice) => match ($choice) {
+            BasicEnumChoice::First => 'first',
+            BasicEnumChoice::Second => 'second',
+            BasicEnumChoice::ThirdName => 'third',
+            BasicEnumChoice::AutocompleteValueFourth => 'auto fourth',
+            BasicEnumChoice::AutocompleteValueFifth => 'auto fifth',
+        };
     }
 }
 

@@ -62,7 +62,7 @@ class SymfonyQuestionHelper extends QuestionHelper
                 $choices = $question->getChoices();
 
                 if ($default instanceof \UnitEnum) {
-                    $defaultOutput = $this->formatEnumValue($default);
+                    $defaultOutput = $this->formatEnumValue($question, $default);
                 } else {
                     /** @var int|string $default */
                     $defaultOutput = $choices[$default] ?? $default;

@@ -89,8 +89,10 @@ interface StyleInterface
 
     /**
      * Asks a choice question.
+     *
+     * @param array|class-string<\UnitEnum> $choicesOrEnum
      */
-    public function choice(string $question, array $choices, mixed $default = null): mixed;
+    public function choice(string $question, array|string $choicesOrEnum, mixed $default = null): mixed;
 
     /**
      * Add newline(s).

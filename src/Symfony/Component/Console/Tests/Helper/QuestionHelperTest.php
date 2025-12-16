@@ -29,6 +29,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Console\Tests\Fixtures\BasicEnumChoice;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Process;
 
@@ -979,6 +980,59 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->expectException(ProcessSignaledException::class);
         $this->expectExceptionMessage('The process has been signaled with signal "2".');
         $p->wait();
+    }
+
+    public function testSelectDefaultEnumValue()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new ChoiceQuestion('What value?', BasicEnumChoice::class, BasicEnumChoice::First);
+        $inputStream = $this->getInputStream("\n");
+        $result = $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
+        $this->assertEquals(BasicEnumChoice::First, $result);
+    }
+
+    public function testSelectEnumValueByIndex()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new ChoiceQuestion('What value?', BasicEnumChoice::class, BasicEnumChoice::First);
+        $inputStream = $this->getInputStream("1\n");
+        $result = $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
+        $this->assertEquals(BasicEnumChoice::Second, $result);
+    }
+
+    public function testSelectEnumValueByName()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new ChoiceQuestion('What value?', BasicEnumChoice::class, BasicEnumChoice::First);
+        $inputStream = $this->getInputStream("Third name\n");
+        $result = $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
+        $this->assertEquals(BasicEnumChoice::ThirdName, $result);
+    }
+
+    public function testAutocompleteWithEnum()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        $dialog = new QuestionHelper();
+
+        $question = new ChoiceQuestion('What value?', BasicEnumChoice::class, BasicEnumChoice::Second);
+
+        // Auto<TAB><NEWLINE>
+        $inputStream = $this->getInputStream("Auto\t\n");
+        $this->assertSame(BasicEnumChoice::AutocompleteValueFourth, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+
+        // Auto<KEYDOWN><TAB><NEWLINE>
+        $inputStream = $this->getInputStream("Auto\033[A\t\n");
+        $this->assertSame(BasicEnumChoice::AutocompleteValueFifth, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+
+        // Auto<KEYDOWN><KEYDOWN><TAB><NEWLINE>
+        $inputStream = $this->getInputStream("Auto\033[A\033[A\t\n");
+        $this->assertSame(BasicEnumChoice::AutocompleteValueFourth, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
     protected function getInputStream($input)

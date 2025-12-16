@@ -211,7 +211,11 @@ class QuestionHelper extends Helper
         foreach ($choices as $key => $value) {
             $padding = str_repeat(' ', $maxWidth - self::width($key));
 
-            $messages[] = \sprintf("  [<$tag>%s$padding</$tag>] %s", $key, $value);
+            $messages[] = \sprintf(
+                "  [<$tag>%s$padding</$tag>] %s",
+                $key,
+                $value instanceof \UnitEnum ? $this->formatEnumValue($value) : $value
+            );
         }
 
         return $messages;
@@ -234,8 +238,8 @@ class QuestionHelper extends Helper
     /**
      * Autocompletes a question.
      *
-     * @param resource                  $inputStream
-     * @param callable(string):string[] $autocomplete
+     * @param resource                                $inputStream
+     * @param callable(string):(string[]|\UnitEnum[]) $autocomplete
      */
     private function autocomplete(OutputInterface $output, Question $question, $inputStream, callable $autocomplete): string
     {
@@ -304,7 +308,7 @@ class QuestionHelper extends Helper
             } elseif ('' === $c || \ord($c) < 32) {
                 if ("\t" === $c || "\n" === $c) {
                     if ($numMatches > 0 && -1 !== $ofs) {
-                        $ret = (string) $matches[$ofs];
+                        $ret = (string) ($matches[$ofs] instanceof \UnitEnum ? $this->formatEnumValue($matches[$ofs]) : $matches[$ofs]);
                         // Echo out remaining chars for current match
                         $remainingCharacters = substr($ret, \strlen(trim($this->mostRecentlyEnteredValue($fullChoice))));
                         $output->write($remainingCharacters);
@@ -313,7 +317,17 @@ class QuestionHelper extends Helper
 
                         $matches = array_filter(
                             $autocomplete($ret),
-                            fn ($match) => '' === $ret || str_starts_with($match, $ret)
+                            function ($match) use ($ret) {
+                                if ('' === $ret) {
+                                    return true;
+                                }
+
+                                if ($match instanceof \UnitEnum) {
+                                    $match = $this->formatEnumValue($match);
+                                }
+
+                                return str_starts_with($match, $ret);
+                            }
                         );
                         $numMatches = \count($matches);
                         $ofs = -1;
@@ -348,6 +362,10 @@ class QuestionHelper extends Helper
                 $ofs = 0;
 
                 foreach ($autocomplete($ret) as $value) {
+                    if ($value instanceof \UnitEnum) {
+                        $value = $this->formatEnumValue($value);
+                    }
+
                     // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
                     if (str_starts_with($value, $tempRet)) {
                         $matches[$numMatches++] = $value;
@@ -361,7 +379,8 @@ class QuestionHelper extends Helper
                 $cursor->savePosition();
                 // Write highlighted text, complete the partially entered response
                 $charactersEntered = \strlen(trim($this->mostRecentlyEnteredValue($fullChoice)));
-                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($matches[$ofs], $charactersEntered)).'</hl>');
+                $stringValue = $matches[$ofs] instanceof \UnitEnum ? $this->formatEnumValue($matches[$ofs]) : $matches[$ofs];
+                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($stringValue, $charactersEntered)).'</hl>');
                 $cursor->restorePosition();
             }
         }
@@ -620,5 +639,13 @@ class QuestionHelper extends Helper
         }
 
         return $ret;
+    }
+
+    /**
+     * Converts an enum value to a human-readable string.
+     */
+    protected function formatEnumValue(\UnitEnum $value): string
+    {
+        return (string) s($value->name)->snake()->replace('_', ' ')->title();
     }
 }

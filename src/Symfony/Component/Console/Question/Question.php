@@ -25,7 +25,7 @@ class Question
     private bool $hidden = false;
     private bool $hiddenFallback = true;
     /**
-     * @var (\Closure(string):string[])|null
+     * @var (\Closure(string):(string[]|\UnitEnum[]))|null
      */
     private ?\Closure $autocompleterCallback = null;
     /**
@@ -41,12 +41,12 @@ class Question
     private ?int $timeout = null;
 
     /**
-     * @param string                     $question The question to ask to the user
-     * @param string|bool|int|float|null $default  The default answer to return if the user enters nothing
+     * @param string                               $question The question to ask to the user
+     * @param string|bool|int|float|\UnitEnum|null $default  The default answer to return if the user enters nothing
      */
     public function __construct(
         private string $question,
-        private string|bool|int|float|null $default = null,
+        private string|bool|int|float|\UnitEnum|null $default = null,
     ) {
     }
 
@@ -61,7 +61,7 @@ class Question
     /**
      * Returns the default answer.
      */
-    public function getDefault(): string|bool|int|float|null
+    public function getDefault(): string|bool|int|float|\UnitEnum|null
     {
         return $this->default;
     }
@@ -204,7 +204,7 @@ class Question
      *
      * The callback is passed the user input as argument and should return an iterable of corresponding suggestions.
      *
-     * @param (callable(string):string[])|null $callback
+     * @param (callable(string):(string[]|\UnitEnum[]))|null $callback
      *
      * @return $this
      */

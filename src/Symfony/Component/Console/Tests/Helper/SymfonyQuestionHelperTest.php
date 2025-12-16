@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Tests\Fixtures\BasicEnumChoice;
 
 #[Group('tty')]
 class SymfonyQuestionHelperTest extends AbstractQuestionHelperTestCase
@@ -180,6 +181,30 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTestCase
              qqq:
               [0] foo
              >ccc>
+            EOT,
+            $output,
+            true
+        );
+    }
+
+    public function testFormatEnumWithDefaultValue()
+    {
+        $choiceQuestion = new ChoiceQuestion('qqq', BasicEnumChoice::class, BasicEnumChoice::Second);
+
+        (new SymfonyQuestionHelper())->ask(
+            $this->createStreamableInputInterfaceMock($this->getInputStream('')),
+            $output = $this->createOutputInterface(),
+            $choiceQuestion
+        );
+
+        $this->assertOutputContains(<<<EOT
+             qqq [Second]:
+              [0] First
+              [1] Second
+              [2] Third name
+              [3] Autocomplete value fourth
+              [4] Autocomplete value fifth
+             >
             EOT,
             $output,
             true

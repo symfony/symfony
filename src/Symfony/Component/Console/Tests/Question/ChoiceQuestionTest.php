@@ -14,6 +14,9 @@ namespace Symfony\Component\Console\Tests\Question;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Tests\Fixtures\BasicEnumChoice;
+use Symfony\Component\Console\Tests\Fixtures\EmptyBasicEnumChoice;
+use Symfony\Component\Console\Tests\Fixtures\OtherBasicEnumChoice;
 
 class ChoiceQuestionTest extends TestCase
 {
@@ -144,6 +147,46 @@ class ChoiceQuestionTest extends TestCase
         $question->setMultiselect(true);
 
         $this->assertSame([$result3, $result2], $question->getValidator()('baz, bar'));
+    }
+
+    public function testThrowExceptionWhenEnablingMultiselectOnEnumQuestion()
+    {
+        $question = new ChoiceQuestion('A question', [1, 2, 3]);
+        $question->setMultiselect(true);
+
+        $question = new ChoiceQuestion('A question', BasicEnumChoice::class);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Enums cannot be set as multiselect.');
+        $question->setMultiselect(true);
+    }
+
+    public function testThrowExceptionWhenEnablingMultilineOnEnumQuestion()
+    {
+        $question = new ChoiceQuestion('A question', [1, 2, 3]);
+        $question->setMultiline(true);
+
+        $question = new ChoiceQuestion('A question', BasicEnumChoice::class);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Enums cannot be set as multiline.');
+        $question->setMultiline(true);
+    }
+
+    public function testThrowExceptionWhenDefaultValueIsNotAnEnumValueOnEnumQuestion()
+    {
+        new ChoiceQuestion('A question', BasicEnumChoice::class, BasicEnumChoice::First);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Default value does not exist in the enum.');
+        new ChoiceQuestion('A question', BasicEnumChoice::class, OtherBasicEnumChoice::First);
+    }
+
+    public function testThrowExceptionWhenEnumValueOnEnumQuestion()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Choice question must have at least 1 choice available.');
+        new ChoiceQuestion('A question', EmptyBasicEnumChoice::class);
     }
 }
 

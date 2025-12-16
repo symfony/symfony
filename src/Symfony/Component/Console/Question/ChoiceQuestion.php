@@ -13,6 +13,8 @@ namespace Symfony\Component\Console\Question;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
+use function Symfony\Component\String\s;
+
 /**
  * Represents a choice question.
  *
@@ -23,29 +25,43 @@ class ChoiceQuestion extends Question
     private bool $multiselect = false;
     private string $prompt = ' > ';
     private string $errorMessage = 'Value "%s" is invalid';
+    private bool $usesEnum = false;
 
     /**
-     * @param string                                   $question The question to ask to the user
-     * @param array<string|bool|int|float|\Stringable> $choices  The list of available choices
-     * @param string|bool|int|float|null               $default  The default answer to return
+     * @var array<string|bool|int|float|\Stringable|\UnitEnum>
+     */
+    private array $choices = [];
+
+    /**
+     * @param string                                                           $question      The question to ask to the user
+     * @param array<string|bool|int|float|\Stringable>|class-string<\UnitEnum> $choicesOrEnum The list of available choices or an Enum FQCN
+     * @param string|bool|int|float|\UnitEnum|null                             $default       The default answer to return
      */
     public function __construct(
         string $question,
-        private array $choices,
-        string|bool|int|float|null $default = null,
+        array|string $choicesOrEnum,
+        string|bool|int|float|\UnitEnum|null $default = null,
     ) {
-        if (!$choices) {
+        if (!$choicesOrEnum) {
             throw new \LogicException('Choice question must have at least 1 choice available.');
+        } elseif (\is_string($choicesOrEnum) && !enum_exists($choicesOrEnum)) {
+            throw new \LogicException(\sprintf('Enum "%s" does not exist.', $choicesOrEnum));
+        } elseif (\is_string($choicesOrEnum) && 0 === \count($choicesOrEnum::cases())) {
+            throw new \LogicException('Choice question must have at least 1 choice available.');
+        } elseif (\is_string($choicesOrEnum) && null !== $default && !($default instanceof $choicesOrEnum)) {
+            throw new \LogicException('Default value does not exist in the enum.');
         }
 
         parent::__construct($question, $default);
 
+        $this->usesEnum = \is_string($choicesOrEnum);
+        $this->choices = $this->usesEnum ? $choicesOrEnum::cases() : $choicesOrEnum;
         $this->setValidator($this->getDefaultValidator());
-        $this->setAutocompleterValues($choices);
+        $this->setAutocompleterValues($this->choices);
     }
 
     /**
-     * @return array<string|bool|int|float|\Stringable>
+     * @return array<string|bool|int|float|\Stringable|\UnitEnum>
      */
     public function getChoices(): array
     {
@@ -57,10 +73,18 @@ class ChoiceQuestion extends Question
      *
      * When multiselect is set to true, multiple choices can be answered.
      *
+     * This option cannot be enabled on enum questions.
+     *
      * @return $this
+     *
+     * @throws \LogicException When multiselect is set to true on an enum question
      */
     public function setMultiselect(bool $multiselect): static
     {
+        if ($this->usesEnum && $multiselect) {
+            throw new \LogicException('Enums cannot be set as multiselect.');
+        }
+
         $this->multiselect = $multiselect;
         $this->setValidator($this->getDefaultValidator());
 
@@ -110,6 +134,16 @@ class ChoiceQuestion extends Question
         return $this;
     }
 
+    #[\Override]
+    public function setMultiline(bool $multiline): static
+    {
+        if ($this->usesEnum && $multiline) {
+            throw new \LogicException('Enums cannot be set as multiline.');
+        }
+
+        return parent::setMultiline($multiline);
+    }
+
     private function getDefaultValidator(): callable
     {
         $choices = $this->choices;
@@ -118,6 +152,17 @@ class ChoiceQuestion extends Question
         $isAssoc = $this->isAssoc($choices);
 
         return function ($selected) use ($choices, $errorMessage, $multiselect, $isAssoc) {
+            if ($this->usesEnum) {
+                if (\in_array($selected, $choices, true)) {
+                    return $selected;
+                }
+
+                // Authorize a string representing the human-readable name of the enum (mainly for autocomplete)
+                if (null !== $selected && null !== ($enumValue = $this->convertStringToEnumValue($selected, $choices[0]::class))) {
+                    return $enumValue;
+                }
+            }
+
             if ($multiselect) {
                 // Check for a separated comma values
                 if (!preg_match('/^[^,]+(?:,[^,]+)*$/', (string) $selected, $matches)) {
@@ -174,5 +219,19 @@ class ChoiceQuestion extends Question
 
             return current($multiselectChoices);
         };
+    }
+
+    /**
+     * @param class-string<\UnitEnum> $enumClass
+     */
+    private function convertStringToEnumValue(string $value, string $enumClass): ?\UnitEnum
+    {
+        if (!enum_exists($enumClass)) {
+            return null;
+        }
+
+        $value = (string) s($value)->pascal();
+
+        return array_find($enumClass::cases(), fn ($case) => $case->name === $value);
     }
 }

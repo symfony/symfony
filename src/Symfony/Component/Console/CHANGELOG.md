@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+* Add support for enums in `ChoiceQuestion`
+
 8.0
 ---
 

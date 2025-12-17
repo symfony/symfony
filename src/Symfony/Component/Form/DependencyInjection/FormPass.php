@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\DependencyInjection;
 
+use Symfony\Component\Config\Resource\StaticMethodResource;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -90,6 +91,7 @@ class FormPass implements CompilerPassInterface
                     $typeExtensions[$extendedType][] = new Reference($serviceId);
                     $extendsTypes = true;
                 }
+                $container->addResource(new StaticMethodResource([$typeExtensionClass, 'getExtendedTypes']));
 
                 if (!$extendsTypes) {
                     throw new InvalidArgumentException(\sprintf('The getExtendedTypes() method for service "%s" does not return any extended types.', $serviceId));

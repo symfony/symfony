@@ -994,6 +994,35 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('nested-id', $test->id);
     }
 
+    public function testDenormalizeWithNestedExtraAttribute()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+
+        $data = [
+            'data' => [
+                'foo' => 'bar',
+                'baz' => [
+                    'qux' => 'quux',
+                    'corge' => 'grault',
+                ],
+            ],
+        ];
+
+        $obj = new class {
+            #[SerializedPath('[data][baz][qux]')]
+            public $foo;
+        };
+
+        try {
+            $normalizer->denormalize($data, $obj::class, 'any', ['allow_extra_attributes' => false]);
+
+            $this->fail(\sprintf('Expected a "%s" to be thrown.', ExtraAttributesException::class));
+        } catch (ExtraAttributesException $e) {
+            $this->assertSame(['data'], $e->getExtraAttributes());
+            $this->assertSame(['data' => ['foo' => 'bar', 'baz' => ['corge' => 'grault']]], $e->getValues());
+        }
+    }
+
     public function testDenormalizeMissingAndNullNestedValues()
     {
         $normalizer = new AbstractObjectNormalizerWithMetadata();

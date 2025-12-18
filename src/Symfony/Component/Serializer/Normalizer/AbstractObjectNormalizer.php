@@ -356,7 +356,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     && $this->nameConverter->normalize($attribute, $resolvedClass, $format, $context) !== $attribute
                 ) {
                     // Input was in wrong format (e.g., camelCase when snake_case expected)
-                    $extraAttributes[] = $notConverted;
+                    $extraAttributes[$notConverted] = $value;
                     continue;
                 }
             }
@@ -365,7 +365,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes, true)) || !$this->isAllowedAttribute($resolvedClass, $attribute, $format, $context)) {
                 if (!($context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES])) {
-                    $extraAttributes[] = $attribute;
+                    $extraAttributes[$attribute] = $value;
                 }
 
                 continue;

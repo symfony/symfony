@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-12T11:28:47Z
+
+instead of gitmodules, can't we use composer? I think we do so already for the intl component (or emoji? I don't remember)
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-12T11:34:44Z
+
+We could indeed use a `package` repository for composer. This is what I do for the sass-spec repo in https://github.com/scssphp/scssphp/ (~~and the setup could be simplified to avoid duplicating the commit reference btw~~ not yet actually: https://github.com/composer/composer/issues/12678).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-13T12:27:32Z
+
+I was thinking about the composer.json in this directory:
+https://github.com/symfony/symfony/tree/8.1/src/Symfony/Component/Emoji/Resources/bin
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-12-15T15:42:33Z
+
+Thanks for the hints, I followed and implemented the Emoji component approach
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-15T16:14:39Z
+
+To me, the big difference between the way the Emoji component works and the way this PR works is that the Emoji composer-based task is about installing things needed for specific tasks updating committed data files that are part of the component. Running the testsuite does *not* require running those commands.
+
+In the case of the JsonPath testsuite (or the Yaml testsuite), the testsuite itself is a dev dependency.
+I would put that composer `package` repository in the normal composer.json to avoid extra work for contributors.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-12-17T11:01:29Z
+
+Proposed a new approach in the last commit taking into account your comment @stof. Updating the test suite would need to edit two files, but I think it's worth it given how easy it makes it to install the suite.
+
+I'm not a big fan of the path guessing in the test case depending on if you use the monorepo or the standalone component, but I'm not sure there's a better solution here?

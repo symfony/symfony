@@ -2845,6 +2845,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->loadFromExtension('framework', []);
         });
         $this->assertTrue($container->has('object_mapper'));
+        $this->assertTrue($container->has('object_mapper.transform.map_collection'));
     }
 
     public function testSecretsDecryptionEnvVarWithDot()

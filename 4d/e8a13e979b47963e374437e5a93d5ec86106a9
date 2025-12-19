@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by keradus at 2025-12-17T10:30:21Z
+
+most components looks ready.
+I started raising actual code fixes to separated PRs.
+
+few components needs more zoom-in and will take some time for me to catch up there. For now, reverted those componentss in this PR (last commits).
+
+perhaps, we can merge all the rest to avoid conflicts , @nicolas-grekas ?
+
+- fabbot complains not related
+- psalm - not sure, also on main branches?
+- x86 / minimal-exts' idle timeout in tests - i see it in yet another PR of mine, some issue on main branches?

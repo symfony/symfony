@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-14T18:20:09Z
+
+> why not creating a function like other config loaders do?
+
+Good idea, PR updated!
+About the test: this is already tested - when testing the generated importmap.php files.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-14T18:35:25Z
+
+👍 I updated both
+
+---------------------------------------------------------------------------
+
+by Kocal at 2025-10-14T18:48:12Z
+
+How things will behave if a project has a `importmap.php` with the `importmap()` function, Symfony Flex, and run `composer require` with an UX package that defines JS dependencies?
+
+Related to https://github.com/symfony/flex/blob/f356aa35f3cf3d2f46c31d344c1098eb2d260426/src/PackageJsonSynchronizer.php#L260-L318, I don't think Flex will be able to parse this `importmap.php`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-19T09:05:48Z
+
+>  I don't think Flex will be able to parse this importmap.php
+
+And you're right.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-16T08:07:52Z
+
+> I don't think Flex will be able to parse this importmap.php
+
+I fixed this by *not* wrapping in a function call. This now uses an inline `@return` annotation, which phpstan et al. don't understand but might in the future. That's sill better than nothing IMHO, at least for human readers for now.
+
+Status: needs review

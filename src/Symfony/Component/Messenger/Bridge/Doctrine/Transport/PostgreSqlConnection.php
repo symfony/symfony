@@ -104,6 +104,14 @@ final class PostgreSqlConnection extends Connection
             return [];
         }
 
+        if (\defined(Table::class.'::OPTION_EXTRA_DROP_SQL')) {
+            // DBAL v4.5
+            $createdTable->addOption(Table::OPTION_EXTRA_DROP_SQL, [
+                \sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
+                \sprintf('DROP FUNCTION IF EXISTS %s();', $this->createTriggerFunctionName()),
+            ]);
+        }
+
         return $this->getTriggerSql();
     }
 

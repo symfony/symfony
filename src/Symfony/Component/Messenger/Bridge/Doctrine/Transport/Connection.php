@@ -21,11 +21,11 @@ use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractAsset;
+use Doctrine\DBAL\Schema\ComparatorConfig;
 use Doctrine\DBAL\Schema\Name\Identifier;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\NamedObject;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
-use Doctrine\DBAL\Schema\ComparatorConfig;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
@@ -546,6 +546,11 @@ class Connection implements ResetInterface
 
                 $schema->createSequence($this->configuration['table_name'].self::ORACLE_SEQUENCES_SUFFIX);
             }
+        }
+
+        if (\defined(Table::class.'::OPTION_EXTRA_CREATE_SQL')) {
+            // DBAL v4.5
+            $table->addOption(Table::OPTION_EXTRA_CREATE_SQL, $this->getExtraSetupSqlForTable($table));
         }
     }
 

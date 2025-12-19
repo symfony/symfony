@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-07T17:25:51Z
+
+Status: needs work
+
+The last commit fixes the tests but needs close review / refactoring of mine (it's LLM generated for now)
+
+---------------------------------------------------------------------------
+
+by stof at 2025-11-07T17:27:26Z
+
+I don't think the amount of code simplification brought by that feature is worth adding new deprecations so late in the process.
+AFAIK, our rule so far was that no new deprecations would be added once the first beta was tagged, to give time to the ecosystem to catch up. If we keep adding deprecations until the very last moment, projects might not be comfortable adding support for Symfony 8.0 in their composer requirement during that beta phase (as they might not be compatible with the stable version if we deprecate and remove something else), which hurts the community adoption of the beta versions of new major versions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-15T13:38:10Z
+
+PR rebased to target 8.1
+
+We could also deprecate `#[AsTaggedItem]` in favor of `#[AutoconfigureTag]` at some point but this needs dedicated thoughts.
+See https://github.com/symfony/symfony/issues/48532 for some background on this idea.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-15T13:57:35Z
+
+@nicolas-grekas those are doing separate things. `#[AutoconfigureTag]` creates an autoconfiguration rule that applies to all instances being a subtype of the class/interface on which it is applied, which has very different effect that `AsTaggedItem` as applied on classes that are extended.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-15T14:27:05Z
+
+@stof I get what you mean. What about the current PR? 👍 ? :)

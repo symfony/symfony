@@ -86,7 +86,7 @@ class ReflectionCasterTest extends TestCase
     public function testClosureCaster()
     {
         $a = $b = 123;
-        $var = function ($x) use ($a, &$b) { var_dump($a, $b); };
+        $var = static function ($x) use ($a, &$b) { var_dump($a, $b); };
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'

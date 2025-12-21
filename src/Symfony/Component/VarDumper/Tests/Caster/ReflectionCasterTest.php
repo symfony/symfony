@@ -131,9 +131,11 @@ class ReflectionCasterTest extends TestCase
 
     public function testClosureCasterExcludingVerbosity()
     {
-        $var = function &($a = 5) {};
+        $var = function &($a = 123) {
+            \assert($this !== null);
+        };
 
-        $this->assertDumpEquals('Closure&($a = 5) { …5}', $var, Caster::EXCLUDE_VERBOSE);
+        $this->assertDumpEquals('Closure&($a = 123) { …5}', $var, Caster::EXCLUDE_VERBOSE);
     }
 
     public function testReflectionParameter()

@@ -43,7 +43,7 @@ class CliDescriptorTest extends TestCase
     {
         $output = new BufferedOutput();
         $output->setDecorated($decorated);
-        $descriptor = new CliDescriptor(new CliDumper(fn ($s) => $s));
+        $descriptor = new CliDescriptor(new CliDumper(static fn ($s) => $s));
 
         $descriptor->describe($output, new Data([[123]]), $context + ['timestamp' => 1544804268.3668], 1);
 

@@ -155,7 +155,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterScalar()
     {
-        $f = function (int $a) {};
+        $f = static function (int $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -172,7 +172,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterMixed()
     {
-        $f = function (mixed $a) {};
+        $f = static function (mixed $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -190,7 +190,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterUnion()
     {
-        $f = function (int|float $a) {};
+        $f = static function (int|float $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -207,7 +207,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterNullableUnion()
     {
-        $f = function (int|float|null $a) {};
+        $f = static function (int|float|null $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -225,7 +225,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterIntersection()
     {
-        $f = function (\Traversable&\Countable $a) {};
+        $f = static function (\Traversable&\Countable $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -370,7 +370,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testReturnType()
     {
-        $f = function (): int {};
+        $f = function (): int {
+          \assert($this !== null);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -388,7 +390,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testMixedReturnType()
     {
-        $f = function (): mixed {};
+        $f = function (): mixed {
+          \assert($this !== null);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -423,7 +427,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testUnionReturnType()
     {
-        $f = function (): int|float {};
+        $f = function (): int|float {
+          \assert($this !== null);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -441,7 +447,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testNullableUnionReturnType()
     {
-        $f = function (): int|float|null {};
+        $f = function (): int|float|null {
+          \assert($this !== null);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -537,7 +545,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testNewInInitializer()
     {
-        $f = function ($a = new \stdClass()) {};
+        $f = function ($a = new \stdClass()) {
+          \assert($this !== null);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-12-20T04:16:48Z
+
+I've checked, and the issue is also present in version 6.4. Bug fixes should target the lowest maintained version that has the issue. Also, could you please cover this case with a test?
+
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2025-12-20T11:23:42Z
+
+> I've checked, and the issue is also present in version 6.4. Bug fixes should target the lowest maintained version that has the issue. Also, could you please cover this case with a test?
+
+Done! also, can you please add a bug label ? thank you

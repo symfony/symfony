@@ -50,7 +50,7 @@
         "symfony/dom-crawler": "^7.4|^8.0",
         "symfony/dotenv": "^7.4|^8.0",
         "symfony/expression-language": "^7.4|^8.0",
-        "symfony/feature-flag": "^8.0",
+        "symfony/feature-flag": "^8.1",
         "symfony/form": "^7.4|^8.0",
         "symfony/html-sanitizer": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0",

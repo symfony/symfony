@@ -21,8 +21,8 @@
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
-        "symfony/http-kernel": "^8.0",
-        "symfony/var-dumper": "^8.0"
+        "symfony/http-kernel": "^8.1",
+        "symfony/var-dumper": "^8.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\FeatureFlag\\": "" },

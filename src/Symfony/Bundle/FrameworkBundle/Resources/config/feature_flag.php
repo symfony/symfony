@@ -36,6 +36,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 '$provider' => service('feature_flag.provider'),
             ])
+            ->tag('kernel.reset', ['method' => 'reset'])
             ->alias(FeatureCheckerInterface::class, 'feature_flag.feature_checker')
     ;
 };

@@ -22,6 +22,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 '$decorated' => service('debug.feature_flag.feature_checker.inner'),
             ])
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('feature_flag.data_collector', FeatureFlagDataCollector::class)
             ->args([
@@ -29,6 +30,6 @@ return static function (ContainerConfigurator $container) {
                 '$featureChecker' => service('debug.feature_flag.feature_checker'),
             ])
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/feature_flag.html.twig', 'id' => 'feature_flag'])
-
+            ->tag('kernel.reset', ['method' => 'reset'])
     ;
 };

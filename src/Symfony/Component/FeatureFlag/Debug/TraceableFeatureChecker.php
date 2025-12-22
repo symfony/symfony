@@ -12,11 +12,12 @@
 namespace Symfony\Component\FeatureFlag\Debug;
 
 use Symfony\Component\FeatureFlag\FeatureCheckerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @experimental
  */
-final class TraceableFeatureChecker implements FeatureCheckerInterface
+final class TraceableFeatureChecker implements FeatureCheckerInterface, ResetInterface
 {
     /** @var array<string, array{status: 'resolved'|'enabled'|'disabled', value: mixed, calls: int}> */
     private array $resolvedValues = [];
@@ -59,5 +60,13 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface
     public function getResolvedValues(): array
     {
         return $this->resolvedValues;
+    }
+
+    public function reset(): void
+    {
+        $this->resolvedValues = [];
+        if ($this->decorated instanceof ResetInterface) {
+            $this->decorated->reset();
+        }
     }
 }

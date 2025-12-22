@@ -14,11 +14,11 @@ namespace Symfony\Component\FeatureFlag\Provider;
 /**
  * @experimental
  */
-final readonly class ChainProvider implements ProviderInterface
+final class ChainProvider implements ProviderInterface
 {
     public function __construct(
         /** @var list<ProviderInterface> */
-        private iterable $providers = [],
+        private readonly iterable $providers = [],
     ) {
     }
 

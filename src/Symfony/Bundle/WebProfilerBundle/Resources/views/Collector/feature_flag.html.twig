@@ -12,16 +12,16 @@
         {% set text %}
             <div class="sf-toolbar-info-group">
                 {% set color_map = {
-                    'not_found': 'gray',
-                    'resolved': 'green',
-                    'disabled': 'red',
-                    'enabled': 'green',
+                    not_found: 'gray',
+                    resolved: 'green',
+                    disabled: 'red',
+                    enabled: 'green',
                 } %}
                 {% for feature_name, info in collector.resolved %}
                     <div class="sf-toolbar-info-piece">
                         <b>{{ feature_name }}</b>
                         <span class="sf-toolbar-status sf-toolbar-status-{{ color_map[info.status] }}">
-                            {{ info.status|capitalize|replace({'_': ' '}) }}
+                            {{ info.status|capitalize|replace({_: ' '}) }}
                         </span>
                         <br />
                     </div>
@@ -29,7 +29,7 @@
             </div>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url}) }}
     {% endif %}
 {% endblock %}
 
@@ -88,7 +88,7 @@
                                 <td>
                                     {% set context_id = 'context-' ~ loop.index %}
                                     <div>
-                                        <span class="badge badge-{{ info.status }}">{{ info.status|capitalize|replace({'_': ' '}) }}</span>
+                                        <span class="badge badge-{{ info.status }}">{{ info.status|capitalize|replace({_: ' '}) }}</span>
                                         <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide details">Show details</button></span>
                                     </div>
 
@@ -96,7 +96,7 @@
                                         <table>
                                             <tr>
                                                 <th>Value</th>
-                                                <td>{{ profiler_dump(info.value, maxDepth=2) }}</td>
+                                                <td>{{ profiler_dump(info.value, maxDepth: 2) }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Calls</th>

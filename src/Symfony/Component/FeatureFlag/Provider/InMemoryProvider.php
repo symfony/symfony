@@ -14,13 +14,13 @@ namespace Symfony\Component\FeatureFlag\Provider;
 /**
  * @experimental
  */
-final readonly class InMemoryProvider implements ProviderInterface
+final class InMemoryProvider implements ProviderInterface
 {
     /**
      * @param array<string, (\Closure(): mixed)> $features
      */
     public function __construct(
-        private array $features,
+        private readonly array $features,
     ) {
     }
 

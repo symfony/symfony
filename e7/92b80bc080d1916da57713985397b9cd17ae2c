@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-12-19T10:18:03Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "7.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-12-19T10:32:44Z
+
+🙇🏻
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-12-19T13:25:00Z
+
+>Non-static lambda is working right now by "accident", but we still call non-static method getSuggestedRoles using class name and not instance - suggestedValues: [self::class, 'getSuggestedRoles']). Yet, imagine getSuggestedRoles method would start using $this...
+
+For reference, we did this intentionally for this case, where it is not possible to define a callable like `[$this, 'getSuggestedRoles']` or simply `$this->getSuggestedRoles(...)` as an attribute argument. Therefore, we first check whether the static method exists; otherwise, we switch the definition to `[$this, 'getSuggestedRoles']` to allow the use of non-static values.
+
+https://github.com/symfony/symfony/blob/fda80055a12bc9a4ab1e474eb1af2a7889a23367/src/Symfony/Component/Console/Attribute/Argument.php#L90
+
+The test changed here was testing that, but it was not actually invoking the method statically.
+
+I think if we want to keep testing that feature, we should revert (the static method) and add a comment instead?
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-12-19T14:22:30Z
+
+in such case, static analysis has no clue given lambda cannot be static [using `$this` later from autoreplaced value, as you explained]
+
+if the feature is expected, it should be tested. let me revert and propose some comments
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-12-19T14:34:52Z
+
+i believe this explicit check against static->$this convertion was hidden. i elaborated on it in newly added comment and put an exception.
+
+in upcoming commit, i also suggest to not declarae exception for whole file (other lambas shall be static) and handle it differently for those 2 unique lambdas.
+
+Please re-review and decide which version you prefer (exception for whole file or workaround with `assert`)

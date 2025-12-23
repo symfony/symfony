@@ -14,7 +14,6 @@ namespace Symfony\Component\Scheduler\Generator;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
@@ -105,8 +104,7 @@ final class MessageGenerator implements MessageGeneratorInterface
                 $context = new MessageContext($this->name, $id, $trigger, $time, $nextTime);
                 try {
                     foreach ($recurringMessage->getMessages($context) as $message) {
-                        $messageKey = $this->getMessageIdAndRun($message, $context);
-                        $key = 'scheduler_lock_'.$this->name.'_'.$messageKey;
+                        $key = 'scheduler_lock_'.$this->name.'_'.$context->id.$context->triggeredAt->format('_YmdHis');
                         // lock for one hour to avoid duplicate message dispatching
                         $lock = ($this->locks[$key] ??= $lockFactory->createLock($key, 3600, false));
                         if (!$lock->acquire()) {
@@ -158,14 +156,5 @@ final class MessageGenerator implements MessageGeneratorInterface
     private function checkpoint(): Checkpoint
     {
         return $this->checkpoint ??= new Checkpoint('scheduler_checkpoint_'.$this->name, $this->getSchedule()->getLock(), $this->getSchedule()->getState());
-    }
-
-    private function getMessageIdAndRun(object $message, MessageContext $contest): string
-    {
-        return match (true) {
-            $message instanceof ServiceCallMessage => $message->__toString().json_encode($message->getArguments()),
-            $message instanceof \Stringable => $message->__toString(),
-            default => $message::class,
-        }.$contest->triggeredAt->format('_YmdHis');
     }
 }

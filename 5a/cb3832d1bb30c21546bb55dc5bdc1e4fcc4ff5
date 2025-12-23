@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-19T08:11:29Z
+
+But why? I mean: if there's no name configured, the default entity manager is used. So why ping should care about any others if it doesn't use them?
+
+---------------------------------------------------------------------------
+
+by fpondepeyre at 2025-12-19T11:35:03Z
+
+@nicolas-grekas  Thanks for taking a look at the MR and for the question!
+
+Even when no manager name is configured, the middleware runs before the handler and doesn’t actually know which EntityManager the handler will use. In multi‑EM apps, handlers can inject a non‑default EM (e.g. reporting/archive). If only the default is pinged, those other connections can still be stale and you can hit “connection gone away” even though the middleware ran.
+
+Pinging all managers in the “no name configured” case makes the default behavior safer for multi‑EM setups, while preserving the existing behavior for people who explicitly configure a single manager (they still only ping that one).
+
+  That said, if you prefer “default‑only unless explicitly configured”, it’s a reasonable position and I understand if the change is rejected on that basis.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-23T09:29:13Z
+
+Thanks for your answer. Now I'm wondering if we could ping only EM that do have an open connection? Won't the current code open new connections at the moment?
+
+---------------------------------------------------------------------------
+
+by fpondepeyre at 2025-12-23T09:49:20Z
+
+Good catch, you’re right: without a guard we’d open connections when pinging. I’ve updated the middleware to skip pings unless the connection is already open (isConnected()), so we don’t create new connections in the ‘no name configured’ case (or when the named EM is still lazy). Tests cover this change.

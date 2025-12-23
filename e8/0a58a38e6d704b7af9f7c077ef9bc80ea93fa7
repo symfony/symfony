@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by charlycoste at 2025-11-27T16:43:31Z
+
+Damn ! Sorry for the typos… Corrected.
+Last push. Waiting for reviews, now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-01T20:02:46Z
+
+Thanks for letting us know about this env var. 2 things:
+- please add tests :)
+- should we populate `kernel.container_build_time` with this instead?

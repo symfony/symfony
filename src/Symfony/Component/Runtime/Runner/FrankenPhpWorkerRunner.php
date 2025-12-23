@@ -58,6 +58,7 @@ class FrankenPhpWorkerRunner implements RunnerInterface
 
             if ($this->kernel instanceof TerminableInterface && $sfRequest && $sfResponse) {
                 $this->kernel->terminate($sfRequest, $sfResponse);
+                $this->kernel->shutdown();
             }
 
             gc_collect_cycles();

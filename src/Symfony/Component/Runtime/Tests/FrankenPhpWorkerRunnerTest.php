@@ -38,6 +38,7 @@ class FrankenPhpWorkerRunnerTest extends TestCase
                 return new Response();
             });
         $application->expects($this->once())->method('terminate');
+        $application->expects($this->once())->method('shutdown');
 
         $_SERVER['FOO'] = 'bar';
 

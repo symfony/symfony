@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-19T07:34:45Z
+
+The deps=low failure need a bump of di to ^7.4.3|^8.0.3 in fwb.
+
+---------------------------------------------------------------------------
+
+by jack-worman at 2025-12-19T12:56:02Z
+
+> The deps=low failure need a bump of di to ^7.4.3|^8.0.3 in fwb.
+
+Thanks for the tip. It was actually `symfony/config` needing the bump.

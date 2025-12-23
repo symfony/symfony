@@ -104,7 +104,7 @@ final class MessageGenerator implements MessageGeneratorInterface
                 $context = new MessageContext($this->name, $id, $trigger, $time, $nextTime);
                 try {
                     foreach ($recurringMessage->getMessages($context) as $message) {
-                        $key = 'scheduler_lock_'.$this->name.'_'.$context->id.$context->triggeredAt->format('_YmdHis');
+                        $key = 'scheduler_lock_'.$this->name.'_'.$context->id.$context->triggeredAt->format('_YmdHi');
                         // lock for one hour to avoid duplicate message dispatching
                         $lock = ($this->locks[$key] ??= $lockFactory->createLock($key, 3600, false));
                         if (!$lock->acquire()) {

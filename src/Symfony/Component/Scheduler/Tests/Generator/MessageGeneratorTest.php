@@ -342,6 +342,85 @@ class MessageGeneratorTest extends TestCase
         $this->assertNull($message5);
     }
 
+    public function testGranularLockAllowsSequentialAcquisitionWithJitter()
+    {
+        // Run multiple iterations to ensure the test is not flaky due to randomness
+        for ($iteration = 0; $iteration < 100; ++$iteration) {
+            // message class stringable representation is used as lock key
+            $message1 = new SomeMessageStringable('message1');
+            $message2 = new SomeMessageStringable('message2');
+            $message3 = new SomeMessageStringable('message3');
+
+            $clock = new MockClock(self::makeDateTime('22:15:00'));
+
+            $lockFactory = new LockFactory(new InMemoryStore());
+            $cache = new ArrayAdapter();
+            // normally it should be the same cache for both consumers to share state
+            // but here we want to simulate two separate workers with their own state
+            $cache2 = new ArrayAdapter();
+
+            // Use a large interval with small jitter
+            $schedule1 = (new Schedule())
+                ->add(RecurringMessage::every('5 minutes', $message1)->withJitter(15))
+                ->add(RecurringMessage::every('5 minutes', $message2)->withJitter(15))
+                ->add(RecurringMessage::every('5 minutes', $message3)->withJitter(15))
+                ->stateful($cache)
+                ->lockFactory($lockFactory)
+            ;
+
+            // Clone schedule for second consumer with its own cache to simulate two separate workers
+            $schedule2 = (new Schedule())
+                ->add(RecurringMessage::every('5 minutes', $message1)->withJitter(15))
+                ->add(RecurringMessage::every('5 minutes', $message2)->withJitter(15))
+                ->add(RecurringMessage::every('5 minutes', $message3)->withJitter(15))
+                ->stateful($cache2)
+                ->lockFactory($lockFactory)
+            ;
+
+            // First consumer
+            $generator1 = new MessageGenerator(
+                $schedule1,
+                'schedule_1',
+                $clock,
+            );
+
+            // Second consumer
+            $generator2 = new MessageGenerator(
+                $schedule2,
+                'schedule_1',
+                $clock,
+            );
+
+            // Warmup. The first run always returns nothing.
+            $this->assertSame([], iterator_to_array($generator1->getMessages(), false));
+            $this->assertSame([], iterator_to_array($generator2->getMessages(), false));
+
+            // Advance clock well beyond interval + max jitter to ensure all messages are ready
+            $clock->sleep(5 * 60 + 60); // 22:21:00 (5 min + 60 sec, well beyond max 15 sec jitter)
+
+            // With jitter, each generator computes different trigger times due to random_int().
+            // However, the lock key uses the canonical (non-jittered) time, so both workers
+            // compete for the same locks. This ensures each message is processed exactly once.
+            $generator1Messages = iterator_to_array($generator1->getMessages(), false);
+            $generator2Messages = iterator_to_array($generator2->getMessages(), false);
+
+            // Collect all processed message IDs
+            $allProcessedIds = [];
+            foreach ($generator1Messages as $msg) {
+                $allProcessedIds[] = $msg->id;
+            }
+            foreach ($generator2Messages as $msg) {
+                $allProcessedIds[] = $msg->id;
+            }
+
+            // Sort to compare regardless of order
+            sort($allProcessedIds);
+
+            // Each message should be processed exactly once across both generators (no duplicates)
+            $this->assertSame(['message1', 'message2', 'message3'], $allProcessedIds, \sprintf('Iteration %d failed', $iteration));
+        }
+    }
+
     public static function messagesProvider(): \Generator
     {
         $first = (object) ['id' => 'first'];

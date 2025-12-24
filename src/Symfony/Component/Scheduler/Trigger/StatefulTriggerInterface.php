@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Scheduler\Trigger;
 
+/**
+ * @deprecated use {@see Schedule::lockFactory()} and {@see MessageGeneratorWithInstanceLocking} instead
+ */
 interface StatefulTriggerInterface extends TriggerInterface
 {
     public function continue(\DateTimeImmutable $startedAt): void;

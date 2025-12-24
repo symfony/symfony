@@ -12,11 +12,13 @@
 namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Scheduler\Event\FailureEvent;
 use Symfony\Component\Scheduler\Event\PostRunEvent;
 use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\Exception\LogicException;
+use Symfony\Component\Scheduler\Generator\MessageGeneratorWithInstanceLocking;
 use Symfony\Contracts\Cache\CacheInterface;
 
 final class Schedule implements ScheduleProviderInterface
@@ -24,6 +26,7 @@ final class Schedule implements ScheduleProviderInterface
     /** @var array<string,RecurringMessage> */
     private array $messages = [];
     private ?LockInterface $lock = null;
+    private ?LockFactory $lockFactory = null;
     private ?CacheInterface $state = null;
     private bool $shouldRestart = false;
     private bool $onlyLastMissed = false;
@@ -95,6 +98,8 @@ final class Schedule implements ScheduleProviderInterface
     }
 
     /**
+     * @deprecated use {@see Schedule::lockFactory()} instead
+     *
      * @return $this
      */
     public function lock(LockInterface $lock): static
@@ -104,9 +109,31 @@ final class Schedule implements ScheduleProviderInterface
         return $this;
     }
 
+    /**
+     * @deprecated use {@see Schedule::lockFactory()} instead
+     */
     public function getLock(): ?LockInterface
     {
         return $this->lock;
+    }
+
+    /**
+     * Setting a lock factory enables the use of {@see MessageGeneratorWithInstanceLocking}.
+     *
+     * You must also use {@see Schedule::stateful()} to avoid race conditions.
+     *
+     * @return $this
+     */
+    public function lockFactory(LockFactory $lockFactory): static
+    {
+        $this->lockFactory = $lockFactory;
+
+        return $this;
+    }
+
+    public function getLockFactory(): ?LockFactory
+    {
+        return $this->lockFactory;
     }
 
     /**

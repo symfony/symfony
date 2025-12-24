@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `--sort` option to `debug:command` to order recurring messages by next run date
+ * Add `Schedule::lockFactory()` and `Generator\MessageGeneratorWithInstanceLocking`
 
 7.3
 ---

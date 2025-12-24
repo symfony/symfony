@@ -18,12 +18,11 @@ use Symfony\Component\Scheduler\Event\FailureEvent;
 use Symfony\Component\Scheduler\Event\PostRunEvent;
 use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
+use Symfony\Component\Scheduler\Generator\MessageGeneratorWithInstanceLocking;
 
 final class Scheduler
 {
-    /**
-     * @var array<MessageGenerator>
-     */
+    /** @var list<MessageGenerator|MessageGeneratorWithInstanceLocking> */
     private array $generators = [];
     private int $index = 0;
     private bool $shouldStop = false;
@@ -44,10 +43,20 @@ final class Scheduler
 
     public function addSchedule(Schedule $schedule): void
     {
-        $this->addMessageGenerator(new MessageGenerator($schedule, 'schedule_'.$this->index++, $this->clock));
+        $lockFactory = $schedule->getLockFactory();
+        if (null !== $lockFactory) {
+            $messageGenerator = new MessageGeneratorWithInstanceLocking(
+                $schedule,
+                'schedule_'.$this->index++,
+                $this->clock,
+            );
+        } else {
+            $messageGenerator = new MessageGenerator($schedule, 'schedule_'.$this->index++, $this->clock);
+        }
+        $this->addMessageGenerator($messageGenerator);
     }
 
-    public function addMessageGenerator(MessageGenerator $generator): void
+    public function addMessageGenerator(MessageGenerator|MessageGeneratorWithInstanceLocking $generator): void
     {
         $this->generators[] = $generator;
     }

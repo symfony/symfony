@@ -12,8 +12,12 @@
 namespace Symfony\Component\Scheduler\Generator;
 
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Scheduler\Schedule;
 use Symfony\Contracts\Cache\CacheInterface;
 
+/**
+ * @deprecated use {@see Schedule::lockFactory()} and {@see MessageGeneratorWithInstanceLocking} instead
+ */
 final class Checkpoint implements CheckpointInterface
 {
     private \DateTimeImmutable $from;

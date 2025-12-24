@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Scheduler\Generator;
 
+/**
+ * @deprecated use {@see Schedule::lockFactory()} and {@see MessageGeneratorWithInstanceLocking} instead
+ */
 interface CheckpointInterface
 {
     public function acquire(\DateTimeImmutable $now): bool;

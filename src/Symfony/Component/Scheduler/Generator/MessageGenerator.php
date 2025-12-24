@@ -18,6 +18,9 @@ use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 use Symfony\Component\Scheduler\Trigger\StatefulTriggerInterface;
 
+/**
+ * @deprecated use {@see Schedule::lockFactory()} and {@see MessageGeneratorWithInstanceLocking} instead
+ */
 final class MessageGenerator implements MessageGeneratorInterface
 {
     private ?Schedule $schedule = null;

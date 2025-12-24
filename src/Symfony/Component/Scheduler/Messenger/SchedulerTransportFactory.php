@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
+use Symfony\Component\Scheduler\Generator\MessageGeneratorWithInstanceLocking;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 
 /**
@@ -46,7 +47,18 @@ class SchedulerTransportFactory implements TransportFactoryInterface
         /** @var ScheduleProviderInterface $scheduleProvider */
         $scheduleProvider = $this->scheduleProviders->get($scheduleName);
 
-        return new SchedulerTransport(new MessageGenerator($scheduleProvider, $scheduleName, $this->clock));
+        $lockFactory = $scheduleProvider->getSchedule()->getLockFactory();
+        if (null !== $lockFactory) {
+            $messageGenerator = new MessageGeneratorWithInstanceLocking(
+                $scheduleProvider,
+                $scheduleName,
+                $this->clock,
+            );
+        } else {
+            $messageGenerator = new MessageGenerator($scheduleProvider, $scheduleName, $this->clock);
+        }
+
+        return new SchedulerTransport($messageGenerator);
     }
 
     public function supports(string $dsn, array $options): bool

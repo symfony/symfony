@@ -57,6 +57,13 @@ Serializer
 
  * Deprecate datetime constructor as a fallback, in version 9.0 a `Symfony\Component\Serializer\Exception\NotNormalizableValueException` will be thrown when a date could not be parsed using the default format
 
+Scheduler
+---------
+
+ * Deprecate `Schedule::lock()`, `Schedule::getLock()`, `Trigger\StatefulTriggerInterface`,
+   `Generator\CheckpointInterface`, `Generator\Checkpoint`, and `Generator\MessageGenerator`. Use
+   `Schedule::lockFactory()` and `Generator\MessageGeneratorWithInstanceLocking` instead
+
 Uid
 ---
 

@@ -11,23 +11,31 @@
 
 namespace Symfony\Component\Messenger;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
+use Symfony\Component\Messenger\Stamp\BatchStamp;
+use Symfony\Component\Messenger\Transport\Sender\BatchCollector;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Matthias Noback <matthiasnoback@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class MessageBus implements MessageBusInterface
+class MessageBus implements BatchMessageBusInterface
 {
+    use LoggerAwareTrait;
+
     private \IteratorAggregate $middlewareAggregate;
 
     /**
      * @param iterable<mixed, MiddlewareInterface> $middlewareHandlers
      */
-    public function __construct(iterable $middlewareHandlers = [])
-    {
+    public function __construct(
+        iterable $middlewareHandlers = [],
+        private ?EventDispatcherInterface $eventDispatcher = null,
+    ) {
         if ($middlewareHandlers instanceof \IteratorAggregate) {
             $this->middlewareAggregate = $middlewareHandlers;
         } elseif (\is_array($middlewareHandlers)) {
@@ -67,5 +75,29 @@ class MessageBus implements MessageBusInterface
         $stack = new StackMiddleware($middlewareIterator);
 
         return $middlewareIterator->current()->handle($envelope, $stack);
+    }
+
+    public function dispatchBatch(array $messages, array $stamps = []): array
+    {
+        if ([] === $messages) {
+            return [];
+        }
+
+        $collector = new BatchCollector($this->eventDispatcher);
+        if (null !== $this->logger) {
+            $collector->setLogger($this->logger);
+        }
+
+        $messages = array_values($messages);
+        $batchSize = \count($messages);
+
+        foreach ($messages as $index => $message) {
+            $batchStamp = new BatchStamp($collector->getBatchId(), $index, $batchSize, $collector);
+
+            $envelope = $this->dispatch($message, [...$stamps, $batchStamp]);
+            $collector->trackEnvelope($index, $envelope);
+        }
+
+        return $collector->flush();
     }
 }

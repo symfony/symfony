@@ -56,4 +56,60 @@ class DoctrineSenderTest extends TestCase
         $sender = new DoctrineSender($connection, $serializer);
         $sender->send($envelope);
     }
+
+    public function testSendBatchWithIdsReturned()
+    {
+        $envelope1 = new Envelope(new DummyMessage('First'));
+        $envelope2 = new Envelope(new DummyMessage('Second'));
+        $encoded1 = ['body' => 'body1', 'headers' => ['type' => DummyMessage::class]];
+        $encoded2 = ['body' => 'body2', 'headers' => ['type' => DummyMessage::class]];
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())
+            ->method('sendBatch')
+            ->with([
+                ['body' => 'body1', 'headers' => ['type' => DummyMessage::class], 'delay' => 0],
+                ['body' => 'body2', 'headers' => ['type' => DummyMessage::class], 'delay' => 0],
+            ])
+            ->willReturn(['15', '16']);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('encode')->willReturnCallback(fn ($envelope) => $envelope->getMessage()->getMessage() === 'First' ? $encoded1 : $encoded2);
+
+        $sender = new DoctrineSender($connection, $serializer);
+        $result = $sender->sendBatch([$envelope1, $envelope2]);
+
+        $this->assertCount(2, $result);
+
+        $stamp1 = $result[0]->last(TransportMessageIdStamp::class);
+        $this->assertNotNull($stamp1);
+        $this->assertSame('15', $stamp1->getId());
+
+        $stamp2 = $result[1]->last(TransportMessageIdStamp::class);
+        $this->assertNotNull($stamp2);
+        $this->assertSame('16', $stamp2->getId());
+    }
+
+    public function testSendBatchWithoutIdsReturned()
+    {
+        $envelope1 = new Envelope(new DummyMessage('First'));
+        $envelope2 = new Envelope(new DummyMessage('Second'));
+        $encoded1 = ['body' => 'body1', 'headers' => ['type' => DummyMessage::class]];
+        $encoded2 = ['body' => 'body2', 'headers' => ['type' => DummyMessage::class]];
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())
+            ->method('sendBatch')
+            ->willReturn(null);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('encode')->willReturnCallback(fn ($envelope) => $envelope->getMessage()->getMessage() === 'First' ? $encoded1 : $encoded2);
+
+        $sender = new DoctrineSender($connection, $serializer);
+        $result = $sender->sendBatch([$envelope1, $envelope2]);
+
+        $this->assertCount(2, $result);
+        $this->assertNull($result[0]->last(TransportMessageIdStamp::class));
+        $this->assertNull($result[1]->last(TransportMessageIdStamp::class));
+    }
 }

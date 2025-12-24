@@ -156,6 +156,67 @@ class Connection implements ResetInterface
         ]);
     }
 
+    /**
+     * Sends multiple messages in a single INSERT query.
+     *
+     * @param list<array{body: string, headers: array, delay: int}> $messages
+     *
+     * @return list<string>|null The inserted IDs if supported by the platform (PostgreSQL), null otherwise
+     *
+     * @throws DBALException
+     */
+    public function sendBatch(array $messages): ?array
+    {
+        if ([] === $messages) {
+            return [];
+        }
+
+        $now = new \DateTimeImmutable('UTC');
+        $queueName = $this->configuration['queue_name'];
+        $queryBuilder = $this->driverConnection->createQueryBuilder()
+            ->insert($this->configuration['table_name'])
+            ->values([
+                'body' => '?',
+                'headers' => '?',
+                'queue_name' => '?',
+                'created_at' => '?',
+                'available_at' => '?',
+            ]);
+
+        $baseSql = $queryBuilder->getSQL();
+
+        $additionalPlaceholders = [];
+        $values = [];
+        $types = [];
+
+        foreach ($messages as $index => $message) {
+            $delay = $message['delay'];
+            $availableAt = $now->modify(\sprintf('%+d seconds', $delay / 1000));
+
+            if ($index > 0) {
+                $additionalPlaceholders[] = '(?, ?, ?, ?, ?)';
+            }
+
+            $values[] = $message['body'];
+            $values[] = json_encode($message['headers']);
+            $values[] = $queueName;
+            $values[] = $now;
+            $values[] = $availableAt;
+
+            $types[] = Types::STRING;
+            $types[] = Types::STRING;
+            $types[] = Types::STRING;
+            $types[] = Types::DATETIME_IMMUTABLE;
+            $types[] = Types::DATETIME_IMMUTABLE;
+        }
+
+        $sql = [] === $additionalPlaceholders
+            ? $baseSql
+            : $baseSql.', '.implode(', ', $additionalPlaceholders);
+
+        return $this->executeBatchInsert($sql, $values, $types);
+    }
+
     public function get(): ?array
     {
         get:
@@ -484,6 +545,38 @@ class Connection implements ResetInterface
         }
 
         return $id;
+    }
+
+    /**
+     * @return list<string>|null The inserted IDs if supported by the platform (PostgreSQL), null otherwise
+     */
+    private function executeBatchInsert(string $sql, array $parameters = [], array $types = []): ?array
+    {
+        $isPostgreSql = $this->driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+
+        if ($isPostgreSql) {
+            $sql .= ' RETURNING id';
+        }
+
+        insert:
+        try {
+            if ($isPostgreSql) {
+                $ids = $this->driverConnection->fetchFirstColumn($sql, $parameters, $types);
+
+                return array_map(strval(...), $ids);
+            }
+
+            $this->driverConnection->executeStatement($sql, $parameters, $types);
+
+            return null;
+        } catch (TableNotFoundException $e) {
+            if (!$this->autoSetup) {
+                throw $e;
+            }
+
+            $this->setup();
+            goto insert;
+        }
     }
 
     private function getSchema(): Schema

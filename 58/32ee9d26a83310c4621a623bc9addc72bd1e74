@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-11-30T23:46:52Z
+
+better review hiding whitespace https://github.com/symfony/symfony/pull/62567/files?w=1
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-01T16:43:57Z
+
+how does this interact with the `Prompt` attribute added in version 7.4 ?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-01T16:46:36Z
+
+To me, the component standalone usage should show how to register those in an Application actually (which will probably show that those are much more cumbersome to use than the invokable commands by having to do the `Command` wrapping in userland instead of keeping it internal, unless I missed something)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-12-01T16:54:33Z
+
+> how does this interact with the Prompt attribute added in version 7.4 ?
+
+when the `#[Interact]` attribute is used, it will need to check `$input->getArgument('command')` to distinguish the executed command. we can create as many `#[Interact]` as needed. though this new approach shouldn't be used for complex commands
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-01T16:58:35Z
+
+> it will need to check `$input->getArgument('command')` to distinguish the executed command.
+
+This is a bad advice because the Application class supports resolving commands using any non-ambiguous shortened name passed as the `command` argument. So you could be running the `foobar` command with `$input->getArgument('command') === 'f'` if this is non ambiguous.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-12-07T22:36:25Z
+
+>>it will need to check $input->getArgument('command') to distinguish the executed command.
+>
+>This is a bad advice because the Application class supports resolving commands using any non-ambiguous shortened name passed as the command argument. So you could be running the foobar command with $input->getArgument('command') === 'f' if this is non ambiguous.
+
+yes, that's unfortunately not perfect, so I've added support for injecting the `Command` instance. This way people can check `getName()` to distinguish them:
+```php
+#[Interact]
+public function prompt(Command $cmd, /* ... */): void
+{
+    // $cmd->getName()
+}
+```

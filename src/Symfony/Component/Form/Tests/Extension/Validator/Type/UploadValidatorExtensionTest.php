@@ -34,7 +34,7 @@ class UploadValidatorExtensionTest extends TypeTestCase
 
         $resolver = new OptionsResolver();
         $resolver->setDefault('post_max_size_message', 'old max {{ max }}!');
-        $resolver->setDefault('upload_max_size_message', fn (Options $options) => fn () => $options['post_max_size_message']);
+        $resolver->setDefault('upload_max_size_message', static fn (Options $options) => static fn () => $options['post_max_size_message']);
 
         $extension->configureOptions($resolver);
         $options = $resolver->resolve();

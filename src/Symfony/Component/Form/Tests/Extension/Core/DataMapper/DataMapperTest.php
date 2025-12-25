@@ -412,7 +412,7 @@ class DataMapperTest extends TestCase
             ->getFormFactory()
             ->createBuilder(FormType::class, $person)
             ->add('name', TextType::class, [
-                'getter' => function (DummyPerson $person) {
+                'getter' => static function (DummyPerson $person) {
                     return $person->myName();
                 },
             ])

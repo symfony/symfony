@@ -170,15 +170,19 @@ class FooType extends AbstractType
         $resolver->setRequired('foo');
         $resolver->setDefined('bar');
         $resolver->setDeprecated('bar', 'vendor/package', '1.1');
-        $resolver->setDefault('empty_data', function (Options $options, $value) {
+        $resolver->setDefault('empty_data', static function (Options $options, $value) {
             $foo = $options['foo'];
 
-            return fn (FormInterface $form) => $form->getConfig()->getCompound() ? [$foo] : $foo;
+            return static fn (FormInterface $form) => $form->getConfig()->getCompound() ? [$foo] : $foo;
         });
         $resolver->setAllowedTypes('foo', 'string');
         $resolver->setAllowedValues('foo', ['bar', 'baz']);
-        $resolver->setNormalizer('foo', fn (Options $options, $value) => (string) $value);
-        $resolver->setOptions('baz', function (OptionsResolver $baz) {
+        $resolver->setNormalizer('foo', function (Options $options, $value) {
+            \assert(null !== $this); // explicitly test non-static normalizer
+
+            return (string) $value;
+        });
+        $resolver->setOptions('baz', static function (OptionsResolver $baz) {
             $baz->setRequired('foo');
             $baz->setDefaults(['foo' => true, 'bar' => true]);
         });

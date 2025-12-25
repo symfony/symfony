@@ -76,7 +76,7 @@ abstract class BaseValidatorExtensionTestCase extends TypeTestCase
     public function testValidationGroupsCanBeSetToClosure()
     {
         $form = $this->createForm([
-            'validation_groups' => function (FormInterface $form) { },
+            'validation_groups' => static function (FormInterface $form) { },
         ]);
 
         $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));

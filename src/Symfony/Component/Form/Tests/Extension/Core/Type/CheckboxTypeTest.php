@@ -146,8 +146,8 @@ class CheckboxTypeTest extends BaseTypeTestCase
     {
         // present a binary status field as a checkbox
         $transformer = new CallbackTransformer(
-            fn ($value) => 'checked' == $value,
-            fn ($value) => $value ? 'checked' : 'unchecked'
+            static fn ($value) => 'checked' == $value,
+            static fn ($value) => $value ? 'checked' : 'unchecked'
         );
 
         $form = $this->factory->createBuilder(static::TESTED_TYPE)

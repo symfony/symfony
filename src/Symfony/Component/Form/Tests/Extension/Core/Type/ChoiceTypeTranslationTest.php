@@ -40,7 +40,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
     {
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')
-            ->willReturnCallback(fn ($key, $params) => strtr(\sprintf('Translation of: %s', $key), $params)
+            ->willReturnCallback(static fn ($key, $params) => strtr(\sprintf('Translation of: %s', $key), $params)
             );
 
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);

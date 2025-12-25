@@ -44,8 +44,8 @@ class TextTypeHtmlSanitizerExtensionTest extends TypeTestCase
 
         return array_merge(parent::getExtensions(), [
             new HtmlSanitizerExtension(new ServiceLocator([
-                'foo' => fn () => $fooSanitizer,
-                'bar' => fn () => $barSanitizer,
+                'foo' => static fn () => $fooSanitizer,
+                'bar' => static fn () => $barSanitizer,
             ]), 'foo'),
         ]);
     }

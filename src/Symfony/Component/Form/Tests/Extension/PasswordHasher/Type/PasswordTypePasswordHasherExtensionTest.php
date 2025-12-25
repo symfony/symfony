@@ -114,7 +114,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         $form = $this->factory
             ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
                 'data_class' => User::class,
-                'empty_data' => function () use ($user) {
+                'empty_data' => static function () use ($user) {
                     return $user;
                 },
             ])

@@ -443,7 +443,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testHandleClosureValidationGroups()
     {
         $object = new \stdClass();
-        $options = ['validation_groups' => fn (FormInterface $form) => ['group1', 'group2']];
+        $options = ['validation_groups' => static fn (FormInterface $form) => ['group1', 'group2']];
         $form = $this->getCompoundForm($object, $options);
         $form->submit([]);
 
@@ -555,7 +555,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $parentOptions = [
-            'validation_groups' => fn () => ['group1', 'group2'],
+            'validation_groups' => static fn () => ['group1', 'group2'],
         ];
         $parent = $this->getBuilder('parent', null, $parentOptions)
             ->setCompound(true)

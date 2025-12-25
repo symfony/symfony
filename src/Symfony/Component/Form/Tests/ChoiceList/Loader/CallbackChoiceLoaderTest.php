@@ -29,8 +29,8 @@ class CallbackChoiceLoaderTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$loader = new CallbackChoiceLoader(fn () => self::$choices);
-        self::$value = fn ($choice) => $choice->value ?? null;
+        self::$loader = new CallbackChoiceLoader(static fn () => self::$choices);
+        self::$value = static fn ($choice) => $choice->value ?? null;
         self::$choices = [
             (object) ['value' => 'choice_one'],
             (object) ['value' => 'choice_two'],
@@ -46,7 +46,7 @@ class CallbackChoiceLoaderTest extends TestCase
     public function testLoadChoicesOnlyOnce()
     {
         $calls = 0;
-        $loader = new CallbackChoiceLoader(function () use (&$calls) {
+        $loader = new CallbackChoiceLoader(static function () use (&$calls) {
             ++$calls;
 
             return [1];
@@ -73,7 +73,7 @@ class CallbackChoiceLoaderTest extends TestCase
             (object) ['id' => 3],
         ];
 
-        $value = fn ($item) => $item->id;
+        $value = static fn ($item) => $item->id;
 
         $this->assertSame(['2', '3'], self::$loader->loadValuesForChoices($choices, $value));
     }

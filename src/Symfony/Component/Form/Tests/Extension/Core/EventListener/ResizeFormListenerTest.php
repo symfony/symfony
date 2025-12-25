@@ -292,7 +292,7 @@ class ResizeFormListenerTest extends TestCase
         $this->builder->setData(['0' => ['name' => 'John'], '1' => ['name' => 'Jane']]);
         $this->builder->add('0', NestedType::class);
         $this->builder->add('1', NestedType::class);
-        $callback = fn ($data) => empty($data['name']);
+        $callback = static fn ($data) => empty($data['name']);
         $this->builder->addEventSubscriber(new ResizeFormListener(NestedType::class, [], false, true, $callback));
 
         $form = $this->builder->getForm();

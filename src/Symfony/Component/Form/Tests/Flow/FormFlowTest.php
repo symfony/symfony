@@ -336,7 +336,7 @@ class FormFlowTest extends TestCase
             'validate' => false,
             'validation_groups' => false,
             'clear_submission' => false,
-            'include_if' => fn (FormFlowCursor $cursor) => $cursor->canMoveBack(),
+            'include_if' => static fn (FormFlowCursor $cursor) => $cursor->canMoveBack(),
         ]);
 
         self::assertSame('professional', $flow->getCursor()->getCurrentStep());
@@ -885,7 +885,7 @@ class FormFlowTest extends TestCase
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
         $flow->get('navigator')->add('next', NextFlowType::class, [
-            'handler' => function (mixed $data, ButtonFlowInterface $button, FormFlowInterface $flow) {
+            'handler' => static function (mixed $data, ButtonFlowInterface $button, FormFlowInterface $flow) {
                 $flow->addError(new FormError('Action error'));
             },
         ]);

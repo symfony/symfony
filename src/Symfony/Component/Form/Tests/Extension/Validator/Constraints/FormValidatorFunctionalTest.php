@@ -439,16 +439,16 @@ class FormValidatorFunctionalTest extends TestCase
             ->add('field1')
             ->add('field2')
             ->addModelTransformer(new CallbackTransformer(
-                function () {
+                static function () {
                 },
-                function () {
+                static function () {
                     throw new TransformationFailedException('This value is invalid.');
                 }
             ));
         $formBuilder->get('field2')->addModelTransformer(new CallbackTransformer(
-            function () {
+            static function () {
             },
-            function () {
+            static function () {
                 throw new TransformationFailedException('This value is invalid.');
             }
         ));

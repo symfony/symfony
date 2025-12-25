@@ -654,4 +654,20 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame('foo', $out->var1);
         $this->assertSame('bar', $out->b->var2);
     }
+
+    public function testTargetDefaultValueIsKeptWhenSourcePropertyIsMissing(): void
+    {
+        $mapper = new ObjectMapper();
+        $source = new class {
+            public string $name = 'test';
+        };
+        $target = $mapper->map($source, new class {
+            public string $name;
+            public bool $isActive = true;
+        });
+
+        $this->assertIsObject($target);
+        $this->assertSame('test', $target->name);
+        $this->assertTrue($target->isActive);
+    }
 }

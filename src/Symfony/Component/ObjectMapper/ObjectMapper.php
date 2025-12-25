@@ -155,6 +155,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             }
 
             if (!$mappings && $targetRefl->hasProperty($propertyName)) {
+                if (!$this->isReadable($source, $propertyName) && $targetRefl->getProperty($propertyName)->hasDefaultValue()) {
+                    continue;
+                }
+
                 $sourceProperty = $refl->getProperty($propertyName);
                 if ($refl->isInstance($source) && !$sourceProperty->isInitialized($source)) {
                     continue;

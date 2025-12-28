@@ -32,6 +32,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php82Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\PropertyNameConflictDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\UnderscoreDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VirtualProperties;
@@ -693,6 +694,23 @@ class ReflectionExtractorTest extends TestCase
         yield ['false', Type::false()];
         yield ['true', Type::true()];
         yield ['someCollection', Type::union(Type::intersection(Type::object(\Traversable::class), Type::object(\Countable::class)), Type::null())];
+    }
+
+    #[DataProvider('propertyNameConflictProvider')]
+    public function testPropertyNameConflicts(string $property, ?Type $type, mixed $value)
+    {
+        $this->assertEquals($type, $this->extractor->getType(PropertyNameConflictDummy::class, $property));
+        $this->assertSame($value, new PropertyNameConflictDummy()->{$property});
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: ?Type, 2: mixed}>
+     */
+    public static function propertyNameConflictProvider(): iterable
+    {
+        yield ['string', Type::string(), 'string'];
+        yield ['boolean', Type::bool(), false];
+        yield ['unchanged', Type::int(), 42];
     }
 
     #[DataProvider('defaultValueProvider')]

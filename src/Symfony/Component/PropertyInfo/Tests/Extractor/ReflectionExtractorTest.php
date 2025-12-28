@@ -27,6 +27,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\PropertyNameConflictDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\SnakeCaseDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\UnderscoreDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VirtualProperties;
@@ -799,6 +800,21 @@ class ReflectionExtractorTest extends TestCase
         yield ['virtualNoSetHook', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PRIVATE];
         yield ['virtualSetHookOnly', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PUBLIC];
         yield ['virtualHook', PropertyReadInfo::VISIBILITY_PUBLIC, PropertyWriteInfo::VISIBILITY_PUBLIC];
+    }
+
+    /**
+     * @dataProvider propertyNameConflictProvider
+     */
+    public function testPropertyNameConflicts(string $property, mixed $value)
+    {
+        $this->assertSame($value, (new PropertyNameConflictDummy())->{$property});
+    }
+
+    public static function propertyNameConflictProvider(): iterable
+    {
+        yield ['string', 'string'];
+        yield ['boolean', false];
+        yield ['unchanged', 42];
     }
 
     /**

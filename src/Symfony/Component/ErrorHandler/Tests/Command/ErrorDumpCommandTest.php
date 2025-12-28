@@ -12,6 +12,7 @@
 namespace Symfony\Component\ErrorHandler\Tests\Command;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -81,9 +82,9 @@ class ErrorDumpCommandTest extends TestCase
         $this->assertFileExists($this->tmpDir.\DIRECTORY_SEPARATOR.'404.html');
     }
 
-    private function getKernel(): MockObject&KernelInterface
+    private function getKernel(): Stub&KernelInterface
     {
-        return $this->createMock(KernelInterface::class);
+        return $this->createStub(KernelInterface::class);
     }
 
     private function getCommandTester(KernelInterface $kernel): CommandTester
@@ -99,7 +100,7 @@ class ErrorDumpCommandTest extends TestCase
             })
         ;
 
-        $entrypointLookup = $this->createMock(EntrypointLookupInterface::class);
+        $entrypointLookup = $this->createStub(EntrypointLookupInterface::class);
 
         $application = new Application($kernel);
         $application->addCommand(new ErrorDumpCommand(

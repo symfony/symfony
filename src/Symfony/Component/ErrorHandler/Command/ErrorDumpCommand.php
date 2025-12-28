@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\ErrorHandler\Command;
 
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -42,20 +42,20 @@ final class ErrorDumpCommand
 
     public function __invoke(
         SymfonyStyle $io,
-	#[Argument(description: 'Path where to dump the error pages in')]
+        #[Argument(description: 'Path where to dump the error pages in')]
         string $path,
-	#[Argument(name: 'status-codes', description: 'Status codes to dump error pages for (all >= 400 by default)')]
+        #[Argument(name: 'status-codes', description: 'Status codes to dump error pages for (all >= 400 by default)')]
         array $statusCodes = [],
-	#[Option(name: 'force', shortcut: 'f', description: 'Force directory removal before dumping new error pages')]
+        #[Option(name: 'force', shortcut: 'f', description: 'Force directory removal before dumping new error pages')]
         bool $force = false,
     ): int {
         $io->title('Dumping error pages');
 
         $this->dump($io, $path, $statusCodes, $force);
 
-        $io->success(sprintf('Error pages have been dumped in "%s".', $path));
+        $io->success(\sprintf('Error pages have been dumped in "%s".', $path));
 
-	return Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     private function dump(SymfonyStyle $io, string $path, array $statusCodes, bool $force): void

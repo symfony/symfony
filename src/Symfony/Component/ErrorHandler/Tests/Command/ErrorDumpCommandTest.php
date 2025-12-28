@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\ErrorHandler\Tests\Command;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;

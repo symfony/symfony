@@ -13,12 +13,14 @@ namespace Symfony\Component\PropertyInfo\Util;
 
 use phpDocumentor\Reflection\PseudoType;
 use phpDocumentor\Reflection\PseudoTypes\ConstExpression;
+use phpDocumentor\Reflection\PseudoTypes\Generic;
 use phpDocumentor\Reflection\PseudoTypes\List_;
 use phpDocumentor\Reflection\Type as DocType;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Integer;
+use phpDocumentor\Reflection\Types\Mixed_;
 use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\String_;
@@ -113,7 +115,7 @@ final class PhpDocTypeHelper
             $docType = 'array';
         }
 
-        if ($type instanceof Collection) {
+        if ($type instanceof Collection || $type instanceof Generic) {
             $fqsen = $type->getFqsen();
             if ($fqsen && 'list' === $fqsen->getName() && !class_exists(List_::class, false) && !class_exists((string) $fqsen)) {
                 // Workaround for phpdocumentor/type-resolver < 1.6
@@ -129,8 +131,21 @@ final class PhpDocTypeHelper
                 return null;
             }
 
-            $keys = $this->getTypes($type->getKeyType());
-            $values = $this->getTypes($type->getValueType());
+            if ($type instanceof Generic) {
+                $genericTypes = $type->getTypes();
+
+                if (null === ($valueType = $genericTypes[1] ?? null)) {
+                    $keyType = new Compound([new String_(), new Integer()]);
+                    $valueType = $genericTypes[0] ?? new Mixed_();
+                } else {
+                    $keyType = $genericTypes[0];
+                }
+                $keys = $this->getTypes($keyType);
+                $values = $this->getTypes($valueType);
+            } else {
+                $keys = $this->getTypes($type->getKeyType());
+                $values = $this->getTypes($type->getValueType());
+            }
 
             return new Type($phpType, $nullable, $class, $collection, $keys, $values);
         }

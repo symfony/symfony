@@ -23,7 +23,7 @@
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3.1|^4",
         "league/html-to-markdown": "^5.0",
-        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpdocumentor/reflection-docblock": "^5.2|^6.0",
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/process": "^6.4|^7.0",
         "symfony/property-access": "^6.4|^7.0",
@@ -32,7 +32,7 @@
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",
-        "phpdocumentor/reflection-docblock": "<5.2|>=6",
+        "phpdocumentor/reflection-docblock": "<5.2",
         "phpdocumentor/type-resolver": "<1.5.1",
         "symfony/mailer": "<6.4",
         "symfony/serializer": "<6.4.3|>7.0,<7.0.3"

@@ -13,15 +13,18 @@ namespace Symfony\Component\PropertyInfo\Util;
 
 use phpDocumentor\Reflection\PseudoType;
 use phpDocumentor\Reflection\PseudoTypes\ConstExpression;
+use phpDocumentor\Reflection\PseudoTypes\Generic;
 use phpDocumentor\Reflection\PseudoTypes\List_;
+use phpDocumentor\Reflection\PseudoTypes\Scalar;
 use phpDocumentor\Reflection\Type as DocType;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Integer;
+use phpDocumentor\Reflection\Types\Mixed_;
 use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
-use phpDocumentor\Reflection\Types\Scalar;
+use phpDocumentor\Reflection\Types\Scalar as LegacyScalar;
 use phpDocumentor\Reflection\Types\String_;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
@@ -63,7 +66,7 @@ final class PhpDocTypeHelper
             $varType = $varType->getActualType();
         }
 
-        if ($varType instanceof Scalar) {
+        if ($varType instanceof LegacyScalar || $varType instanceof Scalar) {
             return [
                 new LegacyType(LegacyType::BUILTIN_TYPE_BOOL),
                 new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
@@ -193,9 +196,11 @@ final class PhpDocTypeHelper
 
         if ('mixed[]' === $docType) {
             $docType = 'array';
+        } elseif ('array' !== $docType && $type instanceof Array_ && null === $type->getOriginalKeyType()) {
+            $docType = \sprintf('%s[]', $type->getValueType());
         }
 
-        if ($type instanceof Collection) {
+        if ($type instanceof Collection || $type instanceof Generic) {
             $fqsen = $type->getFqsen();
             if ($fqsen && 'list' === $fqsen->getName() && !class_exists(List_::class, false) && !class_exists((string) $fqsen)) {
                 // Workaround for phpdocumentor/type-resolver < 1.6
@@ -211,8 +216,22 @@ final class PhpDocTypeHelper
                 return null;
             }
 
-            $keys = $this->getTypes($type->getKeyType());
-            $values = $this->getTypes($type->getValueType());
+            if ($type instanceof Generic) {
+                $genericTypes = $type->getTypes();
+
+                if (null === $valueType = $genericTypes[1] ?? null) {
+                    $keyType = new Compound([new String_(), new Integer()]);
+                    $valueType = $genericTypes[0] ?? new Mixed_();
+                } else {
+                    $keyType = $genericTypes[0];
+                }
+            } else {
+                $keyType = $type->getKeyType();
+                $valueType = $type->getValueType();
+            }
+
+            $keys = $this->getTypes($keyType);
+            $values = $this->getTypes($valueType);
 
             return new LegacyType($phpType, $nullable, $class, $collection, $keys, $values);
         }
@@ -267,6 +286,35 @@ final class PhpDocTypeHelper
             $docTypeString = 'array';
         }
 
+        if ($docType instanceof Generic) {
+            $fqsen = $docType->getFqsen();
+
+            [$phpType, $class] = $this->getPhpTypeAndClass((string) $fqsen);
+
+            $collection = is_a($class, \Traversable::class, true) || is_a($class, \ArrayAccess::class, true);
+
+            // it's safer to fall back to other extractors if the generic type is too abstract
+            if (!$collection && !class_exists($class)) {
+                return null;
+            }
+
+            $genericTypes = $docType->getTypes();
+
+            if (null === $valueType = $genericTypes[1] ?? null) {
+                $keyType = null;
+                $valueType = $genericTypes[0] ?? null;
+            } else {
+                $keyType = $genericTypes[0] ?? null;
+            }
+
+            $value = $valueType ? $this->getType($valueType) : null;
+            $key = $keyType ? $this->getType($keyType) : null;
+
+            $type = null !== $class ? Type::object($class) : Type::builtin($phpType);
+
+            return Type::collection($type, $value, $key);
+        }
+
         if ($docType instanceof Collection) {
             $fqsen = $docType->getFqsen();
             if ($fqsen && 'list' === $fqsen->getName() && !class_exists(List_::class, false) && !class_exists((string) $fqsen)) {
@@ -293,6 +341,10 @@ final class PhpDocTypeHelper
 
         if (!$docTypeString) {
             return null;
+        }
+
+        if ($docType instanceof Array_ && null === $docType->getOriginalKeyType() && str_starts_with($docTypeString, 'array<')) {
+            return Type::list($this->getType($docType->getValueType()));
         }
 
         if (str_ends_with($docTypeString, '[]') && $docType instanceof Array_) {
@@ -332,6 +384,10 @@ final class PhpDocTypeHelper
 
         if (null === $class) {
             return Type::builtin($phpType);
+        }
+
+        if ($docType instanceof LegacyScalar || $docType instanceof Scalar) {
+            return Type::object('scalar');
         }
 
         if ($docType instanceof PseudoType) {

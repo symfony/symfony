@@ -12,9 +12,11 @@
 namespace Symfony\Component\ErrorHandler\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Attribute\Argument;
-use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -31,34 +33,39 @@ use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
     name: 'error:dump',
     description: 'Dump error pages to plain HTML files that can be directly served by a web server',
 )]
-final class ErrorDumpCommand
+final class ErrorDumpCommand extends Command
 {
     public function __construct(
         private readonly Filesystem $filesystem,
         private readonly ErrorRendererInterface $errorRenderer,
         private readonly ?EntrypointLookupInterface $entrypointLookup = null,
     ) {
+        parent::__construct();
     }
 
-    public function __invoke(
-        SymfonyStyle $io,
-	#[Argument(description: 'Path where to dump the error pages in')]
-        string $path,
-	#[Argument(name: 'status-codes', description: 'Status codes to dump error pages for (all >= 400 by default)')]
-        array $statusCodes = [],
-	#[Option(name: 'force', shortcut: 'f', description: 'Force directory removal before dumping new error pages')]
-        bool $force = false,
-    ): int {
+    protected function configure(): void
+    {
+        $this
+            ->addArgument('path', InputArgument::REQUIRED, 'Path where to dump the error pages in')
+            ->addArgument('status-codes', InputArgument::IS_ARRAY, 'Status codes to dump error pages for, all of them by default')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force directory removal before dumping new error pages')
+        ;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $path = $input->getArgument('path');
+
+        $io = new SymfonyStyle($input, $output);
         $io->title('Dumping error pages');
 
-        $this->dump($io, $path, $statusCodes, $force);
+        $this->dump($io, $path, $input->getArgument('status-codes'), (bool) $input->getOption('force'));
+        $io->success(\sprintf('Error pages have been dumped in "%s".', $path));
 
-        $io->success(sprintf('Error pages have been dumped in "%s".', $path));
-
-	return Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
-    private function dump(SymfonyStyle $io, string $path, array $statusCodes, bool $force): void
+    private function dump(SymfonyStyle $io, string $path, array $statusCodes, bool $force = false): void
     {
         if (!$statusCodes) {
             $statusCodes = array_filter(array_keys(Response::$statusTexts), fn ($statusCode) => $statusCode >= 400);

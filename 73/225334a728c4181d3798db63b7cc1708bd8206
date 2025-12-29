@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-28T16:27:34Z
+
+the method should also be registered un frameworkbundle, otherwise it won't be called
+
+---------------------------------------------------------------------------
+
+by tourze at 2025-12-29T04:01:12Z
+
+> the method should also be registered un frameworkbundle, otherwise it won't be called
+
+You are right, I updated the PR.
+
+<img width="679" height="398" alt="image" src="https://github.com/user-attachments/assets/1cff14ca-de3d-4075-bc2d-1ffaa4d4aaed" />

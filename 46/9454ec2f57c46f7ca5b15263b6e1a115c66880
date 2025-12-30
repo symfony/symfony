@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by keradus at 2025-12-28T00:07:35Z
+
+I partially reverted and reconfigured the config file.
+yet, appreciate the hint when to find indicator of minimal supported phpunit per package ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-28T09:29:44Z
+
+Ah, the corrolary of my comments above should be that this PR should target 7.4 ;)
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-12-29T20:55:16Z
+
+> we don't have a list of phpunit versions supported per package, which means all versions (compatible with the min PHP version) should be considered for compatibility, as far as the public API is considered
+
+ack. that's very wide.
+for each package, we have declared PHP version, and then we have global phpunit config
+> '@PHPUnit9x1Migration:risky' => true, // take version from src/Symfony/Bridge/PhpUnit/phpunit.xml.dist#L4
+
+if we would explicitly know phpunit per package, we could fit proper phpunit set per package
+
+---------------------------------------------------------------------------
+
+by keradus at 2025-12-29T21:19:37Z
+
+in theory ready and won't do harm, but not yet working perfectly:
+- https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues/9322 - already not working properly for Symfony, regardless of proposed PR
+- https://github.com/symfony/symfony/issues/62734 - because of this, Fixer in Parallel mode will not consider the customisation policy at all, basically having the improvement only for sequential mode and keeping status quo for parallel mode, till Sf's Finder is fixed

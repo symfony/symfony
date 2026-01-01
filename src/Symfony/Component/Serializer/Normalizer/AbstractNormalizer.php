@@ -232,10 +232,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 $ignoreUsed = true;
             }
 
+            $attributeGroups = $attributeMetadata->getGroups();
+
             // If you update this check, update accordingly the one in Symfony\Component\PropertyInfo\Extractor\SerializerExtractor::getProperties()
             if (
                 !$ignore
-                && ([] === $groups || \in_array('*', $groups, true) || array_intersect($attributeMetadata->getGroups(), $groups))
+                && ([] === $groups || (\in_array('*', $groups, true) && [] !== $attributeGroups) || array_intersect($attributeGroups, $groups))
                 && $this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;

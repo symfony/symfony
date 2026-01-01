@@ -297,7 +297,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             return \call_user_func($fn, $value);
         }
 
-        return $fn($value, $source, $target, $context);
+        if ($fn instanceof TransformCallableWithContextInterface) {
+            return $fn($value, $source, $target, $context);
+        }
+
+        return $fn($value, $source, $target);
     }
 
     /**

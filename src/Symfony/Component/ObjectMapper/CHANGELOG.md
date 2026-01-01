@@ -4,7 +4,7 @@ CHANGELOG
 8.1
 ---
 
- * Add context parameter on `TransformCallableInterface`
+ * Add `TransformCallableWithContextInterface` to read context for Transformer
  * Add context parameter on `Map` attribute
 
 7.4

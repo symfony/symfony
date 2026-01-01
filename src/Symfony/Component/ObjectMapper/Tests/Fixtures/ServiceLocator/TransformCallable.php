@@ -18,7 +18,7 @@ use Symfony\Component\ObjectMapper\TransformCallableInterface;
  */
 class TransformCallable implements TransformCallableInterface
 {
-    public function __invoke(mixed $value, object $source, ?object $target, array $context): mixed
+    public function __invoke(mixed $value, object $source, ?object $target): mixed
     {
         return "transformed$value";
     }

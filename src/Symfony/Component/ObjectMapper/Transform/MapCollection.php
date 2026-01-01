@@ -14,14 +14,14 @@ namespace Symfony\Component\ObjectMapper\Transform;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
-use Symfony\Component\ObjectMapper\TransformCallableInterface;
+use Symfony\Component\ObjectMapper\TransformCallableWithContextInterface;
 
 /**
  * @template T of object
  *
- * @implements TransformCallableInterface<object, T>
+ * @implements TransformCallableWithContextInterface<object, T>
  */
-class MapCollection implements TransformCallableInterface
+class MapCollection implements TransformCallableWithContextInterface
 {
     public function __construct(
         private ObjectMapperInterface $objectMapper = new ObjectMapper(),

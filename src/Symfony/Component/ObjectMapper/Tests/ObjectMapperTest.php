@@ -90,6 +90,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformC
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionD;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionE;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionWithContext;
+use Symfony\Component\ObjectMapper\Transform\MapCollection;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class ObjectMapperTest extends TestCase
@@ -575,6 +578,20 @@ final class ObjectMapperTest extends TestCase
         $this->assertEquals([new TransformCollectionD('a'), new TransformCollectionD('b')], $transformed->foo);
     }
 
+    public function testTransformCollectionWithContext()
+    {
+        $u = new TransformCollectionB();
+        $u->foo = [new TransformCollectionD('a'), new TransformCollectionD('b')];
+        $mapper = new ObjectMapper(
+            transformCallableLocator: $this->getServiceLocator([MapCollection::class => new MapCollection()])
+        );
+
+        $transformed = $mapper->map($u, TransformCollectionWithContext::class);
+
+        $this->assertEquals([new TransformCollectionE('a'), new TransformCollectionE('b')], $transformed->foo);
+    }
+
+    #[RequiresPhp('>=8.4')]
     public function testEmbedsAreLazyLoadedByDefault()
     {
         $mapper = new ObjectMapper();

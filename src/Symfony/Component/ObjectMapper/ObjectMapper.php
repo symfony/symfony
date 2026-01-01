@@ -291,13 +291,13 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     /**
      * @param callable(): mixed $fn
      */
-    private function call(callable $fn, mixed $value, object $source, ?object $target = null): mixed
+    private function call(callable $fn, mixed $value, object $source, ?object $target = null, array $context = []): mixed
     {
         if (\is_string($fn)) {
             return \call_user_func($fn, $value);
         }
 
-        return $fn($value, $source, $target);
+        return $fn($value, $source, $target, $context);
     }
 
     /**
@@ -331,7 +331,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
         foreach ($transforms as $transform) {
             if ($fn = $this->getCallable($transform, $this->transformCallableLocator)) {
-                $value = $this->call($fn, $value, $source, $target);
+                $value = $this->call($fn, $value, $source, $target, $map->context);
             }
         }
 

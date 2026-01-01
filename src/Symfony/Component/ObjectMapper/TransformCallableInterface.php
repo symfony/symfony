@@ -22,9 +22,10 @@ namespace Symfony\Component\ObjectMapper;
 interface TransformCallableInterface
 {
     /**
-     * @param mixed   $value  The value being mapped
-     * @param T       $source The object we're working on
-     * @param T2|null $target The target we're mapping to
+     * @param mixed   $value   The value being mapped
+     * @param T       $source  The object we're working on
+     * @param T2|null $target  The target we're mapping to
+     * @param array   $context The mapping context
      */
-    public function __invoke(mixed $value, object $source, ?object $target): mixed;
+    public function __invoke(mixed $value, object $source, ?object $target, array $context): mixed;
 }

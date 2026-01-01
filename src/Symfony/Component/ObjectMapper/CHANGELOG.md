@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add context parameter on `TransformCallableInterface`
+ * Add context parameter on `Map` attribute
+
 7.4
 ---
 

@@ -23,7 +23,7 @@ class ServiceLoadedValueTransformer implements TransformCallableInterface
     {
     }
 
-    public function __invoke(mixed $value, object $source, ?object $target): mixed
+    public function __invoke(mixed $value, object $source, ?object $target, array $context): mixed
     {
         $metadata = $this->metadata->create($value);
         \assert(count($metadata) === 1);

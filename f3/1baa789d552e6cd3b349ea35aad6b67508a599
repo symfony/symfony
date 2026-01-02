@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-26T10:33:29Z
+
+Future note: we discussed this with @TimoBakx during the SymfonyCon hackday.
+Another idea we had was to trigger one event per controller attribute, before the `kernel.response` event.
+The main benefit would be true lazy loading. This would work around a too common issue in Symfony apps: listeners that do nothing most of the time but are still loaded (together with their deps - something we might also improve by making listeners lazy by default, since this is much cheaper with native lazy objects).
+This note shouldn't prevent this PR from being considered (quite the contrary to me).

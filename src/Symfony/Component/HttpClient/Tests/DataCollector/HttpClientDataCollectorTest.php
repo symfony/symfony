@@ -180,7 +180,7 @@ class HttpClientDataCollectorTest extends TestCase
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
 
         $isWindows = '\\' === \DIRECTORY_SEPARATOR;
-        self::assertEquals(\sprintf($expectedCurlCommand, $isWindows ? '"' : "'", $isWindows ? '' : "'"), $curlCommand);
+        self::assertEquals(\sprintf($expectedCurlCommand, $isWindows ? '"' : "'", $isWindows ? '"' : "'"), $curlCommand);
     }
 
     public static function provideCurlRequests(): iterable

@@ -1471,12 +1471,12 @@ class ProcessTest extends TestCase
     {
         $p = new Process(['/usr/bin/php']);
 
-        $expected = '\\' === \DIRECTORY_SEPARATOR ? '/usr/bin/php' : "'/usr/bin/php'";
+        $expected = '\\' === \DIRECTORY_SEPARATOR ? '"/usr/bin/php"' : "'/usr/bin/php'";
         $this->assertSame($expected, $p->getCommandLine());
 
         $p = new Process(['cd', '/d']);
 
-        $expected = '\\' === \DIRECTORY_SEPARATOR ? 'cd /d' : "'cd' '/d'";
+        $expected = '\\' === \DIRECTORY_SEPARATOR ? 'cd "/d"' : "'cd' '/d'";
         $this->assertSame($expected, $p->getCommandLine());
     }
 
@@ -1536,6 +1536,18 @@ class ProcessTest extends TestCase
         $p->run(null, ['code' => 'echo $argv[1];', 'def' => '"DEF"']);
 
         $this->assertSame('"DEF"', rtrim($p->getOutput()));
+    }
+
+    public function testArgumentsWithEqualsAreQuoted()
+    {
+        $process = new Process(['command', 'foo=bar']);
+        $commandLine = $process->getCommandLine();
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->assertStringContainsString('"foo=bar"', $commandLine, 'Argument with equals sign should be double-quoted on Windows');
+        } else {
+            $this->assertStringContainsString("'foo=bar'", $commandLine, 'Argument with equals sign should be single-quoted on POSIX');
+        }
     }
 
     public function testPreparedCommandWithMissingValue()

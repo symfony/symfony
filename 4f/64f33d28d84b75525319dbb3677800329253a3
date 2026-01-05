@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-05T10:55:52Z
+
+I'd rather not add an option for controlling this. We should be able to guess using reflection, isn't it?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-01-05T14:02:04Z
+
+> I'd rather not add an option for controlling this. We should be able to guess using reflection, isn't it?
+
+@nicolas-grekas I'm not really sure how we could do that, considering this is an expression. Do you have anything in mind?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-05T14:15:32Z
+
+Ah indeed. No I don't. But we could always provide request and args, in addition to the other vars, isn't it?
+An option doesn't make sense for this. That's not something ppl should tweak from one app to another.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-01-05T14:46:21Z
+
+> Ah indeed. No I don't. But we could always provide request and args, in addition to the other vars, isn't it? An option doesn't make sense for this. That's not something ppl should tweak from one app to another.
+
+@nicolas-grekas Makes sense, done.

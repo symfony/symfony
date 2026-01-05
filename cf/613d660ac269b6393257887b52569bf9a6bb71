@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-26T10:28:29Z
+
+This doesn't look specific enough to me. We should first understand why we get the behavior we observe, then figure out the most appropriate patch.
+
+---------------------------------------------------------------------------
+
+by stakovicz at 2026-01-04T20:09:09Z
+
+In fact, the execution of the HTTP cache is based on the boolean (`$this->booted`) which determines whether the kernel is started or not.
+However, in the context of a worker, this cannot work because the kernel remains in memory and is not restarted with each request.
+
+That is why I propose this fix.

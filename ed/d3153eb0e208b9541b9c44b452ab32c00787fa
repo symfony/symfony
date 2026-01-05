@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-01-05T10:03:35Z
+
+Ah, you've been too fast for me 🙂 Shouldn't we use a more straightforward way instead of dealing with regexes? That's what I came up with:
+
+```php
+       if (\PHP_VERSION_ID < 80600) {
+            yield [
+                'content' => 'not json',
+                'responseHeaders' => [],
+                'message' => 'Syntax error for "https://example.com/file.json".',
+            ];
+
+            yield [
+                'content' => '[1,2}',
+                'responseHeaders' => [],
+                'message' => 'State mismatch (invalid or malformed JSON) for "https://example.com/file.json".',
+            ];
+        } else {
+            yield [
+                'content' => 'not json',
+                'responseHeaders' => [],
+                'message' => 'Syntax error near location 1:1 for "https://example.com/file.json".',
+            ];
+
+            yield [
+                'content' => '[1,2}',
+                'responseHeaders' => [],
+                'message' => 'State mismatch (invalid or malformed JSON) near location 1:5 for "https://example.com/file.json".',
+            ];
+        }
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-05T10:07:41Z
+
+`if (\PHP_VERSION_ID < 80600) { ... return }` would work for me (with an early return so that the code in 9.0 has minimal diff with 8.x)
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-05T10:18:48Z
+
+Even better alternative IMO: put the version id check only on the `message` key in the array, keeping the same provided cases in the generator.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-01-05T10:28:39Z
+
+I went with @stof's idea

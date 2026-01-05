@@ -161,6 +161,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 }
 
                 $value = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap);
+                $expectedType = $targetRefl->getProperty($propertyName)->getType()->getName();
+                // If the target type does not match the source type,
+                if (\is_object($value) && $expectedType && class_exists($expectedType) && !($value instanceof $expectedType)) {
+                    $value = $this->doMap($value, $expectedType, $objectMap, false);
+                }
                 $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value);
             }
         }

@@ -648,4 +648,21 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame('foo', $out->var1);
         $this->assertSame('bar', $out->b->var2);
     }
+
+    public function testCorrectTypes()
+    {
+        $source = new Fixtures\MissmatchType\Source(
+            item: new Fixtures\MissmatchType\FooBaz(
+                foo: 'a',
+                baz: 'b',
+            )
+        );
+
+        $mapper = new ObjectMapper();
+        $out = $mapper->map($source, Fixtures\MissmatchType\Out::class);
+
+        $this->assertInstanceOf(Fixtures\MissmatchType\Out::class, $out);
+        $this->assertInstanceOf(Fixtures\MissmatchType\Baz::class, $out->item);
+        $this->assertEquals('b', $out->item->baz);
+    }
 }

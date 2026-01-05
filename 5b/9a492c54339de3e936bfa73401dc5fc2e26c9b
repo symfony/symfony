@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-01-04T11:04:37Z
+
+> Following internal discussions with @nicolas-grekas about [symfony/symfony/actions/runs/20663092372/job/59329680460?pr=62920](https://github.com/symfony/symfony/actions/runs/20663092372/job/59329680460?pr=62920). Related to [symfony/ux#3264](https://github.com/symfony/ux/pull/3264) as well.
+
+Can something be improved on Twig-Cs-Fixer side ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-01-04T11:27:06Z
+
+I don't think so. The error we can see in e.g. https://github.com/symfony/symfony/actions/runs/20683321686/job/59380447732?pr=62925 is coming from Symfony's `Finder` class. For PHP CS Fixer we also use `src` as the directory to inspect.

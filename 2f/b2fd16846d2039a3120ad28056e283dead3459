@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-12-27T18:34:03Z
+
+> the existing messages will not be flushed until the batch is filled or the worker shuts down
+
+Are messages really flushed when a worker shuts down? Last time I tried they were just lost :thinking:
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-12-27T18:44:17Z
+
+> > the existing messages will not be flushed until the batch is filled or the worker shuts down
+>
+> Are messages really flushed when a worker shuts down? Last time I tried they were just lost 🤔
+
+Could you please try again? I've never experienced this behavior.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-12-27T21:19:09Z
+
+I observed this behavior after updating my handler so that it respects `flush`’s `$force` parameter. Else the queue would immediately be flushed so maybe that’s why you never experienced it?
+
+I can confirm this still happens but since this is what your PR fixes I tried applying its changes to a Symfony 7.4 app but the worker crashes on
+```php
+[$envelope, $transportName, $acked] = $unacks[$batchHandler];
+```
+with
+> Warning: Undefined array key 2
+
+and I don’t understand why so I cannot say if it’s fixed :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-12-27T22:22:58Z
+
+@MatTheCat Are you sure you applied the fix correctly? This error would occur if line 168 wasn't applied (`$this->unacks[$noAutoAckStamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope->withoutAll(AckStamp::class), $transportName, &$acked];`).
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-12-28T08:40:43Z
+
+Ah indeed missed this change…
+
+So now I can confirm messages are indeed processed when the worker shuts down :tada: Thanks!
+
+On the other hand I can also see messages keep being logged as received until they’re handled. E.g. here are my worker container logs with a single message added in the queue:
+
+```
+Attaching to worker-1
+worker-1  |
+worker-1  |
+worker-1  |  [OK] Consuming messages from transport "async".
+worker-1  |
+worker-1  |  // The worker will automatically exit once it has received a stop signal via
+worker-1  |  // the messenger:stop-workers command.
+worker-1  |
+worker-1  |  // Quit the worker with CONTROL-C.
+worker-1  |
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Message App\Application\Event\JobOffersListed handled by App\UseCase\CountJobOffersDisplay\CountJobOffersDisplayMessageHandler::__invoke
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+Gracefully Stopping... press Ctrl+C again to force
+Container jobs-mat_the_cat-worker-1 Stopping
+worker-1  | [info] Received signal 3.
+worker-1  | [info] Stopping worker.
+worker-1  | [info] Received message App\Application\Event\JobOffersListed
+worker-1  | [info] App\Application\Event\JobOffersListed was handled successfully (acknowledging to transport).
+Container jobs-mat_the_cat-worker-1 Stopped
+worker-1 exited with code 0
+```
+
+This is less important but maybe there’s something to improve here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-05T15:59:58Z
+
+@HypeMC just in case, did you have a look at @MatTheCat's comment?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-01-05T16:58:40Z
+
+@nicolas-grekas @MatTheCat I believe this should solve the duplicate messages problem: https://github.com/symfony/symfony/compare/014da25e5583b21e1ebb63e0538d70c97aff9447..4c568885099e77eb3d847102a6160f452b0d4d59
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-01-05T20:59:46Z
+
+@HypeMC can confirm it works :+1:

@@ -58,6 +58,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Source;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Target;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\A as MapTargetToSourceA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\B as MapTargetToSourceB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MissmatchType\OutInterface;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MissmatchType\OutUnion;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\A as MultipleTargetPropertyA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\B as MultipleTargetPropertyB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\C as MultipleTargetPropertyC;
@@ -663,6 +665,27 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertInstanceOf(Fixtures\MissmatchType\Out::class, $out);
         $this->assertInstanceOf(Fixtures\MissmatchType\Baz::class, $out->item);
-        $this->assertEquals('b', $out->item->baz);
+        $this->assertSame('b', $out->item->baz);
+    }
+
+    #[DataProvider('unhandledTypesProvider')]
+    public function testUnmappableTypes(string $target)
+    {
+        $this->expectException(\TypeError::class);
+        $source = new Fixtures\MissmatchType\Source(
+            item: new Fixtures\MissmatchType\FooBaz(
+                foo: 'a',
+                baz: 'b',
+            )
+        );
+
+        $mapper = new ObjectMapper();
+        $mapper->map($source, $target);
+    }
+
+    public static function unhandledTypesProvider(): iterable
+    {
+        yield [OutUnion::class];
+        yield [OutInterface::class];
     }
 }

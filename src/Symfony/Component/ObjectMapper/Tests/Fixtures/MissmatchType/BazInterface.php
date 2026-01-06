@@ -2,12 +2,6 @@
 
 namespace Symfony\Component\ObjectMapper\Tests\Fixtures\MissmatchType;
 
-class Out
+interface BazInterface
 {
-
-    public function __construct(
-        public Baz $item
-    ){
-    }
-
 }

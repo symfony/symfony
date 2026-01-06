@@ -2,11 +2,11 @@
 
 namespace Symfony\Component\ObjectMapper\Tests\Fixtures\MissmatchType;
 
-class Out
+class OutUnion
 {
 
     public function __construct(
-        public Baz $item
+        public Foo|Baz $item
     ){
     }
 

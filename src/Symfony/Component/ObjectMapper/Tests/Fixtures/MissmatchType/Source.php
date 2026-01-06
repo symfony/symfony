@@ -8,7 +8,6 @@ class Source
     public function __construct(
         public FooBaz $item
     ){
-
     }
 
 }

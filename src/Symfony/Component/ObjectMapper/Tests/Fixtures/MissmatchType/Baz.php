@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\ObjectMapper\Tests\Fixtures\MissmatchType;
 
-class Baz
+class Baz implements BazInterface
 {
 
     public function __construct(

@@ -9,7 +9,6 @@ class FooBaz
         public string $foo,
         public string $baz,
     ){
-
     }
 
 }

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2026-01-02T19:26:53Z
+
+Thanks for another great addition Yonel!
+
+I like how `#[Ask]` makes it explicit that it is about an interaction, and I feel like this is missing in`#[Choice]`.  Is it me or could we go with `#[AskChoice]` instead?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-01-04T11:12:38Z
+
+Did you consider having `choices` accepting `array|callable` for dynamic computed choices ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2026-01-04T21:40:30Z
+
+Update:
+ * Renamed the attribute to `#[AskChoice]`
+ * Added support for passing a callable to `choices`

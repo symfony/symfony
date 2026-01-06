@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-12-26T15:51:29Z
+
+Still a few things to figure out soon on the Amp side.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-12-29T09:27:22Z
+
+Tests added to ensure async is kept and working with the new option
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-12-30T11:04:23Z
+
+Diff in the PR gets worse, but shall we realign all the comments in contracts Interface?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-12-30T13:02:23Z
+
+@OskarStark overall I'm not a fan of aligned args/comments. I don't find it more readable and it's always painful to update whenever a long-named argument is added. I'd prefer not to, but if this is the convention, I can do it.

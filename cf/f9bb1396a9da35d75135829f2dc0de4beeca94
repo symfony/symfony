@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-12-16T00:28:50Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "7.4 for bugfix since it requires the LockKeyNormalizer".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-06T13:25:52Z
+
+Rebase unlocked
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-01-06T14:35:13Z
+
+> Rebase unlocked
+
+Thanks ! PR is updated without the renaming/deprecation.
+
+But seems like the 7.4 branch Ci already have a lot of failure
+https://github.com/symfony/symfony/commits/7.4/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-06T15:09:28Z
+
+And failures are related to the fix on Serializer. See https://github.com/symfony/symfony/pull/62971
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-06T15:17:38Z
+
+(now merged up)

@@ -14,6 +14,7 @@ namespace Symfony\Component\ObjectMapper;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
+use Symfony\Component\ObjectMapper\Exception\NoSuchCallableException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchPropertyException;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
@@ -345,7 +346,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     /**
      * @param (string|callable(mixed $value, object $object): mixed) $fn
      */
-    private function getCallable(string|callable $fn, ?ContainerInterface $locator = null): ?callable
+    private function getCallable(string|callable $fn, ?ContainerInterface $locator = null): callable
     {
         if (\is_callable($fn)) {
             return $fn;
@@ -355,7 +356,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             return $locator->get($fn);
         }
 
-        return null;
+        throw new NoSuchCallableException(\sprintf('"%s" is not a valid callable.', $fn));
     }
 
     /**

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * The component will map properties recursively if the source and target class do not match
+
 7.4
 ---
 

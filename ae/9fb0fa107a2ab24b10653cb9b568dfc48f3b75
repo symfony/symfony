@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-12-17T11:29:54Z
+
+I'm afraid this still doesn't solve the HttpClient problem because the service name is different. For example, before it was `my.client` and now it's `my.client.scoping`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-07T10:58:39Z
+
+I figured out the proper fix!

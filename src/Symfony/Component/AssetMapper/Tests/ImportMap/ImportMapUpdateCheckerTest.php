@@ -11,17 +11,18 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
-use Symfony\Component\AssetMapper\ImportMap\PackageUpdateInfo;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
+use Symfony\Component\AssetMapper\ImportMap\PackageUpdateInfo;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 class ImportMapUpdateCheckerTest extends TestCase
 {
@@ -115,6 +116,7 @@ class ImportMapUpdateCheckerTest extends TestCase
      * @param PackageUpdateInfo[] $expectedUpdateInfo
      */
     #[DataProvider('provideImportMapEntry')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testGetAvailableUpdatesForSinglePackage(array $entries, array $expectedUpdateInfo, ?\Exception $expectedException)
     {
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries($entries));

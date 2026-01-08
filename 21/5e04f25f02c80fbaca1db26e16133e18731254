@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-05T15:58:23Z
+
+I rebased your branch to target 6.4. Now waiting for tests.
+
+---------------------------------------------------------------------------
+
+by gnoddep at 2026-01-05T22:33:20Z
+
+The 8.2, low-deps tests fails because null coalescing property paths are supported since symfony/property-access 6.2, but the lowest possible version is 5.4.26.
+
+I will create a separate testcase for this change and mark it skipped if symfony/property-access does not support null coalescing property paths

@@ -45,24 +45,24 @@ class TypeContextFactoryTest extends TestCase
     public function testCollectClassNames()
     {
         $typeContext = $this->typeContextFactory->createFromClassName(Dummy::class, AbstractDummy::class);
-        $this->assertSame('Dummy', $typeContext->calledClassName);
-        $this->assertSame('AbstractDummy', $typeContext->declaringClassName);
+        $this->assertSame(Dummy::class, $typeContext->calledClassName);
+        $this->assertSame(AbstractDummy::class, $typeContext->declaringClassName);
 
         $typeContext = $this->typeContextFactory->createFromReflection(new \ReflectionClass(Dummy::class));
-        $this->assertSame('Dummy', $typeContext->calledClassName);
-        $this->assertSame('Dummy', $typeContext->declaringClassName);
+        $this->assertSame(Dummy::class, $typeContext->calledClassName);
+        $this->assertSame(Dummy::class, $typeContext->declaringClassName);
 
         $typeContext = $this->typeContextFactory->createFromReflection(new \ReflectionProperty(Dummy::class, 'id'));
-        $this->assertSame('Dummy', $typeContext->calledClassName);
-        $this->assertSame('Dummy', $typeContext->declaringClassName);
+        $this->assertSame(Dummy::class, $typeContext->calledClassName);
+        $this->assertSame(Dummy::class, $typeContext->declaringClassName);
 
         $typeContext = $this->typeContextFactory->createFromReflection(new \ReflectionMethod(Dummy::class, 'getId'));
-        $this->assertSame('Dummy', $typeContext->calledClassName);
-        $this->assertSame('Dummy', $typeContext->declaringClassName);
+        $this->assertSame(Dummy::class, $typeContext->calledClassName);
+        $this->assertSame(Dummy::class, $typeContext->declaringClassName);
 
         $typeContext = $this->typeContextFactory->createFromReflection(new \ReflectionParameter([Dummy::class, 'setId'], 'id'));
-        $this->assertSame('Dummy', $typeContext->calledClassName);
-        $this->assertSame('Dummy', $typeContext->declaringClassName);
+        $this->assertSame(Dummy::class, $typeContext->calledClassName);
+        $this->assertSame(Dummy::class, $typeContext->declaringClassName);
     }
 
     public function testCacheResultWhenToStringTypeResolver()

@@ -77,7 +77,7 @@ final class TypeContext
      */
     public function getDeclaringClass(): string
     {
-        return $this->normalize($this->declaringClassName);
+        return $this->declaringClassName;
     }
 
     /**
@@ -85,7 +85,7 @@ final class TypeContext
      */
     public function getCalledClass(): string
     {
-        return $this->normalize($this->calledClassName);
+        return $this->calledClassName;
     }
 
     /**

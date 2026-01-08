@@ -1541,6 +1541,46 @@ class ProcessTest extends TestCase
         $this->assertSame($env, $p->getEnv());
     }
 
+    public function testEnvVarNamesCastToString()
+    {
+        $process = $this->getProcess('echo hello');
+        $process->setEnv([123 => 'value']);
+
+        $process->run();
+
+        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
+    }
+
+    public function testEnvVarNamesWithEqualsSigns()
+    {
+        $process = $this->getProcess('echo hello');
+        $process->setEnv(['VAR=NAME' => 'value']);
+
+        $process->run();
+
+        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
+    }
+
+    public function testEnvVarNamesWithNullBytes()
+    {
+        $process = $this->getProcess('echo hello');
+        $process->setEnv(["VAR\0NAME" => 'value']);
+
+        $process->run();
+
+        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
+    }
+
+    public function testEnvVarNamesEmpty()
+    {
+        $process = $this->getProcess('echo hello');
+        $process->setEnv(['' => 'value']);
+
+        $process->run();
+
+        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
+    }
+
     public function testWaitStoppedDeadProcess()
     {
         $process = $this->getProcess(self::$phpBin.' '.__DIR__.'/ErrorProcessInitiator.php -e '.self::$phpBin);

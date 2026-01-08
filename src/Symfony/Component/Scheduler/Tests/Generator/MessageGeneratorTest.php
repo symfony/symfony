@@ -366,7 +366,7 @@ class MessageGeneratorTest extends TestCase
         sort($runs);
 
         $ticks = [self::makeDateTime(''), 0];
-        $trigger = $this->createMock(TriggerInterface::class);
+        $trigger = $this->createStub(TriggerInterface::class);
         $trigger
             ->method('getNextRunDate')
             ->willReturnCallback(function (\DateTimeImmutable $lastTick) use ($runs, &$ticks): \DateTimeImmutable {

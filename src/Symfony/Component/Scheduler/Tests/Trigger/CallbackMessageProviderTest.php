@@ -20,7 +20,7 @@ class CallbackMessageProviderTest extends TestCase
 {
     public function testToString()
     {
-        $context = new MessageContext('test', 'test', $this->createMock(TriggerInterface::class), $this->createMock(\DateTimeImmutable::class));
+        $context = new MessageContext('test', 'test', $this->createStub(TriggerInterface::class), $this->createStub(\DateTimeImmutable::class));
         $messageProvider = new CallbackMessageProvider(fn () => []);
         $this->assertEquals([], $messageProvider->getMessages($context));
         $this->assertEquals('', $messageProvider->getId());

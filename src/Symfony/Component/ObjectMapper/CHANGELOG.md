@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `MapCollection` attribute with `itemClass` to specify the target class for collection items
+ * Add `MappingAwareTransformCallableInterface` to allow transforms to access the original `Map` attribute
+
 7.4
 ---
 

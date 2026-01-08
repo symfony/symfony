@@ -52,6 +52,10 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallback\B as Instance
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallbackWithArguments\A as InstanceCallbackWithArgumentsA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallbackWithArguments\B as InstanceCallbackWithArgumentsB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\LazyFoo;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapCollectionAttribute\Order;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapCollectionAttribute\OrderDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapCollectionAttribute\OrderItem;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapCollectionAttribute\OrderItemDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\AToBMapper;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\MapStructMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Source;
@@ -90,6 +94,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformC
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionD;
+use Symfony\Component\ObjectMapper\Transform\MapCollection;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class ObjectMapperTest extends TestCase
@@ -647,5 +652,32 @@ final class ObjectMapperTest extends TestCase
         $this->assertInstanceOf(ReadOnlyPromotedPropertyBMapped::class, $out->b);
         $this->assertSame('foo', $out->var1);
         $this->assertSame('bar', $out->b->var2);
+    }
+
+    public function testMapCollectionAttributeWithItemClass()
+    {
+        $order = new Order();
+        $order->id = 1;
+        $order->items = [
+            new OrderItem('Product A', 2),
+            new OrderItem('Product B', 3),
+        ];
+
+        $mapper = new ObjectMapper(
+            transformCallableLocator: $this->getServiceLocator([
+                MapCollection::class => new MapCollection(),
+            ])
+        );
+        $result = $mapper->map($order);
+
+        $this->assertInstanceOf(OrderDto::class, $result);
+        $this->assertSame(1, $result->id);
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(OrderItemDto::class, $result->items[0]);
+        $this->assertInstanceOf(OrderItemDto::class, $result->items[1]);
+        $this->assertSame('Product A', $result->items[0]->name);
+        $this->assertSame(2, $result->items[0]->quantity);
+        $this->assertSame('Product B', $result->items[1]->name);
+        $this->assertSame(3, $result->items[1]->quantity);
     }
 }

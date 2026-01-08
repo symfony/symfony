@@ -37,7 +37,7 @@ final class MapStructMapperMetadataFactory implements ObjectMapperMetadataFactor
         foreach (($property ? $refl->getMethod('map') : $refl)->getAttributes(Map::class) as $mappingAttribute) {
             $map = $mappingAttribute->newInstance();
             if ($map->source === $source) {
-                $mapTo[] = new Mapping(source: $map->source, target: $map->target, if: $map->if, transform: $map->transform);
+                $mapTo[] = new Mapping(source: $map->source, target: $map->target, if: $map->if, transform: $map->transform, map: $map);
 
                 continue;
             }

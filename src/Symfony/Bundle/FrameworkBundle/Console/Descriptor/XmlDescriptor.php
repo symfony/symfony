@@ -275,7 +275,7 @@ class XmlDescriptor extends Descriptor
         if ($service instanceof Alias) {
             $dom->appendChild($dom->importNode($this->getContainerAliasDocument($service, $id)->childNodes->item(0), true));
             if ($container) {
-                $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($container->getDefinition((string) $service), (string) $service, false, $showArguments, $container)->childNodes->item(0), true));
+                $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($container->findDefinition($id), (string) $service, false, $showArguments, $container)->childNodes->item(0), true));
             }
         } elseif ($service instanceof Definition) {
             $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($service, $id, false, $showArguments, $container)->childNodes->item(0), true));
@@ -311,7 +311,7 @@ class XmlDescriptor extends Descriptor
                 continue;
             }
 
-            $serviceXML = $this->getContainerServiceDocument($service, $serviceId, null, $showArguments);
+            $serviceXML = $this->getContainerServiceDocument($service, $serviceId, $service instanceof Definition ? $container : null, $showArguments);
             $containerXML->appendChild($containerXML->ownerDocument->importNode($serviceXML->childNodes->item(0), true));
         }
 
@@ -385,7 +385,7 @@ class XmlDescriptor extends Descriptor
         }
 
         if (!$omitTags) {
-            if ($tags = $this->sortTagsByPriority($definition->getTags())) {
+            if ($tags = $this->sortTagsByPriority($container ? $this->resolveServiceTags($container, $definition) : $definition->getTags())) {
                 $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
                 foreach ($tags as $tagName => $tagData) {
                     foreach ($tagData as $parameters) {

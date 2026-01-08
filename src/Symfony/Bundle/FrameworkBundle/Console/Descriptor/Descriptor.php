@@ -15,6 +15,7 @@ use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphEdge;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -256,6 +257,70 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         return $sortedTags;
+    }
+
+    /**
+     * Resolves service tags by merging priorities and indices from #[AsTaggedItem] attributes
+     * or static getDefaultPriority()/getDefaultName() methods into the tag data.
+     *
+     * This ensures debug output shows the same priority values that are used during container compilation.
+     */
+    protected function resolveServiceTags(ContainerBuilder $container, Definition $definition, ?string $tagName = null): array
+    {
+        if (null === $tagName) {
+            $tags = $definition->getTags();
+            foreach ($tags as $name => $tag) {
+                $tags[$name] = $this->resolveServiceTags($container, $definition, $name);
+            }
+
+            return $tags;
+        }
+
+        $tags = $definition->getTag($tagName);
+
+        if ($definition->hasTag('container.ignore_attributes')) {
+            return $tags;
+        }
+
+        $class = $container->getParameterBag()->resolveValue($definition->getClass());
+
+        if (!$class || !($r = $container->getReflectionClass($class))) {
+            return $tags;
+        }
+
+        $priority = $index = null;
+
+        // Check for static getDefaultPriority() method
+        if ($r->hasMethod('getDefaultPriority') && ($m = $r->getMethod('getDefaultPriority'))->isStatic() && $m->isPublic()) {
+            $priority = $m->invoke(null);
+        }
+
+        // Check for static getDefaultName() method
+        if ($r->hasMethod('getDefaultName') && ($m = $r->getMethod('getDefaultName'))->isStatic() && $m->isPublic()) {
+            $index = $m->invoke(null);
+        }
+
+        // Check for #[AsTaggedItem] attribute
+        if ($attr = $r->getAttributes(AsTaggedItem::class)[0] ?? null) {
+            $attribute = $attr->newInstance();
+            $priority ??= $attribute->priority;
+            $index ??= $attribute->index;
+        }
+
+        if (null === $priority && null === $index) {
+            return $tags;
+        }
+
+        foreach ($tags as $i => $tag) {
+            if (null !== $priority) {
+                $tags[$i]['priority'] ??= $priority;
+            }
+            if (null !== $index) {
+                $tags[$i]['index'] ??= $index;
+            }
+        }
+
+        return $tags;
     }
 
     protected function sortByPriority(array $tag): array

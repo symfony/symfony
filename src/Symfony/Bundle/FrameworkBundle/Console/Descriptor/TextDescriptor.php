@@ -197,9 +197,16 @@ class TextDescriptor extends Descriptor
 
         $options['output']->title($title);
 
-        $serviceIds = isset($options['tag']) && $options['tag']
-            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']))
-            : $this->sortServiceIds($container->getServiceIds());
+        if (isset($options['tag']) && $options['tag']) {
+            $services = [];
+            foreach ($container->findTaggedServiceIds($options['tag']) as $serviceId => $tags) {
+                $definition = $container->getDefinition($serviceId);
+                $services[$serviceId] = $this->resolveServiceTags($container, $definition, $options['tag']);
+            }
+            $serviceIds = $this->sortTaggedServicesByPriority($services);
+        } else {
+            $serviceIds = $this->sortServiceIds($container->getServiceIds());
+        }
         $maxTags = [];
 
         if (isset($options['filter'])) {
@@ -221,7 +228,7 @@ class TextDescriptor extends Descriptor
                     continue;
                 }
                 if ($showTag) {
-                    $tags = $definition->getTag($showTag);
+                    $tags = $services[$serviceId];
                     foreach ($tags as $tag) {
                         foreach ($tag as $key => $value) {
                             if (!isset($maxTags[$key])) {
@@ -252,7 +259,7 @@ class TextDescriptor extends Descriptor
             $styledServiceId = $rawOutput ? $serviceId : \sprintf('<fg=cyan>%s</fg=cyan>', OutputFormatter::escape($serviceId));
             if ($definition instanceof Definition) {
                 if ($showTag) {
-                    foreach ($this->sortByPriority($definition->getTag($showTag)) as $key => $tag) {
+                    foreach ($this->sortByPriority($services[$serviceId]) as $key => $tag) {
                         $tagValues = [];
                         foreach ($tagsNames as $tagName) {
                             if (\is_array($tagValue = $tag[$tagName] ?? '')) {
@@ -297,7 +304,7 @@ class TextDescriptor extends Descriptor
         $tableRows[] = ['Class', $definition->getClass() ?: '-'];
 
         $omitTags = isset($options['omit_tags']) && $options['omit_tags'];
-        if (!$omitTags && ($tags = $definition->getTags())) {
+        if (!$omitTags && ($tags = $container ? $this->resolveServiceTags($container, $definition) : $definition->getTags())) {
             $tagInformation = [];
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $tagParameters) {

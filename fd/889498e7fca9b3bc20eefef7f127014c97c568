@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-01-07T11:06:25Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by zoglo at 2026-01-07T11:16:24Z
+
+Failing test seems to be unrelated?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-07T11:24:37Z
+
+> It would be good if we could configure those headers as well but that would be a feature.
+
+this would be rejected. Those headers to bypass are an implementation detail, related to the way the API used by the bridge works. It does not make sense to make that configurable from the outside. If something is missing in the bridge, the solution is to fix the issue in the bridge, not to introduce a public extension point.
+
+---------------------------------------------------------------------------
+
+by zoglo at 2026-01-07T11:51:54Z
+
+@stof should we still update the tests?
+https://github.com/symfony/symfony/pull/62984#pullrequestreview-3634426277
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-07T11:56:58Z
+
+yes, it would make sense, to prevent regressions.
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2026-01-07T12:30:00Z
+
+> this would be rejected. Those headers to bypass are an implementation detail, related to the way the API used by the bridge works. It does not make sense to make that configurable from the outside. If something is missing in the bridge, the solution is to fix the issue in the bridge, not to introduce a public extension point.
+
+The reason this comes up at all is because other bundles might add their own headers to a message - and they might not use the `X-` prefix. The [prefix has been deprecated](https://datatracker.ietf.org/doc/html/rfc6648) for a while now - but Symfony itself still uses it, e.g. `X-Transport` and `X-Bus-Transport`. Technically these should be changed as well - but then the same problem would arise with the Graph Mailer there.
+
+Ideally Microsoft should change this on their end and simply ignore any headers they do not know/support.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-07T14:03:57Z
+
+@fritzmg `Return-Path` is a header that Microsoft Graph manages on their own (as they do the sending and bounce handling).
+If their API forbids *custom* headers that don't have the `x-` prefix, this should be reported to them (as that's a violation of the spec), and it makes sense for the code to report a failure if your own code relies on such custom headers instead of silently dropping the headers (so that you can adapt your code to avoid relying on them, if relevant)
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2026-01-07T14:10:30Z
+
+> If their API forbids _custom_ headers that don't have the `x-` prefix, this should be reported to them (as that's a violation of the spec)
+
+That is the case, yes. If `symfony/mailer` also followed the spec and removed the `X-` prefix from its own custom headers, the `symfony/microsoft-graph-mailer` would not work anymore (with the current state of Microsoft's API).

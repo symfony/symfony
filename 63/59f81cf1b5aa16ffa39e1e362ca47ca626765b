@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-12-25T14:54:16Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "7.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by vveselinov at 2025-12-29T20:45:36Z
+
+I actually think that this should not be limited to properties with a default value. Leaving missing properties uninitialized is fine in my opinion. This is the current behaviour if there are any #[Map] attributes added to the source.
+
+---------------------------------------------------------------------------
+
+by Ali-HENDA at 2025-12-29T21:24:13Z
+
+> I actually think that this should not be limited to properties with a default value. Leaving missing properties uninitialized is fine in my opinion. This is the current behaviour if there are any #[Map] attributes added to the source.
+
+Good point. I was too focused on the specific issue.

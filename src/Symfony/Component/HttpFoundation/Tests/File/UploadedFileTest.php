@@ -225,6 +225,23 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('original.gif', $file->getClientOriginalName());
     }
 
+    public function testGetClientOriginalNameWithBackslash()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'prefix\\original.gif',
+            'image/gif'
+        );
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            // Windows: backslash is treated as directory separator
+            $this->assertEquals('original.gif', $file->getClientOriginalName());
+        } else {
+            // Unix: backslash is a valid filename character
+            $this->assertEquals('prefix\\original.gif', $file->getClientOriginalName());
+        }
+    }
+
     public function testGetSize()
     {
         $file = new UploadedFile(

@@ -133,9 +133,14 @@ class File extends \SplFileInfo
      */
     protected function getName(string $name): string
     {
-        $originalName = str_replace('\\', '/', $name);
-        $pos = strrpos($originalName, '/');
+        // Normalize backslashes to forward slashes only on Windows
+        // where backslash is a directory separator
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $name = str_replace('\\', '/', $name);
+        }
 
-        return false === $pos ? $originalName : substr($originalName, $pos + 1);
+        $pos = strrpos($name, '/');
+
+        return false === $pos ? $name : substr($name, $pos + 1);
     }
 }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-01-09T08:53:37Z
+
+Note to mergers: I opened this PR against the `7.3` branch to confirm that the changes actually fix the tests. Due to how we run high deps jobs on `6.4` we wouldn't get the same result. But if confirmed, these changes need to be merged into the `6.4` branch.

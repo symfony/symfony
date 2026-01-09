@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by azjezz at 2026-01-07T16:50:11Z
+
+I feel like the more correct approach is to generate `array{}` indicating that it has no keys at all.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2026-01-08T10:50:08Z
+
+can also do this if @nicolas-grekas prefers.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-09T10:37:45Z
+
+I prefer not listing them as an empty array doesn't allow any config anyway.

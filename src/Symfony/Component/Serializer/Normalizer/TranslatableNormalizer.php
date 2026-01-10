@@ -45,11 +45,12 @@ final class TranslatableNormalizer implements NormalizerInterface
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        return $data instanceof TranslatableInterface;
+        return $data instanceof TranslatableInterface
+            && false !== ($context[self::NORMALIZATION_LOCALE_KEY] ?? $this->defaultContext[self::NORMALIZATION_LOCALE_KEY]);
     }
 
     public function getSupportedTypes(?string $format): array
     {
-        return [TranslatableInterface::class => true];
+        return [TranslatableInterface::class => false];
     }
 }

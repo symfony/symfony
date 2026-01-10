@@ -119,7 +119,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('serializer.normalizer.translatable', TranslatableNormalizer::class)
             ->args(['$translator' => service('translator')])
-            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -920])
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -910])
 
         ->set('serializer.normalizer.form_error', FormErrorNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -915])

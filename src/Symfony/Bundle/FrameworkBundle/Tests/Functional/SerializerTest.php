@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TranslatableBackedEnum;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\AppKernel;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -60,6 +61,18 @@ class SerializerTest extends AbstractWebTestCase
         }
     }
 
+    public function testSerializeTranslatableBackedEnum()
+    {
+        static::bootKernel(['test_case' => 'Serializer']);
+
+        $serializer = static::getContainer()->get('serializer.alias');
+
+        $this->assertEquals('custom_get_string', $serializer->serialize(TranslatableBackedEnum::Get, 'yaml'));
+        $this->assertEquals('GET', $serializer->serialize(TranslatableBackedEnum::Get, 'yaml', [
+            TranslatableNormalizer::NORMALIZATION_LOCALE_KEY => false,
+        ]));
+    }
+
     protected static function getKernelClass(): string
     {
         return SerializerKernel::class;
@@ -90,15 +103,6 @@ class SerializerKernel extends AppKernel implements CompilerPassInterface
                 }
             }
         }
-    }
-
-    public function testSerializeTranslatableBackedEnum()
-    {
-        static::bootKernel(['test_case' => 'Serializer']);
-
-        $serializer = static::getContainer()->get('serializer.alias');
-
-        $this->assertEquals('GET', $serializer->serialize(TranslatableBackedEnum::Get, 'yaml'));
     }
 }
 

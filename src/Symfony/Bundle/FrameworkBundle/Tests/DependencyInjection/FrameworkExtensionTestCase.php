@@ -1863,7 +1863,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $tag = $definition->getTag('serializer.normalizer');
 
         $this->assertSame(TranslatableNormalizer::class, $definition->getClass());
-        $this->assertSame(-920, $tag[0]['priority']);
+        $this->assertSame(-910, $tag[0]['priority']);
         $this->assertEquals(new Reference('translator'), $definition->getArgument('$translator'));
     }
 

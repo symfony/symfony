@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-01-09T13:01:29Z
+
+with older versions of the PropertyInfo component being installed the type detection fails here: https://github.com/symfony/symfony/blob/55958c88700d35b0727e400fe338b2cac467c121/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L711

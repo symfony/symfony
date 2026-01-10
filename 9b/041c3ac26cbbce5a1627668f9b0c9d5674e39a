@@ -1,0 +1,130 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-01-06T17:15:23Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-01-07T07:51:24Z
+
+What error do you get without these changes?
+
+---------------------------------------------------------------------------
+
+by aurac at 2026-01-07T08:38:09Z
+
+This is the error i get when I try to access the security panel of the profiler :
+
+<img width="1150" height="399" alt="image" src="https://github.com/user-attachments/assets/6a8d6ad7-173b-4070-804f-10f07e76e86b" />
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-01-07T10:11:28Z
+
+Hi,
+
+Indeed `result` might be absent. See how [`TraceableAccessDecisionManager`](https://github.com/symfony/symfony/blob/8.0/src/Symfony/Component/Security/Core/Authorization/TraceableAccessDecisionManager.php#L61-L63) handles that.
+
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2026-01-07T19:54:04Z
+
+IMO, throwing a meaningful exception for invalid expressions in `#[IsGranted]` (e.g., `#[IsGranted(new Expression('invalid expression'))]`) would be a better solution.
+
+---------------------------------------------------------------------------
+
+by aurac at 2026-01-07T20:02:06Z
+
+@ayyoub-afwallah There is already a meaningful exception for invalid expressions in `#[IsGranted]` :
+
+<img width="1076" height="182" alt="image" src="https://github.com/user-attachments/assets/c1b7ee24-eb9e-4327-8dca-4dfd86930802" />
+
+Problem occurs when you try to access the security panel in the profiler of the request that threw this exception
+
+@Spomky Do you mean we should make a fix in [TraceableAccessDecisionManager](https://github.com/symfony/symfony/blob/8.0/src/Symfony/Component/Security/Core/Authorization/TraceableAccessDecisionManager.php) instead of in the template ?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-01-08T08:36:01Z
+
+To me there are two actions to take:
+1. On the current active branch 7.3: the fix you propose or this alternative:
+
+```twig
+{% set result = decision.result|default(null) %}
+
+{% if result is same as(true) %}
+    <span class="label status-success same-width">GRANTED</span>
+{% elseif result is same as(false) %}
+    <span class="label status-error same-width">DENIED</span>
+{% else %}
+    <span class="label status-warning same-width">ERROR</span>
+{% endif %}
+```
+
+2. On the next minor release 8.1 : make sure `result` is always set, and optionnaly share the exception. Example:
+
+```php
+$exception = null;
+try {
+    return $accessDecision->isGranted = $this->manager->decide($token, $attributes, $object, $accessDecision, $allowMultipleAttributes);$allowMultipleAttributes);
+} catch (\Throwable $e) {
+    $exception = $e;
+    throw $e;
+} finally {
+    $this->strategy = $accessDecision->strategy;
+    $currentLog = array_pop($this->currentLog);
+
+    // Guarantee the key exists
+    $currentLog['result'] = $accessDecision->isGranted ?? null;
+
+    // Share the exception
+    if ($exception) {
+        $currentLog['exception'] = ['class' => $exception::class, 'message' => $exception->getMessage(), ...];
+    }
+
+    $this->decisionLog[] = $currentLog;
+}
+```
+
+---------------------------------------------------------------------------
+
+by aurac at 2026-01-09T09:36:54Z
+
+@Spomky I agree to modify the code for the actual version with your alternative so that we check for the `null` value of result in case it is always set in future versions. However I feel like the warning class on the error badge can be a little bit confusing, even though it allows to see that it is neither `GRANTED` nor `DENIED` in a glance.
+
+About sharing the exception in a future version, I am not sure to understand what we should do with it. Displaying it in access decision tab will just result in a duplication of the Exception panel ?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-01-09T09:44:05Z
+
+> [...] However I feel like the warning class on the error badge can be a little bit confusing, even though it allows to see that it is neither GRANTED nor DENIED in a glance.
+
+I wanted to use another class than success and error. Could be neutral. The main idea is to distinguish it from the GRANTED or DENIED. In all cases the user will see the exception message on the page.
+
+> About sharing the exception in a future version, I am not sure to understand what we should do with it. Displaying it in access decision tab will just result in a duplication of the Exception panel ?
+
+I don't have a firm opinion on this, `ERROR` might be enough or it could be a link to the Exception panel.

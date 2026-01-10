@@ -91,26 +91,22 @@ class FileTest extends TestCase
         $this->assertStringEqualsFile(__FILE__, $file->getContent());
     }
 
-    public static function getFilenameFixtures()
+    public static function getFilenameFixtures(): iterable
     {
-        $fixtures = [
-            ['original.gif', 'original.gif'],
-            ['../../original.gif', 'original.gif'],
-            ['файлfile.gif', 'файлfile.gif'],
-            ['../../файлfile.gif', 'файлfile.gif'],
-        ];
+        yield ['original.gif', 'original.gif'];
+        yield ['../../original.gif', 'original.gif'];
+        yield ['файлfile.gif', 'файлfile.gif'];
+        yield ['../../файлfile.gif', 'файлfile.gif'];
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             // Windows: backslash is a directory separator
-            $fixtures[] = ['..\\..\\original.gif', 'original.gif'];
-            $fixtures[] = ['..\\..\\файлfile.gif', 'файлfile.gif'];
+            yield ['..\\..\\original.gif', 'original.gif'];
+            yield ['..\\..\\файлfile.gif', 'файлfile.gif'];
         } else {
             // Unix: backslash is a valid filename character
-            $fixtures[] = ['..\\..\\original.gif', '..\\..\\original.gif'];
-            $fixtures[] = ['..\\..\\файлfile.gif', '..\\..\\файлfile.gif'];
+            yield ['..\\..\\original.gif', '..\\..\\original.gif'];
+            yield ['..\\..\\файлfile.gif', '..\\..\\файлfile.gif'];
         }
-
-        return $fixtures;
     }
 
     #[DataProvider('getFilenameFixtures')]

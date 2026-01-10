@@ -235,10 +235,10 @@ class UploadedFileTest extends TestCase
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             // Windows: backslash is treated as directory separator
-            $this->assertEquals('original.gif', $file->getClientOriginalName());
+            $this->assertSame('original.gif', $file->getClientOriginalName());
         } else {
             // Unix: backslash is a valid filename character
-            $this->assertEquals('prefix\\original.gif', $file->getClientOriginalName());
+            $this->assertSame('prefix\\original.gif', $file->getClientOriginalName());
         }
     }
 

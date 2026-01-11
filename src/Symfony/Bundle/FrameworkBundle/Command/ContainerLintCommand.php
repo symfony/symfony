@@ -38,6 +38,7 @@ final class ContainerLintCommand extends Command
         $this
             ->setHelp('This command parses service definitions and ensures that injected values match the type declarations of each services\' class.')
             ->addOption('resolve-env-vars', null, InputOption::VALUE_NONE, 'Resolve environment variables and fail if one is missing.')
+            ->addOption('validate-map-parameters', null, InputOption::VALUE_NONE, 'Validate services using #[MapParameters] attributes.')
         ;
     }
 
@@ -47,6 +48,13 @@ final class ContainerLintCommand extends Command
         $errorIo = $io->getErrorStyle();
 
         $resolveEnvVars = $input->getOption('resolve-env-vars');
+        $validateMapParameters = $input->getOption('validate-map-parameters');
+
+        // Auto-enable env var resolution if validating MapParameters
+        if ($validateMapParameters && !$resolveEnvVars) {
+            $resolveEnvVars = true;
+            $io->note('Automatically enabling environment variable resolution for MapParameters validation.');
+        }
 
         try {
             $container = $this->getContainerBuilder($resolveEnvVars);
@@ -58,6 +66,26 @@ final class ContainerLintCommand extends Command
 
         $container->setParameter('container.build_time', time());
 
+        $mapParametersServiceIds = [];
+        if ($validateMapParameters) {
+            foreach ($container->findTaggedServiceIds('di.map_parameters') as $serviceId => $tags) {
+                $mapParametersServiceIds[] = $serviceId;
+                if ($container->hasDefinition($serviceId)) {
+                    $container->getDefinition($serviceId)->setPublic(true);
+                } elseif ($container->hasAlias($serviceId)) {
+                    $container->getAlias($serviceId)->setPublic(true);
+                }
+            }
+
+            if ($validatorId = $container->has('validator') ? 'validator' : ($container->has('debug.validator') ? 'debug.validator' : null)) {
+                if ($container->hasDefinition($validatorId)) {
+                    $container->getDefinition($validatorId)->setPublic(true);
+                } elseif ($container->hasAlias($validatorId)) {
+                    $container->getAlias($validatorId)->setPublic(true);
+                }
+            }
+        }
+
         try {
             $container->compile($resolveEnvVars);
         } catch (InvalidArgumentException $e) {
@@ -66,9 +94,45 @@ final class ContainerLintCommand extends Command
             return 1;
         }
 
+        if ($validateMapParameters) {
+            $validator = $container->has('validator') ? $container->get('validator') : ($container->has('debug.validator') ? $container->get('debug.validator') : null);
+
+            if (!$validator) {
+                $io->warning('Validator service not available. Constraint validation will be skipped.');
+            } else {
+                $mapParametersErrors = $this->validateMapParametersServices($container, $mapParametersServiceIds, $validator);
+                if ($mapParametersErrors) {
+                    $errorIo->error($mapParametersErrors);
+
+                    return 1;
+                }
+            }
+        }
+
         $io->success('The container was linted successfully: all services are injected with values that are compatible with their type declarations.');
 
         return 0;
+    }
+
+    private function validateMapParametersServices(ContainerBuilder $container, array $serviceIds, object $validator): array
+    {
+        $errors = [];
+
+        foreach ($serviceIds as $serviceId) {
+            try {
+                $service = $container->get($serviceId);
+                $violations = $validator->validate($service);
+
+                if (\count($violations) > 0) {
+                    $message = implode("\n", array_map(static fn ($v) => \sprintf('  - %s: %s', $v->getPropertyPath(), $v->getMessage()), iterator_to_array($violations)));
+                    $errors[] = \sprintf('Service "%s" validation failed:'."\n\n%s", $serviceId, $message);
+                }
+            } catch (\Throwable $e) {
+                $errors[] = \sprintf('Service "%s": %s', $serviceId, $e->getMessage());
+            }
+        }
+
+        return $errors;
     }
 
     private function getContainerBuilder(bool $resolveEnvVars): ContainerBuilder

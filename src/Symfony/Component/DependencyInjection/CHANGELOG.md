@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate configuring options `alias`, `parent`, `synthetic`, `file`, `arguments`, `properties`, `configurator` or `calls` when using `from_callable`
  * Deprecate default index/priority methods when defining tagged locators/iterators; use the `#[AsTaggedItem]` attribute instead
  * Allow environment variables with `.` in them
+ * Add `#[MapParameters]` attribute to map and validate Parameter DTOs
 
 8.0
 ---

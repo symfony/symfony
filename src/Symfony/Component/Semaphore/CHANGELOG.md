@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+* Add serializable Semaphore Key support to align with `Lock`
+* Added `UnserializableKeyException`
+
 7.4
 ---
 

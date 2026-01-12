@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2026-01-11T16:13:37Z
+
+> Question: The name has a . prefix it seams wrong?
+
+It's on purpose: the dot prefix makes it a hidden service. From https://symfony.com/doc/current/bundles/best_practices.html#services:
+
+> If there is no intention for the service id to be used by the end user, you can mark it as hidden by prefixing it with a dot (e.g. .acme_blog.logger). This prevents the service from being listed in the default debug:container command output.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-01-11T18:44:47Z
+
+> Please add a test case for this if possible e.g. in FrameworkExtension
+
+Still welcome

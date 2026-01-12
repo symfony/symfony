@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by Koc at 2025-12-18T14:49:21Z
+
+@nicolas-grekas nice catch. I've removed `unset` call in the `reset` method.
+
+In our current project we do a lot of http requests. And there are too many of them has slow ssl handshake (up to 100ms). By introducton of this change we can reduce latency a lot.
+
+There is a good video from @beberlei about that
+https://www.youtube.com/watch?v=wr_Jnrc2has
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-19T08:18:18Z
+
+I'm sure it can help reduce latency. I'm just wondering if it could bring some instabilities or unwanted state sharing.
+
+/cc @jwage it'd be great if you could check this one to see how this behaves with your load!
+
+---------------------------------------------------------------------------
+
+by jwage at 2025-12-20T12:58:53Z
+
+> I'm sure it can help reduce latency. I'm just wondering if it could bring some instabilities or unwanted state sharing.
+>
+>
+>
+> /cc @jwage it'd be great if you could check this one to see how this behaves with your load!
+
+Ohh I was just thinking about this exact thing this morning. So this allows us to share connections between php-fpm requests?
+
+I'm still on 8.3 and we are upgrading to 8.4 but as soon as we get to 8.5 I will test this. I was considering proxying all http-client traffic through a sidecar proxy like envoy to get persistent connections but this would be much simpler!
+
+Is it possible to make it opt in somehow so that we can introduce it safely and then if we have no issues, later we can change it to be enabled by default?
+
+---------------------------------------------------------------------------
+
+by Koc at 2025-12-22T08:55:42Z
+
+@nicolas-grekas @jwage I've added configuration option (disabled by default) to enable new behavior. Please check
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-12-22T09:21:56Z
+
+So when I enable "allow", is it used or does cURL decides when to use them? Otherwise the term "allow" is misleading

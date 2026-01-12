@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-12T08:16:48Z
+
+OK, #6852 introduced that normalization step and even-tough it broke proper merging, nobody complained in 14 years so that's a feature now I suppose ;)

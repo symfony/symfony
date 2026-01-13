@@ -236,6 +236,7 @@ return [
         'TZ' => 'Tanzania',
         'UA' => 'Ukraine',
         'UG' => 'Uganda',
+        'UK' => 'United Kingdom',
         'UM' => 'U.S. Outlying Islands',
         'US' => 'United States',
         'UY' => 'Uruguay',

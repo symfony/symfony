@@ -50,7 +50,10 @@ final class ReverseClassObjectMapperMetadataFactory implements ObjectMapperMetad
         }
 
         if (!$property) {
-            $mappings[] = new Mapping($targetClass);
+            // if the mappings don't already contain a mapping to the target class, add one
+            if (!array_any($mappings, static fn ($mapping) => $mapping->target === $targetClass)) {
+                $mappings[] = new Mapping($targetClass);
+            }
 
             return $this->attributesCache[$key] = $mappings;
         }

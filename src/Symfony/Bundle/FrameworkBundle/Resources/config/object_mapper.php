@@ -23,17 +23,24 @@ return static function (ContainerConfigurator $container) {
         ->set('object_mapper.metadata_factory', ReflectionObjectMapperMetadataFactory::class)
         ->alias(ObjectMapperMetadataFactoryInterface::class, 'object_mapper.metadata_factory')
 
+        ->set('object_mapper.metadata_factory.reverse_class', ReverseClassObjectMapperMetadataFactory::class)
+            ->decorate('object_mapper.metadata_factory')
+            ->args([
+                service('.inner'),
+                abstract_arg('class_map'),
+            ])
+
         ->set('object_mapper.transform.map_collection', MapCollection::class)
             ->tag('object_mapper.transform_callable')
             ->args([
                 service('object_mapper'),
             ])
 
-        ->set('object_mapper.metadata_factory.reverse_class', ReverseClassObjectMapperMetadataFactory::class)
-            ->decorate('object_mapper.metadata_factory')
+        ->set(MapCollection::class)
+            ->tag('object_mapper.transform_callable')
+            ->class(MapCollection::class)
             ->args([
-                service('.inner'),
-                abstract_arg('class_map'),
+                service('object_mapper'),
             ])
 
         ->set('object_mapper', ObjectMapper::class)

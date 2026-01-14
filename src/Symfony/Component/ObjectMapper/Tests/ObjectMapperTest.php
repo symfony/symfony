@@ -103,6 +103,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformC
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionD;
+use Symfony\Component\ObjectMapper\Transform\MapCollection;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class ObjectMapperTest extends TestCase
@@ -589,7 +590,11 @@ final class ObjectMapperTest extends TestCase
     {
         $u = new TransformCollectionA();
         $u->foo = [new TransformCollectionC('a'), new TransformCollectionC('b')];
-        $mapper = new ObjectMapper();
+        $mapper = new ObjectMapper(
+            transformCallableLocator: $this->getServiceLocator([
+                MapCollection::class => new MapCollection(),
+            ])
+        );
 
         $transformed = $mapper->map($u, TransformCollectionB::class);
 

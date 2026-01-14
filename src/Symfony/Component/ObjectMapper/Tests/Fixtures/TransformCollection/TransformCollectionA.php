@@ -7,7 +7,7 @@ use Symfony\Component\ObjectMapper\Transform\MapCollection;
 
 class TransformCollectionA
 {
-    #[Map(transform: new MapCollection())]
+    #[Map(transform: MapCollection::class)]
     /** @var TransformCollectionC[] */
     public array $foo;
 }

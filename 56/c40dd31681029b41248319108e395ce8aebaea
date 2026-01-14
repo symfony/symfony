@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-14T15:06:21Z
+
+@stof thanks for the review. I'm merging as is despite the not totally resolved discussion to unlock a follow up PR. This will provide a better opportunity to discuss the design of how listeners should access controllers' metadata.

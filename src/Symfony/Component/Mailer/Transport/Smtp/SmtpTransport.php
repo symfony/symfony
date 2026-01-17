@@ -153,7 +153,7 @@ class SmtpTransport extends AbstractTransport
         return $message;
     }
 
-    protected function parseMessageId(string $mtaResult): string
+    protected function parseQueueId(string $mtaResult): string
     {
         return preg_match('/^250 (?:\S+ )?Ok:?+ (?:queued as |id=)?+(?P<id>[A-Z0-9._-]++)/im', $mtaResult, $matches) ? $matches['id'] : '';
     }
@@ -224,8 +224,9 @@ class SmtpTransport extends AbstractTransport
             $message->appendDebug($this->stream->getDebug());
             $this->lastMessageTime = microtime(true);
 
-            if ($mtaResult && $messageId = $this->parseMessageId($mtaResult)) {
-                $message->setMessageId($messageId);
+            if ($mtaResult && $queueId = $this->parseQueueId($mtaResult)) {
+                // see https://github.com/symfony/symfony/issues/63105#issue-3824509741
+                // $message->setMessageId($queueId);
             }
         } catch (TransportExceptionInterface $e) {
             $e->appendDebug($this->stream->getDebug());

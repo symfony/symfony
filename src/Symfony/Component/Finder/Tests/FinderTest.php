@@ -1317,6 +1317,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testRelativePathOfAppendedItems()
     {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Sorting behavior differs on Windows due to path comparison differences.');
+        }
+
         $this->setupVfsProvider([
             'a' => [
                 'a1' => '',

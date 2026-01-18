@@ -19,15 +19,24 @@ use Symfony\Component\Mime\RawMessage;
 abstract class SMimeTestCase extends TestCase
 {
     protected string $samplesDir;
+    private array $tmpFiles = [];
 
     protected function setUp(): void
     {
         $this->samplesDir = str_replace('\\', '/', realpath(__DIR__.'/../').'/_data/');
     }
 
+    protected function tearDown(): void
+    {
+        foreach ($this->tmpFiles as $tmpFile) {
+            @unlink($tmpFile);
+        }
+        $this->tmpFiles = [];
+    }
+
     protected function generateTmpFilename(): string
     {
-        return stream_get_meta_data(tmpfile())['uri'];
+        return $this->tmpFiles[] = tempnam(sys_get_temp_dir(), 'smime_test_');
     }
 
     protected function normalizeFilePath(string $path): string

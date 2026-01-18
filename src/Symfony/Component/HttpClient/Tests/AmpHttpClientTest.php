@@ -18,6 +18,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[Group('dns-sensitive')]
 class AmpHttpClientTest extends HttpClientTestCase
 {
+    public function testGetRequest()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Too transient on Windows');
+        }
+
+        parent::testGetRequest();
+    }
+
     #[Group('transient')]
     public function testNonBlockingStream()
     {

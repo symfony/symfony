@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2026-01-03T20:08:01Z
+
+Added UidValueResolver + VariadicValueResolver, and submitted https://github.com/doctrine/DoctrineBundle/pull/2193 to wire the `EntityValueResolver`.
+
+This PR is ready to review.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-01-05T17:25:34Z
+
+> I'm just wondering why so many tests are in FrameworkBundle. Is this really legit?
+
+A lot of them were just testing what's already covered in Console, removed.
+Thanks for the reviews!

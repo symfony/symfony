@@ -201,19 +201,22 @@ class GlobResourceTest extends TestCase
         $this->assertEquals($p->getValue($resource), $p->getValue($newResource));
     }
 
+    /**
+     * phar:// is a PHP stream wrapper, not a native filesystem path.
+     * Forward slashes work on all platforms as PHP handles this internally.
+     */
     public function testPhar()
     {
-        $s = \DIRECTORY_SEPARATOR;
         $cwd = getcwd();
         chdir(\dirname(__DIR__).'/Fixtures');
         try {
             $resource = new GlobResource('phar://some.phar', '*', true);
             $files = array_keys(iterator_to_array($resource));
-            $this->assertSame(["phar://some.phar{$s}ProjectWithXsdExtensionInPhar.php", "phar://some.phar{$s}schema{$s}project-1.0.xsd"], $files);
+            $this->assertSame(['phar://some.phar/ProjectWithXsdExtensionInPhar.php', 'phar://some.phar/schema/project-1.0.xsd'], $files);
 
-            $resource = new GlobResource("phar://some.phar{$s}ProjectWithXsdExtensionInPhar.php", '', true);
+            $resource = new GlobResource('phar://some.phar/ProjectWithXsdExtensionInPhar.php', '', true);
             $files = array_keys(iterator_to_array($resource));
-            $this->assertSame(["phar://some.phar{$s}ProjectWithXsdExtensionInPhar.php"], $files);
+            $this->assertSame(['phar://some.phar/ProjectWithXsdExtensionInPhar.php'], $files);
         } finally {
             chdir($cwd);
         }

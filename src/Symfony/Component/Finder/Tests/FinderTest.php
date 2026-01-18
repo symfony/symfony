@@ -1212,17 +1212,18 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $paths[] = $file->getRelativePathname();
         }
 
+        // Relative paths are normalized to forward slashes on all platforms
         $ref = [
             'Zephire.php',
             'test.php',
             'toto',
             'test.py',
             'foo',
-            'foo'.\DIRECTORY_SEPARATOR.'bar.tmp',
+            'foo/bar.tmp',
             'foo bar',
             'qux',
-            'qux'.\DIRECTORY_SEPARATOR.'baz_100_1.py',
-            'qux'.\DIRECTORY_SEPARATOR.'baz_1_2.py',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
             'qux_0_1.php',
             'qux_1000_1.php',
             'qux_1002_0.php',
@@ -1566,13 +1567,13 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * Iterator keys must be the file pathname.
+     * Iterator keys must be the file pathname (normalized to forward slashes).
      */
     public function testIteratorKeys()
     {
         $finder = $this->buildFinder()->in(self::$tmpDir);
         foreach ($finder as $key => $file) {
-            $this->assertEquals($file->getPathname(), $key);
+            $this->assertEquals(str_replace('\\', '/', $file->getPathname()), $key);
         }
     }
 

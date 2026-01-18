@@ -69,7 +69,15 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             $basePath .= $this->directorySeparator;
         }
 
-        return new SplFileInfo($basePath.$subPathname, $this->subPath, $subPathname);
+        // Normalize relative paths to forward slashes for consistency across platforms
+        $relativePath = $this->subPath;
+        $relativePathname = $subPathname;
+        if ('/' !== $this->directorySeparator) {
+            $relativePath = str_replace($this->directorySeparator, '/', $relativePath);
+            $relativePathname = str_replace($this->directorySeparator, '/', $relativePathname);
+        }
+
+        return new SplFileInfo($basePath.$subPathname, $relativePath, $relativePathname);
     }
 
     public function hasChildren(bool $allowLinks = false): bool
@@ -130,5 +138,17 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
         }
 
         parent::rewind();
+    }
+
+    public function key(): string
+    {
+        $key = parent::key();
+
+        // Normalize path separators to forward slashes for consistency across platforms
+        if ('/' !== $this->directorySeparator) {
+            $key = str_replace($this->directorySeparator, '/', $key);
+        }
+
+        return $key;
     }
 }

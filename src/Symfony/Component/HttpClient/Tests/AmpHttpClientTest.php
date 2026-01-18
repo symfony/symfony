@@ -27,6 +27,24 @@ class AmpHttpClientTest extends HttpClientTestCase
         parent::testGetRequest();
     }
 
+    public function testHeadRequest()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Too transient on Windows');
+        }
+
+        parent::testHeadRequest();
+    }
+
+    public function testNonBufferedGetRequest()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Too transient on Windows');
+        }
+
+        parent::testNonBufferedGetRequest();
+    }
+
     #[Group('transient')]
     public function testNonBlockingStream()
     {

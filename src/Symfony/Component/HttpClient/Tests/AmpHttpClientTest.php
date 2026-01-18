@@ -81,6 +81,15 @@ class AmpHttpClientTest extends HttpClientTestCase
         parent::testThrowingBufferCallback();
     }
 
+    public function testHttpVersion()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Too transient on Windows');
+        }
+
+        parent::testHttpVersion();
+    }
+
     #[Group('transient')]
     public function testNonBlockingStream()
     {

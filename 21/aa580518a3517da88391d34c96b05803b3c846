@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-11-19T08:42:33Z
+
+I assume the answer is "yes" given the PR title: you're just moving code around without adding anything new, right?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-19T08:48:53Z
+
+> I assume the answer is "yes" given the PR title: you're just moving code around without adding anything new, right?
+
+the three protected methods of the `YamlFileLoader` from the Routing component have also been deprecated, but apart from that this PR is just moving stuff around to allow us to not use reflection
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-20T12:37:57Z
+
+That should target 8.1 IMHO. Also, why deprecate the methods? Better not if there's no particular cost associated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-10T14:10:21Z
+
+(rebase needed, which makes me hope this won't trigger too many conflicts 😬 )

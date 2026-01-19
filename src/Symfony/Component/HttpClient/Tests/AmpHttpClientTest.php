@@ -18,102 +18,69 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[Group('dns-sensitive')]
 class AmpHttpClientTest extends HttpClientTestCase
 {
+    #[Group('transient-on-windows')]
     public function testGetRequest()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testGetRequest();
     }
 
+    #[Group('transient-on-windows')]
     public function testHeadRequest()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testHeadRequest();
     }
 
+    #[Group('transient-on-windows')]
     public function testNonBufferedGetRequest()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testNonBufferedGetRequest();
     }
 
+    #[Group('transient-on-windows')]
     public function testBufferSink()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testBufferSink();
     }
 
+    #[Group('transient-on-windows')]
     public function testConditionalBuffering()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testConditionalBuffering();
     }
 
+    #[Group('transient-on-windows')]
     public function testReentrantBufferCallback()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testReentrantBufferCallback();
     }
 
+    #[Group('transient-on-windows')]
     public function testThrowingBufferCallback()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testThrowingBufferCallback();
     }
 
+    #[Group('transient-on-windows')]
     public function testHttpVersion()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testHttpVersion();
     }
 
+    #[Group('transient-on-windows')]
     public function testChunkedEncoding()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testChunkedEncoding();
     }
 
+    #[Group('transient-on-windows')]
     public function testClientError()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testClientError();
     }
 
+    #[Group('transient-on-windows')]
     public function testIgnoreErrors()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
-        }
-
         parent::testIgnoreErrors();
     }
 

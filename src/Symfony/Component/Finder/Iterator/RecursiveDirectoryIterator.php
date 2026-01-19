@@ -143,6 +143,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     public function key(): string
     {
         $key = parent::key();
+        \assert(\is_string($key));
 
         // Normalize path separators to forward slashes for consistency across platforms
         if ('/' !== $this->directorySeparator) {

@@ -22,6 +22,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class HttpOptions
 {
+    public const JSON = 'json';
+
     private array $options = [];
 
     public function toArray(): array

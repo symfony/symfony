@@ -1317,10 +1317,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testRelativePathOfAppendedItems()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Sorting behavior differs on Windows due to path comparison differences.');
-        }
-
         $this->setupVfsProvider([
             'a' => [
                 'a1' => '',
@@ -1341,6 +1337,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
             foreach ($finder as $key => $value) {
                 $data[] = ['key' => $key, 'relativePathname' => $value->getRelativePathname()];
             }
+            // Sort to ensure consistent order across platforms (iteration order differs on Windows)
+            usort($data, static fn ($a, $b) => $a['key'] <=> $b['key']);
 
             return $data;
         };

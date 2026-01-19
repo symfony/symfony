@@ -99,6 +99,15 @@ class AmpHttpClientTest extends HttpClientTestCase
         parent::testChunkedEncoding();
     }
 
+    public function testClientError()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Too transient on Windows');
+        }
+
+        parent::testClientError();
+    }
+
     #[Group('transient')]
     public function testNonBlockingStream()
     {

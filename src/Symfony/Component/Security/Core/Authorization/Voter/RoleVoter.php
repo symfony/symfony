@@ -22,8 +22,7 @@ class RoleVoter implements CacheableVoterInterface
 {
     public function __construct(
         private string $prefix = 'ROLE_',
-    ) {
-    }
+    ) {}
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {
@@ -32,6 +31,9 @@ class RoleVoter implements CacheableVoterInterface
         $missingRoles = [];
 
         foreach ($attributes as $attribute) {
+            if ($attribute instanceof \BackedEnum) {
+                $attribute = $attribute->value;
+            }
             if (!\is_string($attribute) || !str_starts_with($attribute, $this->prefix)) {
                 continue;
             }

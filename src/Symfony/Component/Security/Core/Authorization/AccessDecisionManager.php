@@ -108,7 +108,13 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         $keyAttributes = [];
         foreach ($attributes as $attribute) {
-            $keyAttributes[] = \is_string($attribute) ? $attribute : null;
+            if (\is_string($attribute)) {
+                $keyAttributes[] = $attribute;
+            } elseif ($attribute instanceof \BackedEnum) {
+                $keyAttributes[] = $attribute->value;
+            } else {
+                $keyAttributes[] = null;
+            }
         }
         // use `get_class` to handle anonymous classes
         $keyObject = \is_object($object) ? $object::class : get_debug_type($object);

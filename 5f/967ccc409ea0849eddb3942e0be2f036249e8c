@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2025-11-19T10:09:02Z
+
+Should we already update `ConfigurableExtension` and `FrameworkBundle` to extend from `Symfony\Component\DependencyInjection\Extension\Extension` instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-21T13:08:06Z
+
+> Should we already update ConfigurableExtension and FrameworkBundle
+
+Definitely!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-11-21T13:47:29Z
+
+> Should we already update `ConfigurableExtension` and `FrameworkBundle` to extend from `Symfony\Component\DependencyInjection\Extension\Extension` instead?
+
+Shall we do that on 8.0 already? Changing the inheritance chain might break downstream code and it's better we do that on a major.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-21T13:49:01Z
+
+The class is internal since 8.0 so we shouldn't care about this aspect IMHO @derrabus
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-11-21T13:56:26Z
+
+All right. 👍🏻
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-21T19:38:36Z
+
+> Should we already update `ConfigurableExtension` and `FrameworkBundle` to extend from `Symfony\Component\DependencyInjection\Extension\Extension` instead?
+
+👍 done

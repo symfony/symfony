@@ -12,8 +12,10 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Doctrine\DBAL\Exception as DBALException;
+use Symfony\Component\Messenger\CompressorTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\CompressStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -25,6 +27,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class DoctrineSender implements SenderInterface
 {
+    use CompressorTrait;
+
     private SerializerInterface $serializer;
 
     public function __construct(
@@ -42,8 +46,14 @@ class DoctrineSender implements SenderInterface
         $delayStamp = $envelope->last(DelayStamp::class);
         $delay = null !== $delayStamp ? $delayStamp->getDelay() : 0;
 
+        $encodedMessage['headers'] ??= [];
+        if ($envelope->last(CompressStamp::class)) {
+            $encodedMessage['body'] = base64_encode($this->compress($encodedMessage['body']));
+            $encodedMessage['headers'] += [self::COMPRESS_HEADER_KEY => true];
+        }
+
         try {
-            $id = $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay);
+            $id = $this->connection->send($encodedMessage['body'], $encodedMessage['headers'], $delay);
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

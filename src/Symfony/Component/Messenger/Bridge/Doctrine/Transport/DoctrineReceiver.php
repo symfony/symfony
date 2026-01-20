@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\RetryableException;
+use Symfony\Component\Messenger\CompressorTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -29,6 +30,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareInterface, KeepaliveReceiverInterface
 {
+    use CompressorTrait;
+
     private const MAX_RETRIES = 3;
     private int $retryingSafetyCounter = 0;
     private SerializerInterface $serializer;
@@ -137,6 +140,9 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
     private function createEnvelopeFromData(array $data): Envelope
     {
         try {
+            if ($data['headers'][self::COMPRESS_HEADER_KEY] ?? false) {
+                $data['body'] = $this->uncompress(base64_decode($data['body']));
+            }
             $envelope = $this->serializer->decode([
                 'body' => $data['body'],
                 'headers' => $data['headers'],

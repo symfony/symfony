@@ -22,7 +22,8 @@ class RoleVoter implements CacheableVoterInterface
 {
     public function __construct(
         private string $prefix = 'ROLE_',
-    ) {}
+    ) {
+    }
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {

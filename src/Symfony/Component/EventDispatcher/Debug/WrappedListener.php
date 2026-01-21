@@ -55,8 +55,8 @@ final class WrappedListener
             } else {
                 $this->pretty = $this->name = $r->name;
             }
-        } elseif (\is_string($listener)) {
-            $this->pretty = $this->name = $listener;
+        } elseif (\is_string($listener) || $listener instanceof \Stringable) {
+            $this->pretty = $this->name = (string) $listener;
         } else {
             $this->name = get_debug_type($listener);
             $this->pretty = $this->name.'::__invoke';

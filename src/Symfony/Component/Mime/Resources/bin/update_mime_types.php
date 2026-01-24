@@ -20,7 +20,14 @@ foreach ($data as $mimeType => $mimeTypeInformation) {
     if (!array_key_exists('extensions', $mimeTypeInformation)) {
         continue;
     }
-    $new[$mimeType] = $mimeTypeInformation['extensions'];
+
+    foreach ($mimeTypeInformation['extensions'] as $ext) {
+        if (preg_match('/[*?\[\]\{\}\(\)\|]/', $ext)) {
+            continue;
+        }
+
+        $new[$mimeType][] = $ext;
+    }
 }
 
 $xml = simplexml_load_string(file_get_contents('https://gitlab.freedesktop.org/xdg/shared-mime-info/-/raw/master/data/freedesktop.org.xml.in'));
@@ -32,7 +39,12 @@ foreach ($xml as $node) {
             continue;
         }
 
-        $exts[] = substr($pattern, 2);
+        $ext = substr($pattern, 2);
+        if (preg_match('/[*?\[\]\{\}\(\)\|]/', $ext)) {
+            continue;
+        }
+
+        $exts[] = $ext;
     }
 
     if (!$exts) {

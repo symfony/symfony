@@ -135,7 +135,7 @@ final class MimeTypes implements MimeTypesInterface
     /**
      * A map of MIME types and their default extensions.
      *
-     * Updated from upstream on 2026-01-23.
+     * Updated from upstream on 2026-01-24.
      *
      * @see Resources/bin/update_mime_types.php
      */
@@ -1160,7 +1160,7 @@ final class MimeTypes implements MimeTypesInterface
         'application/x-sh' => ['sh'],
         'application/x-shar' => ['shar'],
         'application/x-shared-library-la' => ['la'],
-        'application/x-sharedlib' => ['so', 'so.[0-9]*'],
+        'application/x-sharedlib' => ['so'],
         'application/x-shellscript' => ['sh'],
         'application/x-shockwave-flash' => ['swf', 'spl'],
         'application/x-shorten' => ['shn'],
@@ -1217,7 +1217,7 @@ final class MimeTypes implements MimeTypesInterface
         'application/x-trash' => ['bak', 'old', 'sik'],
         'application/x-trig' => ['trig'],
         'application/x-troff' => ['tr', 'roff', 't'],
-        'application/x-troff-man' => ['man', '[1-9]'],
+        'application/x-troff-man' => ['man'],
         'application/x-tzo' => ['tar.lzo', 'tzo'],
         'application/x-ufraw' => ['ufraw'],
         'application/x-ustar' => ['ustar'],
@@ -1942,7 +1942,7 @@ final class MimeTypes implements MimeTypesInterface
         'video/vnd.vivo' => ['viv', 'vivo'],
         'video/vnd.youtube.yt' => ['yt'],
         'video/webm' => ['webm'],
-        'video/x-anim' => ['anim[1-9j]', 'anim2', 'anim3', 'anim4', 'anim5', 'anim6', 'anim7', 'anim8', 'anim9', 'animj'],
+        'video/x-anim' => ['anim1', 'anim2', 'anim3', 'anim4', 'anim5', 'anim6', 'anim7', 'anim8', 'anim9', 'animj'],
         'video/x-annodex' => ['axv'],
         'video/x-avi' => ['avi', 'avf', 'divx'],
         'video/x-f4v' => ['f4v'],
@@ -2012,7 +2012,6 @@ final class MimeTypes implements MimeTypesInterface
         'PAR2' => ['application/x-par2'],
         'PL' => ['application/x-perl', 'text/x-perl'],
         'Z' => ['application/x-compress'],
-        '[1-9]' => ['application/x-troff-man'],
         'a' => ['application/x-archive'],
         'a26' => ['application/x-atari-2600-rom'],
         'a78' => ['application/x-atari-7800-rom'],
@@ -2060,6 +2059,7 @@ final class MimeTypes implements MimeTypesInterface
         'amr' => ['audio/amr', 'audio/amr-encrypted'],
         'amz' => ['audio/x-amzxml'],
         'ani' => ['application/x-navi-animation'],
+        'anim1' => ['video/x-anim'],
         'anim2' => ['video/x-anim'],
         'anim3' => ['video/x-anim'],
         'anim4' => ['video/x-anim'],
@@ -2068,7 +2068,6 @@ final class MimeTypes implements MimeTypesInterface
         'anim7' => ['video/x-anim'],
         'anim8' => ['video/x-anim'],
         'anim9' => ['video/x-anim'],
-        'anim[1-9j]' => ['video/x-anim'],
         'animj' => ['video/x-anim'],
         'anx' => ['application/annodex', 'application/x-annodex'],
         'ape' => ['audio/x-ape'],
@@ -3400,7 +3399,6 @@ final class MimeTypes implements MimeTypesInterface
         'snd' => ['audio/basic'],
         'snf' => ['application/x-font-snf'],
         'so' => ['application/x-sharedlib'],
-        'so.[0-9]*' => ['application/x-sharedlib'],
         'socket' => ['text/x-systemd-unit'],
         'spc' => ['application/x-pkcs7-certificates'],
         'spd' => ['application/x-font-speedo'],

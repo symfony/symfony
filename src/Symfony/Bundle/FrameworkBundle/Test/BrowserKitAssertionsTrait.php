@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\Constraint\Constraint;
+use Symfony\Component\BrowserKit\Response as BrowserKitResponse;
 use PHPUnit\Framework\Constraint\LogicalAnd;
 use PHPUnit\Framework\Constraint\LogicalNot;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -177,7 +178,7 @@ trait BrowserKitAssertionsTrait
         return $client;
     }
 
-    private static function getResponse(): Response
+    private static function getResponse(): object
     {
         if (!$response = self::getClient()->getResponse()) {
             static::fail('A client must have an HTTP Response to make assertions. Did you forget to make an HTTP request?');
@@ -186,7 +187,7 @@ trait BrowserKitAssertionsTrait
         return $response;
     }
 
-    private static function getRequest(): Request
+    private static function getRequest(): object
     {
         if (!$request = self::getClient()->getRequest()) {
             static::fail('A client must have an HTTP Request to make assertions. Did you forget to make an HTTP request?');

@@ -151,6 +151,25 @@ final class ResendApiTransport extends AbstractApiTransport
                 continue;
             }
 
+            if ('templateid' === $name) {
+                $headersAndTags['template']['id'] = $header->getValue();
+
+                continue;
+            }
+
+            if ('params' === $name) {
+                trigger_deprecation('symfony/resend-mailer', '7.3', 'Usage of params is deprecated use variables instead.');
+                $headersAndTags['template']['variables'] = $header->getParameters();
+
+                continue;
+            }
+
+            if ('variables' === $name) {
+                $headersAndTags['template'][$header->getName()] = $header->getParameters();
+
+                continue;
+            }
+
             $headersAndTags['headers'][$header->getName()] = $header->getBodyAsString();
         }
 

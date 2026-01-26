@@ -683,10 +683,14 @@ class Finder implements \IteratorAggregate, \Countable
                         if (!$file instanceof \SplFileInfo) {
                             $file = new \SplFileInfo($file);
                         }
-                        // Normalize path separators to forward slashes for consistency across platforms
-                        $key = str_replace('\\', '/', $file->getPathname());
+                        $key = $file->getPathname();
+                        // Normalize path separators to forward slashes on Windows for consistency
+                        if ('\\' === \DIRECTORY_SEPARATOR) {
+                            $key = str_replace('\\', '/', $key);
+                        }
                         if (!$file instanceof SplFileInfo) {
-                            $file = new SplFileInfo($file->getPathname(), str_replace('\\', '/', $file->getPath()), $key);
+                            $relativePath = '\\' === \DIRECTORY_SEPARATOR ? str_replace('\\', '/', $file->getPath()) : $file->getPath();
+                            $file = new SplFileInfo($file->getPathname(), $relativePath, $key);
                         }
 
                         yield $key => $file;

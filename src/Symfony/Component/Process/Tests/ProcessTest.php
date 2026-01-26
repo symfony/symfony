@@ -1513,6 +1513,26 @@ class ProcessTest extends TestCase
         yield [1.1];
     }
 
+    public function testMsysEscapingOnWindows()
+    {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test is for Windows platform only');
+        }
+
+        file_put_contents('=foo.txt', 'This is a test file.');
+
+        try {
+            $p = $this->getProcess(['type', substr_replace(getcwd(), '=foo.txt', 2)]);
+            $p->mustRun();
+
+            $this->assertSame('This is a test file.', $p->getOutput());
+        } finally {
+            unlink('=foo.txt');
+        }
+
+        $this->assertSame(\sprintf('type "%s=foo.txt"', substr(getcwd(), 0, 2)), $p->getCommandLine());
+    }
+
     public function testPreparedCommand()
     {
         $p = Process::fromShellCommandline('echo "${:abc}"DEF');

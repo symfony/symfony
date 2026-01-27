@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-26T12:23:08Z
+
+For 7.4 only? 7.3 is not affected? or 6.4?
+
+---------------------------------------------------------------------------
+
+by yoeunes at 2026-01-27T03:39:48Z
+
+Hi @nicolas-grekas, thanks for the review, the fix applies to all maintained branches, i've prepared a separate PR for `6.4` #63204 due to API differences:
+ - `6.4` uses `getTypes()` returning `Type[]` with `Type(Type::BUILTIN_TYPE_OBJECT, ...)`
+ - `7.x` uses `getType()` returning the new unified `Type` object with static factories

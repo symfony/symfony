@@ -1056,4 +1056,43 @@ class PathTest extends TestCase
     {
         $this->assertSame('C:/Foo/Bar/test', Path::normalize('C:\\Foo\\Bar/test'));
     }
+
+    /**
+     * @dataProvider provideNormalizeForCurrentOsTests
+     */
+    public function testNormalizeForCurrentOs(string $path, string $expectedOnWindows, string $expectedOnUnix)
+    {
+        $expected = '\\' === \DIRECTORY_SEPARATOR ? $expectedOnWindows : $expectedOnUnix;
+        $this->assertSame($expected, Path::normalizeForCurrentOs($path));
+    }
+
+    public static function provideNormalizeForCurrentOsTests(): \Generator
+    {
+        // [input, expected on Windows, expected on Unix]
+
+        // Forward slashes are never changed
+        yield ['foo/bar', 'foo/bar', 'foo/bar'];
+        yield ['/absolute/path', '/absolute/path', '/absolute/path'];
+
+        // Backslashes: converted on Windows, preserved on Unix
+        yield ['foo\\bar', 'foo/bar', 'foo\\bar'];
+        yield ['foo\\bar\\baz', 'foo/bar/baz', 'foo\\bar\\baz'];
+
+        // Mixed slashes
+        yield ['foo\\bar/baz', 'foo/bar/baz', 'foo\\bar/baz'];
+
+        // Windows absolute paths
+        yield ['C:\\Windows\\System32', 'C:/Windows/System32', 'C:\\Windows\\System32'];
+
+        // UNC paths
+        yield ['\\\\server\\share', '//server/share', '\\\\server\\share'];
+
+        // Empty and dot paths
+        yield ['', '', ''];
+        yield ['.', '.', '.'];
+        yield ['..', '..', '..'];
+
+        // Unix paths with backslash in filename (valid on Unix)
+        yield ['/path/to/file\\name', '/path/to/file/name', '/path/to/file\\name'];
+    }
 }

@@ -110,10 +110,37 @@ final class Path
      * path.
      *
      * This method is able to deal with both UNIX and Windows paths.
+     *
+     * @see normalizeForCurrentOs() for platform-aware normalization
      */
     public static function normalize(string $path): string
     {
         return str_replace('\\', '/', $path);
+    }
+
+    /**
+     * Normalizes the given path for the current operating system.
+     *
+     * On Windows, backslashes are replaced by forward slashes.
+     * On Unix-like systems, the path is returned unchanged because backslash
+     * is a valid character in filenames, not a directory separator.
+     *
+     * Use this method when working with paths from the local filesystem.
+     * Use {@link normalize()} for cross-platform path handling.
+     *
+     * ```php
+     * // On Unix: filenames can contain backslashes
+     * Path::normalizeForCurrentOs('foo\\bar');
+     * // => foo\bar (unchanged, valid filename)
+     *
+     * // On Windows: backslash is a directory separator
+     * Path::normalizeForCurrentOs('foo\\bar');
+     * // => foo/bar (normalized)
+     * ```
+     */
+    public static function normalizeForCurrentOs(string $path): string
+    {
+        return '\\' === \DIRECTORY_SEPARATOR ? str_replace('\\', '/', $path) : $path;
     }
 
     /**

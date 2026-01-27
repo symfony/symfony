@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `Path::normalizeForCurrentOs()` to normalize paths according to the current OS conventions
+
 5.4
 ---
 

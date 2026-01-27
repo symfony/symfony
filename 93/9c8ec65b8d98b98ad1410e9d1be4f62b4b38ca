@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by yoeunes at 2026-01-27T03:53:29Z
+
+The `5.4` cross-version test failures are pre-existing and unrelated to this PR. Running `php ./phpunit src/Symfony/Component/PropertyInfo/` on a clean 5.4 branch checkout shows the same 3 `mixedCollection` test failures

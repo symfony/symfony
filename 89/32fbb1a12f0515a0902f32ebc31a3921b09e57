@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jhogervorst at 2026-01-24T14:40:53Z
+
+I see there are two [test](https://github.com/symfony/symfony/actions/runs/21315027117/job/61356558565?pr=63170#step:8:924) [failures](https://github.com/symfony/symfony/actions/runs/21315027128/job/61356558508?pr=63170#step:8:820). Both appear unrelated to these changes.

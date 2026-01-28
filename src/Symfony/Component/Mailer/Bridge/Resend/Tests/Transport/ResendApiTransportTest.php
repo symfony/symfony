@@ -51,7 +51,7 @@ class ResendApiTransportTest extends TestCase
         ];
     }
 
-    public function testCustomHeaderWithParams()
+    public function testCustomHeader()
     {
         $params = ['param1' => 'foo', 'param2' => 'bar'];
         $json = json_encode(['custom_header_1' => 'custom_value_1']);
@@ -76,66 +76,6 @@ class ResendApiTransportTest extends TestCase
         $this->assertArrayHasKey('template', $payload);
         $this->assertEquals('1', $payload['template']['id']);
         $this->assertEquals($params, $payload['template']['variables']);
-        $this->assertArrayHasKey('foo', $payload['headers']);
-        $this->assertEquals('bar', $payload['headers']['foo']);
-    }
-
-    public function testCustomHeaderWithVariables()
-    {
-        $variables = ['param1' => 'foo', 'param2' => 'bar'];
-        $json = json_encode(['custom_header_1' => 'custom_value_1']);
-
-        $email = new Email();
-        $email->getHeaders()
-            ->add(new MetadataHeader('custom', $json))
-            ->add(new TagHeader('TagInHeaders'))
-            ->addTextHeader('templateId', 1)
-            ->addParameterizedHeader('variables', 'variables', $variables)
-            ->addTextHeader('foo', 'bar');
-        $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
-
-        $transport = new ResendApiTransport('ACCESS_KEY');
-        $method = new \ReflectionMethod(ResendApiTransport::class, 'getPayload');
-        $payload = $method->invoke($transport, $email, $envelope);
-
-        $this->assertArrayHasKey('X-Metadata-custom', $payload['headers']);
-        $this->assertEquals($json, $payload['headers']['X-Metadata-custom']);
-        $this->assertArrayHasKey('tags', $payload);
-        $this->assertEquals(['X-Tag' => 'TagInHeaders'], current($payload['tags']));
-        $this->assertArrayHasKey('template', $payload);
-        $this->assertEquals('1', $payload['template']['id']);
-        $this->assertEquals($variables, $payload['template']['variables']);
-        $this->assertArrayHasKey('foo', $payload['headers']);
-        $this->assertEquals('bar', $payload['headers']['foo']);
-    }
-
-    public function testCustomHeaderWithVariablesOverrideParams()
-    {
-        $params = ['paramA' => 'foo', 'paramB' => 'bar', 'params1' => 'baz'];
-        $variables = ['param1' => 'foo', 'param2' => 'bar'];
-        $json = json_encode(['custom_header_1' => 'custom_value_1']);
-
-        $email = new Email();
-        $email->getHeaders()
-              ->add(new MetadataHeader('custom', $json))
-              ->add(new TagHeader('TagInHeaders'))
-              ->addTextHeader('templateId', 1)
-              ->addParameterizedHeader('params', 'params', $params)
-              ->addParameterizedHeader('variables', 'variables', $variables)
-              ->addTextHeader('foo', 'bar');
-        $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
-
-        $transport = new ResendApiTransport('ACCESS_KEY');
-        $method = new \ReflectionMethod(ResendApiTransport::class, 'getPayload');
-        $payload = $method->invoke($transport, $email, $envelope);
-
-        $this->assertArrayHasKey('X-Metadata-custom', $payload['headers']);
-        $this->assertEquals($json, $payload['headers']['X-Metadata-custom']);
-        $this->assertArrayHasKey('tags', $payload);
-        $this->assertEquals(['X-Tag' => 'TagInHeaders'], current($payload['tags']));
-        $this->assertArrayHasKey('template', $payload);
-        $this->assertEquals('1', $payload['template']['id']);
-        $this->assertEquals($variables, $payload['template']['variables']);
         $this->assertArrayHasKey('foo', $payload['headers']);
         $this->assertEquals('bar', $payload['headers']['foo']);
     }

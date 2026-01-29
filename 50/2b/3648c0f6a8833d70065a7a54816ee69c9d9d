@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by keradus at 2026-01-28T14:44:04Z
+
+not sure if this error is caused by my PR? eager to get guidance/help
+> 1) Symfony\Component\HttpClient\Tests\AmpHttpClientTest::testGetRequest
+Symfony\Component\HttpClient\Exception\TimeoutException: Idle timeout reached for "http://localhost:8057/".
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-28T14:45:38Z
+
+Unrelated, it's already failing
+
+---------------------------------------------------------------------------
+
+by keradus at 2026-01-28T23:22:28Z
+
+then ready from my side

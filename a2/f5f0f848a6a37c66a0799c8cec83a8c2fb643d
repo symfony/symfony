@@ -1,0 +1,152 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-10-02T09:59:35Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by rairlie at 2025-01-24T14:21:54Z
+
+I've also encountered this issue, and use a similar fix locally.
+
+As @ehoutsma says, the problem is simply that `$unacks` is modified within the loop, messing up the iteration:
+```php
+foreach ($unacks as $batchHandler) {
+    ...
+    try {
+        ...
+        unset($unacks[$batchHandler], $batchHandler); // <<-- $unacks modified while being iterated
+    } catch (\Throwable $e) {
+        ...
+    }
+}
+```
+
+Working example:
+```php
+$handler1 = new stdClass();
+$handler1->val = 1;
+
+$handler2 = new stdClass();
+$handler2->val = 2;
+
+$unacks = new SplObjectStorage();
+$unacks->attach($handler1);
+$unacks->attach($handler2);
+
+foreach ($unacks as $handler) {
+    var_dump($handler);
+    unset($unacks[$handler]);
+}
+```
+
+Results in only one handler being processed:
+```
+object(stdClass)#1 (1) {
+  ["val"]=>
+  int(1)
+}
+```
+
+---------------------------------------------------------------------------
+
+by ehoutsma at 2025-04-09T05:35:10Z
+
+I understand this issue doesn't occur with a lot of users. Leaving this issue unsolved, makes the use of batchhandling with multiple batchhandlers on the same queue unreliable.
+
+@nicolas-grekas, Is it possible to merge this issue, since this is an issue that is still available even in version 7 of symfony?
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-06-12T06:39:32Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by wazum at 2025-07-31T19:12:12Z
+
+I've analyzed this issue and while this PR fixes the bug, there might be a simpler solution (it looks like the code changed too in the meantime).
+
+Since `$this->unacks` is replaced with a new `SplObjectStorage` at the beginning of the method, the local `$unacks` variable becomes the only reference to the old storage. Once the method completes, this storage will be garbage collected.
+
+Therefore, we could simply remove the problematic `unset()` line entirely (only change necessary):
+
+```diff
+diff --git a/src/Symfony/Component/Messenger/Worker.php b/src/Symfony/Component/Messenger/Worker.php
+index 68510c33b3..1a282dabf6 100644
+--- a/src/Symfony/Component/Messenger/Worker.php
++++ b/src/Symfony/Component/Messenger/Worker.php
+@@ -258,7 +258,6 @@ class Worker
+             try {
+                 $this->bus->dispatch($envelope->with(new FlushBatchHandlersStamp($force)));
+                 $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
+-                unset($unacks[$batchHandler], $batchHandler);
+             } catch (\Throwable $e) {
+                 $this->acks[] = [$transportName, $envelope, $e];
+             }
+```
+
+This would:
+- Fix the `SplObjectStorage` iteration bug
+- Avoid unnecessary operations on a storage that's about to be garbage collected
+- Keep the code simpler with fewer changes
+
+The current PR's approach works but adds **unnecessary complexity** with the manual iterator management and `detach()` call.
+
+@ehoutsma  what do you think? Would you modify your pull request?
+
+---------------------------------------------------------------------------
+
+by khaperets at 2025-09-30T09:06:21Z
+
+any updates?
+
+---------------------------------------------------------------------------
+
+by averatec1337 at 2026-01-16T18:37:06Z
+
+This bug recently occured in my app, because I implemented multiple batch message handlers.

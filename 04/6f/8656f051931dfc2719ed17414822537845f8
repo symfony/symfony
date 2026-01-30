@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-06-28T07:48:38Z
+
+So, this line:
+`        $b = ($container->services['kernel'] ?? $container->get('kernel'));`
+should be actually
+`        $b = ($container->services['kernel'] ?? $container->get('kernel', ContainerInterface::NULL_ON_INVALID_REFERENCE));`
+
+That's what you mean?
+
+I think this comparison in PhpDumper is on purpose but it's quite possible that we forgot about synthetic services.
+Can you please add a test case?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-07-26T11:51:55Z
+
+@vtsykun did you check my comment? WDYT?
+
+---------------------------------------------------------------------------
+
+by vtsykun at 2024-07-26T12:01:59Z
+
+> So, this line  `$b = ($container->services['kernel'] ?? $container->get('kernel'));` should be actually `$b = ($container->services['kernel'] ?? $container->get('kernel', ContainerInterface::NULL_ON_INVALID_REFERENCE));`
+
+Yes, exactly.
+
+Ok I'll create a test case

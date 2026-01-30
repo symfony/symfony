@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-01-15T23:41:02Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-16T10:11:36Z
+
+> It's a first step toward a solution, there probably are some other use cases. For example, we reproduce the bug without redirection when we have an argument called `_controller` in our route. For that point, maybe we need to create another issue ?
+
+this would be rejected anyway. `_controller` is a special attribute defining which controller should be executed. If you name your parameter `_controller` without the intent of controller which controller is executed, the bug is in your own code.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-16T10:12:39Z
+
+Hardcoding a reference to FrameworkBundle in the http-kernel component does not make sense. This is not a proper fix for the issue IMO.
+
+---------------------------------------------------------------------------
+
+by florianorineveu at 2026-01-16T10:50:54Z
+
+> > It's a first step toward a solution, there probably are some other use cases. For example, we reproduce the bug without redirection when we have an argument called `_controller` in our route. For that point, maybe we need to create another issue ?
+>
+> this would be rejected anyway. `_controller` is a special attribute defining which controller should be executed. If you name your parameter `_controller` without the intent of controller which controller is executed, the bug is in your own code.
+
+On this point I completely agree. But perhaps we could still specify it in the router's documentation, indicating a list of reserved words?
+
+> Hardcoding a reference to FrameworkBundle in the http-kernel component does not make sense. This is not a proper fix for the issue IMO.
+
+Legit, we understand. Initially, we wanted to rework the processing within the foreach loop, but we haven't been able to find a solution yet.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-16T10:55:36Z
+
+> On this point I completely agree. But perhaps we could still specify it in the router's documentation, indicating a list of reserved words?
+
+IIRC, the documentation already says that names starting with a underscore are reserved for special usages (and so should be used only when your use case matches the corresponding usage).
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-16T10:59:47Z
+
+@florianorineveu could you try whether updating https://github.com/symfony/symfony/blob/8.1/src/Symfony/Bundle/FrameworkBundle/Routing/RedirectableCompiledUrlMatcher.php to force an empty array for `_route_mapping` in the array returned by the `redirect` method works, to enforce _not_ using the path mapping targeting your own controller when generating that redirect ? If it works, it would be a much better fix than the hack submitted here hardcoding a special behavior for FrameworkBundle.
+
+---------------------------------------------------------------------------
+
+by florianorineveu at 2026-01-26T20:26:47Z
+
+Thanks for the suggestion @stof! I've applied your proposal and it works perfectly, much cleaner indeed.
+I changed the target branch to 7.4 to apply the fix to the lowest maintained branch as it's a bug fix and since 7.3 support ends really soon. Does that work?

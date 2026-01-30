@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Neirda24 at 2024-07-04T16:13:07Z
+
+@xabbuh : done. However I don't know how to update the test in FrameworkExtensionTest to try with sanitizer <7.2 & >=7.2.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2024-07-05T16:07:54Z
+
+I don't know where and how to fix those errors (related to xml structure). If anyone can point me in the right direction 🙏
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-06T04:58:11Z
+
+@Neirda24 In the `symfony-1.0.xsd` file (located in `src/Symfony/Bundle/FrameworkBundle/Resources/config/schema`) add `<xsd:attribute name="default-action" type="xsd:string" />` as a new entry after line 920.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-01-05T13:45:29Z
+
+What's the status of this PR?

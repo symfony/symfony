@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-01-15T23:38:01Z
+
+This must target PHP 8.1. Adding new deprecations cannot happen in patch versions.
+
+---------------------------------------------------------------------------
+
+by jprivet-dev at 2026-01-20T07:21:43Z
+
+> please target branch 8.1, that's not a bugfix but an improvement
+
+> This must target PHP 8.1. Adding new deprecations cannot happen in patch versions.
+
+Done!
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-01-23T07:31:09Z
+
+> Way, this misses changelog+upgrade files entries!
+
+Correct.
+Also I've just noticed the [deprecation message](https://github.com/symfony/symfony/pull/63097/changes#diff-86e46aeb57d4884cab464c32d2677b881e0d6c651d1f8af2e2a2b86e8d5d241aR218) proposes the use of `SameOriginCsrfListener::persistStrategy()`, but the method is [`private`](https://github.com/symfony/symfony/pull/63097/changes#diff-cf6b8b8bf6de622ec7630dfce5cb9487fb682cedad6a4a8aa32c521c99d3c407R50).
+
+Furthermore, are we certain that the two services will not be triggered simultaneously? This could lead to a conflict.
+
+---------------------------------------------------------------------------
+
+by jprivet-dev at 2026-01-30T06:47:53Z
+
+> Wait, this misses changelog+upgrade files entries!
+
+Done!
+
+---------------------------------------------------------------------------
+
+by jprivet-dev at 2026-01-30T07:01:57Z
+
+> Also I've just noticed the [deprecation message](https://github.com/symfony/symfony/pull/63097/changes#diff-86e46aeb57d4884cab464c32d2677b881e0d6c651d1f8af2e2a2b86e8d5d241aR218) proposes the use of `SameOriginCsrfListener::persistStrategy()`, but the method is [`private`](https://github.com/symfony/symfony/pull/63097/changes#diff-cf6b8b8bf6de622ec7630dfce5cb9487fb682cedad6a4a8aa32c521c99d3c407R50).
+
+Well spotted! I've adjusted the deprecation messages  for `clearCookies()`, `persistStrategy()` and `onKernelResponse()`:
+
+```
+ @deprecated since Symfony 8.1, logic is handled by SameOriginCsrfListener.
+```
+
+---------------------------------------------------------------------------
+
+by jprivet-dev at 2026-01-30T07:29:03Z
+
+> Furthermore, are we certain that the two services will not be triggered simultaneously? This could lead to a conflict.
+
+Indeed! I've checked the logic to ensure we avoid any conflict or race condition.
+
+### Dependency Injection Configuration
+
+As seen in the updated `security_csrf.php`, I have removed the `kernel.event_listener` tag from `SameOriginCsrfTokenManager`. By default, only the new `SameOriginCsrfListener` will be triggered on `kernel.response`. The Manager is no longer an active listener:
+
+```php
+return static function (ContainerConfigurator $container) {
+    $container->services()
+        // ...
+        ->set('security.csrf.same_origin_token_manager', SameOriginCsrfTokenManager::class)
+            ->decorate('security.csrf.token_manager')
+            ->args([
+                service('request_stack'),
+                service('logger')->nullOnInvalid(),
+                service('.inner'),
+                abstract_arg('framework.csrf_protection.stateless_token_ids'),
+                abstract_arg('framework.csrf_protection.check_header'),
+                abstract_arg('framework.csrf_protection.cookie_name'),
+            ])
+            ->tag('monolog.logger', ['channel' => 'request'])
+
+        ->set('security.csrf.same_origin_listener', SameOriginCsrfListener::class)
+            ->args([
+                abstract_arg('framework.csrf_protection.cookie_name'),
+            ])
+            /* NEW TRIGGER */
+            ->tag('kernel.event_listener', ['event' => 'kernel.response', 'method' => 'onKernelResponse'])
+    ;
+};
+```
+
+### Idempotency
+
+In the edge case where a developer manually calls the deprecated methods (or manually registers the Manager as a listener in their own config), the logic relies on `$response->headers->setCookie()`. Since both classes implement the exact same logic, the operation is idempotent: the second call would simply overwrite the cookie with the same value, causing no data corruption.
+
+### Deprecation Notice
+
+If this edge case occurs, the developer will immediately trigger the deprecation notice added to `onKernelResponse()`, warning them that the logic is now handled automatically by the Listener.
+
+Does this approach suit you?

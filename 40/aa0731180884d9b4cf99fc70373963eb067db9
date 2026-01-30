@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by valtzu at 2024-05-08T14:50:57Z
+
+I like it.
+
+Any reason to call the parameter `redis_cluster` instead of just `cluster`?
+
+EDIT: ok I guess it's kinda in line with `redis_sentinel`
+
+---------------------------------------------------------------------------
+
+by adideas at 2024-05-08T15:10:52Z
+
+If you specify a cluster but do not specify it as an array, then a regular redis will start. Then the cluster reports MOVED and everything breaks down.
+
+In the log you can see an error that is most incomprehensible "MOVED ...". You start looking in the documentation and find the redis_cluster parameter in the cache. And then you think why it’s not in "Messenger"
+
+---------------------------------------------------------------------------
+
+by adideas at 2024-05-15T09:09:41Z
+
+Tell me, did you fix the tests?

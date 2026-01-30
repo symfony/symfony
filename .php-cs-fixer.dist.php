@@ -47,7 +47,6 @@ return (new PhpCsFixer\Config())
         ],
         'declare_strict_types' => false, // part of PHP?x?Migration:risky, awaits https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/pull/9384
         'php_unit_attributes' => true,
-        'void_return' => false, // part of PHP?x?Migration:risky, usage to be concluded
     ])
     ->setRuleCustomisationPolicy(new class implements PhpCsFixer\Config\RuleCustomisationPolicyInterface {
         public function getPolicyVersionForCache(): string
@@ -82,6 +81,17 @@ return (new PhpCsFixer\Config())
 
                     // Keep the default configuration for other files
                     return true;
+                },
+                'void_return' => static function (SplFileInfo $file) {
+                    // temporary hack due to bug: https://github.com/symfony/symfony/issues/62734
+                    if (!$file instanceof Symfony\Component\Finder\SplFileInfo) {
+                        return true;
+                    }
+
+                    $relativePathname = $file->getRelativePathname();
+
+                    return str_contains($relativePathname, '/Tests/')
+                        && !str_contains($relativePathname, '/Test/'); // public namespace, do not mistake it with `/Tests/`
                 },
             ];
         }

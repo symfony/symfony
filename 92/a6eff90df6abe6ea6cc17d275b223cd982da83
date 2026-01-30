@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-15T20:33:11Z
+
+I fear this contradict the implementation of the [move()](https://github.com/symfony/symfony/blob/6234adbbe29aadcd6484b993473aa51a6e944d5f/src/Symfony/Component/HttpFoundation/File/UploadedFile.php#L178) method
+
+If `this->isValid()` returns `false`, with your change the method would throw an exception with no message.
+
+```php
+    /**
+     * Moves the file to a new location.
+     *
+     * @throws FileException if, for any reason, the file could not have been moved
+     */
+    public function move(string $directory, ?string $name = null): File
+    {
+        if ($this->isValid()) {
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-03-18T14:58:37Z
+
+Not sure what you mean @smnandre, can you elaborate or share a test case?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-18T23:15:01Z
+
+```php
+public function testInvalidFile()
+{
+    $this->expectException(FileException::class);
+    $this->expectExceptionMessage('The file "original.gif" was not uploaded due to an unknown error.');
+
+    $file = new UploadedFile(
+        __DIR__.'/Fixtures/test.gif',
+        'original.gif',
+        'image/gif',
+    );
+
+    $file->move(__DIR__.'/Fixtures/directory');
+}
+```
+
+```diff
+Testing Symfony\Component\HttpFoundation\Tests\File\UploadedFileTest
+...................F..............                                34 / 34 (100%)
+
+Time: 00:00.024, Memory: 12.00 MB
+
+There was 1 failure:
+
+1) Symfony\Component\HttpFoundation\Tests\File\UploadedFileTest::testInvalidFile
+- Failed asserting that exception message '' contains 'The file "original.gif" was not uploaded due to an unknown error.'.
+```
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-18T23:16:50Z
+
+The error message is used as exception message, so it seems to me this code was a failsafe if "something went wrong".
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2024-04-05T15:43:50Z
+
+I guess we should add a new case at the end of `move` method to handle `\UPLOAD_ERR_OK` error, in order to have an empty string from `UploadedFile::getErrorMessage()`, but a legit exception message thrown by `move` method on the use case provided by @smnandre. WDYT?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-04-05T20:20:33Z
+
+I'm wondering if we can handle this very-specific use case in another way, because your changes make sense and are easier to "read" than this special "no error but an error" case.
+
+If no, your solution seems very sensible yes!
+
+---------------------------------------------------------------------------
+
+by ArmCyber at 2024-04-08T16:07:22Z
+
+Thanks @smnandre for the review!
+
+I'm considering renaming the original method "getErrorMessage()" to private "getExceptionMessage()" and creating a new "getErrorMessage()" method, which will check if "$this->error === \UPLOAD_ERR_OK", and if it does, it will return null (or an empty string to ensure backward compatibility); otherwise, it will internally call "getExceptionMessage()". Then, in the "move()" method, we can utilize the "getExceptionMessage()" method.
+
+What do you think?
+
+P.S. I'll also add your test case to the UploadedFileTest.php.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-04-08T18:05:28Z
+
+Seems perfect to me.
+
+@nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by ArmCyber at 2024-04-21T17:48:36Z
+
+Thanks @smnandre!
+@nicolas-grekas, what do you think about these changes?

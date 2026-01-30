@@ -90,6 +90,7 @@ return (new PhpCsFixer\Config())
 
                     $relativePathname = $file->getRelativePathname();
 
+                    // Apply only for test cases, as source files are under BC promise, and this rule would break it.
                     return str_contains($relativePathname, '/Tests/')
                         && !str_contains($relativePathname, '/Test/'); // public namespace, do not mistake it with `/Tests/`
                 },
